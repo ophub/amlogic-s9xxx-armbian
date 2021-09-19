@@ -292,7 +292,7 @@ for b in ${build_armbian[*]}; do
     now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//')
     if  [[ "${now_remaining_space}" -le "2" ]]; then
         echo "Remaining space is less than 2G, exit this packaging. \n"
-        break 2
+        break
     else
         echo "Remaining space is ${now_remaining_space}G."
     fi
