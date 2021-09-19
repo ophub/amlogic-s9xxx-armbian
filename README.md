@@ -37,7 +37,9 @@ armbian-update
 ```
 ## Armbian firmware compilation method
 
-Different amlogic armbian firmware, use the corresponding soc code to generate. Please choose according to your box soc model. `A single soc` can be directly input `sudo ./make s905d`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s905d_s905x3_s922x`
+- Different amlogic armbian firmware, use the corresponding soc code to generate. Please choose according to your box soc model.
+
+- compile `a single soc` can be directly input `sudo ./make s905d`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s905d_s905x3_s922x`
 
 ```yaml
 sudo ./make s905x3_s905x2_s905x_s905w_s905d_s922x_s912
