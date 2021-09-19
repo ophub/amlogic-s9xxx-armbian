@@ -10,11 +10,11 @@ on:
   workflow_dispatch:
     inputs:
       ssh:
-        description: 'SSH connection'
+        description: 'SSH connection to Actions'
         required: false
         default: 'false'
   schedule:
-    cron: '0 17 * * 0'
+    - cron: '0 17 * * 0'
 
 env:
   ARMBIAN_BOARD: lepotato
