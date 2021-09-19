@@ -1,0 +1,125 @@
+#========================================================================================================================
+# Description: Build Armbian For Amlogic S9xxx STB
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#========================================================================================================================
+
+name: Build Armbian For Amlogic
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      ssh:
+        description: 'SSH connection'
+        required: false
+        default: 'false'
+  schedule:
+    cron: '0 17 * * 0'
+
+env:
+  ARMBIAN_BOARD: lepotato
+  UPLOAD_FIRMWARE: false
+  UPLOAD_RELEASE: true
+  DELETE_RELEASE: true
+  DELETE_ARTIFACTS: true
+  KEEP_DAY: 1
+  KEEP_MININUM_RUNS: 0
+  KEEP_MININUM_RELEASE: 2
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+
+    - name: Download source code
+      id: down
+      run: |
+        git clone --depth 1 https://github.com/armbian/build.git
+        
+    - name: SSH connection to Actions @ Ctrl+C to enter, Ctrl+D to exit
+      uses: P3TERX/ssh2actions@main
+      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
+      env:
+        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+
+    - name: Build Armbian with ${{ env.ARMBIAN_BOARD }}
+      id: build
+      run: |
+        cd build/
+        sudo chmod +x compile.sh
+        sudo ./compile.sh  BOARD=${{ env.ARMBIAN_BOARD }} BRANCH=current RELEASE=buster BUILD_MINIMAL=no BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+        [ -e ./.config ] && cp -f ./.config ./output/images/.config
+        echo "::set-output name=status::success"
+
+    - name: Build Armbian for amlogic s9xxx STB
+      id: kernel
+      if: steps.build.outputs.status == 'success'
+      run: |
+        sudo chmod +x make kernel.sh
+        sudo ./make s905x3_s905x2_s905x_s905w_s905d_s922x_s912
+        sudo ./kernel.sh
+        cd ./build/output/images && sudo gzip *.img
+        echo "FILEPATH=$PWD" >> $GITHUB_ENV
+        echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Upload Armbian image to Actions
+      uses: kittaakos/upload-artifact-as-is@master
+      if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+      with:
+        path: ${{ env.FILEPATH }}/
+
+    - name: Upload Armbian image to Release
+      uses: softprops/action-gh-release@v1
+      if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: armbian_aml_buster_${{ env.FILE_DATE }}
+        files: ${{ env.FILEPATH }}/*
+        body: |
+          This is Armbian image for amlogic s9xxx STB
+          * Firmware information
+          Default username: root
+          Default password: 1234
+          Install to EMMC command: armbian-install
+          Update command: armbian-update
+
+    - name: Delete older releases
+      uses: dev-drprasad/delete-older-releases@master
+      if: env.DELETE_RELEASE == 'true'
+      with:
+        keep_latest: ${{ env.KEEP_MININUM_RELEASE }}
+        delete_tags: true
+        delete_tag_pattern: _
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Delete older workflow runs and artifacts
+      uses: Mattraks/delete-workflow-runs@main
+      if: env.DELETE_ARTIFACTS == 'true'
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        repository: ${{ github.repository }}
+        retain_days: ${{ env.KEEP_DAY }}
+        keep_minimum_runs: ${{ env.KEEP_MININUM_RUNS }}
+          
