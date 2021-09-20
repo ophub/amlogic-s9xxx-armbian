@@ -7,8 +7,11 @@
 #===== Do not modify the following parameter settings, Start =====
 make_path=${PWD}
 armbian_outputpath=${make_path}/build/output/images
-armbian_path=${make_path}/amlogic-s9xxx
-configfiles_path=${armbian_path}/common-files
+amlogic_path=${make_path}/amlogic-s9xxx
+armbian_path=${amlogic_path}/amlogic-armbian
+dtb_path=${amlogic_path}/amlogic-dtb
+uboot_path=${amlogic_path}/amlogic-u-boot
+configfiles_path=${amlogic_path}/common-files
 tmp_outpath=${make_path}/tmp_out
 tmp_armbian=${make_path}/tmp_armbian
 tmp_build=${make_path}/tmp_build
@@ -172,6 +175,7 @@ copy_files() {
     cd ${make_path}
 
         mkdir -p ${tmp_build}/boot
+        # Copy the original boot core file
         cp -f ${tmp_armbian}/boot/config-* ${tmp_build}/boot
         cp -f ${tmp_armbian}/boot/initrd.img-* ${tmp_build}/boot
         cp -f ${tmp_armbian}/boot/System.map-* ${tmp_build}/boot
@@ -180,7 +184,12 @@ copy_files() {
         cp -f ${tmp_armbian}/boot/uInitrd-* ${tmp_build}/boot/uInitrd
         cp -f ${tmp_armbian}/boot/vmlinuz-* ${tmp_build}/boot/zImage
         chmod +x ${tmp_build}/boot/*
-        tar -xzf "${armbian_path}/amlogic-armbian/boot-common.tar.gz" -C ${tmp_build}/boot
+        # Unzip the relevant files in the boot directory
+        tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
+        # Complete the u-boot file to facilitate the booting of the 5.10+ kernel
+        cp -f ${uboot_path}/* ${tmp_build}/boot
+        # Complete the dtb file
+        cp -f ${dtb_path}/* ${tmp_build}/boot/dtb/amlogic
         sync
 
         tag_bootfs="${tmp_outpath}/bootfs"
