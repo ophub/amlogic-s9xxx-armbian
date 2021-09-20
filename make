@@ -55,7 +55,7 @@ make_image() {
 
         SKIP_MB=68
         BOOT_MB=256
-        ROOT_MB=2550
+        ROOT_MB=2304
         IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
 
         dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} >/dev/null 2>&1
@@ -271,11 +271,12 @@ clean_tmp() {
         sync
         sleep 3
 
-        cd ${tmp_outpath}
-            gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath} && sync
+    cd ${tmp_outpath}
+        gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath} && sync
 
-        cd ${make_path}
-            rm -rf ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tag_bootfs} ${tag_rootfs} ${tmp_aml_image} 2>/dev/null && sync
+    cd ${make_path}
+        rm -rf ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tag_bootfs} ${tag_rootfs} ${tmp_aml_image} 2>/dev/null && sync
+
 }
 
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./make ]"
