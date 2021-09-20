@@ -74,7 +74,7 @@ jobs:
       id: kernel
       if: steps.build.outputs.status == 'success'
       run: |
-        sudo chmod +x make kernel.sh
+        sudo chmod +x make
         sudo ./make s905x3_s905d_s922x_s905x2_s912
         cd ./build/output/images && sudo gzip *.img
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
