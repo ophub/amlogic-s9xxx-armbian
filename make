@@ -52,7 +52,7 @@ make_image() {
         #echo -e "Kernel version: [ ${KERNEL_VERSION} ]"
 
         # Make Amlogic s9xxx armbian
-        build_image_file="${tmp_outpath}/armbian_aml_${build_soc}_buster_k${KERNEL_VERSION}_r$(date +"%Y.%m.%d.%H%M").img"
+        build_image_file="${tmp_outpath}/armbian_aml_${build_soc}_buster_${KERNEL_VERSION}_$(date +"%Y.%m.%d.%H%M").img"
         rm -f ${build_image_file}
         sync
 
