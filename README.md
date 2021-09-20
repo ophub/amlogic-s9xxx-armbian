@@ -41,15 +41,17 @@ armbian-update
 
 - compile `a single soc` can be directly input `sudo ./make s905d`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s905d_s905x3_s922x`
 
+1. Workflows configuration in [build-armbian.yml](.github/workflows/build-armbian.yml) file.
+
+2. Select ***`Build Armbian For Amlogic`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
+
 ```yaml
 sudo ./make s905x3_s905x2_s905x_s905w_s905d_s922x_s912
 ```
 
-## Kernel
+## Update Kernel
 
 - The kernels of `amlogic s9xxx armbian` and `amlogic s9xxx openwrt` are common, you can directly use the [kernel](https://github.com/ophub/flippy-kernel) compiled by flippy to to `update armbian`.
-
-- In the same way, you can also extract the kernel for openwrt from the armbian, The extracted kernel storage path in the `build/output/images` directory, and the file name is `amlogic-s9xxx-openwrt-kernel-*.tar.gz`. The kernel can be used in the [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt/tree/main/amlogic-s9xxx/amlogic-kernel).
 
 ## Acknowledgments
 
