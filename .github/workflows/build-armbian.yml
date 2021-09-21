@@ -18,6 +18,9 @@ on:
 
 env:
   ARMBIAN_BOARD: lepotato
+  ARMBIAN_BOARD_NAME: 'Aml S9xxx'
+  ARMBIAN_HOST: armbian
+  ARMBIAN_NAMESERVER: '192.168.1.1'
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   DELETE_RELEASE: true
@@ -61,21 +64,22 @@ jobs:
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
-    - name: Build Armbian with ${{ env.ARMBIAN_BOARD }}
+    - name: Build Armbian
       id: build
       run: |
         cd build/
         sudo chmod +x compile.sh
-        sudo ./compile.sh  BOARD=${{ env.ARMBIAN_BOARD }} BRANCH=current RELEASE=buster BUILD_MINIMAL=no BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
-        [ -e ./.config ] && cp -f ./.config ./output/images/.config
+        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" BOARD_NAME="${{ env.ARMBIAN_BOARD_NAME }}" HOST="${{ env.ARMBIAN_HOST }}" \
+                          NAMESERVER="${{ env.ARMBIAN_NAMESERVER }}" BRANCH=current RELEASE=buster BUILD_MINIMAL=no BUILD_DESKTOP=no \
+                          KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
         echo "::set-output name=status::success"
 
-    - name: Build Armbian for amlogic s9xxx STB
-      id: kernel
+    - name: Make Armbian for amlogic s9xxx
+      id: make
       if: steps.build.outputs.status == 'success'
       run: |
         sudo chmod +x make
-        sudo ./make s905x3_s905d_s922x_s905x2_s912
+        sudo ./make s922x_s905x3_s905x2_s912_s905d_s905x_s905w
         cd ./build/output/images && sudo gzip *.img
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
@@ -88,13 +92,14 @@ jobs:
         path: ${{ env.FILEPATH }}/
 
     - name: Upload Armbian image to Release
-      uses: softprops/action-gh-release@v1
-      if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      id: release
+      uses: ncipollo/release-action@v1
+      if: steps.make.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        tag_name: armbian_aml_buster_${{ env.FILE_DATE }}
-        files: ${{ env.FILEPATH }}/*
+        tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+        artifacts: ${{ env.FILEPATH }}/*
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           This is Armbian image for amlogic s9xxx STB
           * Firmware information
