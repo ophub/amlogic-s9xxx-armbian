@@ -43,16 +43,16 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-    - name: Build Armbian for amlogic s9xxx STB
-      id: build
+    - name: Make Armbian for amlogic s9xxx
+      id: make
       if: (!cancelled())
       run: |
         [ -d build/output/images ] || mkdir -p build/output/images
-        curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "armbian_aml_buster_.*/Armbian_.*_Lepotato_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
+        curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_buster_.*/Armbian_.*_Lepotato_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
         [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
         cd ./build/output/images && gzip -df *.img.gz && sync && cd ../../../
         sudo chmod +x make
-        sudo ./make s905x3_s905d_s922x_s905x2_s912
+        sudo ./make s922x_s905x3_s905x2_s912_s905d_s905x_s905w
         cd ./build/output/images && sudo gzip *.img
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
@@ -71,14 +71,15 @@ jobs:
       with:
         path: ${{ env.FILEPATH }}/
 
-    - name: Upload Armbian Firmware to Release
-      uses: softprops/action-gh-release@v1
-      if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Armbian image to Release
+      id: release
+      uses: ncipollo/release-action@v1
+      if: steps.make.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        tag_name: armbian_aml_buster_${{ env.FILE_DATE }}
-        files: ${{ env.FILEPATH }}/*
+        tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+        artifacts: ${{ env.FILEPATH }}/*
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           This is Armbian image for amlogic s9xxx STB
           * Firmware information
