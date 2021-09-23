@@ -18,21 +18,17 @@ tmp_build=${make_path}/tmp_build
 tmp_aml_image=${make_path}/tmp_aml_image
 #===== Do not modify the following parameter settings, End =======
 
-build_armbian=("s905x3" "s905x2" "s905x" "s905w" "s905d" "s912" "s922x")
-if [ -n "${1// /}" ]; then
+build_armbian=("s922x" "s905x3" "s905x2" "s912" "s905d")
+if [ -n "${1}" ]; then
     unset build_armbian
     oldIFS=$IFS
     IFS=_
-    build_armbian=(${1// /})
+    build_armbian=(${1})
     IFS=$oldIFS
 fi
 
-error() {
-    echo -e " [\033[1;31m Error \033[0m] ${1}"
-}
-
 die() {
-    error "${1}"
+    echo -e " [\033[1;31m Error \033[0m] ${1}"
     exit 1
 }
 
@@ -46,17 +42,13 @@ make_image() {
         rm -rf ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} 2>/dev/null && sync
         mkdir -p ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${armbian_outputpath} ${tmp_aml_image} && sync
 
-        # Get kernel version
-        armbian_version=$(ls ${armbian_outputpath}/*.img 2>/dev/null | awk -F_ '{print $NF}')
-        KERNEL_VERSION=$(echo ${armbian_version} | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
-        #echo -e "Kernel version: [ ${KERNEL_VERSION} ]"
-
-        # Get armbian release
-        armbian_release=$(ls ${armbian_outputpath}/*.img 2>/dev/null | awk -F- '{print $1}')
-        RELEASE_VERSION=$(echo ${armbian_release} | grep -oE '[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
+        # Get armbian version and release
+        armbian_image_name=$(ls ${armbian_outputpath}/*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
+        out_release=$(echo ${armbian_image_name} | awk -F "buster" '{print $1}' | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
+        out_version=$(echo ${armbian_image_name} | awk -F "buster" '{print $NF}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
 
         # Make Amlogic s9xxx armbian
-        build_image_file="${tmp_outpath}/Armbian_${RELEASE_VERSION}_Aml_${build_soc}_buster_${KERNEL_VERSION}_$(date +"%Y.%m.%d.%H%M").img"
+        build_image_file="${tmp_outpath}/Armbian_${out_release}_Aml_${build_soc}_buster_${out_version}_$(date +"%Y.%m.%d.%H%M").img"
         rm -f ${build_image_file}
         sync
 
