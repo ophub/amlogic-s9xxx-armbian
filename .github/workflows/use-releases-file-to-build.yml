@@ -52,7 +52,8 @@ jobs:
         [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
         cd ./build/output/images && gzip -df *.img.gz && sync && cd ../../../
         sudo chmod +x make
-        sudo ./make s922x_s905x3_s905x2_s912_s905d
+        sudo ./make s922x_s905x3_s905d
+        sudo ./make s905x_s905w 5.4.149
         cd ./build/output/images && sudo gzip *.img
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
