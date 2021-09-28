@@ -10,21 +10,35 @@ armbian_outputpath=${make_path}/build/output/images
 amlogic_path=${make_path}/amlogic-s9xxx
 armbian_path=${amlogic_path}/amlogic-armbian
 dtb_path=${amlogic_path}/amlogic-dtb
+kernel_path=${amlogic_path}/amlogic-kernel
 uboot_path=${amlogic_path}/amlogic-u-boot
 configfiles_path=${amlogic_path}/common-files
 tmp_outpath=${make_path}/tmp_out
 tmp_armbian=${make_path}/tmp_armbian
 tmp_build=${make_path}/tmp_build
 tmp_aml_image=${make_path}/tmp_aml_image
+
+kernel_library="https://github.com/ophub/flippy-kernel/tree/main/library"
+#kernel_library="https://github.com/ophub/flippy-kernel/trunk/library"
 #===== Do not modify the following parameter settings, End =======
 
-build_armbian=("s922x" "s905x3" "s905x2" "s912" "s905d")
+# Specify Amlogic soc
+build_armbian=("s905x3" "s905x2" "s905x" "s905w" "s905d" "s912" "s922x")
 if [ -n "${1}" ]; then
     unset build_armbian
     oldIFS=$IFS
     IFS=_
     build_armbian=(${1})
     IFS=$oldIFS
+fi
+
+# Set whether to change the kernel version
+if [ -n "${2}" ]; then
+    change_kernel="yes"
+    new_kernel="${2}"
+else
+    change_kernel="no"
+    new_kernel=""
 fi
 
 die() {
@@ -40,12 +54,13 @@ make_image() {
     cd ${make_path}
 
         rm -rf ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} 2>/dev/null && sync
-        mkdir -p ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${armbian_outputpath} ${tmp_aml_image} && sync
+        mkdir -p ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} && sync
 
         # Get armbian version and release
-        armbian_image_name=$(ls ${armbian_outputpath}/*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
+        armbian_image_name=$(ls ${armbian_outputpath}/*_Lepotato_*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
         out_release=$(echo ${armbian_image_name} | awk -F "buster" '{print $1}' | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
         out_version=$(echo ${armbian_image_name} | awk -F "buster" '{print $NF}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
+        [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_outputpath}/*_Lepotato_*.img"
 
         # Make Amlogic s9xxx armbian
         build_image_file="${tmp_outpath}/Armbian_${out_release}_Aml_${build_soc}_buster_${out_version}_$(date +"%Y.%m.%d.%H%M").img"
@@ -76,7 +91,8 @@ extract_armbian() {
 
         armbian_image_file="${tmp_aml_image}/armbian-${build_soc}.img"
         rm -f ${armbian_image_file} 2>/dev/null && sync
-        cp -f $( ls ${armbian_outputpath}/*.img 2>/dev/null | head -n 1 ) ${tmp_aml_image}/armbian-${build_soc}.img && sync && sleep 3
+        cp -f $( ls ${armbian_outputpath}/*_Lepotato_*.img 2>/dev/null | head -n 1 ) ${armbian_image_file}
+        sync && sleep 3
 
         loop_old=$(losetup -P -f --show "${armbian_image_file}")
         [ ${loop_old} ] || die "losetup ${armbian_image_file} failed."
@@ -86,9 +102,12 @@ extract_armbian() {
         fi
 
     cd ${tmp_armbian}
-
         # Delete soft link (ln -sf TrueFile Link)
-        rm -rf lib sbin tmp bin var/sbin
+        rm -rf bin lib sbin tmp var/sbin
+}
+
+copy_files() {
+    cd ${tmp_armbian}
 
         #Check if writing to EMMC is supported
         MODULES_NOW=$(ls usr/lib/modules/ 2>/dev/null)
@@ -165,44 +184,50 @@ extract_armbian() {
                 ;;
         esac
 
-}
-
-copy_files() {
     cd ${make_path}
 
+        # Write the specified bootloader
+        if  [[ "${MAINLINE_UBOOT}" != "" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
+            dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
+            dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+            #echo -e "For [ ${build_soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+        elif [[ "${ANDROID_UBOOT}" != ""  && -f "${tag_rootfs}/usr${ANDROID_UBOOT}" ]]; then
+            dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
+            dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+            #echo -e "For [ ${build_soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+        fi
+
+        # Reorganize the /boot partition
         mkdir -p ${tmp_build}/boot
         # Copy the original boot core file
-        cp -f ${tmp_armbian}/boot/config-* ${tmp_build}/boot
-        cp -f ${tmp_armbian}/boot/initrd.img-* ${tmp_build}/boot
-        cp -f ${tmp_armbian}/boot/System.map-* ${tmp_build}/boot
-        cp -f ${tmp_armbian}/boot/uInitrd-* ${tmp_build}/boot
-        cp -f ${tmp_armbian}/boot/vmlinuz-* ${tmp_build}/boot
-        cp -f ${tmp_armbian}/boot/uInitrd-* ${tmp_build}/boot/uInitrd
-        cp -f ${tmp_armbian}/boot/vmlinuz-* ${tmp_build}/boot/zImage
-        chmod +x ${tmp_build}/boot/*
-        # Unzip the relevant files in the boot directory
+        cp -rf ${tmp_armbian}/boot/*-${out_version}-* ${tmp_build}/boot && sync
+        ( cd ${tmp_build}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && chmod +x * && sync )
+        # Unzip the relevant files
         tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
+        tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tmp_armbian}
         # Complete the u-boot file to facilitate the booting of the 5.10+ kernel
-        cp -f ${uboot_path}/* ${tmp_build}/boot
+        cp -f ${uboot_path}/* ${tmp_build}/boot && sync
         # Complete the dtb file
-        cp -f ${dtb_path}/* ${tmp_build}/boot/dtb/amlogic
+        cp -f ${dtb_path}/* ${tmp_build}/boot/dtb/amlogic && sync
+        # Replace the boot directory with the latest file
+        rm -rf ${tmp_armbian}/boot/* 2>/dev/null && sync
+        cp -rf ${tmp_build}/boot/* ${tmp_armbian}/boot && sync
         sync
 
+        # Create a dual-partition general directory
         tag_bootfs="${tmp_outpath}/bootfs"
         tag_rootfs="${tmp_outpath}/rootfs"
+        mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
-        mkdir -p ${tag_bootfs} ${tag_rootfs}
-        sync
-
-        if ! mount ${loop_new}p1 ${tag_bootfs}; then
-            die "mount ${loop_new}p1 failed!"
-        fi
         if ! mount ${loop_new}p2 ${tag_rootfs}; then
             die "mount ${loop_new}p2 failed!"
         fi
+        if ! mount ${loop_new}p1 ${tag_bootfs}; then
+            die "mount ${loop_new}p1 failed!"
+        fi
 
-        cp -rf ${tmp_build}/boot/* ${tag_bootfs} && sync
         cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
+        cp -rf ${tmp_build}/boot/* ${tag_bootfs} && sync
 
         # Complete file for ${root}: [ /etc ], [ /lib/u-boot ] etc.
         if [ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]; then
@@ -212,13 +237,9 @@ copy_files() {
     cd ${tag_bootfs}
 
         # Add u-boot.ext for 5.10 kernel
-        if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" ]]; then
-           if [ -f "${UBOOT_OVERLOAD}" ]; then
-              cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync
-              chmod +x u-boot.ext
-           else
-              die "${build_soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
-           fi
+        if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
+            cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync
+            chmod +x u-boot.ext
         fi
 
         # Edit the uEnv.txt
@@ -233,16 +254,14 @@ copy_files() {
 
     cd ${tag_rootfs}
 
-        # Synchronize the data of the boot partition
-        rm -rf boot && sync && mkdir boot
-        cp -rf ${tag_bootfs}/* boot/ && sync
+        ( cd usr/lib/firmware && mv *.hcd brcm/ )
 
         # Add soft connection
-        ln -sf /usr/lib lib
-        ln -sf /usr/sbin sbin
-        ln -sf /var/tmp tmp
-        ln -sf /usr/bin bin
-        ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
+        ln -sf usr/bin bin
+        ln -sf usr/lib lib
+        ln -sf usr/sbin sbin
+        ln -sf var/tmp tmp
+        ln -sf usr/share/zoneinfo/Asia/Shanghai etc/localtime
         chmod 777 var/tmp
 
         # Delete related files
@@ -262,25 +281,96 @@ copy_files() {
         echo "K510='${K510}'" >> etc/armbian-aml-release 2>/dev/null
 
         sync
-}
 
-clean_tmp() {
     cd ${make_path}
 
         umount -f ${tmp_armbian} 2>/dev/null
-        losetup -d ${loop_old} 2>/dev/null
 
-        umount -f ${tag_bootfs} 2>/dev/null
         umount -f ${tag_rootfs} 2>/dev/null
-        losetup -d ${loop_new} 2>/dev/null
+        umount -f ${tag_bootfs} 2>/dev/null
+
+        losetup -D 2>/dev/null
         sync
-        sleep 3
+}
+
+clean_tmp() {
+
+    # Replace if specified
+    if [[ "${change_kernel}" == "yes" ]]; then
+
+        # 01. Check kernel files
+        cd ${kernel_path}
+
+            if [ "$( ls ${new_kernel}/*${new_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l )" -eq "0" ]; then
+                # If the kernel is not found, try to download from the server: ${kernel_library}
+                if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
+                    kernel_library=${kernel_library//tree\/main/trunk}
+                fi
+                svn checkout ${kernel_library}/${new_kernel} ${new_kernel} >/dev/null && rm -rf ${new_kernel}/.svn >/dev/null && sync
+            fi
+
+            [ -f ${new_kernel}/boot-${new_kernel}-*.tar.gz ] || die "Missing boot-${new_kernel}-*.tar.gz file!"
+            [ -f ${new_kernel}/modules-${new_kernel}-*.tar.gz ] || die "Missing modules-${new_kernel}-*.tar.gz file!"
+
+            build_boot=$( ls ${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+            build_dtb=$( ls ${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+            build_modules=$( ls ${new_kernel}/modules-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+
+        # 02. Rplace kernel
+        cd ${make_path}
+
+            loop_redo=$(losetup -P -f --show "${build_image_file}")
+            [ ${loop_redo} ] || die "losetup ${build_image_file} failed."
+
+            redo_bootfs="${tmp_outpath}/p1"
+            redo_rootfs="${tmp_outpath}/p2"
+
+            mkdir -p ${redo_bootfs} ${redo_rootfs}
+
+            if ! mount ${loop_redo}p2 ${redo_rootfs}; then
+                die "mount ${loop_redo}p2 failed!"
+            fi
+            if ! mount ${loop_redo}p1 ${redo_bootfs}; then
+                die "mount ${loop_redo}p1 failed!"
+            fi
+            sync
+
+            # 02.01 For /boot files
+            ( cd ${redo_bootfs} && rm -rf *-${out_version}-* uInitrd zImage 2>/dev/null && sync )
+            tar -xzf ${kernel_path}/${build_boot} -C ${redo_bootfs} && sync
+            ( cd ${redo_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync )
+            [ "$( ls ${redo_bootfs}/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l )" -ge "4" ] || die "boot/ 5 files is missing."
+            tar -xzf ${kernel_path}/${build_dtb} -C ${redo_bootfs}/dtb/amlogic && sync
+
+            # 02.02 For lib/modules/*
+            ( cd ${redo_rootfs}/lib/modules && rm -rf * 2>/dev/null && sync )
+            tar -xzf ${kernel_path}/${build_modules} -C ${redo_rootfs}/lib/modules && sync
+            ( cd ${redo_rootfs}/lib/modules/*/ && echo "build source" | xargs rm -f && sync )
+            if [ "$(ls ${redo_rootfs}/lib/modules/${new_kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
+                die "${redo_rootfs}/lib/modules/${new_kernel}-* kernel folder is missing."
+            fi
+
+            rm -rf ${redo_rootfs}/boot/* 2>/dev/null && sync
+            cp -rf ${redo_bootfs}/* ${redo_rootfs}/boot && sync
+
+            umount -f ${redo_rootfs} 2>/dev/null
+            umount -f ${redo_bootfs} 2>/dev/null
+
+            losetup -D 2>/dev/null
+            sync
+
+            redo_image_file=${build_image_file//${out_version}/${new_kernel}}
+            mv -f ${build_image_file} ${redo_image_file} && sync
+
+    fi
 
     cd ${tmp_outpath}
-        gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath} && sync
+        gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
+        sync
 
     cd ${make_path}
-        rm -rf ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tag_bootfs} ${tag_rootfs} ${tmp_aml_image} 2>/dev/null && sync
+        rm -rf ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} 2>/dev/null
+        sync
 
 }
 
