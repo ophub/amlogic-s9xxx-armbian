@@ -284,15 +284,14 @@ sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
 mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
 mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
-if [ "${K510}" -eq "1" ]; then
-    if [ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]; then
-        echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
-        cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
-    else
-        echo "Mv [ u-boot.sd ] to u-boot.emmc"
-        mv -f ${DIR_INSTALL}/u-boot.sd ${DIR_INSTALL}/u-boot.emmc
-    fi
+if [ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]; then
+    echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
+    cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+else
+    echo "Mv [ u-boot.sd ] to u-boot.emmc"
+    mv -f ${DIR_INSTALL}/u-boot.sd ${DIR_INSTALL}/u-boot.emmc
 fi
+
 sync
 
 umount ${DIR_INSTALL}

@@ -32,7 +32,7 @@ if [ -f ${ENV_ARMBIAN_FILE} ]; then
     source "${ENV_ARMBIAN_FILE}" 2>/dev/null
     SOC="${SOC}"
 else
-    echo  "The supported SOC types are: s905x3  s905x2  s905x  s905d  s912  s922x"
+    echo  "The supported SOC types are: s922x, s905x3, s905x2, s912, s905d, s905x, s905w"
     echo  "Please enter the SOC type of your device, such as: s905x3"
     read  AMLOGIC_SOC
     SOC="${AMLOGIC_SOC}"
