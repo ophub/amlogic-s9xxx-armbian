@@ -1,0 +1,15 @@
+#!/bin/bash
+#=========================================================================
+# Description: Install docker to armbian
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#=========================================================================
+
+curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+apt-key fingerprint 0EBFCD88
+add-apt-repository "deb [arch=arm64,armhf] https://mirrors.tuna.tsinghua.edu.cn/docker-ce/linux/debian $(lsb_release -cs) stable"
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
+rm -f /etc/apt/sources.list.save 2>/dev/null
+rm -f /etc/apt/*.gpg~ 2>/dev/null
+
