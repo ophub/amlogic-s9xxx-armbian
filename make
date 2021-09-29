@@ -20,10 +20,13 @@ tmp_aml_image=${make_path}/tmp_aml_image
 
 kernel_library="https://github.com/ophub/flippy-kernel/tree/main/library"
 #kernel_library="https://github.com/ophub/flippy-kernel/trunk/library"
+
+build_armbian=("s922x" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
+build_kernel=("default")
+change_kernel="no"
 #===== Do not modify the following parameter settings, End =======
 
 # Specify Amlogic soc
-build_armbian=("s922x" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
 if [ -n "${1}" ]; then
     unset build_armbian
     oldIFS=$IFS
@@ -32,13 +35,73 @@ if [ -n "${1}" ]; then
     IFS=$oldIFS
 fi
 
-# Set whether to change the kernel version
+# Set whether to replace the kernel
 if [ -n "${2}" ]; then
+    auto_kernel="${3}"
     change_kernel="yes"
-    new_kernel="${2}"
-else
-    change_kernel="no"
-    new_kernel=""
+    unset build_kernel
+    oldIFS=$IFS
+    IFS=_
+    build_kernel=(${2})
+    IFS=$oldIFS
+
+    # Convert kernel library address to svn format
+    if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
+        kernel_library=${kernel_library//tree\/main/trunk}
+    fi
+
+    # Check the new version on the kernel library
+    if [[ -z "${auto_kernel}" || "${auto_kernel}" != "false" ]]; then
+
+        # Set empty array
+        TMP_ARR_KERNELS=()
+
+        # Convert kernel library address to API format
+        SERVER_KERNEL_URL=${kernel_library#*com\/}
+        SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
+        SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
+
+        # Query the latest kernel in a loop
+        i=1
+        for KERNEL_VAR in ${build_kernel[*]}; do
+            echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
+            MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
+            MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
+            MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
+            MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
+            # Check the version on the server (e.g LATEST_VERSION="124")
+            LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
+            if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
+                TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+            else
+                TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
+            fi
+            echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
+
+            let i++
+        done
+
+        # Reset the kernel array to the latest kernel version
+        unset build_kernel
+        build_kernel=${TMP_ARR_KERNELS[*]}
+
+    fi
+
+    # Synchronization related kernel
+    i=1
+    for KERNEL_VAR in ${build_kernel[*]}; do
+        if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
+            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
+            svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
+            rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
+        else
+            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
+        fi
+
+        let i++
+    done
+
+    sync
 fi
 
 die() {
@@ -47,7 +110,7 @@ die() {
 }
 
 process() {
-    echo -e " [\033[1;32m ${build_soc} \033[0m] ${1}"
+    echo -e " [\033[1;32m ${build_soc}${out_kernel} \033[0m] ${1}"
 }
 
 make_image() {
@@ -95,7 +158,7 @@ make_image() {
 extract_armbian() {
     cd ${make_path}
 
-        armbian_image_file="${tmp_aml_image}/armbian-${build_soc}.img"
+        armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_version}.img"
         rm -f ${armbian_image_file} 2>/dev/null && sync
         cp -f $( ls ${armbian_outputpath}/*_Lepotato_*.img 2>/dev/null | head -n 1 ) ${armbian_image_file}
         sync && sleep 3
@@ -116,48 +179,30 @@ extract_armbian() {
 replace_kernel() {
     # Replace if specified
     if [[ "${change_kernel}" == "yes" ]]; then
-
-        # 01. Check kernel files
-        cd ${kernel_path}
-
-            if [ "$( ls ${new_kernel}/*${new_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l )" -eq "0" ]; then
-                # If the kernel is not found, try to download from the server: ${kernel_library}
-                if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
-                    kernel_library=${kernel_library//tree\/main/trunk}
-                fi
-                svn checkout ${kernel_library}/${new_kernel} ${new_kernel} >/dev/null && rm -rf ${new_kernel}/.svn >/dev/null && sync
-            fi
-
-            [ -f ${new_kernel}/boot-${new_kernel}-*.tar.gz ] || die "Missing boot-${new_kernel}-*.tar.gz file!"
-            [ -f ${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz ] || die "Missing dtb-amlogic-${new_kernel}-*.tar.gz file!"
-            [ -f ${new_kernel}/modules-${new_kernel}-*.tar.gz ] || die "Missing modules-${new_kernel}-*.tar.gz file!"
-
-            build_boot=$( ls ${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
-            build_dtb=$( ls ${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
-            build_modules=$( ls ${new_kernel}/modules-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
-
-        # 02. Rplace kernel
         cd ${make_path}
 
-            # 02.01 For /boot five files
+            build_boot=$( ls ${kernel_path}/${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+            build_dtb=$( ls ${kernel_path}/${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+            build_modules=$( ls ${kernel_path}/${new_kernel}/modules-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
+
+            # 01 For /boot five files
             ( cd ${tmp_armbian}/boot && rm -rf *-${out_version}-* uInitrd zImage dtb* 2>/dev/null && sync )
-            tar -xzf ${kernel_path}/${build_boot} -C ${tmp_armbian}/boot && sync
+            tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
             [ "$( ls ${tmp_armbian}/boot/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l )" -ge "4" ] || die "boot/ 5 files is missing."
 
-            # 02.02 For dtb files
+            # 02 For dtb files
             mkdir -p ${tmp_armbian}/boot/dtb/amlogic && sync
-            tar -xzf ${kernel_path}/${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
+            tar -xzf ${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
 
-            # 02.03 For usr/lib/modules/*
+            # 03 For usr/lib/modules/*
             ( cd ${tmp_armbian}/usr/lib/modules && rm -rf * 2>/dev/null && sync )
-            tar -xzf ${kernel_path}/${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
+            tar -xzf ${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
             ( cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync )
             if [ "$(ls ${tmp_armbian}/usr/lib/modules/${new_kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
                 die "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
             fi
 
             sync
-
     fi
 }
 
@@ -370,32 +415,45 @@ echo -e "Ready, start build armbian... \n"
 # Start loop compilation
 k=1
 for b in ${build_armbian[*]}; do
-    build_soc=${b}
 
-    echo -n "(${k}) Start build armbian [ ${b} ]. "
-    now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//')
-    if  [[ "${now_remaining_space}" -le "2" ]]; then
-        echo "Remaining space is less than 2G, exit this packaging. \n"
-        break
-    else
-        echo "Remaining space is ${now_remaining_space}G."
-    fi
+    i=1
+    for x in ${build_kernel[*]}; do
+        {
+            echo -n "(${k}.${i}) Start build armbian [ ${b} - ${x} ]. "
+            now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//')
+            if  [[ "${now_remaining_space}" -le "2" ]]; then
+                echo "Remaining space is less than 2G, exit this packaging. \n"
+                break
+            else
+                echo "Remaining space is ${now_remaining_space}G."
+            fi
 
-    process " (1/5) make new armbian image."
-    make_image
-    process " (2/5) extract old armbian files."
-    extract_armbian
-    process " (3/5) replace kernel for armbian."
-    replace_kernel
-    process " (4/5) copy files to new image."
-    copy_files
-    process " (5/5) clear temp files."
-    clean_tmp
+            build_soc="${b}"
+            if [ "${x}" == "default" ]; then
+                new_kernel=""
+                out_kernel=""
+            else
+                new_kernel="${x}"
+                out_kernel=" - ${x}"
+            fi
 
-    echo -e "(${k}) Build successfully. \n"
+            process " (1/5) make new armbian image."
+            make_image
+            process " (2/5) extract old armbian files."
+            extract_armbian
+            process " (3/5) replace kernel for armbian."
+            replace_kernel
+            process " (4/5) copy files to new image."
+            copy_files
+            process " (5/5) clear temp files."
+            clean_tmp
+
+            echo -e "(${k}.${i}) Build successfully. \n"
+            let i++
+        }
+    done
 
     let k++
-
 done
 
 echo -e "Server space usage after compilation: \n$(df -hT ${PWD}) \n"
