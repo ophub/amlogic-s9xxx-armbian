@@ -18,9 +18,7 @@ on:
 
 env:
   ARMBIAN_BOARD: lepotato
-  ARMBIAN_BOARD_NAME: 'Aml S9xxx'
   ARMBIAN_HOST: armbian
-  ARMBIAN_NAMESERVER: '192.168.1.1'
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   DELETE_RELEASE: true
@@ -69,9 +67,8 @@ jobs:
       run: |
         cd build/
         sudo chmod +x compile.sh
-        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" BOARD_NAME="${{ env.ARMBIAN_BOARD_NAME }}" HOST="${{ env.ARMBIAN_HOST }}" \
-                          NAMESERVER="${{ env.ARMBIAN_NAMESERVER }}" BRANCH=current RELEASE=buster BUILD_MINIMAL=no BUILD_DESKTOP=no \
-                          KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST="${{ env.ARMBIAN_HOST }}" BRANCH=current RELEASE=buster \
+                          BUILD_MINIMAL=no BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
         echo "::set-output name=status::success"
 
     - name: Make Armbian for amlogic s9xxx
