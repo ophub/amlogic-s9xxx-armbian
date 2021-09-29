@@ -383,6 +383,9 @@ copy_files() {
         echo "KERNEL_VERSION='${KERNEL_VERSION}'" >> etc/armbian-aml-release 2>/dev/null
         echo "SOC='${AMLOGIC_SOC}'" >> etc/armbian-aml-release 2>/dev/null
         echo "K510='${K510}'" >> etc/armbian-aml-release 2>/dev/null
+        
+        # Custom banner name
+        sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
 
         sync
 
