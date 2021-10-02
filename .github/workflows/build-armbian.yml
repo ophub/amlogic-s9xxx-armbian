@@ -8,11 +8,6 @@ name: Build Armbian For Amlogic
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      ssh:
-        description: 'SSH connection to Actions'
-        required: false
-        default: 'false'
   schedule:
     - cron: '0 17 * * 0'
 
@@ -54,13 +49,6 @@ jobs:
       id: down
       run: |
         git clone --depth 1 https://github.com/armbian/build.git
-        
-    - name: SSH connection to Actions @ Ctrl+C to enter, Ctrl+D to exit
-      uses: P3TERX/ssh2actions@main
-      if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
-      env:
-        TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
 
     - name: Build Armbian
       id: build
@@ -76,7 +64,7 @@ jobs:
       if: steps.build.outputs.status == 'success'
       run: |
         sudo chmod +x make
-        sudo ./make s922x_s905x3_s905d
+        sudo ./make s922x_s905x3_s905x2_s912_s905d
         sudo ./make s905x_s905w 5.4.149
         cd ./build/output/images && sudo gzip *.img && sync
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
