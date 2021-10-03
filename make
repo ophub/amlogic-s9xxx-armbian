@@ -120,10 +120,10 @@ make_image() {
         mkdir -p ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} && sync
 
         # Get armbian version and release
-        armbian_image_name=$(ls ${armbian_outputpath}/*_Lepotato_*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
+        armbian_image_name=$(ls ${armbian_outputpath}/*-trunk_*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
         out_release=$(echo ${armbian_image_name} | awk -F "buster" '{print $1}' | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
         out_version=$(echo ${armbian_image_name} | awk -F "buster" '{print $NF}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
-        [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_outputpath}/*_Lepotato_*.img"
+        [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_outputpath}/*-trunk_*.img"
         if [ -n "${new_kernel}" ]; then
             make_version=${new_kernel}
         else
@@ -160,7 +160,7 @@ extract_armbian() {
 
         armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_version}.img"
         rm -f ${armbian_image_file} 2>/dev/null && sync
-        cp -f $( ls ${armbian_outputpath}/*_Lepotato_*.img 2>/dev/null | head -n 1 ) ${armbian_image_file}
+        cp -f $( ls ${armbian_outputpath}/*-trunk_*.img 2>/dev/null | head -n 1 ) ${armbian_image_file}
         sync && sleep 3
 
         loop_old=$(losetup -P -f --show "${armbian_image_file}")

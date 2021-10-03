@@ -8,12 +8,15 @@ name: Build Armbian For Amlogic
 on:
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      set_board:
+        description: 'Optional: lepotato / odroidn2'
+        required: false
+        default: 'lepotato'
   schedule:
     - cron: '0 17 * * 0'
 
 env:
-  ARMBIAN_BOARD: lepotato
-  ARMBIAN_HOST: armbian
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
   DELETE_RELEASE: true
@@ -44,19 +47,27 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         sudo mkdir -p /workdir
         sudo chown $USER:$GROUPS /workdir
+        ARR_BOARD=("lepotato" "odroidn2")
+        if  [[ -n "${{ github.event.inputs.set_board }}" && -n "$(echo "${ARR_BOARD[@]}" | grep -w "${{ github.event.inputs.set_board }}")" ]]; then
+            set_board="${{ github.event.inputs.set_board }}"
+        else
+            set_board="lepotato"
+        fi
+        echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
+        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
     - name: Download source code
       id: down
       run: |
         git clone --depth 1 https://github.com/armbian/build.git
 
-    - name: Build Armbian
+    - name: Build Armbian [ ${{ env.ARMBIAN_BOARD }} ]
       id: build
       run: |
         cd build/
         sudo chmod +x compile.sh
-        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST="${{ env.ARMBIAN_HOST }}" BRANCH=current RELEASE=buster \
-                          BUILD_MINIMAL=no BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+        sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST=armbian BRANCH=current RELEASE=buster BUILD_MINIMAL=no \
+                          BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
         echo "::set-output name=status::success"
 
     - name: Make Armbian for amlogic s9xxx
