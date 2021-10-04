@@ -367,6 +367,8 @@ copy_files() {
         ln -sf var/tmp tmp
         ln -sf usr/share/zoneinfo/Asia/Shanghai etc/localtime
         chmod 777 var/tmp
+        chown man:root var/cache/man -R
+        chmod g+s var/cache/man -R
 
         # Delete related files
         rm -f etc/apt/sources.list.save 2>/dev/null
