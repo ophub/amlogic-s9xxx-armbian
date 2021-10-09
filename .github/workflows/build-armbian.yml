@@ -75,8 +75,8 @@ jobs:
       if: steps.build.outputs.status == 'success'
       run: |
         sudo chmod +x make
-        sudo ./make s922x_s905x3_s905x2_s912_s905d
-        sudo ./make s905x_s905w 5.4.149
+        sudo ./make s922x_s905x3_s905x2_s912_s905d 5.10.70_5.4.150
+        sudo ./make s905x_s905w 5.4.150
         cd ./build/output/images && sudo gzip *.img && sync
         echo "FILEPATH=$PWD" >> $GITHUB_ENV
         echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV

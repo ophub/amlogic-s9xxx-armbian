@@ -45,7 +45,7 @@ armbian-update 5.10.66
 
 - compile `a single soc` can be directly input `sudo ./make s905x3`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s922x_s905x3`
 
-- Optionality: Replace the kernel. Run Eg: `sudo ./make s905x 5.4.150`. When multiple kernel versions are generated at one time, the kernel version number is connected with `_` . Run Eg: `sudo ./make s922x_s905x3 5.4.150_5.14.9`.  When there is an latest version of the same series of the specified kernel version, the `latest version` will be download from [kernel library](https://github.com/ophub/flippy-kernel/tree/main/library) and used automatically. When you want to compile a `fixed kernel`, Run `sudo ./make s905x 5.4.150 false`.
+- Optionality: Replace the kernel. Run Eg: `sudo ./make s905x 5.4.150`. When multiple kernel versions are generated at one time, the kernel version number is connected with `_` . Run Eg: `sudo ./make s922x_s905x3 5.10.70_5.4.150`.  When there is an latest version of the same series of the specified kernel version, the `latest version` will be download from [kernel library](https://github.com/ophub/flippy-kernel/tree/main/library) and used automatically. When you want to compile a `fixed kernel`, Run `sudo ./make s905x 5.4.150 false`.
 
 💡Tips: The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4.*` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
 
