@@ -5,6 +5,23 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #=========================================================================
 
+echo "Start install armbian to emmc..."
+
+root_devname=$(df / | tail -n1 | awk '{print $1}' | awk -F '\/' '{print substr($3, 1, length($3)-2)}')
+if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
+    echo "you are running in emmc mode, please boot system with usb or tf card!"
+    exit 1
+fi
+
+install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+if [[ "${install_emmc}" == "" ]]; then
+    echo "No emmc can be found to install the openwrt system!"
+    exit 1
+fi
+
+DEV_EMMC="/dev/${install_emmc}"
+echo ${DEV_EMMC}
+
 cat <<EOF
 **************************************************************************
 Please select amlogic s9xxx box model:
@@ -153,67 +170,6 @@ echo "SKIP = ${SKIP} MB"
 
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
-
-echo "Start script create MBR and filesystem"
-
-hasdrives=$(lsblk | grep -oE '(mmcblk[0-9])' | sort | uniq)
-if [ "${hasdrives}" = "" ]; then
-    echo "UNABLE TO FIND ANY EMMC OR SD DRIVES ON THIS SYSTEM!!! "
-    exit 1
-fi
-
-avail=$(lsblk | grep -oE '(mmcblk[0-9]|sda[0-9])' | sort | uniq)
-if [ "${avail}" = "" ]; then
-    echo "UNABLE TO FIND ANY DRIVES ON THIS SYSTEM!!!"
-    exit 1
-fi
-
-runfrom=$(lsblk | grep /$ | grep -oE '(mmcblk[0-9]|sda[0-9])')
-if [ "${runfrom}" = "" ]; then
-    echo " UNABLE TO FIND ROOT OF THE RUNNING SYSTEM!!! "
-    exit 1
-fi
-
-emmc=$(echo ${avail} | sed "s/${runfrom}//" | sed "s/sd[a-z][0-9]//g" | sed "s/ //g")
-if [ "${emmc}" = "" ]; then
-    echo " UNABLE TO FIND YOUR EMMC DRIVE OR YOU ALREADY RUN FROM EMMC!!!"
-    exit 1
-fi
-
-if [ "${runfrom}" = "${avail}" ]; then
-    echo " YOU ARE RUNNING ALREADY FROM EMMC!!! "
-    exit 1
-fi
-
-if [ "${runfrom}" = "${emmc}" ]; then
-    echo " YOU ARE RUNNING ALREADY FROM EMMC!!! "
-    exit 1
-fi
-
-if [ "$(echo ${emmc} | grep mmcblk)" = "" ]; then
-    echo " YOU DO NOT APPEAR TO HAVE AN EMMC DRIVE!!! "
-    exit 1
-fi
-
-DEV_EMMC="/dev/${emmc}"
-echo ${DEV_EMMC}
-
-# 判断内核版本是否 >= 5.10
-KERNEL_VERSION=$(uname -r)
-K_VER=$(echo "${KERNEL_VERSION}" | cut -d '.' -f1)
-K_MAJ=$(echo "${KERNEL_VERSION}" | cut -d '.' -f2)
-
-if [ "${K_VER}" -eq "5" ];then
-    if [ "${K_MAJ}" -ge "10" ];then
-        K510=1
-    else
-        K510=0
-    fi
-elif [ "${K_VER}" -gt "5" ];then
-    K510=1
-else
-    K510=0
-fi
 
 echo "Start backup u-boot default"
 dd if="${DEV_EMMC}" of=/root/u-boot-default-aml.img bs=1M count=4 conv=fsync
