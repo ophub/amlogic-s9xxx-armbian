@@ -22,7 +22,7 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 
 Choose the corresponding firmware according to your STB. Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the STB. Common for all `Amlogic S9xxx STB`.
 
-- ### Install Armbian
+- ### Install Armbian to EMMC
 
 Login in to armbian (default user: root, default password: 1234) → input command:
 
@@ -30,13 +30,29 @@ Login in to armbian (default user: root, default password: 1234) → input comma
 armbian-install
 ```
 
-- ### Update Armbian
+- ### Update Armbian Kernel
 
 Query the available [kernel_version](https://github.com/ophub/flippy-kernel/tree/main/library). Login in to armbian → input command:
 
 ```yaml
 # Run as root user (sudo -i), input command: armbian-update <kernel_version>
 armbian-update 5.10.66
+```
+
+- ### Install Docker Service
+
+Login in to armbian → input command:
+
+```yaml
+armbian-docker
+```
+
+- ### Modify Armbian Config
+
+Login in to armbian → input command:
+
+```yaml
+armbian-config
 ```
 
 ## Armbian firmware make method

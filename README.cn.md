@@ -22,7 +22,7 @@
 
 选择和你的盒子型号对应的 Armbian 固件，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将固件写入 USB 里，然后把写好固件的 USB 插入盒子。
 
-- ### 安装 Armbian
+- ### 安装 Armbian 到 EMMC
 
 登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
@@ -30,13 +30,29 @@
 armbian-install
 ```
 
-- ### 更新 Armbian
+- ### 更新 Armbian 内核
 
 查询 [可选内核](https://github.com/ophub/flippy-kernel/tree/main/library) 版本，登录 Armbian 系统 → 输入命令：
 
 ```yaml
 # 使用 root 用户运行 (sudo -i), 输入命令: armbian-update <内核版本>
 armbian-update 5.10.66
+```
+
+- ### 安装 Docker 服务
+
+登录 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-docker
+```
+
+- ### 修改 Armbian 配置
+
+登录 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-config
 ```
 
 ## Armbian 固件制作方法
