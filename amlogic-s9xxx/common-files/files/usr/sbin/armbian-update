@@ -25,7 +25,7 @@ die() {
 
 echo -e "Start update the armbian kernel."
 # Operation environment check
-EMMC_NAME=$(lsblk | grep -oE '(mmcblk[0-9])' | sort | uniq)
+EMMC_NAME="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
 P4_PATH="${PWD}"
 
 if [ -f ${ENV_ARMBIAN_FILE} ]; then
