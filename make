@@ -140,18 +140,19 @@ make_image() {
         ROOT_MB=2304
         IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
 
-        dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} >/dev/null 2>&1
+        dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
+        sync
 
         parted -s ${build_image_file} mklabel msdos 2>/dev/null
         parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))M $((SKIP_MB + BOOT_MB -1))M 2>/dev/null
         parted -s ${build_image_file} mkpart primary ext4 $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
+        sync
 
         loop_new=$(losetup -P -f --show "${build_image_file}")
         [ ${loop_new} ] || die "losetup ${build_image_file} failed."
 
         mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
         mke2fs -F -q -t ext4 -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
-
         sync
 }
 
@@ -296,6 +297,7 @@ copy_files() {
             dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
             #echo -e "For [ ${build_soc} ] write Android bootloader: ${ANDROID_UBOOT}"
         fi
+        sync
 
         # Reorganize the /boot partition
         mkdir -p ${tmp_build}/boot
