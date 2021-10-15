@@ -85,9 +85,15 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 3. Create the `build/output/images` folder, and upload the Armbian image of the `lepotato` board ( Eg: `Armbian_21.11.0-trunk_Lepotato_buster_current_5.10.67.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory.
 4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./make s905x3` to make armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
+## Borrow
+
+The [armbian](https://github.com/armbian/build) directly calls the official source code for compilation, When making dedicated Armbian systems for different boxes, the kernel, scripts, u-boot and other resources made by [flippy](https://github.com/unifreq/openwrt_packit) for `Amlogic s9xxx openwrt` are used. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
+
 ## Acknowledgments
 
-The [armbian](https://github.com/armbian/build) directly calls the official source code for compilation, The `u-boot` uses related resources developed by [flippy](https://github.com/unifreq/openwrt_packit) for `amlogic s9xxx openwrt`. The compilation ideas refer to the tutorial of [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box), thanks.
+- [armbian/build](https://github.com/armbian/build)
+- [flippy/openwrt](https://github.com/unifreq)
+- [ebkso/compile](https://www.kflyo.com/howto-compile-armbian-for-n1-box)
 
 ## License
 
