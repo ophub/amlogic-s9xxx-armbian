@@ -11,8 +11,14 @@
 # UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/amlogic-u-boot"
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
 #==================================================================================================================================
+# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
+# armbian-update yes
 
+# Receive one-key command related parameters
 INPUTS_KERNEL="${1}"
+AUTO_MAINLINE_UBOOT="${2}"
+
+# Set default value
 SERVER_KERNEL_URL="https://api.github.com/repos/ophub/flippy-kernel/contents/library"
 GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/amlogic-s9xxx"
 ENV_ARMBIAN_FILE="/etc/armbian-aml-release"
@@ -209,7 +215,7 @@ if [ "${V510}" -lt "${K510}" ]; then
         fi
 
         # Check ${MAINLINE_UBOOT}
-        if [[ -n "${MAINLINE_UBOOT}" ]]; then
+        if [[ -n "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
             if [[ ! -s "${MAINLINE_UBOOT}" ]]; then
                 echo -e "Try to download the MAINLINE_UBOOT file from the server."
                 GITHUB_MAINLINE_UBOOT="${GITHUB_RAW}/common-files/files/usr${MAINLINE_UBOOT}"
@@ -237,7 +243,7 @@ if [ "${V510}" -lt "${K510}" ]; then
     fi
 
     # Write Mainline bootloader
-    if [ -f "${MAINLINE_UBOOT}" ]; then
+    if [[ -f "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
         echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ] to [ /dev/${EMMC_NAME} ]"
         dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=1 count=442 conv=fsync
         dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=512 skip=1 seek=1 conv=fsync
@@ -259,7 +265,7 @@ if [[ -f "/boot/uInitrd-${flippy_version}" ]]; then
         cp -f /boot/uInitrd-${flippy_version} /boot/uInitrd 2>/dev/null && sync
         uInitrd_original=$(md5sum /boot/uInitrd-${flippy_version} | awk '{print $1}')
         uInitrd_new=$(md5sum /boot/uInitrd | awk '{print $1}')
-        if [ "${uInitrd_original}" = "${uInitrd_new}" ]; then
+        if [[ "${uInitrd_original}" == "${uInitrd_new}" ]]; then
             break
         else
             rm -f /boot/uInitrd && sync
@@ -279,7 +285,7 @@ if [[ -f "/boot/vmlinuz-${flippy_version}" ]]; then
         cp -f /boot/vmlinuz-${flippy_version} /boot/zImage 2>/dev/null && sync
         vmlinuz_original=$(md5sum /boot/vmlinuz-${flippy_version} | awk '{print $1}')
         vmlinuz_new=$(md5sum /boot/zImage | awk '{print $1}')
-        if [ "${vmlinuz_original}" = "${vmlinuz_new}" ]; then
+        if [[ "${vmlinuz_original}" == "${vmlinuz_new}" ]]; then
             break
         else
             rm -f /boot/zImage && sync

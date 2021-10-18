@@ -4,6 +4,11 @@
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #=========================================================================
+# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
+# armbian-install yes
+
+# Receive one-key command related parameters
+AUTO_MAINLINE_UBOOT="${1}"
 
 echo "Start install armbian to emmc..."
 
@@ -189,7 +194,7 @@ parted -s "${DEV_EMMC}" mkpart primary fat32 $((SKIP*1024*1024))b $(( (SKIP+BOOT
 parted -s "${DEV_EMMC}" mkpart primary ext4 $(( (SKIP+BOOT)*1024*1024 ))b 100% 2>/dev/null
 
 echo "Start write u-boot"
-if  [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} ]]; then
+if  [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
     echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
