@@ -1,0 +1,269 @@
+#!/bin/bash
+# Author: xXx
+# Purpose: Automate the process of backing up internal storage.
+# Date: 4 Jan 2017 20:22:00 EET
+###############################################################################
+# Update: 5 Jan 2017 19:48:00 EET                                             #
+# Reason: Added support for when the user have started his machine            #
+# from USB. Now the right source and destination should be selected.          #
+# Added support for uncompressed images.                                      #
+# Added detection if the user runs already from emmc.                         #
+###############################################################################
+# Update: 6 Jan 2017 21:43:00 EET                                             #
+# Reason: Added functionality to restore images that this program creates.    #
+###############################################################################
+# Update: 8 Mar 2017 18:30:00 EET                                             #
+# Reason: Changed yellow color to cyan for white backround terminals.         #
+###############################################################################
+# Update: 8 Mar 2017 18:52:00 EET                                             #
+# Reason: Changed backup/restore dir to /ddbr as installer excludes this dir. #
+###############################################################################
+# Update: 12 Mar 2017 10:47:00 EET                                            #
+# Reason: Added the ability for the user to continue with compressed backup   #
+# only, and at his/her own risk, in case of lesser free space on the drive.   #
+# Tried to annoy the user with questions, in order to discourage him/her.     #
+###############################################################################
+# Update: 12 Mar 2017 13:02:00 EET                                            #
+# Reason: Separated backup and restore dialogs for better handling of the     #
+# various situations for the program itself. Now the program ask first if a   #
+# backup or restore is wanted, and skips/adds some checks accordingly.        #
+# There should be no stops now, if a restore only wanted, and the free space  #
+# was too low, as this is irrelevant to the requested function.               #
+###############################################################################
+# Update: 12 Mar 2017 16:08:00 EET                                            #
+# Reason: The program can now accept an argument for PowerUsers.              #
+# This argument can only be a directory, and must exists before calling the   #
+# program. This mode is dangerous, and most users will not need this mode, as #
+# great damages can be done to your system if you use it incorrectly.         #
+# The argument is really the backup/restore directory that now can be forced  #
+# by the user, to bypass the programs checks, always at his/her own risk.     #
+###############################################################################
+# Update: 12 Mar 2017 16:32:00 EET                                            #
+# Reason: Code cleaning. As the program have become very complex already, a   #
+# cleaner code was mandatory, in order to keep it safe and maintainable. If i #
+# am to kill any bugs below these lines, i should be able to spot them first. #
+###############################################################################
+# Update: 13 Mar 2017 11:52:00 EET                                            #
+# Reason: Squashed some small bugs when running on normal Linux desktops that #
+# have no EMMC or SDCARDS installed. And some more code cleaning.             #
+###############################################################################
+# Update: 13 Mar 2017 12:40:00 EET                                            #
+# Reason: Changed the messages to darker colors for better compatibility with #
+# white background terminals. Only the red color is now bright for emphasis.  #
+###############################################################################
+
+_r=$(tput bold && tput setaf 1)
+_g=$(tput setaf 2)
+_b=$(tput setaf 4)
+_c=$(tput setaf 6)
+_x=$(tput sgr0)
+
+[ $(whoami) != root ] && echo "$_r Please run this program as root""$_x" && exit 1
+
+OUTDIR=$1
+
+if [ "$OUTDIR" = "" ]
+then
+	OUTDIR="/ddbr"
+	[ ! -d /ddbr ] && mkdir -p /ddbr
+else
+	OUTDIR=$(echo "$OUTDIR" | sed "s,/\+$,,")
+	echo "$_b ARGUMENT MODE DETECTED. YOU HAVE BEEN WARNED!!!       $_x"
+	echo "$_b NO IN/OUT SIZE CHECKS WILL BE PERFORMED IN THIS MODE. $_x"
+	echo "$_b YOU ARE USING THIS MODE AT YOUR OWN RISK!!! $_x"
+		if [ ! -d "$OUTDIR" ]
+		then
+			echo "$_r IN ARGUMENT MODE THE OUT/IN DIRECTORY MUST PRE-EXIST $_x"
+			echo "$_r AND IT IS BETTER TO BE ON AN MOUNTED EXTERNAL DRIVE. $_x"
+			echo "$_r PROGRAM EXITED DUE TO ERROR: NO DIR $OUTDIR          $_x"
+			exit 1
+		fi
+fi
+
+dobackup(){
+	echo $_c" DO YOU WANT COMPRESSION ? "$_x
+		while true
+		read -p " "$_b"YES=("$_c"y"$_b") NO=("$_c"n"$_b")"$_x" " yn
+		do
+			case $yn in
+				y)
+				COMPRESS=TRUE
+				break;;
+				n)
+				COMPRESS=FALSE
+				break;;
+				*)
+				;;
+			esac
+		done
+	if [ "$COMPRESS" = "TRUE" ]
+	then
+		echo "$_b SAVING AND COMPRESSING "$_g"$emmc"$_b" TO "$_g"$OUTDIR/$image.gz"$_x"..."
+		dd if=/dev/$emmc | pv -s $intsize"K" | gzip > $OUTDIR/$image.gz
+		finish
+	else
+		echo "$_b SAVING "$_g"$emmc"$_b" TO "$_g"$OUTDIR/$image"$_x"..."
+		dd if=/dev/$emmc | pv -s $intsize"K" | dd of=$OUTDIR/$image
+		finish
+	fi
+}
+
+dorestore(){
+	echo $_c" DID YOU USED COMPRESSION WHEN YOU TOOK THE BACKUP ? "$_x
+	while true
+	read -p " "$_b"YES=("$_c"y"$_b") NO=("$_c"n"$_b")"$_x" " yn
+	do
+		case $yn in
+			y)
+			COMPRESS=TRUE
+			break;;
+			n)
+			COMPRESS=FALSE
+			break;;
+			*)
+			;;
+		esac
+	done
+	if [ "$COMPRESS" = "TRUE" ]
+	then
+		[ ! -f $OUTDIR/$image.gz ] && echo "$_r NO IMAGE FOUND. MAKE SURE YOU HAVE MADE A BACKUP FIRST."$_x"" && exit 1
+		echo "$_c YOU ARE ABOUT TO MAKE SERIOUS CHANGES TO YOUR SYSTEM!!!"
+		echo " FILE "$_g"$OUTDIR/$image.gz"$_c" IS GOING TO BE WRITEN TO "$_g"$emmc"$_c" "
+		echo " MAKE SURE EVERYTHING LOOKS OK AND:"
+		read -p " PRESS ENTER TO CONTINUE OR CTRL+C TO CANCEL $_x" blah
+		echo $_b" RESTORING $OUTDIR/$image.gz TO /dev/$emmc | PLEASE WAIT..."$_x
+		gunzip -c $OUTDIR/$image.gz | pv -s $intsize"K" | dd of=/dev/$emmc
+		finish
+	else
+		[ ! -f $OUTDIR/$image ] && echo "$_r NO IMAGE FOUND. MAKE SURE YOU HAVE MADE A BACKUP FIRST."$_x"" && exit 1
+		echo "$_c YOU ARE ABOUT TO MAKE SERIOUS CHANGES TO YOUR SYSTEM!!!"
+		echo " FILE "$_g"$OUTDIR/$image"$_c" IS GOING TO BE WRITEN TO "$_g"$emmc"$_c" "
+		echo " MAKE SURE EVERYTHING LOOKS OK AND:"
+		read -p " PRESS ENTER TO CONTINUE OR CTRL+C TO CANCEL $_x" blah
+		echo $_b" RESTORING $OUTDIR/$image TO /dev/$emmc | PLEASE WAIT..."$_x
+		dd if=$OUTDIR/$image | pv -s $intsize"K" | dd of=/dev/$emmc
+		finish
+	fi
+}
+
+compress(){
+	echo "$_c YOU ARE IN FORCED COMPRESSION MODE!!! $_x"
+	echo " THIS MODE CAN BE FROM DANGEROUS TO DESTRUCTIVE FOR YOUR $runfrom DRIVE"
+	echo " IF THE COMPRESSED BACKUP GROW BIGGER THAN THE FREE SPACE ON THE DRIVE"
+	echo " BAD THINGS MAY HAPPEN TO YOUR CURRENTLY RUNNING DRIVE $runfrom"
+	echo " IT IS BETTER TO USE A DRIVE WITH PLENTY OF SPACE FOR BACKING UP EMMC"
+	echo " BY PRESSING ENTER YOU ARE CONTINUING AT YOUR OWN RISK!!!"
+	read -p " CTRL+C to QUIT | ENTER TO CONTINUE " null
+	while true
+	read -p " "$_b"ARE YOU SURE? YES=("$_c"y"$_b") NO=("$_c"n"$_b")"$_x" " YN
+	do
+		case $YN in
+			y)
+			break;;
+			n)
+			exit 1
+			break;;
+			*)
+			;;
+		esac
+	done
+	echo "$_b SAVING AND COMPRESSING "$_g"$emmc"$_b" TO "$_g"$OUTDIR/$image.gz"$_x"..."
+	dd if=/dev/$emmc | pv -s $intsize"K" | gzip > $OUTDIR/$image.gz
+	finish
+}
+
+finish(){
+	echo "$_g JOB FINISHED!"$_x""
+	exit 0
+}
+
+echo "$_c DO YOU WANT TO BACKUP OR RESTORE ? "$_x""
+while true
+read -p " "$_b"BACKUP=("$_c"b"$_b") RESTORE=("$_c"r"$_b")"$_x" " br
+do
+	case $br in
+		b)
+		wantsbackup=true
+		break;;
+		r)
+		wantsbackup=false
+		break;;
+		*)
+		;;
+	esac
+done
+
+### COMMON CHECKS / VARIABLES CREATION / INFO GATHERING
+
+hasdrives=$(lsblk | grep -oE '(mmcblk[0-9])' | sort | uniq)
+if [ "$hasdrives" = "" ]
+then
+	echo "$_r UNABLE TO FIND ANY EMMC OR SD DRIVES ON THIS SYSTEM!!! $_x"
+	exit 1
+fi
+avail=$(lsblk | grep -oE '(mmcblk[0-9]|sda[0-9])' | sort | uniq)
+if [ "$avail" = "" ]
+then
+	echo "$_r UNABLE TO FIND ANY DRIVES ON THIS SYSTEM!!! $_x"
+	exit 1
+fi
+runfrom=$(lsblk | grep /$ | grep -oE '(mmcblk[0-9]|sda[0-9])')
+if [ "$runfrom" = "" ]
+then
+	echo "$_r UNABLE TO FIND ROOT OF THE RUNNING SYSTEM!!! $_x"
+	exit 1
+fi
+emmc=$(echo $avail | sed "s/$runfrom//" | sed "s/sd[a-z][0-9]//g" | sed "s/ //g")
+if [ "$emmc" = "" ]
+then
+	echo "$_r UNABLE TO FIND YOUR EMMC DRIVE "$_c"OR"$_r" YOU ALREADY RUN FROM EMMC!!! $_x"
+	exit 1
+fi
+if [ "$runfrom" = "$avail" ]
+then
+	echo "$_r YOU ARE RUNNING ALREADY FROM EMMC!!! $_x"
+	exit 1
+fi
+if [ $runfrom = $emmc ]
+then
+	echo "$_r YOU ARE RUNNING ALREADY FROM EMMC!!! $_x"
+	exit 1
+fi
+if [ "$(echo $emmc | grep mmcblk)" = "" ]
+then
+	echo "$_r YOU DO NOT APPEAR TO HAVE AN EMMC DRIVE!!! $_x"
+	exit 1
+fi
+intsize=$(fdisk -s /dev/$emmc)
+#image=$(echo $(cat /proc/cpuinfo | egrep '(Hardware|Revision)' | awk '{print $3}') | sed "s/ /-/g")-emmc.img
+image=BACKUP-arm-64-emmc.img
+
+### BACKUP ONLY CHECKS
+
+if [ "$wantsbackup" = true ]
+then
+	rootfree=$(df | grep /$ | awk '{print $4}')
+	[ $rootfree -le $intsize ] && echo -e "$_r NOT ENOUGH FREE SPACE! \n FORCING COMPRESSION MODE $_x" && compress=true
+else
+	echo "$_b AVAILABLE DEVICES: "$_g"$(echo $avail)""$_x"
+	echo "$_b YOU ARE RUNNING "$_g"$(lsb_release -c | awk '{print $2}')"$_b" FROM "$_g"$runfrom""$_x"
+	dorestore
+fi
+
+echo "$_b AVAILABLE DEVICES: "$_g"$(echo $avail)""$_x"
+echo "$_b YOU ARE RUNNING "$_g"$(lsb_release -c | awk '{print $2}')"$_b" FROM "$_g"$runfrom""$_x"
+
+if [ $(echo $intsize | sed "s/ //g" | wc -c) -le 7 ]
+then
+	echo -e "$_b INTERNAL EMMC IS: "$_g"$emmc"$_b" SIZE:\t"$_g"$intsize""$_x"
+else
+	echo -e "$_b INTERNAL EMMC IS: "$_g"$emmc"$_b" SIZE:\t"$_g"$intsize""$_x"
+fi
+
+if [ $(echo $rootfree | sed "s/ //g" | wc -c) -le 7 ]
+then
+	echo -e "$_b ROOT ($runfrom) FREE SPACE IS:\t\t\t"$_g"$rootfree""$_x"
+else
+	echo -e "$_b ROOT ($runfrom) FREE SPACE IS:\t\t"$_g"$rootfree""$_x"
+fi
+[ "$compress" = "true" ] && compress || dobackup
