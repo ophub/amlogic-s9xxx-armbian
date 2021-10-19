@@ -137,7 +137,7 @@ make_image() {
 
         SKIP_MB=68
         BOOT_MB=256
-        ROOT_MB=2304
+        ROOT_MB=2748
         IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
 
         dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
