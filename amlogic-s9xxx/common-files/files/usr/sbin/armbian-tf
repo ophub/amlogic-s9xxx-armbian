@@ -1,0 +1,83 @@
+#!/bin/bash
+#==================================================================================================================================
+# Copyright (C) 2020- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Create TF/USB remaining space partition
+#==================================================================================================================================
+
+# Set font color
+purple_font_prefix="\033[35m"
+green_font_prefix="\033[32m"
+red_font_prefix="\033[31m"
+font_color_suffix="\033[0m"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+
+echo -e "${STEPS} Try to create a shared partition..."
+
+# Find the partition where root is located
+ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
+if [ "${ROOT_PTNAME}" == "" ]; then
+    echo -e "${ERROR} Cannot find the partition corresponding to the root file system!"
+    exit 1
+fi
+
+# Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+case ${ROOT_PTNAME} in
+       mmcblk?p[1-4]) DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')
+                      PT_PRE="${DISK_NAME}p"
+                      LB_PRE="EMMC_"
+                      ;;
+    [hsv]d[a-z][1-4]) DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')
+                      PT_PRE="${DISK_NAME}"
+                      LB_PRE=""
+                      ;;
+                   *) echo -e "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
+                      exit 1
+                      ;;
+esac
+
+# Get the starting position of the p3 partition
+START_P3=$( fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 )
+if [[ -z "${START_P3}" || -z "$(echo ${START_P3} | sed -n "/^[0-9]\+$/p")" ]]; then
+    echo -e "${ERROR} Unable to get starting position!"
+    exit 1
+fi
+TOTAL_SIZE=$(lsblk -l -b -o NAME,SIZE | awk "\$1 ~ /^${DISK_NAME}\$/ {print \$2}")
+END_P3=$((TOTAL_SIZE / 512 - 1))
+
+cat > /tmp/fdisk.script <<EOF
+n
+p
+3
+$START_P3
+$END_P3
+t
+3
+83
+w
+EOF
+sync
+
+echo -e "${STEPS} Fdisk starting ... "
+fdisk /dev/${DISK_NAME} < /tmp/fdisk.script
+if [ $? -ne 0 ];then
+	echo -e "${ERROR} fdisk failed!"
+	exit 1
+fi
+sync
+
+echo -e "${STEPS} Create shared filesystem ... "
+mkdir -p /mnt/${PT_PRE}3 && sync
+mkfs.ext4  -F -L "${LB_PRE}SHARED" "/dev/${PT_PRE}3"
+mount -t ext4 "/dev/${PT_PRE}3" "/mnt/${PT_PRE}3"
+echo "/dev/${PT_PRE}3 /mnt/${PT_PRE}3 ext4 defaults 0 0" >> /etc/fstab
+sync
+
+echo -e "${SUCCESS} Create partition successfully, mount it in [ /mnt/${PT_PRE}3 ]"
+rm -f /usr/sbin/armbian-tf 2>/dev/null && sync
+sync
+exit 0
+
