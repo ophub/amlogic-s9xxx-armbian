@@ -71,8 +71,10 @@ armbian-tf
 ```yaml
 # 1. Confirm the name of the TF/USB according to the size of the space. The TF is [ `mmcblk` ], USB is [ `sd` ]
 Command: Enter [ fdisk -l | grep "sd" ]
+
 # 2. Get the starting value of the remaining space, Copy and save, used below  (E.g: 5382144)
 Command: Enter [ fdisk -l | grep "sd" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 ]
+
 # 3. Start allocating unused space (E.g: sda, mmcblk0 or mmcblk1)
 Command: Enter [ fdisk /dev/sda ] Start allocating the remaining space
 Command: Select [ n ] to create a partition
@@ -86,11 +88,14 @@ Command: Enter Partition number [ 3 ]
 Command: Enter Hex code (type L to list all codes): [ 83 ]
 Command: Enter [ w ] to save
 Command: Enter [ reboot ] to restart
+
 # 4. After restarting, format the new partition
 Command: Enter [ mkfs.ext4 -F -L SHARED /dev/sda3 ] to format the new partition
+
 # 5. Set the mount directory for the new partition
 Command: Enter [ mkdir -p /mnt/share ] to Create mount directory
 Command: Enter [ mount -t ext4 /dev/sda3 /mnt/share ] to Mount the newly created partition to the directory
+
 # 6. Add automatic mount at boot
 Command: Enter [ vi /etc/fstab ]
 # Press [ i ] to enter the input mode, copy the following values to the end of the file
