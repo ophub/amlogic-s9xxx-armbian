@@ -286,6 +286,25 @@ for src in ${COPY_SRC}; do
 done
 echo "Copy complete."
 
+echo "Update the relevant parameters of armbian-aml-release"
+ENV_ARMBIAN_FILE="${DIR_INSTALL}/etc/armbian-aml-release"
+sed -i '/FDTFILE/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "FDTFILE='${FDTFILE}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
+
+sed -i '/UBOOT_OVERLOAD/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
+
+sed -i '/MAINLINE_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
+
+sed -i '/ANDROID_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
+
+sed -i '/SOC/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "SOC='${AMLOGIC_SOC}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
+echo "Update complete."
+sync
+        
 rm ${DIR_INSTALL}/etc/fstab
 cat > ${DIR_INSTALL}/etc/fstab<<EOF
 /dev/root       /               ext4            defaults,noatime,errors=remount-ro     	0 1

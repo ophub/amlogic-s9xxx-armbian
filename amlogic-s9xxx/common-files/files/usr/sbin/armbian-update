@@ -48,16 +48,14 @@ case ${ROOT_PTNAME} in
 esac
 P4_PATH="${PWD}"
 
-if [ -f ${ENV_ARMBIAN_FILE} ]; then
+if [ -f "${ENV_ARMBIAN_FILE}" ]; then
     source "${ENV_ARMBIAN_FILE}" 2>/dev/null
-    SOC="${SOC}"
+    UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
+    MAINLINE_UBOOT="${MAINLINE_UBOOT}"
 else
-    echo  "The supported SOC types are: s922x, s922x-n2, s905x3, s905x2, s912, s905d, s905x, s905w"
-    echo  "Please enter the SOC type of your device, such as: s905x3"
-    read  AMLOGIC_SOC
-    SOC="${AMLOGIC_SOC}"
+    echo  "${ENV_ARMBIAN_FILE} file is missing!"
+    exit 1
 fi
-echo -e "SOC: ${SOC}"
 
 # Download 3 kernel files
 if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; then
@@ -190,63 +188,40 @@ fi
 # Check version consistency
 if [ "${V510}" -lt "${K510}" ]; then
     echo -e "Update to kernel 5.10 or higher and install U-BOOT."
-    if [ -n "${SOC}" ]; then
-        case ${SOC} in
-              s905x3) UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-                      MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin" ;;
-              s905x2) UBOOT_OVERLOAD="u-boot-x96max.bin"
-                      MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin" ;;
-               s905x) UBOOT_OVERLOAD="u-boot-p212.bin"
-                      MAINLINE_UBOOT="" ;;
-               s905w) UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-                      MAINLINE_UBOOT="" ;;
-               s905d) UBOOT_OVERLOAD="u-boot-n1.bin"
-                      MAINLINE_UBOOT="" ;;
-                s912) UBOOT_OVERLOAD="u-boot-zyxq.bin"
-                      MAINLINE_UBOOT="" ;;
-               s922x) UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-                      MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin" ;;
-            s922x-n2) UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
-                      MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin" ;;
-                   *) die "Unknown SOC, unable to update to kernel 5.10 and above." ;;
-        esac
 
-        # Check ${UBOOT_OVERLOAD}
-        if [[ -n "${UBOOT_OVERLOAD}" ]]; then
-            if [[ ! -s "/boot/${UBOOT_OVERLOAD}" ]]; then
-                echo -e "Try to download the ${UBOOT_OVERLOAD} file from the server."
-                GITHUB_UBOOT_OVERLOAD="${GITHUB_RAW}/amlogic-u-boot/${UBOOT_OVERLOAD}"
-                #echo -e "UBOOT_OVERLOAD: ${GITHUB_UBOOT_OVERLOAD}"
-                wget -c "${GITHUB_UBOOT_OVERLOAD}" -O "/boot/${UBOOT_OVERLOAD}" >/dev/null 2>&1 && sync
-                if [[ "$?" -eq "0" && -s "/boot/${UBOOT_OVERLOAD}" ]]; then
-                    echo -e "The ${UBOOT_OVERLOAD} file download is complete."
-                else
-                    die "The ${UBOOT_OVERLOAD} file download failed. please try again."
-                fi
+    # Check ${UBOOT_OVERLOAD}
+    if [[ -n "${UBOOT_OVERLOAD}" ]]; then
+        if [[ ! -s "/boot/${UBOOT_OVERLOAD}" ]]; then
+            echo -e "Try to download the ${UBOOT_OVERLOAD} file from the server."
+            GITHUB_UBOOT_OVERLOAD="${GITHUB_RAW}/amlogic-u-boot/${UBOOT_OVERLOAD}"
+            #echo -e "UBOOT_OVERLOAD: ${GITHUB_UBOOT_OVERLOAD}"
+            wget -c "${GITHUB_UBOOT_OVERLOAD}" -O "/boot/${UBOOT_OVERLOAD}" >/dev/null 2>&1 && sync
+            if [[ "$?" -eq "0" && -s "/boot/${UBOOT_OVERLOAD}" ]]; then
+                echo -e "The ${UBOOT_OVERLOAD} file download is complete."
             else
-                echo -e "The ${UBOOT_OVERLOAD} file has been found."
+                die "The ${UBOOT_OVERLOAD} file download failed. please try again."
             fi
         else
-            die "The 5.10 kernel cannot be used without UBOOT_OVERLOAD."
-        fi
-
-        # Check ${MAINLINE_UBOOT}
-        if [[ -n "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
-            if [[ ! -s "${MAINLINE_UBOOT}" ]]; then
-                echo -e "Try to download the MAINLINE_UBOOT file from the server."
-                GITHUB_MAINLINE_UBOOT="${GITHUB_RAW}/common-files/files/usr${MAINLINE_UBOOT}"
-                #echo -e "MAINLINE_UBOOT: ${GITHUB_MAINLINE_UBOOT}"
-                [ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
-                wget -c "${GITHUB_MAINLINE_UBOOT}" -O "${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
-                if [[ "$?" -eq "0" && -s "${MAINLINE_UBOOT}" ]]; then
-                    echo -e "The MAINLINE_UBOOT file download is complete."
-                else
-                    die "The MAINLINE_UBOOT file download failed. please try again."
-                fi
-            fi
+            echo -e "The ${UBOOT_OVERLOAD} file has been found."
         fi
     else
-        die "Unknown SOC, unable to update."
+        die "The 5.10 kernel cannot be used without UBOOT_OVERLOAD."
+    fi
+
+    # Check ${MAINLINE_UBOOT}
+    if [[ -n "${MAINLINE_UBOOT}" && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
+        if [[ ! -s "${MAINLINE_UBOOT}" ]]; then
+            echo -e "Try to download the MAINLINE_UBOOT file from the server."
+            GITHUB_MAINLINE_UBOOT="${GITHUB_RAW}/common-files/files/usr${MAINLINE_UBOOT}"
+            #echo -e "MAINLINE_UBOOT: ${GITHUB_MAINLINE_UBOOT}"
+            [ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
+            wget -c "${GITHUB_MAINLINE_UBOOT}" -O "${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
+            if [[ "$?" -eq "0" && -s "${MAINLINE_UBOOT}" ]]; then
+                echo -e "The MAINLINE_UBOOT file download is complete."
+            else
+                die "The MAINLINE_UBOOT file download failed. please try again."
+            fi
+        fi
     fi
 
     # Copy u-boot.ext and u-boot.emmc
