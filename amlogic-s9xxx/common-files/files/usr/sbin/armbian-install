@@ -305,15 +305,17 @@ echo "SOC='${AMLOGIC_SOC}'" >> ${ENV_ARMBIAN_FILE} 2>/dev/null
 echo "Update complete."
 sync
         
-rm ${DIR_INSTALL}/etc/fstab
+rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
 cat > ${DIR_INSTALL}/etc/fstab<<EOF
 /dev/root       /               ext4            defaults,noatime,errors=remount-ro     	0 1
 LABEL=BOOT_EMMC /boot           vfat            defaults                                0 0
 tmpfs           /tmp            tmpfs           defaults,nosuid                         0 0
 EOF
 
-cd /
+rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
 sync
+
+cd /
 umount ${DIR_INSTALL}
 sleep 3
 
