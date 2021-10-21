@@ -21,7 +21,7 @@ tmp_aml_image=${make_path}/tmp_aml_image
 kernel_library="https://github.com/ophub/flippy-kernel/tree/main/library"
 #kernel_library="https://github.com/ophub/flippy-kernel/trunk/library"
 
-build_armbian=("s922x" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
+build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
 build_kernel=("default")
 change_kernel="no"
 #===== Do not modify the following parameter settings, End =======
@@ -279,6 +279,13 @@ copy_files() {
                 MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
                 ANDROID_UBOOT=""
                 AMLOGIC_SOC="s922x"
+                ;;
+            s922x-n2 | odroid-n2 | n2)
+                FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
+                UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
+                MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
+                ANDROID_UBOOT=""
+                AMLOGIC_SOC="s922x-n2"
                 ;;
             *)
                 die "Have no this soc: [ ${build_soc} ]"

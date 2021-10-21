@@ -10,7 +10,7 @@
 
 | 型号  | 盒子 | [可选内核](https://github.com/ophub/flippy-kernel/tree/main/library) | Armbian 固件 |
 | ---- | ---- | ---- | ---- |
-| s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db) | 全部 | armbian_aml_s922x_buster_*.img |
+| s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db), [ODROID-N2](https://www.tokopedia.com/search?st=product&q=ODROID-N2) | 全部 | armbian_aml_s922x_buster_*.img |
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://tokopedia.link/5WHiETbdGgb), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | 全部 | armbian_aml_s905x3_buster_*.img |
 | s905x2 | [X96Max-4G](https://tokopedia.link/HcfLaRzjqeb), [X96Max-2G](https://tokopedia.link/HcfLaRzjqeb) | 全部 | armbian_aml_s905x2_buster_*.img |
 | s912 | [H96-Pro-Plus](https://tokopedia.link/jb42fsBdGgb), Octopus-Planet | 全部 | armbian_aml_s912_buster_*.img |
@@ -63,50 +63,9 @@ armbian-config
 armbian-tf
 ```
 
-<details>
-  <summary>或者手动分配剩余空间 </summary>
-
-#### 查看 [操作截图](https://user-images.githubusercontent.com/68696949/137860992-fbd4e2fa-e90c-4bbb-8985-7f5db9f49927.jpg)
-
-```yaml
-# 1. 根据空间大小确认 TF/USB 的名称，TF卡为 [ mmcblk ]，USB 为[ sd ]
-在命令行中: 输入 [ fdisk -l | grep "sd" ] 查看卡的名称
-
-# 2. 获取剩余空间的起始值，复制并保存，下面使用（例如：5382144）
-在命令行中: 输入 [ fdisk -l | grep "sd" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 ] 得到剩余空间起始值
-
-# 3. 开始分配未使用的空间（例如：sda、mmcblk0 或 mmcblk1）
-在命令行中: 输入 [ fdisk /dev/sda ] 开始分配剩余空间
-在命令行中: 输入 [ n ] 创建新分区
-在命令行中: 输入 [ p ] 指定分区类型为主分区
-在命令行中: 将分区号设置为 [ 3 ]
-在命令行中: 分区的起始值，输入第二步得到的值 [ 5382144 ]
-在命令行中: 分区的结束值，按 [ 回车 ] 使用默认值
-在命令行中: 如果提示是否删除签名？[Y]es/[N]o: 输入 [ Y ]
-在命令行中: 输入 [ t ] 指定分区类型
-在命令行中: 输入分区编号 [ 3 ]
-在命令行中: 指定分区类型为 Linux，输入代码 [ 83 ]
-在命令行中: 输入 [ w ] 保存结果
-在命令行中: 输入 [ reboot ] 重启
-
-# 4. 重新启动后，格式化新分区
-在命令行中: 输入 [ mkfs.ext4 -F -L SHARED /dev/sda3 ] 格式新分区
-
-# 5. 为新分区设置挂载目录
-在命令行中: 输入 [ mkdir -p /mnt/share ] 创建新分区的挂载目录
-在命令行中: 输入 [ mount -t ext4 /dev/sda3 /mnt/share ] 进行挂载
-
-# 6. 添加开机自动挂载
-在命令行中: [ vi /etc/fstab ]
-# 按 [ i ] 进入编译模式，将下面的代码复制，黏贴到文件的末尾处
-/dev/sda3 /mnt/share ext4 defaults 0 0
-# 按 [ esc ] 键退出，输入 [ :wq! ] 后按 [ 回车 ] 保存退出，结束设置。
-```
-</details>
-
 ## Armbian 固件制作方法
 
-- 不同的 Amlogic armbian 固件，使用对应的 soc 代码生成。 请根据你的盒子的 soc 型号进行选择。支持 `s922x`，`s905x3`，`s905x2`，`s912`，`s905d`，`s905x`，`s905w`
+- 不同的 Amlogic armbian 固件，使用对应的 soc 代码生成。 请根据你的盒子的 soc 型号进行选择。支持 `s922x`，`s922x-n2`，`s905x3`，`s905x2`，`s912`，`s905d`，`s905x`，`s905w` 。说明：`s922x-n2` 是 `s922x-odroid-n2`
 
 - 编译单个盒子的 Armbian 时，输入对应的 soc 型号，如 `sudo ./make s905x3`。 如果同时编译多个不同盒子时，将对应的 soc 型号使用 `_` 连接, 如 `sudo ./make s922x_s905x3`
 
