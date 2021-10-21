@@ -52,7 +52,7 @@ if [ -f ${ENV_ARMBIAN_FILE} ]; then
     source "${ENV_ARMBIAN_FILE}" 2>/dev/null
     SOC="${SOC}"
 else
-    echo  "The supported SOC types are: s922x, s905x3, s905x2, s912, s905d, s905x, s905w"
+    echo  "The supported SOC types are: s922x, s922x-n2, s905x3, s905x2, s912, s905d, s905x, s905w"
     echo  "Please enter the SOC type of your device, such as: s905x3"
     read  AMLOGIC_SOC
     SOC="${AMLOGIC_SOC}"
@@ -192,21 +192,23 @@ if [ "${V510}" -lt "${K510}" ]; then
     echo -e "Update to kernel 5.10 or higher and install U-BOOT."
     if [ -n "${SOC}" ]; then
         case ${SOC} in
-            s905x3) UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-                    MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin" ;;
-            s905x2) UBOOT_OVERLOAD="u-boot-x96max.bin"
-                    MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin" ;;
-            s905x)  UBOOT_OVERLOAD="u-boot-p212.bin"
-                    MAINLINE_UBOOT="" ;;
-            s905w)  UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-                    MAINLINE_UBOOT="" ;;
-            s905d)  UBOOT_OVERLOAD="u-boot-n1.bin"
-                    MAINLINE_UBOOT="" ;;
-            s912)   UBOOT_OVERLOAD="u-boot-zyxq.bin"
-                    MAINLINE_UBOOT="" ;;
-            s922x)  UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-                    MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin" ;;
-            *)      die "Unknown SOC, unable to update to kernel 5.10 and above." ;;
+              s905x3) UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
+                      MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin" ;;
+              s905x2) UBOOT_OVERLOAD="u-boot-x96max.bin"
+                      MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin" ;;
+               s905x) UBOOT_OVERLOAD="u-boot-p212.bin"
+                      MAINLINE_UBOOT="" ;;
+               s905w) UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
+                      MAINLINE_UBOOT="" ;;
+               s905d) UBOOT_OVERLOAD="u-boot-n1.bin"
+                      MAINLINE_UBOOT="" ;;
+                s912) UBOOT_OVERLOAD="u-boot-zyxq.bin"
+                      MAINLINE_UBOOT="" ;;
+               s922x) UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
+                      MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin" ;;
+            s922x-n2) UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
+                      MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin" ;;
+                   *) die "Unknown SOC, unable to update to kernel 5.10 and above." ;;
         esac
 
         # Check ${UBOOT_OVERLOAD}

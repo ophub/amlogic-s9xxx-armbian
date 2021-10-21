@@ -40,10 +40,11 @@ Please select amlogic s9xxx box model:
 7.  Belink-GT-King ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
 8.  Belink-GT-King-Pro ------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
 9.  UGOOS-AM6-Plus ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-10. Octopus-Planet ----------- [ S912   / CPU: 2124Mtz / NETWORK: 1000M ]
-11. Phicomm-n1 --------------- [ S905d  / CPU: 2124Mtz / NETWORK: 1000M ]
-12. hg680p & b860h ----------- [ S905x  / CPU: 2124Mtz / NETWORK: 1000M ]
-13. X96-Mini & TX3-Mini ------ [ S905w  / CPU: 1944Mtz / NETWORK: 100M  ]
+10. ODROID-N2 ---------------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+11. Octopus-Planet ----------- [ S912   / CPU: 2124Mtz / NETWORK: 1000M ]
+12. Phicomm-n1 --------------- [ S905d  / CPU: 2124Mtz / NETWORK: 1000M ]
+13. hg680p & b860h ----------- [ S905x  / CPU: 2124Mtz / NETWORK: 1000M ]
+14. X96-Mini & TX3-Mini ------ [ S905w  / CPU: 1944Mtz / NETWORK: 100M  ]
 
 0. Other --------------------- [ Customize the skipped space (unit: MB) ]
 **************************************************************************
@@ -117,28 +118,35 @@ case "${select}" in
          AMLOGIC_SOC="s922x"
          SKIP=1350
          ;;
-      10) FDTFILE="meson-gxm-octopus-planet.dtb"
+      10) FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
+         UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
+         MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
+         ANDROID_UBOOT=""
+         AMLOGIC_SOC="s922x-n2"
+         SKIP=1350
+         ;;
+      11) FDTFILE="meson-gxm-octopus-planet.dtb"
          UBOOT_OVERLOAD="u-boot-zyxq.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""
          AMLOGIC_SOC="s912"
          SKIP=700
          ;;
-      11) FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
+      12) FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
          UBOOT_OVERLOAD="u-boot-n1.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
          AMLOGIC_SOC="s905d"
          SKIP=700
          ;;
-      12) FDTFILE="meson-gxl-s905x-p212.dtb"
+      13) FDTFILE="meson-gxl-s905x-p212.dtb"
          UBOOT_OVERLOAD="u-boot-p212.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""
          AMLOGIC_SOC="s905x"
          SKIP=700
          ;;
-      13) FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
+      14) FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
          UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""

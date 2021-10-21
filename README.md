@@ -10,7 +10,7 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 
 | Model  | STB | [Optional kernel](https://github.com/ophub/flippy-kernel/tree/main/library) | Armbian Firmware |
 | ---- | ---- | ---- | ---- |
-| s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db) | All | armbian_aml_s922x_buster_*.img |
+| s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db), [ODROID-N2](https://www.tokopedia.com/search?st=product&q=ODROID-N2) | All | armbian_aml_s922x_buster_*.img |
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://tokopedia.link/5WHiETbdGgb), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | All | armbian_aml_s905x3_buster_*.img |
 | s905x2 | [X96Max-4G](https://tokopedia.link/HcfLaRzjqeb), [X96Max-2G](https://tokopedia.link/HcfLaRzjqeb) | All | armbian_aml_s905x2_buster_*.img |
 | s912 | [H96-Pro-Plus](https://tokopedia.link/jb42fsBdGgb), Octopus-Planet | All | armbian_aml_s912_buster_*.img |
@@ -63,51 +63,9 @@ Login in to armbian → input command:
 armbian-tf
 ```
 
-<details>
-  <summary>Or manually allocate the remaining space</summary>
-
-#### View [Operation screenshot](https://user-images.githubusercontent.com/68696949/137860992-fbd4e2fa-e90c-4bbb-8985-7f5db9f49927.jpg)
-
-```yaml
-# 1. Confirm the name of the TF/USB according to the size of the space. The TF is [ `mmcblk` ], USB is [ `sd` ]
-Command: Enter [ fdisk -l | grep "sd" ]
-
-# 2. Get the starting value of the remaining space, Copy and save, used below  (E.g: 5382144)
-Command: Enter [ fdisk -l | grep "sd" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 ]
-
-# 3. Start allocating unused space (E.g: sda, mmcblk0 or mmcblk1)
-Command: Enter [ fdisk /dev/sda ] Start allocating the remaining space
-Command: Select [ n ] to create a partition
-Command: Select [ p ] to specify the partition type as primary partition
-Command: Set the partition number to [ 3 ]
-Command: The start value of the partition, enter the value obtained in the second step, E.g: [ 5382144 ]
-Command: End value, press [ Enter ] to use the default value
-Command: If there is a hint: Do you want to remove the signature? [Y]es/[N]o: Enter [ Y ]
-Command: Enter [ t ] to specify the partition type
-Command: Enter Partition number [ 3 ]
-Command: Enter Hex code (type L to list all codes): [ 83 ]
-Command: Enter [ w ] to save
-Command: Enter [ reboot ] to restart
-
-# 4. After restarting, format the new partition
-Command: Enter [ mkfs.ext4 -F -L SHARED /dev/sda3 ] to format the new partition
-
-# 5. Set the mount directory for the new partition
-Command: Enter [ mkdir -p /mnt/share ] to Create mount directory
-Command: Enter [ mount -t ext4 /dev/sda3 /mnt/share ] to Mount the newly created partition to the directory
-
-# 6. Add automatic mount at boot
-Command: Enter [ vi /etc/fstab ]
-# Press [ i ] to enter the input mode, copy the following values to the end of the file
-/dev/sda3 /mnt/share ext4 defaults 0 0
-# Press [ esc ] to exit, Input [ :wq! ] and [ Enter ] to Save, Finish.
-```
-</details>
-
-
 ## Armbian firmware make method
 
-- Different amlogic armbian firmware, use the corresponding soc code to generate. Please choose according to your box soc model. Supported soc are `s922x`, `s905x3`, `s905x2`, `s912`, `s905d`, `s905x`, `s905w`.
+- Different amlogic armbian firmware, use the corresponding soc code to generate. Please choose according to your box soc model. Supported soc are `s922x`, `s922x-n2`, `s905x3`, `s905x2`, `s912`, `s905d`, `s905x`, `s905w`. Note: `s922x-n2` is `s922x-odroid-n2`.
 
 - compile `a single soc` can be directly input `sudo ./make s905x3`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s922x_s905x3`
 
