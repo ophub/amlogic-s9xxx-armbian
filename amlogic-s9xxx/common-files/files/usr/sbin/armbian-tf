@@ -17,6 +17,14 @@ ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
 
 echo -e "${STEPS} Try to create a shared partition..."
 
+echo -ne "${STEPS} This operation will clear the data in the remaining space, are you sure to continue? y/n [y]\b\b"
+read yn
+case $yn in
+     n*|N*) echo -e "${ERROR} You aborted the operation!"
+            exit 1
+            ;;
+esac
+
 # Find the partition where root is located
 ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
 if [ "${ROOT_PTNAME}" == "" ]; then
@@ -62,7 +70,7 @@ EOF
 sync
 
 echo -e "${STEPS} Fdisk starting ... "
-fdisk /dev/${DISK_NAME} < /tmp/fdisk.script
+fdisk /dev/${DISK_NAME} < /tmp/fdisk.script 2>/dev/null
 if [ $? -ne 0 ];then
 	echo -e "${ERROR} fdisk failed!"
 	exit 1
