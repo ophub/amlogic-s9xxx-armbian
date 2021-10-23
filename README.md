@@ -55,9 +55,9 @@ Login in to armbian → input command:
 armbian-config
 ```
 
-- ### When using Armbian in TF/USB, enable free space
+- ### Use Armbian in TF/USB
 
-Login in to armbian → input command:
+To activate the remaining space of TF/USB, please login in to armbian → input command:
 
 ```yaml
 armbian-tf
