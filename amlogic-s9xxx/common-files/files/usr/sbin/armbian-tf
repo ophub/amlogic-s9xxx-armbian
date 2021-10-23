@@ -48,7 +48,7 @@ case ${ROOT_PTNAME} in
 esac
 
 # Get the starting position of the p3 partition
-START_P3=$( fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 )
+START_P3=$( fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | echo $(($(xargs)+1)) )
 if [[ -z "${START_P3}" || -z "$(echo ${START_P3} | sed -n "/^[0-9]\+$/p")" ]]; then
     echo -e "${ERROR} Unable to get starting position!"
     exit 1
@@ -62,6 +62,7 @@ p
 3
 $START_P3
 $END_P3
+Y
 t
 3
 83
