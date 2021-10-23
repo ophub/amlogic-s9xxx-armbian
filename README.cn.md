@@ -55,9 +55,9 @@ armbian-docker
 armbian-config
 ```
 
-- ### 当在 TF/USB 中使用 Armbian 时如何激活剩余空间
+- ### 在 TF/USB 中使用 Armbian
 
-登录 Armbian 系统 → 输入命令：
+激活 TF/USB 的剩余空间，请登录 Armbian 系统 → 输入命令：
 
 ```yaml
 armbian-tf
