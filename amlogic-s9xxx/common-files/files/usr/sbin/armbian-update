@@ -12,11 +12,16 @@
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
 #==================================================================================================================================
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# armbian-update yes
+# Do not write main line U-BOOT command: armbian-update 5.4.150 no
+# Write the main line U-BOOT by default: armbian-update 5.4.150
 
 # Receive one-key command related parameters
 INPUTS_KERNEL="${1}"
-AUTO_MAINLINE_UBOOT="${2}"
+if [[ "${2}" == "no" ]]; then
+    AUTO_MAINLINE_UBOOT="no"
+else
+    AUTO_MAINLINE_UBOOT="yes"
+fi
 
 # Set default value
 SERVER_KERNEL_URL="https://api.github.com/repos/ophub/flippy-kernel/contents/library"

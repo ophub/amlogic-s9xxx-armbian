@@ -5,10 +5,15 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #=========================================================================
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# armbian-install yes
+# Do not write main line U-BOOT command: armbian-install no
+# Write the main line U-BOOT by default: armbian-install
 
 # Receive one-key command related parameters
-AUTO_MAINLINE_UBOOT="${1}"
+if [[ "${1}" == "no" ]]; then
+    AUTO_MAINLINE_UBOOT="no"
+else
+    AUTO_MAINLINE_UBOOT="yes"
+fi
 
 echo "Start install armbian to emmc..."
 
@@ -28,26 +33,28 @@ DEV_EMMC="/dev/${install_emmc}"
 echo ${DEV_EMMC}
 
 cat <<EOF
-**************************************************************************
+***************************************************************************
 Please select amlogic s9xxx box model:
 
-1.  X96-Max+ (4G DDR) -------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-2.  HK1-Box (4G DDR) --------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-3.  H96-Max-X3 (4G DDR) ------ [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-4.  Ugoos-X3 (Cube/Pro/Plus) - [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-5.  X96-Max-4G --------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 1000M ]
-6.  X96-Max-2G --------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 100M  ]
-7.  Belink-GT-King ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-8.  Belink-GT-King-Pro ------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-9.  UGOOS-AM6-Plus ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-10. ODROID-N2 ---------------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-11. Octopus-Planet ----------- [ S912   / CPU: 2124Mtz / NETWORK: 1000M ]
-12. Phicomm-n1 --------------- [ S905d  / CPU: 2124Mtz / NETWORK: 1000M ]
-13. hg680p & b860h ----------- [ S905x  / CPU: 2124Mtz / NETWORK: 1000M ]
-14. X96-Mini & TX3-Mini ------ [ S905w  / CPU: 1944Mtz / NETWORK: 100M  ]
+1.  X96-Max+ (4G DDR) --------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
+2.  HK1-Box (4G DDR) ---------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
+3.  H96-Max-X3 (4G DDR) ------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
+4.  Ugoos-X3 (Cube/Pro/Plus) -- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
+5.  X96-Max-4G ---------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 1000M ]
+6.  X96-Max-2G ---------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 100M  ]
+7.  Beelink-GT-King ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+8.  Beelink-GT-King-Pro ------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+9.  Beelink-GT-King-Pro-H ----- [ S922x  / CPU: 2208Mtz / NETWORK: 1000M ]
+10. Beelink-GT-King-Pro-Rev_A - [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+11. UGOOS-AM6-Plus ------------ [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+12. ODROID-N2 ----------------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
+13. Octopus-Planet ------------ [ S912   / CPU: 2124Mtz / NETWORK: 1000M ]
+14. Phicomm-n1 ---------------- [ S905d  / CPU: 2124Mtz / NETWORK: 1000M ]
+15. hg680p & b860h ------------ [ S905x  / CPU: 2124Mtz / NETWORK: 1000M ]
+16. X96-Mini & TX3-Mini ------- [ S905w  / CPU: 1944Mtz / NETWORK: 100M  ]
 
-0. Other --------------------- [ Customize the skipped space (unit: MB) ]
-**************************************************************************
+0. Other ---------------------- [ Customize the skipped space (unit: MB) ]
+***************************************************************************
 EOF
 
 SKIP=700
@@ -111,7 +118,7 @@ case "${select}" in
          AMLOGIC_SOC="s922x"
          SKIP=1350
          ;;
-      9) FDTFILE="meson-g12b-ugoos-am6.dtb"
+      9) FDTFILE="meson-g12b-gtking-pro-h.dtb"
          UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
          MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
          ANDROID_UBOOT=""
@@ -120,33 +127,47 @@ case "${select}" in
          ;;
       10) FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
          UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
+         MAINLINE_UBOOT=""
+         ANDROID_UBOOT=""
+         AMLOGIC_SOC="s922x"
+         SKIP=1350
+         ;;
+      11) FDTFILE="meson-g12b-ugoos-am6.dtb"
+         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
+         MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
+         ANDROID_UBOOT=""
+         AMLOGIC_SOC="s922x"
+         SKIP=1350
+         ;;
+      12) FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
+         UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
          MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
          ANDROID_UBOOT=""
          AMLOGIC_SOC="s922x-n2"
          SKIP=1350
          ;;
-      11) FDTFILE="meson-gxm-octopus-planet.dtb"
+      13) FDTFILE="meson-gxm-octopus-planet.dtb"
          UBOOT_OVERLOAD="u-boot-zyxq.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""
          AMLOGIC_SOC="s912"
          SKIP=700
          ;;
-      12) FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
+      14) FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
          UBOOT_OVERLOAD="u-boot-n1.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
          AMLOGIC_SOC="s905d"
          SKIP=700
          ;;
-      13) FDTFILE="meson-gxl-s905x-p212.dtb"
+      15) FDTFILE="meson-gxl-s905x-p212.dtb"
          UBOOT_OVERLOAD="u-boot-p212.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""
          AMLOGIC_SOC="s905x"
          SKIP=700
          ;;
-      14) FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
+      16) FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
          UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
          MAINLINE_UBOOT=""
          ANDROID_UBOOT=""
