@@ -471,4 +471,6 @@ for b in ${build_armbian[*]}; do
 done
 
 echo -e "Server space usage after compilation: \n$(df -hT ${PWD}) \n"
+sync
+exit 0
 
