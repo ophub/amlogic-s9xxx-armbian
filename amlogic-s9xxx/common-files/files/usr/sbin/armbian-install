@@ -8,6 +8,9 @@
 # Do not write main line U-BOOT command: armbian-install no
 # Write the main line U-BOOT by default: armbian-install
 
+SKIP=700
+BOOT=256
+
 # Receive one-key command related parameters
 if [[ "${1}" == "no" ]]; then
     AUTO_MAINLINE_UBOOT="no"
@@ -30,177 +33,86 @@ if [[ "${install_emmc}" == "" ]]; then
 fi
 
 DEV_EMMC="/dev/${install_emmc}"
-echo ${DEV_EMMC}
+echo "DEV_EMMC: ${DEV_EMMC}"
 
-cat <<EOF
-***************************************************************************
-Please select amlogic s9xxx box model:
+# Set model list, begin ------------
+AMLOGIC_MODEL_LIST="
+# 1.id  2.model  3.soc  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.description
 
-1.  X96-Max+ (4G DDR) --------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-2.  HK1-Box (4G DDR) ---------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-3.  H96-Max-X3 (4G DDR) ------- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-4.  Ugoos-X3 (Cube/Pro/Plus) -- [ S905x3 / CPU: 2124Mtz / NETWORK: 1000M ]
-5.  X96-Max-4G ---------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 1000M ]
-6.  X96-Max-2G ---------------- [ S905x2 / CPU: 1944Mtz / NETWORK: 100M  ]
-7.  Beelink-GT-King ----------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-8.  Beelink-GT-King-Pro ------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-9.  Beelink-GT-King-Pro-H ----- [ S922x  / CPU: 2208Mtz / NETWORK: 1000M ]
-10. Beelink-GT-King-Pro-Rev_A - [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-11. UGOOS-AM6-Plus ------------ [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-12. ODROID-N2 ----------------- [ S922x  / CPU: 2124Mtz / NETWORK: 1000M ]
-13. Octopus-Planet ------------ [ S912   / CPU: 2124Mtz / NETWORK: 1000M ]
-14. Phicomm-n1 ---------------- [ S905d  / CPU: 2124Mtz / NETWORK: 1000M ]
-15. hg680p & b860h ------------ [ S905x  / CPU: 2124Mtz / NETWORK: 1000M ]
-16. X96-Mini & TX3-Mini ------- [ S905w  / CPU: 1944Mtz / NETWORK: 100M  ]
+# Amlogic GXL Family
+11:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Net,Wifi
+12:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
+13:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,1Gb Net
+14:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100M Net
 
-0. Other ---------------------- [ Customize the skipped space (unit: MB) ]
-***************************************************************************
-EOF
+# Amlogic GXM Family
+21:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Net
 
-SKIP=700
-BOOT=256
+# Amlogic G12A Family
+31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
+32:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100M Net
 
-read select
-case "${select}" in
-      1) FDTFILE="meson-sm1-x96-max-plus.dtb"
-         UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-         MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin"
-         ANDROID_UBOOT="/lib/u-boot/hk1box-bootloader.img"
-         AMLOGIC_SOC="s905x3"
-         SKIP=1350
-         ;;
-      2) FDTFILE="meson-sm1-hk1box-vontar-x3.dtb"
-         UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-         MAINLINE_UBOOT="/lib/u-boot/hk1box-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x3"
-         SKIP=1350
-         ;;
-      3) FDTFILE="meson-sm1-h96-max-x3.dtb"
-         UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-         MAINLINE_UBOOT="/lib/u-boot/h96maxx3-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x3"
-         SKIP=1350
-         ;;
-      4) FDTFILE="meson-sm1-ugoos-x3.dtb"
-         UBOOT_OVERLOAD="u-boot-ugoos-x3.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x3"
-         SKIP=1350
-         ;;
-      5) FDTFILE="meson-g12a-x96-max.dtb"
-         UBOOT_OVERLOAD="u-boot-x96max.bin"
-         MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x2"
-         SKIP=1350
-         ;;
-      6) FDTFILE="meson-g12a-x96-max-rmii.dtb"
-         UBOOT_OVERLOAD="u-boot-x96max.bin"
-         MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x2"
-         SKIP=1350
-         ;;
-      7) FDTFILE="meson-g12b-gtking.dtb"
-         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-         MAINLINE_UBOOT="/lib/u-boot/gtking-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x"
-         SKIP=1350
-         ;;
-      8) FDTFILE="meson-g12b-gtking-pro.dtb"
-         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-         MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x"
-         SKIP=1350
-         ;;
-      9) FDTFILE="meson-g12b-gtking-pro-h.dtb"
-         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-         MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x"
-         SKIP=1350
-         ;;
-      10) FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
-         UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x"
-         SKIP=1350
-         ;;
-      11) FDTFILE="meson-g12b-ugoos-am6.dtb"
-         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-         MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x"
-         SKIP=1350
-         ;;
-      12) FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
-         UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
-         MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s922x-n2"
-         SKIP=1350
-         ;;
-      13) FDTFILE="meson-gxm-octopus-planet.dtb"
-         UBOOT_OVERLOAD="u-boot-zyxq.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s912"
-         SKIP=700
-         ;;
-      14) FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
-         UBOOT_OVERLOAD="u-boot-n1.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
-         AMLOGIC_SOC="s905d"
-         SKIP=700
-         ;;
-      15) FDTFILE="meson-gxl-s905x-p212.dtb"
-         UBOOT_OVERLOAD="u-boot-p212.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905x"
-         SKIP=700
-         ;;
-      16) FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
-         UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC="s905w"
-         SKIP=700
-         ;;
-      99) FDTFILE=${SPECIFY_DTB}
-         UBOOT_OVERLOAD=""
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC=""
-         SKIP=700
-         ;;
-      0) cat <<EOF
-Please enter the .dtb file name of your box, do not include the path.
-For example: $FDTFILE
-EOF
-         echo  "Enter the .dtb File name:"
-         read  CUST_FDTFILE
-         FDTFILE=${CUST_FDTFILE}
-         UBOOT_OVERLOAD=""
-         MAINLINE_UBOOT=""
-         ANDROID_UBOOT=""
-         AMLOGIC_SOC=""
-         SKIP=700
-         ;;
-      *) echo "Input error, exit!"
-         exit 1
-         ;;
-esac
+# Amlogic G12B Family
+41:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+42:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+43:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Net,Wifi
+44:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro-rev_a.dtb:u-boot-odroid-n2.bin:NA:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+45:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-odroid-n2.bin:/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
+46:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 
-echo -e "FDT Value [ ${FDTFILE} ]"
-echo "SKIP = ${SKIP} MB"
+# Amlogic SM1 Family
+51:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Net
+52:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Net
+53:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
+54:HK1 Box (OveClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+55:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
+56:H96 Max X3:s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+57:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
+58:Ugoos X3(OverClock):s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
+
+# Other
+0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
+"
+
+search_aml_model() {
+    local search_soc_id="${1}"
+    local ret_count=$(echo "${AMLOGIC_MODEL_LIST}" | grep -E "^${search_soc_id}:" | wc -l)
+    if [ "${ret_count}" -eq "1" ];then
+        echo "${AMLOGIC_MODEL_LIST}" | grep -E "^${search_soc_id}:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g'
+    fi
+}
+
+# Display the model list
+printf "%-s\n" "----------------------------------------------------------------------------------"
+printf "%-4s %-8s %-30s %-50s\n" ID SOC MODEL DTB
+printf "%-s\n" "----------------------------------------------------------------------------------"
+printf "%-4s %-8s %-30s %-50s\n" $( echo "${AMLOGIC_MODEL_LIST}" | grep -E "^[0-9]{1,9}:" | sed -e 's/[ ][ ]*/-/g' | awk -F ':' '{print $1,$3,$2,$4}' )
+printf "%-s\n"   "----------------------------------------------------------------------------------"
+
+read -p "Please Input ID: " boxtype
+if [ "${boxtype}" -eq "0" ]; then
+    read -p "Please Input DTB Name: " FDTFILE
+    FDTFILE=${FDTFILE}
+    AMLOGIC_SOC=""
+    UBOOT_OVERLOAD=""
+    MAINLINE_UBOOT=""
+    ANDROID_UBOOT=""
+else
+    ret=$(search_aml_model "${boxtype}")
+    if [ "${ret}" == "" ];then
+        echo "Input error, exit!"
+        exit 1
+    fi
+
+    AMLOGIC_SOC=$(echo "${ret}" | awk -F ':' '{print $3}' )
+    FDTFILE=$(echo "${ret}" | awk -F ':' '{print $4}')
+    UBOOT_OVERLOAD=$(echo "${ret}" | awk -F ':' '{print $5}')
+    MAINLINE_UBOOT=$(echo "${ret}" | awk -F ':'  '{print $6}')
+    ANDROID_UBOOT=$(echo "${ret}" | awk -F ':' '{print $7}')
+fi
+# Set model list, end ------------
+
+echo -e "FDTFILE: [ ${FDTFILE} ]"
 
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
