@@ -55,6 +55,16 @@ Login in to armbian → input command:
 armbian-config
 ```
 
+- ### Create swap for Armbian
+
+If you feel that the memory of the current box is not enough when you are using applications with a large memory footprint such as `docker`, you can create a `swap` virtual memory partition, Change the disk space a certain capacity is virtualized into memory for use. The unit of the input parameter of the following command is `GB`, and the default is `1`.
+
+Login in to armbian → input command:
+
+```yaml
+armbian-swap 1
+```
+
 - ### Use Armbian in TF/USB
 
 To activate the remaining space of TF/USB, please login in to armbian → input command:
