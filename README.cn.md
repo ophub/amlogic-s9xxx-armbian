@@ -55,6 +55,16 @@ armbian-docker
 armbian-config
 ```
 
+- ### 为 Armbian 创建 swap
+
+如果你在使用 `docker` 等内存占用较大的应用时，觉得当前盒子的内存不够使用，可以创建 `swap` 虚拟内存分区，将磁盘空间的一定容量虚拟成内存来使用。下面命令输入参数的单位是 `GB`，默认为 `1`。
+
+登录 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-swap 1
+```
+
 - ### 在 TF/USB 中使用 Armbian
 
 激活 TF/USB 的剩余空间，请登录 Armbian 系统 → 输入命令：
