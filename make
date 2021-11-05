@@ -365,7 +365,7 @@ copy_files() {
     cd ${tag_rootfs}
 
         # Replace the boot directory with the latest file
-        rm -rf boot/* 2>/dev/null && cp -rf ${tag_bootfs}/* boot && sync
+        rm -rf boot/* 2>/dev/null && sync
 
         ( cd usr/lib/firmware && mv *.hcd brcm/ )
 
