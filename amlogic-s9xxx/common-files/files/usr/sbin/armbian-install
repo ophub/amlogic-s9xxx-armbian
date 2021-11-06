@@ -1,12 +1,13 @@
 #!/bin/bash
 #=========================================================================
-# Description: Install armbian to EMMC
+# Function: Install armbian to EMMC
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#=========================================================================
-# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
+#
+# The kernel above version 5.10 needs to install  main line U-BOOT
 # Do not write main line U-BOOT command: armbian-install no
 # Write the main line U-BOOT by default: armbian-install
+#=========================================================================
 
 SKIP=700
 BOOT=256

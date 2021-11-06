@@ -1,8 +1,10 @@
 #!/bin/bash
 #=========================================================================
-# Description: Install docker to armbian
+# Function: Install docker to armbian
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+
+# Command: armbian-docker
 #=========================================================================
 
 # Install the necessary system tools

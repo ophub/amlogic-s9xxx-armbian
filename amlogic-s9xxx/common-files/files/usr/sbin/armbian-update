@@ -1,19 +1,20 @@
 #!/bin/bash
 #==================================================================================================================================
-# Copyright (C) 2020- https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+# Function: Armbian kernel update
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Armbian kernel update
-# Kernel download: https://github.com/ophub/flippy-kernel/tree/main/library
+# Kernel download server: https://github.com/ophub/flippy-kernel/tree/main/library
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install U-BOOT.
 # When there is no U-BOOT file in related directory, the script will auto try to download the file from the server for completion:
 # UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/amlogic-u-boot"
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
-#==================================================================================================================================
+#
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
 # Do not write main line U-BOOT command: armbian-update 5.4.150 no
 # Write the main line U-BOOT by default: armbian-update 5.4.150
+#==================================================================================================================================
 
 # Receive one-key command related parameters
 INPUTS_KERNEL="${1}"
