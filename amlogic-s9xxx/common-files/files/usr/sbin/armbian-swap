@@ -1,6 +1,7 @@
 #!/bin/bash
 #=======================================================================
 # Function: Create swap for armbian system
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # The input parameter unit is GB, the default is 1

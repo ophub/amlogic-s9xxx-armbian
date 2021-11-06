@@ -1,10 +1,11 @@
 #!/bin/bash
-#==================================================================================================================================
-# Copyright (C) 2020- https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#=========================================================================
+# Function: Create TF/USB remaining space partition
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Create TF/USB remaining space partition
-#==================================================================================================================================
+# Command: armbian-tf
+#=========================================================================
 
 # Set font color
 purple_font_prefix="\033[35m"
