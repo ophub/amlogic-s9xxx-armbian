@@ -18,91 +18,18 @@ tmp_armbian=${make_path}/tmp_armbian
 tmp_build=${make_path}/tmp_build
 tmp_aml_image=${make_path}/tmp_aml_image
 
-kernel_library="https://github.com/ophub/flippy-kernel/tree/main/library"
-#kernel_library="https://github.com/ophub/flippy-kernel/trunk/library"
+kernel_library="https://github.com/ophub/kernel/tree/main/pub"
+#kernel_library="https://github.com/ophub/kernel/trunk/pub"
+version_branch="stable"
 
 build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
 build_kernel=("default")
-change_kernel="no"
+auto_kernel="ture"
+
+SKIP_MB=68
+BOOT_MB=256
+ROOT_MB=2748
 #===== Do not modify the following parameter settings, End =======
-
-# Specify Amlogic soc
-if [ -n "${1}" ]; then
-    unset build_armbian
-    oldIFS=$IFS
-    IFS=_
-    build_armbian=(${1})
-    IFS=$oldIFS
-fi
-
-# Set whether to replace the kernel
-if [ -n "${2}" ]; then
-    auto_kernel="${3}"
-    change_kernel="yes"
-    unset build_kernel
-    oldIFS=$IFS
-    IFS=_
-    build_kernel=(${2})
-    IFS=$oldIFS
-
-    # Convert kernel library address to svn format
-    if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
-        kernel_library=${kernel_library//tree\/main/trunk}
-    fi
-
-    # Check the new version on the kernel library
-    if [[ -z "${auto_kernel}" || "${auto_kernel}" != "false" ]]; then
-
-        # Set empty array
-        TMP_ARR_KERNELS=()
-
-        # Convert kernel library address to API format
-        SERVER_KERNEL_URL=${kernel_library#*com\/}
-        SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
-        SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
-
-        # Query the latest kernel in a loop
-        i=1
-        for KERNEL_VAR in ${build_kernel[*]}; do
-            echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
-            MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
-            MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
-            MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
-            MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
-            # Check the version on the server (e.g LATEST_VERSION="124")
-            LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
-            if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
-                TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
-            else
-                TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
-            fi
-            echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
-
-            let i++
-        done
-
-        # Reset the kernel array to the latest kernel version
-        unset build_kernel
-        build_kernel=${TMP_ARR_KERNELS[*]}
-
-    fi
-
-    # Synchronization related kernel
-    i=1
-    for KERNEL_VAR in ${build_kernel[*]}; do
-        if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
-            svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
-            rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
-        else
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
-        fi
-
-        let i++
-    done
-
-    sync
-fi
 
 die() {
     echo -e " [\033[1;31m Error \033[0m] ${1}"
@@ -111,6 +38,64 @@ die() {
 
 process() {
     echo -e " [\033[1;32m ${build_soc}${out_kernel} \033[0m] ${1}"
+}
+
+download_kernel() {
+    cd ${make_path}
+
+		# Convert kernel library address to svn format
+		if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
+			kernel_library="${kernel_library//tree\/main/trunk}"
+		fi
+		kernel_library="${kernel_library}/${version_branch}"
+
+		# Set empty array
+		TMP_ARR_KERNELS=()
+
+		# Convert kernel library address to API format
+		SERVER_KERNEL_URL=${kernel_library#*com\/}
+		SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
+		SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
+
+		# Query the latest kernel in a loop
+		i=1
+		for KERNEL_VAR in ${build_kernel[*]}; do
+			echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
+			MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
+			MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
+			MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
+			MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
+			# Check the version on the server (e.g LATEST_VERSION="124")
+			LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
+			if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
+				TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+			else
+				TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
+			fi
+			echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
+
+			let i++
+		done
+
+		# Reset the kernel array to the latest kernel version
+		unset build_kernel
+		build_kernel=${TMP_ARR_KERNELS[*]}
+
+		# Synchronization related kernel
+		i=1
+		for KERNEL_VAR in ${build_kernel[*]}; do
+			if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
+				echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
+				svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
+				rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
+			else
+				echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
+			fi
+
+			let i++
+		done
+
+		sync
 }
 
 make_image() {
@@ -135,9 +120,6 @@ make_image() {
         rm -f ${build_image_file}
         sync
 
-        SKIP_MB=68
-        BOOT_MB=256
-        ROOT_MB=2748
         IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
 
         dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
@@ -179,7 +161,7 @@ extract_armbian() {
 
 replace_kernel() {
     # Replace if specified
-    if [[ "${change_kernel}" == "yes" ]]; then
+    if [[ "${auto_kernel}" == "ture" && ! "${build_kernel[*]}" =~ "default" ]]; then
         cd ${make_path}
 
             build_boot=$( ls ${kernel_path}/${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
@@ -421,9 +403,89 @@ clean_tmp() {
         sync
 }
 
+
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./make ]"
 echo -e "Welcome to build armbian for amlogic s9xxx STB! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+
+while [ "${1}" ]; do
+    case "${1}" in
+        -d | --default)
+            : ${version_branch:="${version_branch}"}
+            : ${build_armbian:="${build_armbian}"}
+            : ${build_kernel:="${build_kernel}"}
+            : ${ROOT_MB:="${ROOT_MB}"}
+            ;;
+        -b | --build)
+            if [ -n "${2}" ]; then
+                 unset build_armbian
+                 oldIFS=$IFS
+                 IFS=_
+                 build_armbian=(${2})
+                 IFS=$oldIFS
+                 shift
+            else
+                 die "Invalid build [ ${2} ]!"
+            fi
+            ;;
+        -k)
+            if [ -n "${2}" ]; then
+                 oldIFS=$IFS
+                 IFS=_
+                 build_kernel=(${2})
+                 IFS=$oldIFS
+                 shift
+            else
+                 die "Invalid kernel [ ${2} ]!"
+            fi
+            ;;
+        -a | --autokernel)
+            if [ -n "${2}" ]; then
+                 oldIFS=$IFS
+                 IFS=_
+                 auto_kernel="${2}"
+                 IFS=$oldIFS
+                 shift
+            else
+                 die "Invalid kernel [ ${2} ]!"
+            fi
+            ;;
+        -v | --versionbranch)
+            if [ -n "${2}" ]; then
+                 oldIFS=$IFS
+                 IFS=_
+                 version_branch="${2}"
+                 IFS=$oldIFS
+                 shift
+            else
+                 die "Invalid kernel [ ${2} ]!"
+            fi
+            ;;
+        -s | --size)
+            if [[ -n "${2}" && "${2}" -ge "256" ]]; then
+                 oldIFS=$IFS
+                 IFS=_
+                 ROOT_MB="${2}"
+                 IFS=$oldIFS
+                 shift
+            else
+                die "Invalid size [ ${2} ]!"
+            fi
+            ;;
+        *)
+            die "Invalid option [ ${1} ]!"
+            ;;
+    esac
+    shift
+done
+
+# Set whether to replace the kernel
+if [[ "${auto_kernel}" == "ture" && ! "${build_kernel[*]}" =~ "default" ]]; then
+	download_kernel
+fi
+
+echo -e "Armbian SoC List: [ ${build_armbian[*]} ]"
+echo -e "Kernel List: [ ${build_kernel[*]} ]"
 echo -e "Ready, start build armbian... \n"
 
 # Start loop compilation

@@ -4,7 +4,7 @@
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Kernel download server: https://github.com/ophub/flippy-kernel/tree/main/library
+# Kernel download server: https://github.com/ophub/kernel/tree/main/pub
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install U-BOOT.
 # When there is no U-BOOT file in related directory, the script will auto try to download the file from the server for completion:
@@ -12,20 +12,31 @@
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# Do not write main line U-BOOT command: armbian-update 5.4.150 no
+# Do not write main line U-BOOT command: armbian-update 5.4.150 stable no
 # Write the main line U-BOOT by default: armbian-update 5.4.150
 #==================================================================================================================================
 
 # Receive one-key command related parameters
+# Specify the kernel, such as: 5.10.70
 INPUTS_KERNEL="${1}"
-if [[ "${2}" == "no" ]]; then
+
+# Specify version branch, such as: stable
+ARR_BRANCH=("stable" "beta")
+if [[ -n "${2}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${2}")" ]]; then
+    version_branch="${2}"
+else
+    version_branch="stable"
+fi
+
+# Specify whether to brush into the mainline u-boot, such as: yes
+if [[ "${3}" == "no" ]]; then
     AUTO_MAINLINE_UBOOT="no"
 else
     AUTO_MAINLINE_UBOOT="yes"
 fi
 
 # Set default value
-SERVER_KERNEL_URL="https://api.github.com/repos/ophub/flippy-kernel/contents/library"
+SERVER_KERNEL_URL="https://api.github.com/repos/ophub/kernel/contents/pub/${version_branch}"
 GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/amlogic-s9xxx"
 ENV_ARMBIAN_FILE="/etc/armbian-aml-release"
 
@@ -82,7 +93,7 @@ if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; th
     fi
 
     echo -e "Kernel version: ${KERNEL_NUM}"
-    echo -e "Start downloading the kernel from github.com ..."
+    echo -e "Start downloading the kernel from [ github.com/ophub/kernel/tree/main/pub/${version_branch} ] to [ ${P4_PATH} ]..."
 
     # Delete tmp files
     rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz 2>/dev/null
