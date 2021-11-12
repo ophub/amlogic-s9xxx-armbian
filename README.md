@@ -39,6 +39,10 @@ Query the available [kernel_version](https://github.com/ophub/flippy-kernel/tree
 armbian-update 5.10.66
 ```
 
+By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.2 beta`
+
+The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.10.66 stable no`
+
 - ### Install Docker Service
 
 Login in to armbian → input command:
@@ -114,13 +118,26 @@ Command: Enter [ vi /etc/fstab ]
 ```
 </details>
 
-## Armbian firmware make method
+## Detailed make compile command
 
-- Different amlogic armbian firmware, use the corresponding soc code to generate. Please choose according to your box soc model. Supported soc are `s922x`, `s922x-n2`, `s905x3`, `s905x2`, `s912`, `s905d`, `s905x`, `s905w`. Note: `s922x-n2` is `s922x-odroid-n2`.
+- `sudo ./make -d -b s905x3 -k 5.4.150`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
+- `sudo ./make -d -b s905x3_s905d -k 5.10.70_5.4.150`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
+- `sudo ./make -d`: Compile latest kernel versions of openwrt for all SoC with the default configuration.
+- `sudo ./make -d -b s905x3 -k 5.4.150 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./make -d -b s905x3 -v beta -k 5.7.2`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
+- `sudo ./make -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
+- `sudo ./make -d -k 5.10.70_5.4.150`: Use the default configuration. Specify multiple cores, use `_` to connect.
+- `sudo ./make -d -k 5.10.70_5.4.150 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
+- `sudo ./make -d -s 1024 -k 5.4.150`: Use the default configuration and set the partition size to 1024m, and only compile the openwrt firmware with the kernel version 5.4.150.
 
-- compile `a single soc` can be directly input `sudo ./make s905x3`. When `multiple soc` is compiled at the same time, please use `_` to connect multiple soc, such as `sudo ./make s922x_s905x3`
-
-- Optionality: Replace the kernel. Run Eg: `sudo ./make s905x 5.4.150`. When multiple kernel versions are generated at one time, the kernel version number is connected with `_` . Run Eg: `sudo ./make s922x_s905x3 5.10.70_5.4.150`.  When there is an latest version of the same series of the specified kernel version, the `latest version` will be download from [kernel library](https://github.com/ophub/flippy-kernel/tree/main/library) and used automatically. When you want to compile a `fixed kernel`, Run `sudo ./make s905x 5.4.150 false`.
+| Parameter | Meaning | Description |
+| ---- | ---- | ---- |
+| -d | Defaults | Compile all cores and all firmware types. |
+| -b | Build | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s922x`, `s922x-n2`, `s912`. Note: `s922x-n2` is `s922x-odroid-n2`. |
+| -v | Version | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
+| -k | Kernel | Specify the [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) name. Write the kernel name individually such as `-k 5.4.150` . Multiple kernel use `_` connection such as `-k 5.10.70_5.4.150` |
+| -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.150 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| -s | Size | Specify the size of the root partition in MB. The default is 1024, and the specified size must be greater than 256. Such as `-s 1024` |
 
 💡Tips: The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4.*` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
 
