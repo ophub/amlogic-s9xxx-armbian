@@ -43,59 +43,59 @@ process() {
 download_kernel() {
     cd ${make_path}
 
-		# Convert kernel library address to svn format
-		if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
-			kernel_library="${kernel_library//tree\/main/trunk}"
-		fi
-		kernel_library="${kernel_library}/${version_branch}"
+        # Convert kernel library address to svn format
+        if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
+            kernel_library="${kernel_library//tree\/main/trunk}"
+        fi
+        kernel_library="${kernel_library}/${version_branch}"
 
-		# Set empty array
-		TMP_ARR_KERNELS=()
+        # Set empty array
+        TMP_ARR_KERNELS=()
 
-		# Convert kernel library address to API format
-		SERVER_KERNEL_URL=${kernel_library#*com\/}
-		SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
-		SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
+        # Convert kernel library address to API format
+        SERVER_KERNEL_URL=${kernel_library#*com\/}
+        SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
+        SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
 
-		# Query the latest kernel in a loop
-		i=1
-		for KERNEL_VAR in ${build_kernel[*]}; do
-			echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
-			MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
-			MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
-			MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
-			MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
-			# Check the version on the server (e.g LATEST_VERSION="124")
-			LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
-			if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
-				TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
-			else
-				TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
-			fi
-			echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
+        # Query the latest kernel in a loop
+        i=1
+        for KERNEL_VAR in ${build_kernel[*]}; do
+            echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
+            MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
+            MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
+            MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
+            MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
+            # Check the version on the server (e.g LATEST_VERSION="124")
+            LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
+            if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
+                TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+            else
+                TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
+            fi
+            echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
 
-			let i++
-		done
+            let i++
+        done
 
-		# Reset the kernel array to the latest kernel version
-		unset build_kernel
-		build_kernel=${TMP_ARR_KERNELS[*]}
+        # Reset the kernel array to the latest kernel version
+        unset build_kernel
+        build_kernel=${TMP_ARR_KERNELS[*]}
 
-		# Synchronization related kernel
-		i=1
-		for KERNEL_VAR in ${build_kernel[*]}; do
-			if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
-				echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
-				svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
-				rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
-			else
-				echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
-			fi
+        # Synchronization related kernel
+        i=1
+        for KERNEL_VAR in ${build_kernel[*]}; do
+            if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
+                echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
+                svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
+                rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
+            else
+                echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
+            fi
 
-			let i++
-		done
+            let i++
+        done
 
-		sync
+        sync
 }
 
 make_image() {
@@ -481,7 +481,7 @@ done
 
 # Set whether to replace the kernel
 if [[ "${auto_kernel}" == "ture" && ! "${build_kernel[*]}" =~ "default" ]]; then
-	download_kernel
+    download_kernel
 fi
 
 echo -e "Armbian SoC List: [ ${build_armbian[*]} ]"
