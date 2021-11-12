@@ -8,7 +8,7 @@
 
 ## Armbian 固件说明
 
-| 型号  | 盒子 | [可选内核](https://github.com/ophub/flippy-kernel/tree/main/library) | Armbian 固件 |
+| 型号  | 盒子 | [可选内核](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian 固件 |
 | ---- | ---- | ---- | ---- |
 | s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db), [ODROID-N2](https://www.tokopedia.com/search?st=product&q=ODROID-N2) | 全部 | armbian_aml_s922x_buster_*.img |
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://tokopedia.link/5WHiETbdGgb), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | 全部 | armbian_aml_s905x3_buster_*.img |
@@ -32,7 +32,7 @@ armbian-install
 
 - ### 更新 Armbian 内核
 
-查询 [可选内核](https://github.com/ophub/flippy-kernel/tree/main/library) 版本，登录 Armbian 系统 → 输入命令：
+查询 [可选内核](https://github.com/ophub/kernel/tree/main/pub/stable) 版本，登录 Armbian 系统 → 输入命令：
 
 ```yaml
 # 使用 root 用户运行 (sudo -i), 输入命令: armbian-update <内核版本>
