@@ -122,13 +122,13 @@ Command: Enter [ vi /etc/fstab ]
 
 - `sudo ./make -d -b s905x3 -k 5.4.150`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
 - `sudo ./make -d -b s905x3_s905d -k 5.10.70_5.4.150`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
-- `sudo ./make -d`: Compile latest kernel versions of openwrt for all SoC with the default configuration.
+- `sudo ./make -d`: Use the default configuration to pack all boxes.
 - `sudo ./make -d -b s905x3 -k 5.4.150 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
 - `sudo ./make -d -b s905x3 -v beta -k 5.7.2`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./make -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
 - `sudo ./make -d -k 5.10.70_5.4.150`: Use the default configuration. Specify multiple cores, use `_` to connect.
 - `sudo ./make -d -k 5.10.70_5.4.150 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./make -d -s 1024 -k 5.4.150`: Use the default configuration and set the partition size to 1024m, and only compile the openwrt firmware with the kernel version 5.4.150.
+- `sudo ./make -d -s 1024 -k 5.4.150`: Use the default configuration and set the partition size to 1024m, and only compile the armbian firmware with the kernel version 5.4.150.
 
 | Parameter | Meaning | Description |
 | ---- | ---- | ---- |
