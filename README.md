@@ -8,7 +8,7 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 
 ## Armbian Firmware instructions
 
-| Model  | STB | [Optional kernel](https://github.com/ophub/flippy-kernel/tree/main/library) | Armbian Firmware |
+| Model  | STB | [Optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian Firmware |
 | ---- | ---- | ---- | ---- |
 | s922x | [Belink](https://tokopedia.link/RAgZmOM41db), [Belink-Pro](https://tokopedia.link/sfTHlfS41db), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db), [ODROID-N2](https://www.tokopedia.com/search?st=product&q=ODROID-N2) | All | armbian_aml_s922x_buster_*.img |
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://tokopedia.link/5WHiETbdGgb), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | All | armbian_aml_s905x3_buster_*.img |
@@ -32,7 +32,7 @@ armbian-install
 
 - ### Update Armbian Kernel
 
-Query the available [kernel_version](https://github.com/ophub/flippy-kernel/tree/main/library). Login in to armbian → input command:
+Query the available [kernel_version](https://github.com/ophub/kernel/tree/main/pub/stable). Login in to armbian → input command:
 
 ```yaml
 # Run as root user (sudo -i), input command: armbian-update <kernel_version>
