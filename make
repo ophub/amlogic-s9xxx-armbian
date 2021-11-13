@@ -50,12 +50,12 @@ download_kernel() {
         kernel_library="${kernel_library}/${version_branch}"
 
         # Set empty array
-        TMP_ARR_KERNELS=()
+        tmp_arr_kernels=()
 
         # Convert kernel library address to API format
-        SERVER_KERNEL_URL=${kernel_library#*com\/}
-        SERVER_KERNEL_URL=${SERVER_KERNEL_URL//trunk/contents}
-        SERVER_KERNEL_URL="https://api.github.com/repos/${SERVER_KERNEL_URL}"
+        server_kernel_url=${kernel_library#*com\/}
+        server_kernel_url=${server_kernel_url//trunk/contents}
+        server_kernel_url="https://api.github.com/repos/${server_kernel_url}"
 
         # Query the latest kernel in a loop
         i=1
@@ -66,20 +66,20 @@ download_kernel() {
             MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
             MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
             # Check the version on the server (e.g LATEST_VERSION="124")
-            LATEST_VERSION=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
+            LATEST_VERSION=$(curl -s "${server_kernel_url}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+"  | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')
             if [[ "$?" -eq "0" && ! -z "${LATEST_VERSION}" ]]; then
-                TMP_ARR_KERNELS[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+                tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
             else
-                TMP_ARR_KERNELS[${i}]="${KERNEL_VAR}"
+                tmp_arr_kernels[${i}]="${KERNEL_VAR}"
             fi
-            echo -e "(${i}) [ ${TMP_ARR_KERNELS[$i]} ] is latest kernel. \n"
+            echo -e "(${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
             let i++
         done
 
         # Reset the kernel array to the latest kernel version
         unset build_kernel
-        build_kernel=${TMP_ARR_KERNELS[*]}
+        build_kernel=${tmp_arr_kernels[*]}
 
         # Synchronization related kernel
         i=1
@@ -161,7 +161,7 @@ extract_armbian() {
 
 replace_kernel() {
     # Replace if specified
-    if [[ "${auto_kernel}" == "ture" && ! "${build_kernel[*]}" =~ "default" ]]; then
+    if [[ ! "${build_kernel[*]}" =~ "default" ]]; then
         cd ${make_path}
 
             build_boot=$( ls ${kernel_path}/${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1 )
@@ -199,13 +199,13 @@ copy_files() {
 
         k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
         k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
-        if  [ "${k510_ver}" -eq "5" ];then
-            if  [ "${k510_maj}" -ge "10" ];then
+        if  [ "${k510_ver}" -eq "5" ]; then
+            if  [ "${k510_maj}" -ge "10" ]; then
                 K510="1"
             else
                 K510="0"
             fi
-        elif [ "${k510_ver}" -gt "5" ];then
+        elif [ "${k510_ver}" -gt "5" ]; then
             K510="1"
         else
             K510="0"
@@ -425,10 +425,10 @@ while [ "${1}" ]; do
                  IFS=$oldIFS
                  shift
             else
-                 die "Invalid build [ ${2} ]!"
+                 die "Invalid -b parameter [ ${2} ]!"
             fi
             ;;
-        -k)
+        -k | --kernel)
             if [ -n "${2}" ]; then
                  oldIFS=$IFS
                  IFS=_
@@ -436,40 +436,31 @@ while [ "${1}" ]; do
                  IFS=$oldIFS
                  shift
             else
-                 die "Invalid kernel [ ${2} ]!"
+                 die "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
         -a | --autokernel)
             if [ -n "${2}" ]; then
-                 oldIFS=$IFS
-                 IFS=_
                  auto_kernel="${2}"
-                 IFS=$oldIFS
                  shift
             else
-                 die "Invalid kernel [ ${2} ]!"
+                 die "Invalid -a parameter [ ${2} ]!"
             fi
             ;;
         -v | --versionbranch)
             if [ -n "${2}" ]; then
-                 oldIFS=$IFS
-                 IFS=_
                  version_branch="${2}"
-                 IFS=$oldIFS
                  shift
             else
-                 die "Invalid kernel [ ${2} ]!"
+                 die "Invalid -v parameter [ ${2} ]!"
             fi
             ;;
         -s | --size)
-            if [[ -n "${2}" && "${2}" -ge "256" ]]; then
-                 oldIFS=$IFS
-                 IFS=_
+            if [[ -n "${2}" && "${2}" -ge "1000" ]]; then
                  ROOT_MB="${2}"
-                 IFS=$oldIFS
                  shift
             else
-                die "Invalid size [ ${2} ]!"
+                die "Invalid -s parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -480,12 +471,10 @@ while [ "${1}" ]; do
 done
 
 # Set whether to replace the kernel
-if [[ "${auto_kernel}" == "ture" && ! "${build_kernel[*]}" =~ "default" ]]; then
-    download_kernel
-fi
+[ "${auto_kernel}" == "ture" ] && download_kernel
 
-echo -e "Armbian SoC List: [ ${build_armbian[*]} ]"
-echo -e "Kernel List: [ ${build_kernel[*]} ]"
+echo -e "Armbian SoC List: [ $( echo ${build_armbian[*]} | tr "\n" " " ) ]"
+echo -e "Kernel List: [ $( echo ${build_kernel[*]} | tr "\n" " " ) ]"
 echo -e "Ready, start build armbian... \n"
 
 # Start loop compilation
