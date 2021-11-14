@@ -364,6 +364,7 @@ copy_files() {
         chmod 4755 usr/bin/sudo
         chown 0 usr/lib/sudo/sudoers.so
         chmod 644 usr/lib/sudo/sudoers.so
+        chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
 
         # Delete related files
         rm -f etc/apt/sources.list.save 2>/dev/null
