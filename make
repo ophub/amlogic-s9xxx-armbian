@@ -360,6 +360,10 @@ copy_files() {
         chmod 777 var/tmp
         chown man:root var/cache/man -R
         chmod g+s var/cache/man -R
+        chown root:root usr/bin/sudo
+        chmod 4755 usr/bin/sudo
+        chown 0 usr/lib/sudo/sudoers.so
+        chmod 644 usr/lib/sudo/sudoers.so
 
         # Delete related files
         rm -f etc/apt/sources.list.save 2>/dev/null
@@ -376,7 +380,8 @@ copy_files() {
         echo "KERNEL_VERSION='${KERNEL_VERSION}'" >> etc/armbian-aml-release 2>/dev/null
         echo "SOC='${AMLOGIC_SOC}'" >> etc/armbian-aml-release 2>/dev/null
         echo "K510='${K510}'" >> etc/armbian-aml-release 2>/dev/null
-        
+        echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >> etc/armbian-aml-release 2>/dev/null
+
         # Custom banner name
         sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
 
