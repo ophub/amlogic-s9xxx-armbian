@@ -24,7 +24,7 @@ version_branch="stable"
 
 build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
 build_kernel=("default")
-auto_kernel="ture"
+auto_kernel="true"
 
 SKIP_MB=68
 BOOT_MB=256
@@ -477,7 +477,7 @@ while [ "${1}" ]; do
 done
 
 # Set whether to replace the kernel
-[ "${auto_kernel}" == "ture" ] && download_kernel
+[ "${auto_kernel}" == "true" ] && download_kernel
 
 echo -e "Armbian SoC List: [ $( echo ${build_armbian[*]} | tr "\n" " " ) ]"
 echo -e "Kernel List: [ $( echo ${build_kernel[*]} | tr "\n" " " ) ]"
