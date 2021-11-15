@@ -75,7 +75,7 @@ jobs:
       if: steps.build.outputs.status == 'success'
       run: |
         sudo chmod +x make
-        sudo ./make -d -b s922x_s922x-n2_s905x3_s905x2_s912_s905d -k 5.10.70_5.4.150
+        sudo ./make -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z -k 5.10.70_5.4.150
         sudo ./make -d -b s905x_s905w -k 5.4.150
         cd ./build/output/images && sudo gzip *.img && sync
         echo "FILEPATH=$PWD" >> $GITHUB_ENV

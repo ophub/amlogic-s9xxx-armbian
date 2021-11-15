@@ -255,6 +255,13 @@ copy_files() {
                 ANDROID_UBOOT=""
                 AMLOGIC_SOC="s912"
                 ;;
+            s912-t95z | s912-t95z-plus)
+                FDTFILE="meson-gxm-t95z-plus.dtb"
+                UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
+                MAINLINE_UBOOT=""
+                ANDROID_UBOOT=""
+                AMLOGIC_SOC="s912"
+                ;;
             s922x | belink | belinkpro | ugoos)
                 FDTFILE="meson-g12b-gtking-pro.dtb"
                 UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
@@ -267,7 +274,7 @@ copy_files() {
                 UBOOT_OVERLOAD="u-boot-odroid-n2.bin"
                 MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
                 ANDROID_UBOOT=""
-                AMLOGIC_SOC="s922x-n2"
+                AMLOGIC_SOC="s922x"
                 ;;
             *)
                 die "Have no this soc: [ ${build_soc} ]"
@@ -341,6 +348,9 @@ copy_files() {
            old_fdt_dtb="meson-gxl-s905d-phicomm-n1.dtb"
            sed -i "s/${old_fdt_dtb}/${FDTFILE}/g" uEnv.txt
         fi
+
+        # For s912-t95z-plus /boot/extlinux/extlinux.conf
+        [ "${FDTFILE}" == "meson-gxm-t95z-plus.dtb" ] && cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* .
 
         sync
 
