@@ -7,7 +7,7 @@
 #===== Do not modify the following parameter settings, Start =====
 make_path=${PWD}
 armbian_outputpath=${make_path}/build/output/images
-amlogic_path=${make_path}/amlogic-s9xxx
+amlogic_path=${make_path}/build-armbian
 armbian_path=${amlogic_path}/amlogic-armbian
 dtb_path=${amlogic_path}/amlogic-dtb
 kernel_path=${amlogic_path}/amlogic-kernel
