@@ -8,8 +8,8 @@
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install U-BOOT.
 # When there is no U-BOOT file in related directory, the script will auto try to download the file from the server for completion:
-# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/amlogic-u-boot"
-# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/amlogic-s9xxx/common-files/files/usr/lib/u-boot
+# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot"
+# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
 # Do not write main line U-BOOT command: armbian-update 5.4.150 stable no
@@ -37,7 +37,7 @@ fi
 
 # Set default value
 SERVER_KERNEL_URL="https://api.github.com/repos/ophub/kernel/contents/pub/${version_branch}"
-GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/amlogic-s9xxx"
+GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian"
 ENV_ARMBIAN_FILE="/etc/armbian-aml-release"
 
 # Encountered a serious error, abort the script execution
