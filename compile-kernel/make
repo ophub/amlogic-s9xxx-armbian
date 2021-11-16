@@ -1,0 +1,344 @@
+#!/bin/bash
+#===========================================================================
+# Description: compile linux kernel for armbian
+# Copyright (C) 2020-2021 https://github.com/unifreq
+# Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#===========================================================================
+
+#===== Do not modify the following parameter settings, Start =====
+# Set environment variables
+make_path=${PWD}
+out_kernel="${make_path}/out_kernel"
+config_dir="${make_path}/tools/config"
+uInitrd_dir="${make_path}/tools/uInitrd"
+dtb_dir="${make_path}/tools/dtb"
+kernel_path="${make_path}/kernel"
+arch_info=$(arch)
+auto_kernel="true"
+use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
+use_linuxgun_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
+use_linuxgun_localpath="/usr/local/aarch64"
+# Check the version on the server
+server_url="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
+build_kernel=("5.15.2" "5.4.159")
+custom_kernel_name="-meson64-diy"
+
+# Set font color
+blue_font_prefix="\033[34m"
+purple_font_prefix="\033[35m"
+green_font_prefix="\033[32m"
+yellow_font_prefix="\033[33m"
+red_font_prefix="\033[31m"
+font_color_suffix="\033[0m"
+INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+WARNING="[${yellow_font_prefix}WARNING${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+#===== Do not modify the following parameter settings, End =======
+
+die() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+check_environment() {
+	# Download aarch64-linux-gnu
+	echo -e "${STEPS} Check the cross-compilation environment ..."
+	if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
+		echo -e "${INFO} Run on x86_64"
+		if [ ! -d "${use_linuxgun_localpath}" ]; then
+			mkdir -p ${use_linuxgun_localpath}
+		fi
+		if [ ! -d "${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" ]; then
+			echo -e "${INFO} Download [ ${use_linuxgun_file} ] ..."
+			wget -c "${use_linuxgun_url}/${use_linuxgun_file}" -O "${use_linuxgun_localpath}/${use_linuxgun_file}" >/dev/null 2>&1 && sync
+			tar -xJf ${use_linuxgun_localpath}/${use_linuxgun_file} -C ${use_linuxgun_localpath} && sync
+		fi
+		if [ ! -d "${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" ]; then
+			die "The cross compilation environment is not set!"
+		fi
+	else
+		echo -e "${INFO} Run on aarch64"
+	fi
+}
+
+query_version() {
+	# Set empty array
+	tmp_arr_kernels=()
+
+	# Query the latest kernel in a loop
+	i=1
+	for KERNEL_VAR in ${build_kernel[*]}; do
+		echo -e "${INFO} (${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
+		MAIN_LINE_M=$(echo "${KERNEL_VAR}" | cut -d '.' -f1)
+		MAIN_LINE_V=$(echo "${KERNEL_VAR}" | cut -d '.' -f2)
+		MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
+		MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
+
+		# latest_version="linux-5.4.159.tar.xz"
+		latest_version=$( curl -s ${server_url} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' )
+		if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
+			tmp_arr_kernels[${i}]="${latest_version}"
+		else
+			tmp_arr_kernels[${i}]="${KERNEL_VAR}"
+		fi
+		echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+
+		let i++
+	done
+
+	# Reset the kernel array to the latest kernel version
+	unset build_kernel
+	build_kernel=${tmp_arr_kernels[*]}
+}
+
+download_kernel() {
+	cd ${make_path}
+		echo -e "${STEPS} Start query and download the kernel."
+
+		# kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
+		if [ ! -d "${kernel_path}/linux-${kernel_version}" ]; then
+			if [ -f "${kernel_path}/linux-${kernel_version}.tar.xz" ]; then
+				echo -e "${INFO} Unzip local files [ linux-${kernel_version}.tar.xz ]"
+				cd ${kernel_path}
+					tar -xJf linux-${kernel_version}.tar.xz
+					[ "$?" -eq "0" ] || die "[ linux-${kernel_version}.tar.xz ] file decompression failed."
+			else
+				echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${server_url}linux-${kernel_version}.tar.xz ]"
+				wget -q -P ${kernel_path} ${server_url}linux-${kernel_version}.tar.xz && sync
+				if [[ "$?" -eq "0" && -s "${kernel_path}/linux-${kernel_version}.tar.xz" ]]; then
+					echo -e "${SUCCESS} The kernel file is downloaded successfully."
+					cd ${kernel_path}
+						tar -xJf linux-${kernel_version}.tar.xz
+						[ -d "linux-${kernel_version}" ] || die "[ linux-${kernel_version}.tar.xz ] file decompression failed."
+				else
+					die "Kernel file download failed!"
+				fi
+			fi
+		else
+			echo -e "${INFO} [ linux-${kernel_version} ] Kernel is in the local directory."
+		fi
+
+        sync
+}
+
+make_kernel() {
+	cd ${kernel_path}/linux-${kernel_version}
+		if [ ! -f ".config" ]; then
+			# Copy config file
+			echo -e "${STEPS} Copy config file to linux-${kernel_version}"
+			config_demo=$( ls ${config_dir}/config-${kernel_vermaj}* 2>/dev/null | head -n 1 )
+			config_demo_file=${config_demo##*/}
+			echo -e "${INFO} CONFIG_DEMO: ${config_demo_file}"
+			cp -vf ${config_dir}/${config_demo_file} .config && sync
+		else
+			echo -e "${STEPS} Use the .config file in the current directory."
+		fi
+
+		sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
+		#sed -i "s|# CONFIG_LOCALVERSION_AUTO.*|CONFIG_LOCALVERSION_AUTO=n|" .config
+
+		# Set cross compilation parameters
+		echo -e "${STEPS} Set cross compilation parameters."
+		if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
+			export CROSS_COMPILE=${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
+			export PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin
+			export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib
+			echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >> /etc/profile && sync
+			echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >> ~/.bashrc && sync
+			echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >> /etc/profile && sync
+			echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >> ~/.bashrc && sync
+			source ~/.bashrc
+		else
+			export CROSS_COMPILE="aarch64-linux-gnu-"
+		fi
+			export ARCH="arm64"
+			export LOCALVERSION="${custom_kernel_name}"
+
+			echo -e "${INFO} CROSS_COMPILE: ${CROSS_COMPILE}"
+			echo -e "${INFO} ARCH: ${ARCH}"
+			echo -e "${INFO} LOCALVERSION: ${LOCALVERSION}"
+			echo -e "${INFO} PATH: ${PATH}"
+
+		# Make kernel
+		echo -e "${STEPS} Make kernel: linux-${kernel_version} ..."
+		make prepare
+		make scripts
+		make -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+		[ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is compiled successfully."
+
+		# Install kernel
+		echo -e "${STEPS} Install kernel ..."
+		make modules_install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+		[ $? -eq 0 ] && echo -e "${SUCCESS} The modules is installed successfully."
+		make install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+		[ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is installed successfully."
+}
+
+generate_uinitrd() {
+	cd /boot
+		# Tips: Generate uInitrd must be created in ARM64 (AArch64) system, it is invalid in X86_64 environment.
+		echo -e "${STEPS} Find the uInitrd file."
+		if  [ -f uInitrd ]; then
+			# Backup the original uInitrd file
+			[ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
+
+			# Generate initramfs and uInitrd
+			echo -e "${STEPS} Try to update-initramfs the uInitrd file (1)."
+			update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
+			if  [ -f uInitrd ]; then
+				echo -e "${SUCCESS} The uInitrd file is Successfully generated (1)."
+				mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+			else
+				echo -e "${WARNING} The uInitrd file not updated (1)."
+			fi
+
+			# Restore the original uInitrd
+			[ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
+		else
+			echo -e "${INFO} Try to generate uInitrd file (2)."
+			mkimage -A arm -T ramdisk -C none -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd
+			if  [ -f uInitrd ]; then
+				echo -e "${SUCCESS} The uInitrd file is successfully generated (2)."
+				mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+			else
+				echo -e "${WARNING} The uInitrd file not updated (2)."
+			fi
+		fi
+}
+
+packit_kernel() {
+	# Copy kernel related files
+	echo -e "${STEPS} Copy the kernel-${kernel_version} related files."
+	rm -rf ${out_kernel}/{boot/,dtb/,modules/,${kernel_version}/} 2>/dev/null && sync
+	mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,${kernel_version}/} && sync
+
+	# Pack the kernel 3 files
+	echo -e "${STEPS} Packing the kernel-${kernel_version} related 3 files ..."
+	cd ${out_kernel}/boot
+		cp -vf /boot/*${kernel_version}${LOCALVERSION} . && sync
+		# When the uInitrd file cannot be generated in the X86_64 environment, use the existing file instead.
+		if [ ! -f uInitrd-${kernel_version}${LOCALVERSION} ]; then
+			echo -e "${WARNING} Use the backup uInitrd file instead."
+			cp -vf ${uInitrd_dir}/uInitrd-${kernel_vermaj}* uInitrd-${kernel_version}${LOCALVERSION} && sync
+		else
+			echo -e "${INFO} Use the newly generated uInitrd file."
+		fi
+		chmod +x *
+		tar -czf boot-${kernel_version}${LOCALVERSION}.tar.gz * && sync && cp -f *.tar.gz ../${kernel_version}
+		echo -e "${SUCCESS} The [ boot-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+
+	cd ${out_kernel}/dtb/allwinner
+		cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
+		tar -czf dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+		cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+		echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+	cd ${out_kernel}/dtb/amlogic
+		cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
+		tar -czf dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+		cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+		echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+	cd ${out_kernel}/dtb/rockchip
+		cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
+		tar -czf dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+		cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+		echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+
+	cd ${out_kernel}/modules
+		cp -rf /lib/modules/${kernel_version}${LOCALVERSION} . && sync
+		tar -czf modules-${kernel_version}${LOCALVERSION}.tar.gz * && sync && cp -f *.tar.gz ../${kernel_version}
+		echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+
+	cd ${out_kernel}
+		rm -rf boot root 2>/dev/null
+		sync
+
+	echo -e "${SUCCESS} The kernel packaged successfully."
+}
+
+clean_tmp() {
+	# Update grub for Ubuntu
+	echo -e "${STEPS} Clear the space and update-grub."
+	rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
+	rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
+	update-grub 2>/dev/null
+	echo -e "${SUCCESS} Space cleared successfully."
+
+	sync
+	echo -e "${INFO} Save to [ ${out_kernel} ]."
+	echo -e "${SUCCESS} All processes have been completed."
+}
+
+[ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./make ]"
+echo -e "Welcome to compile kernel! \n"
+echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+
+while [ "${1}" ]; do
+    case "${1}" in
+        -k | --kernel)
+            if [ -n "${2}" ]; then
+                 oldIFS=$IFS
+                 IFS=_
+                 build_kernel=(${2})
+                 IFS=$oldIFS
+                 shift
+            else
+                 die "Invalid -k parameter [ ${2} ]!"
+            fi
+            ;;
+        -a | --autokernel)
+            if [ -n "${2}" ]; then
+                 auto_kernel="${2}"
+                 shift
+            else
+                 die "Invalid -a parameter [ ${2} ]!"
+            fi
+            ;;
+        -n | --kernelname)
+            if [ -n "${2}" ]; then
+                 custom_kernel_name="${2}"
+                 shift
+            else
+                 die "Invalid -n parameter [ ${2} ]!"
+            fi
+            ;;
+        -r | --repo)
+            if [ -n "${2}" ]; then
+                 repo_url="${2}"
+                 shift
+            else
+                 die "Invalid -r parameter [ ${2} ]!"
+            fi
+            ;;
+        *)
+            die "Invalid option [ ${1} ]!"
+            ;;
+    esac
+    shift
+done
+
+check_environment
+# Set whether to replace the kernel
+[ "${auto_kernel}" == "true" ] && query_version
+
+echo -e "Kernel List: [ $( echo ${build_kernel[*]} | tr "\n" " " ) ]"
+echo -e "Ready, start compile kernel... \n"
+
+k=1
+for x in ${build_kernel[*]}; do
+	kernel_version="${x}"
+	# Mainline name of the kernel version, such as [ 5.4 ]
+	kernel_vermaj="${kernel_version%.*}"
+
+	download_kernel
+	make_kernel
+	generate_uinitrd
+	packit_kernel
+	clean_tmp
+
+    let k++
+done
+
+exit 0
+
