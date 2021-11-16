@@ -163,6 +163,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 3. 在根目录下创建文件夹 `build/output/images` ，并上传采用 `lepotato` 分支生成的 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Lepotato_buster_current_5.10.67.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。
 4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./make s905x3` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
+## 编译自定义内核
+
+自定义内核的编译方法详见 [compile-kernel](compile-kernel)
+
 ## 借鉴
 
 编译的 [armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。为不同的盒子制作专用的 Armbian 系统时采用了 [flippy](https://github.com/unifreq/openwrt_packit) 为 `amlogic s9xxx openwrt` 制作的内核、脚本及 `u-boot` 等资源。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在 Amlogic s9xxx 盒子里使用 Armbian 系统。

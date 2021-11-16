@@ -161,6 +161,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 3. Create the `build/output/images` folder, and upload the Armbian image of the `lepotato` board ( Eg: `Armbian_21.11.0-trunk_Lepotato_buster_current_5.10.67.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory.
 4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./make s905x3` to make armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
+## Compile a custom kernel
+
+For the compilation method of the custom kernel, see [compile-kernel](compile-kernel)
+
 ## Borrow
 
 The [armbian](https://github.com/armbian/build) directly calls the official source code for compilation, When making dedicated Armbian systems for different boxes, the kernel, scripts, u-boot and other resources made by [flippy](https://github.com/unifreq/openwrt_packit) for `Amlogic s9xxx openwrt` are used. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
