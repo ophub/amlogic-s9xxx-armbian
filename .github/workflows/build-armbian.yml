@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #========================================================================================================================
 
-name: Build Armbian For Amlogic
+name: Build the armbian firmware
 
 on:
   repository_dispatch:

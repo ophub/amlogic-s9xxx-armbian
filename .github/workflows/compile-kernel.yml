@@ -1,0 +1,99 @@
+#==========================================================================
+# Description: Compile the Armbian kernel
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#==========================================================================
+
+name: Compile the armbian kernel
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      kernel_ver:
+        description: 'Kernel version: 5.15.2'
+        required: false
+        default: '5.15.2'
+  #schedule:
+    #- cron: '0 17 * * 0'
+
+env:
+  UPLOAD_KERNEL: false
+  UPLOAD_RELEASE: true
+  UPLOAD_WETRANSFER: false
+  DELETE_RELEASE: true
+  DELETE_ARTIFACTS: true
+  KEEP_DAY: 15
+  KEEP_MININUM_RUNS: 0
+  KEEP_MININUM_RELEASE: 3
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL git.io/armbian-kernel-server)
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+        ARR_BRANCH=("kernel.org" "flippy")
+        if  [[ -n "${{ github.event.inputs.kernel_repo }}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${{ github.event.inputs.kernel_repo }}")" ]]; then
+            KERNEL_REPO="${{ github.event.inputs.kernel_repo }}"
+        else
+            KERNEL_REPO="kernel.org"
+        fi
+        echo "KERNEL_REPO=${KERNEL_REPO}" >> $GITHUB_ENV
+
+        if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
+            KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
+        else
+            KERNEL_VER="5.15.2"
+        fi
+        echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
+
+    - name: Compile the Kernel ${{ env.KERNEL_VER }}
+      id: compile
+      run: |
+        sudo chmod +x recompile
+        sudo ./recompile -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
+        echo "PACKAGED_OUTPUTPATH=${PWD}/compile-kernel/output" >> $GITHUB_ENV
+        echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+        echo "::set-output name=status::success"
+
+    - name: Upload Kernel to Actions
+      uses: kittaakos/upload-artifact-as-is@master
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_KERNEL == 'true' && !cancelled()
+      with:
+        path: ${{ env.PACKAGED_OUTPUTPATH }}/
+
+    - name: Upload Kernel to WeTransfer
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+      run: |
+        curl -fsSL git.io/file-transfer | sh
+        ./transfer wet -s -p 16 --no-progress ${{ env.PACKAGED_OUTPUTPATH }} 2>&1 | tee wetransfer.log
+        echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
+
+    - name: Upload Kernel to Release
+      uses: ncipollo/release-action@v1
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      with:
+        tag: kernel_${{ env.KERNEL_VER }}_${{ env.PACKAGED_OUTPUTDATE }}
+        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+        allowUpdates: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+          The kernel can be used to compile Armbian and OpenWer.
+          
+        
