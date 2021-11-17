@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       kernel_ver:
-        description: 'Kernel version: 5.15.2'
+        description: 'Kernel version: 5.4.159'
         required: false
-        default: '5.15.2'
+        default: '5.4.159'
   #schedule:
     #- cron: '0 17 * * 0'
 
@@ -42,7 +42,7 @@ jobs:
       run: |
         sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
         sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL git.io/armbian-kernel-server)
+        sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
         sudo -E apt-get -qq autoremove --purge
         sudo -E apt-get -qq clean
         sudo timedatectl set-timezone "$TZ"
