@@ -120,15 +120,15 @@ armbian-tf
 
 ## 打包命令的相关参数说明
 
-- `sudo ./make -d -b s905x3 -k 5.4.150` : 推荐使用. 使用默认配置进行相关内核打包。
-- `sudo ./make -d -b s905x3_s905d -k 5.10.70_5.4.150` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
-- `sudo ./make -d` : 使用默认配置，对全部型号的机顶盒进行打包。
-- `sudo ./make -d -b s905x3 -k 5.4.150 -s 1024` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为1024M。
-- `sudo ./make -d -b s905x3 -v beta -k 5.7.2` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
-- `sudo ./make -d -b s905x3_s905d`  使用默认配置，对多个型号的机顶盒进行全部内核打包, 使用 `_` 进行多型号连接。
-- `sudo ./make -d -k 5.10.70_5.4.150` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。
-- `sudo ./make -d -k 5.10.70_5.4.150 -a true` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
-- `sudo ./make -d -s 1024 -k 5.4.150` : 使用默认配置，设置固件大小为 1024M, 并指定内核为 5.4.150 ，对全部型号机顶盒进行打包。
+- `sudo ./rebuild -d -b s905x3 -k 5.4.150` : 推荐使用. 使用默认配置进行相关内核打包。
+- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.70_5.4.150` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
+- `sudo ./rebuild -d` : 使用默认配置，对全部型号的机顶盒进行打包。
+- `sudo ./rebuild -d -b s905x3 -k 5.4.150 -s 1024` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为1024M。
+- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.2` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
+- `sudo ./rebuild -d -b s905x3_s905d`  使用默认配置，对多个型号的机顶盒进行全部内核打包, 使用 `_` 进行多型号连接。
+- `sudo ./rebuild -d -k 5.10.70_5.4.150` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。
+- `sudo ./rebuild -d -k 5.10.70_5.4.150 -a true` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
+- `sudo ./rebuild -d -s 1024 -k 5.4.150` : 使用默认配置，设置固件大小为 1024M, 并指定内核为 5.4.150 ，对全部型号机顶盒进行打包。
 
 | 参数 | 含义 | 说明 |
 | ---- | ---- | ---- |
@@ -161,7 +161,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 3. 在根目录下创建文件夹 `build/output/images` ，并上传采用 `lepotato` 分支生成的 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Lepotato_buster_current_5.10.67.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./make s905x3` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild s905x3` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
 ## 编译自定义内核
 
