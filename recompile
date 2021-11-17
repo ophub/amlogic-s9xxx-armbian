@@ -18,7 +18,7 @@ auto_kernel="true"
 
 # Kernel download address and custom name
 server_url="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
-build_kernel=("5.15.2" "5.4.159")
+build_kernel=("5.4.159" "5.10.79")
 custom_name="-meson64-beta"
 
 # Cross compile
@@ -239,6 +239,7 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
+    cp -f /boot/dtb/amlogic/*.dtb . && chmod +x * && sync
     cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
     tar -czf dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
