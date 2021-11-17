@@ -118,17 +118,17 @@ Command: Enter [ vi /etc/fstab ]
 ```
 </details>
 
-## Detailed make compile command
+## Detailed build compile command
 
-- `sudo ./make -d -b s905x3 -k 5.4.150`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
-- `sudo ./make -d -b s905x3_s905d -k 5.10.70_5.4.150`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
-- `sudo ./make -d`: Use the default configuration to pack all boxes.
-- `sudo ./make -d -b s905x3 -k 5.4.150 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
-- `sudo ./make -d -b s905x3 -v beta -k 5.7.2`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
-- `sudo ./make -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
-- `sudo ./make -d -k 5.10.70_5.4.150`: Use the default configuration. Specify multiple cores, use `_` to connect.
-- `sudo ./make -d -k 5.10.70_5.4.150 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./make -d -s 1024 -k 5.4.150`: Use the default configuration and set the partition size to 1024m, and only compile the armbian firmware with the kernel version 5.4.150.
+- `sudo ./rebuild -d -b s905x3 -k 5.4.150`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
+- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.70_5.4.150`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
+- `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
+- `sudo ./rebuild -d -b s905x3 -k 5.4.150 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.2`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
+- `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
+- `sudo ./rebuild -d -k 5.10.70_5.4.150`: Use the default configuration. Specify multiple cores, use `_` to connect.
+- `sudo ./rebuild -d -k 5.10.70_5.4.150 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
+- `sudo ./rebuild -d -s 1024 -k 5.4.150`: Use the default configuration and set the partition size to 1024m, and only compile the armbian firmware with the kernel version 5.4.150.
 
 | Parameter | Meaning | Description |
 | ---- | ---- | ---- |
@@ -141,15 +141,15 @@ Command: Enter [ vi /etc/fstab ]
 
 💡Tips: The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4.*` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
 
-- ### Use GitHub Action to make instructions
+- ### Use GitHub Action to build instructions
 
-1. Workflows configuration in [.yml](.github/workflows) files. Set the armbian `soc` you want to make in `Make Armbian for amlogic s9xxx`.
+1. Workflows configuration in [.yml](.github/workflows) files. Set the armbian `soc` you want to build in `Build Armbian for amlogic s9xxx`.
 
 2. New compilation: Select ***`Build Armbian For Amlogic`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build armbian` of different soc. Select ***`Use Releases file to build`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
-- ### Local make instructions
+- ### Local build instructions
 
 1. Install the necessary packages (E.g Ubuntu 20.04 LTS user)
 ```yaml
@@ -159,7 +159,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 ```
 2. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 3. Create the `build/output/images` folder, and upload the Armbian image of the `lepotato` board ( Eg: `Armbian_21.11.0-trunk_Lepotato_buster_current_5.10.67.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory.
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./make s905x3` to make armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild s905x3` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
 ## Compile a custom kernel
 
