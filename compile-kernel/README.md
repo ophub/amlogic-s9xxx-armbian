@@ -45,11 +45,15 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 ## Other instructions
 
-1. If there is a folder of the specified kernel in the `compile-kernel/kernle` directory, such as `linux-5.4.150`, the local source code will be used for compilation; when there is no specified kernel folder, but there is a compressed file of the specified kernel, such as linux -5.4.150.tar.xz, it will be automatically decompressed and compiled; when no kernel is specified locally, it will be automatically downloaded and compiled from the server.
+1. Priority of kernel compilation file inspection: If there is a folder of the specified kernel in the `compile-kernel/kernle` directory, such as `linux-5.4.150`, the local source code will be used for compilation; when there is no specified kernel folder, but there is a compressed file of the specified kernel, such as linux -5.4.150.tar.xz, it will be automatically decompressed and compiled; when no kernel is specified locally, it will be automatically downloaded and compiled from the server.
 
 2. If there is no [.config](tools/config) file in the local kernel directory such as `compile-kernel/kernle/linux-5.4.150`, the file will be automatically copied from template.
 
-3. When cross-compiling the `Armbian` kernel in a system such as `Ubuntu` under the environment of `x86_64`, the [uInitrd](tools/uInitrd) file cannot be generated. When the kernel file is packaged, the file of the same kernel series in the repository will be automatically used instead . The substitution may be unstable. During the kernel test, please test on the `USB/TF` device, and don't write to the `EMMC` partition rashly to avoid bricking.
+3. When cross-compiling the `Armbian` kernel in a system such as `Ubuntu` under the environment of `x86_64`, the [uInitrd](tools/uInitrd) file cannot be generated. When the kernel file is packaged, the file of the same kernel series in the repository will be automatically used instead. The substitution may be unstable.
 
 4. After the kernel is compiled, it will be automatically packaged into 5 kernel files according to the organization of the kernel files shared by flippy and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the Armbian system compiled with the current kernel. If you want to install on the current system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.150` and execute the specified kernel installation command such as `armbian-update 5.4.150` to install.
+
+5. If a kernel with the same name such as `5.4.150-meson64-beta` is already installed in the current `Armbian` system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
+
+6. Four basic principles: During the kernel test, please test on the `USB/TF` device, and don't write to the `EMMC` partition rashly to avoid bricking; Please do not perform a custom kernel test before you have mastered the method of system recovery proficiently; Please do not test the custom kernel in a formal production environment; Skilled use of [Stable Kernel](https://github.com/ophub/kernel/tree/main/pub/stable) can effectively avoid being fined by the boss and being punished by the wife.
 
