@@ -8,17 +8,18 @@
 #===== Do not modify the following parameter settings, Start =====
 # Set environment variables
 make_path=${PWD}
-out_kernel="${make_path}/out_kernel"
-config_dir="${make_path}/tools/config"
-uInitrd_dir="${make_path}/tools/uInitrd"
-kernel_path="${make_path}/kernel"
+compile_path="${make_path}/compile-kernel"
+out_kernel="${compile_path}/output"
+config_dir="${compile_path}/tools/config"
+uInitrd_dir="${compile_path}/tools/uInitrd"
+kernel_path="${compile_path}/kernel"
 arch_info=$(arch)
 auto_kernel="true"
 
 # Kernel download address and custom name
 server_url="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 build_kernel=("5.15.2" "5.4.159")
-custom_kernel_name="-meson64-diy"
+custom_name="-meson64-beta"
 
 # Cross compile
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
@@ -78,7 +79,7 @@ query_version() {
         MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
         MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
 
-        # latest_version="linux-5.4.159.tar.xz"
+        # latest_version="5.4.159"
         latest_version=$(curl -s ${server_url} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
         if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
             tmp_arr_kernels[${i}]="${latest_version}"
@@ -96,10 +97,8 @@ query_version() {
 }
 
 download_kernel() {
-    cd ${make_path}
-    echo -e "${STEPS} Start query and download the kernel."
-
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
+    echo -e "${STEPS} Start query and download the kernel."
     if [ ! -d "${kernel_path}/linux-${kernel_version}" ]; then
         if [ -f "${kernel_path}/linux-${kernel_version}.tar.xz" ]; then
             echo -e "${INFO} Unzip local files [ linux-${kernel_version}.tar.xz ]"
@@ -156,7 +155,7 @@ make_kernel() {
         export CROSS_COMPILE="aarch64-linux-gnu-"
     fi
     export ARCH="arm64"
-    export LOCALVERSION="${custom_kernel_name}"
+    export LOCALVERSION="${custom_name}"
 
     echo -e "${INFO} CROSS_COMPILE: ${CROSS_COMPILE}"
     echo -e "${INFO} ARCH: ${ARCH}"
@@ -257,6 +256,10 @@ packit_kernel() {
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
+    cd ${out_kernel}
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/} 2>/dev/null && sync
+    tar -czf ${kernel_version}.tar.gz ${kernel_version}
+
     sync
     echo -e "${SUCCESS} Kernel series files are stored in [ ${out_kernel} ]."
 }
@@ -265,7 +268,6 @@ clean_tmp() {
     # Update grub for Ubuntu
     echo -e "${STEPS} Clear the space and update-grub."
 
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/} 2>/dev/null
     rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
     rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
 
@@ -275,10 +277,6 @@ clean_tmp() {
     sync
     echo -e "${SUCCESS} All processes have been completed."
 }
-
-[ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./make ]"
-echo -e "${INFO} Welcome to compile kernel! \n"
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 
 while [ "${1}" ]; do
     case "${1}" in
@@ -303,7 +301,7 @@ while [ "${1}" ]; do
         ;;
     -n | --kernelname)
         if [ -n "${2}" ]; then
-            custom_kernel_name="${2}"
+            custom_name="${2}"
             shift
         else
             die "Invalid -n parameter [ ${2} ]!"
@@ -328,6 +326,9 @@ check_environment
 # Set whether to replace the kernel
 [ "${auto_kernel}" == "true" ] && query_version
 
+[ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
+echo -e "Welcome to compile kernel! \n"
+echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "Ready, start compile kernel... \n"
 
