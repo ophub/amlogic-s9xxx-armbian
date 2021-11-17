@@ -13,6 +13,7 @@ out_kernel="${compile_path}/output"
 config_dir="${compile_path}/tools/config"
 uInitrd_dir="${compile_path}/tools/uInitrd"
 kernel_path="${compile_path}/kernel"
+moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
 auto_kernel="true"
 
@@ -94,6 +95,11 @@ query_version() {
     # Reset the kernel array to the latest kernel version
     unset build_kernel
     build_kernel=${tmp_arr_kernels[*]}
+}
+
+local_kernel_check() {
+    local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_version}${custom_name}")"
+    [ -n "${local_kernel}" ] && die "The current system has the same named kernel, stop compiling!"
 }
 
 download_kernel() {
@@ -187,7 +193,7 @@ generate_uinitrd() {
         [ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
 
         # Generate initramfs and uInitrd
-        echo -e "${STEPS} Try to update-initramfs the uInitrd file (1)."
+        echo -e "${INFO} The uInitrd file exist, Try to update-initramfs the uInitrd file (1)."
         update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
         if [ -f uInitrd ]; then
             echo -e "${SUCCESS} The uInitrd file is Successfully generated (1)."
@@ -199,7 +205,7 @@ generate_uinitrd() {
         # Restore the original uInitrd
         [ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
     else
-        echo -e "${INFO} Try to generate uInitrd file (2)."
+        echo -e "${INFO} The uInitrd file does not exist, Try to generate uInitrd file (2)."
         mkimage -A arm -T ramdisk -C none -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd
         if [ -f uInitrd ]; then
             echo -e "${SUCCESS} The uInitrd file is successfully generated (2)."
@@ -239,7 +245,7 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
-    cp -f /boot/dtb/amlogic/*.dtb . && chmod +x * && sync
+    [ -d ${moredtb_path} ] && cp -f ${moredtb_path}/*.dtb . && chmod +x * && sync
     cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
     tar -czf dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
@@ -258,17 +264,16 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/} 2>/dev/null && sync
-    tar -czf ${kernel_version}.tar.gz ${kernel_version}
+    tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
 
-    sync
-    echo -e "${SUCCESS} Kernel series files are stored in [ ${out_kernel} ]."
+    echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
 }
 
 clean_tmp() {
     # Update grub for Ubuntu
     echo -e "${STEPS} Clear the space and update-grub."
 
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,${kernel_version}/} 2>/dev/null && sync
     rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
     rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
 
@@ -339,6 +344,7 @@ for x in ${build_kernel[*]}; do
     # Mainline name of the kernel version, such as [ 5.4 ]
     kernel_vermaj="${kernel_version%.*}"
 
+    local_kernel_check
     download_kernel
     make_kernel
     generate_uinitrd
