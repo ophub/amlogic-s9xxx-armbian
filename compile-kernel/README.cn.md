@@ -49,7 +49,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. 如果本地的内核目录如 `compile-kernel/kernle/linux-5.4.150` 中没有 [.config](tools/config) 文件，将自动从 flippy 分享的模板中复制相同内核系列的配置文件。
 
-3. 如果在 `x86_64` 的环境下使用 `Ubuntu` 等系统进行内核编译，由于交叉编译 `Armbian` 内核时无法生成 [uInitrd](tools/uInitrd) 文件，在打包内核文件时，将自动使用仓库中的相同内核系列的文件进行替代，这在使用中可能会不稳定。
+3. 如果在 `x86_64` 的环境下使用 `Ubuntu` 等系统进行内核编译，由于交叉编译 `Armbian` 内核时无法生成 [uInitrd](tools/uInitrd) 文件，在打包内核文件时，将自动使用仓库中的相同内核系列的文件进行替代，这在使用中可能会不稳定。在内核测试时，请在 `USB/TF` 设备上进行测试，不要贸然写入 `EMMC` 分区，避免成砖。
 
 4. 内核编译完成后，将会按照 flippy 分享的内核文件的组织方式自动打包成 5 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的 Armbian 系统中清除。如果你想在当前系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.150` 下，执行指定内核安装命令如 `armbian-update 5.4.150` 进行安装。
 

@@ -74,8 +74,8 @@ else
     exit 1
 fi
 
-# Download 3 kernel files
-if  [ $( ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -ne 3 ]; then
+# Check 3 kernel files
+if  [ $( ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l ) -lt 3 ]; then
 
     if [[ -z "${INPUTS_KERNEL}" ]]; then
         LATEST_VERSION_K4_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.4.[0-9]+"  | sed -e "s/5.4.//g" | sort -n | sed -n '$p')
