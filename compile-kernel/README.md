@@ -1,8 +1,8 @@
-# Compile the Armbian kernel
+# Compile the kernel
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
-Compile a custom kernel for your Armbian system as needed.
+Compile a custom kernel as needed. This kernel can be used in [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) and [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) systems. Commonly used in systems made with the [flippy](https://github.com/unifreq/openwrt_packit) standard.
 
 ## Compile command description
 
