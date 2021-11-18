@@ -1,8 +1,8 @@
-# 编译 Armbian 内核
+# 编译内核
 
 查看英文说明 | [View English description](README.md)
 
-根据需要，为自己的 Armbian 系统编译自定义内核。
+根据需要，编译自定义内核。此内核可用于 [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) 和 [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) 系统，在以 [flippy](https://github.com/unifreq/openwrt_packit) 标准制作的同类系统中可通用。
 
 ## 编译命令说明
 

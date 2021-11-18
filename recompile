@@ -137,6 +137,7 @@ make_kernel() {
         echo -e "${STEPS} Copy config file to linux-${kernel_version}"
         config_demo=$(ls ${config_dir}/config-${kernel_vermaj}* 2>/dev/null | head -n 1)
         config_demo_file=${config_demo##*/}
+        [ -z "${config_demo_file}" ] && die "Missing [ config-${kernel_vermaj}* ] template!"
         echo -e "${INFO} CONFIG_DEMO: ${config_demo_file}"
         cp -vf ${config_dir}/${config_demo_file} .config && sync
     else
@@ -187,13 +188,14 @@ make_kernel() {
 generate_uinitrd() {
     cd /boot
     # Tips: Generate uInitrd must be created in ARM64 (AArch64) system, it is invalid in X86_64 environment.
+    # Update under Armbian system, Skip under Non-Armbian system.
     echo -e "${STEPS} Find the uInitrd file."
     if [ -f uInitrd ]; then
         # Backup the original uInitrd file
         [ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
 
         # Generate initramfs and uInitrd
-        echo -e "${INFO} The uInitrd file exist, Try to update-initramfs the uInitrd file (1)."
+        echo -e "${INFO} Find uInitrd file in Armbian system, Try to update-initramfs the uInitrd file (1)."
         update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
         if [ -f uInitrd ]; then
             echo -e "${SUCCESS} The uInitrd file is Successfully generated (1)."
@@ -205,14 +207,15 @@ generate_uinitrd() {
         # Restore the original uInitrd
         [ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
     else
-        echo -e "${INFO} The uInitrd file does not exist, Try to generate uInitrd file (2)."
-        mkimage -A arm -T ramdisk -C none -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd
-        if [ -f uInitrd ]; then
-            echo -e "${SUCCESS} The uInitrd file is successfully generated (2)."
-            mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
-        else
-            echo -e "${WARNING} The uInitrd file not updated (2)."
-        fi
+        echo -e "${WARNING} The uInitrd file does not exist, jump over (2)."
+        #echo -e "${INFO} No uInitrd file found on Non-Armbian systems, Try to generate uInitrd file (2)."
+        #mkimage -A arm -T ramdisk -C none -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd
+        #if [ -f uInitrd ]; then
+        #    echo -e "${SUCCESS} The uInitrd file is successfully generated (2)."
+        #    mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+        #else
+        #    echo -e "${WARNING} The uInitrd file not updated (2)."
+        #fi
     fi
 }
 
@@ -229,7 +232,10 @@ packit_kernel() {
     # When the uInitrd file cannot be generated in the X86_64 environment, use the existing file instead.
     if [ ! -f uInitrd-${kernel_version}${LOCALVERSION} ]; then
         echo -e "${WARNING} Use the backup uInitrd file instead."
-        cp -vf ${uInitrd_dir}/uInitrd-${kernel_vermaj}* uInitrd-${kernel_version}${LOCALVERSION} && sync
+        uInitrd_demo=$(ls ${uInitrd_dir}/uInitrd-${kernel_vermaj}* 2>/dev/null | head -n 1)
+        uInitrd_demo_file=${uInitrd_demo##*/}
+        [ -z "${uInitrd_demo_file}" ] && die "Missing [ uInitrd-${kernel_vermaj}* ] template!"
+        cp -vf ${uInitrd_dir}/${uInitrd_demo_file} uInitrd-${kernel_version}${LOCALVERSION} && sync
     else
         echo -e "${INFO} Use the newly generated uInitrd file."
     fi
