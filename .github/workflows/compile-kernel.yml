@@ -9,6 +9,10 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      kernel_repo:
+        description: 'Source: kernel.org / flippy'
+        required: false
+        default: 'kernel.org'
       kernel_ver:
         description: 'Kernel version: 5.4.159'
         required: false
@@ -63,7 +67,7 @@ jobs:
         fi
         echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
 
-    - name: Compile the Kernel ${{ env.KERNEL_VER }}
+    - name: Compile the Kernel ${{ env.KERNEL_REPO }} ${{ env.KERNEL_VER }}
       id: compile
       run: |
         sudo chmod +x recompile
@@ -95,5 +99,6 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
           The kernel can be used to compile Armbian and OpenWer.
+          The kernel source code comes from: ${{ env.KERNEL_REPO }}
           
         

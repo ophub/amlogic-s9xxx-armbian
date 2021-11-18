@@ -19,7 +19,7 @@
 | -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-beta` ，生成的内核名称为 `5.4.150-meson64-beta` 。设置自定义签名时请勿包含空格。 |
 | -r | Repo | 指定内核编译源码的下载站。可选项为 [kernel.org](https://www.kernel.org/) 和 [flippy](https://github.com/unifreq) ，默认为 `kernel.org` |
 
-💡提示：当前已开通使用 `kernel.org` 的源码进行编译，使用 `flippy` 的源码进行编译正在调试中。
+💡提示：可以使用 `flippy` 的源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 的 `最新版本` 。`其他版本或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。
 
 - ### 使用 GitHub Action 进行编译
 

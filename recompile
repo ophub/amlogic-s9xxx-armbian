@@ -18,9 +18,12 @@ arch_info=$(arch)
 auto_kernel="true"
 
 # Kernel download address and custom name
-server_url="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
+kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
+kernel_flippy_repo="unifreq"
+kernel_flippy_branch="main"
 build_kernel=("5.4.159" "5.10.79")
 custom_name="-meson64-beta"
+repo_url="kernel.org"
 
 # Cross compile
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
@@ -80,14 +83,27 @@ query_version() {
         MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
         MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
 
-        # latest_version="5.4.159"
-        latest_version=$(curl -s ${server_url} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
-        if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
-            tmp_arr_kernels[${i}]="${latest_version}"
+        if [ "${repo_url}" == "flippy" ]; then
+            kernel_flippy_sub="${kernel_flippy_repo}/linux-${MAIN_LINE}.y"
+            kernel_flippy_ver="https://raw.githubusercontent.com/${kernel_flippy_sub}/main/Makefile"
+            # latest_version="159"
+            latest_version=$(curl -s ${kernel_flippy_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')
+            if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
+                tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
+            else
+                die "Failed to query the kernel version in [ github.com/${kernel_flippy_sub} ]"
+            fi
+            echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${kernel_flippy_sub} latest kernel. \n"
         else
-            tmp_arr_kernels[${i}]="${KERNEL_VAR}"
+            # latest_version="5.4.159"
+            latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
+            if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
+                tmp_arr_kernels[${i}]="${latest_version}"
+            else
+                die "Failed to query the kernel version in [ ${kernel_org_repo} ]"
+            fi
+            echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is kernel.org latest kernel. \n"
         fi
-        echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
         let i++
     done
@@ -105,36 +121,41 @@ local_kernel_check() {
 download_kernel() {
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
     echo -e "${STEPS} Start query and download the kernel."
-    if [ ! -d "${kernel_path}/linux-${kernel_version}" ]; then
-        if [ -f "${kernel_path}/linux-${kernel_version}.tar.xz" ]; then
-            echo -e "${INFO} Unzip local files [ linux-${kernel_version}.tar.xz ]"
-            cd ${kernel_path}
-            tar -xJf linux-${kernel_version}.tar.xz
-            [ "$?" -eq "0" ] || die "[ linux-${kernel_version}.tar.xz ] file decompression failed."
+    if [ ! -d "${kernel_path}/${linux_kernel_dirname}" ]; then
+        if [ "${repo_url}" == "flippy" ]; then
+            echo -e "${INFO} Start cloning from [ https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} ]"
+            git clone --depth 1 https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} -b ${kernel_flippy_branch} ${kernel_path}/${linux_kernel_dirname}
+            [ "$?" -eq "0" ] || die "[ https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} ] Clone failed."
         else
-            echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${server_url}linux-${kernel_version}.tar.xz ]"
-            wget -q -P ${kernel_path} ${server_url}linux-${kernel_version}.tar.xz && sync
-            if [[ "$?" -eq "0" && -s "${kernel_path}/linux-${kernel_version}.tar.xz" ]]; then
-                echo -e "${SUCCESS} The kernel file is downloaded successfully."
+            if [ -f "${kernel_path}/${linux_kernel_dirname}.tar.xz" ]; then
+                echo -e "${INFO} Unzip local files [ ${linux_kernel_dirname}.tar.xz ]"
                 cd ${kernel_path}
-                tar -xJf linux-${kernel_version}.tar.xz
-                [ -d "linux-${kernel_version}" ] || die "[ linux-${kernel_version}.tar.xz ] file decompression failed."
+                tar -xJf ${linux_kernel_dirname}.tar.xz
+                [ "$?" -eq "0" ] || die "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
             else
-                die "Kernel file download failed!"
+                echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${kernel_org_repo}${linux_kernel_dirname}.tar.xz ]"
+                wget -q -P ${kernel_path} ${kernel_org_repo}${linux_kernel_dirname}.tar.xz && sync
+                if [[ "$?" -eq "0" && -s "${kernel_path}/${linux_kernel_dirname}.tar.xz" ]]; then
+                    echo -e "${SUCCESS} The kernel file is downloaded successfully."
+                    cd ${kernel_path}
+                    tar -xJf ${linux_kernel_dirname}.tar.xz && sync
+                    [ -d "${linux_kernel_dirname}" ] || die "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
+                else
+                    die "Kernel file download failed!"
+                fi
             fi
         fi
     else
-        echo -e "${INFO} [ linux-${kernel_version} ] Kernel is in the local directory."
+        echo -e "${INFO} [ ${linux_kernel_dirname} ] Kernel is in the local directory."
     fi
-
     sync
 }
 
 make_kernel() {
-    cd ${kernel_path}/linux-${kernel_version}
+    cd ${kernel_path}/${linux_kernel_dirname}
     if [ ! -f ".config" ]; then
         # Copy config file
-        echo -e "${STEPS} Copy config file to linux-${kernel_version}"
+        echo -e "${STEPS} Copy config file to ${linux_kernel_dirname}"
         config_demo=$(ls ${config_dir}/config-${kernel_vermaj}* 2>/dev/null | head -n 1)
         config_demo_file=${config_demo##*/}
         [ -z "${config_demo_file}" ] && die "Missing [ config-${kernel_vermaj}* ] template!"
@@ -170,7 +191,7 @@ make_kernel() {
     echo -e "${INFO} PATH: ${PATH}"
 
     # Make kernel
-    echo -e "${STEPS} Make kernel: linux-${kernel_version} ..."
+    echo -e "${STEPS} Make kernel: ${linux_kernel_dirname} ..."
     make prepare
     make scripts
     make -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
@@ -221,7 +242,7 @@ generate_uinitrd() {
 
 packit_kernel() {
     # Pack the kernel 5 files
-    echo -e "${STEPS} Packing the linux-${kernel_version} related 3 files ..."
+    echo -e "${STEPS} Packing the ${linux_kernel_dirname} related 3 files ..."
 
     # Create a temp directory
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,${kernel_version}/} 2>/dev/null && sync
@@ -245,20 +266,20 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ boot-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/allwinner
-    cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
     tar -czf dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
     [ -d ${moredtb_path} ] && cp -f ${moredtb_path}/*.dtb . && chmod +x * && sync
-    cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
     tar -czf dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/rockchip
-    cp -f ${kernel_path}/linux-${kernel_version}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
     tar -czf dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
@@ -303,7 +324,7 @@ while [ "${1}" ]; do
             die "Invalid -k parameter [ ${2} ]!"
         fi
         ;;
-    -a | --autokernel)
+    -a | --autoKernel)
         if [ -n "${2}" ]; then
             auto_kernel="${2}"
             shift
@@ -311,7 +332,7 @@ while [ "${1}" ]; do
             die "Invalid -a parameter [ ${2} ]!"
         fi
         ;;
-    -n | --kernelname)
+    -n | --customName)
         if [ -n "${2}" ]; then
             custom_name="${2}"
             shift
@@ -349,6 +370,11 @@ for x in ${build_kernel[*]}; do
     kernel_version="${x}"
     # Mainline name of the kernel version, such as [ 5.4 ]
     kernel_vermaj="${kernel_version%.*}"
+    if [ "${repo_url}" == "flippy" ]; then
+        linux_kernel_dirname="linux-${kernel_vermaj}.y"
+    else
+        linux_kernel_dirname="linux-${kernel_version}"
+    fi
 
     local_kernel_check
     download_kernel
