@@ -357,7 +357,7 @@ done
 
 check_environment
 # Set whether to replace the kernel
-[ "${auto_kernel}" == "true" ] && query_version
+[[ "${auto_kernel}" == "true" || "${repo_url}" == "flippy" ]] && query_version
 
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
 echo -e "Welcome to compile kernel! \n"
