@@ -12,7 +12,7 @@ on:
       kernel_ver:
         description: 'Kernel version: 5.4.159'
         required: false
-        default: '5.4.159'
+        default: '5.4.159_5.10.79'
   #schedule:
     #- cron: '0 17 * * 0'
 
@@ -59,7 +59,7 @@ jobs:
         if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
             KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
         else
-            KERNEL_VER="5.15.2"
+            KERNEL_VER="5.4.159_5.10.79"
         fi
         echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
 
@@ -89,7 +89,7 @@ jobs:
       uses: ncipollo/release-action@v1
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        tag: kernel_${{ env.KERNEL_VER }}_${{ env.PACKAGED_OUTPUTDATE }}
+        tag: kernel_${{ env.KERNEL_VER }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
