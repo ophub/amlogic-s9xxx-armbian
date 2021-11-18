@@ -67,12 +67,15 @@ jobs:
         fi
         echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
 
-    - name: Compile the Kernel ${{ env.KERNEL_REPO }} ${{ env.KERNEL_VER }}
+    - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
       id: compile
       run: |
         sudo chmod +x recompile
         sudo ./recompile -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
-        echo "PACKAGED_OUTPUTPATH=${PWD}/compile-kernel/output" >> $GITHUB_ENV
+        output_dirname="${PWD}/compile-kernel/output"
+        output_tags="$(ls ${output_dirname}/*.tar.gz -l | grep "^-" | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
+        echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
+        echo "PACKAGED_OUTPUTPATH=${output_dirname}" >> $GITHUB_ENV
         echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
         echo "::set-output name=status::success"
 
@@ -93,7 +96,7 @@ jobs:
       uses: ncipollo/release-action@v1
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       with:
-        tag: kernel_${{ env.KERNEL_VER }}
+        tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
         artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
