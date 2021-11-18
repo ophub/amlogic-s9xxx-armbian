@@ -21,9 +21,10 @@ echo -e "${STEPS} Try to create a shared partition..."
 echo -ne "${STEPS} This operation will clear the data in the remaining space, are you sure to continue? y/n [y]\b\b"
 read yn
 case $yn in
-     n*|N*) echo -e "${ERROR} You aborted the operation!"
-            exit 1
-            ;;
+n* | N*)
+    echo -e "${ERROR} You aborted the operation!"
+    exit 1
+    ;;
 esac
 
 # Find the partition where root is located
@@ -35,21 +36,24 @@ fi
 
 # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
 case ${ROOT_PTNAME} in
-       mmcblk?p[1-4]) DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')
-                      PT_PRE="${DISK_NAME}p"
-                      LB_PRE="EMMC_"
-                      ;;
-    [hsv]d[a-z][1-4]) DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')
-                      PT_PRE="${DISK_NAME}"
-                      LB_PRE=""
-                      ;;
-                   *) echo -e "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
-                      exit 1
-                      ;;
+mmcblk?p[1-4])
+    DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')
+    PT_PRE="${DISK_NAME}p"
+    LB_PRE="EMMC_"
+    ;;
+[hsv]d[a-z][1-4])
+    DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')
+    PT_PRE="${DISK_NAME}"
+    LB_PRE=""
+    ;;
+*)
+    echo -e "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
+    exit 1
+    ;;
 esac
 
 # Get the starting position of the p3 partition
-START_P3=$( fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | echo $(($(xargs)+1)) )
+START_P3=$(fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | echo $(($(xargs) + 1)))
 if [[ -z "${START_P3}" || -z "$(echo ${START_P3} | sed -n "/^[0-9]\+$/p")" ]]; then
     echo -e "${ERROR} Unable to get starting position!"
     exit 1
@@ -57,7 +61,7 @@ fi
 TOTAL_SIZE=$(lsblk -l -b -o NAME,SIZE | awk "\$1 ~ /^${DISK_NAME}\$/ {print \$2}")
 END_P3=$((TOTAL_SIZE / 512 - 1))
 
-cat > /tmp/fdisk.script <<EOF
+cat >/tmp/fdisk.script <<EOF
 n
 p
 3
@@ -72,22 +76,21 @@ EOF
 sync
 
 echo -e "${STEPS} Fdisk starting ... "
-fdisk /dev/${DISK_NAME} < /tmp/fdisk.script 2>/dev/null
-if [ $? -ne 0 ];then
-	echo -e "${ERROR} fdisk failed!"
-	exit 1
+fdisk /dev/${DISK_NAME} </tmp/fdisk.script 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo -e "${ERROR} fdisk failed!"
+    exit 1
 fi
 sync
 
 echo -e "${STEPS} Create shared filesystem ... "
 mkdir -p /mnt/${PT_PRE}3 && sync
-mkfs.ext4  -F -L "${LB_PRE}SHARED" "/dev/${PT_PRE}3"
+mkfs.ext4 -F -L "${LB_PRE}SHARED" "/dev/${PT_PRE}3"
 mount -t ext4 "/dev/${PT_PRE}3" "/mnt/${PT_PRE}3"
-echo "/dev/${PT_PRE}3 /mnt/${PT_PRE}3 ext4 defaults 0 0" >> /etc/fstab
+echo "/dev/${PT_PRE}3 /mnt/${PT_PRE}3 ext4 defaults 0 0" >>/etc/fstab
 sync
 
 echo -e "${SUCCESS} Create partition successfully, mount it in [ /mnt/${PT_PRE}3 ]"
 rm -f /usr/sbin/armbian-tf 2>/dev/null && sync
 sync
 exit 0
-
