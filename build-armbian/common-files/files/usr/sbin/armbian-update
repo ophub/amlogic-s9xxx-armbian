@@ -80,11 +80,6 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     if [[ -z "${INPUTS_KERNEL}" ]]; then
         LATEST_VERSION_K4_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.4.[0-9]+" | sed -e "s/5.4.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K4="5.4.${LATEST_VERSION_K4_LATEST}"
-
-        LATEST_VERSION_K10_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.10.[0-9]+" | sed -e "s/5.10.//g" | sort -n | sed -n '$p')
-        LATEST_VERSION_K10="5.10.${LATEST_VERSION_K10_LATEST}"
-
-        echo "The latest version on the server is: [ ${LATEST_VERSION_K4} / ${LATEST_VERSION_K10} ]"
         echo "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
         read KERNEL_NUM
         [ -n "${KERNEL_NUM}" ] || KERNEL_NUM="${LATEST_VERSION_K4}"
