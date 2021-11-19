@@ -21,7 +21,7 @@ auto_kernel="true"
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 kernel_flippy_repo="unifreq"
 kernel_flippy_branch="main"
-build_kernel=("5.4.159" "5.10.79")
+build_kernel=("5.4.160" "5.10.80")
 custom_name="-meson64-beta"
 repo_url="kernel.org"
 
@@ -86,7 +86,7 @@ query_version() {
         if [ "${repo_url}" == "flippy" ]; then
             kernel_flippy_sub="${kernel_flippy_repo}/linux-${MAIN_LINE}.y"
             kernel_flippy_ver="https://raw.githubusercontent.com/${kernel_flippy_sub}/main/Makefile"
-            # latest_version="159"
+            # latest_version="160"
             latest_version=$(curl -s ${kernel_flippy_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
@@ -95,7 +95,7 @@ query_version() {
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${kernel_flippy_sub} latest kernel. \n"
         else
-            # latest_version="5.4.159"
+            # latest_version="5.4.160"
             latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${latest_version}"
