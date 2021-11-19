@@ -115,7 +115,7 @@ query_version() {
 
 local_kernel_check() {
     local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_version}${custom_name}")"
-    [ -n "${local_kernel}" ] && die "The current system has the same named kernel, stop compiling!"
+    [ -n "${local_kernel}" ] && die "The current system has the same named kernel [ ${kernel_version}${custom_name} ], stop compiling!"
 }
 
 download_kernel() {

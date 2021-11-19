@@ -39,7 +39,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. Clone the repository to local: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. Go to [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) to download the kernel and unzip it to the `compile-kernel/kernle` directory. Enter the directory of the kernel such as `compile-kernel/kernle/linux-5.4.150`, run the personalized configuration selection command `make menuconfig` to select, and save it to generate a custom kernel `.config` file. 
+3. For example, use the source code of [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) to compile, Please download the corresponding kernel and unzip it to the directory `compile-kernel/kernle`; If you use the source code of [flippy](https://github.com/unifreq) to compile, Please clone the source code of the specified kernel series such as `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` to the corresponding directory. After completion, enter the corresponding kernel such as `compile-kernel/kernle/linux-5.4.150` directory, Run the personalized configuration selection command `make menuconfig` to make a selection, save it after completion, A custom kernel `.config` configuration file will be generated in the kernel directory. 
 
 4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run the `sudo ./recompile -k 5.4.150` command to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
@@ -49,7 +49,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. If there is no [.config](tools/config) file in the local kernel directory such as `compile-kernel/kernle/linux-5.4.150`, the file will be automatically copied from template.
 
-3. When cross-compiling the `Armbian` kernel in a system such as `Ubuntu` under the environment of `x86_64`, the [uInitrd](tools/uInitrd) file cannot be generated. When the kernel file is packaged, the file of the same kernel series in the repository will be automatically used instead. The substitution may be unstable.
+3. When cross-compiling the `Armbian` kernel in a system such as `Ubuntu` under the environment of `x86_64`, the [uInitrd](tools/uInitrd) file cannot be generated. When the kernel file is packaged, the file of the same kernel series in the repository will be automatically used instead. At present, cross-compilation in the `x86_64` environment cannot completely replace the kernel compilation in the real `Armbian` environment, and the produced kernel is unstable.
 
 4. After the kernel is compiled, it will be automatically packaged into 5 kernel files according to the organization of the kernel files shared by flippy and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the Armbian system compiled with the current kernel. If you want to install on the current system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.150` and execute the specified kernel installation command such as `armbian-update 5.4.150` to install.
 
