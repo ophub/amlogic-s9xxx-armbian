@@ -14,9 +14,9 @@ on:
         required: false
         default: 'kernel.org'
       kernel_ver:
-        description: 'Kernel version: 5.4.159'
+        description: 'Kernel version: 5.4.160'
         required: false
-        default: '5.4.159_5.10.79'
+        default: '5.4.160_5.10.80'
   #schedule:
     #- cron: '0 17 * * 0'
 
@@ -63,7 +63,7 @@ jobs:
         if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
             KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
         else
-            KERNEL_VER="5.4.159_5.10.79"
+            KERNEL_VER="5.4.160_5.10.80"
         fi
         echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
 
@@ -73,7 +73,7 @@ jobs:
         sudo chmod +x recompile
         sudo ./recompile -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
         output_dirname="${PWD}/compile-kernel/output"
-        output_tags="$(ls ${output_dirname}/*.tar.gz -l | grep "^-" | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
+        output_tags="$(ls ${output_dirname}/*.tar.gz -l | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
         echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
         echo "PACKAGED_OUTPUTPATH=${output_dirname}" >> $GITHUB_ENV
         echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
