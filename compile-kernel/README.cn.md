@@ -39,7 +39,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. 到 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 下载内核并解压到 `compile-kernel/kernle` 目录下。进入内核如 `compile-kernel/kernle/linux-5.4.150` 的目录下，运行个性化配置选择命令 `make menuconfig` 进行选择，完成后保存即可生成自定义内核的 `.config` 配置文件。
+3. 如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核并解压到 `compile-kernel/kernle` 目录下；如采用 [flippy](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernle/linux-5.4.150` 的目录下，运行个性化配置选择命令 `make menuconfig` 进行选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
 
 4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.4.150` 命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
@@ -49,7 +49,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. 如果本地的内核目录如 `compile-kernel/kernle/linux-5.4.150` 中没有 [.config](tools/config) 文件，将自动从 flippy 分享的模板中复制相同内核系列的配置文件。
 
-3. 如果在 `x86_64` 的环境下使用 `Ubuntu` 等系统进行内核编译，由于交叉编译 `Armbian` 内核时无法生成 [uInitrd](tools/uInitrd) 文件，在打包内核文件时，将自动使用仓库中的相同内核系列的文件进行替代，这在使用中可能会不稳定。
+3. 如果在 `x86_64` 的环境下使用 `Ubuntu` 等系统进行内核编译，由于交叉编译 `Armbian` 内核时无法生成 [uInitrd](tools/uInitrd) 文件，在打包内核文件时，将自动使用仓库中的相同内核系列的文件进行替代。目前，在 `x86_64` 环境下的交叉编译还不能完全代替真实 `Armbian` 环境下的内核编译，制作的内核存在不稳定性。
 
 4. 内核编译完成后，将会按照 flippy 分享的内核文件的组织方式自动打包成 5 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的 Armbian 系统中清除。如果你想在当前系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.150` 下，执行指定内核安装命令如 `armbian-update 5.4.150` 进行安装。
 
