@@ -197,13 +197,19 @@ make_kernel() {
     make -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
-    # Install kernel
-    echo -e "${STEPS} Install kernel ..."
+    # Install modules
+    echo -e "${STEPS} Install modules ..."
     make modules_install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The modules is installed successfully."
 
+    # Install headers
+    echo -e "${STEPS} Install headers ..."
+    make headers_install INSTALL_HDR_PATH=/usr ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
+
+    # Install new image
     make install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
-    [ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is installed successfully."
+    [ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
 }
 
 generate_uinitrd() {
@@ -245,8 +251,8 @@ packit_kernel() {
     echo -e "${STEPS} Packing the ${linux_kernel_dirname} related 3 files ..."
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,${kernel_version}/} && sync
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
+    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 
     cd ${out_kernel}/boot
     cp -f /boot/*${kernel_version}${LOCALVERSION} . && sync
@@ -290,6 +296,12 @@ packit_kernel() {
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
+    cd ${out_kernel}/header
+    cp -rf ${kernel_path}/${linux_kernel_dirname}/usr/include . && sync
+    tar -czf header-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    cp -f *.tar.gz ${out_kernel}/${kernel_version}
+    echo -e "${SUCCESS} The [ header-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+
     cd ${out_kernel}
     tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
 
@@ -297,10 +309,10 @@ packit_kernel() {
 }
 
 clean_tmp() {
-    # Update grub for Ubuntu
+    # Update grub
     echo -e "${STEPS} Clear the space and update-grub."
 
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,${kernel_version}/} 2>/dev/null && sync
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
     rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
     rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
 
