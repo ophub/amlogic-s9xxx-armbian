@@ -13,7 +13,7 @@ Because of these innovations and contributors, we can have the company of the bo
 | Innovation and contributors | Record of achievements |
 | ---- | ---- |
 | [flippy](https://github.com/unifreq) | Developed many Armbian and OpenWrt systems, provided s905d-s922x and many other SOC system boot and firmware production solutions, shared abundant resources and tutorials. The [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) etc. used on this site all fully adopted his results, and he opened the door to the world of Armbian and OpenWrt from the TV box. |
-| [NewbieOrange](https://github.com/NewbieOrange) | He provided the [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) file and usage method of the new device [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) in [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448). |
+| [NewbieOrange](https://github.com/NewbieOrange) | He provided the [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) file and [usage method](build-armbian/common-files/patches/boot/s912-t95z-plus) of the new device [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) in [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448). |
 
 ## Armbian Firmware instructions
 
@@ -48,7 +48,7 @@ Query the available [kernel_version](https://github.com/ophub/kernel/tree/main/p
 armbian-update 5.4.160
 ```
 
-By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.2 beta`
+By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.19 beta`
 
 The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.4.160 stable no`
 
@@ -133,7 +133,7 @@ Command: Enter [ vi /etc/fstab ]
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.10.80_5.4.160`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
-- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.2`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
+- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.19`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
 - `sudo ./rebuild -d -k 5.10.80_5.4.160`: Use the default configuration. Specify multiple cores, use `_` to connect.
 - `sudo ./rebuild -d -k 5.10.80_5.4.160 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
