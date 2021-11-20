@@ -13,7 +13,7 @@
 | 创新与贡献者 | 成果记载 |
 | ---- | ---- |
 | [flippy](https://github.com/unifreq) | 开发了众多盒子的 Armbian 和 OpenWrt 系统，提供了 s905d-s922x 等众多 SOC 下系统的引导启动和固件制作的解决方案，分享了丰富的资源和教程。本站使用的 [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) 等均完全采用了他的成果，是他开启了从 TV 盒子走进 Armbian 和 OpenWrt 世界的大门。 |
-| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和 [使用方法](build-armbian/common-files/patches/boot/s912-t95z-plus) 。 |
+| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和 [使用方法](build-armbian/common-files/patches/boot/s912-t95z-plus) ；在 [pull](https://github.com/ophub/amlogic-s9xxx-armbian/pull/29) 中分享了 s905l2 (p281 board) [meson-gxl-s905l2-p281.dtb](build-armbian/amlogic-dtb/meson-gxl-s905l2-p281.dtb) 文件。 |
 
 ## Armbian 固件说明
 
