@@ -95,7 +95,7 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     echo -e "Start downloading the kernel from [ github.com/ophub/kernel/tree/main/pub/${version_branch} ] to [ ${P4_PATH} ]..."
 
     # Delete tmp files
-    rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz 2>/dev/null
+    rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz ${P4_PATH}/header-*.tar.gz 2>/dev/null
     sync
 
     # Download boot file
@@ -131,13 +131,25 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
         die "01.03 The modules file failed to download."
     fi
 
+    # Download header file
+    SERVER_KERNEL_HEADER="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/header-.*.tar.gz" | head -n 1)"
+    if [ -n "${SERVER_KERNEL_HEADER}" ]; then
+        SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER##*/}"
+        SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER_NAME//%2B/+}"
+        wget -c "${SERVER_KERNEL_HEADER}" -O "${P4_PATH}/${SERVER_KERNEL_HEADER_NAME}" >/dev/null 2>&1 && sync
+        if [[ "$?" -eq "0" && -s "${P4_PATH}/${SERVER_KERNEL_HEADER_NAME}" ]]; then
+            echo -e "01.04 The header file download complete."
+        else
+            die "01.04 The header file failed to download."
+        fi
+    fi
+
     sync
 fi
 
 if [ $(ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
     if [ $(ls ${P4_PATH}/boot-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 1 ]; then
         build_boot=$(ls ${P4_PATH}/boot-*.tar.gz | head -n 1) && build_boot=${build_boot##*/}
-        echo -e "Update using [ ${build_boot} ] files. Please wait a moment ..."
         custom_kernel_name=${build_boot/boot-/} && custom_kernel_name=${custom_kernel_name/.tar.gz/}
         kernel_version=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
         kernel_vermaj=$(echo ${kernel_version} | grep -oE '^[1-9].[0-9]{1,3}')
@@ -158,27 +170,25 @@ if [ $(ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
         die "Have no boot-*.tar.gz file found in the ${P4_PATH} directory."
     fi
 
-    if [ -f ${P4_PATH}/dtb-amlogic-${custom_kernel_name}.tar.gz ]; then
+    if [ -f "${P4_PATH}/dtb-amlogic-${custom_kernel_name}.tar.gz" ]; then
         build_dtb="dtb-amlogic-${custom_kernel_name}.tar.gz"
     else
         die "Have no dtb-amlogic-*.tar.gz file found in the ${P4_PATH} directory."
     fi
 
-    if [ -f ${P4_PATH}/modules-${custom_kernel_name}.tar.gz ]; then
+    if [ -f "${P4_PATH}/modules-${custom_kernel_name}.tar.gz" ]; then
         build_modules="modules-${custom_kernel_name}.tar.gz"
     else
         die "Have no modules-*.tar.gz file found in the ${P4_PATH} directory."
     fi
 
-    echo -e " \
-    Try to using this files to update the kernel: \n \
-    boot: ${build_boot} \n \
-    dtb: ${build_dtb} \n \
-    modules: ${build_modules} \n \
-    custom_kernel_name: ${custom_kernel_name} \n \
-    kernel_version: ${kernel_version} \n \
-    K510: ${K510}"
+    if [ -f "${P4_PATH}/header-${custom_kernel_name}.tar.gz" ]; then
+        build_header="header-${custom_kernel_name}.tar.gz"
+    else
+        build_header=""
+    fi
 
+    echo -e "custom_kernel_name: ${custom_kernel_name}"
 else
     echo -e "Please upload the kernel files to [ ${P4_PATH} ], then run [ $0 ] again."
     exit 1
@@ -324,7 +334,15 @@ tar -xzf ${P4_PATH}/${build_modules} -C /lib/modules && sync
 echo -e "02.03 Unpack [ ${build_modules} ] complete."
 sleep 3
 
-rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz 2>/dev/null
+# 04 for /usr/include/*
+if [[ -n "${build_header}" && -f "${P4_PATH}/${build_header}" ]]; then
+    tar -xzf ${P4_PATH}/${build_header} -C /usr && sync
+    echo -e "02.04 Unpack [ ${build_header} ] complete."
+    sleep 3
+fi
+
+# Delete kernel files
+rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz ${P4_PATH}/header-*.tar.gz 2>/dev/null
 
 # 04 Update
 sed -i '/KERNEL_VERSION/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
