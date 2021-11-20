@@ -6,6 +6,15 @@
 
 最新的 Armbian 固件可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
+## Armbian 开创者名单
+
+因为有不断的创新与贡献者，我们才能在岁月的长河里，拥有盒子的陪伴。很多年后我们都长大了，但这个美好的回忆总会长久地留在记忆深处。从现在开始，把这些开创者们的成果记录起来，留给新加入盒子圈的新朋友们。
+
+| 创新与贡献者 | 成果记载 |
+| ---- | ---- |
+| [flippy](https://github.com/unifreq) | 开发了众多盒子的 Armbian 和 OpenWrt 系统，提供了 s905d-s922x 等众多 SOC 下系统的引导启动和固件制作的解决方案，分享了丰富的资源和教程。本站使用的 [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) 等均完全采用了他的成果，是他开启了从 TV 盒子走进 Armbian 和 OpenWrt 世界的大门。 |
+| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和使用方法。 |
+
 ## Armbian 固件说明
 
 | 型号  | 盒子 | [可选内核](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian 固件 |
