@@ -6,6 +6,15 @@ Compile the Armbian for Amlogic S9xxx STB. including install to EMMC and update 
 
 The latest version of the Armbian firmware can be downloaded in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize it. If it is useful to you, you can click on the `Star` in the upper right corner of the warehouse to show your support.
 
+## Armbian pioneer list
+
+Because of these innovations and contributors, we can have the company of the box in the long river of years. We have grown up many years later, but this beautiful memory will always stay deep in the memory for a long time. From now on, record the achievements of these pioneers and leave them to the new friends who have joined the box circle.
+
+| Innovation and contributors | Record of achievements |
+| ---- | ---- |
+| [flippy](https://github.com/unifreq) | Developed many Armbian and OpenWrt systems, provided s905d-s922x and many other SOC system boot and firmware production solutions, shared abundant resources and tutorials. The [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) etc. used on this site all fully adopted his results, and he opened the door to the world of Armbian and OpenWrt from the TV box. |
+| [NewbieOrange](https://github.com/NewbieOrange) | He provided the [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) file and usage method of the new device [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) in [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448). |
+
 ## Armbian Firmware instructions
 
 | Model  | STB | [Optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian Firmware |
