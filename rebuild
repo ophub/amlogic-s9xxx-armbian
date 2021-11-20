@@ -167,6 +167,7 @@ replace_kernel() {
         build_boot=$(ls ${kernel_path}/${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
         build_dtb=$(ls ${kernel_path}/${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
         build_modules=$(ls ${kernel_path}/${new_kernel}/modules-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
+        build_header=$(ls ${kernel_path}/${new_kernel}/header-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
 
         # 01 For /boot five files
         (cd ${tmp_armbian}/boot && rm -rf *-${out_version}-* uInitrd zImage dtb* 2>/dev/null && sync)
@@ -183,6 +184,11 @@ replace_kernel() {
         (cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync)
         if [ "$(ls ${tmp_armbian}/usr/lib/modules/${new_kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
             die "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
+        fi
+
+        # 04 For header files, usr/include
+        if [[ -n "${build_header}" && -f "${build_header}" ]]; then
+            tar -xzf ${build_header} -C ${tmp_armbian}/usr && sync
         fi
 
         sync
