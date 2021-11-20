@@ -13,7 +13,7 @@
 | 创新与贡献者 | 成果记载 |
 | ---- | ---- |
 | [flippy](https://github.com/unifreq) | 开发了众多盒子的 Armbian 和 OpenWrt 系统，提供了 s905d-s922x 等众多 SOC 下系统的引导启动和固件制作的解决方案，分享了丰富的资源和教程。本站使用的 [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) 等均完全采用了他的成果，是他开启了从 TV 盒子走进 Armbian 和 OpenWrt 世界的大门。 |
-| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和使用方法。 |
+| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和 [使用方法](build-armbian/common-files/patches/boot/s912-t95z-plus) 。 |
 
 ## Armbian 固件说明
 
@@ -48,7 +48,7 @@ armbian-install
 armbian-update 5.4.160
 ```
 
-默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.2 beta`
+默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 beta`
 
 默认自动安装主线 u-boot，可以更好的支持 5.10 及以上内核系列的使用。如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.160 stable no`
 
@@ -133,7 +133,7 @@ armbian-tf
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.10.80_5.4.160` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
 - `sudo ./rebuild -d` : 使用默认配置，对全部型号的机顶盒进行打包。
 - `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 1024` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为1024M。
-- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.2` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
+- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.19` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
 - `sudo ./rebuild -d -b s905x3_s905d`  使用默认配置，对多个型号的机顶盒进行全部内核打包, 使用 `_` 进行多型号连接。
 - `sudo ./rebuild -d -k 5.10.80_5.4.160` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。
 - `sudo ./rebuild -d -k 5.10.80_5.4.160 -a true` : 使用默认配置，指定多个内核，进行全部型号机顶盒进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
