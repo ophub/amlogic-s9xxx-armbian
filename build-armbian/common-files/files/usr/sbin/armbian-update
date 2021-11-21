@@ -16,6 +16,8 @@
 # Write the main line U-BOOT by default: armbian-update 5.4.150
 #==================================================================================================================================
 
+echo -e "Ready to update, please wait..."
+
 # Receive one-key command related parameters
 # Specify the kernel, such as: 5.10.70
 INPUTS_KERNEL="${1}"
@@ -37,7 +39,7 @@ fi
 
 # Automatically detect and update the armbian-update script
 GIT_ARMBIAN_UPDATE_SCRIPT="git.io/armbian-update"
-GIT_ARMBIAN_UPDATE_VERSION="10001"
+GIT_ARMBIAN_UPDATE_VERSION="10002"
 latest_script_version=$(curl -fsSL ${GIT_ARMBIAN_UPDATE_SCRIPT} | grep -oE "GIT_ARMBIAN_UPDATE_VERSION=\"[0-9]+\"" | grep -oE '[0-9]+')
 if [[ -n "${latest_script_version}" && "${latest_script_version}" != "${GIT_ARMBIAN_UPDATE_VERSION}" ]]; then
     echo -e "Automatically update the armbian-update script..."
@@ -56,8 +58,6 @@ die() {
     echo -e " [Error] ${1}"
     exit 1
 }
-
-echo -e "Start update the armbian kernel."
 
 # Find the partition where root is located
 ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
@@ -97,20 +97,22 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
         LATEST_VERSION_K4="5.4.${LATEST_VERSION_K4_LATEST}"
         echo "Please enter the kernel version number, such as: ${LATEST_VERSION_K4}"
         read KERNEL_NUM
-        [ -n "${KERNEL_NUM}" ] || KERNEL_NUM="${LATEST_VERSION_K4}"
-    else
-        KERNEL_NUM="${INPUTS_KERNEL}"
+        if [ -n "${KERNEL_NUM}" ]; then
+            INPUTS_KERNEL="${KERNEL_NUM}"
+        else
+            INPUTS_KERNEL="${LATEST_VERSION_K4}"
+        fi
     fi
 
-    echo -e "Kernel version: ${KERNEL_NUM}"
+    echo -e "Kernel version: ${INPUTS_KERNEL}"
     echo -e "Start downloading the kernel from [ github.com/ophub/kernel/tree/main/pub/${version_branch} ] to [ ${P4_PATH} ]..."
 
     # Delete tmp files
-    rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz ${P4_PATH}/header-*.tar.gz 2>/dev/null
+    rm -f ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz 2>/dev/null
     sync
 
     # Download boot file
-    SERVER_KERNEL_BOOT="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/boot-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_BOOT="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/boot-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_BOOT_NAME="${SERVER_KERNEL_BOOT##*/}"
     SERVER_KERNEL_BOOT_NAME="${SERVER_KERNEL_BOOT_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_BOOT}" -O "${P4_PATH}/${SERVER_KERNEL_BOOT_NAME}" >/dev/null 2>&1 && sync
@@ -121,7 +123,7 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     fi
 
     # Download dtb file
-    SERVER_KERNEL_DTB="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/dtb-amlogic-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_DTB="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/dtb-amlogic-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_DTB_NAME="${SERVER_KERNEL_DTB##*/}"
     SERVER_KERNEL_DTB_NAME="${SERVER_KERNEL_DTB_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_DTB}" -O "${P4_PATH}/${SERVER_KERNEL_DTB_NAME}" >/dev/null 2>&1 && sync
@@ -132,7 +134,7 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     fi
 
     # Download modules file
-    SERVER_KERNEL_MODULES="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/modules-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_MODULES="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/modules-.*.tar.gz" | head -n 1)"
     SERVER_KERNEL_MODULES_NAME="${SERVER_KERNEL_MODULES##*/}"
     SERVER_KERNEL_MODULES_NAME="${SERVER_KERNEL_MODULES_NAME//%2B/+}"
     wget -c "${SERVER_KERNEL_MODULES}" -O "${P4_PATH}/${SERVER_KERNEL_MODULES_NAME}" >/dev/null 2>&1 && sync
@@ -143,7 +145,7 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     fi
 
     # Download header file
-    SERVER_KERNEL_HEADER="$(curl -s "${SERVER_KERNEL_URL}/${KERNEL_NUM}" | grep "download_url" | grep -o "https.*/header-.*.tar.gz" | head -n 1)"
+    SERVER_KERNEL_HEADER="$(curl -s "${SERVER_KERNEL_URL}/${INPUTS_KERNEL}" | grep "download_url" | grep -o "https.*/header-.*.tar.gz" | head -n 1)"
     if [ -n "${SERVER_KERNEL_HEADER}" ]; then
         SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER##*/}"
         SERVER_KERNEL_HEADER_NAME="${SERVER_KERNEL_HEADER_NAME//%2B/+}"
@@ -158,10 +160,12 @@ if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -
     sync
 fi
 
-if [ $(ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
-    if [ $(ls ${P4_PATH}/boot-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 1 ]; then
-        build_boot=$(ls ${P4_PATH}/boot-*.tar.gz | head -n 1) && build_boot=${build_boot##*/}
+if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
+    if [ $(ls ${P4_PATH}/boot-${INPUTS_KERNEL}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 1 ]; then
+        build_boot=$(ls ${P4_PATH}/boot-${INPUTS_KERNEL}-*.tar.gz | head -n 1) && build_boot=${build_boot##*/}
         custom_kernel_name=${build_boot/boot-/} && custom_kernel_name=${custom_kernel_name/.tar.gz/}
+        echo -e "custom_kernel_name: ${custom_kernel_name}"
+
         kernel_version=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
         kernel_vermaj=$(echo ${kernel_version} | grep -oE '^[1-9].[0-9]{1,3}')
         k510_ver=${kernel_vermaj%%.*}
@@ -198,8 +202,6 @@ if [ $(ls ${P4_PATH}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
     else
         build_header=""
     fi
-
-    echo -e "custom_kernel_name: ${custom_kernel_name}"
 else
     echo -e "Please upload the kernel files to [ ${P4_PATH} ], then run [ $0 ] again."
     exit 1
@@ -353,7 +355,7 @@ if [[ -n "${build_header}" && -f "${P4_PATH}/${build_header}" ]]; then
 fi
 
 # Delete kernel files
-rm -f ${P4_PATH}/dtb-amlogic-*.tar.gz ${P4_PATH}/boot-*.tar.gz ${P4_PATH}/modules-*.tar.gz ${P4_PATH}/header-*.tar.gz 2>/dev/null
+rm -f ${P4_PATH}/*${custom_kernel_name}*.tar.gz 2>/dev/null
 
 # 04 Update
 sed -i '/KERNEL_VERSION/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
