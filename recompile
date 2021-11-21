@@ -204,7 +204,7 @@ make_kernel() {
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
-    rm -rf /usr/local/include/* 2>/dev/null && sync
+    mv -f /usr/local/include /usr/local/include.bak 2>/dev/null && sync
     make headers_install INSTALL_HDR_PATH=/usr/local ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
 
@@ -299,7 +299,7 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/header
-    cp -rf ${kernel_path}/${linux_kernel_dirname}/usr/include . && sync
+    cp -rf /usr/local/include . && sync
     tar -czf header-${kernel_version}${LOCALVERSION}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ header-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
@@ -317,6 +317,7 @@ clean_tmp() {
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
     rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
     rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
+    mv -f /usr/local/include.bak /usr/local/include 2>/dev/null && sync
 
     update-grub 2>/dev/null
     echo -e "${SUCCESS} Space cleared successfully."
