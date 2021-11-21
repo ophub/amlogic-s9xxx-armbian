@@ -208,6 +208,7 @@ make_kernel() {
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
 
     # Install new image
+    echo -e "${STEPS} Install new image ..."
     make install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
 }
