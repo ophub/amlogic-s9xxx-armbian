@@ -39,7 +39,7 @@ fi
 
 # Automatically detect and update the armbian-update script
 GIT_ARMBIAN_UPDATE_SCRIPT="git.io/armbian-update"
-GIT_ARMBIAN_UPDATE_VERSION="10002"
+GIT_ARMBIAN_UPDATE_VERSION="10003"
 latest_script_version=$(curl -fsSL ${GIT_ARMBIAN_UPDATE_SCRIPT} | grep -oE "GIT_ARMBIAN_UPDATE_VERSION=\"[0-9]+\"" | grep -oE '[0-9]+')
 if [[ -n "${latest_script_version}" && "${latest_script_version}" != "${GIT_ARMBIAN_UPDATE_VERSION}" ]]; then
     echo -e "Automatically update the armbian-update script..."
@@ -347,9 +347,10 @@ tar -xzf ${P4_PATH}/${build_modules} -C /lib/modules && sync
 echo -e "02.03 Unpack [ ${build_modules} ] complete."
 sleep 3
 
-# 04 for /usr/include/*
+# 04 for /usr/local/include/*
 if [[ -n "${build_header}" && -f "${P4_PATH}/${build_header}" ]]; then
-    tar -xzf ${P4_PATH}/${build_header} -C /usr && sync
+    rm -rf /usr/local/include/* 2>/dev/null && sync
+    tar -xzf ${P4_PATH}/${build_header} -C /usr/local && sync
     echo -e "02.04 Unpack [ ${build_header} ] complete."
     sleep 3
 fi
