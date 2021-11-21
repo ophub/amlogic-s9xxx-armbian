@@ -204,7 +204,8 @@ make_kernel() {
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
-    make headers_install INSTALL_HDR_PATH=/usr ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    rm -rf /usr/local/include/* 2>/dev/null && sync
+    make headers_install INSTALL_HDR_PATH=/usr/local ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
 
     # Install new image

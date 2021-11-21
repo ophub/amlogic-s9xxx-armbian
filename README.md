@@ -52,6 +52,8 @@ By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub
 
 The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.4.160 stable no`
 
+The `headers` files in the kernel is installed in the `/use/local/include` directory. When compiling the application, add `-I /usr/local/include` to the `CFLAG` parameter of `GCC` to find the headers files.
+
 - ### Install Docker Service
 
 Login in to armbian → input command:
