@@ -52,6 +52,8 @@ armbian-update 5.4.160
 
 默认自动安装主线 u-boot，可以更好的支持 5.10 及以上内核系列的使用。如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.160 stable no`
 
+内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。在编译应用程序的时候，在 `GCC` 的 `CFLAG` 参数中添加 `-I /usr/local/include` 即可找到头文件。
+
 - ### 安装 Docker 服务
 
 登录 Armbian 系统 → 输入命令：

@@ -186,9 +186,10 @@ replace_kernel() {
             die "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
         fi
 
-        # 04 For header files, usr/include
+        # 04 For header files, usr/local/include
         if [[ -n "${build_header}" && -f "${build_header}" ]]; then
-            tar -xzf ${build_header} -C ${tmp_armbian}/usr && sync
+            rm -rf ${tmp_armbian}/usr/local/include/* 2>/dev/null && sync
+            tar -xzf ${build_header} -C ${tmp_armbian}/usr/local && sync
         fi
 
         sync
