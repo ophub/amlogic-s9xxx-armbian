@@ -121,6 +121,7 @@ local_kernel_check() {
 download_kernel() {
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
     echo -e "${STEPS} Start query and download the kernel."
+    [ -d "${kernel_path}" ] || mkdir -p ${kernel_path}
     if [ ! -d "${kernel_path}/${linux_kernel_dirname}" ]; then
         if [ "${repo_url}" == "flippy" ]; then
             echo -e "${INFO} Start cloning from [ https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} ]"
