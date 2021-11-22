@@ -195,7 +195,7 @@ make_kernel() {
     echo -e "${STEPS} Make kernel: ${linux_kernel_dirname} ..."
     make prepare
     make scripts
-    make -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    make Image modules dtbs -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
     [ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
