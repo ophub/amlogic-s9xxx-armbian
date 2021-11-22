@@ -1,0 +1,7 @@
+!.gitignore
+/build
+/tmp_dir
+/compile-kernel/kernel
+/compile-kernel/output
+.DS_Store
+npm-debug.log*
