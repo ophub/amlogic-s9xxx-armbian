@@ -13,10 +13,11 @@ dtb_path=${build_path}/amlogic-dtb
 kernel_path=${build_path}/amlogic-kernel
 uboot_path=${build_path}/amlogic-u-boot
 configfiles_path=${build_path}/common-files
-tmp_outpath=${make_path}/tmp_out
-tmp_armbian=${make_path}/tmp_armbian
-tmp_build=${make_path}/tmp_build
-tmp_aml_image=${make_path}/tmp_aml_image
+tmp_dir=${make_path}/tmp_dir
+tmp_outpath=${tmp_dir}/tmp_out
+tmp_armbian=${tmp_dir}/tmp_armbian
+tmp_build=${tmp_dir}/tmp_build
+tmp_aml_image=${tmp_dir}/tmp_aml_image
 
 kernel_library="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
@@ -101,8 +102,8 @@ download_kernel() {
 make_image() {
     cd ${make_path}
 
-    rm -rf ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} 2>/dev/null && sync
-    mkdir -p ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} && sync
+    rm -rf ${tmp_dir} 2>/dev/null && sync
+    mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
 
     # Get armbian version and release
     armbian_image_name=$(ls ${armbian_outputpath}/*-trunk_*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
@@ -422,7 +423,7 @@ clean_tmp() {
     sync
 
     cd ${make_path}
-    rm -rf ${tmp_armbian} ${tmp_build} ${tmp_outpath} ${tmp_aml_image} 2>/dev/null
+    rm -rf ${tmp_dir} 2>/dev/null
     sync
 }
 
