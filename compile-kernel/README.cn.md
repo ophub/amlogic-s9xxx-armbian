@@ -39,7 +39,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. 如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核并解压到 `compile-kernel/kernle` 目录下；如采用 [flippy](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernle/linux-5.4.160` 的目录下，运行个性化配置选择命令 `make menuconfig` 进行选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
+3. 首先在 `compile-kernel` 目录下创建 `kernle` 目录，用于存放编译的内核源码。如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核如 `linux-5.4.160.tar.xz` 并解压到 `compile-kernel/kernle/linux-5.4.160` 目录下；如采用 [flippy](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernle/linux-5.4.160` 的目录下，运行个性化配置选择命令 `make menuconfig` 进行选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
 
 4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.4.160` 命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
