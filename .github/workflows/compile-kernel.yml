@@ -12,7 +12,7 @@ on:
       kernel_repo:
         description: 'Source: kernel.org / flippy'
         required: false
-        default: 'kernel.org'
+        default: 'flippy'
       kernel_ver:
         description: 'Kernel version: 5.4.160'
         required: false
