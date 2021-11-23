@@ -18,12 +18,12 @@ arch_info=$(arch)
 auto_kernel="true"
 
 # Kernel download address and custom name
+build_kernel=("5.4.160" "5.10.80")
+custom_name="-meson64-beta"
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 kernel_flippy_repo="unifreq"
 kernel_flippy_branch="main"
-build_kernel=("5.4.160" "5.10.80")
-custom_name="-meson64-beta"
-repo_url="kernel.org"
+repo_url="flippy"
 
 # Cross compile
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
