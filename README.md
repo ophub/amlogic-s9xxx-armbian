@@ -6,16 +6,6 @@ Compile the Armbian for Amlogic S9xxx STB. including install to EMMC and update 
 
 The latest version of the Armbian firmware can be downloaded in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize it. If it is useful to you, you can click on the `Star` in the upper right corner of the warehouse to show your support.
 
-## Armbian pioneer list
-
-Because of these innovations and contributors, we can have the company of the box in the long river of years. We have grown up many years later, but this beautiful memory will always stay deep in the memory for a long time. From now on, record the achievements of these pioneers and leave them to the new friends who have joined the box circle.
-
-| Innovation and contributors | Record of achievements |
-| ---- | ---- |
-| [flippy](https://github.com/unifreq) | Developed many Armbian and OpenWrt systems, provided s905d-s922x and many other SOC system boot and firmware production solutions, shared abundant resources and tutorials. The [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) etc. used on this site all fully adopted his results, and he opened the door to the world of Armbian and OpenWrt from the TV box. |
-| [NewbieOrange](https://github.com/NewbieOrange) | He provided the [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) file and [usage method](build-armbian/common-files/patches/boot/s912-t95z-plus) of the new device [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) in [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448); Shared the [meson-gxl-s905l2-p281.dtb](build-armbian/amlogic-dtb/meson-gxl-s905l2-p281.dtb) file of s905l2 (p281 board) in [pull](https://github.com/ophub/amlogic-s9xxx-armbian/pull/29). |
-| [pulpoff](https://github.com/pulpoff) | He shared how to adjust [dtb freq](https://github.com/armbian/build/commit/d0831a7ce191759011d8a0f23019acebc2348149) and add new [display resolution](https://github.com/tobetter/linux/commit/248da29964751908c36e2c5558385ec09aed87ad) in [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/31#issuecomment-974982500), and provided test firmware [download](https://vp5.net/king/). |
-
 ## Armbian Firmware instructions
 
 | Model  | STB | [Optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian Firmware |
@@ -177,15 +167,11 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 For the compilation method of the custom kernel, see [compile-kernel](compile-kernel)
 
-## Borrow
+## Armbian contributor list
 
 The [armbian](https://github.com/armbian/build) directly calls the official source code for compilation, When making dedicated Armbian systems for different boxes, the kernel, scripts, u-boot and other resources made by [flippy](https://github.com/unifreq/openwrt_packit) for `Amlogic s9xxx openwrt` are used. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
 
-## Acknowledgments
-
-- [armbian/build](https://github.com/armbian/build)
-- [flippy/openwrt](https://github.com/unifreq)
-- [ebkso/compile](https://www.kflyo.com/howto-compile-armbian-for-n1-box)
+Because of these [innovations and contributors](CONTRIBUTOR.md), we can have the company of the box in the long river of years. We have grown up many years later, but this beautiful memory will always stay deep in the memory for a long time. From now on, record the achievements of these pioneers and leave them to the new friends who have joined the box circle.
 
 ## License
 
