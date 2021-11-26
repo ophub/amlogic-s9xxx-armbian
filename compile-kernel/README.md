@@ -41,7 +41,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. First create a `kernle` directory under the `~/amlogic-s9xxx-armbian/compile-kernel` directory to store the compiled kernel source code. For example, use the source code of [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) to compile, Please download the corresponding kernel such as `linux-5.4.160.tar.xz` and unzip it to the `compile-kernel/kernle/linux-5.4.160` corresponding directory; If you use the source code of [flippy](https://github.com/unifreq) to compile, Please clone the source code of the specified kernel series such as `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` to the corresponding directory. After completion, enter the corresponding kernel such as `compile-kernel/kernle/linux-5.4.160` directory, Run the personalized configuration selection command `make menuconfig` to make a selection, save it after completion, A custom kernel `.config` configuration file will be generated in the kernel directory. 
 
-4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run the `sudo ./recompile -k 5.4.160` command to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
+4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -k 5.4.160 -r flippy -a false` and other specified parameter commands to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
 ## Other instructions
 
