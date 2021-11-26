@@ -6,16 +6,6 @@
 
 最新的 Armbian 固件可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
-## Armbian 开创者名单
-
-因为有不断的创新与贡献者，我们才能在岁月的长河里，拥有盒子的陪伴。很多年后我们都长大了，但这个美好的回忆总会长久地留在记忆深处。从现在开始，把这些开创者们的成果记录起来，留给新加入盒子圈的新朋友们。
-
-| 创新与贡献者 | 成果记载 |
-| ---- | ---- |
-| [flippy](https://github.com/unifreq) | 开发了众多盒子的 Armbian 和 OpenWrt 系统，提供了 s905d-s922x 等众多 SOC 下系统的引导启动和固件制作的解决方案，分享了丰富的资源和教程。本站使用的 [u-boot](build-armbian/amlogic-u-boot), [dtb](build-armbian/amlogic-dtb), [kernel](https://github.com/ophub/kernel/tree/main/pub/stable), [script](build-armbian/common-files/files/usr/sbin) 等均完全采用了他的成果，是他开启了从 TV 盒子走进 Armbian 和 OpenWrt 世界的大门。 |
-| [NewbieOrange](https://github.com/NewbieOrange) | 在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/22#issuecomment-968260448) 中提供了新设备 [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus) 的 [meson-gxm-t95z-plus.dtb](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/amlogic-dtb/meson-gxm-t95z-plus.dtb) 文件和 [使用方法](build-armbian/common-files/patches/boot/s912-t95z-plus) ；在 [pull](https://github.com/ophub/amlogic-s9xxx-armbian/pull/29) 中分享了 s905l2 (p281 board) [meson-gxl-s905l2-p281.dtb](build-armbian/amlogic-dtb/meson-gxl-s905l2-p281.dtb) 文件。 |
-| [pulpoff](https://github.com/pulpoff) | 他在 [issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/31#issuecomment-974982500) 中分享了调整 [dtb 频率](https://github.com/armbian/build/commit/d0831a7ce191759011d8a0f23019acebc2348149) 和添加新的 [显示分辨率](https://github.com/tobetter/linux/commit/248da29964751908c36e2c5558385ec09aed87ad) 的作法，并提供了测试固件的 [下载](https://vp5.net/king/) 链接。 |
-
 ## Armbian 固件说明
 
 | 型号  | 盒子 | [可选内核](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian 固件 |
@@ -179,15 +169,11 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 自定义内核的编译方法详见 [compile-kernel](compile-kernel)
 
-## 借鉴
+## Armbian 贡献者名单
 
 编译的 [armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。为不同的盒子制作专用的 Armbian 系统时采用了 [flippy](https://github.com/unifreq/openwrt_packit) 为 `amlogic s9xxx openwrt` 制作的内核、脚本及 `u-boot` 等资源。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在 Amlogic s9xxx 盒子里使用 Armbian 系统。
 
-## 鸣谢
-
-- [armbian/build](https://github.com/armbian/build)
-- [flippy/openwrt](https://github.com/unifreq)
-- [ebkso/compile](https://www.kflyo.com/howto-compile-armbian-for-n1-box)
+因为有不断的 [创新与贡献者](CONTRIBUTOR.md) ，我们才能在岁月的长河里，拥有盒子的陪伴。很多年后我们都长大了，但这个美好的回忆总会长久地留在记忆深处。从现在开始，把这些开创者们的成果记录起来，留给新加入盒子圈的新朋友们。
 
 ## License
 
