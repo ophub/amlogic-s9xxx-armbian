@@ -37,17 +37,6 @@ else
     AUTO_MAINLINE_UBOOT="yes"
 fi
 
-# Automatically detect and update the armbian-update script
-GIT_ARMBIAN_UPDATE_SCRIPT="git.io/armbian-update"
-GIT_ARMBIAN_UPDATE_VERSION="10003"
-latest_script_version=$(curl -fsSL ${GIT_ARMBIAN_UPDATE_SCRIPT} | grep -oE "GIT_ARMBIAN_UPDATE_VERSION=\"[0-9]+\"" | grep -oE '[0-9]+')
-if [[ -n "${latest_script_version}" && "${latest_script_version}" != "${GIT_ARMBIAN_UPDATE_VERSION}" ]]; then
-    echo -e "Automatically update the armbian-update script..."
-    wget -q -O /usr/sbin/armbian-update ${GIT_ARMBIAN_UPDATE_SCRIPT} && chmod +x /usr/sbin/armbian-update
-    # Use server commands temporarily when updating the server’s new script
-    bash <(curl -fsSL ${GIT_ARMBIAN_UPDATE_SCRIPT}) ${INPUTS_KERNEL} ${version_branch} ${AUTO_MAINLINE_UBOOT}
-fi
-
 # Set default value
 SERVER_KERNEL_URL="https://api.github.com/repos/ophub/kernel/contents/pub/${version_branch}"
 GITHUB_RAW="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian"
