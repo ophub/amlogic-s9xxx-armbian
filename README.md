@@ -39,7 +39,7 @@ Query the available [kernel_version](https://github.com/ophub/kernel/tree/main/p
 armbian-update 5.4.160
 ```
 
-The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -q -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.160`
+If there is a complete set of kernel files in the current directory, you can run the `armbian-update` command to install this kernel. The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -q -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.160`
 
 When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.19 beta` . The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.4.160 stable no`
 
