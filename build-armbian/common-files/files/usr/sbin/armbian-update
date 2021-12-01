@@ -20,7 +20,14 @@ echo -e "Ready to update, please wait..."
 
 # Receive one-key command related parameters
 # Specify the kernel, such as: 5.10.70
-INPUTS_KERNEL="${1}"
+if [ -n "${1}" ]; then
+    INPUTS_KERNEL="${1}"
+elif [[ "$(ls *.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -gt "3" ]]; then
+    try_boot=$(ls boot-*.tar.gz 2>/dev/null | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
+    [ -n "${try_boot}" ] && INPUTS_KERNEL="${try_boot}"
+else
+    INPUTS_KERNEL=""
+fi
 
 # Specify version branch, such as: stable
 ARR_BRANCH=("stable" "beta")
@@ -80,7 +87,7 @@ else
 fi
 
 # Check 3 kernel files
-if [ $(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -lt 3 ]; then
+if [[ "$(ls ${P4_PATH}/*${INPUTS_KERNEL}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
     if [[ -z "${INPUTS_KERNEL}" ]]; then
         LATEST_VERSION_K4_LATEST=$(curl -s "${SERVER_KERNEL_URL}" | grep "name" | grep -oE "5.4.[0-9]+" | sed -e "s/5.4.//g" | sort -n | sed -n '$p')
         LATEST_VERSION_K4="5.4.${LATEST_VERSION_K4_LATEST}"
