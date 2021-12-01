@@ -12,6 +12,7 @@ compile_path="${make_path}/compile-kernel"
 out_kernel="${compile_path}/output"
 config_dir="${compile_path}/tools/config"
 uInitrd_dir="${compile_path}/tools/uInitrd"
+script_dir="${compile_path}/tools/script"
 kernel_path="${compile_path}/kernel"
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
@@ -29,6 +30,11 @@ repo_url="flippy"
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 use_linuxgun_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
 use_linuxgun_localpath="/usr/local/aarch64"
+
+# Armbian system
+armbian_repo="ophub/amlogic-s9xxx-armbian"
+armbian_releases_file="Armbian_Aml_buster_.*/Armbian_.*_s905d_.*.img.gz"
+armbian_chroot_file="${out_kernel}/armbian/armbian.img"
 
 # Set font color
 blue_font_prefix="\033[34m"
@@ -50,10 +56,12 @@ die() {
 }
 
 check_environment() {
-    # Download aarch64-linux-gnu
+    cd ${make_path}
     echo -e "${STEPS} Check the cross-compilation environment ..."
     if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
         echo -e "${INFO} Run on x86_64"
+
+        # Download aarch64-linux-gnu
         if [ ! -d "${use_linuxgun_localpath}" ]; then
             mkdir -p ${use_linuxgun_localpath}
         fi
@@ -71,6 +79,7 @@ check_environment() {
 }
 
 query_version() {
+    cd ${make_path}
     # Set empty array
     tmp_arr_kernels=()
 
@@ -114,11 +123,18 @@ query_version() {
 }
 
 local_kernel_check() {
+    cd ${make_path}
+    # Check whether the kernel of the same name has been installed locally
     local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_version}${custom_name}")"
     [ -n "${local_kernel}" ] && die "The current system has the same named kernel [ ${kernel_version}${custom_name} ], stop compiling!"
+
+    # Create a temp directory
+    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
+    mkdir -p ${out_kernel}/{armbian/{root/boot/},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
 download_kernel() {
+    cd ${make_path}
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
     echo -e "${STEPS} Start query and download the kernel."
     [ -d "${kernel_path}" ] || mkdir -p ${kernel_path}
@@ -175,9 +191,16 @@ make_kernel() {
         export CROSS_COMPILE=${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
         export PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin
         export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib
+
+        sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
         echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >>/etc/profile && sync
-        echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >>~/.bashrc && sync
+        sed -i '/^LD_LIBRARY_PATH=/d' /etc/profile 2>/dev/null && sync
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >>/etc/profile && sync
+        source /etc/profile
+
+        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
+        echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >>~/.bashrc && sync
+        sed -i '/^LD_LIBRARY_PATH=/d' ~/.bashrc 2>/dev/null && sync
         echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >>~/.bashrc && sync
         source ~/.bashrc
     else
@@ -215,47 +238,103 @@ make_kernel() {
     [ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
 }
 
-generate_uinitrd() {
-    cd /boot
-    # Tips: Generate uInitrd must be created in ARM64 (AArch64) system, it is invalid in X86_64 environment.
-    # Update under Armbian system, Skip under Non-Armbian system.
-    echo -e "${STEPS} Find the uInitrd file."
-    if [ -f uInitrd ]; then
-        # Backup the original uInitrd file
-        [ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
+chroot_armbian_for_x64() {
+    cd ${make_path}
 
-        # Generate initramfs and uInitrd
-        echo -e "${INFO} Find uInitrd file in Armbian system, Try to update-initramfs the uInitrd file (1)."
-        update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
-        if [ -f uInitrd ]; then
-            echo -e "${SUCCESS} The uInitrd file is Successfully generated (1)."
-            mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+    # Download armbian
+    if [ ! -f "${armbian_chroot_file}" ]; then
+        echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
+        rm -f ${out_kernel}/armbian/{*.img,*.img.gz} 2>/dev/null
+        armbian_file=$(curl -s "https://api.github.com/repos/${armbian_repo}/releases" | grep -oE "${armbian_releases_file}" | head -n 1)
+        if [ -n "${armbian_file}" ]; then
+            wget -q -P ${out_kernel}/armbian https://github.com/${armbian_repo}/releases/download/${armbian_file}
         else
-            echo -e "${WARNING} The uInitrd file not updated (1)."
+            die "There is no specified armbian file in [ github.com/${armbian_repo}/releases ]"
         fi
 
-        # Restore the original uInitrd
-        [ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
-    else
-        echo -e "${WARNING} The uInitrd file does not exist, jump over (2)."
-        #echo -e "${INFO} No uInitrd file found on Non-Armbian systems, Try to generate uInitrd file (2)."
-        #mkimage -A arm -T ramdisk -C none -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd
-        #if [ -f uInitrd ]; then
-        #    echo -e "${SUCCESS} The uInitrd file is successfully generated (2)."
-        #    mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
-        #else
-        #    echo -e "${WARNING} The uInitrd file not updated (2)."
-        #fi
+        cd ${out_kernel}/armbian && gzip -df *.img.gz && sync
+        mv -f *.img ${armbian_chroot_file} && sync
+        if [ ! -f "${armbian_chroot_file}" ]; then
+            die "There is no armbian file: [ ${armbian_chroot_file} ]"
+        else
+            echo -e "${INFO} Armbian system download results: \n$(ls -l ${out_kernel}/armbian) \n"
+        fi
     fi
+
+    # Mount the armbian system
+    tag_rootfs=${out_kernel}/armbian/root
+
+    loop_armbian=$(losetup -P -f --show "${armbian_chroot_file}")
+    [ ${loop_armbian} ] || die "losetup ${armbian_chroot_file} failed."
+
+    if ! mount ${loop_armbian}p2 ${tag_rootfs}; then
+        die "mount ${loop_armbian}p2 failed!"
+    fi
+    if ! mount ${loop_armbian}p1 ${tag_rootfs}/boot; then
+        die "mount ${loop_armbian}p1 failed!"
+    fi
+
+    # Copy related files into armbian system
+    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} 2>/dev/null && sync
+    cp -f /boot/*${kernel_version}${LOCALVERSION} ${tag_rootfs}/boot && sync
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
+
+    rm -rf ${tag_rootfs}/lib/modules/* 2>/dev/null && sync
+    cp -rf /lib/modules/${kernel_version}${LOCALVERSION} ${tag_rootfs}/lib/modules && sync
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/lib/modules) \n"
+
+    cp ${script_dir}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
+    chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
+
+    # Enter the armbian system to generate /boot/uInitrd file
+    chroot ${tag_rootfs} <<EOF
+bash /root/generate_uinitrd.sh ${kernel_version}${LOCALVERSION}
+exit
+EOF
+
+    # Copy the generated uInitrd file to the current system
+    echo -e "${INFO} Copy the generated [ ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} ] file"
+    cp -vf ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} /boot/uInitrd
+    sync
+
+    # Unmount the armbian system
+    umount ${tag_rootfs}/boot 2>/dev/null
+    umount ${tag_rootfs} 2>/dev/null
+    losetup -D 2>/dev/null
+}
+
+generate_uinitrd() {
+    cd /boot
+    # Backup the original uInitrd file
+    [ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
+
+    echo -e "${STEPS} Generate uInitrd file [ ${arch_info} ]."
+
+    if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
+        # mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd-${kernel_version}${LOCALVERSION}
+        # x86_64 and other environments need to mount the armbian system to generate uInitrd file
+        chroot_armbian_for_x64
+    else
+        # Generate uInitrd file directly under armbian system
+        update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
+    fi
+
+    cd /boot
+    if [ -f uInitrd ]; then
+        echo -e "${SUCCESS} The uInitrd file is Successfully generated."
+        mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+    else
+        echo -e "${WARNING} The uInitrd file not updated."
+    fi
+
+    # Restore the original uInitrd
+    [ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
 }
 
 packit_kernel() {
-    # Pack the kernel 5 files
-    echo -e "${STEPS} Packing the ${linux_kernel_dirname} related 3 files ..."
-
-    # Create a temp directory
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
+    # Pack the kernel 6 files
+    echo -e "${STEPS} Packing the 6 [ ${kernel_version}${LOCALVERSION} ] packages generated by the compilation of the [ ${linux_kernel_dirname} ] kernel..."
 
     cd ${out_kernel}/boot
     cp -f /boot/*${kernel_version}${LOCALVERSION} . && sync
@@ -312,10 +391,11 @@ packit_kernel() {
 }
 
 clean_tmp() {
+    cd ${make_path}
     # Update grub
     echo -e "${STEPS} Clear the space and update-grub."
 
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
+    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
     rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
     rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
     mv -f /usr/local/include.bak /usr/local/include 2>/dev/null && sync
