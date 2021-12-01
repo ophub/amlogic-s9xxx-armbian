@@ -51,7 +51,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. 目前，在 `x86_64` 环境下的交叉编译还不能完全代替真实 `Armbian` 环境下的内核编译。
 
-4. 内核编译完成后，将会按照 flippy 分享的内核文件的组织方式自动打包成 5 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的 Armbian 系统中清除。如果你想在当前系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.160` 下，执行指定内核安装命令如 `armbian-update 5.4.160` 进行安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
+4. 内核编译完成后，将会按照 flippy 分享的内核文件的组织方式自动打包成 6 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的 Armbian 系统中清除。如果你想在当前系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.160` 下，执行指定内核安装命令如 `armbian-update` 进行安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
 
 5. 如果当前 `Armbian` 系统中已经安装了相同名称的内核如 `5.4.160-meson64-beta` ，将会自动停止编译，因为打包时会删除本地相同名称的内核文件，这么做会造成系统瘫痪。
 
