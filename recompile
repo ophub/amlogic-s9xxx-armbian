@@ -34,6 +34,7 @@ use_linuxgun_localpath="/usr/local/aarch64"
 # Armbian system
 armbian_repo="ophub/amlogic-s9xxx-armbian"
 armbian_releases_file="Armbian_Aml_buster_.*/Armbian_.*_s905d_.*.img.gz"
+armbian_tmp_file="${out_kernel}/tmp/armbian.img"
 armbian_chroot_file="${out_kernel}/armbian/armbian.img"
 
 # Set font color
@@ -130,7 +131,7 @@ local_kernel_check() {
 
     # Create a temp directory
     rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{armbian/{root/boot/},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
+    mkdir -p ${out_kernel}/{armbian/{root/boot/,},tmp/,boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
 download_kernel() {
@@ -240,27 +241,34 @@ make_kernel() {
 
 chroot_armbian_for_x64() {
     cd ${make_path}
-
     # Download armbian
     if [ ! -f "${armbian_chroot_file}" ]; then
-        echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
-        rm -f ${out_kernel}/armbian/{*.img,*.img.gz} 2>/dev/null
-        armbian_file=$(curl -s "https://api.github.com/repos/${armbian_repo}/releases" | grep -oE "${armbian_releases_file}" | head -n 1)
-        if [ -n "${armbian_file}" ]; then
-            wget -q -P ${out_kernel}/armbian https://github.com/${armbian_repo}/releases/download/${armbian_file}
+        if [ -f "${armbian_tmp_file}" ]; then
+            cp -f ${armbian_tmp_file} ${armbian_chroot_file} && sync
         else
-            die "There is no specified armbian file in [ github.com/${armbian_repo}/releases ]"
+            echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
+            rm -f ${out_kernel}/tmp/{*.img,*.img.gz} 2>/dev/null
+            armbian_file=$(curl -s "https://api.github.com/repos/${armbian_repo}/releases" | grep -oE "${armbian_releases_file}" | head -n 1)
+            if [ -n "${armbian_file}" ]; then
+                wget -q -P ${out_kernel}/tmp https://github.com/${armbian_repo}/releases/download/${armbian_file}
+                if [ "$?" -eq "0" ]; then
+                    echo -e "${SUCCESS} Download armbian successfully."
+                    cd ${out_kernel}/tmp && gzip -df *.img.gz && sync
+                    mv -f *.img ${armbian_tmp_file} && sync
+                    cp -f ${armbian_tmp_file} ${armbian_chroot_file} && sync
+                else
+                    echo -e "${WARNING} Download armbian failed."
+                fi
+            else
+                echo -e "${WARNING} There is no specified armbian file in [ github.com/${armbian_repo}/releases ]"
+            fi
+
         fi
 
-        cd ${out_kernel}/armbian && gzip -df *.img.gz && sync
-        mv -f *.img ${armbian_chroot_file} && sync
-        if [ ! -f "${armbian_chroot_file}" ]; then
-            die "There is no armbian file: [ ${armbian_chroot_file} ]"
-        else
-            echo -e "${INFO} Armbian system download results: \n$(ls -l ${out_kernel}/armbian) \n"
-        fi
+        [ -f "${armbian_chroot_file}" ] || echo -e "${WARNING} There is no armbian file: [ ${armbian_chroot_file} ]"
     fi
 
+    cd ${make_path}
     # Mount the armbian system
     tag_rootfs=${out_kernel}/armbian/root
 
@@ -293,6 +301,7 @@ bash /root/generate_uinitrd.sh ${kernel_version}${LOCALVERSION}
 exit
 EOF
 
+    cd ${make_path}
     # Copy the generated uInitrd file to the current system
     echo -e "${INFO} Copy the generated [ ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} ] file"
     cp -vf ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} /boot/uInitrd
@@ -482,6 +491,7 @@ for x in ${build_kernel[*]}; do
     let k++
 done
 
-echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
+rm -rf ${out_kernel}/tmp 2>/dev/null
 sync
+echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
 exit 0
