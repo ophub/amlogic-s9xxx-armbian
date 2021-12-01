@@ -49,7 +49,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. If there is no [.config](tools/config) file in the local kernel directory such as `compile-kernel/kernle/linux-5.4.160`, the file will be automatically copied from template.
 
-3. When cross-compiling the `Armbian` kernel in a system such as `Ubuntu` under the environment of `x86_64`, the [uInitrd](tools/uInitrd) file cannot be generated. When the kernel file is packaged, the file of the same kernel series in the repository will be automatically used instead. At present, cross-compilation in the `x86_64` environment cannot completely replace the kernel compilation in the real `Armbian` environment, and the produced kernel is unstable.
+3. At present, cross-compilation in the `x86_64` environment cannot completely replace the kernel compilation in the real `Armbian` environment.
 
 4. After the kernel is compiled, it will be automatically packaged into 5 kernel files according to the organization of the kernel files shared by flippy and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the Armbian system compiled with the current kernel. If you want to install on the current system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.160` and execute the specified kernel installation command such as `armbian-update 5.4.160` to install. The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
