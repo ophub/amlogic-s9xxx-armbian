@@ -418,6 +418,12 @@ clean_tmp() {
 
 while [ "${1}" ]; do
     case "${1}" in
+    -d | --default)
+        : ${build_kernel:="${build_kernel}"}
+        : ${auto_kernel:="${auto_kernel}"}
+        : ${custom_name:="${custom_name}"}
+        : ${repo_url:="${repo_url}"}
+        ;;
     -k | --kernel)
         if [ -n "${2}" ]; then
             oldIFS=$IFS

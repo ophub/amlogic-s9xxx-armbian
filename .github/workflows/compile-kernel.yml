@@ -71,7 +71,7 @@ jobs:
       id: compile
       run: |
         sudo chmod +x recompile
-        sudo ./recompile -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
+        sudo ./recompile -d -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
         output_dirname="${PWD}/compile-kernel/output"
         output_tags="$(ls ${output_dirname}/*.tar.gz -l | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
         echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
