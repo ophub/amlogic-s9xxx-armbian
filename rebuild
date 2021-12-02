@@ -5,19 +5,20 @@
 #=========================================================================
 
 #===== Do not modify the following parameter settings, Start =====
-make_path=${PWD}
-armbian_outputpath=${make_path}/build/output/images
-build_path=${make_path}/build-armbian
-armbian_path=${build_path}/amlogic-armbian
-dtb_path=${build_path}/amlogic-dtb
-kernel_path=${build_path}/amlogic-kernel
-uboot_path=${build_path}/amlogic-u-boot
-configfiles_path=${build_path}/common-files
-tmp_dir=${make_path}/tmp_dir
-tmp_outpath=${tmp_dir}/tmp_out
-tmp_armbian=${tmp_dir}/tmp_armbian
-tmp_build=${tmp_dir}/tmp_build
-tmp_aml_image=${tmp_dir}/tmp_aml_image
+make_path="${PWD}"
+armbian_outputpath="${make_path}/build/output/images"
+armbian_original_file="${armbian_outputpath}/Armbian*trunk*buster*.img"
+build_path="${make_path}/build-armbian"
+armbian_path="${build_path}/amlogic-armbian"
+dtb_path="${build_path}/amlogic-dtb"
+kernel_path="${build_path}/amlogic-kernel"
+uboot_path="${build_path}/amlogic-u-boot"
+configfiles_path="${build_path}/common-files"
+tmp_dir="${make_path}/tmp_dir"
+tmp_outpath="${tmp_dir}/tmp_out"
+tmp_armbian="${tmp_dir}/tmp_armbian"
+tmp_build="${tmp_dir}/tmp_build"
+tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
 kernel_library="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
@@ -106,10 +107,10 @@ make_image() {
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
 
     # Get armbian version and release
-    armbian_image_name=$(ls ${armbian_outputpath}/*-trunk_*.img 2>/dev/null | awk -F "/Armbian_" '{print $2}')
+    armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
     out_release=$(echo ${armbian_image_name} | awk -F "buster" '{print $1}' | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
     out_version=$(echo ${armbian_image_name} | awk -F "buster" '{print $NF}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
-    [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_outputpath}/*-trunk_*.img"
+    [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_original_file}"
     if [ -n "${new_kernel}" ]; then
         make_version=${new_kernel}
     else
@@ -144,7 +145,7 @@ extract_armbian() {
 
     armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_version}.img"
     rm -f ${armbian_image_file} 2>/dev/null && sync
-    cp -f $(ls ${armbian_outputpath}/*-trunk_*.img 2>/dev/null | head -n 1) ${armbian_image_file}
+    cp -f $(ls ${armbian_original_file} 2>/dev/null | head -n 1) ${armbian_image_file}
     sync && sleep 3
 
     loop_old=$(losetup -P -f --show "${armbian_image_file}")
