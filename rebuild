@@ -404,6 +404,15 @@ copy_files() {
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
 
+    # Set interfaces
+    interfaces_file="etc/network/interfaces"
+    if [ -f "${interfaces_file}" ]; then
+        mac_hexchars="0123456789ABCDEF"
+        mac_end=$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')
+        random_mac_addr="9E:60:1F${mac_end}"
+        sed -i "s|hwaddress ether.*|hwaddress ether ${random_mac_addr}|g" ${interfaces_file}
+    fi
+
     sync
 
     cd ${make_path}

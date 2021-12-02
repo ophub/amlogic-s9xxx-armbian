@@ -1,0 +1,5 @@
+source /etc/network/interfaces.d/*
+# Network is managed by Network manager
+auto eth0
+iface eth0 inet dhcp
+        hwaddress ether 12:34:56:78:9A:BC
