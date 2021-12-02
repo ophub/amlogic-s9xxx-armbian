@@ -6,14 +6,15 @@
 
 ## 编译命令说明
 
-- `sudo ./recompile -k 5.4.160` : 通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
-- `sudo ./recompile -k 5.4.160 -a true` : 通过 -a 参数设置编译内核时，是否自动升级到同系列最新内核。
-- `sudo ./recompile -k 5.4.160 -n leifeng` : 通过 -n 参数设置内核自定义签名。
-- `sudo ./recompile -k 5.4.160 -r kernel.org` : 通过 -r 参数设置编译源码的下载站。
-- `sudo ./recompile -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org` : 通过多个参数进行设置。
+- `sudo ./recompile -d -k 5.4.160` : 使用默认配置，并通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
+- `sudo ./recompile -d -k 5.4.160 -a true` : 使用默认配置，并通过 -a 参数设置编译内核时，是否自动升级到同系列最新内核。
+- `sudo ./recompile -d -k 5.4.160 -n leifeng` : 使用默认配置，并通过 -n 参数设置内核自定义签名。
+- `sudo ./recompile -d -k 5.4.160 -r kernel.org` : 使用默认配置，并通过 -r 参数设置编译源码的下载站。
+- `sudo ./recompile -d -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
 
 | 参数 | 含义 | 说明 |
 | ---- | ---- | ---- |
+| -d | Defaults | 使用默认配置 |
 | -k | Kernel | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `-k 5.4.160` . 多个内核使用 `_` 进行连接，如 `-k 5.10.80_5.4.160` |
 | -a | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.4.160` 的 `5.4` 同系列是否有更新的版本，如有 `5.4.160` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-beta` ，生成的内核名称为 `5.4.160-meson64-beta` 。设置自定义签名时请勿包含空格。 |
@@ -41,7 +42,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. 首先在 `~/amlogic-s9xxx-armbian/compile-kernel` 目录下创建 `kernle` 目录，用于存放编译的内核源码。如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核如 `linux-5.4.160.tar.xz` 并解压到对应的 `compile-kernel/kernle/linux-5.4.160` 目录下；如采用 [flippy](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernle/linux-5.4.160` 的目录下，运行个性化配置选择命令 `make menuconfig` 进行选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
 
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.4.160 -r flippy -a false` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.160 -r flippy -a false` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
 ## 其他说明
 
