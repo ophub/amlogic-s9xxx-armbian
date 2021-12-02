@@ -6,14 +6,15 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 
 ## Compile command description
 
-- `sudo ./recompile -k 5.4.160`: Use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
-- `sudo ./recompile -k 5.4.160 -a true`: Use the `-a` parameter to set whether to automatically upgrade to the latest kernel of the same series when compiling the kernel.
-- `sudo ./recompile -k 5.4.160 -n leifeng`: Use the `-n` parameter to set the kernel custom signature.
-- `sudo ./recompile -k 5.4.160 -r kernel.org`: Use the `-r` parameter to set the download station of the compiled source code.
-- `sudo ./recompile -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org`: Set through multiple parameters.
+- `sudo ./recompile -d -k 5.4.160`: Use the default configuration, and use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
+- `sudo ./recompile -d -k 5.4.160 -a true`: Use the default configuration, and use the `-a` parameter to set whether to automatically upgrade to the latest kernel of the same series when compiling the kernel.
+- `sudo ./recompile -d -k 5.4.160 -n leifeng`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
+- `sudo ./recompile -d -k 5.4.160 -r kernel.org`: Use the default configuration, and use the `-r` parameter to set the download station of the compiled source code.
+- `sudo ./recompile -d -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org`: Use the default configuration, and set through multiple parameters.
 
 | Parameter | Meaning | Description |
 | ---- | ---- | ---- |
+| -d | Defaults | Compile all kernels with default configuration. |
 | -k | Kernel | Specify [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) name, such as `-k 5.4.160`. Multiple kernels use `_` to connect, such as `- k 5.10.80_5.4.160` |
 | -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find whether there is a newer version of the kernel specified in `-k` such as `5.4.160` of the `5.4` series. If there is the latest version after `5.4.160`, it will be automatically replaced with the latest version . When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -n | CustomName | Set the kernel custom signature. The default value is `-meson64-beta` and the generated kernel is `5.4.160-meson64-beta`. Do not include spaces when setting a custom signature. |
@@ -41,7 +42,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. First create a `kernle` directory under the `~/amlogic-s9xxx-armbian/compile-kernel` directory to store the compiled kernel source code. For example, use the source code of [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) to compile, Please download the corresponding kernel such as `linux-5.4.160.tar.xz` and unzip it to the `compile-kernel/kernle/linux-5.4.160` corresponding directory; If you use the source code of [flippy](https://github.com/unifreq) to compile, Please clone the source code of the specified kernel series such as `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` to the corresponding directory. After completion, enter the corresponding kernel such as `compile-kernel/kernle/linux-5.4.160` directory, Run the personalized configuration selection command `make menuconfig` to make a selection, save it after completion, A custom kernel `.config` configuration file will be generated in the kernel directory. 
 
-4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -k 5.4.160 -r flippy -a false` and other specified parameter commands to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
+4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.4.160 -r flippy -a false` and other specified parameter commands to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
 ## Other instructions
 
