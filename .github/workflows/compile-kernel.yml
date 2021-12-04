@@ -10,13 +10,13 @@ on:
   workflow_dispatch:
     inputs:
       kernel_repo:
-        description: 'Source: kernel.org / flippy'
+        description: "Source: kernel.org / flippy"
         required: false
-        default: 'flippy'
+        default: "flippy"
       kernel_ver:
-        description: 'Kernel version: 5.4.160'
+        description: "Kernel version: 5.4.160"
         required: false
-        default: '5.4.160_5.10.80'
+        default: "5.4.160_5.10.80"
   #schedule:
     #- cron: '0 17 * * 0'
 
@@ -37,71 +37,69 @@ jobs:
     if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Initialization environment
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
-        sudo timedatectl set-timezone "$TZ"
-        echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-        ARR_BRANCH=("kernel.org" "flippy")
-        if  [[ -n "${{ github.event.inputs.kernel_repo }}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${{ github.event.inputs.kernel_repo }}")" ]]; then
-            KERNEL_REPO="${{ github.event.inputs.kernel_repo }}"
-        else
-            KERNEL_REPO="kernel.org"
-        fi
-        echo "KERNEL_REPO=${KERNEL_REPO}" >> $GITHUB_ENV
+          ARR_BRANCH=("kernel.org" "flippy")
+          if  [[ -n "${{ github.event.inputs.kernel_repo }}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${{ github.event.inputs.kernel_repo }}")" ]]; then
+              KERNEL_REPO="${{ github.event.inputs.kernel_repo }}"
+          else
+              KERNEL_REPO="kernel.org"
+          fi
+          echo "KERNEL_REPO=${KERNEL_REPO}" >> $GITHUB_ENV
 
-        if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
-            KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
-        else
-            KERNEL_VER="5.4.160_5.10.80"
-        fi
-        echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
+          if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
+              KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
+          else
+              KERNEL_VER="5.4.160_5.10.80"
+          fi
+          echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
 
-    - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
-      id: compile
-      run: |
-        sudo chmod +x recompile
-        sudo ./recompile -d -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
-        output_dirname="${PWD}/compile-kernel/output"
-        output_tags="$(ls ${output_dirname}/*.tar.gz -l | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
-        echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
-        echo "PACKAGED_OUTPUTPATH=${output_dirname}" >> $GITHUB_ENV
-        echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
+      - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
+        id: compile
+        run: |
+          sudo chmod +x recompile
+          sudo ./recompile -d -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }}
+          output_dirname="${PWD}/compile-kernel/output"
+          output_tags="$(ls ${output_dirname}/*.tar.gz -l | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
+          echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
+          echo "PACKAGED_OUTPUTPATH=${output_dirname}" >> $GITHUB_ENV
+          echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
 
-    - name: Upload Kernel to Actions
-      uses: kittaakos/upload-artifact-as-is@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_KERNEL == 'true' && !cancelled()
-      with:
-        path: ${{ env.PACKAGED_OUTPUTPATH }}/
+      - name: Upload Kernel to Actions
+        uses: kittaakos/upload-artifact-as-is@master
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_KERNEL == 'true' && !cancelled()
+        with:
+          path: ${{ env.PACKAGED_OUTPUTPATH }}/
 
-    - name: Upload Kernel to WeTransfer
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${{ env.PACKAGED_OUTPUTPATH }} 2>&1 | tee wetransfer.log
-        echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
+      - name: Upload Kernel to WeTransfer
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+        run: |
+          curl -fsSL git.io/file-transfer | sh
+          ./transfer wet -s -p 16 --no-progress ${{ env.PACKAGED_OUTPUTPATH }} 2>&1 | tee wetransfer.log
+          echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
 
-    - name: Upload Kernel to Release
-      uses: ncipollo/release-action@v1
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
-        artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-        allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        body: |
-          The kernel can be used to compile Armbian and OpenWer.
-          The kernel source code comes from: ${{ env.KERNEL_REPO }}
-          
-        
+      - name: Upload Kernel to Release
+        uses: ncipollo/release-action@v1
+        if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+        with:
+          tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            The kernel can be used to compile Armbian and OpenWer.
+            The kernel source code comes from: ${{ env.KERNEL_REPO }}
