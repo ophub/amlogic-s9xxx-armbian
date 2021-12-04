@@ -161,15 +161,15 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - ### Use GitHub Action to build
 
-1. Workflows configuration in [.yml](.github/workflows) files. Set the armbian `SOC` you want to build in `Rebuild Armbian for amlogic s9xxx`.
+1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `SOC` you want to build in `Rebuild Armbian for amlogic s9xxx`.
 
-2. New compilation: Select ***`Build the armbian firmware`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
+2. New compilation: Select ***`Build armbian`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build armbian` of different soc. Select ***`Use Releases file to build armbian`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
 - ### Only import GitHub Action for Armbian rebuild
 
-You can use other methods to build the Armbian system. Or use [Armbian](https://armbian.tnahosting.net/dl/) officially provided [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) and other branch firmware. and only import the Action from this repository in the process control file .github/workflows/.yml to rebuild Armbian to adapt to the use of Amlogic S9xxx series boxes, code show as below:
+You can use other methods to build the Armbian system. Or use [Armbian](https://armbian.tnahosting.net/dl/) officially provided [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) and other branch firmware. and only import the Action from this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) to rebuild Armbian to adapt to the use of Amlogic S9xxx series boxes, code show as below:
 
 ```yaml
 - name: Rebuild Armbian for Amlogic s9xxx
