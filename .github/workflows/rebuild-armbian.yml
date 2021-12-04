@@ -73,7 +73,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_buster_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: Armbian_Aml_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
