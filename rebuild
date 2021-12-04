@@ -7,7 +7,7 @@
 #===== Do not modify the following parameter settings, Start =====
 make_path="${PWD}"
 armbian_outputpath="${make_path}/build/output/images"
-armbian_original_file="${armbian_outputpath}/Armbian*trunk*buster*.img"
+armbian_original_file="${armbian_outputpath}/*.img"
 build_path="${make_path}/build-armbian"
 armbian_path="${build_path}/amlogic-armbian"
 dtb_path="${build_path}/amlogic-dtb"
@@ -106,19 +106,14 @@ make_image() {
     rm -rf ${tmp_dir} 2>/dev/null && sync
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
 
-    # Get armbian version and release
-    armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
-    out_release=$(echo ${armbian_image_name} | awk -F "buster" '{print $1}' | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
-    out_version=$(echo ${armbian_image_name} | awk -F "buster" '{print $NF}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]{1,3}' 2>/dev/null)
-    [[ -n "${out_release}" && -n "${out_version}" ]] || die "Invalid file: ${armbian_original_file}"
     if [ -n "${new_kernel}" ]; then
         make_version=${new_kernel}
     else
-        make_version=${out_version}
+        make_version=${armbian_original_version}
     fi
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${out_release}_Aml_${build_soc}_buster_${make_version}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_original_release}_Aml_${build_soc}_buster_${make_version}_$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file}
     sync
 
@@ -172,7 +167,7 @@ replace_kernel() {
         build_header=$(ls ${kernel_path}/${new_kernel}/header-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
 
         # 01 For /boot five files
-        (cd ${tmp_armbian}/boot && rm -rf *-${out_version}-* uInitrd zImage dtb* 2>/dev/null && sync)
+        (cd ${tmp_armbian}/boot && rm -rf *-${armbian_original_version}-* uInitrd zImage dtb* 2>/dev/null && sync)
         tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
         [ "$(ls ${tmp_armbian}/boot/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || die "boot/ 5 files is missing."
 
@@ -502,12 +497,21 @@ done
 # Set whether to replace the kernel
 [ "${auto_kernel}" == "true" ] && download_kernel
 
+# Get armbian release and version
+armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
+[[ -n "${armbian_image_name}" ]] || die "The armbian original file does not exist: [ ${armbian_original_file} ]"
+original_release_version=$(echo ${armbian_image_name} | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' | xargs | tr "[ ]" "_")
+armbian_original_release=$(echo ${original_release_version} | awk -F '_' '{print $1}')
+armbian_original_version=$(echo ${original_release_version} | awk -F '_' '{print $NF}')
+
+# Show welcome message
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
-echo -e "Welcome to build armbian for amlogic s9xxx STB! \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+echo -e "\n"
+echo -e "Welcome to build armbian for amlogic s9xxx STB!"
+echo -e "Armbian original file: [ ${armbian_image_name} ], Release: [ ${armbian_original_release} ], Version: [ ${armbian_original_version} ]"
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
-echo -e "Ready, start build armbian... \n"
+echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 
 # Start loop compilation
 k=1
@@ -517,7 +521,7 @@ for b in ${build_armbian[*]}; do
     for x in ${build_kernel[*]}; do
         {
             echo -n "(${k}.${i}) Start build armbian [ ${b} - ${x} ]. "
-            now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//')
+            now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
             if [[ "${now_remaining_space}" -le "2" ]]; then
                 echo "Remaining space is less than 2G, exit this packaging. \n"
                 break
