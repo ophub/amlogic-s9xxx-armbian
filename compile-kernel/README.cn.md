@@ -6,12 +6,6 @@
 
 ## 编译命令说明
 
-- `sudo ./recompile -d -k 5.4.160` : 使用默认配置，并通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
-- `sudo ./recompile -d -k 5.4.160 -a true` : 使用默认配置，并通过 -a 参数设置编译内核时，是否自动升级到同系列最新内核。
-- `sudo ./recompile -d -k 5.4.160 -n leifeng` : 使用默认配置，并通过 -n 参数设置内核自定义签名。
-- `sudo ./recompile -d -k 5.4.160 -r kernel.org` : 使用默认配置，并通过 -r 参数设置编译源码的下载站。
-- `sudo ./recompile -d -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
-
 | 参数 | 含义 | 说明 |
 | ---- | ---- | ---- |
 | -d | Defaults | 使用默认配置 |
@@ -20,13 +14,13 @@
 | -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-beta` ，生成的内核名称为 `5.4.160-meson64-beta` 。设置自定义签名时请勿包含空格。 |
 | -r | Repo | 指定内核编译源码的下载站。可选项为 [kernel.org](https://www.kernel.org/) 和 [flippy](https://github.com/unifreq) ，默认为 `flippy` |
 
+- `sudo ./recompile -d -k 5.4.160` : 使用默认配置，并通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
+- `sudo ./recompile -d -k 5.4.160 -a true` : 使用默认配置，并通过 -a 参数设置编译内核时，是否自动升级到同系列最新内核。
+- `sudo ./recompile -d -k 5.4.160 -n leifeng` : 使用默认配置，并通过 -n 参数设置内核自定义签名。
+- `sudo ./recompile -d -k 5.4.160 -r kernel.org` : 使用默认配置，并通过 -r 参数设置编译源码的下载站。
+- `sudo ./recompile -d -k 5.10.80_5.4.160 -a true -n leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
+
 💡提示：可以使用 `flippy` 的 [.config](https://github.com/unifreq/arm64-kernel-configs) 模板和源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 的 `最新版本` 。`其他系列或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。
-
-- ### 使用 GitHub Action 进行编译
-
-1. 关于 Workflows 文件的配置在 [.yml](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/.github/workflows) 文件里。
-
-2. 在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Compile the armbian kernel`*** ，点击 ***`Run workflow`*** 按钮即可编译。
 
 - ### 本地编译
 
@@ -43,6 +37,12 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 3. 首先在 `~/amlogic-s9xxx-armbian/compile-kernel` 目录下创建 `kernle` 目录，用于存放编译的内核源码。如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核如 `linux-5.4.160.tar.xz` 并解压到对应的 `compile-kernel/kernle/linux-5.4.160` 目录下；如采用 [flippy](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernle/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernle/linux-5.4.160` 的目录下，复制对应的内核系列的 [.config](tools/config) 模板到当前内核目录（如复制 config-5.4.160 文件，并重命名为 `.config`），并运行个性化配置选择命令 `make menuconfig` 进行自定义选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
 
 4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.160 -r flippy -a false` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+
+- ### 使用 GitHub Action 进行编译
+
+1. 关于 Workflows 文件的配置在 [.yml](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/.github/workflows) 文件里。
+
+2. 在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Compile the armbian kernel`*** ，点击 ***`Run workflow`*** 按钮即可编译。
 
 ## 其他说明
 
