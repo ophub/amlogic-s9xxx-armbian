@@ -1,0 +1,92 @@
+name: "Rebuild armbian for Amlogic S9xxx STB"
+author: "ophub"
+description: "Support Amlogic S9xxx STB are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, etc."
+inputs:
+  mode:
+    description: "Choose script."
+    required: false
+    default: "ophub"
+  armbian_soc:
+    description: "Set Amlogic SoC."
+    required: false
+    default: "s905d_s905x3"
+  armbian_kernel:
+    description: "Set kernel."
+    required: false
+    default: "5.10.80_5.4.160"
+  version_branch:
+    description: "Set kernel."
+    required: false
+    default: "stable"
+  auto_kernel:
+    description: "Auto use the latest kernel."
+    required: false
+    default: "true"
+  armbian_size:
+    description: "Set armbian rootfs size."
+    required: false
+    default: "2748"
+  armbian_path:
+    description: "Set armbian original file path."
+    required: false
+    default: "build/output/images/*.img"
+
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        cd ${GITHUB_ACTION_PATH}
+        echo -e "Armbian rebuild actions path: ${PWD}"
+
+        armbian_file="${{ inputs.armbian_path }}"
+        armbian_filepath="build/output/images"
+        echo -e "Get armbian file input parameters: [ ${armbian_file} ]"
+        [ -z "${armbian_file}" ] && echo -e "The [ armbian_path ] variable must be specified." && exit 1
+        [ -d "${armbian_filepath}" ] || sudo mkdir -p ${armbian_filepath}
+        if [[ "${armbian_file}" == http* ]]; then
+          echo -e "Use wget to download file: [ ${armbian_file} ]"
+          sudo wget ${armbian_file} -q -P ${armbian_filepath} 2>/dev/null
+        elif [[ "${armbian_file:0:6}" != "build/" && "${armbian_file:0:8}" != "./build/" ]]; then
+          echo -e "Copy files: [ ${armbian_file} ]"
+          sudo cp -f ${GITHUB_WORKSPACE}/${armbian_file} ${armbian_filepath} 2>/dev/null
+        else
+          echo -e "Use armbian files: [ ${armbian_file} ]"
+        fi
+        sync
+        echo -e "About the ${armbian_filepath} directory: \n $(ls ${armbian_filepath} -l 2>/dev/null)"
+
+        cd ${armbian_filepath}
+        echo -e "Check the armbian file format..."
+        down_file="$(ls . -l 2>/dev/null | grep "^-" | awk '{print $9}' | head -n 1)"
+        [ -z "${down_file}" ] && echo -e "The [ ${armbian_file} ] is invalid." && exit 1
+        [ "${down_file:0-7}" == ".img.gz" ] && sudo gzip -df ${down_file} 2>/dev/null && sync
+        [ "${down_file:0-7}" == ".img.xz" ] && sudo xz -d ${down_file} 2>/dev/null && sync
+        [ "${down_file:0-4}" == ".zip" ] && sudo unzip -o ${down_file} 2>/dev/null && sync
+        echo -e "Armbian file: [ $(ls *.img -l 2>/dev/null) ]"
+
+        cd ${GITHUB_ACTION_PATH}
+        echo -e "Start to rebuild armbian..."
+        make_command=" -d"
+        [ -n ${{ inputs.armbian_soc }} ] && make_command="${make_command} -b ${{ inputs.armbian_soc }}"
+        [ -n ${{ inputs.armbian_kernel }} ] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
+        [ -n ${{ inputs.version_branch }} ] && make_command="${make_command} -v ${{ inputs.version_branch }}"
+        [ -n ${{ inputs.auto_kernel }} ] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
+        [ -n ${{ inputs.armbian_size }} ] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
+        sudo chmod +x rebuild
+        sudo ./rebuild ${make_command}
+
+        cd ${GITHUB_ACTION_PATH}
+        echo -e "Output environment variables."
+        echo "PACKAGED_OUTPUTPATH=${PWD}/${armbian_filepath}" >> $GITHUB_ENV
+        echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+        echo "PACKAGED_STATUS=success" >> $GITHUB_ENV
+        echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${armbian_filepath}"
+        echo -e "PACKAGED_OUTPUTDATE: $(date +"%Y.%m.%d.%H%M")"
+        echo -e "PACKAGED_STATUS: success"
+        echo -e "PACKAGED_OUTPUTPATH files list:"
+        echo -e "$(ls ${PWD}/${armbian_filepath} 2>/dev/null) \n"
+
+branding:
+  icon: "terminal"
+  color: "gray-dark"
