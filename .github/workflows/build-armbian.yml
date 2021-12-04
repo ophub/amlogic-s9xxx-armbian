@@ -9,8 +9,12 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      set_release:
+        description: "RELEASE: buster / focal"
+        required: false
+        default: "buster"
       set_board:
-        description: "Optional: lepotato / odroidn2"
+        description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
   schedule:
@@ -47,6 +51,16 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          if  [[ -n "${{ github.event.inputs.set_release }}" && -n "$(echo "${ARR_RELEASE[@]}" | grep -w "${{ github.event.inputs.set_release }}")" ]]; then
+              set_release="${{ github.event.inputs.set_release }}"
+          else
+              set_release="buster"
+          fi
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+
           ARR_BOARD=("lepotato" "odroidn2")
           if  [[ -n "${{ github.event.inputs.set_board }}" && -n "$(echo "${ARR_BOARD[@]}" | grep -w "${{ github.event.inputs.set_board }}")" ]]; then
               set_board="${{ github.event.inputs.set_board }}"
@@ -54,7 +68,6 @@ jobs:
               set_board="lepotato"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
       - name: Download source code
         id: down
@@ -66,7 +79,7 @@ jobs:
         run: |
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST=armbian BRANCH=current RELEASE=buster BUILD_MINIMAL=no \
+          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} HOST=armbian BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} BUILD_MINIMAL=no \
                             BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
           echo "::set-output name=status::success"
 
@@ -93,7 +106,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
