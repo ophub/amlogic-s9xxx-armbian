@@ -161,15 +161,15 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - ### 使用 GitHub Action 进行编译
 
-1. 关于 Workflows 文件的配置在 [.yml](.github/workflows) 文件里。可以设置需要编译的盒子的 `SOC` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
+1. 关于 Workflows 文件的配置在 [.yml](.github/workflows/build-armbian.yml) 文件里。可以设置需要编译的盒子的 `SOC` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
 
-2. 全新编译：在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build the armbian firmware`*** ，点击 ***`Run workflow`*** 按钮即可编译。
+2. 全新编译：在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build armbian`*** ，点击 ***`Run workflow`*** 按钮即可编译。
 
 3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 soc 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
 
 - ### 仅单独引入 GitHub Action 进行 Armbian 重构
 
-你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 .github/workflows/.yml 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用，代码如下:
+你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用，代码如下:
 
 ```yaml
 - name: Rebuild Armbian for Amlogic s9xxx
