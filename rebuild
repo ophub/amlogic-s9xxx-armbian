@@ -285,6 +285,7 @@ copy_files() {
         ;;
     esac
 
+    # Batch file
     cd ${make_path}
 
     # Write the specified bootloader
@@ -332,22 +333,27 @@ copy_files() {
     # Copy rootfs files
     rm -rf ${tmp_armbian}/boot/* 2>/dev/null
     cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
-    # Copy the same file of the release for ROOTFS
+    #
+    # Copy the same files of the release for ROOTFS
     if [ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]; then
         cp -rf ${configfiles_path}/files/* ${tag_rootfs} && sync
     fi
-    # Distinguish between ubuntu and debian
+    #
+    # Copy the different files of the release for ROOTFS: ubuntu and debian
     armbian_ubuntu=("bionic" "focal" "hirsute")
     armbian_debian=("bullseye" "buster" "stretch")
-    DISTRIBUTION_CODENAME="$(cat ${tag_rootfs}/etc/armbian-release | grep -oE "^DISTRIBUTION_CODENAME=.*" | awk -F "=" '{print $2}')"
-    if [ -n "${DISTRIBUTION_CODENAME}" ]; then
-        apt_sources_files="${configfiles_path}/patches/release/${DISTRIBUTION_CODENAME}"
-        [ -d "${apt_sources_files}" ] && cp -rf ${apt_sources_files}/* ${tag_rootfs} && sync
-        #
-        # For usr/sbin/armbian-docker
-        [[ -n "$(echo "${armbian_ubuntu[@]}" | grep -w "${DISTRIBUTION_CODENAME}")" ]] && sed -i "s|debian|ubuntu|g" usr/sbin/armbian-docker
+    diff_release_name="$(cat ${tag_rootfs}/etc/armbian-release | grep -oE "^DISTRIBUTION_CODENAME=.*" | awk -F "=" '{print $2}')"
+    diff_release_files="${configfiles_path}/release/${diff_release_name}"
+    if [[ -n "${diff_release_name}" && -d "${diff_release_files}" ]]; then
+        cp -rf ${diff_release_files}/* ${tag_rootfs} && sync
+    fi
+    #
+    # Modify different releases for usr/sbin/armbian-docker
+    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_ubuntu[@]}" | grep -w "${diff_release_name}")" ]]; then
+        sed -i "s|debian|ubuntu|g" ${tag_rootfs}/usr/sbin/armbian-docker
     fi
 
+    # Processing partition files: bootfs
     cd ${tag_bootfs}
 
     # Add u-boot.ext for 5.10 kernel
@@ -369,6 +375,7 @@ copy_files() {
 
     sync
 
+    # Processing partition files: rootfs
     cd ${tag_rootfs}
 
     # Replace the boot directory with the latest file
@@ -425,22 +432,17 @@ copy_files() {
     cd ${make_path}
 
     umount -f ${tmp_armbian} 2>/dev/null
-
     umount -f ${tag_rootfs} 2>/dev/null
     umount -f ${tag_bootfs} 2>/dev/null
-
     losetup -D 2>/dev/null
+
     sync
 }
 
 clean_tmp() {
     cd ${tmp_outpath}
-
     # Rename version
-    support_armbian=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
-    if [[ "${DISTRIBUTION_CODENAME}" != "buster" && -n "$(echo "${support_armbian[@]}" | grep -w "${DISTRIBUTION_CODENAME}")" ]]; then
-        rename "s/buster/${DISTRIBUTION_CODENAME}/g" *.img 2>/dev/null && sync
-    fi
+    [[ "${diff_release_name}" != "buster" ]] && rename "s/buster/${diff_release_name}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
     sync
 
