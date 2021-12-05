@@ -17,8 +17,6 @@ on:
         description: "Kernel version: 5.4.160"
         required: false
         default: "5.4.160_5.10.80"
-  #schedule:
-    #- cron: '0 17 * * 0'
 
 env:
   UPLOAD_KERNEL: false
