@@ -345,6 +345,10 @@ copy_files() {
     diff_release_name="$(cat ${tag_rootfs}/etc/armbian-release | grep -oE "^DISTRIBUTION_CODENAME=.*" | awk -F "=" '{print $2}')"
     diff_release_files="${configfiles_path}/release/${diff_release_name}"
     if [[ -n "${diff_release_name}" && -d "${diff_release_files}" ]]; then
+        # Backup source
+        mv -f ${tag_rootfs}/etc/apt/sources.list ${tag_rootfs}/etc/apt/sources.list.bak
+        mv -f ${tag_rootfs}/etc/apt/sources.list.d/armbian.list ${tag_rootfs}/etc/apt/sources.list.d/armbian.list.bak
+        # Copy custom source
         cp -rf ${diff_release_files}/* ${tag_rootfs} && sync
     fi
     #
