@@ -1,0 +1,47 @@
+#==========================================================================
+# https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Automatically delete older releases and artifacts
+#==========================================================================
+
+name: Delete older releases and artifacts
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 23 * * 0"
+
+env:
+  DELETE_RELEASE: true
+  DELETE_ARTIFACTS: true
+  KEEP_DAY: 1
+  KEEP_MININUM_RUNS: 0
+  KEEP_MININUM_RELEASE: 2
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Delete older releases
+        uses: dev-drprasad/delete-older-releases@master
+        if: env.DELETE_RELEASE == 'true'
+        with:
+          keep_latest: ${{ env.KEEP_MININUM_RELEASE }}
+          delete_tags: true
+          delete_tag_pattern: _
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete older workflow runs and artifacts
+        uses: Mattraks/delete-workflow-runs@main
+        if: env.DELETE_ARTIFACTS == 'true'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ env.KEEP_DAY }}
+          keep_minimum_runs: ${{ env.KEEP_MININUM_RUNS }}
