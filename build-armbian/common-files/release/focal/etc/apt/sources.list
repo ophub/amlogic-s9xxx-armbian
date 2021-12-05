@@ -1,0 +1,11 @@
+deb https://mirrors.huaweicloud.com/ubuntu-ports/ focal main restricted universe multiverse
+#deb-src http://ports.ubuntu.com/ focal main restricted universe multiverse
+
+deb https://mirrors.huaweicloud.com/ubuntu-ports/ focal-security main restricted universe multiverse
+#deb-src http://ports.ubuntu.com/ focal-security main restricted universe multiverse
+
+deb https://mirrors.huaweicloud.com/ubuntu-ports/ focal-updates main restricted universe multiverse
+#deb-src http://ports.ubuntu.com/ focal-updates main restricted universe multiverse
+
+deb https://mirrors.huaweicloud.com/ubuntu-ports/ focal-backports main restricted universe multiverse
+#deb-src http://ports.ubuntu.com/ focal-backports main restricted universe multiverse
