@@ -1,7 +1,7 @@
-#========================================================================================================================
+#==========================================================================
 # Description: Build Armbian For Amlogic S9xxx STB
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#========================================================================================================================
+#==========================================================================
 
 name: Rebuild armbian
 
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       armbian_url:
-        description: "Enter armbian path"
+        description: "Input armbian path"
         required: false
         default: ""
 
