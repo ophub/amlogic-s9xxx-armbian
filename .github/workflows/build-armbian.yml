@@ -1,7 +1,7 @@
-#========================================================================================================================
+#==========================================================================
 # Description: Build Armbian For Amlogic S9xxx STB
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#========================================================================================================================
+#==========================================================================
 
 name: Build armbian
 
@@ -9,8 +9,12 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      set_release:
+        description: "RELEASE: buster / focal"
+        required: false
+        default: "buster"
       set_board:
-        description: "Optional: lepotato / odroidn2"
+        description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
   schedule:
@@ -19,11 +23,6 @@ on:
 env:
   UPLOAD_FIRMWARE: false
   UPLOAD_RELEASE: true
-  DELETE_RELEASE: true
-  DELETE_ARTIFACTS: true
-  KEEP_DAY: 1
-  KEEP_MININUM_RUNS: 0
-  KEEP_MININUM_RELEASE: 2
   TZ: Asia/Shanghai
 
 jobs:
@@ -47,6 +46,16 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          if  [[ -n "${{ github.event.inputs.set_release }}" && -n "$(echo "${ARR_RELEASE[@]}" | grep -w "${{ github.event.inputs.set_release }}")" ]]; then
+              set_release="${{ github.event.inputs.set_release }}"
+          else
+              set_release="buster"
+          fi
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+
           ARR_BOARD=("lepotato" "odroidn2")
           if  [[ -n "${{ github.event.inputs.set_board }}" && -n "$(echo "${ARR_BOARD[@]}" | grep -w "${{ github.event.inputs.set_board }}")" ]]; then
               set_board="${{ github.event.inputs.set_board }}"
@@ -54,7 +63,6 @@ jobs:
               set_board="lepotato"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
       - name: Download source code
         id: down
@@ -66,7 +74,7 @@ jobs:
         run: |
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD="${{ env.ARMBIAN_BOARD }}" HOST=armbian BRANCH=current RELEASE=buster BUILD_MINIMAL=no \
+          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} HOST=armbian BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} BUILD_MINIMAL=no \
                             BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
           echo "::set-output name=status::success"
 
@@ -93,7 +101,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -104,22 +112,3 @@ jobs:
             Default password: 1234
             Install to EMMC command: armbian-install
             Update command: armbian-update
-
-      - name: Delete older releases
-        uses: dev-drprasad/delete-older-releases@master
-        if: env.DELETE_RELEASE == 'true'
-        with:
-          keep_latest: ${{ env.KEEP_MININUM_RELEASE }}
-          delete_tags: true
-          delete_tag_pattern: _
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Delete older workflow runs and artifacts
-        uses: Mattraks/delete-workflow-runs@main
-        if: env.DELETE_ARTIFACTS == 'true'
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          retain_days: ${{ env.KEEP_DAY }}
-          keep_minimum_runs: ${{ env.KEEP_MININUM_RUNS }}

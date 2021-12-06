@@ -1,8 +1,7 @@
-#========================================================================================================================
+#==========================================================================
 # Description: Build Armbian For Amlogic S9xxx STB
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-# Cron: min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday)
-#========================================================================================================================
+#==========================================================================
 
 name: Use Releases file to build armbian
 
@@ -41,7 +40,7 @@ jobs:
         if: (!cancelled())
         run: |
           [ -d build/output/images ] || mkdir -p build/output/images
-          curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_buster_.*/Armbian_.*-trunk_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
+          curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_.*/Armbian_.*-trunk_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
           [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
           cd build/output/images/ && gzip -df *.img.gz && sync && cd ../../../
           sudo chmod +x rebuild
@@ -63,7 +62,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_buster_${{ env.FILE_DATE }}
+          tag: Armbian_Aml_${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
