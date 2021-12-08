@@ -107,13 +107,13 @@ make_image() {
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
 
     if [ -n "${new_kernel}" ]; then
-        make_version=${new_kernel}
+        make_kernel=${new_kernel}
     else
-        make_version=${armbian_original_kernel}
+        make_kernel=${armbian_original_kernel}
     fi
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_bullseye_${make_version}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_bullseye_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file}
     sync
 
@@ -138,7 +138,7 @@ make_image() {
 extract_armbian() {
     cd ${make_path}
 
-    armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_version}.img"
+    armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_kernel}.img"
     rm -f ${armbian_image_file} 2>/dev/null && sync
     cp -f $(ls ${armbian_original_file} 2>/dev/null | head -n 1) ${armbian_image_file}
     sync && sleep 3
@@ -303,7 +303,7 @@ copy_files() {
     # Reorganize the /boot partition
     mkdir -p ${tmp_build}/boot
     # Copy the original boot core file
-    cp -rf ${tmp_armbian}/boot/*-${make_version}-* ${tmp_build}/boot && sync
+    cp -rf ${tmp_armbian}/boot/*-${make_kernel}-* ${tmp_build}/boot && sync
     (cd ${tmp_build}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && chmod +x * && sync)
     # Unzip the relevant files
     tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
@@ -523,9 +523,8 @@ done
 # Get armbian release and version
 armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
 [[ -n "${armbian_image_name}" ]] || die "The armbian original file does not exist: [ ${armbian_original_file} ]"
-original_version_kernel=$(echo ${armbian_image_name} | grep -oE '[1-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}' | xargs | tr "[ ]" "_")
-armbian_original_version=$(echo ${original_version_kernel} | awk -F '_' '{print $1}')
-armbian_original_kernel=$(echo ${original_version_kernel} | awk -F '_' '{print $NF}')
+armbian_original_version="$(echo ${armbian_image_name} | grep -oE '2[0-9].[0-9]{1,2}[.]*[0-9]{1,2}' | head -n 1)"
+armbian_original_kernel="$(echo ${armbian_image_name} | grep -oE '[4-5].[0-9]{1,2}.[0-9]{1,3}' | head -n 1)"
 
 # Show welcome message
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"

@@ -57,7 +57,7 @@ jobs:
           done
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
-          cd ${GITHUB_ACTION_PATH}
+          cd ${GITHUB_WORKSPACE}
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z -k 5.10.80_5.4.160
           sudo ./rebuild -d -b s905x_s905w -k 5.4.160
