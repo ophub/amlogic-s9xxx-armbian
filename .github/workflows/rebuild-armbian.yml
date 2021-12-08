@@ -42,15 +42,15 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
 
           # Get the url of the rebuild armbian file
-          if  [[ -n "${{ github.event.inputs.armbian_url }}" ]]; then
-              armbian_url="${{ github.event.inputs.armbian_url }}"
-          else
-              armbian_down="https://armbian.tnahosting.net/dl/lepotato/archive/"
-              armbian_file=$(curl -s ${armbian_down} | grep -oE Armbian.*bullseye.*.img.xz | head -n 1)
+          armbian_url="${{ github.event.inputs.armbian_url }}"
+          if  [[ -z "${armbian_url}" ]]; then
+              armbian_site="https://armbian.tnahosting.net/dl/lepotato/archive/"
+              armbian_name="Armbian.*bullseye.*.img.xz"
+              armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [ -n "${armbian_file}" ]; then
-                  armbian_url="${armbian_down}/${armbian_file}"
+                  armbian_url="${armbian_site}/${armbian_file}"
               else
-                  echo -e "Invalid download path: [ ${armbian_down} ]"
+                  echo -e "Invalid download path: [ ${armbian_site} ]"
                   exit 1
               fi
           fi
