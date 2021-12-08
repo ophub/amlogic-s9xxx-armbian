@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       set_release:
-        description: "RELEASE: buster / focal"
+        description: "RELEASE: bullseye / focal"
         required: false
-        default: "buster"
+        default: "bullseye"
       set_board:
         description: "BOARD: lepotato / odroidn2"
         required: false
@@ -52,7 +52,7 @@ jobs:
           if  [[ -n "${{ github.event.inputs.set_release }}" && -n "$(echo "${ARR_RELEASE[@]}" | grep -w "${{ github.event.inputs.set_release }}")" ]]; then
               set_release="${{ github.event.inputs.set_release }}"
           else
-              set_release="buster"
+              set_release="bullseye"
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
