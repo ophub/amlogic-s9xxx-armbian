@@ -6,7 +6,7 @@ etc/network/interfaces
 usr/sbin/
 ```
 
-- release: It has the same function as `files`. According to the difference of `release` (E.g. focal, buster), it is classified and merged in `sudo ./rebuild`.
+- release: It has the same function as `files`. According to the difference of `release` (E.g. focal, bullseye), it is classified and merged in `sudo ./rebuild`.
 
 - patches: The files in the `patches` directory are patch files, which are integrated when rebuild armbian.
 

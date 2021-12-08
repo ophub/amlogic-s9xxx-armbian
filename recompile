@@ -33,7 +33,7 @@ use_linuxgun_localpath="/usr/local/aarch64"
 
 # Armbian system
 armbian_repo="ophub/amlogic-s9xxx-armbian"
-armbian_releases_file="Armbian_Aml_buster_.*/Armbian_.*_s905d_.*.img.gz"
+armbian_releases_file="Armbian_Aml_.*/Armbian_.*_s905d_.*.img.gz"
 armbian_tmp_file="${out_kernel}/tmp/armbian.img"
 armbian_chroot_file="${out_kernel}/armbian/armbian.img"
 
