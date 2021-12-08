@@ -42,7 +42,22 @@ jobs:
           [ -d build/output/images ] || mkdir -p build/output/images
           curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_.*/Armbian_.*-trunk_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
           [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
-          cd build/output/images/ && gzip -df *.img.gz && sync && cd ../../../
+          cd build/output/images/ && gzip -df *.img.gz && sync
+
+          set_release="_"
+          out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          i=1
+          for r in ${ARR_RELEASE[*]}; do
+              if [[ "${out_releasename}" == *${r}* ]]; then
+                  set_release="_${r}_"
+                  break
+              fi
+              let i++
+          done
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+
+          cd ${GITHUB_ACTION_PATH}
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z -k 5.10.80_5.4.160
           sudo ./rebuild -d -b s905x_s905w -k 5.4.160
@@ -62,7 +77,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_${{ env.FILE_DATE }}
+          tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
