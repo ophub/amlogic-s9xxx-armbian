@@ -51,19 +51,17 @@ jobs:
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
           ARR_BRANCH=("kernel.org" "flippy")
-          if  [[ -n "${{ github.event.inputs.kernel_repo }}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${{ github.event.inputs.kernel_repo }}")" ]]; then
-              KERNEL_REPO="${{ github.event.inputs.kernel_repo }}"
-          else
-              KERNEL_REPO="kernel.org"
+          kernel_repo="${{ github.event.inputs.kernel_repo }}"
+          if  [[ -z "${kernel_repo}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${kernel_repo}")" ]]; then
+              kernel_repo="kernel.org"
           fi
-          echo "KERNEL_REPO=${KERNEL_REPO}" >> $GITHUB_ENV
+          echo "KERNEL_REPO=${kernel_repo}" >> $GITHUB_ENV
 
-          if  [[ -n "${{ github.event.inputs.kernel_ver }}" ]]; then
-              KERNEL_VER="${{ github.event.inputs.kernel_ver }}"
-          else
-              KERNEL_VER="5.4.160_5.10.80"
+          kernel_ver="${{ github.event.inputs.kernel_ver }}"
+          if  [[ -z "${kernel_ver}" ]]; then
+              kernel_ver="5.4.160_5.10.80"
           fi
-          echo "KERNEL_VER=${KERNEL_VER}" >> $GITHUB_ENV
+          echo "KERNEL_VER=${kernel_ver}" >> $GITHUB_ENV
 
       - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
         id: compile
