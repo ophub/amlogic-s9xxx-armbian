@@ -8,6 +8,11 @@ name: Use Releases file to build armbian
 on:
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      sel_tags_keywords:
+        description: "Select tags keywords: bullseye / focal"
+        required: false
+        default: "bullseye"
 
 env:
   UPLOAD_FIRMWARE: false
@@ -39,10 +44,15 @@ jobs:
         id: rebuild
         if: (!cancelled())
         run: |
-          [ -d build/output/images ] || mkdir -p build/output/images
-          curl -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" | grep -o "Armbian_Aml_.*/Armbian_.*-trunk_.*.img.gz" | head -n 1 > DOWNLOAD_ARMBIAN
-          [ -s DOWNLOAD_ARMBIAN ] && wget -q -P build/output/images https://github.com/${GITHUB_REPOSITORY}/releases/download/$(cat DOWNLOAD_ARMBIAN)
-          cd build/output/images/ && gzip -df *.img.gz && sync
+          armbian_buildpath="build/output/images"
+          [ -d "${armbian_buildpath}" ] || mkdir -p "${armbian_buildpath}"
+          down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
+          down_path="Armbian_Aml_${{ github.event.inputs.sel_tags_keywords }}.*/Armbian_.*-trunk_.*.img.gz"
+          down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
+          down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
+          [ -z "${down_file}" ] && echo "Invalid download file." && exit 1
+          wget -q -P "${armbian_buildpath}" "${down_file}" && sync
+          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
           set_release="_"
           out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
