@@ -113,7 +113,7 @@ make_image() {
     fi
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_buster_${make_version}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_bullseye_${make_version}_$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file}
     sync
 
@@ -446,7 +446,7 @@ copy_files() {
 clean_tmp() {
     cd ${tmp_outpath}
     # Rename version
-    [[ "${diff_release_name}" != "buster" ]] && rename "s/buster/${diff_release_name}/g" *.img 2>/dev/null && sync
+    [[ "${diff_release_name}" != "bullseye" ]] && rename "s/bullseye/${diff_release_name}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
     sync
 
