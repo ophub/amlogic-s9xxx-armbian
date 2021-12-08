@@ -40,11 +40,13 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
+
+          # Get the url of the rebuild armbian file
           if  [[ -n "${{ github.event.inputs.armbian_url }}" ]]; then
               armbian_url="${{ github.event.inputs.armbian_url }}"
           else
               armbian_down="https://armbian.tnahosting.net/dl/lepotato/archive/"
-              armbian_file=$(curl -s ${armbian_down} | grep -oE Armbian.*buster.*.img.xz | head -n 1)
+              armbian_file=$(curl -s ${armbian_down} | grep -oE Armbian.*bullseye.*.img.xz | head -n 1)
               if [ -n "${armbian_file}" ]; then
                   armbian_url="${armbian_down}/${armbian_file}"
               else
@@ -54,6 +56,19 @@ jobs:
           fi
           echo "ARMBIAN_URL=${armbian_url}" >> $GITHUB_ENV
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+          # Get the release name of the rebuild armbian file
+          set_release="_"
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          i=1
+          for r in ${ARR_RELEASE[*]}; do
+              if [[ "${armbian_url}" == *${r}* ]]; then
+                  set_release="_${r}_"
+                  break
+              fi
+              let i++
+          done
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
@@ -73,7 +88,7 @@ jobs:
         uses: ncipollo/release-action@v1
         if: env.PACKAGED_STATUS == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          tag: Armbian_Aml_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
