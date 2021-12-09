@@ -68,7 +68,7 @@ jobs:
           
 
           ARR_DESKTOP=("no" "yes")
-          set_board="${{ github.event.inputs.set_desktop }}"
+          set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ -z "${set_desktop}" || -z "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               set_board="no"
           fi
