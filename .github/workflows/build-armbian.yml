@@ -18,7 +18,7 @@ on:
         required: false
         default: "lepotato"
       set_desktop:
-        description: "DESKTOP: no / yes"
+        description: "DESKTOP: no / yes DESKTOP_ENVIRONMENT=xfce"
         required: false
         default: "no"
   schedule:
