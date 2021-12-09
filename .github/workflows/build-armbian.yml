@@ -17,6 +17,10 @@ on:
         description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
+      set_desktop:
+        description: "DESKTOP: no / yes"
+        required: false
+        default: "no"
   schedule:
     - cron: "0 17 * * 0"
 
@@ -61,6 +65,14 @@ jobs:
               set_board="lepotato"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
+          
+
+          ARR_DESKTOP=("no" "yes")
+          set_board="${{ github.event.inputs.set_desktop }}"
+          if  [[ -z "${set_desktop}" || -z "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
+              set_board="no"
+          fi
+          echo "ARMBIAN_DESKTOP=${set_desktop}" >> $GITHUB_ENV
 
       - name: Download source code
         id: down
@@ -73,7 +85,7 @@ jobs:
           cd build/
           sudo chmod +x compile.sh
           sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} HOST=armbian BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} BUILD_MINIMAL=no \
-                            BUILD_DESKTOP=no KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
+                            BUILD_DESKTOP=${{ env.ARMBIAN_DESKTOP }} KERNEL_ONLY=no KERNEL_CONFIGURE=no COMPRESS_OUTPUTIMAGE=sha,img
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for amlogic s9xxx
