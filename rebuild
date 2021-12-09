@@ -30,7 +30,7 @@ auto_kernel="true"
 
 SKIP_MB=68
 BOOT_MB=256
-ROOT_MB=2748
+ROOT_MB=5496
 #===== Do not modify the following parameter settings, End =======
 
 die() {
