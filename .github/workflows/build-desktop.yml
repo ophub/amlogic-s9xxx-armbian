@@ -1,42 +1,112 @@
-# This is a basic workflow to help you get started with Actions
+#==========================================================================
+# Description: Build Armbian For Amlogic S9xxx STB
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#==========================================================================
 
-name: build-armbian-desktop
+name: Build armbian Desktop
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  repository_dispatch:
   workflow_dispatch:
+    inputs:
+      set_release:
+        description: "RELEASE: bullseye / focal"
+        required: false
+        default: "bullseye"
+      set_board:
+        description: "BOARD: lepotato / odroidn2"
+        required: false
+        default: "lepotato"
+      
+  schedule:
+    - cron: "0 17 * * 0"
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  UPLOAD_FIRMWARE: false
+  UPLOAD_RELEASE: true
+  TZ: Asia/Shanghai
+
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    if: github.event.repository.owner.id == github.event.sender.id
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: uname -a && ifconfig -a && free && df -h && mount && cat /proc/cpuinfo
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
-          #df -h
-          #mount
-          #cd /
-          #sudo tree
-          
-          
+          #sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          #sudo -E apt-get -qq update
+          #sudo -E apt-get -qq install $(curl -fsSL git.io/ubuntu-2004-server)
+          #sudo -E apt-get -qq autoremove --purge
+          #sudo -E apt-get -qq clean
+          #sudo timedatectl set-timezone "$TZ"
+          #sudo mkdir -p /workdir
+          #sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+
+          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          set_release="${{ github.event.inputs.set_release }}"
+          if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
+              set_release="bullseye"
+          fi
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+
+          ARR_BOARD=("lepotato" "odroidn2")
+          set_board="${{ github.event.inputs.set_board }}"
+          if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
+              set_board="lepotato"
+          fi
+          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV         
+
+      - name: Download armbian image file
+        id: down
+        run: |
+          #git clone --depth 1 https://github.com/armbian/build.git
+          mkdir -p build/output/images
+          cd build/output/images
+          wget --content-disposition https://redirect.armbian.com/odroidhc4/Bullseye_current
+          #wget --content-disposition https://redirect.armbian.com/region/AS/odroidhc4/Bullseye_current
+          xz -d Armbian*
+          echo "::set-output name=status::success"
+
+      - name: Rebuild Armbian for amlogic s9xxx
+        id: rebuild
+        if: steps.compile.outputs.status == 'success'
+        run: |
+          sudo chmod +x rebuild
+          sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z -k 5.10.80_5.4.160
+          sudo ./rebuild -d -b s905x_s905w -k 5.4.160
+          cd build/output/images/ && sudo gzip *.img && sync
+          echo "FILEPATH=$PWD" >> $GITHUB_ENV
+          echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
+
+      - name: Upload Armbian image to Actions
+        uses: kittaakos/upload-artifact-as-is@master
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+        with:
+          path: ${{ env.FILEPATH }}/
+
+      - name: Upload Armbian image to Release
+        id: release
+        uses: ncipollo/release-action@v1
+        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+        with:
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
+          artifacts: ${{ env.FILEPATH }}/*
+          allowUpdates: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            This is Armbian image for amlogic s9xxx STB
+            * Firmware information
+            Default username: root
+            Default password: 1234
+            Install to EMMC command: armbian-install
+            Update command: armbian-update
+# This is a basic workflow to help you get started with Actions
+        
