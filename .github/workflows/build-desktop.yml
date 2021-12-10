@@ -65,7 +65,7 @@ jobs:
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
-        if: steps.compile.outputs.status == 'success'
+        #if: steps.compile.outputs.status == 'success'
         run: |
           mkdir -p build/output/images
           cd build/output/images
