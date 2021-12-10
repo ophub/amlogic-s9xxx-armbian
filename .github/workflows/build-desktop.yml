@@ -41,8 +41,8 @@ jobs:
         run: |
           echo "show system info"
           uanme -a && df -h %% free
-          pwd
-          tree
+          //pwd
+          //tree
           
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
@@ -56,10 +56,10 @@ jobs:
           ARR_BOARD=("s905x3" "s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z")
           set_board="${{ github.event.inputs.set_board }}"
           if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
-              set_board="lepotato"
+              set_board="s905x3"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV    
-          echo "ARMBIAN_RELEASE=hirsute" >> $GITHUB_ENV
+          echo "ARMBIAN_RELEASE='hirsute'" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
