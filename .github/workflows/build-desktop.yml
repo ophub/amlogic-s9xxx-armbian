@@ -41,9 +41,7 @@ jobs:
         run: |
           echo "show system info"
           uanme -a && df -h %% free
-          //pwd
-          //tree
-          
+
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
           ARR_KERNEL=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
