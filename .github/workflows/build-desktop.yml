@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build armbian Desktop
+name: Build armbian Desktop quikly
 
 on:
   repository_dispatch:
@@ -44,7 +44,7 @@ jobs:
 
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_KERNEL=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          ARR_KERNEL=("5.10.80" "5.4.160" "5.10.80_5.4.160")
           set_kernel="${{ github.event.inputs.set_kernel }}"
           if  [[ -z "${set_kernel}" || -z "$(echo "${ARR_KERNEL[@]}" | grep -w "${set_kernel}")" ]]; then
               set_kernel="5.10.80"
@@ -57,7 +57,7 @@ jobs:
               set_board="s905x3"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV    
-          echo "ARMBIAN_RELEASE='hirsute'" >> $GITHUB_ENV
+          echo "ARMBIAN_RELEASE='bullseye'" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
@@ -65,7 +65,7 @@ jobs:
         run: |
           mkdir -p build/output/images
           cd build/output/images
-          wget --content-disposition https://redirect.armbian.com/region/AS/odroidc4/Hirsute_edge_xfce
+          wget --content-disposition https://redirect.armbian.com/region/NA/odroidc4/Bullseye_current
           #wget --content-disposition https://redirect.armbian.com/odroidhc4/Bullseye_current
           #wget --content-disposition https://redirect.armbian.com/region/AS/odroidhc4/Bullseye_current
           xz -d Armbian*
