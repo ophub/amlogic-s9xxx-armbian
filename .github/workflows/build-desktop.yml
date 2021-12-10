@@ -40,7 +40,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           echo "show system info"
-          uname -a && df -h %% free
+          uname -a && df -h && free
 
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
