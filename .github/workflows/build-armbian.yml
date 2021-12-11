@@ -14,11 +14,11 @@ on:
         required: false
         default: "bullseye"
       set_board:
-        description: "BOARD: lepotato / odroidn2"
+        description: "BOARD: lepotato / odroidn2 / odroidc4"
         required: false
         default: "lepotato"
       set_desktop:
-        description: "DESKTOP: no / yes DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic DESKTOP_APPGROUPS_SELECTED=editors"
+        description: "DESKTOP: no / yes DESKTOP_ENVIRONMENT=mate DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes"
         required: false
         default: "no"
   schedule:
@@ -59,7 +59,7 @@ jobs:
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
-          ARR_BOARD=("lepotato" "odroidn2")
+          ARR_BOARD=("lepotato" "odroidn2" "odroidc4")
           set_board="${{ github.event.inputs.set_board }}"
           if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
               set_board="lepotato"
@@ -67,7 +67,7 @@ jobs:
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
           
 
-          ARR_DESKTOP=("no" "yes DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic DESKTOP_APPGROUPS_SELECTED=editors")
+          ARR_DESKTOP=("no" "yes DESKTOP_ENVIRONMENT=mate DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes")
           set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ -z "${set_desktop}" || -z "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               set_board="no"
