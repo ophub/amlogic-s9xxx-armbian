@@ -18,7 +18,7 @@ on:
         required: false
         default: "lepotato"
       set_desktop:
-        description: "DESKTOP: no / yes DESKTOP_ENVIRONMENT=mate DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes"
+        description: "DESKTOP: no / yes DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes"
         required: false
         default: "no"
   schedule:
@@ -67,7 +67,7 @@ jobs:
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
           
 
-          ARR_DESKTOP=("no" "yes DESKTOP_ENVIRONMENT=mate DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes")
+          ARR_DESKTOP=("no" "yes DESKTOP_ENVIRONMENT=xfce DESKTOP_ENVIRONMENT_CONFIG_NAME=config_all DESKTOP_APPGROUPS_SELECTED=browsers EXPERT=yes")
           set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ -z "${set_desktop}" || -z "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               set_board="no"
