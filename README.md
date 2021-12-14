@@ -120,6 +120,18 @@ Command: Enter [ vi /etc/fstab ]
 ```
 </details>
 
+- ### Backup/restore the original EMMC system
+
+Supports backup/restore of the box's `EMMC` partition in `TF/SD/USB`. It is recommended that you back up the Android TV system that comes with the current box before installing the Armbian system in a brand new box, so that you can use it in the future when restoring the TV system.
+
+Please login in to armbian → input command:
+
+```yaml
+ddbr
+```
+
+According to the prompt, enter `b` to perform system backup, and enter `r` to perform system recovery.
+
 ## Detailed build compile command
 
 | Parameter | Meaning | Description |
