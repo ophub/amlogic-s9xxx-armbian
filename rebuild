@@ -30,7 +30,7 @@ auto_kernel="true"
 
 SKIP_MB=68
 BOOT_MB=256
-ROOT_MB=2748
+ROOT_MB=3244
 #===== Do not modify the following parameter settings, End =======
 
 die() {
@@ -503,7 +503,7 @@ while [ "${1}" ]; do
         fi
         ;;
     -s | --size)
-        if [[ -n "${2}" && "${2}" -ge "1000" ]]; then
+        if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
             ROOT_MB="${2}"
             shift
         else
