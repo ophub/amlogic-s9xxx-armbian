@@ -79,6 +79,8 @@ To activate the remaining space of TF/USB, please login in to armbian → input 
 armbian-tf
 ```
 
+According to the prompt, enter `e` to expand the remaining space to the current system partition and file system, and enter `c` to create a new third partition.
+
 <details>
   <summary>Or manually allocate the remaining space</summary>
 
