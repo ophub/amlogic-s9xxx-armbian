@@ -79,6 +79,8 @@ armbian-swap 1
 armbian-tf
 ```
 
+根据提示输入 `e` 将剩余空间扩容至当前系统分区和文件系统，输入 `c` 将创建新的第 3 分区。
+
 <details>
   <summary>或者手动分配剩余空间 </summary>
 
