@@ -53,6 +53,8 @@ armbian-update 5.4.160
 armbian-docker
 ```
 
+在安装 docker 时将同时安装 `portainer` 可视化管理面板，默认访问地址为 `IP:9000` ，请及时访问面板`创建管理帐号` 。
+
 - ### 修改 Armbian 配置
 
 登录 Armbian 系统 → 输入命令：
