@@ -7,33 +7,68 @@
 # Command: armbian-docker
 #=========================================================================
 
-# Install the necessary system tools
+# Set font color
+blue_font_prefix="\033[34m"
+purple_font_prefix="\033[35m"
+green_font_prefix="\033[32m"
+yellow_font_prefix="\033[33m"
+red_font_prefix="\033[31m"
+font_color_suffix="\033[0m"
+INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+OPT="[${yellow_font_prefix}OPT${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+
+echo -e "${INFO} Welcome to docker installation tool."
+
+echo -e "${STEPS} Initialize the docker installation environment ... "
 sudo apt-get update
 sudo apt-get remove -y docker docker-engine docker.io containerd runc
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
 # Install GPG certificate
-# curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | apt-key add -
+# sudo curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
+sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | apt-key add -
 
 # Add software source information
 # sudo add-apt-repository "deb [arch=arm64,armhf] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
 sudo add-apt-repository "deb [arch=arm64,armhf] https://mirrors.aliyun.com/docker-ce/linux/debian $(lsb_release -cs) stable"
 
-# Update and install Docker
+echo -e "${STEPS} Install docker related packages ... "
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 
-# Configure Docker to start automatically after booting
-sudo systemctl enable docker.service
-sudo systemctl enable containerd.service
+echo -e "${STEPS} Install docker accelerator ... "
+sudo cat >/etc/docker/daemon.json <<EOF
+{
+  "bip": "172.31.0.1/24",
+  "data-root": "/var/lib/docker/",
+  "log-level": "warn",
+  "log-driver": "json-file",
+  "log-opts": {
+     "max-size": "10m",
+     "max-file": "5"
+   },
+  "iptables": true,
+  "registry-mirrors": [
+     "https://docker.mirrors.ustc.edu.cn",
+     "https://registry.cn-shanghai.aliyuncs.com",
+     "https://hub-mirror.c.163.com"
+   ]
+}
+EOF
+sync
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+echo -e "${STEPS} Install portainer panel ... "
+sudo docker volume create portainer_data
+sudo docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer:linux-arm64
+echo -e "${SUCCESS} The portainer address [ IP:9000 ]"
 
 # Set up ordinary users to run docker directly
-sudo usermod -aG docker $USER
-newgrp docker
+sudo usermod -a -G docker $USER 2>/dev/null
 
-# Save Settings
-rm -f /etc/apt/sources.list.save 2>/dev/null
-rm -f /etc/apt/*.gpg~ 2>/dev/null
-sync
+echo -e "${SUCCESS} Docker installed successfully."
 exit 0
