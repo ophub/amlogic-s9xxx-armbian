@@ -53,6 +53,8 @@ Login in to armbian → input command:
 armbian-docker
 ```
 
+When installing docker, the `portainer` visual management panel will be installed at the same time. The default access address is `IP:9000` . Please visit the panel in time to `create a management account`.
+
 - ### Modify Armbian Config
 
 Login in to armbian → input command:
