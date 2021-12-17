@@ -62,13 +62,33 @@ sync
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 
-echo -e "${STEPS} Install portainer panel ... "
-sudo docker volume create portainer_data
-sudo docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer:linux-arm64
-echo -e "${SUCCESS} The portainer address [ IP:9000 ]"
-
 # Set up ordinary users to run docker directly
 sudo usermod -a -G docker $USER 2>/dev/null
 
 echo -e "${SUCCESS} Docker installed successfully."
+
+# No SSL certificate, http LAN access
+portainer_lan() {
+    echo -e "${STEPS} Select Install Portainer (No SSL certificate, http LAN access)... "
+    sudo docker volume create portainer_data
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer:linux-arm64
+    echo -e "${SUCCESS} The portainer address [ http://ip:9000 ]"
+}
+
+# Have SSL certificate, install domain name certificate https access
+portainer_domain() {
+    echo -e "${STEPS} Select Install Portainer (Have SSL certificate, install domain name certificate https access)... "
+    sudo docker volume create portainer_data
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v /etc/ssl:/certs -v portainer_data:/data portainer/portainer:linux-arm64 --ssl --sslcert /certs/portainer.crt --sslkey /certs/portainer.key
+    echo -e "${SUCCESS} The portainer address [ https://domain:9000 ]"
+}
+
+echo -ne "${OPT} Select Install Portainer? No=(n) / LAN ip access=(h) / Domain cert access=(s): "
+read pt
+case ${pt} in
+    h | H | http) portainer_lan ;;
+    s | S | https) portainer_domain ;;
+    *) echo -e "${INFO} Finish the installation." && exit 0 ;;
+esac
+
 exit 0

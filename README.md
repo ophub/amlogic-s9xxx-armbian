@@ -53,7 +53,7 @@ Login in to armbian → input command:
 armbian-docker
 ```
 
-When installing docker, the `portainer` visual management panel will be installed at the same time. The default access address is `IP:9000` . Please visit the panel in time to `create a management account`.
+After installing docker, you can choose whether to install the `portainer` visual management panel. Users who intend to use the `LAN IP` for management can choose (`h`) to install the `http://ip:9000` version; Users who intend to use the `domain name` for remote management can choose (`s`) to install the `https://domain:9000` domain name certificate version (Please name the domain name `SSL` certificate as `portainer.crt` and `portainer.key` and upload it to the `/etc/ssl/` directory); Users who `do not need` to install can choose (`n`) to end the installation.
 
 - ### Modify Armbian Config
 
