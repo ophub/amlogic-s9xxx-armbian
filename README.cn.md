@@ -53,7 +53,7 @@ armbian-update 5.4.160
 armbian-docker
 ```
 
-在安装 docker 时将同时安装 `portainer` 可视化管理面板，默认访问地址为 `IP:9000` ，请及时访问面板`创建管理帐号` 。
+在安装 docker 结束后，可以选择是否安装 `portainer` 可视化管理面板。拟使用`局域网 IP` 进行管理的用户可选择（`h`）安装 `http://ip:9000` 版本；拟使用`域名`进行远程管理的用户可选择（`s`）安装 `https://domain:9000` 域名证书版本（请把域名 `SSL` 证书命名为 `portainer.crt` 和 `portainer.key` 上传至 `/etc/ssl/` 目录下）；`不需要`安装的用户可选择（`n`）结束安装。
 
 - ### 修改 Armbian 配置
 
