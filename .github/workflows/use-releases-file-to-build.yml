@@ -1,5 +1,5 @@
 #==========================================================================
-# Description: Build Armbian For Amlogic S9xxx STB
+# Description: Build Armbian For Amlogic s9xxx tv box
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
@@ -92,7 +92,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            This is Armbian image for amlogic s9xxx STB
+            This is Armbian image for Amlogic s9xxx tv box
             * Firmware information
             Default username: root
             Default password: 1234
