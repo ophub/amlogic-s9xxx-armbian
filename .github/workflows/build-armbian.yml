@@ -17,8 +17,8 @@ on:
         description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
-  schedule:
-    - cron: "0 17 * * 0"
+  #schedule:
+    #- cron: "0 17 * * 0"
 
 env:
   UPLOAD_FIRMWARE: false
