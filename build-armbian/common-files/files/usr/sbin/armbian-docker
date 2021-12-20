@@ -80,6 +80,7 @@ portainer_domain() {
     echo -e "${STEPS} Select Install Portainer (Have SSL certificate, install domain name certificate https access)... "
     sudo docker volume create portainer_data
     sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v /etc/ssl:/certs -v portainer_data:/data portainer/portainer:linux-arm64 --ssl --sslcert /certs/portainer.crt --sslkey /certs/portainer.key
+    echo -e "${INFO} Please rename and upload the domain certificate [ portainer.crt & portainer.key ] to the [ /etc/ssl/ ] directory."
     echo -e "${SUCCESS} The portainer address [ https://domain:9000 ]"
 }
 

@@ -8,8 +8,8 @@ name: Delete older releases and artifacts
 on:
   repository_dispatch:
   workflow_dispatch:
-  schedule:
-    - cron: "0 23 * * 0"
+  #schedule:
+    #- cron: "0 23 * * 0"
 
 env:
   DELETE_RELEASE: true
