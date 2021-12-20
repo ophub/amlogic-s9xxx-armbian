@@ -1,6 +1,6 @@
 #!/bin/bash
 #=========================================================================
-# Description: Build armbian for amlogic s9xxx
+# Description: Build armbian for Amlogic s9xxx tv box
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #=========================================================================
 
@@ -553,7 +553,7 @@ armbian_original_kernel="$(echo ${armbian_image_name} | grep -oE '[4-5].[0-9]{1,
 # Show welcome message
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
 echo -e "\n"
-echo -e "Welcome to build armbian for amlogic s9xxx STB!"
+echo -e "Welcome to build Armbian for Amlogic s9xxx tv box!"
 echo -e "Armbian original file: [ ${armbian_image_name} ], Version: [ ${armbian_original_version} ], Kernel: [ ${armbian_original_kernel} ]"
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
