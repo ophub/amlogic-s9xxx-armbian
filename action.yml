@@ -1,6 +1,6 @@
-name: "Rebuild armbian for Amlogic S9xxx STB"
+name: "Rebuild armbian for Amlogic s9xxx tv box"
 author: "ophub"
-description: "Support Amlogic S9xxx STB are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, etc."
+description: "Support Amlogic s9xxx tv box are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, etc."
 inputs:
   mode:
     description: "Choose script."
