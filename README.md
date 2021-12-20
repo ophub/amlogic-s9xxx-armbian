@@ -145,17 +145,17 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 | -v | Version | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -k | Kernel | Specify the [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) name. Write the kernel name individually such as `-k 5.4.160` . Multiple kernel use `_` connection such as `-k 5.10.80_5.4.160` |
 | -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.160 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -s | Size | Specify the size of the root partition in MB. The default is 1024, and the specified size must be greater than 256. Such as `-s 1024` |
+| -s | Size | Specify the size of the root partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 
 - `sudo ./rebuild -d -b s905x3 -k 5.4.160`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.10.80_5.4.160`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
-- `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 1024`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
 - `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.19`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
 - `sudo ./rebuild -d -k 5.10.80_5.4.160`: Use the default configuration. Specify multiple cores, use `_` to connect.
 - `sudo ./rebuild -d -k 5.10.80_5.4.160 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -d -s 1024 -k 5.4.160`: Use the default configuration and set the partition size to 1024m, and only compile the armbian firmware with the kernel version 5.4.160.
+- `sudo ./rebuild -d -s 2748 -k 5.4.160`: Use the default configuration and set the partition size to 2748m, and only compile the armbian firmware with the kernel version 5.4.160.
 
 💡Tips: The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4.*` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
 
@@ -205,7 +205,7 @@ You can use other methods to build the Armbian system. Or use [Armbian](https://
 | version_branch         | stable                 | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | armbian_kernel         | 5.10.80_5.4.160        | Set the kernel version，The [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) library contains many original kernels of `Flippy`, you can view and choose to specify. |
 | auto_kernel            | true                   | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `amlogic_kernel`. such as 5.4.160 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| armbian_size           | 2748                   | Set the size of the firmware ROOTFS partition. |
+| armbian_size           | 2748                   | Set the size of the firmware ROOTFS partition, and the specified size must be greater than 2000. |
 
 - GitHub Action Output variable description
 
