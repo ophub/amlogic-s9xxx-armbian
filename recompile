@@ -9,11 +9,11 @@
 # Set environment variables
 make_path=${PWD}
 compile_path="${make_path}/compile-kernel"
+kernel_path="${compile_path}/kernel"
 out_kernel="${compile_path}/output"
 config_dir="${compile_path}/tools/config"
 uInitrd_dir="${compile_path}/tools/uInitrd"
 script_dir="${compile_path}/tools/script"
-kernel_path="${compile_path}/kernel"
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
 auto_kernel="true"
