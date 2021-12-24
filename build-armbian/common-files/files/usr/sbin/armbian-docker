@@ -37,7 +37,7 @@ sudo add-apt-repository "deb [arch=arm64,armhf] https://mirrors.aliyun.com/docke
 
 echo -e "${STEPS} Install docker related packages ... "
 sudo apt-get update
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
 echo -e "${STEPS} Install docker accelerator ... "
 sudo cat >/etc/docker/daemon.json <<EOF
@@ -50,7 +50,6 @@ sudo cat >/etc/docker/daemon.json <<EOF
      "max-size": "10m",
      "max-file": "5"
    },
-  "iptables": true,
   "registry-mirrors": [
      "https://docker.mirrors.ustc.edu.cn",
      "https://registry.cn-shanghai.aliyuncs.com",
