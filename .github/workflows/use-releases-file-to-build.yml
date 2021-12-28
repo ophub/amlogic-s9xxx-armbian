@@ -15,8 +15,6 @@ on:
         default: "bullseye"
 
 env:
-  UPLOAD_FIRMWARE: false
-  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -76,16 +74,10 @@ jobs:
           echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
-      - name: Upload artifact to Actions
-        uses: kittaakos/upload-artifact-as-is@master
-        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-        with:
-          path: ${{ env.FILEPATH }}/
-
       - name: Upload Armbian image to Release
         id: release
         uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
         with:
           tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
