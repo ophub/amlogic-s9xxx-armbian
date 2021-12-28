@@ -252,6 +252,13 @@ copy_files() {
         ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
         AMLOGIC_SOC="s905d"
         ;;
+    s905 | beelinkminimx | mxqpro+)
+        FDTFILE="meson-gxbb-vega-s95-telos.dtb"
+        UBOOT_OVERLOAD="u-boot-s905.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        AMLOGIC_SOC="s905"
+        ;;
     s912 | h96proplus | octopus)
         FDTFILE="meson-gxm-octopus-planet.dtb"
         UBOOT_OVERLOAD="u-boot-zyxq.bin"
