@@ -2,7 +2,7 @@
 
 查看英文说明 | [View English description](README.md)
 
-为 Amlogic s9xxx 电视盒子编译 Armbian 系统。支持写入 EMMC 中使用，支持更新内核等功能。支持的 Amlogic S9xxx 系列型号有 ***`s922x, s905x3, s905x2, s912, s905d, s905x, s905w`*** 等，例如 ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`*** 等盒子。
+为 Amlogic s9xxx 电视盒子编译 Armbian 系统。支持写入 EMMC 中使用，支持更新内核等功能。支持的 Amlogic S9xxx 系列型号有 ***`s922x, s905x3, s905x2, s912, s905d, s905x, s905w, s905`*** 等，例如 ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`*** 等盒子。
 
 最新的 Armbian 固件可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
@@ -15,8 +15,11 @@
 | s905x2 | [X96Max-4G](https://tokopedia.link/HcfLaRzjqeb), [X96Max-2G](https://tokopedia.link/HcfLaRzjqeb) | 全部 | armbian_aml_s905x2_*.img |
 | s912 | [H96-Pro-Plus](https://tokopedia.link/jb42fsBdGgb), [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus), Octopus-Planet | 全部 | armbian_aml_s912_*.img |
 | s905d | Phicomm-N1 | 全部 | armbian_aml_s905d_*.img |
+| s905 | [Beelink MiniMX](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ PRO+](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | 全部 | armbian_aml_s905_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://tokopedia.link/LC4DiTXtEib) | 5.4.* | armbian_aml_s905x_*.img |
 | s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.tokopedia.com/beststereo/tanix-tx3-mini-2gb-16gb-android-7-1-kodi-17-3-amlogic-s905w-4k-tv-box) | 5.4.* | armbian_aml_s905w_*.img |
+
+💡提示：当前 ***`s905`*** 的盒子只能在 `TF/SD/USB` 中使用，其他型号的盒子同时支持写入 `EMMC` 中使用。
 
 ## 安装及升级 Armbian 的相关说明
 
