@@ -14,8 +14,8 @@
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://tokopedia.link/5WHiETbdGgb), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | 全部 | armbian_aml_s905x3_*.img |
 | s905x2 | [X96Max-4G](https://tokopedia.link/HcfLaRzjqeb), [X96Max-2G](https://tokopedia.link/HcfLaRzjqeb) | 全部 | armbian_aml_s905x2_*.img |
 | s912 | [H96-Pro-Plus](https://tokopedia.link/jb42fsBdGgb), [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus), Octopus-Planet | 全部 | armbian_aml_s912_*.img |
-| s905d | Phicomm-N1 | 全部 | armbian_aml_s905d_*.img |
 | s905 | [Beelink MiniMX](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ PRO+](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | 全部 | armbian_aml_s905_*.img |
+| s905d | Phicomm-N1 | 全部 | armbian_aml_s905d_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://tokopedia.link/LC4DiTXtEib) | 5.4.* | armbian_aml_s905x_*.img |
 | s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.tokopedia.com/beststereo/tanix-tx3-mini-2gb-16gb-android-7-1-kodi-17-3-amlogic-s905w-4k-tv-box) | 5.4.* | armbian_aml_s905w_*.img |
 
