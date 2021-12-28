@@ -21,8 +21,6 @@ on:
     #- cron: "0 17 * * 0"
 
 env:
-  UPLOAD_FIRMWARE: false
-  UPLOAD_RELEASE: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -78,7 +76,7 @@ jobs:
 
       - name: Rebuild Armbian for amlogic s9xxx
         id: rebuild
-        if: steps.compile.outputs.status == 'success'
+        if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           sudo chmod +x rebuild
           sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z_s905 -k 5.10.80_5.4.160
@@ -88,16 +86,10 @@ jobs:
           echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
-      - name: Upload Armbian image to Actions
-        uses: kittaakos/upload-artifact-as-is@master
-        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-        with:
-          path: ${{ env.FILEPATH }}/
-
       - name: Upload Armbian image to Release
         id: release
         uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+        if: steps.rebuild.outputs.status == 'success' && !cancelled()
         with:
           tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
           artifacts: ${{ env.FILEPATH }}/*
