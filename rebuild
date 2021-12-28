@@ -24,7 +24,7 @@ kernel_library="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 
-build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w")
+build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w" "s905")
 build_kernel=("default")
 auto_kernel="true"
 
@@ -254,7 +254,9 @@ copy_files() {
         ;;
     s905 | beelinkminimx | mxqpro+)
         FDTFILE="meson-gxbb-vega-s95-telos.dtb"
+        #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
         UBOOT_OVERLOAD="u-boot-s905.bin"
+        #UBOOT_OVERLOAD="u-boot-p201.bin"
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         AMLOGIC_SOC="s905"
