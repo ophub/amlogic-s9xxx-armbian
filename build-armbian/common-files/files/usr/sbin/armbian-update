@@ -35,7 +35,7 @@ else
 fi
 
 # Specify version branch, such as: stable
-ARR_BRANCH=("stable" "beta")
+ARR_BRANCH=("stable" "dev")
 if [[ -n "${2}" && -n "$(echo "${ARR_BRANCH[@]}" | grep -w "${2}")" ]]; then
     version_branch="${2}"
 else
