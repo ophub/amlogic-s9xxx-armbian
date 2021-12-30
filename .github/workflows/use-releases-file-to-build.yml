@@ -12,7 +12,7 @@ on:
       sel_tags_keywords:
         description: "Select tags keywords: bullseye / focal"
         required: false
-        default: "bullseye"
+        default: "focal"
 
 env:
   TZ: Asia/Shanghai
