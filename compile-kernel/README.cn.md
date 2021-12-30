@@ -11,7 +11,7 @@
 | -d | Defaults | 使用默认配置 |
 | -k | Kernel | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `-k 5.4.160` . 多个内核使用 `_` 进行连接，如 `-k 5.10.80_5.4.160` |
 | -a | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.4.160` 的 `5.4` 同系列是否有更新的版本，如有 `5.4.160` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
-| -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-beta` ，生成的内核名称为 `5.4.160-meson64-beta` 。设置自定义签名时请勿包含空格。 |
+| -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-dev` ，生成的内核名称为 `5.4.160-meson64-dev` 。设置自定义签名时请勿包含空格。 |
 | -r | Repo | 指定内核编译源码的下载站。可选项为 [kernel.org](https://www.kernel.org/) 和 [flippy](https://github.com/unifreq) ，默认为 `flippy` |
 
 - `sudo ./recompile -d -k 5.4.160` : 使用默认配置，并通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
@@ -52,7 +52,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. 目前在 `Armbian` 系统下编译内核是最好的选择，强烈推荐。在 `x86_64` 环境下编译内核时，会自动下载 Armbian 系统，并通过 chroot 实现 `uInitrd` 文件的生成。内核编译完成后，将会按照 flippy 分享的内核文件的组织方式自动打包成 6 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。如果你想在当前 Armbian 系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.160` 下，执行 `armbian-update` 命令进行内核安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
 
-4. 如果当前 `Armbian` 系统中已经安装了相同名称的内核如 `5.4.160-meson64-beta` ，将会自动停止编译，因为打包时会删除本地相同名称的内核文件，这么做会造成系统瘫痪。
+4. 如果当前 `Armbian` 系统中已经安装了相同名称的内核如 `5.4.160-meson64-dev` ，将会自动停止编译，因为打包时会删除本地相同名称的内核文件，这么做会造成系统瘫痪。
 
 5. 在内核测试时，请在 `USB/TF` 设备上进行测试，请不要贸然写入 `EMMC` 分区，避免成砖；在没有熟练地掌握救砖方法之前，请不要进行自定义内核测试；请不要在正式生产环境中测试自定义内核。
 
