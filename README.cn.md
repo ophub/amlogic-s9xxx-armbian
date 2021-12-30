@@ -44,7 +44,7 @@ armbian-update 5.4.160
 
 如果当前目录下有成套的内核文件，可以运行 `armbian-update` 命令安装此内核。内核更新脚本会在开发中不断更新，可使用此命令同步更新本地的脚本：`wget -O /usr/sbin/armbian-update git.io/armbian-update` 。或者直接使用服务器端最新脚本进行内核更新：`bash <(curl -fsSL git.io/armbian-update) 5.4.160`
 
-内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 beta` 。默认自动安装主线 u-boot，可以更好的支持 5.10 及以上内核系列的使用。如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.160 stable no`
+内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 dev` 。默认自动安装主线 u-boot，可以更好的支持 5.10 及以上内核系列的使用。如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.160 stable no`
 
 内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。在编译应用程序的时候，在 `GCC` 的 `CFLAG` 参数中添加 `-I /usr/local/include` 即可找到头文件。
 
@@ -154,7 +154,7 @@ ddbr
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.10.80_5.4.160` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
 - `sudo ./rebuild -d` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 2748` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为2748M。
-- `sudo ./rebuild -d -b s905x3 -v beta -k 5.7.19` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
+- `sudo ./rebuild -d -b s905x3 -v dev -k 5.7.19` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
 - `sudo ./rebuild -d -b s905x3_s905d`  使用默认配置，对多个型号的电视盒子进行全部内核打包, 使用 `_` 进行多型号连接。
 - `sudo ./rebuild -d -k 5.10.80_5.4.160` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
 - `sudo ./rebuild -d -k 5.10.80_5.4.160 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
