@@ -50,10 +50,10 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="bullseye"
+              set_release="focal"
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
