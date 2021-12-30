@@ -182,7 +182,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 1. 关于 Workflows 文件的配置在 [.yml](.github/workflows/build-armbian.yml) 文件里。可以设置需要编译的盒子的 `SOC` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
 
-2. 全新编译：在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build armbian`*** ，根据 Armbian 官方支持的 OS 版本，可在 [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/) 里选择 Ubuntu 系列：`bionic` / `focal` / `hirsute` ，或者 Debian 系列：`bullseye` / `buster` / `stretch` ，在 BOARD 里可选 `lepotato` / `odroidn2` 等，点击 ***`Run workflow`*** 按钮即可编译。
+2. 全新编译：在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build armbian`*** ，根据 Armbian 官方支持的 OS 版本，可在 [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/) 里选择 Ubuntu 系列：`bionic` / `focal` / `hirsute` ，或者 Debian 系列：`bullseye` / `buster` / `stretch` 。在 `BOARD` 里可选 `lepotato` / `odroidn2` 等。可根据需要在 `More build options` 里为 `compile.sh` 添加更多设置选项。点击 ***`Run workflow`*** 按钮即可编译。
 
 3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 soc 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
 
