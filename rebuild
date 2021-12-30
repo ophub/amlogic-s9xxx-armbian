@@ -362,8 +362,8 @@ copy_files() {
     fi
     #
     # Modify different releases for usr/sbin/armbian-docker
-    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_ubuntu[@]}" | grep -w "${diff_release_name}")" ]]; then
-        sed -i "s|debian|ubuntu|g" ${tag_rootfs}/usr/sbin/armbian-docker
+    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${diff_release_name}")" ]]; then
+        sed -i "s|ubuntu|debian|g" ${tag_rootfs}/usr/sbin/armbian-docker
     fi
 
     # Processing partition files: bootfs
