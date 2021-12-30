@@ -20,7 +20,7 @@ auto_kernel="true"
 
 # Kernel download address and custom name
 build_kernel=("5.4.160" "5.10.80")
-custom_name="-meson64-beta"
+custom_name="-meson64-dev"
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 kernel_flippy_repo="unifreq"
 kernel_flippy_branch="main"
