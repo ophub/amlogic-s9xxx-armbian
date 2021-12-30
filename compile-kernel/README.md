@@ -11,7 +11,7 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 | -d | Defaults | Compile all kernels with default configuration. |
 | -k | Kernel | Specify [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) name, such as `-k 5.4.160`. Multiple kernels use `_` to connect, such as `- k 5.10.80_5.4.160` |
 | -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find whether there is a newer version of the kernel specified in `-k` such as `5.4.160` of the `5.4` series. If there is the latest version after `5.4.160`, it will be automatically replaced with the latest version . When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -n | CustomName | Set the kernel custom signature. The default value is `-meson64-beta` and the generated kernel is `5.4.160-meson64-beta`. Do not include spaces when setting a custom signature. |
+| -n | CustomName | Set the kernel custom signature. The default value is `-meson64-dev` and the generated kernel is `5.4.160-meson64-dev`. Do not include spaces when setting a custom signature. |
 | -r | Repo | Specify the download site of the kernel compilation source code. The available options are [kernel.org](https://www.kernel.org/) and [flippy](https://github.com/unifreq), the default is `flippy` |
 
 - `sudo ./recompile -d -k 5.4.160`: Use the default configuration, and use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
@@ -52,7 +52,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 3. Currently, compiling the kernel under the `Armbian` system is the best choice, and it is highly recommended. When compiling the kernel under the `x86_64` environment, the Armbian system will be automatically downloaded, and the `uInitrd` file will be generated through chroot. After the kernel is compiled, it will be automatically packaged into 6 kernel files according to the organization of the kernel files shared by flippy and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. If you want to install on the current Armbian system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.160` and execute the `armbian-update` command to install the kernel. The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
-4. If a kernel with the same name such as `5.4.160-meson64-beta` is already installed in the current `Armbian` system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
+4. If a kernel with the same name such as `5.4.160-meson64-dev` is already installed in the current `Armbian` system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
 
 5. During the kernel test, please test on the `USB/TF` device, and don't write to the `EMMC` partition rashly to avoid bricking; Please do not perform a custom kernel test before you have mastered the method of system recovery proficiently; Please do not test the custom kernel in a formal production environment.
 
