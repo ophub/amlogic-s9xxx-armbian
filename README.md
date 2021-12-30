@@ -182,7 +182,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `SOC` you want to build in `Rebuild Armbian for amlogic s9xxx`.
 
-2. New compilation: Select ***`Build armbian`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, In [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/), you can choose Ubuntu series: `bionic` / `focal` / `hirsute`, or Debian series: `bullseye` / `buster` / `stretch`, and in `BOARD`, you can choose `lepotato` / `odroidn2`, etc., You can add more setting options for `compile.sh` in `More build options` as needed. Click the ***`Run workflow`*** button.
+2. New compilation: Select ***`Build armbian`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, In [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/), you can choose Ubuntu series: `focal`, or Debian series: `bullseye` / `buster`, and in `BOARD`, you can choose `lepotato` / `odroidn2`, etc., You can add more setting options for `compile.sh` in `More build options` as needed. Click the ***`Run workflow`*** button.
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build armbian` of different soc. Select ***`Use Releases file to build armbian`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
