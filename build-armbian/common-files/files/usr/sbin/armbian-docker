@@ -28,12 +28,12 @@ sudo apt-get remove -y docker docker-engine docker.io containerd runc
 sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
 
 # Install GPG certificate
-# sudo curl -fsSL https://download.docker.com/linux/debian/gpg | apt-key add -
-sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/debian/gpg | apt-key add -
+# sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
 
 # Add software source information
-# sudo add-apt-repository "deb [arch=arm64,armhf] https://download.docker.com/linux/debian $(lsb_release -cs) stable"
-sudo add-apt-repository "deb [arch=arm64,armhf] https://mirrors.aliyun.com/docker-ce/linux/debian $(lsb_release -cs) stable"
+# sudo add-apt-repository "deb [arch=arm64,armhf] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo add-apt-repository "deb [arch=arm64,armhf] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
 
 echo -e "${STEPS} Install docker related packages ... "
 sudo apt-get update
