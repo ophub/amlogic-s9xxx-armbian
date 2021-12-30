@@ -12,7 +12,7 @@ on:
       set_release:
         description: "RELEASE: bullseye / focal"
         required: false
-        default: "bullseye"
+        default: "focal"
       set_board:
         description: "BOARD: lepotato / odroidn2"
         required: false
