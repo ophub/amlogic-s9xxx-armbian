@@ -14,9 +14,9 @@ on:
         required: false
         default: "flippy"
       kernel_ver:
-        description: "Kernel version: 5.4.160"
+        description: "Kernel version: 5.4.170"
         required: false
-        default: "5.4.160_5.10.80"
+        default: "5.4.170_5.10.90"
 
 env:
   TZ: Asia/Shanghai
@@ -51,7 +51,7 @@ jobs:
 
           kernel_ver="${{ github.event.inputs.kernel_ver }}"
           if  [[ -z "${kernel_ver}" ]]; then
-              kernel_ver="5.4.160_5.10.80"
+              kernel_ver="5.4.170_5.10.90"
           fi
           echo "KERNEL_VER=${kernel_ver}" >> $GITHUB_ENV
 
