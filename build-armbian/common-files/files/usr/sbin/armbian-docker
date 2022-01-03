@@ -8,11 +8,11 @@
 #=========================================================================
 
 # Set font color
-blue_font_prefix="\033[34m"
-purple_font_prefix="\033[35m"
-green_font_prefix="\033[32m"
-yellow_font_prefix="\033[33m"
-red_font_prefix="\033[31m"
+blue_font_prefix="\033[94m"
+purple_font_prefix="\033[95m"
+green_font_prefix="\033[92m"
+yellow_font_prefix="\033[93m"
+red_font_prefix="\033[91m"
 font_color_suffix="\033[0m"
 INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
 STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
