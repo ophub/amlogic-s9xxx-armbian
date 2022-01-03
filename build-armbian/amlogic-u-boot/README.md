@@ -1,6 +1,6 @@
-# u-boot files of amlogic-s9xxx 5.10 kernel
+# u-boot files of amlogic-s9xxx 5.10+ kernel
 
-When using the 5.10 kernel version, you need to copy the corresponding `u-boot-*.bin` file to `u-boot.ext` (TF/SD card boot file) and `u-boot.emmc` (EMMC boot file).
+When using the 5.10+ kernel version, you need to copy the corresponding `u-boot-*.bin` file to `u-boot.ext` (TF/SD card boot file) and `u-boot.emmc` (EMMC boot file).
 
 ## Correspondence for Amlogic s9xxx tv box
 
