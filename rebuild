@@ -34,12 +34,12 @@ ROOT_MB=2748
 #===== Do not modify the following parameter settings, End =======
 
 die() {
-    echo -e " [\033[1;31m Error \033[0m] ${1}"
+    echo -e " [\033[1;91m Error \033[0m] ${1}"
     exit 1
 }
 
 process() {
-    echo -e " [\033[1;32m ${build_soc}${out_kernel} \033[0m] ${1}"
+    echo -e " [\033[1;92m ${build_soc}${out_kernel} \033[0m] ${1}"
 }
 
 download_kernel() {
