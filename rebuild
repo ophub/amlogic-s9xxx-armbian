@@ -24,7 +24,7 @@ kernel_library="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 
-build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s905d" "s905x" "s905w" "s905")
+build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
 build_kernel=("default")
 auto_kernel="true"
 
@@ -250,6 +250,13 @@ copy_files() {
         UBOOT_OVERLOAD="u-boot-n1.bin"
         MAINLINE_UBOOT=""
         ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
+        AMLOGIC_SOC="s905d"
+        ;;
+    s905d-ki)
+        FDTFILE="meson-gxl-s905d-mecool-ki-pro.dtb"
+        UBOOT_OVERLOAD="u-boot-p201.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
         AMLOGIC_SOC="s905d"
         ;;
     s905 | beelinkminimx | mxqpro+)
