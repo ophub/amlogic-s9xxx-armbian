@@ -76,8 +76,9 @@ jobs:
         run: |
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current BUILD_MINIMAL=no BUILD_DESKTOP=no \
-                            HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha,img ${{ env.ARMBIAN_MORE_OPTS }}
+          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current \
+                            BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
+                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha,img EXPERT=yes ${{ env.ARMBIAN_MORE_OPTS }}
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for amlogic s9xxx
@@ -85,8 +86,8 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           sudo chmod +x rebuild
-          sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905d_s912_s912-t95z_s905 -k 5.10.80_5.4.160
-          sudo ./rebuild -d -b s905x_s905w -k 5.4.160
+          sudo ./rebuild -d -b s922x_s922x-n2_s905x3_s905x2_s905_s905d_s905d-ki_s912_s912-t95z -k 5.15.13_5.10.90_5.4.170
+          sudo ./rebuild -d -b s905x_s905w -k 5.4.170
           cd build/output/images/ && sudo gzip *.img && sync
           echo "FILEPATH=$PWD" >> $GITHUB_ENV
           echo "FILE_DATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
