@@ -1,6 +1,6 @@
 name: "Rebuild armbian for Amlogic s9xxx tv box"
 author: "ophub"
-description: "Support Amlogic s9xxx tv box are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, etc."
+description: "Support Amlogic s9xxx tv box are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, s905, etc."
 inputs:
   mode:
     description: "Choose script."
@@ -13,7 +13,7 @@ inputs:
   armbian_kernel:
     description: "Set kernel."
     required: false
-    default: "5.10.80_5.4.160"
+    default: "5.10.90_5.4.170"
   version_branch:
     description: "Set kernel."
     required: false
