@@ -8,18 +8,18 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 
 ## Armbian Firmware instructions
 
-| Model  | BOX | [Optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian Firmware |
+| SoC  | Device | [Optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) | Armbian Firmware |
 | ---- | ---- | ---- | ---- |
 | s922x | [Beelink-GT-King](https://tokopedia.link/RAgZmOM41db), [Beelink-GT-King-Pro](https://www.gearbest.com/tv-box/pp_3008857542462482.html), [Ugoos-AM6-Plus](https://tokopedia.link/pHGKXuV41db), [ODROID-N2](https://www.tokopedia.com/search?st=product&q=ODROID-N2) | All | armbian_aml_s922x_*.img |
 | s905x3 | [X96-Max+](https://tokopedia.link/uMaH09s41db), [HK1-Box](https://tokopedia.link/xhWeQgTuwfb), [H96-Max-X3](https://tokopedia.link/KuWvwoYuwfb), [Ugoos-X3](https://tokopedia.link/duoIXZpdGgb), [X96-Air](https://www.gearbest.com/tv-box/pp_3002885621272175.html), [A95XF3-Air](https://tokopedia.link/ByBL45jdGgb) | All | armbian_aml_s905x3_*.img |
 | s905x2 | [X96Max-4G](https://tokopedia.link/HcfLaRzjqeb), [X96Max-2G](https://tokopedia.link/HcfLaRzjqeb) | All | armbian_aml_s905x2_*.img |
-| s912 | [H96-Pro-Plus](https://tokopedia.link/jb42fsBdGgb), [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus), Octopus-Planet | All | armbian_aml_s912_*.img |
+| s912 | [H96-Pro-Plus](https://www.gearbest.com/tv-box-mini-pc/pp_503486.html), [T95Z-Plus](https://www.tokopedia.com/search?st=product&q=t95z%20plus), Octopus-Planet | All | armbian_aml_s912_*.img |
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-PRO+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | All | armbian_aml_s905_*.img |
-| s905d | Phicomm-N1 | All | armbian_aml_s905d_*.img |
+| s905d | [MECOOL-KI-Pro](https://www.gearbest.com/tv-box-mini-pc/pp_629409.html), Phicomm-N1 | All | armbian_aml_s905d_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://www.zte.com.cn/global/products/cocloud/201707261551/IP-STB/ZXV10-B860H) | 5.4.* | armbian_aml_s905x_*.img |
 | s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.4.* | armbian_aml_s905w_*.img |
 
-💡Tip: The current box of ***`s905`*** can only be used in `TF/SD/USB`, and other types of boxes can also be used in `EMMC` at the same time.
+💡Tip: The current box of ***`s905`*** can only be used in `TF/SD/USB`, and other types of boxes can also be used in `EMMC` at the same time. The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
 
 ## Install to EMMC and update instructions
 
@@ -39,12 +39,12 @@ Query the available [kernel_version](https://github.com/ophub/kernel/tree/main/p
 
 ```yaml
 # Run as root user (sudo -i), input command: armbian-update <kernel_version>
-armbian-update 5.4.160
+armbian-update 5.4.170
 ```
 
-If there is a complete set of kernel files in the current directory, you can run the `armbian-update` command to install this kernel. The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.160`
+If there is a complete set of kernel files in the current directory, you can run the `armbian-update` command to install this kernel. The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.170`
 
-When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.19 dev` . The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.4.160 stable no`
+When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `second` parameter, such as `armbian-update 5.7.19 dev` . The mainline u-boot is automatically installed by default, which can better support the use of kernel series 5.10 and above. If you choose not to install, please specify in the `third` input parameter, such as `armbian-update 5.4.170 stable no`
 
 The `headers` files in the kernel is installed in the `/use/local/include` directory. When compiling the application, add `-I /usr/local/include` to the `CFLAG` parameter of `GCC` to find the headers files.
 
@@ -144,23 +144,21 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 | Parameter | Meaning | Description |
 | ---- | ---- | ---- |
 | -d | Defaults | Compile all cores and all firmware types. |
-| -b | Build | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`. |
+| -b | Build | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`, `s905d-ki` is `mecool-ki-pro`. |
 | -v | Version | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
-| -k | Kernel | Specify the [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) name. Write the kernel name individually such as `-k 5.4.160` . Multiple kernel use `_` connection such as `-k 5.10.80_5.4.160` |
-| -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.160 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -s | Size | Specify the size of the root partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
+| -k | Kernel | Specify the [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) name. Write the kernel name individually such as `-k 5.4.170` . Multiple kernel use `_` connection such as `-k 5.10.90_5.4.170` |
+| -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.170 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| -s | Size | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 
-- `sudo ./rebuild -d -b s905x3 -k 5.4.160`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
-- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.80_5.4.160`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
+- `sudo ./rebuild -d -b s905x3 -k 5.4.170`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
+- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.90_5.4.170`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
-- `sudo ./rebuild -d -b s905x3 -k 5.4.160 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./rebuild -d -b s905x3 -k 5.4.170 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
 - `sudo ./rebuild -d -b s905x3 -v dev -k 5.7.19`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
-- `sudo ./rebuild -d -k 5.10.80_5.4.160`: Use the default configuration. Specify multiple cores, use `_` to connect.
-- `sudo ./rebuild -d -k 5.10.80_5.4.160 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -d -s 2748 -k 5.4.160`: Use the default configuration and set the partition size to 2748m, and only compile the armbian firmware with the kernel version 5.4.160.
-
-💡Tips: The ***`s905x`*** and ***`s905w`*** boxs currently only support `5.4.*` kernels, Cannot use kernel version 5.10 and above. Please add kernel substitution variables when compiling these two models of devices. Other devices can be freely selected.
+- `sudo ./rebuild -d -k 5.10.90_5.4.170`: Use the default configuration. Specify multiple cores, use `_` to connect.
+- `sudo ./rebuild -d -k 5.10.90_5.4.170 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
+- `sudo ./rebuild -d -s 2748 -k 5.4.170`: Use the default configuration and set the partition size to 2748m, and only compile the armbian firmware with the kernel version 5.4.170.
 
 - ### Local build instructions
 
@@ -174,9 +172,9 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Lepotato_current_5.10.80.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.10.80`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
+3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Lepotato_current_5.10.90.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.10.90`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.4.160` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.4.170` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
 - ### Use GitHub Action to build
 
@@ -196,26 +194,26 @@ You can use other methods to build the Armbian system. Or use [Armbian](https://
   with:
     armbian_path: build/output/images/*.img
     armbian_soc: s905d_s905x3_s922x_s905x
-    armbian_kernel: 5.10.80_5.4.160
+    armbian_kernel: 5.10.90_5.4.170
 ```
 
 - GitHub Action Input parameter description
 
-| parameter              | Defaults               | Description                                                   |
+| Parameter              | Defaults               | Description                                                   |
 |------------------------|------------------------|---------------------------------------------------------------|
 | armbian_path         | no                     | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
-| armbian_soc        | s905d_s905x3           | Set the `SoC` of the packaging box, you can specify a single box such as `s905x3`, you can choose multiple boxes to use `_` connection such as `s905x3_s905d` . SOC code of each box is: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905`, `s922x`, `s922x-n2`, `s912`. Note: `s922x-n2` is `s922x-odroid-n2` |
+| armbian_soc        | s905d_s905x3           | Set the `SoC` of the packaging box, you can specify a single box such as `s905x3`, you can choose multiple boxes to use `_` connection such as `s905x3_s905d` . SOC code of each box is: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`, `s905d-ki` is `mecool-ki-pro`. |
 | version_branch         | stable                 | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
-| armbian_kernel         | 5.10.80_5.4.160        | Set the kernel version，The [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) library contains many original kernels of `Flippy`, you can view and choose to specify. |
-| auto_kernel            | true                   | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `amlogic_kernel`. such as 5.4.160 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| armbian_kernel         | 5.10.90_5.4.170        | Set the kernel version，The [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) library contains many original kernels of `Flippy`, you can view and choose to specify. |
+| auto_kernel            | true                   | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `amlogic_kernel`. such as 5.4.170 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | armbian_size           | 2748                   | Set the size of the firmware ROOTFS partition, and the specified size must be greater than 2000. |
 
 - GitHub Action Output variable description
 
-| parameter                                | For example             | Description                   |
+| Parameter                                | For example             | Description                   |
 |------------------------------------------|-------------------------|-------------------------------|
 | ${{ env.PACKAGED_OUTPUTPATH }}           | ${PWD}/out              | OpenWrt firmware storage path |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.21.1058         | Packing date                  |
+| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058         | Packing date                  |
 | ${{ env.PACKAGED_STATUS }}               | success / failure       | Package status                |
 
 ## Compile a custom kernel
@@ -224,7 +222,7 @@ For the compilation method of the custom kernel, see [compile-kernel](compile-ke
 
 ## Armbian contributor list
 
-The [armbian](https://github.com/armbian/build) directly calls the official source code for compilation, When making dedicated Armbian systems for different boxes, the kernel, scripts, u-boot and other resources made by [flippy](https://github.com/unifreq/openwrt_packit) for `Amlogic s9xxx openwrt` are used. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
+First of all, I would like to thank [150balbes](https://github.com/150balbes) for his outstanding contributions and a good foundation for using Armbian in the Amlogic box. The [armbian](https://github.com/armbian/build) system compiled here directly uses the latest official source code for real-time compilation, When making dedicated Armbian systems for different boxes, the kernel, scripts, u-boot and other resources made by [flippy](https://github.com/unifreq/openwrt_packit) for `Amlogic s9xxx openwrt` are used. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
 
 Because of these [innovations and contributors](CONTRIBUTOR.md), we can have the company of the box in the long river of years. We have grown up many years later, but this beautiful memory will always stay deep in the memory for a long time. From now on, record the achievements of these pioneers and leave them to the new friends who have joined the box circle.
 
