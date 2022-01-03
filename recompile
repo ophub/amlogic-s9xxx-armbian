@@ -19,7 +19,7 @@ arch_info=$(arch)
 auto_kernel="true"
 
 # Kernel download address and custom name
-build_kernel=("5.4.160" "5.10.80")
+build_kernel=("5.4.170" "5.10.90")
 custom_name="-meson64-dev"
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 kernel_flippy_repo="unifreq"
@@ -108,7 +108,7 @@ query_version() {
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${kernel_flippy_sub} latest kernel. \n"
         else
-            # latest_version="5.4.160"
+            # latest_version="5.4.170"
             latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${latest_version}"
