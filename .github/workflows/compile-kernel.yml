@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       kernel_repo:
-        description: "Source: kernel.org / flippy"
+        description: "Source: kernel.org / unifreq"
         required: false
-        default: "flippy"
+        default: "unifreq"
       kernel_ver:
         description: "Kernel version: 5.4.170"
         required: false
@@ -42,17 +42,12 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_BRANCH=("kernel.org" "flippy")
           kernel_repo="${{ github.event.inputs.kernel_repo }}"
-          if  [[ -z "${kernel_repo}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${kernel_repo}")" ]]; then
-              kernel_repo="kernel.org"
-          fi
+          [ -z "${kernel_repo}"] && kernel_repo="kernel.org"
           echo "KERNEL_REPO=${kernel_repo}" >> $GITHUB_ENV
 
           kernel_ver="${{ github.event.inputs.kernel_ver }}"
-          if  [[ -z "${kernel_ver}" ]]; then
-              kernel_ver="5.4.170_5.10.90"
-          fi
+          [ -z "${kernel_ver}" ] && kernel_ver="5.4.170_5.10.90"
           echo "KERNEL_VER=${kernel_ver}" >> $GITHUB_ENV
 
       - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
