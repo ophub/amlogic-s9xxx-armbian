@@ -203,10 +203,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 |------------------------|------------------------|------------------------------------------------|
 | armbian_path         | no                     | 设置原版 Armbian 文件的路径，支持使用当前工作流中的文件路径如 `build/output/images/*.img` ，也支持使用网络下载地址如： `https://dl.armbian.com/*/Armbian_*.img.xz` |
 | armbian_soc        | s905d_s905x3           | 设置打包盒子的 `SOC` ，可指定单个盒子如 `s905x3` ，可选择多个盒子用_连接如 `s905x3_s905d` 。各盒子的SoC代码为：`s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` 。说明：`s922x-n2` 是 `s922x-odroid-n2` ，`s912-t95z` 是 `s912-t95z-plus` ，`s905d-ki` 是 `mecool-ki-pro` |
-| version_branch         | stable                 | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，如 `stable` 。指定的名称须与分支目录名称相同。默认使用 `stable` 分支版本。 |
-| armbian_kernel         | 5.10.90_5.4.170        | 设置内核版本，[kernel](https://github.com/ophub/kernel/tree/main/pub/stable) 库里收藏了众多 Flippy 的原版内核，可以查看并选择指定。 |
+| version_branch         | stable                 | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，如 `stable` 。指定的名称须与分支目录名称相同。默认使用 `stable` 分支版本 |
+| armbian_kernel         | 5.10.90_5.4.170        | 设置内核 [版本](https://github.com/ophub/kernel/tree/main/pub/stable) 如 `5.4.170` ，多个内核使用 `_` 进行连接，如 `5.10.90_5.4.170` |
 | auto_kernel            | true                   | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `amlogic_kernel` 中指定的内核如 5.4.170 的 5.4 同系列是否有更新的版本，如有 5.4.170 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
-| armbian_size           | 2748                   | 设置固件 ROOTFS 分区的大小，必须大于 2000。                         |
+| armbian_size           | 2748                   | 设置固件 ROOTFS 分区的大小，必须大于 2000                         |
 
 - GitHub Action 输出变量说明
 
@@ -222,7 +222,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 ## Armbian 贡献者名单
 
-首先感谢 [150balbes](https://github.com/150balbes) 为在 Amlogic 盒子中使用 Armbian 所做出的杰出贡献和奠定的良好基础。这里编译的 [armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。为不同的盒子制作专用的 Armbian 系统时采用了 [flippy](https://github.com/unifreq/openwrt_packit) 为 `amlogic s9xxx openwrt` 制作的内核、脚本及 `u-boot` 等资源。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在 Amlogic s9xxx 盒子里使用 Armbian 系统。
+首先感谢 [150balbes](https://github.com/150balbes) 为在 Amlogic 盒子中使用 Armbian 所做出的杰出贡献和奠定的良好基础。这里编译的 [armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。为不同的盒子制作专用的 Armbian 系统时采用了 [unifreq](https://github.com/unifreq/openwrt_packit) 为 `amlogic s9xxx openwrt` 制作的内核、脚本及 `u-boot` 等资源。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在 Amlogic s9xxx 盒子里使用 Armbian 系统。
 
 因为有不断的 [创新与贡献者](CONTRIBUTOR.md) ，我们才能在岁月的长河里，拥有盒子的陪伴。很多年后我们都长大了，但这个美好的回忆总会长久地留在记忆深处。从现在开始，把这些开创者们的成果记录起来，留给新加入盒子圈的新朋友们。
 
