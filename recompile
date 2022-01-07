@@ -17,14 +17,17 @@ script_dir="${compile_path}/tools/script"
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
 auto_kernel="true"
-
-# Kernel download address and custom name
 build_kernel=("5.4.170" "5.10.90")
+
+# Kernel custom name
 custom_name="-meson64-dev"
+
+# Kernel download from github.com, Support repository named in [ linux-5.x.y ] format.
+repo_owner="unifreq"
+#
+# Kernel download from kernel.org
+#repo_owner="kernel.org"
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
-kernel_flippy_repo="unifreq"
-kernel_flippy_branch="main"
-repo_url="flippy"
 
 # Cross compile
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
@@ -96,18 +99,7 @@ query_version() {
         MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
         MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
 
-        if [ "${repo_url}" == "flippy" ]; then
-            kernel_flippy_sub="${kernel_flippy_repo}/linux-${MAIN_LINE}.y"
-            kernel_flippy_ver="https://raw.githubusercontent.com/${kernel_flippy_sub}/main/Makefile"
-            # latest_version="160"
-            latest_version=$(curl -s ${kernel_flippy_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')
-            if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
-                tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
-            else
-                die "Failed to query the kernel version in [ github.com/${kernel_flippy_sub} ]"
-            fi
-            echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${kernel_flippy_sub} latest kernel. \n"
-        else
+        if [ "${repo_owner}" == "kernel.org" ]; then
             # latest_version="5.4.170"
             latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
@@ -116,6 +108,17 @@ query_version() {
                 die "Failed to query the kernel version in [ ${kernel_org_repo} ]"
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is kernel.org latest kernel. \n"
+        else
+            github_kernel_repo="${repo_owner}/linux-${MAIN_LINE}.y"
+            github_kernel_ver="https://raw.githubusercontent.com/${github_kernel_repo}/main/Makefile"
+            # latest_version="160"
+            latest_version=$(curl -s ${github_kernel_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')
+            if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
+                tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
+            else
+                die "Failed to query the kernel version in [ github.com/${github_kernel_repo} ]"
+            fi
+            echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${github_kernel_repo} latest kernel. \n"
         fi
 
         let i++
@@ -143,11 +146,7 @@ download_kernel() {
     echo -e "${STEPS} Start query and download the kernel."
     [ -d "${kernel_path}" ] || mkdir -p ${kernel_path}
     if [ ! -d "${kernel_path}/${linux_kernel_dirname}" ]; then
-        if [ "${repo_url}" == "flippy" ]; then
-            echo -e "${INFO} Start cloning from [ https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} ]"
-            git clone --depth 1 https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} -b ${kernel_flippy_branch} ${kernel_path}/${linux_kernel_dirname}
-            [ "$?" -eq "0" ] || die "[ https://github.com/${kernel_flippy_repo}/${linux_kernel_dirname} ] Clone failed."
-        else
+        if [ "${repo_owner}" == "kernel.org" ]; then
             if [ -f "${kernel_path}/${linux_kernel_dirname}.tar.xz" ]; then
                 echo -e "${INFO} Unzip local files [ ${linux_kernel_dirname}.tar.xz ]"
                 cd ${kernel_path}
@@ -165,6 +164,10 @@ download_kernel() {
                     die "Kernel file download failed!"
                 fi
             fi
+        else
+            echo -e "${INFO} Start cloning from [ https://github.com/${repo_owner}/${linux_kernel_dirname} ]"
+            git clone --depth 1 https://github.com/${repo_owner}/${linux_kernel_dirname} ${repo_branch} ${kernel_path}/${linux_kernel_dirname}
+            [ "$?" -eq "0" ] || die "[ https://github.com/${repo_owner}/${linux_kernel_dirname} ] Clone failed."
         fi
     else
         echo -e "${INFO} [ ${linux_kernel_dirname} ] Kernel is in the local directory."
@@ -428,7 +431,7 @@ while [ "${1}" ]; do
         : ${build_kernel:="${build_kernel}"}
         : ${auto_kernel:="${auto_kernel}"}
         : ${custom_name:="${custom_name}"}
-        : ${repo_url:="${repo_url}"}
+        : ${repo_owner:="${repo_owner}"}
         ;;
     -k | --kernel)
         if [ -n "${2}" ]; then
@@ -459,7 +462,7 @@ while [ "${1}" ]; do
         ;;
     -r | --repo)
         if [ -n "${2}" ]; then
-            repo_url="${2}"
+            repo_owner="${2}"
             shift
         else
             die "Invalid -r parameter [ ${2} ]!"
@@ -472,9 +475,25 @@ while [ "${1}" ]; do
     shift
 done
 
+# Receive incoming branch, such as [ owner@branch ] or [ owner ]
+# From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ] or default.
+repo_owner="${repo_owner//https\:\/\/github\.com\//}"
+if [ "$(echo "${repo_owner}" | grep "@")" != "" ]; then
+    github_repo="$(echo "${repo_owner}" | awk -F '@' '{print $1}')"
+    github_branch="$(echo "${repo_owner}" | awk -F '@' '{print $2}')"
+    repo_owner="${github_repo}"
+    repo_branch=" -b ${github_branch} "
+elif [ "$(echo "${repo_owner}" | grep "/")" != "" ]; then
+    repo_owner="$(echo "${repo_owner}" | awk -F '/' '{print $1}')"
+    repo_branch=""
+else
+    repo_owner="${repo_owner}"
+    repo_branch=""
+fi
+
 check_environment
 # Set whether to replace the kernel
-[[ "${auto_kernel}" == "true" || "${repo_url}" == "flippy" ]] && query_version
+[[ "${auto_kernel}" == "true" || "${repo_owner}" != "kernel.org" ]] && query_version
 
 [ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
 echo -e "Welcome to compile kernel! \n"
@@ -487,10 +506,10 @@ for x in ${build_kernel[*]}; do
     kernel_version="${x}"
     # Mainline name of the kernel version, such as [ 5.4 ]
     kernel_vermaj="${kernel_version%.*}"
-    if [ "${repo_url}" == "flippy" ]; then
-        linux_kernel_dirname="linux-${kernel_vermaj}.y"
-    else
+    if [ "${repo_owner}" == "kernel.org" ]; then
         linux_kernel_dirname="linux-${kernel_version}"
+    else
+        linux_kernel_dirname="linux-${kernel_vermaj}.y"
     fi
 
     local_kernel_check
