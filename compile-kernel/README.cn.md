@@ -16,9 +16,9 @@
 
 - `sudo ./recompile -d -k 5.4.170` : 使用默认配置，并通过 -k 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
 - `sudo ./recompile -d -k 5.4.170 -a true` : 使用默认配置，并通过 -a 参数设置编译内核时，是否自动升级到同系列最新内核。
-- `sudo ./recompile -d -k 5.4.170 -n leifeng` : 使用默认配置，并通过 -n 参数设置内核自定义签名。
+- `sudo ./recompile -d -k 5.4.170 -n -leifeng` : 使用默认配置，并通过 -n 参数设置内核自定义签名。
 - `sudo ./recompile -d -k 5.4.170 -r kernel.org` : 使用默认配置，并通过 -r 参数设置编译源码的下载站。
-- `sudo ./recompile -d -k 5.10.90_5.4.170 -a true -n leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
+- `sudo ./recompile -d -k 5.10.90_5.4.170 -a true -n -leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
 
 💡提示：可以使用 `unifreq` 的 [.config](https://github.com/unifreq/arm64-kernel-configs) 模板和源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 的 `最新版本` 。`其他系列或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。
 
