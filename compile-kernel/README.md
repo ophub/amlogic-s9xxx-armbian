@@ -16,9 +16,9 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 
 - `sudo ./recompile -d -k 5.4.170`: Use the default configuration, and use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
 - `sudo ./recompile -d -k 5.4.170 -a true`: Use the default configuration, and use the `-a` parameter to set whether to automatically upgrade to the latest kernel of the same series when compiling the kernel.
-- `sudo ./recompile -d -k 5.4.170 -n leifeng`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
+- `sudo ./recompile -d -k 5.4.170 -n -leifeng`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
 - `sudo ./recompile -d -k 5.4.170 -r kernel.org`: Use the default configuration, and use the `-r` parameter to set the download station of the compiled source code.
-- `sudo ./recompile -d -k 5.10.90_5.4.170 -a true -n leifeng -r kernel.org`: Use the default configuration, and set through multiple parameters.
+- `sudo ./recompile -d -k 5.10.90_5.4.170 -a true -n -leifeng -r kernel.org`: Use the default configuration, and set through multiple parameters.
 
 💡Tip: You can use the [.config](https://github.com/unifreq/arm64-kernel-configs) template and source code of `unifreq` to compile the `latest version` of [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y). `Other series or historical versions` can be compiled with [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/).
 
