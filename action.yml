@@ -56,7 +56,7 @@ runs:
         sync
         echo -e "About the ${armbian_filepath} directory: \n $(ls ${armbian_filepath} -l 2>/dev/null)"
 
-        cd ${armbian_filepath}
+        cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
         echo -e "Check the armbian file format..."
         down_file="$(ls . -l 2>/dev/null | grep "^-" | awk '{print $9}' | head -n 1)"
         [ -z "${down_file}" ] && echo -e "The [ ${armbian_file} ] is invalid." && exit 1
@@ -75,6 +75,10 @@ runs:
         [ -n ${{ inputs.armbian_size }} ] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
         sudo chmod +x rebuild
         sudo ./rebuild ${make_command}
+
+        cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
+        echo -e "Compress the .img file in the [ ${armbian_filepath} ] directory. \n"
+        sudo gzip *.img && sync
 
         cd ${GITHUB_ACTION_PATH}
         echo -e "Output environment variables."
