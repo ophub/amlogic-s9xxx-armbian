@@ -14,9 +14,9 @@ BOOT=256
 
 # Receive one-key command related parameters
 if [[ "${1}" == "no" ]]; then
-    AUTO_MAINLINE_UBOOT="no"
+    auto_mainline_uboot="no"
 else
-    AUTO_MAINLINE_UBOOT="yes"
+    auto_mainline_uboot="yes"
 fi
 
 echo "Start install armbian to emmc..."
@@ -139,7 +139,7 @@ parted -s "${DEV_EMMC}" mkpart primary fat32 $((SKIP * 1024 * 1024))b $(((SKIP +
 parted -s "${DEV_EMMC}" mkpart primary ext4 $(((SKIP + BOOT) * 1024 * 1024))b 100% 2>/dev/null
 
 echo "Start write u-boot"
-if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${AUTO_MAINLINE_UBOOT}" == "yes" ]]; then
+if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
     echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
@@ -227,21 +227,21 @@ done
 echo "Copy complete."
 
 echo "Update the relevant parameters of armbian-aml-release"
-ENV_ARMBIAN_FILE="${DIR_INSTALL}/etc/armbian-aml-release"
-sed -i '/FDTFILE/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "FDTFILE='${FDTFILE}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+ophub_release_file="${DIR_INSTALL}/etc/ophub-release"
+sed -i '/FDTFILE/d' ${ophub_release_file} 2>/dev/null
+echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/UBOOT_OVERLOAD/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/UBOOT_OVERLOAD/d' ${ophub_release_file} 2>/dev/null
+echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/MAINLINE_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/MAINLINE_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/ANDROID_UBOOT/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
-sed -i '/SOC/d' ${ENV_ARMBIAN_FILE} 2>/dev/null
-echo "SOC='${AMLOGIC_SOC}'" >>${ENV_ARMBIAN_FILE} 2>/dev/null
+sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
+echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
 echo "Update complete."
 sync
 
