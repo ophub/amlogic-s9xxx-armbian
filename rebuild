@@ -21,14 +21,14 @@ tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
 # get VERSION_CODENAME: such as [ focal ]
-get_version_codename="etc/os-release"
+os_release_file="etc/os-release"
 # set BOARD_NAME: such as [ s905x3 ]
-set_board_name="etc/armbian-release"
+armbian_release_file="etc/armbian-release"
 # Add custom firmware information
-set_armbian_aml_release="etc/armbian-aml-release"
+ophub_release_file="etc/ophub-release"
 
-kernel_library="https://github.com/ophub/kernel/tree/main/pub"
-#kernel_library="https://github.com/ophub/kernel/trunk/pub"
+kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
+#kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 
 build_armbian=("s922x" "s922x-n2" "s905x3" "s905x2" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
@@ -53,16 +53,16 @@ download_kernel() {
     cd ${make_path}
 
     # Convert kernel library address to svn format
-    if [[ ${kernel_library} == http* && $(echo ${kernel_library} | grep "tree/main") != "" ]]; then
-        kernel_library="${kernel_library//tree\/main/trunk}"
+    if [[ ${kernel_repo} == http* && $(echo ${kernel_repo} | grep "tree/main") != "" ]]; then
+        kernel_repo="${kernel_repo//tree\/main/trunk}"
     fi
-    kernel_library="${kernel_library}/${version_branch}"
+    kernel_repo="${kernel_repo}/${version_branch}"
 
     # Set empty array
     tmp_arr_kernels=()
 
     # Convert kernel library address to API format
-    server_kernel_url=${kernel_library#*com\/}
+    server_kernel_url=${kernel_repo#*com\/}
     server_kernel_url=${server_kernel_url//trunk/contents}
     server_kernel_url="https://api.github.com/repos/${server_kernel_url}"
 
@@ -94,8 +94,8 @@ download_kernel() {
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
         if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_library}/${KERNEL_VAR} ]"
-            svn checkout ${kernel_library}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
+            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo}/${KERNEL_VAR} ]"
+            svn checkout ${kernel_repo}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} >/dev/null
             rm -rf ${kernel_path}/${KERNEL_VAR}/.svn >/dev/null && sync
         else
             echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
@@ -365,10 +365,10 @@ copy_files() {
     # Copy the different files of the release for ROOTFS: ubuntu and debian
     armbian_ubuntu=("bionic" "focal" "hirsute")
     armbian_debian=("bullseye" "buster" "stretch")
-    diff_release_name="$(cat ${tag_rootfs}/${get_version_codename} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
-    [ -z "${diff_release_name}" ] && die "RELEASE CODENAME is invalid."
-    diff_release_files="${configfiles_path}/release/${diff_release_name}"
-    if [[ -n "${diff_release_name}" && -d "${diff_release_files}" ]]; then
+    release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
+    [ -z "${release_codename}" ] && die "RELEASE CODENAME is invalid."
+    diff_release_files="${configfiles_path}/release/${release_codename}"
+    if [[ -n "${release_codename}" && -d "${diff_release_files}" ]]; then
         # Backup source
         mv -f ${tag_rootfs}/etc/apt/sources.list ${tag_rootfs}/etc/apt/sources.list.bak
         mv -f ${tag_rootfs}/etc/apt/sources.list.d/armbian.list ${tag_rootfs}/etc/apt/sources.list.d/armbian.list.bak
@@ -377,7 +377,7 @@ copy_files() {
     fi
     #
     # Modify different releases for usr/sbin/armbian-docker
-    if [[ -n "${diff_release_name}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${diff_release_name}")" ]]; then
+    if [[ -n "${release_codename}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${release_codename}")" ]]; then
         sed -i "s|ubuntu|debian|g" ${tag_rootfs}/usr/sbin/armbian-docker
     fi
 
@@ -431,18 +431,19 @@ copy_files() {
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
     # Add custom firmware information
-    echo "FDTFILE='${FDTFILE}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "U_BOOT_EXT='${K510}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "SOC='${AMLOGIC_SOC}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "K510='${K510}'" >>${set_armbian_aml_release} 2>/dev/null
-    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
+    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
+    echo "U_BOOT_EXT='${K510}'" >>${ophub_release_file} 2>/dev/null
+    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
+    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
+    echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
+    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 
     # Custom banner name
-    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" ${set_board_name}
+    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" ${armbian_release_file}
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
@@ -488,7 +489,7 @@ copy_files() {
 clean_tmp() {
     cd ${tmp_outpath}
     # Rename version
-    [[ "${diff_release_name}" != "focal" ]] && rename "s/focal/${diff_release_name}/g" *.img 2>/dev/null && sync
+    [[ "${release_codename}" != "focal" ]] && rename "s/focal/${release_codename}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
     sync
 
