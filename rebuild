@@ -20,6 +20,13 @@ tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
+# get VERSION_CODENAME: such as [ focal ]
+get_version_codename="etc/os-release"
+# set BOARD_NAME: such as [ s905x3 ]
+set_board_name="etc/armbian-release"
+# Add custom firmware information
+set_armbian_aml_release="etc/armbian-aml-release"
+
 kernel_library="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_library="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
@@ -358,7 +365,8 @@ copy_files() {
     # Copy the different files of the release for ROOTFS: ubuntu and debian
     armbian_ubuntu=("bionic" "focal" "hirsute")
     armbian_debian=("bullseye" "buster" "stretch")
-    diff_release_name="$(cat ${tag_rootfs}/etc/armbian-release | grep -oE "^DISTRIBUTION_CODENAME=.*" | awk -F "=" '{print $2}')"
+    diff_release_name="$(cat ${tag_rootfs}/${get_version_codename} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
+    [ -z "${diff_release_name}" ] && die "RELEASE CODENAME is invalid."
     diff_release_files="${configfiles_path}/release/${diff_release_name}"
     if [[ -n "${diff_release_name}" && -d "${diff_release_files}" ]]; then
         # Backup source
@@ -422,19 +430,19 @@ copy_files() {
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
-    # Add firmware information to the etc/armbian-aml-release
-    echo "FDTFILE='${FDTFILE}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "U_BOOT_EXT='${K510}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "SOC='${AMLOGIC_SOC}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "K510='${K510}'" >>etc/armbian-aml-release 2>/dev/null
-    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>etc/armbian-aml-release 2>/dev/null
+    # Add custom firmware information
+    echo "FDTFILE='${FDTFILE}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "U_BOOT_EXT='${K510}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "SOC='${AMLOGIC_SOC}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "K510='${K510}'" >>${set_armbian_aml_release} 2>/dev/null
+    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${set_armbian_aml_release} 2>/dev/null
 
     # Custom banner name
-    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" etc/armbian-release
+    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" ${set_board_name}
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
