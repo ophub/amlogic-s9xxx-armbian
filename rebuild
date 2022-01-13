@@ -425,8 +425,8 @@ copy_files() {
     chown 0 usr/lib/sudo/sudoers.so
     chmod 644 usr/lib/sudo/sudoers.so
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    chmod 4755 etc/update-motd.d/10-armbian-header 2>/dev/null
-    chmod 4755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
+    chmod 755 etc/update-motd.d/10-armbian-header 2>/dev/null
+    chmod 755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
 
     # Delete related files
     rm -f etc/apt/sources.list.save 2>/dev/null
