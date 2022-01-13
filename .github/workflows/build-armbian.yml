@@ -86,7 +86,7 @@ jobs:
         if: steps.compile.outputs.status == 'success' && !cancelled()
         run: |
           sudo chmod +x rebuild
-          sudo ./rebuild -d -b s905x3_s905x -k 5.4.170_5.10.90 -v dev
+          sudo ./rebuild -d -b s905x3_s905x -k 5.4.170_5.10.90_5.15.13 -v dev
           sudo rm -rf build-armbian/amlogic-kernel/* && sync
           sudo ./rebuild -d -b s922x_s922x-n2_s905d -k 5.4.170_5.15.13
           sudo ./rebuild -d -b s905w_s912_s912-t95z_s905x2_s905_s905d-ki -k 5.4.170
