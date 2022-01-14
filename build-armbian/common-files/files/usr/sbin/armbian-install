@@ -61,8 +61,9 @@ AMLOGIC_MODEL_LIST="
 42:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 43:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Net,Wifi
 44:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro-rev_a.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
-45:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
-46:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+45:Beelink GT-King Pro Rev_A (beta):s922x:meson-sm1-sei610LE.dtb:u-boot-gtkingpro-rev-a.bin:NA:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+46:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
+47:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 
 # Amlogic SM1 Family
 51:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Net
