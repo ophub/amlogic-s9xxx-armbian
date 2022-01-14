@@ -50,7 +50,9 @@ AMLOGIC_MODEL_LIST="
 # Amlogic GXM Family
 21:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Net
 22:H96 Pro Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:2G/32G,1Gb Net
-23:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band Wi-Fi/10-1000M LAN 64Bit BT4.0
+23:Tanix-TX92:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Net
+24:VORKE-Z6-Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Net
+25:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band Wi-Fi/10-1000M LAN 64Bit BT4.0
 
 # Amlogic G12A Family
 31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
