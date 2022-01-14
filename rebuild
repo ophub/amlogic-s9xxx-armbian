@@ -303,6 +303,13 @@ copy_files() {
         ANDROID_UBOOT=""
         AMLOGIC_SOC="s922x"
         ;;
+    s922x-reva)
+        FDTFILE="meson-sm1-sei610LE.dtb"
+        UBOOT_OVERLOAD="u-boot-gtkingpro-rev-a.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        AMLOGIC_SOC="s922x"
+        ;;
     *)
         die "Have no this soc: [ ${build_soc} ]"
         ;;
