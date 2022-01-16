@@ -475,9 +475,9 @@ copy_files() {
     interfaces_file="etc/network/interfaces"
     [ -f "${interfaces_file}" ] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
 
-    # Add rtl8189fs driver for s905x(HG680P & B860H), rtl8822cs driver for s905x3(x96max+) in the dev branch of the kernel repo
+    # Add rtl8189fs & 8188fu driver for s905x(HG680P & B860H), rtl8822cs driver for s905x3(x96max+) in the dev branch kernel
     [[ "${build_soc}" == "s905x3" || "${build_soc}" == "s905x" ]] && {
-        sed -i "s|version_branch=\"stable\"|version_branch=\"dev\"|g" usr/sbin/armbian-update
+        #sed -i "s|version_branch=\"stable\"|version_branch=\"dev\"|g" usr/sbin/armbian-update
     }
 
     # Optimize wifi/bluetooth module
