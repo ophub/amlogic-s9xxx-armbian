@@ -31,7 +31,7 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 
-build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
+build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
 build_kernel=("default")
 auto_kernel="true"
 
@@ -233,6 +233,13 @@ copy_files() {
         ;;
     s905x2 | x96max4g | x96max2g)
         FDTFILE="meson-g12a-x96-max.dtb"
+        UBOOT_OVERLOAD="u-boot-x96max.bin"
+        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        AMLOGIC_SOC="s905x2"
+        ;;
+    s905x2-km3)
+        FDTFILE="meson-g12a-sei510.dtb"
         UBOOT_OVERLOAD="u-boot-x96max.bin"
         MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
