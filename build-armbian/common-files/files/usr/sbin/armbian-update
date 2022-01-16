@@ -253,8 +253,8 @@ if [ "${V510}" -lt "${K510}" ]; then
 
     # Copy u-boot.ext and u-boot.emmc
     if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
-        cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-        cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
         echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
     else
         die "The UBOOT_OVERLOAD file is missing and cannot be update."
