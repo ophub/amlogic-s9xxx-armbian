@@ -57,6 +57,7 @@ AMLOGIC_MODEL_LIST="
 # Amlogic G12A Family
 31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
 32:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100M Net
+33:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100M Net
 
 # Amlogic G12B Family
 41:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
@@ -194,7 +195,11 @@ mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
 if [ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]; then
     echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
-    cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+    if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
+        cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
+    else
+        cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+    fi
 else
     echo "Mv [ u-boot.sd ] to u-boot.emmc"
     mv -f ${DIR_INSTALL}/u-boot.sd ${DIR_INSTALL}/u-boot.emmc
