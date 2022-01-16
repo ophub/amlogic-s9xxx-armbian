@@ -311,8 +311,8 @@ copy_files() {
         AMLOGIC_SOC="s922x"
         ;;
     s922x-reva)
-        FDTFILE="meson-g12b-gtking-pro-rev_a.dtb"
-        UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
+        FDTFILE="meson-g12b-gtking-pro.dtb"
+        UBOOT_OVERLOAD="u-boot-gtkingpro-rev-a.bin"
         MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         AMLOGIC_SOC="s922x"
@@ -399,9 +399,12 @@ copy_files() {
     cd ${tag_bootfs}
 
     # Add u-boot.ext for 5.10 kernel
-    if [[ -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
-        cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync
-        chmod +x u-boot.ext
+    if [[ "${K510}" -eq "1" ]]; then
+        if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
+            cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync && chmod +x u-boot.ext
+        else
+            die "${build_soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
+        fi
     fi
 
     # Edit the uEnv.txt
