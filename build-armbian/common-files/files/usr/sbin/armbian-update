@@ -252,12 +252,14 @@ if [ "${V510}" -lt "${K510}" ]; then
     fi
 
     # Copy u-boot.ext and u-boot.emmc
-    if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
-        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
-        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
-    else
-        die "The UBOOT_OVERLOAD file is missing and cannot be update."
+    if [ "${K510}" -eq "1" ]; then
+        if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
+            [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+            [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+            echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+        else
+            die "The UBOOT_OVERLOAD file is missing and cannot be update."
+        fi
     fi
 
     # Write Mainline bootloader
@@ -267,6 +269,12 @@ if [ "${V510}" -lt "${K510}" ]; then
         dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=512 skip=1 seek=1 conv=fsync
         echo -e "The MAINLINE_UBOOT file write is complete."
     fi
+fi
+
+# Remove u-boot.ext files in kernels below 5.10
+if [ "${K510}" -eq "0" ]; then
+    rm -f /boot/u-boot.ext 2>/dev/null && sync
+    rm -f /boot/u-boot.emmc 2>/dev/null && sync
 fi
 
 echo -e "Unpack [ ${custom_kernel_name} ] related files ..."
@@ -329,10 +337,10 @@ echo -e "02.02 Unpack [ ${build_dtb} ] complete."
 sleep 3
 
 # 03. for /lib/modules/*
-rm -rf /lib/modules/* 2>/dev/null && sync
-tar -xzf ${P4_PATH}/${build_modules} -C /lib/modules && sync
-(cd /lib/modules/${custom_kernel_name} && echo "build source" | xargs rm -f)
-[[ -d "/lib/modules/${custom_kernel_name}" ]] || die "/lib/modules/${custom_kernel_name} kernel folder is missing."
+rm -rf /usr/lib/modules/* 2>/dev/null && sync
+tar -xzf ${P4_PATH}/${build_modules} -C /usr/lib/modules && sync
+(cd /usr/lib/modules/${custom_kernel_name} && echo "build source" | xargs rm -f)
+[[ -d "/usr/lib/modules/${custom_kernel_name}" ]] || die "/usr/lib/modules/${custom_kernel_name} kernel folder is missing."
 echo -e "02.03 Unpack [ ${build_modules} ] complete."
 sleep 3
 

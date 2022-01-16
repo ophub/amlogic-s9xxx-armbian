@@ -36,6 +36,26 @@ fi
 DEV_EMMC="/dev/${install_emmc}"
 echo "DEV_EMMC: ${DEV_EMMC}"
 
+#Check if writing to EMMC is supported
+MODULES_NOW=$(ls /usr/lib/modules/ 2>/dev/null)
+VERSION_NOW=$(echo ${MODULES_NOW} | grep -oE '^[1-9].[0-9]{1,3}' 2>/dev/null)
+echo "This Kernel [ ${VERSION_NOW} ]"
+
+k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
+k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
+if [ "${k510_ver}" -eq "5" ]; then
+    if [ "${k510_maj}" -ge "10" ]; then
+        K510="1"
+    else
+        K510="0"
+    fi
+elif [ "${k510_ver}" -gt "5" ]; then
+    K510="1"
+else
+    K510="0"
+fi
+echo "K510: [ ${K510} ]"
+
 # Set model list, begin ------------
 AMLOGIC_MODEL_LIST="
 # 1.id  2.model  3.soc  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.description
@@ -63,7 +83,7 @@ AMLOGIC_MODEL_LIST="
 41:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 42:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 43:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Net,Wifi
-44:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro-rev_a.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+44:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro-rev-a.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 45:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
 46:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
 
@@ -120,6 +140,11 @@ fi
 # Set model list, end ------------
 
 echo -e "FDTFILE: [ ${FDTFILE} ]"
+echo -e "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
+
+if [ "${K510}" -eq "1" ]; then
+    [[ -z "${UBOOT_OVERLOAD}" || ! -f "/boot/${UBOOT_OVERLOAD}" ]] && echo "Have no the 5.10 kernel u-boot file." && exit 1
+fi
 
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
@@ -193,19 +218,25 @@ sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
 mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
 mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
-if [ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]; then
-    echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
-    if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
-        cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
+if [ "${K510}" -eq "1" ]; then
+    if [[ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]]; then
+        echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
+        if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
+            cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
+        else
+            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.ext
+            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+        fi
+        chmod +x ${DIR_INSTALL}/u-boot.ext
+        chmod +x ${DIR_INSTALL}/u-boot.emmc
     else
-        cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+        echo "Have no the 5.10 kernel u-boot file."
+        exit 1
     fi
-else
-    echo "Mv [ u-boot.sd ] to u-boot.emmc"
-    mv -f ${DIR_INSTALL}/u-boot.sd ${DIR_INSTALL}/u-boot.emmc
 fi
 
 sync
+sleep 3
 
 umount ${DIR_INSTALL}
 
