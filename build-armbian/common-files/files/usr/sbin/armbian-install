@@ -13,10 +13,10 @@ SKIP=700
 BOOT=256
 
 # Receive one-key command related parameters
-if [[ "${1}" == "no" ]]; then
-    auto_mainline_uboot="no"
-else
+if [[ "${1}" == "yes" ]]; then
     auto_mainline_uboot="yes"
+else
+    auto_mainline_uboot="no"
 fi
 
 echo "Start install armbian to emmc..."
@@ -149,8 +149,12 @@ fi
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
 
-echo "Start backup u-boot default"
-dd if="${DEV_EMMC}" of=/root/u-boot-default-aml.img bs=1M count=4 conv=fsync
+ORIGINAL_BOOTLOADER="/root/u-boot-default-aml.img"
+if [ ! -f "${ORIGINAL_BOOTLOADER}" ]; then
+    echo "Start backup default bootloader"
+    dd if="${DEV_EMMC}" of=${ORIGINAL_BOOTLOADER} bs=1M count=4 conv=fsync
+fi
+
 exists_pts=$(parted ${DEV_EMMC} print | grep 'primary' | wc -l)
 if [ "${exists_pts}" -gt "0" ]; then
     i=1
@@ -168,17 +172,17 @@ parted -s "${DEV_EMMC}" mkpart primary ext4 $(((SKIP + BOOT) * 1024 * 1024))b 10
 
 echo "Start write u-boot"
 if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
-    echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+    echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
 elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-    echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+    echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
-else
+elif [[ -n "${ORIGINAL_BOOTLOADER}" && -f "${ORIGINAL_BOOTLOADER}" ]]; then
     echo "Restore the original u-boot"
-    dd if=/root/u-boot-default-aml.img of="${DEV_EMMC}" conv=fsync bs=1 count=442
-    dd if=/root/u-boot-default-aml.img of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=1 count=442
+    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
 fi
 
 echo "Start copy system for eMMC."
