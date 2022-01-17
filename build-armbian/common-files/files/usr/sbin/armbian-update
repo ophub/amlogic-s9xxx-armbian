@@ -12,8 +12,8 @@
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# Do not write main line U-BOOT command: armbian-update 5.4.150 stable no
-# Write the main line U-BOOT by default: armbian-update 5.4.150
+# Write mainline u-boot command: armbian-update 5.4.150 stable yes
+# The mainline u-boot is not installed by default: armbian-update 5.4.150
 #==================================================================================================================================
 
 echo -e "Ready to update, please wait..."
