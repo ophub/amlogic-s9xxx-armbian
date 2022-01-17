@@ -179,10 +179,6 @@ elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
     echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
-elif [[ -n "${ORIGINAL_BOOTLOADER}" && -f "${ORIGINAL_BOOTLOADER}" ]]; then
-    echo "Restore the original u-boot"
-    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=1 count=442
-    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
 fi
 
 echo "Start copy system for eMMC."

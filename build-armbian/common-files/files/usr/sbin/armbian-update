@@ -80,7 +80,6 @@ if [ -f "${ophub_release_file}" ]; then
 else
     die "${ophub_release_file} file is missing!"
 fi
-ORIGINAL_BOOTLOADER="/root/u-boot-default-aml.img"
 
 # Check 3 kernel files
 if [[ "$(ls ${P4_PATH}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
@@ -273,10 +272,6 @@ if [ "${V510}" -lt "${K510}" ]; then
         echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
         dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
         dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ORIGINAL_BOOTLOADER}" && -f "${ORIGINAL_BOOTLOADER}" ]]; then
-        echo -e "Restore the original u-boot"
-        dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=1 count=442
-        dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 
 fi
