@@ -313,7 +313,7 @@ copy_files() {
     s922x-reva)
         FDTFILE="meson-g12b-gtking-pro.dtb"
         UBOOT_OVERLOAD="u-boot-gtkingpro-rev-a.bin"
-        MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
+        MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         AMLOGIC_SOC="s922x"
         ;;
