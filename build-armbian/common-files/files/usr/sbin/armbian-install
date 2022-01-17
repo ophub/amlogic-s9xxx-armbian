@@ -286,7 +286,7 @@ sync
 rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
 cat >${DIR_INSTALL}/etc/fstab <<EOF
 /dev/root       /               ext4            defaults,noatime,errors=remount-ro     	0 1
-LABEL=BOOT_EMMC /boot           vfat            defaults                                0 0
+LABEL=BOOT_EMMC /boot           vfat            defaults                                0 2
 tmpfs           /tmp            tmpfs           defaults,nosuid                         0 0
 EOF
 
