@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.14 Kernel Configuration
+# Linux/arm64 5.15.15 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="gcc (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0"
 CONFIG_CC_IS_GCC=y

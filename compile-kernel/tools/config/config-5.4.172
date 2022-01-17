@@ -1,10 +1,10 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.4.171 Kernel Configuration
+# Linux/arm64 5.4.172 Kernel Configuration
 #
 
 #
-# Compiler: aarch64-linux-gnu-gcc (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
+# Compiler: gcc (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
 #
 CONFIG_CC_IS_GCC=y
 CONFIG_GCC_VERSION=90400
