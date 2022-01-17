@@ -43,10 +43,10 @@ else
 fi
 
 # Specify whether to brush into the mainline u-boot, such as: yes
-if [[ "${3}" == "no" ]]; then
-    auto_mainline_uboot="no"
-else
+if [[ "${3}" == "yes" ]]; then
     auto_mainline_uboot="yes"
+else
+    auto_mainline_uboot="no"
 fi
 
 # Set default value
@@ -76,9 +76,11 @@ if [ -f "${ophub_release_file}" ]; then
     source "${ophub_release_file}" 2>/dev/null
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
+    ANDROID_UBOOT="${ANDROID_UBOOT}"
 else
     die "${ophub_release_file} file is missing!"
 fi
+ORIGINAL_BOOTLOADER="/root/u-boot-default-aml.img"
 
 # Check 3 kernel files
 if [[ "$(ls ${P4_PATH}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
@@ -262,13 +264,21 @@ if [ "${V510}" -lt "${K510}" ]; then
         fi
     fi
 
-    # Write Mainline bootloader
-    if [[ -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ] to [ /dev/${EMMC_NAME} ]"
-        dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=1 count=442 conv=fsync
-        dd if=${MAINLINE_UBOOT} of=/dev/${EMMC_NAME} bs=512 skip=1 seek=1 conv=fsync
-        echo -e "The MAINLINE_UBOOT file write is complete."
+    # Write bootloader
+    if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
+        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+        dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
+        dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+        dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
+        dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ORIGINAL_BOOTLOADER}" && -f "${ORIGINAL_BOOTLOADER}" ]]; then
+        echo -e "Restore the original u-boot"
+        dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=1 count=442
+        dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
+
 fi
 
 # Remove u-boot.ext files in kernels below 5.10
