@@ -57,7 +57,7 @@ WARNING="[${yellow_font_prefix}WARNING${font_color_suffix}]"
 ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
 #===== Do not modify the following parameter settings, End =======
 
-die() {
+error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
 }
@@ -78,7 +78,7 @@ check_environment() {
             tar -xJf ${use_linuxgun_localpath}/${use_linuxgun_file} -C ${use_linuxgun_localpath} && sync
         fi
         if [ ! -d "${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" ]; then
-            die "The cross compilation environment is not set!"
+            error_msg "The cross compilation environment is not set!"
         fi
     else
         echo -e "${INFO} Run on aarch64"
@@ -105,7 +105,7 @@ query_version() {
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${latest_version}"
             else
-                die "Failed to query the kernel version in [ ${kernel_org_repo} ]"
+                error_msg "Failed to query the kernel version in [ ${kernel_org_repo} ]"
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is kernel.org latest kernel. \n"
         else
@@ -116,7 +116,7 @@ query_version() {
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
             else
-                die "Failed to query the kernel version in [ github.com/${github_kernel_repo} ]"
+                error_msg "Failed to query the kernel version in [ github.com/${github_kernel_repo} ]"
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${github_kernel_repo} latest kernel. \n"
         fi
@@ -133,7 +133,7 @@ local_kernel_check() {
     cd ${make_path}
     # Check whether the kernel of the same name has been installed locally
     local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_version}${custom_name}")"
-    [ -n "${local_kernel}" ] && die "The current system has the same named kernel [ ${kernel_version}${custom_name} ], stop compiling!"
+    [ -n "${local_kernel}" ] && error_msg "The current system has the same named kernel [ ${kernel_version}${custom_name} ], stop compiling!"
 
     # Create a temp directory
     rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
@@ -151,7 +151,7 @@ download_kernel() {
                 echo -e "${INFO} Unzip local files [ ${linux_kernel_dirname}.tar.xz ]"
                 cd ${kernel_path}
                 tar -xJf ${linux_kernel_dirname}.tar.xz
-                [ "$?" -eq "0" ] || die "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
+                [ "$?" -eq "0" ] || error_msg "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
             else
                 echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${kernel_org_repo}${linux_kernel_dirname}.tar.xz ]"
                 wget -q -P ${kernel_path} ${kernel_org_repo}${linux_kernel_dirname}.tar.xz && sync
@@ -159,15 +159,15 @@ download_kernel() {
                     echo -e "${SUCCESS} The kernel file is downloaded successfully."
                     cd ${kernel_path}
                     tar -xJf ${linux_kernel_dirname}.tar.xz && sync
-                    [ -d "${linux_kernel_dirname}" ] || die "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
+                    [ -d "${linux_kernel_dirname}" ] || error_msg "[ ${linux_kernel_dirname}.tar.xz ] file decompression failed."
                 else
-                    die "Kernel file download failed!"
+                    error_msg "Kernel file download failed!"
                 fi
             fi
         else
             echo -e "${INFO} Start cloning from [ https://github.com/${repo_owner}/${linux_kernel_dirname} ]"
             git clone --depth 1 https://github.com/${repo_owner}/${linux_kernel_dirname} ${repo_branch} ${kernel_path}/${linux_kernel_dirname}
-            [ "$?" -eq "0" ] || die "[ https://github.com/${repo_owner}/${linux_kernel_dirname} ] Clone failed."
+            [ "$?" -eq "0" ] || error_msg "[ https://github.com/${repo_owner}/${linux_kernel_dirname} ] Clone failed."
         fi
     else
         echo -e "${INFO} [ ${linux_kernel_dirname} ] Kernel is in the local directory."
@@ -182,7 +182,7 @@ make_kernel() {
         echo -e "${STEPS} Copy config file to ${linux_kernel_dirname}"
         config_demo=$(ls ${config_dir}/config-${kernel_vermaj}* 2>/dev/null | head -n 1)
         config_demo_file=${config_demo##*/}
-        [ -z "${config_demo_file}" ] && die "Missing [ config-${kernel_vermaj}* ] template!"
+        [ -z "${config_demo_file}" ] && error_msg "Missing [ config-${kernel_vermaj}* ] template!"
         echo -e "${INFO} CONFIG_DEMO: ${config_demo_file}"
         cp -vf ${config_dir}/${config_demo_file} .config && sync
     else
@@ -279,13 +279,13 @@ chroot_armbian_for_x64() {
     tag_rootfs=${out_kernel}/armbian/root
 
     loop_armbian=$(losetup -P -f --show "${armbian_chroot_file}")
-    [ ${loop_armbian} ] || die "losetup ${armbian_chroot_file} failed."
+    [ ${loop_armbian} ] || error_msg "losetup ${armbian_chroot_file} failed."
 
     if ! mount ${loop_armbian}p2 ${tag_rootfs}; then
-        die "mount ${loop_armbian}p2 failed!"
+        error_msg "mount ${loop_armbian}p2 failed!"
     fi
     if ! mount ${loop_armbian}p1 ${tag_rootfs}/boot; then
-        die "mount ${loop_armbian}p1 failed!"
+        error_msg "mount ${loop_armbian}p1 failed!"
     fi
 
     # Copy related files into armbian system
@@ -361,7 +361,7 @@ packit_kernel() {
         echo -e "${WARNING} Use the backup uInitrd file instead."
         uInitrd_demo=$(ls ${uInitrd_dir}/uInitrd-${kernel_vermaj}* 2>/dev/null | head -n 1)
         uInitrd_demo_file=${uInitrd_demo##*/}
-        [ -z "${uInitrd_demo_file}" ] && die "Missing [ uInitrd-${kernel_vermaj}* ] template!"
+        [ -z "${uInitrd_demo_file}" ] && error_msg "Missing [ uInitrd-${kernel_vermaj}* ] template!"
         cp -vf ${uInitrd_dir}/${uInitrd_demo_file} uInitrd-${kernel_version}${LOCALVERSION} && sync
     else
         echo -e "${INFO} Use the newly generated uInitrd file."
@@ -441,7 +441,7 @@ while [ "${1}" ]; do
             IFS=$oldIFS
             shift
         else
-            die "Invalid -k parameter [ ${2} ]!"
+            error_msg "Invalid -k parameter [ ${2} ]!"
         fi
         ;;
     -a | --autoKernel)
@@ -449,7 +449,7 @@ while [ "${1}" ]; do
             auto_kernel="${2}"
             shift
         else
-            die "Invalid -a parameter [ ${2} ]!"
+            error_msg "Invalid -a parameter [ ${2} ]!"
         fi
         ;;
     -n | --customName)
@@ -457,7 +457,7 @@ while [ "${1}" ]; do
             custom_name="${2}"
             shift
         else
-            die "Invalid -n parameter [ ${2} ]!"
+            error_msg "Invalid -n parameter [ ${2} ]!"
         fi
         ;;
     -r | --repo)
@@ -465,11 +465,11 @@ while [ "${1}" ]; do
             repo_owner="${2}"
             shift
         else
-            die "Invalid -r parameter [ ${2} ]!"
+            error_msg "Invalid -r parameter [ ${2} ]!"
         fi
         ;;
     *)
-        die "Invalid option [ ${1} ]!"
+        error_msg "Invalid option [ ${1} ]!"
         ;;
     esac
     shift
@@ -495,7 +495,7 @@ check_environment
 # Set whether to replace the kernel
 [[ "${auto_kernel}" == "true" || "${repo_owner}" != "kernel.org" ]] && query_version
 
-[ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
+[ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
