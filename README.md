@@ -37,14 +37,14 @@ The mainline u-boot is not installed by default, and individual boxes need to be
 
 - ### Update Armbian Kernel
 
-Query the available [kernel_version](https://github.com/ophub/kernel/tree/main/pub/stable). Login in to armbian → input command:
+Login in to armbian → input command:
 
 ```yaml
-# Run as root user (sudo -i), input command: armbian-update <kernel_version>
-armbian-update 5.4.170
+# Run as root user (sudo -i)
+armbian-update
 ```
 
-If there is a complete set of kernel files in the current directory, you can run the `armbian-update` command to install this kernel. The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.170`
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory. If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. You can also query the [optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) version and update the specified version: `armbian-update 5.4.170`. The optional kernel supported by the device can be freely updated, such as from 5.4.170 kernel to 5.10.90 kernel. The kernel update script will be continuously updated during development. You can use this command to update the local script synchronously: `wget -O /usr/sbin/armbian-update git.io/armbian-update` . Or directly use the latest script on the server side to update the kernel: `bash <(curl -fsSL git.io/armbian-update) 5.4.170`
 
 When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `2` parameter, such as `armbian-update 5.7.19 dev` . The mainline u-boot is not installed by default, and individual boxes need to be installed when using kernels above 5.10. If you choose to install, specify it in the `3` input parameter, e.g. `armbian-update 5.4.170 stable yes`
 
