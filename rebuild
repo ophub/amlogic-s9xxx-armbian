@@ -40,12 +40,12 @@ BOOT_MB=256
 ROOT_MB=2748
 #===== Do not modify the following parameter settings, End =======
 
-die() {
+error_msg() {
     echo -e " [\033[1;91m Error \033[0m] ${1}"
     exit 1
 }
 
-process() {
+process_msg() {
     echo -e " [\033[1;92m ${build_soc}${out_kernel} \033[0m] ${1}"
 }
 
@@ -135,7 +135,7 @@ make_image() {
     sync
 
     loop_new=$(losetup -P -f --show "${build_image_file}")
-    [ ${loop_new} ] || die "losetup ${build_image_file} failed."
+    [ ${loop_new} ] || error_msg "losetup ${build_image_file} failed."
 
     mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
     mke2fs -F -q -t ext4 -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
@@ -151,10 +151,10 @@ extract_armbian() {
     sync && sleep 3
 
     loop_old=$(losetup -P -f --show "${armbian_image_file}")
-    [ ${loop_old} ] || die "losetup ${armbian_image_file} failed."
+    [ ${loop_old} ] || error_msg "losetup ${armbian_image_file} failed."
 
     if ! mount ${loop_old}p1 ${tmp_armbian}; then
-        die "mount ${loop_old}p1 failed!"
+        error_msg "mount ${loop_old}p1 failed!"
     fi
 
     cd ${tmp_armbian}
@@ -176,7 +176,7 @@ replace_kernel() {
         # 01 For /boot five files
         (cd ${tmp_armbian}/boot && rm -rf *-${armbian_original_kernel}-* uInitrd zImage dtb* 2>/dev/null && sync)
         tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
-        [ "$(ls ${tmp_armbian}/boot/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || die "boot/ 5 files is missing."
+        [ "$(ls ${tmp_armbian}/boot/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || error_msg "boot/ 5 files is missing."
 
         # 02 For dtb files
         mkdir -p ${tmp_armbian}/boot/dtb/amlogic && sync
@@ -187,7 +187,7 @@ replace_kernel() {
         tar -xzf ${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
         (cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync)
         if [ "$(ls ${tmp_armbian}/usr/lib/modules/${new_kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
-            die "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
+            error_msg "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
         fi
 
         # 04 For header files, usr/local/include
@@ -204,8 +204,8 @@ copy_files() {
     cd ${tmp_armbian}
 
     #Check if writing to EMMC is supported
-    MODULES_NOW=$(ls usr/lib/modules/ 2>/dev/null)
-    VERSION_NOW=$(echo ${MODULES_NOW} | grep -oE '^[1-9].[0-9]{1,3}' 2>/dev/null)
+    VERSION_NOW=$(ls usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+    [ -z "${VERSION_NOW}" ] && error_msg "Failed to query the current version."
     #echo -e "This Kernel [ ${VERSION_NOW} ]"
 
     k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
@@ -318,7 +318,7 @@ copy_files() {
         AMLOGIC_SOC="s922x"
         ;;
     *)
-        die "Have no this soc: [ ${build_soc} ]"
+        error_msg "Have no this soc: [ ${build_soc} ]"
         ;;
     esac
 
@@ -358,10 +358,10 @@ copy_files() {
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
     if ! mount ${loop_new}p2 ${tag_rootfs}; then
-        die "mount ${loop_new}p2 failed!"
+        error_msg "mount ${loop_new}p2 failed!"
     fi
     if ! mount ${loop_new}p1 ${tag_bootfs}; then
-        die "mount ${loop_new}p1 failed!"
+        error_msg "mount ${loop_new}p1 failed!"
     fi
 
     # Copy boot files
@@ -380,7 +380,7 @@ copy_files() {
     armbian_ubuntu=("bionic" "focal" "hirsute")
     armbian_debian=("bullseye" "buster" "stretch")
     release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
-    [ -z "${release_codename}" ] && die "RELEASE CODENAME is invalid."
+    [ -z "${release_codename}" ] && error_msg "RELEASE CODENAME is invalid."
     diff_release_files="${configfiles_path}/release/${release_codename}"
     if [[ -n "${release_codename}" && -d "${diff_release_files}" ]]; then
         # Backup source
@@ -403,13 +403,13 @@ copy_files() {
         if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync && chmod +x u-boot.ext
         else
-            die "${build_soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
+            error_msg "${build_soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
         fi
     fi
 
     # Edit the uEnv.txt
     if [ ! -f "uEnv.txt" ]; then
-        die "The uEnv.txt File does not exist"
+        error_msg "The uEnv.txt File does not exist"
     else
         old_fdt_dtb="meson-gxl-s905d-phicomm-n1.dtb"
         sed -i "s/${old_fdt_dtb}/${FDTFILE}/g" uEnv.txt
@@ -539,7 +539,7 @@ while [ "${1}" ]; do
             IFS=$oldIFS
             shift
         else
-            die "Invalid -b parameter [ ${2} ]!"
+            error_msg "Invalid -b parameter [ ${2} ]!"
         fi
         ;;
     -k | --kernel)
@@ -550,7 +550,7 @@ while [ "${1}" ]; do
             IFS=$oldIFS
             shift
         else
-            die "Invalid -k parameter [ ${2} ]!"
+            error_msg "Invalid -k parameter [ ${2} ]!"
         fi
         ;;
     -a | --autokernel)
@@ -558,7 +558,7 @@ while [ "${1}" ]; do
             auto_kernel="${2}"
             shift
         else
-            die "Invalid -a parameter [ ${2} ]!"
+            error_msg "Invalid -a parameter [ ${2} ]!"
         fi
         ;;
     -v | --versionbranch)
@@ -566,7 +566,7 @@ while [ "${1}" ]; do
             version_branch="${2}"
             shift
         else
-            die "Invalid -v parameter [ ${2} ]!"
+            error_msg "Invalid -v parameter [ ${2} ]!"
         fi
         ;;
     -s | --size)
@@ -574,11 +574,11 @@ while [ "${1}" ]; do
             ROOT_MB="${2}"
             shift
         else
-            die "Invalid -s parameter [ ${2} ]!"
+            error_msg "Invalid -s parameter [ ${2} ]!"
         fi
         ;;
     *)
-        die "Invalid option [ ${1} ]!"
+        error_msg "Invalid option [ ${1} ]!"
         ;;
     esac
     shift
@@ -589,12 +589,12 @@ done
 
 # Get armbian release and version
 armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
-[[ -n "${armbian_image_name}" ]] || die "The armbian original file does not exist: [ ${armbian_original_file} ]"
+[[ -n "${armbian_image_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_original_file} ]"
 armbian_original_version="$(echo ${armbian_image_name} | grep -oE '2[0-9].[0-9]{1,2}[.]*[0-9]{1,2}' | head -n 1)"
 armbian_original_kernel="$(echo ${armbian_image_name} | grep -oE '[4-5].[0-9]{1,2}.[0-9]{1,3}' | head -n 1)"
 
 # Show welcome message
-[ $(id -u) = 0 ] || die "please run this script as root: [ sudo ./$0 ]"
+[ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
 echo -e "\n"
 echo -e "Welcome to build Armbian for Amlogic s9xxx tv box!"
 echo -e "Armbian original file: [ ${armbian_image_name} ], Version: [ ${armbian_original_version} ], Kernel: [ ${armbian_original_kernel} ]"
@@ -627,15 +627,15 @@ for b in ${build_armbian[*]}; do
                 out_kernel=" - ${x}"
             fi
 
-            process " (1/5) make new armbian image."
+            process_msg " (1/5) make new armbian image."
             make_image
-            process " (2/5) extract old armbian files."
+            process_msg " (2/5) extract old armbian files."
             extract_armbian
-            process " (3/5) replace kernel for armbian."
+            process_msg " (3/5) replace kernel for armbian."
             replace_kernel
-            process " (4/5) copy files to new image."
+            process_msg " (4/5) copy files to new image."
             copy_files
-            process " (5/5) clear temp files."
+            process_msg " (5/5) clear temp files."
             clean_tmp
 
             echo -e "(${k}.${i}) Build successfully. \n"
