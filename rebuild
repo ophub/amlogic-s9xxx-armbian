@@ -451,6 +451,9 @@ copy_files() {
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
+    # renaming/disabling related files
+    mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
+
     # Add custom firmware information
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
