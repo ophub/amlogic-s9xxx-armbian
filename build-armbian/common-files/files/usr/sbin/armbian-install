@@ -153,11 +153,13 @@ fi
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
 
-ORIGINAL_BOOTLOADER="/root/u-boot-default-aml.img"
-if [ ! -f "${ORIGINAL_BOOTLOADER}" ]; then
+[ -d "/usr/lib/u-boot" ] || mkdir -p /usr/lib/u-boot
+MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
+if [ ! -f "${MYBOX_UBOOT}" ]; then
     echo "Start backup default bootloader"
-    dd if="${DEV_EMMC}" of=${ORIGINAL_BOOTLOADER} bs=1M count=4 conv=fsync
+    dd if="${DEV_EMMC}" of=${MYBOX_UBOOT} bs=1M count=4 conv=fsync
 fi
+sync
 
 exists_pts=$(parted ${DEV_EMMC} print | grep 'primary' | wc -l)
 if [ "${exists_pts}" -gt "0" ]; then
@@ -168,11 +170,13 @@ if [ "${exists_pts}" -gt "0" ]; then
     done
 fi
 dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
+sync
 
 echo "Start create MBR and partittion"
 parted -s "${DEV_EMMC}" mklabel msdos 2>/dev/null
 parted -s "${DEV_EMMC}" mkpart primary fat32 $((SKIP * 1024 * 1024))b $(((SKIP + BOOT) * 1024 * 1024 - 1))b 2>/dev/null
 parted -s "${DEV_EMMC}" mkpart primary ext4 $(((SKIP + BOOT) * 1024 * 1024))b 100% 2>/dev/null
+sync
 
 echo "Start write u-boot"
 if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
@@ -183,10 +187,10 @@ elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
     echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
     dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
-elif [[ -n "${ORIGINAL_BOOTLOADER}" && -f "${ORIGINAL_BOOTLOADER}" ]]; then
-    echo "Restore the original u-boot"
-    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=1 count=442
-    dd if=${ORIGINAL_BOOTLOADER} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+    echo "Restore the mybox u-boot"
+    dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=442
+    dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
 fi
 
 echo "Start copy system for eMMC."
@@ -201,6 +205,7 @@ if [ -d ${DIR_INSTALL} ]; then
     rm -rf ${DIR_INSTALL}
 fi
 mkdir -p ${DIR_INSTALL}
+sync
 
 if grep -q ${PART_BOOT} /proc/mounts; then
     echo "Unmounting BOOT partiton."
@@ -285,6 +290,9 @@ echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
 sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
 echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+
+sed -i '/MYBOX_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "MYBOX_UBOOT='${MYBOX_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 
 sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
 echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
