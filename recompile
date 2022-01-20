@@ -24,6 +24,7 @@ custom_name="-meson64-dev"
 
 # Kernel download from github.com, Support repository named in [ linux-5.x.y ] format.
 repo_owner="unifreq"
+repo_branch="main"
 #
 # Kernel download from kernel.org
 #repo_owner="kernel.org"
@@ -99,7 +100,7 @@ query_version() {
         MAIN_LINE_S=$(echo "${KERNEL_VAR}" | cut -d '.' -f3)
         MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
 
-        if [ "${repo_owner}" == "kernel.org" ]; then
+        if [ "${code_owner}" == "kernel.org" ]; then
             # latest_version="5.4.170"
             latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
@@ -109,8 +110,9 @@ query_version() {
             fi
             echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is kernel.org latest kernel. \n"
         else
-            github_kernel_repo="${repo_owner}/linux-${MAIN_LINE}.y"
-            github_kernel_ver="https://raw.githubusercontent.com/${github_kernel_repo}/main/Makefile"
+            [ -z "${code_repo}" ] && code_repo="linux-${MAIN_LINE}.y"
+            github_kernel_repo="${code_owner}/${code_repo}/${code_branch}"
+            github_kernel_ver="https://raw.githubusercontent.com/${github_kernel_repo}/Makefile"
             # latest_version="160"
             latest_version="$(curl -s ${github_kernel_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
@@ -135,7 +137,7 @@ download_kernel() {
     echo -e "${STEPS} Start query and download the kernel."
     [ -d "${kernel_path}" ] || mkdir -p ${kernel_path}
     if [ ! -d "${kernel_path}/${linux_kernel_dirname}" ]; then
-        if [ "${repo_owner}" == "kernel.org" ]; then
+        if [ "${code_owner}" == "kernel.org" ]; then
             if [ -f "${kernel_path}/${linux_kernel_dirname}.tar.xz" ]; then
                 echo -e "${INFO} Unzip local files [ ${linux_kernel_dirname}.tar.xz ]"
                 cd ${kernel_path}
@@ -154,9 +156,9 @@ download_kernel() {
                 fi
             fi
         else
-            echo -e "${INFO} Start cloning from [ https://github.com/${repo_owner}/${linux_kernel_dirname} ]"
-            git clone --depth 1 https://github.com/${repo_owner}/${linux_kernel_dirname} ${repo_branch} ${kernel_path}/${linux_kernel_dirname}
-            [ "$?" -eq "0" ] || error_msg "[ https://github.com/${repo_owner}/${linux_kernel_dirname} ] Clone failed."
+            echo -e "${INFO} Start cloning from [ https://github.com/${code_owner}/${linux_kernel_dirname} -b ${code_branch} ]"
+            git clone --depth 1 https://github.com/${code_owner}/${linux_kernel_dirname} -b ${code_branch} ${kernel_path}/${linux_kernel_dirname}
+            [ "$?" -eq "0" ] || error_msg "[ https://github.com/${code_owner}/${linux_kernel_dirname} ] Clone failed."
         fi
     else
         echo -e "${INFO} [ ${linux_kernel_dirname} ] Kernel is in the local directory."
@@ -173,7 +175,8 @@ compile_env_check() {
     LOCAL_MAKEFILE_VERSION="$(cat ${LOCAL_MAKEFILE} | grep -oE "VERSION =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
     LOCAL_MAKEFILE_PATCHLEVEL="$(cat ${LOCAL_MAKEFILE} | grep -oE "PATCHLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
     LOCAL_MAKEFILE_SUBLEVEL="$(cat ${LOCAL_MAKEFILE} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
-    unset kernel_version && kernel_version="${LOCAL_MAKEFILE_VERSION}.${LOCAL_MAKEFILE_PATCHLEVEL}.${LOCAL_MAKEFILE_SUBLEVEL}"
+    unset kernel_version
+    kernel_version="${LOCAL_MAKEFILE_VERSION}.${LOCAL_MAKEFILE_PATCHLEVEL}.${LOCAL_MAKEFILE_SUBLEVEL}"
     echo -e "${INFO} Compile kernel [ ${kernel_version} ]. \n"
 
     # Check whether the kernel of the same name has been installed locally
@@ -489,41 +492,61 @@ while [ "${1}" ]; do
     shift
 done
 
-# Receive incoming branch, such as [ owner@branch ] or [ owner ]
-# From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ] or default.
-repo_owner="${repo_owner//https\:\/\/github\.com\//}"
-if [ "$(echo "${repo_owner}" | grep "@")" != "" ]; then
-    github_repo="$(echo "${repo_owner}" | awk -F '@' '{print $1}')"
-    github_branch="$(echo "${repo_owner}" | awk -F '@' '{print $2}')"
-    repo_owner="${github_repo}"
-    repo_branch=" -b ${github_branch} "
-elif [ "$(echo "${repo_owner}" | grep "/")" != "" ]; then
-    repo_owner="$(echo "${repo_owner}" | awk -F '/' '{print $1}')"
-    repo_branch=""
-else
-    repo_owner="${repo_owner}"
-    repo_branch=""
-fi
+#========== Specify the code repository of github.com through the -r parameter ==========
+#
+# 01. [ sudo ./recompile -r owner ]
+# 01. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is default
+#
+# 02. [ sudo ./recompile -r owner@branch ]
+# 02. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ]
+#
+# 03. [ sudo ./recompile -r owner/repo ]
+# 03. From the [ owner ], Search the [ repo ] named repository, branch is default
+#
+# 04. [ sudo ./recompile -r owner/repo@branch ]
+# 04. From the [ owner ], Search the [ repo ] named repository, branch is [ branch ]
+#
+#========== Specify the code repository of kernel.org through the -r parameter ==========
+#
+# 01. [ sudo ./recompile -r kernel.org ]
+# 01. From the [ kernel.org ], download [ linux-5.x.y.tar.xz ] kernel zip file
+#
+#===========================================================================================
+#
+input_r_value="${repo_owner//https\:\/\/github\.com\//}"
+#
+code_owner="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $1}')"
+code_repo="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $2}')"
+code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
+#
+[ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
+[ -n "${code_branch}" ] || code_branch="${repo_branch}"
+echo -e "Input owner: [ ${code_owner} ], repo: [ ${code_repo} ], branch: [ ${code_branch} ]"
+#
+#===========================================================================================
 
 gcc_check
 # Set whether to replace the kernel
 [[ "${auto_kernel}" == "true" ]] && query_version
 
-[ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
+[ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "Input kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "Ready, start compile kernel... \n"
 
 k=1
 for x in ${build_kernel[*]}; do
     kernel_version="${x}"
-    # Mainline name of the kernel version, such as [ 5.4 ]
     kernel_vermaj="${kernel_version%.*}"
-    if [ "${repo_owner}" == "kernel.org" ]; then
+    # Mainline name of the kernel version, such as [ 5.4 ]
+
+    if [ "${code_owner}" == "kernel.org" ]; then
         linux_kernel_dirname="linux-${kernel_version}"
-    else
+    elif [ -z "${code_repo}" ]; then
         linux_kernel_dirname="linux-${kernel_vermaj}.y"
+    else
+        linux_kernel_dirname="${code_repo}"
     fi
 
     download_kernel
