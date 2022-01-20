@@ -62,7 +62,7 @@ error_msg() {
     exit 1
 }
 
-check_environment() {
+gcc_check() {
     cd ${make_path}
     echo -e "${STEPS} Check the cross-compilation environment ..."
     if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
@@ -112,7 +112,7 @@ query_version() {
             github_kernel_repo="${repo_owner}/linux-${MAIN_LINE}.y"
             github_kernel_ver="https://raw.githubusercontent.com/${github_kernel_repo}/main/Makefile"
             # latest_version="160"
-            latest_version=$(curl -s ${github_kernel_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')
+            latest_version="$(curl -s ${github_kernel_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
             else
@@ -127,17 +127,6 @@ query_version() {
     # Reset the kernel array to the latest kernel version
     unset build_kernel
     build_kernel=${tmp_arr_kernels[*]}
-}
-
-local_kernel_check() {
-    cd ${make_path}
-    # Check whether the kernel of the same name has been installed locally
-    local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_version}${custom_name}")"
-    [ -n "${local_kernel}" ] && error_msg "The current system has the same named kernel [ ${kernel_version}${custom_name} ], stop compiling!"
-
-    # Create a temp directory
-    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{armbian/{root/boot/,},tmp/,boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
 download_kernel() {
@@ -175,11 +164,36 @@ download_kernel() {
     sync
 }
 
+compile_env_check() {
+    cd ${make_path}
+    echo -e "${STEPS} Start checking local compilation environments."
+
+    # Get a local kernel version
+    LOCAL_MAKEFILE="${kernel_path}/${linux_kernel_dirname}/Makefile"
+    LOCAL_MAKEFILE_VERSION="$(cat ${LOCAL_MAKEFILE} | grep -oE "VERSION =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
+    LOCAL_MAKEFILE_PATCHLEVEL="$(cat ${LOCAL_MAKEFILE} | grep -oE "PATCHLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
+    LOCAL_MAKEFILE_SUBLEVEL="$(cat ${LOCAL_MAKEFILE} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
+    unset kernel_version && kernel_version="${LOCAL_MAKEFILE_VERSION}.${LOCAL_MAKEFILE_PATCHLEVEL}.${LOCAL_MAKEFILE_SUBLEVEL}"
+    echo -e "${INFO} Compile kernel [ ${kernel_version} ]. \n"
+
+    # Check whether the kernel of the same name has been installed locally
+    kernel_outname="${kernel_version}${custom_name}"
+    local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_outname}")"
+    [ -n "${local_kernel}" ] && error_msg "The current system has the same named kernel [ ${kernel_outname} ], stop compiling!"
+    echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
+
+    # Create a temp directory
+    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
+    mkdir -p ${out_kernel}/{armbian/{root/boot/,},tmp/,boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
+}
+
 make_kernel() {
     cd ${kernel_path}/${linux_kernel_dirname}
+    echo -e "${STEPS} Start compilation kernel..."
+
     if [ ! -f ".config" ]; then
         # Copy config file
-        echo -e "${STEPS} Copy config file to ${linux_kernel_dirname}"
+        echo -e "${INFO} Copy config file to ${linux_kernel_dirname}"
         config_demo=$(ls ${config_dir}/config-${kernel_vermaj}* 2>/dev/null | head -n 1)
         config_demo_file=${config_demo##*/}
         [ -z "${config_demo_file}" ] && error_msg "Missing [ config-${kernel_vermaj}* ] template!"
@@ -290,11 +304,11 @@ chroot_armbian_for_x64() {
 
     # Copy related files into armbian system
     rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} 2>/dev/null && sync
-    cp -f /boot/*${kernel_version}${LOCALVERSION} ${tag_rootfs}/boot && sync
+    cp -f /boot/*${kernel_outname} ${tag_rootfs}/boot && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/lib/modules/* 2>/dev/null && sync
-    cp -rf /lib/modules/${kernel_version}${LOCALVERSION} ${tag_rootfs}/lib/modules && sync
+    cp -rf /lib/modules/${kernel_outname} ${tag_rootfs}/lib/modules && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/lib/modules) \n"
 
     cp -f ${script_dir}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
@@ -306,14 +320,14 @@ chroot_armbian_for_x64() {
 
     # Enter the armbian system to generate /boot/uInitrd file
     chroot ${tag_rootfs} <<EOF
-bash /root/generate_uinitrd.sh ${kernel_version}${LOCALVERSION}
+bash /root/generate_uinitrd.sh ${kernel_outname}
 exit
 EOF
 
     cd ${make_path}
     # Copy the generated uInitrd file to the current system
-    echo -e "${INFO} Copy the generated [ ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} ] file"
-    cp -vf ${tag_rootfs}/boot/uInitrd-${kernel_version}${LOCALVERSION} /boot/uInitrd
+    echo -e "${INFO} Copy the generated [ ${tag_rootfs}/boot/uInitrd-${kernel_outname} ] file"
+    cp -vf ${tag_rootfs}/boot/uInitrd-${kernel_outname} /boot/uInitrd
     sync
 
     # Unmount the armbian system
@@ -330,18 +344,18 @@ generate_uinitrd() {
     echo -e "${STEPS} Generate uInitrd file [ ${arch_info} ]."
 
     if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
-        # mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d initrd.img-${kernel_version}${LOCALVERSION} uInitrd-${kernel_version}${LOCALVERSION}
+        # mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d initrd.img-${kernel_outname} uInitrd-${kernel_outname}
         # x86_64 and other environments need to mount the armbian system to generate uInitrd file
         chroot_armbian_for_x64
     else
         # Generate uInitrd file directly under armbian system
-        update-initramfs -c -k ${kernel_version}${LOCALVERSION} 2>/dev/null
+        update-initramfs -c -k ${kernel_outname} 2>/dev/null
     fi
 
     cd /boot
     if [ -f uInitrd ]; then
         echo -e "${SUCCESS} The uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_version}${LOCALVERSION} 2>/dev/null && sync
+        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null && sync
     else
         echo -e "${WARNING} The uInitrd file not updated."
     fi
@@ -352,55 +366,55 @@ generate_uinitrd() {
 
 packit_kernel() {
     # Pack the kernel 6 files
-    echo -e "${STEPS} Packing the 6 [ ${kernel_version}${LOCALVERSION} ] packages generated by the compilation of the [ ${linux_kernel_dirname} ] kernel..."
+    echo -e "${STEPS} Packing the 6 [ ${kernel_outname} ] packages generated by the compilation of the [ ${linux_kernel_dirname} ] kernel..."
 
     cd ${out_kernel}/boot
-    cp -f /boot/*${kernel_version}${LOCALVERSION} . && sync
+    cp -f /boot/*${kernel_outname} . && sync
     # When the uInitrd file cannot be generated in the X86_64 environment, use the existing file instead.
-    if [ ! -f uInitrd-${kernel_version}${LOCALVERSION} ]; then
+    if [ ! -f uInitrd-${kernel_outname} ]; then
         echo -e "${WARNING} Use the backup uInitrd file instead."
         uInitrd_demo=$(ls ${uInitrd_dir}/uInitrd-${kernel_vermaj}* 2>/dev/null | head -n 1)
         uInitrd_demo_file=${uInitrd_demo##*/}
         [ -z "${uInitrd_demo_file}" ] && error_msg "Missing [ uInitrd-${kernel_vermaj}* ] template!"
-        cp -vf ${uInitrd_dir}/${uInitrd_demo_file} uInitrd-${kernel_version}${LOCALVERSION} && sync
+        cp -vf ${uInitrd_dir}/${uInitrd_demo_file} uInitrd-${kernel_outname} && sync
     else
         echo -e "${INFO} Use the newly generated uInitrd file."
     fi
     chmod +x *
-    tar -czf boot-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    tar -czf boot-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ boot-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/allwinner
     cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
-    tar -czf dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    tar -czf dtb-allwinner-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
-    echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
     [ -d ${moredtb_path} ] && cp -f ${moredtb_path}/*.dtb . && chmod +x * && sync
     cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
-    tar -czf dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    tar -czf dtb-amlogic-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
-    echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/rockchip
     cp -f ${kernel_path}/${linux_kernel_dirname}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
-    tar -czf dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    tar -czf dtb-rockchip-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
-    echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/modules
-    cp -rf /lib/modules/${kernel_version}${LOCALVERSION} . && sync
-    tar -czf modules-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    cp -rf /lib/modules/${kernel_outname} . && sync
+    tar -czf modules-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ modules-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/header
     cp -rf /usr/local/include . && sync
-    tar -czf header-${kernel_version}${LOCALVERSION}.tar.gz * && sync
+    tar -czf header-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ header-${kernel_version}${LOCALVERSION}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}
     tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
@@ -414,8 +428,8 @@ clean_tmp() {
     echo -e "${STEPS} Clear the space and update-grub."
 
     rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    rm -f /boot/*${kernel_version}${LOCALVERSION} 2>/dev/null
-    rm -rf /lib/modules/${kernel_version}${LOCALVERSION} 2>/dev/null
+    rm -f /boot/*${kernel_outname} 2>/dev/null
+    rm -rf /lib/modules/${kernel_outname} 2>/dev/null
     mv -f /usr/local/include.bak /usr/local/include 2>/dev/null && sync
 
     update-grub 2>/dev/null
@@ -491,9 +505,9 @@ else
     repo_branch=""
 fi
 
-check_environment
+gcc_check
 # Set whether to replace the kernel
-[[ "${auto_kernel}" == "true" || "${repo_owner}" != "kernel.org" ]] && query_version
+[[ "${auto_kernel}" == "true" ]] && query_version
 
 [ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
 echo -e "Welcome to compile kernel! \n"
@@ -512,8 +526,8 @@ for x in ${build_kernel[*]}; do
         linux_kernel_dirname="linux-${kernel_vermaj}.y"
     fi
 
-    local_kernel_check
     download_kernel
+    compile_env_check
     make_kernel
     generate_uinitrd
     packit_kernel
