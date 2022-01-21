@@ -1,9 +1,34 @@
 #!/bin/bash
-#===========================================================================
+#============================================================================================
+#
 # Description: compile linux kernel for armbian
 # Copyright (C) 2020-2021 https://github.com/unifreq
 # Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#===========================================================================
+#
+#============================================================================================
+#
+# Command to compile the kernel: [ sudo ./recompile -r unifreq -k 5.4.170_5.10.90 ]
+#
+# ---------- Specify the code repository of github.com through the [ -r ] parameter ---------
+#
+# 01. [ sudo ./recompile -r owner ]
+# 01. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is default
+#
+# 02. [ sudo ./recompile -r owner@branch ]
+# 02. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ]
+#
+# 03. [ sudo ./recompile -r owner/repo ]
+# 03. From the [ owner ], Search the [ repo ] named repository, branch is default
+#
+# 04. [ sudo ./recompile -r owner/repo@branch ]
+# 04. From the [ owner ], Search the [ repo ] named repository, branch is [ branch ]
+#
+# ---------- Specify the code repository of kernel.org through the [ -r ] parameter ---------
+#
+# 01. [ sudo ./recompile -r kernel.org ]
+# 01. From the [ kernel.org ], download [ linux-5.x.y.tar.xz ] kernel zip file
+#
+#============================================================================================
 
 #===== Do not modify the following parameter settings, Start =====
 # Set environment variables
@@ -22,13 +47,12 @@ build_kernel=("5.4.170" "5.10.90")
 # Kernel custom name
 custom_name="-meson64-dev"
 
-# Kernel download from github.com, Support repository named in [ linux-5.x.y ] format.
+# Set the default value of the [ -r ] parameter
+# When set to [ -r kernel.org ], Kernel download from kernel.org
+kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
+# Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
-#
-# Kernel download from kernel.org
-#repo_owner="kernel.org"
-kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 
 # Cross compile
 use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
@@ -492,27 +516,7 @@ while [ "${1}" ]; do
     shift
 done
 
-#========== Specify the code repository of github.com through the -r parameter ==========
-#
-# 01. [ sudo ./recompile -r owner ]
-# 01. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is default
-#
-# 02. [ sudo ./recompile -r owner@branch ]
-# 02. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ]
-#
-# 03. [ sudo ./recompile -r owner/repo ]
-# 03. From the [ owner ], Search the [ repo ] named repository, branch is default
-#
-# 04. [ sudo ./recompile -r owner/repo@branch ]
-# 04. From the [ owner ], Search the [ repo ] named repository, branch is [ branch ]
-#
-#========== Specify the code repository of kernel.org through the -r parameter ==========
-#
-# 01. [ sudo ./recompile -r kernel.org ]
-# 01. From the [ kernel.org ], download [ linux-5.x.y.tar.xz ] kernel zip file
-#
-#===========================================================================================
-#
+# Receive the value entered by the [ -r ] parameter
 input_r_value="${repo_owner//https\:\/\/github\.com\//}"
 #
 code_owner="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $1}')"
@@ -522,8 +526,6 @@ code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
 [ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
 [ -n "${code_branch}" ] || code_branch="${repo_branch}"
 echo -e "Input owner: [ ${code_owner} ], repo: [ ${code_repo} ], branch: [ ${code_branch} ]"
-#
-#===========================================================================================
 
 gcc_check
 # Set whether to replace the kernel
