@@ -13,7 +13,7 @@ inputs:
   armbian_kernel:
     description: "Set kernel."
     required: false
-    default: "5.10.90_5.4.170"
+    default: "5.15.13_5.4.170"
   version_branch:
     description: "Set kernel."
     required: false
