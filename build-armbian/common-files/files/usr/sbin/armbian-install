@@ -259,7 +259,7 @@ if grep -q ${PART_ROOT} /proc/mounts; then
 fi
 
 echo "Formatting ROOT partition..."
-mkfs.ext4 -F -L ROOTFS_EMMC ${PART_ROOT}
+mkfs.ext4 -F -q -L "ROOTFS_EMMC" ${PART_ROOT}
 
 echo "Start copy ROOTFS_EMMC partition data..."
 mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
@@ -301,9 +301,10 @@ sync
 
 rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
 cat >${DIR_INSTALL}/etc/fstab <<EOF
-/dev/root       /               ext4            defaults,noatime,errors=remount-ro     	0 1
-LABEL=BOOT_EMMC /boot           vfat            defaults                                0 2
-tmpfs           /tmp            tmpfs           defaults,nosuid                         0 0
+LABEL=ROOTFS_EMMC  /               ext4            defaults,noatime,errors=remount-ro     0 1
+LABEL=BOOT_EMMC    /boot           vfat            defaults                               0 2
+tmpfs              /tmp            tmpfs           defaults,nosuid                        0 0
+
 EOF
 
 rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
