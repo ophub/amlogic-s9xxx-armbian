@@ -55,7 +55,8 @@ repo_owner="unifreq"
 repo_branch="main"
 
 # Cross compile
-use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
+#use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
+use_linuxgun_url="https://github.com/ophub/script/releases/download/dev"
 use_linuxgun_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
 use_linuxgun_localpath="/usr/local/aarch64"
 
