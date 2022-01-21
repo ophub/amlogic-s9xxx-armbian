@@ -16,7 +16,7 @@ on:
       kernel_ver:
         description: "Kernel version: 5.4.170"
         required: false
-        default: "5.4.170_5.10.90"
+        default: "5.4.170_5.15.13"
 
 env:
   TZ: Asia/Shanghai
@@ -47,7 +47,7 @@ jobs:
           echo "KERNEL_REPO=${kernel_repo}" >> $GITHUB_ENV
 
           kernel_ver="${{ github.event.inputs.kernel_ver }}"
-          [ -z "${kernel_ver}" ] && kernel_ver="5.4.170_5.10.90"
+          [ -z "${kernel_ver}" ] && kernel_ver="5.4.170_5.15.13"
           echo "KERNEL_VER=${kernel_ver}" >> $GITHUB_ENV
 
       - name: Compile the Kernel [ -k ${{ env.KERNEL_VER }} -r ${{ env.KERNEL_REPO }} ]
