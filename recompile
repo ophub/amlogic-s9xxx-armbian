@@ -195,7 +195,7 @@ download_kernel() {
         if [[ "${auto_kernel}" == "true" && "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
             # Pull the latest source code of the server
             cd ${kernel_path}/${local_kernel_dirname}
-            git fetch --all && git reset --hard origin/${code_branch} && git pull && sync
+            git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull && sync
             unset kernel_version
             kernel_version="${local_makefile_version}.${local_makefile_patchlevel}.${kernel_sub}"
             echo -e "${INFO} Synchronize the upstream source code, compile the kernel version [ ${kernel_version} ]."
