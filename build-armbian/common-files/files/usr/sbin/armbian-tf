@@ -84,7 +84,7 @@ EOF
 
     echo -e "${STEPS} Create shared filesystem ... "
     mkdir -p /mnt/${PT_PRE}3 && sync
-    mkfs.ext4 -F -L "${LB_PRE}SHARED" "/dev/${PT_PRE}3"
+    mkfs.ext4 -F -p -L "${LB_PRE}SHARED" "/dev/${PT_PRE}3"
     mount -t ext4 "/dev/${PT_PRE}3" "/mnt/${PT_PRE}3"
     echo "/dev/${PT_PRE}3 /mnt/${PT_PRE}3 ext4 defaults 0 0" >>/etc/fstab
     sync
