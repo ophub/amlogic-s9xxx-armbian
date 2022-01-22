@@ -7,7 +7,7 @@
 #
 #============================================================================================
 #
-# Command to compile the kernel: [ sudo ./recompile -r unifreq -k 5.4.170_5.15.13 ]
+# Command to compile the kernel: [ sudo ./recompile -r unifreq -k 5.4.170_5.10.90 ]
 #
 # ---------- Specify the code repository of github.com through the [ -r ] parameter ---------
 #
@@ -42,7 +42,7 @@ script_dir="${compile_path}/tools/script"
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
 auto_kernel="true"
-build_kernel=("5.4.170" "5.15.13")
+build_kernel=("5.4.170" "5.10.90")
 
 # Kernel custom name
 custom_name="-meson64-dev"
