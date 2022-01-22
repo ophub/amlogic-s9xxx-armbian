@@ -41,10 +41,11 @@ VERSION_NOW=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE
 if [ -z "${VERSION_NOW}" ]; then
     echo "Failed to query the current version."
     exit 1
+else
+    echo "This Kernel Version: [ ${VERSION_NOW} ]"
 fi
 
-echo "This Kernel [ ${VERSION_NOW} ]"
-
+# Check if the version is above 5.10, for u-boot.ext and u-boot.emmc
 k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
 k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
 if [ "${k510_ver}" -eq "5" ]; then
@@ -59,6 +60,17 @@ else
     K510="0"
 fi
 echo "K510: [ ${K510} ]"
+
+# generate uuid
+ROOTFS_UUID="$(uuidgen)"
+if [ -z "${ROOTFS_UUID}" ]; then
+    echo "The uuidgen is missing, try installing online and continue..."
+    sudo apt update
+    sudo apt install -y uuid-runtime
+    ROOTFS_UUID="$(uuidgen)"
+    [ -z "${ROOTFS_UUID}" ] && echo "The uuidgen is invalid, the installation cannot continue." && exit 1
+fi
+echo "ROOTFS_UUID: ${ROOTFS_UUID}"
 
 # Set model list, begin ------------
 AMLOGIC_MODEL_LIST="
@@ -146,6 +158,7 @@ fi
 echo -e "FDTFILE: [ ${FDTFILE} ]"
 echo -e "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
 
+# Check if u-boot version 5.10 or later exists
 if [ "${K510}" -eq "1" ]; then
     [[ -z "${UBOOT_OVERLOAD}" || ! -f "/boot/${UBOOT_OVERLOAD}" ]] && echo "Have no the 5.10 kernel u-boot file." && exit 1
 fi
@@ -153,6 +166,7 @@ fi
 systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
 
+# Backup the bootloader, if necessary for system recovery
 [ -d "/usr/lib/u-boot" ] || mkdir -p /usr/lib/u-boot
 MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
 if [ ! -f "${MYBOX_UBOOT}" ]; then
@@ -161,6 +175,7 @@ if [ ! -f "${MYBOX_UBOOT}" ]; then
 fi
 sync
 
+# Clear emmc disk data
 exists_pts=$(parted ${DEV_EMMC} print | grep 'primary' | wc -l)
 if [ "${exists_pts}" -gt "0" ]; then
     i=1
@@ -172,12 +187,14 @@ fi
 dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
 sync
 
+# Format emmc disk
 echo "Start create MBR and partittion"
 parted -s "${DEV_EMMC}" mklabel msdos 2>/dev/null
 parted -s "${DEV_EMMC}" mkpart primary fat32 $((SKIP * 1024 * 1024))b $(((SKIP + BOOT) * 1024 * 1024 - 1))b 2>/dev/null
 parted -s "${DEV_EMMC}" mkpart primary ext4 $(((SKIP + BOOT) * 1024 * 1024))b 100% 2>/dev/null
 sync
 
+# Write the uboot
 echo "Start write u-boot"
 if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
     echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
@@ -211,18 +228,24 @@ if grep -q ${PART_BOOT} /proc/mounts; then
     echo "Unmounting BOOT partiton."
     umount -f ${PART_BOOT}
 fi
-echo "Formatting BOOT partition..."
+echo "Formatting BOOTFS partition..."
 mkfs.vfat -n "BOOT_EMMC" ${PART_BOOT}
 
 mount -o rw ${PART_BOOT} ${DIR_INSTALL}
+[ "$?" -ne "0" ] && echo "Failed to mount BOOTFS partition" && exit 1
 
 echo "Start copy BOOT_EMMC partition data..."
 cp -rf /boot/* ${DIR_INSTALL} && sync
 rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
 
-echo "Edit init config..."
-sed -i "s|ROOTFS|ROOTFS_EMMC|g" ${DIR_INSTALL}/uEnv.txt
-sed -i "s|meson.*.dtb|${FDTFILE}|g" ${DIR_INSTALL}/uEnv.txt
+echo "Generate the new uEnv.txt file."
+rm -f ${DIR_INSTALL}/uEnv.txt 2>/dev/null && sync
+cat >${DIR_INSTALL}/uEnv.txt <<EOF
+LINUX=/zImage
+INITRD=/uInitrd
+FDT=/dtb/amlogic/${FDTFILE}
+APPEND=root=UUID=${ROOTFS_UUID} rootflags=data=writeback rw console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
+EOF
 
 rm ${DIR_INSTALL}/s9*
 rm ${DIR_INSTALL}/aml*
@@ -258,11 +281,12 @@ if grep -q ${PART_ROOT} /proc/mounts; then
     umount -f ${PART_ROOT}
 fi
 
-echo "Formatting ROOT partition..."
-mkfs.ext4 -F -q -L "ROOTFS_EMMC" ${PART_ROOT}
+echo "Formatting ROOTFS partition..."
+mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" ${PART_ROOT}
 
 echo "Start copy ROOTFS_EMMC partition data..."
 mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
+[ "$?" -ne "0" ] && echo "Failed to mount ROOTFS partition" && exit 1
 
 cd /
 mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/} && sync
@@ -277,33 +301,34 @@ for src in ${COPY_SRC}; do
 done
 echo "Copy complete."
 
-echo "Update the relevant parameters of armbian-aml-release"
+echo "Update the relevant parameters"
 ophub_release_file="${DIR_INSTALL}/etc/ophub-release"
+#
 sed -i '/FDTFILE/d' ${ophub_release_file} 2>/dev/null
 echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
-
+#
 sed -i '/UBOOT_OVERLOAD/d' ${ophub_release_file} 2>/dev/null
 echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
-
+#
 sed -i '/MAINLINE_UBOOT/d' ${ophub_release_file} 2>/dev/null
 echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-
+#
 sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
 echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-
+#
 sed -i '/MYBOX_UBOOT/d' ${ophub_release_file} 2>/dev/null
 echo "MYBOX_UBOOT='${MYBOX_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-
+#
 sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
 echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
-echo "Update complete."
 sync
 
+echo "Generate the new fstab file."
 rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
 cat >${DIR_INSTALL}/etc/fstab <<EOF
-LABEL=ROOTFS_EMMC  /               ext4            defaults,noatime,errors=remount-ro     0 1
-LABEL=BOOT_EMMC    /boot           vfat            defaults                               0 2
-tmpfs              /tmp            tmpfs           defaults,nosuid                        0 0
+UUID=${ROOTFS_UUID}  /               ext4            defaults,noatime,errors=remount-ro     0 1
+LABEL=BOOT_EMMC      /boot           vfat            defaults                               0 2
+tmpfs                /tmp            tmpfs           defaults,nosuid                        0 0
 
 EOF
 
