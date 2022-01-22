@@ -62,14 +62,9 @@ fi
 echo "K510: [ ${K510} ]"
 
 # generate uuid
-ROOTFS_UUID="$(uuidgen)"
-if [ -z "${ROOTFS_UUID}" ]; then
-    echo "The uuidgen is missing, try installing online and continue..."
-    sudo apt update
-    sudo apt install -y uuid-runtime
-    ROOTFS_UUID="$(uuidgen)"
-    [ -z "${ROOTFS_UUID}" ] && echo "The uuidgen is invalid, the installation cannot continue." && exit 1
-fi
+ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+[ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
+[ -z "${ROOTFS_UUID}" ] && echo "The uuidgen is invalid, cannot continue." && exit 1
 echo "ROOTFS_UUID: ${ROOTFS_UUID}"
 
 # Set model list, begin ------------
