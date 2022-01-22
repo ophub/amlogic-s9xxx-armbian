@@ -449,8 +449,12 @@ copy_files() {
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
-    # renaming/disabling related files
+    # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
+
+    # Add other files
+    [ -f "usr/bin/ddbr" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/ddbr usr/bin/
+    [ -f "usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen usr/bin/
 
     # Edit the etc/fstab
     [ -f "etc/fstab" ] || error_msg "The etc/fstab File does not exist."
