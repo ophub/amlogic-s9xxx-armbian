@@ -19,9 +19,8 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 - `sudo ./recompile -d -k 5.4.170 -n -leifeng`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
 - `sudo ./recompile -d -k 5.4.170 -r kernel.org`: Use the default configuration, and set the kernel source code repository through the `-r` parameter.
 - `sudo ./recompile -d -k 5.15.13_5.4.170 -a true -n -leifeng -r kernel.org`: Use the default configuration, and set through multiple parameters.
-- `sudo ./recompile -d -k 5.4.170 -r chewitt/linux@amlogic-5.4.y`: Use the default configuration, and specify the kernel source code repository and branch with the `-r` parameter.
 
-💡Tip: Recommended Use the [.config](https://github.com/unifreq/arm64-kernel-configs) template and source code of `unifreq` to compile the `latest version` of [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y), etc. `Other series or historical versions` can be compiled with [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/). You can also use other excellent kernel source code repositories, such as [chewitt/linux@amlogic-5.4.y](https://github.com/chewitt/linux/tree/amlogic-5.4.y) etc.
+💡Tip: Recommended Use the [.config](https://github.com/unifreq/arm64-kernel-configs) template and source code of `unifreq` to compile the `latest version` of [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.15](https://github.com/unifreq/linux-5.15.y), etc. `Other series or historical versions` can be compiled with [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/). You can also use other kernel source code repositories.
 
 - ### Local compilation
 
