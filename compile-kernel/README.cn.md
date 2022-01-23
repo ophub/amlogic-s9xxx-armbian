@@ -19,9 +19,8 @@
 - `sudo ./recompile -d -k 5.4.170 -n -leifeng` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
 - `sudo ./recompile -d -k 5.4.170 -r kernel.org` : 使用默认配置，并通过 `-r` 参数设置内核源代码仓库。
 - `sudo ./recompile -d -k 5.15.13_5.4.170 -a true -n -leifeng -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
-- `sudo ./recompile -d -k 5.4.170 -r chewitt/linux@amlogic-5.4.y` : 使用默认配置，并通过 `-r` 参数指定内核源代码仓库及分支。
 
-💡提示：推荐使用 `unifreq` 的 [.config](https://github.com/unifreq/arm64-kernel-configs) 模板和源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.12](https://github.com/unifreq/linux-5.12.y) / [5.13](https://github.com/unifreq/linux-5.13.y) / [5.14](https://github.com/unifreq/linux-5.14.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 等内核的 `最新版本` 。`其他系列或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。也可以使用其他优秀的内核源代码仓库，如 [chewitt/linux@amlogic-5.4.y](https://github.com/chewitt/linux/tree/amlogic-5.4.y) 等。
+💡提示：推荐使用 `unifreq` 的 [.config](https://github.com/unifreq/arm64-kernel-configs) 模板和源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 等内核的 `最新版本` 。`其他系列或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。你也可以使用其他内核源代码仓库。
 
 - ### 本地编译
 
