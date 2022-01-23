@@ -208,12 +208,12 @@ copy_files() {
     cd ${tmp_armbian}
 
     #Check if writing to EMMC is supported
-    VERSION_NOW=$(ls usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-    [ -z "${VERSION_NOW}" ] && error_msg "Failed to query the current version."
-    #echo -e "This Kernel [ ${VERSION_NOW} ]"
+    KERNEL_VERSION=$(ls usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+    [ -z "${KERNEL_VERSION}" ] && error_msg "Failed to query the current kernel version."
+    #echo -e "This Kernel version [ ${KERNEL_VERSION} ]"
 
-    k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
-    k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
+    k510_ver=$(echo "${KERNEL_VERSION}" | cut -d '.' -f1)
+    k510_maj=$(echo "${KERNEL_VERSION}" | cut -d '.' -f2)
     if [ "${k510_ver}" -eq "5" ]; then
         if [ "${k510_maj}" -ge "10" ]; then
             K510="1"
