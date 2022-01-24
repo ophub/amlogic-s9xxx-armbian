@@ -24,19 +24,19 @@
 
 - ### 本地编译
 
-1. 请在你的盒子中安装 Armbian 系统，并安装以下依赖环境。
+1. 安装必要的软件包（脚本仅在 Ubuntu_20.04-x86_64 下做过测试）
 
 ```yaml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
+sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 ```
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
 3. 首先在 `~/amlogic-s9xxx-armbian/compile-kernel` 目录下创建 `kernel` 目录，用于存放编译的内核源码。如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核如 `linux-5.4.170.tar.xz` 并解压到对应的 `compile-kernel/kernel/linux-5.4.170` 目录下；如采用 [unifreq](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernel/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernel/linux-5.4.170` 的目录下，复制对应的内核系列的 [.config](tools/config) 模板到当前内核目录（如复制 config-5.4.170 文件，并重命名为 `.config`），并运行个性化配置选择命令 `make menuconfig` 进行自定义选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
 
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170 -r unifreq -a false` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
 - ### 使用 GitHub Action 进行编译
 
@@ -50,7 +50,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. 如果本地的内核目录如 `compile-kernel/kernel/linux-5.4.170` 中没有 [.config](tools/config) 文件，将自动从 unifreq 分享的模板中复制相同内核系列的配置文件。
 
-3. 目前在 `Armbian` 系统下编译内核是最好的选择，强烈推荐。在 `x86_64` 环境下编译内核时，会自动下载 Armbian 系统，并通过 chroot 实现 `uInitrd` 文件的生成。内核编译完成后，将会按照 `unifreq` 分享的内核文件的组织方式自动打包成 6 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。如果你想在当前 Armbian 系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.170` 下，执行 `armbian-update` 命令进行内核安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
+3. 内核编译完成后，将会按照 `unifreq` 分享的内核文件的组织方式自动打包成 6 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。如果你想在当前 Armbian 系统安装，可进入对应的内核目录如 `compile-kernel/output/5.4.170` 下，执行 `armbian-update` 命令进行内核安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
 
 4. 如果当前 `Armbian` 系统中已经安装了相同名称的内核如 `5.4.170-meson64-dev` ，将会自动停止编译，因为打包时会删除本地相同名称的内核文件，这么做会造成系统瘫痪。
 
