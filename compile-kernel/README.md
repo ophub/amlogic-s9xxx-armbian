@@ -24,19 +24,19 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 
 - ### Local compilation
 
-1. Please install the Armbian system in your box and install the following dependent environment.
+1. Install the necessary packages (The script has only been tested on Ubuntu_20.04-x86_64)
 
 ```yaml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
+sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 ```
 
 2. Clone the repository to local: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
 3. First create a `kernel` directory under the `~/amlogic-s9xxx-armbian/compile-kernel` directory to store the compiled kernel source code. For example, use the source code of [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) to compile, Please download the corresponding kernel such as `linux-5.4.170.tar.xz` and unzip it to the `compile-kernel/kernel/linux-5.4.170` corresponding directory; If you use the source code of [unifreq](https://github.com/unifreq) to compile, Please clone the source code of the specified kernel series such as `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernel/linux-5.4.y` to the corresponding directory. After completion, enter the corresponding kernel such as `compile-kernel/kernel/linux-5.4.170` directory, Copy the [.config](tools/config) template of the corresponding kernel series to the current kernel directory (For example, copy the config-5.4.170 file and rename it to `.config`), Then run the personalized configuration selection command `make menuconfig` to Make a custom selection, save it after completion, A custom kernel `.config` configuration file will be generated in the kernel directory.
 
-4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.4.170 -r unifreq -a false` and other specified parameter commands to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
+4. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.4.170` and other specified parameter commands to compile the kernel. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
 - ### Compile with GitHub Action
 
@@ -50,7 +50,7 @@ sudo apt-get install -y $(curl -fsSL git.io/armbian-kernel-server)
 
 2. If there is no [.config](tools/config) file in the local kernel directory such as `compile-kernel/kernel/linux-5.4.170`, the file will be automatically copied from template.
 
-3. Currently, compiling the kernel under the `Armbian` system is the best choice, and it is highly recommended. When compiling the kernel under the `x86_64` environment, the Armbian system will be automatically downloaded, and the `uInitrd` file will be generated through chroot. After the kernel is compiled, it will be automatically packaged into 6 kernel files according to the organization of the kernel files shared by `unifreq` and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. If you want to install on the current Armbian system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.170` and execute the `armbian-update` command to install the kernel. The `headers` files in the kernel is installed in the `/use/local/include` directory.
+3. After the kernel is compiled, it will be automatically packaged into 6 kernel files according to the organization of the kernel files shared by `unifreq` and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. If you want to install on the current Armbian system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.170` and execute the `armbian-update` command to install the kernel. The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
 4. If a kernel with the same name such as `5.4.170-meson64-dev` is already installed in the current `Armbian` system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
 
