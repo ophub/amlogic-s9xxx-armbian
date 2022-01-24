@@ -1,7 +1,7 @@
 #!/bin/bash
 #============================================================================================
 #
-# Description: compile linux kernel for armbian
+# Description: Run on ubuntu-20.04, compile linux kernel for armbian
 # Copyright (C) 2020-2021 https://github.com/unifreq
 # Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -54,20 +54,25 @@ kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 repo_owner="unifreq"
 repo_branch="main"
 
-# Cross compile
-#use_linuxgun_url="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
-use_linuxgun_url="https://github.com/ophub/script/releases/download/dev"
-use_linuxgun_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
-use_linuxgun_localpath="/usr/local/aarch64"
+# Cross compile toolchain, run on ubuntu-20.04
+toolchain_dir="/usr/local/toolchain_x86_64_aarch64"
+dev_repo="https://github.com/ophub/script/releases/download/dev"
+# armbian
+armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
+armbian_dir="${compile_path}/tools/armbian"
+armbian_file="${armbian_dir}/armbian.img"
+chroot_dir="${out_kernel}/chroot"
+chroot_file="${chroot_dir}/armbian.img"
+# gcc
+gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
+gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
+# clang
+clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
+clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
 
 # QEMU BINARY
+qemu_binary_arm="qemu-arm-static"
 qemu_binary_arm64="qemu-aarch64-static"
-
-# Armbian system
-armbian_repo="ophub/amlogic-s9xxx-armbian"
-armbian_releases_file="Armbian_Aml_.*/Armbian_.*_s905d_.*.img.gz"
-armbian_tmp_file="${out_kernel}/tmp/armbian.img"
-armbian_chroot_file="${out_kernel}/armbian/armbian.img"
 
 # Set font color
 blue_font_prefix="\033[94m"
@@ -88,26 +93,36 @@ error_msg() {
     exit 1
 }
 
-gcc_check() {
+toolchain_check() {
     cd ${make_path}
     echo -e "${STEPS} Check the cross-compilation environment ..."
-    if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
-        echo -e "${INFO} Run on x86_64"
 
-        # Download aarch64-linux-gnu
-        if [ ! -d "${use_linuxgun_localpath}" ]; then
-            mkdir -p ${use_linuxgun_localpath}
-        fi
-        if [ ! -d "${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" ]; then
-            echo -e "${INFO} Download [ ${use_linuxgun_file} ] ..."
-            wget -c "${use_linuxgun_url}/${use_linuxgun_file}" -O "${use_linuxgun_localpath}/${use_linuxgun_file}" >/dev/null 2>&1 && sync
-            tar -xJf ${use_linuxgun_localpath}/${use_linuxgun_file} -C ${use_linuxgun_localpath} && sync
-        fi
-        if [ ! -d "${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" ]; then
-            error_msg "The cross compilation environment is not set!"
-        fi
-    else
-        echo -e "${INFO} Run on aarch64"
+    [ -d "${toolchain_dir}" ] || mkdir -p ${toolchain_dir}
+
+    # Download gcc
+    if [ ! -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ]; then
+        echo -e "${INFO} Download [ ${gcc_file} ] ..."
+        wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_dir}/${gcc_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${toolchain_dir}/${gcc_file} -C ${toolchain_dir} && sync
+        [ -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
+    fi
+
+    # Download clang
+    if [ ! -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ]; then
+        echo -e "${INFO} Download [ ${clang_file} ] ..."
+        wget -c "${dev_repo}/${clang_file}" -O "${toolchain_dir}/${clang_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${toolchain_dir}/${clang_file} -C ${toolchain_dir} && sync
+        [ -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
+    fi
+
+    # Download armbian
+    if [ ! -f "${armbian_file}" ]; then
+        echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
+        rm -rf ${armbian_dir} 2>/dev/null && mkdir -p ${armbian_dir}
+        wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_dir}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${armbian_dir}/${armbian_rootfs_file} -C ${armbian_dir} && sync
+        mv -f ${armbian_dir}/*.img ${armbian_file} && rm -f ${armbian_dir}/*.tar.xz && sync
+        [ -f "${armbian_file}" ] || error_msg "There is no armbian file: [ ${armbian_file} ]"
     fi
 }
 
@@ -221,8 +236,8 @@ compile_env_check() {
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{armbian/{root/boot/,},tmp/,boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
+    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
+    mkdir -p ${out_kernel}/{chroot/{root/boot/,},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
 make_kernel() {
@@ -246,92 +261,60 @@ make_kernel() {
 
     # Set cross compilation parameters
     echo -e "${STEPS} Set cross compilation parameters."
-    if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
-        export CROSS_COMPILE=${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
-        export PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin
-        export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib
+    export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
+    export PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin
+    export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
+    export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
+    export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
 
-        sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-        echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >>/etc/profile && sync
-        sed -i '/^LD_LIBRARY_PATH=/d' /etc/profile 2>/dev/null && sync
-        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >>/etc/profile && sync
-        source /etc/profile
+    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
+    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>/etc/profile && sync
+    source /etc/profile
 
-        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-        echo "PATH=${PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/bin" >>~/.bashrc && sync
-        sed -i '/^LD_LIBRARY_PATH=/d' ~/.bashrc 2>/dev/null && sync
-        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${use_linuxgun_localpath}/${use_linuxgun_file//.tar.xz/}/lib" >>~/.bashrc && sync
-        source ~/.bashrc
-    else
-        export CROSS_COMPILE="aarch64-linux-gnu-"
-    fi
+    sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
+    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>~/.bashrc && sync
+    source ~/.bashrc
+
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
+    export MAKE_SET_STRING=" ARCH=${ARCH} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 CROSS_COMPILE=${CROSS_COMPILE} LOCALVERSION=${LOCALVERSION} "
 
-    echo -e "${INFO} CROSS_COMPILE: ${CROSS_COMPILE}"
-    echo -e "${INFO} ARCH: ${ARCH}"
-    echo -e "${INFO} LOCALVERSION: ${LOCALVERSION}"
-    echo -e "${INFO} PATH: ${PATH}"
+    # Make menuconfig
+    #make ${MAKE_SET_STRING} menuconfig
 
     # Make kernel
     echo -e "${STEPS} Make kernel: ${local_kernel_dirname} ..."
-    make prepare
-    make scripts
-    make Image modules dtbs -j$(($(nproc) + 1)) ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
+    [ -z ${PROCESS} ] && PROCESS="1" && echo "PROCESS: 1"
+    make -j${PROCESS} ${MAKE_SET_STRING}
     [ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
-    make modules_install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    make ${MAKE_SET_STRING} modules_install
     [ $? -eq 0 ] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
-    mv -f /usr/local/include /usr/local/include.bak 2>/dev/null && sync
-    make headers_install INSTALL_HDR_PATH=/usr/local ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
+    header_path="${out_kernel}/header"
+    make ${MAKE_SET_STRING} headers_install INSTALL_HDR_PATH=${header_path}
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
 
     # Install new image
-    echo -e "${STEPS} Install new image ..."
-    make install ARCH="${ARCH}" CROSS_COMPILE="${CROSS_COMPILE}" LOCALVERSION="${LOCALVERSION}"
-    [ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
+    #echo -e "${STEPS} Install new image ..."
+    #make ${MAKE_SET_STRING} install
+    #[ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
 }
 
-chroot_armbian_for_x64() {
+update_initramfs() {
     cd ${make_path}
-    # Download armbian
-    if [ ! -f "${armbian_chroot_file}" ]; then
-        if [ -f "${armbian_tmp_file}" ]; then
-            cp -f ${armbian_tmp_file} ${armbian_chroot_file} && sync
-        else
-            echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
-            rm -f ${out_kernel}/tmp/{*.img,*.img.gz} 2>/dev/null
-            armbian_file=$(curl -s "https://api.github.com/repos/${armbian_repo}/releases" | grep -oE "${armbian_releases_file}" | head -n 1)
-            if [ -n "${armbian_file}" ]; then
-                wget -q -P ${out_kernel}/tmp https://github.com/${armbian_repo}/releases/download/${armbian_file}
-                if [ "$?" -eq "0" ]; then
-                    echo -e "${SUCCESS} Download armbian successfully."
-                    cd ${out_kernel}/tmp && gzip -df *.img.gz && sync
-                    mv -f *.img ${armbian_tmp_file} && sync
-                    cp -f ${armbian_tmp_file} ${armbian_chroot_file} && sync
-                else
-                    echo -e "${WARNING} Download armbian failed."
-                fi
-            else
-                echo -e "${WARNING} There is no specified armbian file in [ github.com/${armbian_repo}/releases ]"
-            fi
+    cp -f ${armbian_file} ${chroot_file} && sync
 
-        fi
-
-        [ -f "${armbian_chroot_file}" ] || echo -e "${WARNING} There is no armbian file: [ ${armbian_chroot_file} ]"
-    fi
-
-    cd ${make_path}
     # Mount the armbian system
-    tag_rootfs=${out_kernel}/armbian/root
+    tag_rootfs=${chroot_dir}/root
 
-    loop_armbian=$(losetup -P -f --show "${armbian_chroot_file}")
-    [ ${loop_armbian} ] || error_msg "losetup ${armbian_chroot_file} failed."
+    loop_armbian=$(losetup -P -f --show "${chroot_file}")
+    [ ${loop_armbian} ] || error_msg "losetup ${chroot_file} failed."
 
     if ! mount ${loop_armbian}p2 ${tag_rootfs}; then
         error_msg "mount ${loop_armbian}p2 failed!"
@@ -340,9 +323,13 @@ chroot_armbian_for_x64() {
         error_msg "mount ${loop_armbian}p1 failed!"
     fi
 
-    # Copy related files into armbian system
+    # Copy /boot related files into armbian system
     rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} 2>/dev/null && sync
-    cp -f /boot/*${kernel_outname} ${tag_rootfs}/boot && sync
+    #
+    cp -f ${kernel_path}/${local_kernel_dirname}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_dirname}/.config ${tag_rootfs}/boot/config-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_dirname}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
+    sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/lib/modules/* 2>/dev/null && sync
@@ -353,6 +340,7 @@ chroot_armbian_for_x64() {
     chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
+    [ -f "/usr/bin/${qemu_binary_arm}" ] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/ && sync
     [ -f "/usr/bin/${qemu_binary_arm64}" ] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/ && sync
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
@@ -364,42 +352,14 @@ EOF
 
     cd ${make_path}
     # Copy the generated uInitrd file to the current system
-    echo -e "${INFO} Copy the generated [ ${tag_rootfs}/boot/uInitrd-${kernel_outname} ] file"
-    cp -vf ${tag_rootfs}/boot/uInitrd-${kernel_outname} /boot/uInitrd
-    sync
+    echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot/ ]"
+    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${out_kernel}/boot/ && sync
 
     # Unmount the armbian system
     umount ${tag_rootfs}/boot 2>/dev/null
     umount ${tag_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
-}
 
-generate_uinitrd() {
-    cd /boot
-    # Backup the original uInitrd file
-    [ -f uInitrd ] && mv -f uInitrd uInitrd.bak 2>/dev/null
-
-    echo -e "${STEPS} Generate uInitrd file [ ${arch_info} ]."
-
-    if [[ ${arch_info} == "x86_64" || ${arch_info} == "x64" || ${arch_info} == "amd64" ]]; then
-        # mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d initrd.img-${kernel_outname} uInitrd-${kernel_outname}
-        # x86_64 and other environments need to mount the armbian system to generate uInitrd file
-        chroot_armbian_for_x64
-    else
-        # Generate uInitrd file directly under armbian system
-        update-initramfs -c -k ${kernel_outname} 2>/dev/null
-    fi
-
-    cd /boot
-    if [ -f uInitrd ]; then
-        echo -e "${SUCCESS} The uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null && sync
-    else
-        echo -e "${WARNING} The uInitrd file not updated."
-    fi
-
-    # Restore the original uInitrd
-    [ -f uInitrd.bak ] && mv -f uInitrd.bak uInitrd 2>/dev/null
 }
 
 packit_kernel() {
@@ -407,17 +367,6 @@ packit_kernel() {
     echo -e "${STEPS} Packing the 6 [ ${kernel_outname} ] packages generated by the compilation of the [ ${local_kernel_dirname} ] kernel..."
 
     cd ${out_kernel}/boot
-    cp -f /boot/*${kernel_outname} . && sync
-    # When the uInitrd file cannot be generated in the X86_64 environment, use the existing file instead.
-    if [ ! -f uInitrd-${kernel_outname} ]; then
-        echo -e "${WARNING} Use the backup uInitrd file instead."
-        uInitrd_demo=$(ls ${uInitrd_dir}/uInitrd-${kernel_verpatch}* 2>/dev/null | head -n 1)
-        uInitrd_demo_file=${uInitrd_demo##*/}
-        [ -z "${uInitrd_demo_file}" ] && error_msg "Missing [ uInitrd-${kernel_verpatch}* ] template!"
-        cp -vf ${uInitrd_dir}/${uInitrd_demo_file} uInitrd-${kernel_outname} && sync
-    else
-        echo -e "${INFO} Use the newly generated uInitrd file."
-    fi
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
@@ -443,13 +392,12 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/modules
-    cp -rf /lib/modules/${kernel_outname} . && sync
+    mv -f /lib/modules/${kernel_outname} . && sync
     tar -czf modules-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/header
-    cp -rf /usr/local/include . && sync
     tar -czf header-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
@@ -465,10 +413,7 @@ clean_tmp() {
     # Update grub
     echo -e "${STEPS} Clear the space and update-grub."
 
-    rm -rf ${out_kernel}/{armbian/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    rm -f /boot/*${kernel_outname} 2>/dev/null
-    rm -rf /lib/modules/${kernel_outname} 2>/dev/null
-    mv -f /usr/local/include.bak /usr/local/include 2>/dev/null && sync
+    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
 
     update-grub 2>/dev/null
     echo -e "${SUCCESS} Space cleared successfully."
@@ -537,11 +482,12 @@ code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
 [ -n "${code_branch}" ] || code_branch="${repo_branch}"
 echo -e "Input owner: [ ${code_owner} ], repo: [ ${code_repo} ], branch: [ ${code_branch} ]"
 
-gcc_check
+toolchain_check
 # Set whether to replace the kernel
 [[ "${auto_kernel}" == "true" ]] && query_version
 
 [ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
+[[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
@@ -570,14 +516,14 @@ for x in ${build_kernel[*]}; do
     download_kernel
     compile_env_check
     make_kernel
-    generate_uinitrd
+    update_initramfs
     packit_kernel
     clean_tmp
 
     let k++
 done
 
-rm -rf ${out_kernel}/tmp 2>/dev/null
+#rm -rf ${armbian_dir} 2>/dev/null
 sync
 echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
 exit 0
