@@ -1,7 +1,7 @@
 #!/bin/bash
 #============================================================================================
 #
-# Description: Run on ubuntu-20.04, compile linux kernel for armbian
+# Description: Run on Ubuntu-20.04-x86_64, compile linux kernel for armbian
 # Copyright (C) 2020-2021 https://github.com/unifreq
 # Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -64,10 +64,10 @@ armbian_file="${armbian_dir}/armbian.img"
 chroot_dir="${out_kernel}/chroot"
 chroot_file="${chroot_dir}/armbian.img"
 # gcc
-gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
+#gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
 # clang
-clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
+#clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
 
 # QEMU BINARY
@@ -101,27 +101,30 @@ toolchain_check() {
 
     # Download gcc
     if [ ! -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ]; then
-        echo -e "${INFO} Download [ ${gcc_file} ] ..."
+        echo -e "${INFO} Download gcc [ ${gcc_file} ] ..."
         wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_dir}/${gcc_file}" >/dev/null 2>&1 && sync
         tar -xJf ${toolchain_dir}/${gcc_file} -C ${toolchain_dir} && sync
+        rm -f ${toolchain_dir}/${gcc_file} && sync
         [ -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
     fi
 
     # Download clang
     if [ ! -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ]; then
-        echo -e "${INFO} Download [ ${clang_file} ] ..."
+        echo -e "${INFO} Download clang [ ${clang_file} ] ..."
         wget -c "${dev_repo}/${clang_file}" -O "${toolchain_dir}/${clang_file}" >/dev/null 2>&1 && sync
         tar -xJf ${toolchain_dir}/${clang_file} -C ${toolchain_dir} && sync
+        rm -f ${toolchain_dir}/${clang_file} && sync
         [ -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
     fi
 
     # Download armbian
     if [ ! -f "${armbian_file}" ]; then
-        echo -e "${INFO} Download armbian from [ github.com/${armbian_repo}/releases ]..."
+        echo -e "${INFO} Download armbian [ ${armbian_rootfs_file} ]..."
         rm -rf ${armbian_dir} 2>/dev/null && mkdir -p ${armbian_dir}
         wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_dir}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
         tar -xJf ${armbian_dir}/${armbian_rootfs_file} -C ${armbian_dir} && sync
-        mv -f ${armbian_dir}/*.img ${armbian_file} && rm -f ${armbian_dir}/*.tar.xz && sync
+        mv -f ${armbian_dir}/*.img ${armbian_file} && sync
+        rm -f ${armbian_dir}/${armbian_rootfs_file} && sync
         [ -f "${armbian_file}" ] || error_msg "There is no armbian file: [ ${armbian_file} ]"
     fi
 }
@@ -250,8 +253,8 @@ make_kernel() {
         config_demo=$(ls ${config_dir}/config-${kernel_verpatch}* 2>/dev/null | head -n 1)
         config_demo_file=${config_demo##*/}
         [ -z "${config_demo_file}" ] && error_msg "Missing [ config-${kernel_verpatch}* ] template!"
-        echo -e "${INFO} CONFIG_DEMO: ${config_demo_file}"
-        cp -vf ${config_dir}/${config_demo_file} .config && sync
+        echo -e "${INFO} CONFIG_DEMO: [ ${config_dir}/${config_demo_file} ]"
+        cp -f ${config_dir}/${config_demo_file} .config && sync
     else
         echo -e "${STEPS} Use the .config file in the current directory."
     fi
@@ -299,14 +302,9 @@ make_kernel() {
     header_path="${out_kernel}/header"
     make ${MAKE_SET_STRING} headers_install INSTALL_HDR_PATH=${header_path}
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
-
-    # Install new image
-    #echo -e "${STEPS} Install new image ..."
-    #make ${MAKE_SET_STRING} install
-    #[ $? -eq 0 ] && echo -e "${SUCCESS} The new image is installed successfully."
 }
 
-update_initramfs() {
+generate_uinitrd() {
     cd ${make_path}
     cp -f ${armbian_file} ${chroot_file} && sync
 
@@ -410,7 +408,6 @@ packit_kernel() {
 
 clean_tmp() {
     cd ${make_path}
-    # Update grub
     echo -e "${STEPS} Clear the space and update-grub."
 
     rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
@@ -516,14 +513,13 @@ for x in ${build_kernel[*]}; do
     download_kernel
     compile_env_check
     make_kernel
-    update_initramfs
+    generate_uinitrd
     packit_kernel
     clean_tmp
 
     let k++
 done
 
-#rm -rf ${armbian_dir} 2>/dev/null
 sync
 echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
 exit 0
