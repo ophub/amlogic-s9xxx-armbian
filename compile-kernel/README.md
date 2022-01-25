@@ -24,7 +24,7 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 
 - ### Local compilation
 
-1. Install the necessary packages (The script has only been tested on Ubuntu_20.04-x86_64)
+1. Install the necessary packages (The script has only been tested on Ubuntu-20.04-x86_64)
 
 ```yaml
 sudo apt-get update -y
@@ -50,9 +50,9 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. If there is no [.config](tools/config) file in the local kernel directory such as `compile-kernel/kernel/linux-5.4.170`, the file will be automatically copied from template.
 
-3. After the kernel is compiled, it will be automatically packaged into 6 kernel files according to the organization of the kernel files shared by `unifreq` and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. If you want to install on the current Armbian system, you can enter the corresponding kernel directory such as `compile-kernel/output/5.4.170` and execute the `armbian-update` command to install the kernel. The `headers` files in the kernel is installed in the `/use/local/include` directory.
+3. After the kernel is compiled, it will be automatically packaged into 6 kernel files according to the organization of the kernel files shared by `unifreq` and stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. You can upload these 6 kernel files to any directory of `Armbian` system, such as `/opt/5.4.170` directory, and execute the `armbian-update` command in this kernel directory to install the kernel. The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
-4. If a kernel with the same name such as `5.4.170-meson64-dev` is already installed in the current `Armbian` system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
+4. If a kernel with the same name such as `5.4.170-meson64-dev` is already installed in the current system, the compilation will automatically stop, because the local kernel file with the same name will be deleted during packaging, which will cause the system to crash.
 
 5. During the kernel test, please test on the `USB/TF` device, and don't write to the `EMMC` partition rashly to avoid bricking; Please do not perform a custom kernel test before you have mastered the method of system recovery proficiently; Please do not test the custom kernel in a formal production environment.
 
