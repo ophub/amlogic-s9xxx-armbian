@@ -119,7 +119,7 @@ toolchain_check() {
 
     # Download armbian
     if [ ! -f "${armbian_file}" ]; then
-        echo -e "${INFO} Download armbian [ ${armbian_rootfs_file} ]..."
+        echo -e "${INFO} Download armbian [ ${armbian_rootfs_file} ] ..."
         rm -rf ${armbian_dir} 2>/dev/null && mkdir -p ${armbian_dir}
         wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_dir}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
         tar -xJf ${armbian_dir}/${armbian_rootfs_file} -C ${armbian_dir} && sync
@@ -245,8 +245,33 @@ compile_env_check() {
 
 make_kernel() {
     cd ${kernel_path}/${local_kernel_dirname}
-    echo -e "${STEPS} Start compilation kernel..."
+    # Set cross compilation parameters
+    echo -e "${STEPS} Set cross compilation parameters."
+    export ARCH="arm64"
+    export LOCALVERSION="${custom_name}"
+    export PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin
+    export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
+    export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
+    export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
+    export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
+    #
+    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
+    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>/etc/profile && sync
+    source /etc/profile
+    #
+    sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
+    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>~/.bashrc && sync
+    source ~/.bashrc
+    #
+    MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CLANG_TRIPLE=${CLANG_TRIPLE} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
+    # Make mrproper
+    make ${MAKE_SET_STRING} mrproper
+
+    # Make menuconfig
+    #make ${MAKE_SET_STRING} menuconfig
+
+    # Check .config file
     if [ ! -f ".config" ]; then
         # Copy config file
         echo -e "${INFO} Copy config file to ${local_kernel_dirname}"
@@ -256,37 +281,15 @@ make_kernel() {
         echo -e "${INFO} CONFIG_DEMO: [ ${config_dir}/${config_demo_file} ]"
         cp -f ${config_dir}/${config_demo_file} .config && sync
     else
-        echo -e "${STEPS} Use the .config file in the current directory."
+        echo -e "${INFO} Use the .config file in the current directory."
     fi
-
+    #
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
     #sed -i "s|# CONFIG_LOCALVERSION_AUTO.*|CONFIG_LOCALVERSION_AUTO=n|" .config
-
-    # Set cross compilation parameters
-    echo -e "${STEPS} Set cross compilation parameters."
-    export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
-    export PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin
-    export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
-    export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
-    export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
-
-    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>/etc/profile && sync
-    source /etc/profile
-
-    sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>~/.bashrc && sync
-    source ~/.bashrc
-
-    export ARCH="arm64"
-    export LOCALVERSION="${custom_name}"
-    export MAKE_SET_STRING=" ARCH=${ARCH} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 CROSS_COMPILE=${CROSS_COMPILE} LOCALVERSION=${LOCALVERSION} "
-
-    # Make menuconfig
-    #make ${MAKE_SET_STRING} menuconfig
+    sync
 
     # Make kernel
-    echo -e "${STEPS} Make kernel: ${local_kernel_dirname} ..."
+    echo -e "${STEPS} Start compilation kernel [ ${local_kernel_dirname} ]..."
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [ -z ${PROCESS} ] && PROCESS="1" && echo "PROCESS: 1"
     make -j${PROCESS} ${MAKE_SET_STRING}
@@ -477,7 +480,6 @@ code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
 #
 [ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
 [ -n "${code_branch}" ] || code_branch="${repo_branch}"
-echo -e "Input owner: [ ${code_owner} ], repo: [ ${code_repo} ], branch: [ ${code_branch} ]"
 
 toolchain_check
 # Set whether to replace the kernel
@@ -488,6 +490,7 @@ toolchain_check
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "Kernel from: [ ${code_owner} ]"
 echo -e "Ready, start compile kernel... \n"
 
 k=1
