@@ -275,7 +275,7 @@ make_kernel() {
     if [ ! -f ".config" ]; then
         # Copy config file
         echo -e "${INFO} Copy config file to ${local_kernel_dirname}"
-        config_demo=$(ls ${config_dir}/config-${kernel_verpatch}* 2>/dev/null | head -n 1)
+        config_demo=$(ls ${config_dir}/config-${kernel_verpatch}* 2>/dev/null | sort -rV | head -n 1)
         config_demo_file=${config_demo##*/}
         [ -z "${config_demo_file}" ] && error_msg "Missing [ config-${kernel_verpatch}* ] template!"
         echo -e "${INFO} CONFIG_DEMO: [ ${config_dir}/${config_demo_file} ]"
