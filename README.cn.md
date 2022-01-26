@@ -33,7 +33,7 @@
 armbian-install
 ```
 
-默认不安装主线 u-boot，个别盒子在使用 5.10 以上内核时需要安装。如果选择安装，请在第 `1` 个输入参数中指定，如 `armbian-install yes`
+默认将安装主线 u-boot，以便支持 5.10 及以上内核的使用。如果选择不安装，请在第 `1` 个输入参数中指定，如 `armbian-install no`
 
 - ### 更新 Armbian 内核
 
