@@ -4,19 +4,19 @@
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# The kernel above version 5.10 needs to install main line U-BOOT
+# The kernel above version 5.10 needs to install mainline u-boot
 # Write mainline u-boot command: armbian-install yes
-# The mainline u-boot is not installed by default: armbian-install
+# The mainline u-boot is installed by default: armbian-install
 #=========================================================================
 
 SKIP=700
 BOOT=256
 
 # Receive one-key command related parameters
-if [[ "${1}" == "yes" ]]; then
-    auto_mainline_uboot="yes"
-else
+if [[ "${1}" == "no" ]]; then
     auto_mainline_uboot="no"
+else
+    auto_mainline_uboot="yes"
 fi
 
 echo "Start install armbian to emmc..."
@@ -162,8 +162,8 @@ systemctl stop armbian-resize-filesystem.service
 systemctl disable armbian-resize-filesystem.service
 
 # Backup the bootloader, if necessary for system recovery
-[ -d "/usr/lib/u-boot" ] || mkdir -p /usr/lib/u-boot
-MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
+[ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
+MYBOX_UBOOT="/lib/u-boot/mybox-bootloader.img"
 if [ ! -f "${MYBOX_UBOOT}" ]; then
     echo "Start backup default bootloader"
     dd if="${DEV_EMMC}" of=${MYBOX_UBOOT} bs=1M count=4 conv=fsync
