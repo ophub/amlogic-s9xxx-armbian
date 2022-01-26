@@ -6,14 +6,14 @@
 #
 # Kernel download server: https://github.com/ophub/kernel/tree/main/pub
 #
-# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install U-BOOT.
-# When there is no U-BOOT file in related directory, the script will auto try to download the file from the server for completion:
+# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install mainline u-boot.
+# When there is no mainline u-boot file in related directory, the script will auto try to download the file from the server:
 # UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot"
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
 #
-# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the MAINLINE_UBOOT.
-# Write mainline u-boot command: armbian-update 5.4.150 stable yes
-# The mainline u-boot is not installed by default: armbian-update 5.4.150
+# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the mainline u-boot.
+# Write mainline u-boot command: armbian-update 5.4.170 stable yes
+# The mainline u-boot is installed by default: armbian-update 5.4.170
 #==================================================================================================================================
 
 # Set default value
@@ -60,6 +60,7 @@ mmcblk?p[1-4])
     error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
     ;;
 esac
+DEV_EMMC="/dev/${EMMC_NAME}"
 
 # Query the current version
 current_kernel_v=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
@@ -99,10 +100,10 @@ fi
 kernel_down="${kernel_repo}/${version_branch}"
 
 # Specify whether to brush into the mainline u-boot, such as: yes
-if [[ "${3}" == "yes" ]]; then
-    auto_mainline_uboot="yes"
-else
+if [[ "${3}" == "no" ]]; then
     auto_mainline_uboot="no"
+else
+    auto_mainline_uboot="yes"
 fi
 
 # Automatically query the latest kernel version
