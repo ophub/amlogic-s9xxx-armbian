@@ -12,11 +12,11 @@ on:
       kernel_repo:
         description: "Source: kernel.org / unifreq"
         required: false
-        default: "unifreq"
+        default: "ongbaoha"
       kernel_ver:
         description: "Kernel version: 5.4.170"
         required: false
-        default: "5.4.170_5.10.90"
+        default: "5.4.170_5.15.13"
 
 env:
   TZ: Asia/Shanghai
