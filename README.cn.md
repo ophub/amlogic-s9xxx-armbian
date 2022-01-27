@@ -191,9 +191,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用。在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Rebuild armbian`*** ，输入 Armbian 的网络下载地址如 `https://dl.armbian.com/*/Armbian_*.img.xz` ，或者在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中通过 `armbian_path` 参数设定重构文件的加载路径。代码如下:
 
 ```yaml
-- name: Rebuild Armbian for Amlogic s9xxx
+- name: Rebuild the Armbian for Amlogic s9xxx
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
+    build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_soc: s905d_s905x3_s922x_s905x
     armbian_kernel: 5.15.13_5.4.170
@@ -221,6 +222,16 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 ## 编译自定义内核
 
 自定义内核的编译方法详见 [compile-kernel](compile-kernel/README.cn.md)
+
+```yaml
+- name: Compile the kernel for Amlogic s9xxx
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: kernel
+    kernel_version: 5.15.13_5.4.170
+    kernel_auto: true
+    kernel_sign: -meson64-dev
+```
 
 ## Armbian 贡献者名单
 
