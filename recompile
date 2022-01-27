@@ -252,29 +252,32 @@ make_kernel() {
     cd ${kernel_path}/${local_kernel_dirname}
     echo -e "${STEPS} Set cross compilation parameters."
     # Set cross compilation parameters
+    path_ubuntu2004="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+    path_clang="${toolchain_dir}/${clang_file//.tar.xz/}/bin:${path_ubuntu2004}"
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
-    export PATH=${toolchain_dir}/${clang_file//.tar.xz/}/bin:${PATH}
+    export PATH=${path_clang}
     export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
     export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
     export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
     export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
     # Set $PATH variable for ~/.bashrc
     sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-    echo "PATH=${PATH}" >>~/.bashrc && sync
+    echo "PATH=${path_clang}" >>~/.bashrc && sync
     source ~/.bashrc
     # Set $PATH variable for /etc/profile
     sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-    echo "PATH=${PATH}" >>/etc/profile && sync
+    echo "PATH=${path_clang}" >>/etc/profile && sync
     source /etc/profile
 
-    # Enable/Disabled Linux Kernel Clang LTO
-    if [[ "${kernel_v}" -ge "6" ]] || [[ "${kernel_v}" -eq "5" && "${kernel_p}" -ge "12" ]]; then
-        scripts/config -e LTO_CLANG_THIN
-    else
-        scripts/config -d LTO_CLANG_THIN
-    fi
-
+    # Show variable
+    echo -e "${INFO} ARCH: [ ${ARCH} ]"
+    echo -e "${INFO} LOCALVERSION: [ ${LOCALVERSION} ]"
+    echo -e "${INFO} PATH: [ ${PATH} ]"
+    echo -e "${INFO} CROSS_COMPILE: [ ${CROSS_COMPILE} ]"
+    echo -e "${INFO} CLANG_TRIPLE: [ ${CLANG_TRIPLE} ]"
+    echo -e "${INFO} CC: [ ${CC} ]"
+    echo -e "${INFO} LD: [ ${LD} ]"
     # Set generic make string
     MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CLANG_TRIPLE=${CLANG_TRIPLE} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
@@ -300,11 +303,18 @@ make_kernel() {
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
     sync
 
+    # Enable/Disabled Linux Kernel Clang LTO
+    if [[ "${kernel_v}" -ge "6" ]] || [[ "${kernel_v}" -eq "5" && "${kernel_p}" -ge "12" ]]; then
+        scripts/config -e LTO_CLANG_THIN
+    else
+        scripts/config -d LTO_CLANG_THIN
+    fi
+
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_dirname} ]..."
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [ -z ${PROCESS} ] && PROCESS="1" && echo "PROCESS: 1"
-    make -j${PROCESS} ${MAKE_SET_STRING}
+    make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
     [ $? -eq 0 ] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
@@ -356,6 +366,11 @@ generate_uinitrd() {
     [ -f "/usr/bin/${qemu_binary_arm}" ] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/ && sync
     [ -f "/usr/bin/${qemu_binary_arm64}" ] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/ && sync
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
+
+    # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
+    compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
+    sed -i "/^COMPRESS=/d" ${compress_initrd_file} && sync
+    echo "COMPRESS=gzip" >>${compress_initrd_file} && sync
 
     # Enter the armbian system to generate /boot/uInitrd file
     chroot ${tag_rootfs} <<EOF
