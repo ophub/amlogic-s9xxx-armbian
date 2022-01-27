@@ -238,6 +238,11 @@ compile_env_check() {
     [ -n "${local_kernel}" ] && error_msg "The current system has the same named kernel [ ${kernel_outname} ], stop compiling!"
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
+    # Get current kernel version
+    kernel_v=$(echo "${kernel_version}" | cut -d '.' -f1)
+    kernel_p=$(echo "${kernel_version}" | cut -d '.' -f2)
+    kernel_s=$(echo "${kernel_version}" | cut -d '.' -f3)
+
     # Create a temp directory
     rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
     mkdir -p ${out_kernel}/{chroot/{root/boot/,},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
@@ -245,28 +250,36 @@ compile_env_check() {
 
 make_kernel() {
     cd ${kernel_path}/${local_kernel_dirname}
-    # Set cross compilation parameters
     echo -e "${STEPS} Set cross compilation parameters."
+    # Set cross compilation parameters
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
-    export PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin
+    export PATH=${toolchain_dir}/${clang_file//.tar.xz/}/bin:${PATH}
     export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
     export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
     export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
     export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
-    #
-    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>/etc/profile && sync
-    source /etc/profile
-    #
+    # Set $PATH variable for ~/.bashrc
     sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-    echo "PATH=${PATH}:${toolchain_dir}/${gcc_file//.tar.xz/}/bin" >>~/.bashrc && sync
+    echo "PATH=${PATH}" >>~/.bashrc && sync
     source ~/.bashrc
-    #
+    # Set $PATH variable for /etc/profile
+    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
+    echo "PATH=${PATH}" >>/etc/profile && sync
+    source /etc/profile
+
+    # Enable/Disabled Linux Kernel Clang LTO
+    if [[ "${kernel_v}" -ge "6" ]] || [[ "${kernel_v}" -eq "5" && "${kernel_p}" -ge "12" ]]; then
+        scripts/config -e LTO_CLANG_THIN
+    else
+        scripts/config -d LTO_CLANG_THIN
+    fi
+
+    # Set generic make string
     MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CLANG_TRIPLE=${CLANG_TRIPLE} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
-    make ${MAKE_SET_STRING} clean
+    #make ${MAKE_SET_STRING} clean
 
     # Make menuconfig
     #make ${MAKE_SET_STRING} menuconfig
@@ -285,7 +298,6 @@ make_kernel() {
     fi
     #
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
-    #sed -i "s|# CONFIG_LOCALVERSION_AUTO.*|CONFIG_LOCALVERSION_AUTO=n|" .config
     sync
 
     # Make kernel
