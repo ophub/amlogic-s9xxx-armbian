@@ -191,9 +191,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 You can use other methods to build the Armbian system. Or use [Armbian](https://armbian.tnahosting.net/dl/) officially provided [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) and other branch firmware. and only import the Action from this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) to rebuild Armbian to adapt to the use of Amlogic S9xxx series boxes. In the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
 
 ```yaml
-- name: Rebuild Armbian for Amlogic s9xxx
+- name: Rebuild the Armbian for Amlogic s9xxx
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
+    build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_soc: s905d_s905x3_s922x_s905x
     armbian_kernel: 5.15.13_5.4.170
@@ -221,6 +222,16 @@ You can use other methods to build the Armbian system. Or use [Armbian](https://
 ## Compile a custom kernel
 
 For the compilation method of the custom kernel, see [compile-kernel](compile-kernel)
+
+```yaml
+- name: Compile the kernel for Amlogic s9xxx
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: kernel
+    kernel_version: 5.15.13_5.4.170
+    kernel_auto: true
+    kernel_sign: -meson64-dev
+```
 
 ## Armbian contributor list
 
