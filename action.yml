@@ -49,6 +49,10 @@ inputs:
     description: "Set the kernel custom signature"
     required: false
     default: "-meson64-dev"
+  kernel_config:
+    description: "Set the path of kernel .config"
+    required: false
+    default: "compile-kernel/tools/config"
 
 runs:
   using: "composite"
@@ -126,6 +130,8 @@ runs:
           [ -n ${{ inputs.kernel_version }} ] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
           [ -n ${{ inputs.kernel_auto }} ] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
           [ -n ${{ inputs.kernel_sign }} ] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
+          [ -n ${{ inputs.kernel_config }} ] && make_command="${make_command} -c ${{ inputs.kernel_config }}"
+
           sudo chmod +x recompile
           sudo ./recompile ${make_command}
 
