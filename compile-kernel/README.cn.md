@@ -34,9 +34,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. 首先在 `~/amlogic-s9xxx-armbian/compile-kernel` 目录下创建 `kernel` 目录，用于存放编译的内核源码。如采用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 的源码进行编译，请下载对应的内核如 `linux-5.4.170.tar.xz` 并解压到对应的 `compile-kernel/kernel/linux-5.4.170` 目录下；如采用 [unifreq](https://github.com/unifreq) 的源码进行编译，请克隆指定内核系列的源码如 `git clone --depth 1 https://github.com/unifreq/linux-5.4.y compile-kernel/kernel/linux-5.4.y` 到对应的目录下。完成后进入对应的内核如 `compile-kernel/kernel/linux-5.4.170` 的目录下，复制对应的内核系列的 [.config](tools/config) 模板到当前内核目录（如复制 config-5.4.170 文件，并重命名为 `.config`），并运行个性化配置选择命令 `make menuconfig` 进行自定义选择，完成后保存，会在内核目录下生成自定义的内核 `.config` 配置文件。
-
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170` 等指定参数命令即可编译内核。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
 - ### 使用 GitHub Action 进行编译
 
@@ -60,33 +58,29 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - GitHub Action 输入参数说明
 
-| 参数                   | 默认值                  | 说明                                            |
-|------------------------|------------------------|------------------------------------------------|
-| build_target         | kernel                 | 固定参数 `kernel`，设置编译目标为内核。 |
-| kernel_repo | unifreq | 指定编译内核的源代码仓库。默认为 `unifreq` 。可选择 `kernel.org` 的源码和 `github.com` 的内核源代码仓库。例如 `kernel.org` 或 `unifreq` 。当使用 `github.com` 的内核源代码仓库时，可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch` |
-| kernel_version | 5.15.13_5.4.170 | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `5.4.170` . 多个内核使用 `_` 进行连接，如 `5.15.13_5.4.170` |
-| kernel_auto | true | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在指定的内核如 `5.4.170` 的 `5.4` 同系列是否有更新的版本，如有 `5.4.170` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
-| kernel_sign | -meson64-dev | 设置内核自定义签名。默认值为 `-meson64-dev` ，生成的内核名称为 `5.4.170-meson64-dev` 。设置自定义签名时请勿包含空格。 |
-| kernel_config | 无 | 默认值使用 [compile-kernel/tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
+相关参数与`本地编译命令`相对应，请参考上面的说明。
+
+| 参数               | 默认值           | 说明                                                      |
+|-------------------|-----------------|-----------------------------------------------------------|
+| build_target      | kernel          | 固定参数 `kernel`，设置编译目标为内核。                        |
+| kernel_repo       | unifreq         | 指定编译内核的源代码仓库。默认值为 `unifreq` 。功能参考 `-r`      |
+| kernel_version    | 5.15.13_5.4.170 | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `5.4.170`。功能参考 `-k` |
+| kernel_auto       | true            | 设置是否自动采用同系列最新版本内核。默认值为 `true`。功能参考 `-a`  |
+| kernel_sign       | -meson64-dev    | 设置内核自定义签名。默认值为 `-meson64-dev`。功能参考 `-n`       |
+| kernel_config     | 无              | 默认值使用 [compile-kernel/tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
 
 - GitHub Action 输出变量说明
 
 | 参数                               | 默认值                        | 说明                       |
 |-----------------------------------|------------------------------|---------------------------|
 | ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.13_5.4.170              | 编译好的内核的名称           |
-| ${{ env.PACKAGED_OUTPUTPATH }}    | ${PWD}/compile-kernel/output | 编译完成的内核所在文件夹的路径  |
+| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output        | 编译完成的内核所在文件夹的路径  |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058              | 编译日期                    |
-| ${{ env.PACKAGED_STATUS }}        | success / failure            | 编译状态。成功 / 失败        |
+| ${{ env.PACKAGED_STATUS }}        | success                      | 编译状态。成功 / 失败        |
 
 ## 其他说明
 
-1. 内核编译文件检查的优先级：如果 `compile-kernel/kernel` 目录下有指定内核的文件夹如 `linux-5.4.170` 时，将使用本地源码进行编译；当没有指定内核的文件夹，但有指定内核的压缩文件如 linux-5.4.170.tar.xz 时，将自动解压并进行编译；当本地没有指定内核时，将自动从服务器下载并编译。
+1. 内核编译完成后，将会存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。可以将这些内核文件上传到 `Armbian` 系统任意目录，如 `/opt/5.4.170` 目录下，并在此内核目录内执行 `armbian-update` 命令进行内核安装。
 
-2. 如果本地的内核目录如 `compile-kernel/kernel/linux-5.4.170` 中没有 [.config](tools/config) 文件，将自动从 unifreq 分享的模板中复制相同内核系列的配置文件。
-
-3. 内核编译完成后，将会按照 `unifreq` 分享的内核文件的组织方式自动打包成 6 个内核文件，并存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。可以将这 6 个内核文件上传到 `Armbian` 系统任意目录，如 `/opt/5.4.170` 目录下，并在此内核目录内执行 `armbian-update` 命令进行内核安装。内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
-
-4. 如果当前系统中已经安装了相同名称的内核如 `5.4.170-meson64-dev` ，将会自动停止编译，因为打包时会删除本地相同名称的内核文件，这么做会造成系统瘫痪。
-
-5. 在内核测试时，请在 `USB/TF` 设备上进行测试，请不要贸然写入 `EMMC` 分区，避免成砖；在没有熟练地掌握救砖方法之前，请不要进行自定义内核测试；请不要在正式生产环境中测试自定义内核。
+2. 请先在 `USB/SD/TF` 设备上进行自定义内核测试，完成调试后再安装到正式环境中使用。
 
