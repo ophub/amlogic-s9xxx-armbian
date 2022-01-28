@@ -455,7 +455,6 @@ while [ "${1}" ]; do
         : ${auto_kernel:="${auto_kernel}"}
         : ${custom_name:="${custom_name}"}
         : ${repo_owner:="${repo_owner}"}
-        : ${config_path:="${config_path}"}
         ;;
     -k | --kernel)
         if [ -n "${2}" ]; then
@@ -492,14 +491,6 @@ while [ "${1}" ]; do
             error_msg "Invalid -r parameter [ ${2} ]!"
         fi
         ;;
-    -c | --config)
-        if [ -n "${2}" ]; then
-            config_path="${make_path}/${2}"
-            shift
-        else
-            error_msg "Invalid -c parameter [ ${2} ]!"
-        fi
-        ;;
     *)
         error_msg "Invalid option [ ${1} ]!"
         ;;
@@ -526,7 +517,6 @@ echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 echo -e "Kernel from: [ ${code_owner} ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
-echo -e "Kernel .config files path: [ ${config_path} ]"
 echo -e "Ready, start compile kernel... \n"
 
 k=1
