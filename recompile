@@ -494,7 +494,7 @@ while [ "${1}" ]; do
         ;;
     -c | --config)
         if [ -n "${2}" ]; then
-            config_path="${2}"
+            config_path="${make_path}/${2}"
             shift
         else
             error_msg "Invalid -c parameter [ ${2} ]!"
@@ -524,8 +524,9 @@ toolchain_check
 [[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "Kernel from: [ ${code_owner} ]"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "Kernel .config files path: [ ${config_path} ]"
 echo -e "Ready, start compile kernel... \n"
 
 k=1
