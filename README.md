@@ -144,13 +144,13 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 ## Detailed build compile command
 
 | Parameter | Meaning | Description |
-| ---- | ---- | ---- |
-| -d | Defaults | Compile all cores and all firmware types. |
-| -b | Build | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`, `s905d-ki` is `s912-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3`. |
-| -v | Version | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
-| -k | Kernel | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.4.170` . Multiple kernel use `_` connection such as `-k 5.15.13_5.4.170` |
-| -a | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.170 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -s | Size | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
+| ------ | ---------- | ----------------------------------------- |
+| -d     | Defaults   | Compile all cores and all firmware types. |
+| -b     | Build      | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`, `s905d-ki` is `s912-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3`. |
+| -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
+| -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.4.170` . Multiple kernel use `_` connection such as `-k 5.15.13_5.4.170` |
+| -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.170 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 
 - `sudo ./rebuild -d -b s905x3 -k 5.4.170`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.15.13_5.4.170`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
@@ -202,14 +202,16 @@ You can use other methods to build the Armbian system. Or use [Armbian](https://
 
 - GitHub Action Input parameter description
 
-| Parameter              | Defaults               | Description                                                   |
-|------------------------|------------------------|---------------------------------------------------------------|
-| armbian_path         | no                     | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
-| armbian_soc        | s905d_s905x3           | Set the `SoC` of the packaging box, you can specify a single box such as `s905x3`, you can choose multiple boxes to use `_` connection such as `s905x3_s905d` . SOC code of each box is: `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-t95z` is `s912-t95z-plus`, `s905d-ki` is `s912-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3`. |
-| version_branch         | stable                 | Set the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
-| armbian_kernel         | 5.15.13_5.4.170        | Set the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `5.4.170` . Multiple kernel use `_` connection such as `5.15.13_5.4.170` |
-| auto_kernel            | true                   | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `amlogic_kernel`. such as 5.4.170 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| armbian_size           | 2748                   | Set the size of the firmware ROOTFS partition, and the specified size must be greater than 2000. |
+The relevant parameters correspond to the `local packaging command`, please refer to the above description.
+
+| Parameter          | Defaults          | Description                                                   |
+|--------------------|-------------------|---------------------------------------------------------------|
+| armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
+| armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged box, function reference `-b`    |
+| version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
+| armbian_kernel     | 5.15.13_5.4.170   | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k` |
+| auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
+| armbian_size       | 2748             | Set the size of the firmware ROOTFS partition, function reference `-s` |
 
 - GitHub Action Output variable description
 
