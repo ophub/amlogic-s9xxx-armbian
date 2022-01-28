@@ -36,9 +36,8 @@ make_path=${PWD}
 compile_path="${make_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
 out_kernel="${compile_path}/output"
-config_dir="${compile_path}/tools/config"
-uInitrd_dir="${compile_path}/tools/uInitrd"
-script_dir="${compile_path}/tools/script"
+config_path="${compile_path}/tools/config"
+script_path="${compile_path}/tools/script"
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 arch_info=$(arch)
 auto_kernel="true"
@@ -55,14 +54,14 @@ repo_owner="unifreq"
 repo_branch="main"
 
 # Cross compile toolchain, run on ubuntu-20.04
-toolchain_dir="/usr/local/toolchain_x86_64_aarch64"
+toolchain_path="/usr/local/toolchain_x86_64_aarch64"
 dev_repo="https://github.com/ophub/script/releases/download/dev"
 # armbian
 armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
-armbian_dir="${compile_path}/tools/armbian"
-armbian_file="${armbian_dir}/armbian.img"
-chroot_dir="${out_kernel}/chroot"
-chroot_file="${chroot_dir}/armbian.img"
+armbian_path="${compile_path}/tools/armbian"
+armbian_file="${armbian_path}/armbian.img"
+chroot_path="${out_kernel}/chroot"
+chroot_file="${chroot_path}/armbian.img"
 # gcc
 #gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
@@ -97,34 +96,34 @@ toolchain_check() {
     cd ${make_path}
     echo -e "${STEPS} Check the cross-compilation environment ..."
 
-    [ -d "${toolchain_dir}" ] || mkdir -p ${toolchain_dir}
+    [ -d "${toolchain_path}" ] || mkdir -p ${toolchain_path}
 
     # Download gcc
-    if [ ! -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ]; then
+    if [ ! -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ]; then
         echo -e "${INFO} Download gcc [ ${gcc_file} ] ..."
-        wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_dir}/${gcc_file}" >/dev/null 2>&1 && sync
-        tar -xJf ${toolchain_dir}/${gcc_file} -C ${toolchain_dir} && sync
-        rm -f ${toolchain_dir}/${gcc_file} && sync
-        [ -d "${toolchain_dir}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
+        wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_path}/${gcc_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${toolchain_path}/${gcc_file} -C ${toolchain_path} && sync
+        rm -f ${toolchain_path}/${gcc_file} && sync
+        [ -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
     fi
 
     # Download clang
-    if [ ! -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ]; then
+    if [ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]; then
         echo -e "${INFO} Download clang [ ${clang_file} ] ..."
-        wget -c "${dev_repo}/${clang_file}" -O "${toolchain_dir}/${clang_file}" >/dev/null 2>&1 && sync
-        tar -xJf ${toolchain_dir}/${clang_file} -C ${toolchain_dir} && sync
-        rm -f ${toolchain_dir}/${clang_file} && sync
-        [ -d "${toolchain_dir}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
+        wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path} && sync
+        rm -f ${toolchain_path}/${clang_file} && sync
+        [ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
     fi
 
     # Download armbian
     if [ ! -f "${armbian_file}" ]; then
         echo -e "${INFO} Download armbian [ ${armbian_rootfs_file} ] ..."
-        rm -rf ${armbian_dir} 2>/dev/null && mkdir -p ${armbian_dir}
-        wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_dir}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
-        tar -xJf ${armbian_dir}/${armbian_rootfs_file} -C ${armbian_dir} && sync
-        mv -f ${armbian_dir}/*.img ${armbian_file} && sync
-        rm -f ${armbian_dir}/${armbian_rootfs_file} && sync
+        rm -rf ${armbian_path} 2>/dev/null && mkdir -p ${armbian_path}
+        wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_path}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
+        tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path} && sync
+        mv -f ${armbian_path}/*.img ${armbian_file} && sync
+        rm -f ${armbian_path}/${armbian_rootfs_file} && sync
         [ -f "${armbian_file}" ] || error_msg "There is no armbian file: [ ${armbian_file} ]"
     fi
 }
@@ -179,33 +178,33 @@ download_kernel() {
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
     echo -e "${STEPS} Start query and download the kernel."
     [ -d "${kernel_path}" ] || mkdir -p ${kernel_path}
-    if [ ! -d "${kernel_path}/${local_kernel_dirname}" ]; then
+    if [ ! -d "${kernel_path}/${local_kernel_path}" ]; then
         if [ "${code_owner}" == "kernel.org" ]; then
-            if [ -f "${kernel_path}/${local_kernel_dirname}.tar.xz" ]; then
-                echo -e "${INFO} Unzip local files [ ${local_kernel_dirname}.tar.xz ]"
+            if [ -f "${kernel_path}/${local_kernel_path}.tar.xz" ]; then
+                echo -e "${INFO} Unzip local files [ ${local_kernel_path}.tar.xz ]"
                 cd ${kernel_path}
-                tar -xJf ${local_kernel_dirname}.tar.xz
-                [ "$?" -eq "0" ] || error_msg "[ ${local_kernel_dirname}.tar.xz ] file decompression failed."
+                tar -xJf ${local_kernel_path}.tar.xz
+                [ "$?" -eq "0" ] || error_msg "[ ${local_kernel_path}.tar.xz ] file decompression failed."
             else
-                echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${server_kernel_repo}${local_kernel_dirname}.tar.xz ]"
-                wget -q -P ${kernel_path} ${server_kernel_repo}${local_kernel_dirname}.tar.xz && sync
-                if [[ "$?" -eq "0" && -s "${kernel_path}/${local_kernel_dirname}.tar.xz" ]]; then
+                echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${server_kernel_repo}${local_kernel_path}.tar.xz ]"
+                wget -q -P ${kernel_path} ${server_kernel_repo}${local_kernel_path}.tar.xz && sync
+                if [[ "$?" -eq "0" && -s "${kernel_path}/${local_kernel_path}.tar.xz" ]]; then
                     echo -e "${SUCCESS} The kernel file is downloaded successfully."
                     cd ${kernel_path}
-                    tar -xJf ${local_kernel_dirname}.tar.xz && sync
-                    [ -d "${local_kernel_dirname}" ] || error_msg "[ ${local_kernel_dirname}.tar.xz ] file decompression failed."
+                    tar -xJf ${local_kernel_path}.tar.xz && sync
+                    [ -d "${local_kernel_path}" ] || error_msg "[ ${local_kernel_path}.tar.xz ] file decompression failed."
                 else
                     error_msg "Kernel file download failed!"
                 fi
             fi
         else
             echo -e "${INFO} Start cloning from [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
-            git clone --depth 1 https://github.com/${server_kernel_repo} -b ${code_branch} ${kernel_path}/${local_kernel_dirname}
+            git clone --depth 1 https://github.com/${server_kernel_repo} -b ${code_branch} ${kernel_path}/${local_kernel_path}
             [ "$?" -eq "0" ] || error_msg "[ https://github.com/${server_kernel_repo} ] Clone failed."
         fi
     elif [ "${code_owner}" != "kernel.org" ]; then
         # Get a local kernel version
-        local_makefile="${kernel_path}/${local_kernel_dirname}/Makefile"
+        local_makefile="${kernel_path}/${local_kernel_path}/Makefile"
         local_makefile_version="$(cat ${local_makefile} | grep -oE "VERSION =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
         local_makefile_patchlevel="$(cat ${local_makefile} | grep -oE "PATCHLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
         local_makefile_sublevel="$(cat ${local_makefile} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
@@ -213,7 +212,7 @@ download_kernel() {
         # Local version and server version comparison
         if [[ "${auto_kernel}" == "true" && "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
             # Pull the latest source code of the server
-            cd ${kernel_path}/${local_kernel_dirname}
+            cd ${kernel_path}/${local_kernel_path}
             git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull && sync
             unset kernel_version
             kernel_version="${local_makefile_version}.${local_makefile_patchlevel}.${kernel_sub}"
@@ -249,18 +248,18 @@ compile_env_check() {
 }
 
 make_kernel() {
-    cd ${kernel_path}/${local_kernel_dirname}
+    cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set cross compilation parameters."
     # Set cross compilation parameters
     path_ubuntu2004="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-    path_clang="${toolchain_dir}/${clang_file//.tar.xz/}/bin:${path_ubuntu2004}"
+    path_clang="${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_ubuntu2004}"
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
     export PATH=${path_clang}
-    export CROSS_COMPILE=${toolchain_dir}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
-    export CLANG_TRIPLE=${toolchain_dir}/${clang_file//.tar.xz/}/bin
-    export CC=${toolchain_dir}/${clang_file//.tar.xz/}/bin/clang
-    export LD=${toolchain_dir}/${clang_file//.tar.xz/}/bin/ld.lld
+    export CROSS_COMPILE=${toolchain_path}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
+    export CLANG_TRIPLE=${toolchain_path}/${clang_file//.tar.xz/}/bin
+    export CC=${toolchain_path}/${clang_file//.tar.xz/}/bin/clang
+    export LD=${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld
     # Set $PATH variable for ~/.bashrc
     sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
     echo "PATH=${path_clang}" >>~/.bashrc && sync
@@ -290,12 +289,12 @@ make_kernel() {
     # Check .config file
     if [ ! -f ".config" ]; then
         # Copy config file
-        echo -e "${INFO} Copy config file to ${local_kernel_dirname}"
-        config_demo=$(ls ${config_dir}/config-${kernel_verpatch}* 2>/dev/null | sort -rV | head -n 1)
+        echo -e "${INFO} Copy config file to ${local_kernel_path}"
+        config_demo=$(ls ${config_path}/config-${kernel_verpatch}* 2>/dev/null | sort -rV | head -n 1)
         config_demo_file=${config_demo##*/}
         [ -z "${config_demo_file}" ] && error_msg "Missing [ config-${kernel_verpatch}* ] template!"
-        echo -e "${INFO} CONFIG_DEMO: [ ${config_dir}/${config_demo_file} ]"
-        cp -f ${config_dir}/${config_demo_file} .config && sync
+        echo -e "${INFO} CONFIG_DEMO: [ ${config_path}/${config_demo_file} ]"
+        cp -f ${config_path}/${config_demo_file} .config && sync
     else
         echo -e "${INFO} Use the .config file in the current directory."
     fi
@@ -311,7 +310,7 @@ make_kernel() {
     fi
 
     # Make kernel
-    echo -e "${STEPS} Start compilation kernel [ ${local_kernel_dirname} ]..."
+    echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [ -z ${PROCESS} ] && PROCESS="1" && echo "PROCESS: 1"
     make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
@@ -334,7 +333,7 @@ generate_uinitrd() {
     cp -f ${armbian_file} ${chroot_file} && sync
 
     # Mount the armbian system
-    tag_rootfs=${chroot_dir}/root
+    tag_rootfs=${chroot_path}/root
 
     loop_armbian=$(losetup -P -f --show "${chroot_file}")
     [ ${loop_armbian} ] || error_msg "losetup ${chroot_file} failed."
@@ -349,9 +348,9 @@ generate_uinitrd() {
     # Copy /boot related files into armbian system
     rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} 2>/dev/null && sync
     #
-    cp -f ${kernel_path}/${local_kernel_dirname}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_dirname}/.config ${tag_rootfs}/boot/config-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_dirname}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
     sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
@@ -359,7 +358,7 @@ generate_uinitrd() {
     cp -rf /lib/modules/${kernel_outname} ${tag_rootfs}/lib/modules && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/lib/modules) \n"
 
-    cp -f ${script_dir}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
+    cp -f ${script_path}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
     chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
@@ -392,7 +391,7 @@ EOF
 
 packit_kernel() {
     # Pack the kernel 6 files
-    echo -e "${STEPS} Packing the 6 [ ${kernel_outname} ] packages generated by the compilation of the [ ${local_kernel_dirname} ] kernel..."
+    echo -e "${STEPS} Packing the 6 [ ${kernel_outname} ] packages generated by the compilation of the [ ${local_kernel_path} ] kernel..."
 
     cd ${out_kernel}/boot
     chmod +x *
@@ -401,20 +400,20 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/allwinner
-    cp -f ${kernel_path}/${local_kernel_dirname}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
     tar -czf dtb-allwinner-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
     [ -d ${moredtb_path} ] && cp -f ${moredtb_path}/*.dtb . && chmod +x * && sync
-    cp -f ${kernel_path}/${local_kernel_dirname}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
     tar -czf dtb-amlogic-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/rockchip
-    cp -f ${kernel_path}/${local_kernel_dirname}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
     tar -czf dtb-rockchip-${kernel_outname}.tar.gz * && sync
     cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
@@ -456,6 +455,7 @@ while [ "${1}" ]; do
         : ${auto_kernel:="${auto_kernel}"}
         : ${custom_name:="${custom_name}"}
         : ${repo_owner:="${repo_owner}"}
+        : ${config_path:="${config_path}"}
         ;;
     -k | --kernel)
         if [ -n "${2}" ]; then
@@ -490,6 +490,14 @@ while [ "${1}" ]; do
             shift
         else
             error_msg "Invalid -r parameter [ ${2} ]!"
+        fi
+        ;;
+    -c | --config)
+        if [ -n "${2}" ]; then
+            config_path="${2}"
+            shift
+        else
+            error_msg "Invalid -c parameter [ ${2} ]!"
         fi
         ;;
     *)
@@ -531,13 +539,13 @@ for x in ${build_kernel[*]}; do
 
     if [ "${code_owner}" == "kernel.org" ]; then
         server_kernel_repo="${kernel_org_repo}"
-        local_kernel_dirname="linux-${kernel_version}"
+        local_kernel_path="linux-${kernel_version}"
     elif [ -z "${code_repo}" ]; then
         server_kernel_repo="${code_owner}/linux-${kernel_verpatch}.y"
-        local_kernel_dirname="linux-${kernel_verpatch}.y"
+        local_kernel_path="linux-${kernel_verpatch}.y"
     else
         server_kernel_repo="${code_owner}/${code_repo}"
-        local_kernel_dirname="${code_repo}-${code_branch}"
+        local_kernel_path="${code_repo}-${code_branch}"
     fi
 
     download_kernel
