@@ -11,7 +11,6 @@
 | -d | Defaults | 使用默认配置 |
 | -k | Kernel | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `-k 5.4.170` . 多个内核使用 `_` 进行连接，如 `-k 5.15.13_5.4.170` |
 | -a | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.4.170` 的 `5.4` 同系列是否有更新的版本，如有 `5.4.170` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
-| -c | ConfigPath | 设置内核编译时 [.config](tools/config) 配置文件模板的存放路径。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。默认值：`compile-kernel/tools/config` |
 | -n | CustomName | 设置内核自定义签名。默认值为 `-meson64-dev` ，生成的内核名称为 `5.4.170-meson64-dev` 。设置自定义签名时请勿包含空格。 |
 | -r | Repo | 指定编译内核的源代码仓库。默认为 `unifreq` 。可选择 `kernel.org` 的源码和 `github.com` 的内核源代码仓库。例如 `-r kernel.org` 或 `-r unifreq` 等。当使用 `github.com` 的内核源代码仓库时，可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch` |
 
@@ -68,7 +67,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | kernel_version | 5.15.13_5.4.170 | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `5.4.170` . 多个内核使用 `_` 进行连接，如 `5.15.13_5.4.170` |
 | kernel_auto | true | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在指定的内核如 `5.4.170` 的 `5.4` 同系列是否有更新的版本，如有 `5.4.170` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | kernel_sign | -meson64-dev | 设置内核自定义签名。默认值为 `-meson64-dev` ，生成的内核名称为 `5.4.170-meson64-dev` 。设置自定义签名时请勿包含空格。 |
-| kernel_config | compile-kernel/tools/config | 设置内核编译时 [.config](tools/config) 配置文件模板的存放路径。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。默认值：`compile-kernel/tools/config` |
+| kernel_config | 无 | 默认值使用 [compile-kernel/tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
 
 - GitHub Action 输出变量说明
 
