@@ -60,13 +60,15 @@ runs:
     - shell: bash
       run: |
         cd ${GITHUB_ACTION_PATH}
+        echo -e "Current running path: [ ${PWD} ]"
+        echo -e "The contents of the current directory: $(ls .) \n"
         build_target="${{ inputs.build_target }}"
         [ -z "${build_target}" ] && build_target="armbian"
 
         if [ "${build_target}" == "armbian" ]; then
 
           cd ${GITHUB_ACTION_PATH}
-          echo -e "Rebuild the armbian actions path: ${PWD}"
+          echo -e "Start rebuilding Armbian..."
 
           armbian_file="${{ inputs.armbian_path }}"
           armbian_filepath="build/output/images"
@@ -123,7 +125,7 @@ runs:
         elif [ "${build_target}" == "kernel" ]; then
 
           cd ${GITHUB_ACTION_PATH}
-          echo -e "Compile the kernel actions path: ${PWD}"
+          echo -e "Start compile kernel..."
 
           make_command=" -d"
           [ -n ${{ inputs.kernel_repo }} ] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
