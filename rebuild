@@ -397,6 +397,7 @@ copy_files() {
     if [[ -n "${release_codename}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${release_codename}")" ]]; then
         sed -i "s|ubuntu|debian|g" ${tag_rootfs}/usr/sbin/armbian-docker
     fi
+    [[ "${release_codename}" != "focal" ]] && sed -i "s|focal|${release_codename}|g" ${tag_rootfs}/usr/sbin/armbian-docker
 
     # Processing partition files: bootfs
     cd ${tag_bootfs}
