@@ -171,11 +171,11 @@ fi
 sync
 
 # Clear emmc disk data
-exists_pts=$(parted ${DEV_EMMC} print | grep 'primary' | wc -l)
+exists_pts=$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)
 if [ "${exists_pts}" -gt "0" ]; then
     i=1
     while [ "${i}" -le "${exists_pts}" ]; do
-        parted -s ${DEV_EMMC} rm $i 2>/dev/null
+        parted -s ${DEV_EMMC} rm ${i} 2>/dev/null
         let i++
     done
 fi
