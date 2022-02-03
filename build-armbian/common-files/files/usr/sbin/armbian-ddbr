@@ -93,7 +93,7 @@ echo -e "${INFO} The ddbr file path: [ ${out_path}/${ddbr_image} ]\n"
 echo -ne "${OPT} Do you want to backup or restore? Backup=(b) Restore=(r): "
 read br
 case ${br} in
-b | B | backup) do_backup ;;
-r | R | restore) do_restore ;;
-*) exit 0 ;;
+	b | B | backup) do_backup ;;
+	r | R | restore) do_restore ;;
+	*) exit 0 ;;
 esac
