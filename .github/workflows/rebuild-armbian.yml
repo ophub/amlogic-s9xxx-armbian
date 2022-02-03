@@ -53,7 +53,7 @@ jobs:
               fi
           fi
           echo "ARMBIAN_URL=${armbian_url}" >> $GITHUB_ENV
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
           # Get the release name of the rebuild armbian file
           set_release="_"
