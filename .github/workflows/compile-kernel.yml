@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Compile the armbian kernel
+name: Compile the kernel
 
 on:
   repository_dispatch:
@@ -40,7 +40,7 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "$TZ"
-          echo "COMPILE_STARTINGTIME=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
           kernel_repo="${{ github.event.inputs.kernel_repo }}"
           [ -z "${kernel_repo}"] && kernel_repo="kernel.org"
@@ -59,7 +59,7 @@ jobs:
           output_tags="$(ls ${output_dirname}/*.tar.gz -l | awk '{print $9}' | grep -oE '[1-9].[0-9]{1,3}.[0-9]+' | xargs | tr "[ ]" "_")"
           echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
           echo "PACKAGED_OUTPUTPATH=${output_dirname}" >> $GITHUB_ENV
-          echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
       - name: Upload Kernel to Release
