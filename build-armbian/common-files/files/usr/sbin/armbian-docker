@@ -25,21 +25,22 @@ echo -e "${INFO} Welcome to docker installation tool."
 echo -e "${STEPS} Initialize the docker installation environment ... "
 sudo apt-get update
 sudo apt-get remove -y docker docker-engine docker.io containerd runc
-sudo apt-get install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
 # Install GPG certificate
-# sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | apt-key add -
+# sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
 # Add software source information
-# sudo add-apt-repository "deb [arch=arm64,armhf] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo add-apt-repository "deb [arch=arm64,armhf] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+# echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/ubuntu focal stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
 echo -e "${STEPS} Install docker related packages ... "
 sudo apt-get update
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
 
 echo -e "${STEPS} Install docker accelerator ... "
+[ -d "/etc/docker" ] || mkdir -p /etc/docker
 sudo cat >/etc/docker/daemon.json <<EOF
 {
   "bip": "172.31.0.1/24",
@@ -70,7 +71,7 @@ echo -e "${SUCCESS} Docker installed successfully."
 portainer_lan() {
     echo -e "${STEPS} Select Install Portainer (No SSL certificate, http LAN access)... "
     sudo docker volume create portainer_data
-    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer:linux-arm64
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:linux-arm64
     echo -e "${SUCCESS} The portainer address [ http://ip:9000 ]"
 }
 
@@ -78,12 +79,12 @@ portainer_lan() {
 portainer_domain() {
     echo -e "${STEPS} Select Install Portainer (Have SSL certificate, install domain name certificate https access)... "
     sudo docker volume create portainer_data
-    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v /etc/ssl:/certs -v portainer_data:/data portainer/portainer:linux-arm64 --ssl --sslcert /certs/portainer.crt --sslkey /certs/portainer.key
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v /etc/ssl:/certs -v portainer_data:/data portainer/portainer-ce:linux-arm64 --ssl --sslcert /certs/portainer.crt --sslkey /certs/portainer.key
     echo -e "${INFO} Please rename and upload the domain certificate [ portainer.crt & portainer.key ] to the [ /etc/ssl/ ] directory."
     echo -e "${SUCCESS} The portainer address [ https://domain:9000 ]"
 }
 
-echo -ne "${OPT} Select Install Portainer? No=(n) / LAN ip access=(h) / Domain cert access=(s): "
+echo -ne "${OPT} Select Install Portainer-ce? No=(n) / LAN ip access=(h) / Domain cert access=(s): "
 read pt
 case ${pt} in
     h | H | http) portainer_lan ;;
