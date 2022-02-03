@@ -52,7 +52,7 @@ inputs:
   kernel_config:
     description: "Set the path of kernel .config"
     required: false
-    default: "compile-kernel/tools/config"
+    default: ""
 
 runs:
   using: "composite"
@@ -132,7 +132,7 @@ runs:
             if [[ "$(ls ${GITHUB_WORKSPACE}/${{ inputs.kernel_config }}/config-* -l 2>/dev/null | grep "^-" | wc -l)" -ne "0" ]]; then
               echo -e "Use a custom kernel compilation template."
               rm -f ${config_filepath}/* 2>/dev/null && sync
-              sudo cp -vf ${GITHUB_WORKSPACE}/${{ inputs.kernel_config }}/config-* ${config_filepath}/ 2>/dev/null && sync
+              sudo cp -f ${GITHUB_WORKSPACE}/${{ inputs.kernel_config }}/config-* ${config_filepath}/ 2>/dev/null && sync
               echo -e "List of Kernel Custom Compilation Configuration Templates: \n$(ls ${config_filepath})"
             else
               echo -e "The custom kernel compilation template path is invalid, continue to use the default template."
