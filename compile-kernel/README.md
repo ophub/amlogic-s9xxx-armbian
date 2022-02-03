@@ -34,7 +34,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. Clone the repository to local: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.4.170` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory.
+3. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.4.170` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory. You can upload these kernel files to any directory of `Armbian` system, such as `/opt/5.4.170` directory, and execute the `armbian-update` command in this kernel directory to install the kernel.
 
 - ### Compile with GitHub Action
 
@@ -77,10 +77,4 @@ The relevant parameters correspond to the `local compilation commands`, please r
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output        | kernel files storage path  |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058              | compile date                    |
 | ${{ env.PACKAGED_STATUS }}        | success                      | Compile status. success / failure |
-
-## Other instructions
-
-1. After the kernel is compiled, it will be stored in the `compile-kernel/output` directory. These kernel files will be automatically cleared from the system compiled with the current kernel. You can upload these kernel files to any directory of `Armbian` system, such as `/opt/5.4.170` directory, and execute the `armbian-update` command in this kernel directory to install the kernel.
-
-2. Please perform a custom kernel test on the `USB/SD/TF` device first, and then install it in the official environment after debugging.
 
