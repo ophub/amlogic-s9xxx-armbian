@@ -17,10 +17,6 @@ on:
         description: "BOARD: lepotato / odroidn2"
         required: false
         default: "lepotato"
-      set_opts:
-        description: "More build options: for compile.sh"
-        required: false
-        default: ""
   #schedule:
     #- cron: "0 17 * * 0"
 
@@ -64,8 +60,6 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
-          echo "ARMBIAN_MORE_OPTS=${{ github.event.inputs.set_opts }}" >> $GITHUB_ENV
-
       - name: Download source code
         id: down
         run: |
@@ -78,8 +72,7 @@ jobs:
           sudo chmod +x compile.sh
           sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current \
                             BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
-                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha KERNEL_KEEP_CONFIG=no EXTERNAL=no \
-                            ${{ env.ARMBIAN_MORE_OPTS }}
+                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for amlogic s9xxx
