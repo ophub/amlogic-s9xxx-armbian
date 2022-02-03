@@ -432,7 +432,8 @@ copy_files() {
     ln -sf usr/lib lib
     ln -sf usr/sbin sbin
     ln -sf var/tmp tmp
-    ln -sf usr/share/zoneinfo/Asia/Shanghai etc/localtime
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
+    rm -f usr/sbin/ddbr 2>/dev/null && ln -sf armbian-ddbr usr/sbin/ddbr
 
     # Fix permission
     chmod 777 var/tmp
@@ -456,7 +457,6 @@ copy_files() {
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
     # Add other files
-    [ -f "usr/bin/ddbr" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/ddbr usr/bin/
     [ -f "usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen usr/bin/
 
     # Edit the etc/fstab
