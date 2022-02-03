@@ -34,7 +34,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.4.170` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。可以将这些内核文件上传到 `Armbian` 系统任意目录，如 `/opt/5.4.170` 目录下，并在此内核目录内执行 `armbian-update` 命令进行内核安装。
 
 - ### 使用 GitHub Action 进行编译
 
@@ -77,10 +77,4 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output        | 编译完成的内核所在文件夹的路径  |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058              | 编译日期                    |
 | ${{ env.PACKAGED_STATUS }}        | success                      | 编译状态。成功 / 失败        |
-
-## 其他说明
-
-1. 内核编译完成后，将会存放在 `compile-kernel/output` 目录下。这些内核文件会自动从当前内核编译的系统中自动清除。可以将这些内核文件上传到 `Armbian` 系统任意目录，如 `/opt/5.4.170` 目录下，并在此内核目录内执行 `armbian-update` 命令进行内核安装。
-
-2. 请先在 `USB/SD/TF` 设备上进行自定义内核测试，完成调试后再安装到正式环境中使用。
 
