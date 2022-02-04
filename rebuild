@@ -20,11 +20,11 @@ tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 
-# get VERSION_CODENAME: such as [ focal ]
+# Get VERSION_CODENAME: such as [ focal ]
 os_release_file="etc/os-release"
-# set BOARD_NAME: such as [ s905x3 ]
+# Set BOARD_NAME: such as [ s905x3 ]
 armbian_release_file="etc/armbian-release"
-# Add custom firmware information
+# Add custom armbian firmware information
 ophub_release_file="etc/ophub-release"
 
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
@@ -372,18 +372,19 @@ copy_files() {
 
     # Copy rootfs files
     rm -rf ${tmp_armbian}/boot/* 2>/dev/null
+    # Copy the base files of the release for ROOTFS
     cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
-    #
     # Copy the same files of the release for ROOTFS
     if [ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]; then
         cp -rf ${configfiles_path}/files/* ${tag_rootfs} && sync
     fi
-    #
-    # Copy the different files of the release for ROOTFS: ubuntu and debian
-    armbian_ubuntu=("bionic" "focal" "hirsute")
-    armbian_debian=("bullseye" "buster" "stretch")
+    # Find ID in ${os_release_file}: such as [ubuntu/debian]
+    release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
+    [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
+    # Find VERSION_CODENAME in ${os_release_file}: such as [focal/bullseye/buster]
     release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
-    [ -z "${release_codename}" ] && error_msg "RELEASE CODENAME is invalid."
+    [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
+    # Copy the different files of the release for ROOTFS
     diff_release_files="${configfiles_path}/release/${release_codename}"
     if [[ -n "${release_codename}" && -d "${diff_release_files}" ]]; then
         # Backup source
@@ -392,12 +393,6 @@ copy_files() {
         # Copy custom source
         cp -rf ${diff_release_files}/* ${tag_rootfs} && sync
     fi
-    #
-    # Modify different releases for usr/sbin/armbian-docker
-    if [[ -n "${release_codename}" && -n "$(echo "${armbian_debian[@]}" | grep -w "${release_codename}")" ]]; then
-        sed -i "s|ubuntu|debian|g" ${tag_rootfs}/usr/sbin/armbian-docker
-    fi
-    [[ "${release_codename}" != "focal" ]] && sed -i "s|focal|${release_codename}|g" ${tag_rootfs}/usr/sbin/armbian-docker
 
     # Processing partition files: bootfs
     cd ${tag_bootfs}
@@ -464,6 +459,7 @@ copy_files() {
     sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
 
     # Add custom firmware information
+    echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
     echo "U_BOOT_EXT='${K510}'" >>${ophub_release_file} 2>/dev/null
