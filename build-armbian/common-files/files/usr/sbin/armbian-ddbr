@@ -36,7 +36,7 @@ fi
 # Find the partition where root is located
 root_devname=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')
 if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-    echo "you are running in emmc mode, please boot system with usb or tf card!"
+    echo "You are running in emmc mode, please boot system with TF/SD/USB!"
     exit 1
 fi
 
