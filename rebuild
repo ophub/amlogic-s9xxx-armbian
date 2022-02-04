@@ -419,9 +419,6 @@ copy_files() {
     # Processing partition files: rootfs
     cd ${tag_rootfs}
 
-    # Replace the boot directory with the latest file
-    rm -rf boot 2>/dev/null && mkdir -p boot && sync
-
     # Add soft connection
     ln -sf usr/bin bin
     ln -sf usr/lib lib
@@ -443,26 +440,28 @@ copy_files() {
     chmod 755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
 
     # Delete related files
+    rm -rf boot 2>/dev/null && mkdir -p boot && sync
+    rm -rf usr/share/doc/linux-image-current-meson64 2>/dev/null
+    rm -rf usr/lib/linux-image-current-meson64 2>/dev/null
+    rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
     rm -f etc/apt/sources.list.save 2>/dev/null
     rm -f etc/apt/*.gpg~ 2>/dev/null
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
-    rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
+    # Add tasks that need to be executed on initial startup
+    armbian_firstrun="usr/lib/armbian/armbian-firstrun"
+    sed -i '/armbian-release/i\sudo apt-get purge -y linux-image-current-meson64' ${armbian_firstrun}
+
     # Add other files
     [ -f "usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen usr/bin/
-
-    # Edit the etc/fstab
-    [ -f "etc/fstab" ] || error_msg "The etc/fstab File does not exist."
-    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
 
     # Add custom firmware information
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
-    echo "U_BOOT_EXT='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
     echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
@@ -470,6 +469,10 @@ copy_files() {
     echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
+
+    # Edit the etc/fstab
+    [ -f "etc/fstab" ] || error_msg "The etc/fstab File does not exist."
+    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
 
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" ${armbian_release_file}
@@ -482,9 +485,6 @@ copy_files() {
     # Set interfaces macaddr
     interfaces_file="etc/network/interfaces"
     [ -f "${interfaces_file}" ] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
-    # Add rtl8189fs & 8188fu driver for s905x(HG680P & B860H), rtl8822cs driver for s905x3(x96max+) in the dev branch kernel
-    #[[ "${build_soc}" == "s905x3" || "${build_soc}" == "s905x" ]] && sed -i "s|version_branch=\"stable\"|version_branch=\"dev\"|g" usr/sbin/armbian-update
 
     # Optimize wifi/bluetooth module
     [ -d "usr/lib/firmware/brcm" ] && (
