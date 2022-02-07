@@ -215,11 +215,11 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - GitHub Action 输出变量说明
 
-| 参数                                      | 默认值                  | 说明                       |
-|------------------------------------------|-------------------------|---------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}           | ${PWD}/out              | 打包后的固件所在文件夹的路径  |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058         | 打包日期                   |
-| ${{ env.PACKAGED_STATUS }}               | success / failure       | 打包状态。成功 / 失败       |
+| 参数                                      | 默认值             | 说明                       |
+|------------------------------------------|-------------------|---------------------------|
+| ${{ env.PACKAGED_OUTPUTPATH }}           | out               | 打包后的固件所在文件夹的路径   |
+| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058   | 打包日期                    |
+| ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
 
 ## 编译自定义内核
 
