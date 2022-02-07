@@ -436,8 +436,7 @@ copy_files() {
     chown 0 usr/lib/sudo/sudoers.so
     chmod 644 usr/lib/sudo/sudoers.so
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    chmod 755 etc/update-motd.d/10-armbian-header 2>/dev/null
-    chmod 755 etc/update-motd.d/30-armbian-sysinfo 2>/dev/null
+    chmod 755 etc/update-motd.d/* 2>/dev/null
 
     # Delete related files
     rm -rf boot 2>/dev/null && mkdir -p boot && sync
@@ -453,7 +452,9 @@ copy_files() {
 
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\sudo apt-get purge -y linux-image-current-meson64' ${armbian_firstrun}
+    sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
+    #armbian_firstlogin="usr/lib/armbian/armbian-firstlogin"
+    #sed -i 's/warranty.*implied/#&/g' ${armbian_firstlogin} 2>/dev/null
 
     # Add other files
     [ -f "usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen usr/bin/
