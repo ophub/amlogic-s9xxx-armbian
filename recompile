@@ -33,18 +33,21 @@
 #===== Do not modify the following parameter settings, Start =====
 # Set environment variables
 make_path=${PWD}
+moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 compile_path="${make_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
-out_kernel="${compile_path}/output"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
-moredtb_path="${make_path}/build-armbian/amlogic-dtb"
+armbian_path="${compile_path}/tools/armbian"
+armbian_file="${armbian_path}/armbian.img"
+out_kernel="${compile_path}/output"
+chroot_path="${out_kernel}/chroot"
+chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info=$(arch)
 auto_kernel="true"
 build_kernel=("5.4.170" "5.10.90")
-
-# Kernel custom name
 custom_name="-meson64-dev"
+toolchain_path="/usr/local/toolchain_x86_64_aarch64"
 
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
@@ -53,15 +56,10 @@ kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 repo_owner="unifreq"
 repo_branch="main"
 
-# Cross compile toolchain, run on ubuntu-20.04
-toolchain_path="/usr/local/toolchain_x86_64_aarch64"
+# Cross compile toolchain download mirror, run on ubuntu-20.04
 dev_repo="https://github.com/ophub/script/releases/download/dev"
 # armbian
 armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
-armbian_path="${compile_path}/tools/armbian"
-armbian_file="${armbian_path}/armbian.img"
-chroot_path="${out_kernel}/chroot"
-chroot_file="${chroot_path}/armbian.img"
 # gcc
 #gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
