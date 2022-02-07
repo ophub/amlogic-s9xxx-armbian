@@ -61,7 +61,7 @@ You can call the kernel compilation script of this repository through Actions in
 
 The relevant parameters correspond to the `local compilation commands`, please refer to the above description.
 
-| Parameter | Meaning | Description |
+| Parameter | Defaults | Description |
 | ---- | ---- | ---- |
 | build_target   | kernel   | Fixed parameter `kernel`, set the compilation target to the kernel. |
 | kernel_repo    | unifreq  | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
@@ -72,10 +72,10 @@ The relevant parameters correspond to the `local compilation commands`, please r
 
 - GitHub Action Output variable description
 
-| Parameter                         | For example                  | Description               |
-|-----------------------------------|------------------------------|---------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.10.90_5.4.170              | The name of the compiled kernel   |
-| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output        | kernel files storage path  |
-| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058              | compile date                    |
-| ${{ env.PACKAGED_STATUS }}        | success                      | Compile status. success / failure |
+| Parameter                         | For example              | Description                       |
+|-----------------------------------|--------------------------|-----------------------------------|
+| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.10.90_5.4.170          | The name of the compiled kernel   |
+| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | kernel files storage path         |
+| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | compile date                      |
+| ${{ env.PACKAGED_STATUS }}        | success                  | Compile status. success / failure |
 
