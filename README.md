@@ -215,11 +215,11 @@ The relevant parameters correspond to the `local packaging command`, please refe
 
 - GitHub Action Output variable description
 
-| Parameter                                | For example             | Description                   |
-|------------------------------------------|-------------------------|-------------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}           | ${PWD}/out              | OpenWrt firmware storage path |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058         | Packing date                  |
-| ${{ env.PACKAGED_STATUS }}               | success / failure       | Package status                |
+| Parameter                                | For example       | Description                       |
+|------------------------------------------|-------------------|-----------------------------------|
+| ${{ env.PACKAGED_OUTPUTPATH }}           | out               | OpenWrt firmware storage path     |
+| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058   | Packing date                      |
+| ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure |
 
 ## Compile a custom kernel
 
