@@ -3,5 +3,6 @@
 /tmp_dir
 /compile-kernel/kernel
 /compile-kernel/output
+/compile-kernel/tools/armbian
 .DS_Store
 npm-debug.log*
