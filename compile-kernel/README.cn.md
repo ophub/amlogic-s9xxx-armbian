@@ -72,10 +72,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - GitHub Action 输出变量说明
 
-| 参数                               | 默认值                        | 说明                       |
-|-----------------------------------|------------------------------|---------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.10.90_5.4.170              | 编译好的内核的名称           |
-| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output        | 编译完成的内核所在文件夹的路径  |
-| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058              | 编译日期                    |
-| ${{ env.PACKAGED_STATUS }}        | success                      | 编译状态。成功 / 失败        |
+| 参数                               | 默认值                    | 说明                       |
+|-----------------------------------|--------------------------|----------------------------|
+| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.10.90_5.4.170          | 编译好的内核的名称            |
+| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | 编译完成的内核所在文件夹的路径  |
+| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | 编译日期                    |
+| ${{ env.PACKAGED_STATUS }}        | success                  | 编译状态：success / failure  |
 
