@@ -255,7 +255,6 @@ make_kernel() {
     export LOCALVERSION="${custom_name}"
     export PATH=${path_clang}
     export CROSS_COMPILE=${toolchain_path}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
-    export CLANG_TRIPLE=${toolchain_path}/${clang_file//.tar.xz/}/bin
     export CC=${toolchain_path}/${clang_file//.tar.xz/}/bin/clang
     export LD=${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld
     # Set $PATH variable for ~/.bashrc
@@ -272,11 +271,10 @@ make_kernel() {
     echo -e "${INFO} LOCALVERSION: [ ${LOCALVERSION} ]"
     echo -e "${INFO} PATH: [ ${PATH} ]"
     echo -e "${INFO} CROSS_COMPILE: [ ${CROSS_COMPILE} ]"
-    echo -e "${INFO} CLANG_TRIPLE: [ ${CLANG_TRIPLE} ]"
     echo -e "${INFO} CC: [ ${CC} ]"
     echo -e "${INFO} LD: [ ${LD} ]"
     # Set generic make string
-    MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CLANG_TRIPLE=${CLANG_TRIPLE} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
+    MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
     #make ${MAKE_SET_STRING} clean
