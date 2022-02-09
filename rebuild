@@ -1,8 +1,19 @@
 #!/bin/bash
-#=========================================================================
-# Description: Build armbian for Amlogic s9xxx tv box
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#=========================================================================
+#=================================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Run on Ubuntu-20.04-x86_64, Build armbian for Amlogic s9xxx tv box
+# Copyright (C) 2021- https://github.com/unifreq
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: sudo ./rebuild -d
+# Command optional parameters please refer to the source code repository
+#=================================================================================
 
 #===== Do not modify the following parameter settings, Start =====
 make_path="${PWD}"

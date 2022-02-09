@@ -1,12 +1,19 @@
 #!/bin/bash
-#=======================================================================
+#=========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
 # Function: Create swap for armbian system
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# The input parameter unit is GB, the default is 1
 # Command: armbian-swap 1
-#=======================================================================
+# The input parameter unit is GB, the default is 1
+#=========================================================================
 
 # Set the swap size in GB
 my_swap_gb="${1}"

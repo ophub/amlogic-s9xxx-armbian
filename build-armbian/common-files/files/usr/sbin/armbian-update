@@ -1,5 +1,12 @@
 #!/bin/bash
-#==================================================================================================================================
+#============================================================================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
 # Function: Armbian kernel update
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
@@ -11,10 +18,12 @@
 # UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot"
 # MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
 #
-# When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, Can choose to install the mainline u-boot.
-# Write mainline u-boot command: armbian-update 5.4.170 stable yes
-# The mainline u-boot is installed by default: armbian-update 5.4.170
-#==================================================================================================================================
+# Command: armbian-update
+# Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
+# The kernel above version 5.10 needs to install mainline u-boot
+# The mainline u-boot is installed by default: armbian-update
+# Don't write mainline u-boot command: armbian-update 5.4.170 stable no
+#============================================================================================================================
 
 # Set default value
 tmp_path="${PWD}"
