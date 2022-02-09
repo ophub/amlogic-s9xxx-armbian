@@ -1,9 +1,16 @@
 #!/bin/bash
-#===========================================================================
-# Description: compile linux kernel for armbian
-# Copyright (C) 2020-2021 https://github.com/unifreq
-# Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
-#===========================================================================
+#======================================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Run on Ubuntu-20.04-x86_64, Compile the kernel for Amlogic s9xxx tv box
+# Copyright (C) 2021- https://github.com/unifreq
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#======================================================================================
 
 #===== Do not modify the following parameter settings, Start =====
 # Set environment variables
@@ -62,4 +69,3 @@ chroot_generate_uinitrd() {
 chroot_generate_uinitrd
 
 sync
-exit 0
