@@ -243,5 +243,5 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 ## License
 
-[LICENSE](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/LICENSE) © OPHUB
+The amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/LICENSE)
 
