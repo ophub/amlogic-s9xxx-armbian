@@ -1,15 +1,23 @@
 #!/bin/bash
-#============================================================================================
+#==========================================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
 #
-# Description: Run on Ubuntu-20.04-x86_64, compile linux kernel for armbian
-# Copyright (C) 2020-2021 https://github.com/unifreq
-# Copyright (C) 2020-2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
 #
-#============================================================================================
+# Description: Run on Ubuntu-20.04-x86_64, Compile the kernel for Amlogic s9xxx tv box
+# Copyright (C) 2021- https://github.com/unifreq
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: sudo ./recompile -d
+# Command optional parameters please refer to the source code repository
+#==========================================================================================
 #
 # Command to compile the kernel: [ sudo ./recompile -r unifreq -k 5.4.170_5.10.90 ]
 #
-# ---------- Specify the code repository of github.com through the [ -r ] parameter ---------
+# -------- Specify the code repository of github.com through the [ -r ] parameter ---------
 #
 # 01. [ sudo ./recompile -r owner ]
 # 01. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is default
@@ -23,12 +31,12 @@
 # 04. [ sudo ./recompile -r owner/repo@branch ]
 # 04. From the [ owner ], Search the [ repo ] named repository, branch is [ branch ]
 #
-# ---------- Specify the code repository of kernel.org through the [ -r ] parameter ---------
+# -------- Specify the code repository of kernel.org through the [ -r ] parameter --------
 #
 # 01. [ sudo ./recompile -r kernel.org ]
 # 01. From the [ kernel.org ], download [ linux-5.x.y.tar.xz ] kernel zip file
 #
-#============================================================================================
+#==========================================================================================
 
 #===== Do not modify the following parameter settings, Start =====
 # Set environment variables
@@ -326,6 +334,8 @@ make_kernel() {
 
 generate_uinitrd() {
     cd ${make_path}
+    echo -e "${STEPS} Create chroot..."
+
     cp -f ${armbian_file} ${chroot_file} && sync
 
     # Mount the armbian system
@@ -354,24 +364,23 @@ generate_uinitrd() {
     cp -rf /lib/modules/${kernel_outname} ${tag_rootfs}/lib/modules && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/lib/modules) \n"
 
-    cp -f ${script_path}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
-    chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
-
-    [ -f "/usr/bin/${qemu_binary_arm}" ] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/ && sync
-    [ -f "/usr/bin/${qemu_binary_arm64}" ] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/ && sync
-    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
-
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file} && sync
     echo "COMPRESS=gzip" >>${compress_initrd_file} && sync
 
-    # Enter the armbian system to generate /boot/uInitrd file
-    chroot ${tag_rootfs} <<EOF
-bash /root/generate_uinitrd.sh ${kernel_outname}
-exit
-EOF
+    [ -f "/usr/bin/${qemu_binary_arm}" ] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/ && sync
+    [ -f "/usr/bin/${qemu_binary_arm64}" ] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/ && sync
+    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
+
+    cp -f ${script_path}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
+    chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
+
+    echo -e "${INFO} Enter the chroot armbian system..."
+    # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
+    chroot ${tag_rootfs} /bin/bash -c "/root/generate_uinitrd.sh ${kernel_outname}"
+    [[ $? -ne 0 || ! -f "${tag_rootfs}"/boot/uInitrd-${kernel_outname} ]] && error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
     cd ${make_path}
     # Copy the generated uInitrd file to the current system
@@ -382,7 +391,6 @@ EOF
     umount ${tag_rootfs}/boot 2>/dev/null
     umount ${tag_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
-
 }
 
 packit_kernel() {
