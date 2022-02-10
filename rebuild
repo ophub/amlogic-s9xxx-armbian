@@ -18,7 +18,7 @@
 #===== Do not modify the following parameter settings, Start =====
 make_path="${PWD}"
 armbian_outputpath="${make_path}/build/output/images"
-armbian_original_file="${armbian_outputpath}/*.img"
+armbian_rebuild_file="${armbian_outputpath}/*.img"
 build_path="${make_path}/build-armbian"
 armbian_path="${build_path}/amlogic-armbian"
 dtb_path="${build_path}/amlogic-dtb"
@@ -30,20 +30,14 @@ tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
-
-# Get VERSION_CODENAME: such as [ focal ]
-os_release_file="etc/os-release"
-# Set BOARD_NAME: such as [ s905x3 ]
-armbian_release_file="etc/armbian-release"
-# Add custom armbian firmware information
-ophub_release_file="etc/ophub-release"
+os_release_file="etc/os-release"           # Get armbian ${VERSION_CODENAME}: such as [ focal ]
+armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
+ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
+build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
 
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
-
-build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
-#build_kernel=("default")
 build_kernel=("5.10.90" "5.4.170")
 auto_kernel="true"
 
@@ -58,7 +52,18 @@ error_msg() {
 }
 
 process_msg() {
-    echo -e " [\033[1;92m ${build_soc}${out_kernel} \033[0m] ${1}"
+    echo -e " [\033[1;92m ${soc} - ${kernel} \033[0m] ${1}"
+}
+
+find_rebuild() {
+    cd ${make_path}
+
+    # Get armbian release and version
+    armbian_rebuild_name=$(ls ${armbian_rebuild_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
+    [[ -n "${armbian_rebuild_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_rebuild_file} ]"
+    armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '2[0-9].[0-9]{1,2}[.]*[0-9]{1,2}' | head -n 1)"
+    armbian_rebuild_kernel="$(echo ${armbian_rebuild_name} | grep -oE '[4-5].[0-9]{1,2}.[0-9]{1,3}' | head -n 1)"
+    [[ -n "${armbian_rebuild_version}" && -n "${armbian_rebuild_kernel}" ]] || error_msg "Armbian Rebuild file analysis error."
 }
 
 download_kernel() {
@@ -126,16 +131,9 @@ make_image() {
     rm -rf ${tmp_dir} 2>/dev/null && sync
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
 
-    if [ -n "${new_kernel}" ]; then
-        make_kernel=${new_kernel}
-    else
-        make_kernel=${armbian_original_kernel}
-    fi
-
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_original_version}_Aml_${build_soc}_focal_${make_kernel}_$(date +"%Y.%m.%d.%H%M").img"
-    rm -f ${build_image_file}
-    sync
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_focal_${kernel}_$(date +"%Y.%m.%d.%H%M").img"
+    rm -f ${build_image_file} 2>/dev/null && sync
 
     IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
 
@@ -164,9 +162,9 @@ extract_armbian() {
 
     cd ${make_path}
 
-    armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_kernel}.img"
+    armbian_image_file="${tmp_aml_image}/armbian_${soc}_${kernel}.img"
     rm -f ${armbian_image_file} 2>/dev/null && sync
-    cp -f $(ls ${armbian_original_file} 2>/dev/null | head -n 1) ${armbian_image_file}
+    cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}"
     sync && sleep 3
 
     loop_old=$(losetup -P -f --show "${armbian_image_file}")
@@ -185,40 +183,37 @@ extract_armbian() {
 replace_kernel() {
     process_msg " (3/5) replace kernel for armbian."
 
-    # Replace if specified
-    if [[ ! "${build_kernel[*]}" =~ "default" ]]; then
-        cd ${make_path}
+    cd ${make_path}
 
-        build_boot=$(ls ${kernel_path}/${new_kernel}/boot-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
-        build_dtb=$(ls ${kernel_path}/${new_kernel}/dtb-amlogic-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
-        build_modules=$(ls ${kernel_path}/${new_kernel}/modules-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
-        build_header=$(ls ${kernel_path}/${new_kernel}/header-${new_kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_dtb=$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_modules=$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_header=$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
 
-        # 01 For /boot five files
-        (cd ${tmp_armbian}/boot && rm -rf *-${armbian_original_kernel}-* uInitrd zImage dtb* 2>/dev/null && sync)
-        tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
-        [ "$(ls ${tmp_armbian}/boot/*-${new_kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || error_msg "boot/ 5 files is missing."
+    # 01 For /boot five files
+    (cd ${tmp_armbian}/boot && rm -rf *-${armbian_rebuild_kernel}-* uInitrd zImage dtb* 2>/dev/null && sync)
+    tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
+    [ "$(ls ${tmp_armbian}/boot/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || error_msg "boot/ 5 files is missing."
 
-        # 02 For dtb files
-        mkdir -p ${tmp_armbian}/boot/dtb/amlogic && sync
-        tar -xzf ${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
+    # 02 For dtb files
+    mkdir -p ${tmp_armbian}/boot/dtb/amlogic && sync
+    tar -xzf ${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
 
-        # 03 For usr/lib/modules/*
-        (cd ${tmp_armbian}/usr/lib/modules && rm -rf * 2>/dev/null && sync)
-        tar -xzf ${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
-        (cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync)
-        if [ "$(ls ${tmp_armbian}/usr/lib/modules/${new_kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
-            error_msg "${tmp_armbian}/usr/lib/modules/${new_kernel}-* kernel folder is missing."
-        fi
-
-        # 04 For header files, usr/local/include
-        if [[ -n "${build_header}" && -f "${build_header}" ]]; then
-            rm -rf ${tmp_armbian}/usr/local/include/* 2>/dev/null && sync
-            tar -xzf ${build_header} -C ${tmp_armbian}/usr/local && sync
-        fi
-
-        sync
+    # 03 For usr/lib/modules/*
+    (cd ${tmp_armbian}/usr/lib/modules && rm -rf * 2>/dev/null && sync)
+    tar -xzf ${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
+    (cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync)
+    if [ "$(ls ${tmp_armbian}/usr/lib/modules/${kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
+        error_msg "${tmp_armbian}/usr/lib/modules/${kernel}-* kernel folder is missing."
     fi
+
+    # 04 For header files, usr/local/include
+    if [[ -n "${build_header}" && -f "${build_header}" ]]; then
+        rm -rf ${tmp_armbian}/usr/local/include/* 2>/dev/null && sync
+        tar -xzf ${build_header} -C ${tmp_armbian}/usr/local && sync
+    fi
+
+    sync
 }
 
 copy_files() {
@@ -246,7 +241,7 @@ copy_files() {
     fi
     #echo -e "K510: [ ${K510} ]"
 
-    case "${build_soc}" in
+    case "${soc}" in
     s905x3 | x96 | hk1 | h96 | ugoosx3)
         FDTFILE="meson-sm1-x96-max-plus-100m.dtb"
         UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
@@ -341,7 +336,7 @@ copy_files() {
         AMLOGIC_SOC="s922x"
         ;;
     *)
-        error_msg "Have no this soc: [ ${build_soc} ]"
+        error_msg "Have no this soc: [ ${soc} ]"
         ;;
     esac
 
@@ -352,18 +347,18 @@ copy_files() {
     if [[ "${MAINLINE_UBOOT}" != "" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
         dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
         dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${build_soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
     elif [[ "${ANDROID_UBOOT}" != "" && -f "${tag_rootfs}/usr${ANDROID_UBOOT}" ]]; then
         dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
         dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${build_soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
     sync
 
     # Reorganize the /boot partition
     mkdir -p ${tmp_build}/boot
     # Copy the original boot core file
-    cp -rf ${tmp_armbian}/boot/*-${make_kernel}-* ${tmp_build}/boot && sync
+    cp -rf ${tmp_armbian}/boot/*-${kernel}-* ${tmp_build}/boot && sync
     (cd ${tmp_build}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && chmod +x * && sync)
     # Unzip the relevant files
     tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
@@ -422,7 +417,7 @@ copy_files() {
         if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync && chmod +x u-boot.ext
         else
-            error_msg "${build_soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
+            error_msg "${soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
         fi
     fi
 
@@ -615,22 +610,14 @@ while [ "${1}" ]; do
     shift
 done
 
-# Set whether to replace the kernel
-[ "${auto_kernel}" == "true" ] && download_kernel
-
-# Get armbian release and version
-armbian_image_name=$(ls ${armbian_original_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
-[[ -n "${armbian_image_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_original_file} ]"
-armbian_original_version="$(echo ${armbian_image_name} | grep -oE '2[0-9].[0-9]{1,2}[.]*[0-9]{1,2}' | head -n 1)"
-armbian_original_kernel="$(echo ${armbian_image_name} | grep -oE '[4-5].[0-9]{1,2}.[0-9]{1,3}' | head -n 1)"
-
 # Show welcome message
+echo -e "Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
 [ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
-echo -e "\n"
-echo -e "Welcome to build Armbian for Amlogic s9xxx tv box!"
-echo -e "Armbian original file: [ ${armbian_image_name} ], Version: [ ${armbian_original_version} ], Kernel: [ ${armbian_original_kernel} ]"
+find_rebuild && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+[ "${auto_kernel}" == "true" ] && download_kernel
+#
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
@@ -642,7 +629,7 @@ for b in ${build_armbian[*]}; do
     i=1
     for x in ${build_kernel[*]}; do
         {
-            echo -n "(${k}.${i}) Start building armbian [ ${b} - ${x} ]. "
+            echo -n "(${k}.${i}) Start building Armbian [ ${b} - ${x} ]. "
             now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
             if [[ "${now_remaining_space}" -le "2" ]]; then
                 echo "Remaining space is less than 2G, exit this build. \n"
@@ -652,14 +639,8 @@ for b in ${build_armbian[*]}; do
             fi
 
             # The loop variable assignment
-            build_soc="${b}"
-            if [ "${x}" == "default" ]; then
-                new_kernel=""
-                out_kernel=""
-            else
-                new_kernel="${x}"
-                out_kernel=" - ${x}"
-            fi
+            soc="${b}"
+            kernel="${x}"
 
             # Execute the following functions in sequence
             make_image
@@ -668,7 +649,7 @@ for b in ${build_armbian[*]}; do
             copy_files
             clean_tmp
 
-            echo -e "(${k}.${i}) Build successfully. \n"
+            echo -e "(${k}.${i}) Armbian build successfully. \n"
             let i++
         }
     done
