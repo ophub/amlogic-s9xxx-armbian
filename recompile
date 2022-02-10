@@ -518,9 +518,11 @@ toolchain_check
 # Set whether to replace the kernel
 [[ "${auto_kernel}" == "true" ]] && query_version
 
+# Show welcome message
+echo -e "Welcome to compile kernel! \n"
 [ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
 [[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
-echo -e "Welcome to compile kernel! \n"
+#
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
@@ -528,6 +530,7 @@ echo -e "Kernel from: [ ${code_owner} ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "Ready, start compile kernel... \n"
 
+# Start loop compilation
 k=1
 for x in ${build_kernel[*]}; do
     # kernel_version, such as [ 5.4.170 ]
