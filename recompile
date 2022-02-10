@@ -52,9 +52,6 @@ out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info=$(arch)
-auto_kernel="true"
-build_kernel=("5.4.170" "5.10.90")
-custom_name="-meson64-dev"
 toolchain_path="/usr/local/toolchain_x86_64_aarch64"
 
 # Set the default value of the [ -r ] parameter
@@ -63,6 +60,9 @@ kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
+build_kernel=("5.4.170" "5.10.90")
+auto_kernel="true"
+custom_name="-meson64-dev"
 
 # Cross compile toolchain download mirror, run on ubuntu-20.04
 dev_repo="https://github.com/ophub/script/releases/download/dev"
@@ -537,6 +537,7 @@ for x in ${build_kernel[*]}; do
     # kernel_sub, such as [ 170 ]
     kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
 
+    # The loop variable assignment
     if [ "${code_owner}" == "kernel.org" ]; then
         server_kernel_repo="${kernel_org_repo}"
         local_kernel_path="linux-${kernel_version}"
@@ -548,6 +549,7 @@ for x in ${build_kernel[*]}; do
         local_kernel_path="${code_repo}-${code_branch}"
     fi
 
+    # Execute the following functions in sequence
     download_kernel
     compile_env_check
     make_kernel
