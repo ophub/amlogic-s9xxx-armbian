@@ -43,8 +43,8 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch="stable"
 
 build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
-build_kernel=("5.10.90" "5.4.170")
 #build_kernel=("default")
+build_kernel=("5.10.90" "5.4.170")
 auto_kernel="true"
 
 SKIP_MB=68
@@ -119,6 +119,8 @@ download_kernel() {
 }
 
 make_image() {
+    process_msg " (1/5) make new armbian image."
+
     cd ${make_path}
 
     rm -rf ${tmp_dir} 2>/dev/null && sync
@@ -158,6 +160,8 @@ make_image() {
 }
 
 extract_armbian() {
+    process_msg " (2/5) extract old armbian files."
+
     cd ${make_path}
 
     armbian_image_file="${tmp_aml_image}/armbian_${build_soc}_${make_kernel}.img"
@@ -179,6 +183,8 @@ extract_armbian() {
 }
 
 replace_kernel() {
+    process_msg " (3/5) replace kernel for armbian."
+
     # Replace if specified
     if [[ ! "${build_kernel[*]}" =~ "default" ]]; then
         cd ${make_path}
@@ -216,6 +222,8 @@ replace_kernel() {
 }
 
 copy_files() {
+    process_msg " (4/5) copy files to new image."
+
     cd ${tmp_armbian}
 
     #Check if writing to EMMC is supported
@@ -532,6 +540,8 @@ copy_files() {
 }
 
 clean_tmp() {
+    process_msg " (5/5) clear temp files."
+
     cd ${tmp_outpath}
     # Rename version
     [[ "${release_codename}" != "focal" ]] && rename "s/focal/${release_codename}/g" *.img 2>/dev/null && sync
@@ -632,15 +642,16 @@ for b in ${build_armbian[*]}; do
     i=1
     for x in ${build_kernel[*]}; do
         {
-            echo -n "(${k}.${i}) Start build armbian [ ${b} - ${x} ]. "
+            echo -n "(${k}.${i}) Start building armbian [ ${b} - ${x} ]. "
             now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
             if [[ "${now_remaining_space}" -le "2" ]]; then
-                echo "Remaining space is less than 2G, exit this packaging. \n"
+                echo "Remaining space is less than 2G, exit this build. \n"
                 break
             else
                 echo "Remaining space is ${now_remaining_space}G."
             fi
 
+            # The loop variable assignment
             build_soc="${b}"
             if [ "${x}" == "default" ]; then
                 new_kernel=""
@@ -650,15 +661,11 @@ for b in ${build_armbian[*]}; do
                 out_kernel=" - ${x}"
             fi
 
-            process_msg " (1/5) make new armbian image."
+            # Execute the following functions in sequence
             make_image
-            process_msg " (2/5) extract old armbian files."
             extract_armbian
-            process_msg " (3/5) replace kernel for armbian."
             replace_kernel
-            process_msg " (4/5) copy files to new image."
             copy_files
-            process_msg " (5/5) clear temp files."
             clean_tmp
 
             echo -e "(${k}.${i}) Build successfully. \n"
