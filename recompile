@@ -52,7 +52,7 @@ out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info=$(arch)
-toolchain_path="/usr/local/toolchain_x86_64_aarch64"
+toolchain_path="/usr/local/toolchain"
 
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
@@ -380,8 +380,8 @@ generate_uinitrd() {
     chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
-    echo -e "${INFO} Enter the chroot armbian system..."
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
+    echo -e "${INFO} Enter the chroot armbian system..."
     chroot ${tag_rootfs} /bin/bash -c "/root/generate_uinitrd.sh ${kernel_outname}"
     [[ $? -ne 0 || ! -f "${tag_rootfs}"/boot/uInitrd-${kernel_outname} ]] && error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
@@ -514,14 +514,12 @@ code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
 [ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
 [ -n "${code_branch}" ] || code_branch="${repo_branch}"
 
-toolchain_check
-# Set whether to replace the kernel
-[[ "${auto_kernel}" == "true" ]] && query_version
-
 # Show welcome message
 echo -e "Welcome to compile kernel! \n"
 [ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
 [[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
+[[ "${auto_kernel}" == "true" ]] && query_version
+toolchain_check
 #
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
