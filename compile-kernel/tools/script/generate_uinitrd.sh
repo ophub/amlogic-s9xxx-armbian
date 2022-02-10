@@ -62,7 +62,7 @@ chroot_generate_uinitrd() {
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
 
-    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${chroot_kernel_version}) \n"
+    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${chroot_kernel_version})"
 }
 
 #chroot_env_init
