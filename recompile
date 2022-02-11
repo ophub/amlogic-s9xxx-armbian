@@ -1,5 +1,6 @@
 #!/bin/bash
-#==========================================================================================
+#==============================================================================================
+#
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
@@ -11,35 +12,35 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
+#============= Install the basic packages of compile the kernel for Ubuntu 20.04 ==============
+#
+# sudo apt-get update -y
+# sudo apt-get full-upgrade -y
+# sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
+#
 # Command: sudo ./recompile -d
 # Command optional parameters please refer to the source code repository
-#==========================================================================================
 #
-# Command to compile the kernel: [ sudo ./recompile -r unifreq -k 5.4.170_5.10.90 ]
+#======================================= Functions list =======================================
 #
-# -------- Specify the code repository of github.com through the [ -r ] parameter ---------
+# error_msg          : Output error message
 #
-# 01. [ sudo ./recompile -r owner ]
-# 01. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is default
+# init_var           : Initialize all variables
+# toolchain_check    : Check and install the cross-compilation toolchain (gcc, clang, armbian)
+# query_version      : Query the latest kernel version
 #
-# 02. [ sudo ./recompile -r owner@branch ]
-# 02. From the [ owner ], Search the [ linux-5.x.y ] named repository, branch is [ branch ]
+# download_kernel    : Download the kernel source code
+# compile_env_check  : Check local build environment
+# compile_kernel     : Compile the kernel
+# generate_uinitrd   : Chroot into armbian to generate initrd.img and uInitrd
+# packit_kernel      : Package the full set of kernel files
+# clean_tmp          : Clear temporary files
 #
-# 03. [ sudo ./recompile -r owner/repo ]
-# 03. From the [ owner ], Search the [ repo ] named repository, branch is default
+# loop_recompile     : Loop to compile kernel
 #
-# 04. [ sudo ./recompile -r owner/repo@branch ]
-# 04. From the [ owner ], Search the [ repo ] named repository, branch is [ branch ]
+#=============================== Set make environment variables ===============================
 #
-# -------- Specify the code repository of kernel.org through the [ -r ] parameter --------
-#
-# 01. [ sudo ./recompile -r kernel.org ]
-# 01. From the [ kernel.org ], download [ linux-5.x.y.tar.xz ] kernel zip file
-#
-#==========================================================================================
-
-#===== Do not modify the following parameter settings, Start =====
-# Set environment variables
+# Related file storage path
 make_path=${PWD}
 moredtb_path="${make_path}/build-armbian/amlogic-dtb"
 compile_path="${make_path}/compile-kernel"
@@ -53,7 +54,7 @@ chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info=$(arch)
 toolchain_path="/usr/local/toolchain"
-
+#
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
@@ -63,25 +64,25 @@ repo_branch="main"
 build_kernel=("5.4.170" "5.10.90")
 auto_kernel="true"
 custom_name="-meson64-dev"
-
+#
 # Cross compile toolchain download mirror, run on ubuntu-20.04
 dev_repo="https://github.com/ophub/script/releases/download/dev"
-# armbian
+#
 # armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
-# gcc
+#
 # gcc download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
 #gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
-# clang
+#
 # clang download from: https://github.com/llvm/llvm-project/releases
 #clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
-
+#
 # QEMU BINARY
 qemu_binary_arm="qemu-arm-static"
 qemu_binary_arm64="qemu-aarch64-static"
-
+#
 # Set font color
 blue_font_prefix="\033[94m"
 purple_font_prefix="\033[95m"
@@ -94,11 +95,78 @@ STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
 SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
 WARNING="[${yellow_font_prefix}WARNING${font_color_suffix}]"
 ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
-#===== Do not modify the following parameter settings, End =======
+#
+#==============================================================================================
 
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+init_var() {
+    cd ${make_path}
+
+    # If it is followed by [ : ], it means that the option requires a parameter value
+    get_all_ver=$(getopt "dk:a:n:r:" "${@}")
+
+    while [ -n "${1}" ]; do
+        case "${1}" in
+        -d | --default)
+            : ${build_kernel:="${build_kernel}"}
+            : ${auto_kernel:="${auto_kernel}"}
+            : ${custom_name:="${custom_name}"}
+            : ${repo_owner:="${repo_owner}"}
+            ;;
+        -k | --kernel)
+            if [ -n "${2}" ]; then
+                oldIFS=$IFS
+                IFS=_
+                build_kernel=(${2})
+                IFS=$oldIFS
+                shift
+            else
+                error_msg "Invalid -k parameter [ ${2} ]!"
+            fi
+            ;;
+        -a | --autoKernel)
+            if [ -n "${2}" ]; then
+                auto_kernel="${2}"
+                shift
+            else
+                error_msg "Invalid -a parameter [ ${2} ]!"
+            fi
+            ;;
+        -n | --customName)
+            if [ -n "${2}" ]; then
+                custom_name="${2}"
+                shift
+            else
+                error_msg "Invalid -n parameter [ ${2} ]!"
+            fi
+            ;;
+        -r | --repo)
+            if [ -n "${2}" ]; then
+                repo_owner="${2}"
+                shift
+            else
+                error_msg "Invalid -r parameter [ ${2} ]!"
+            fi
+            ;;
+        *)
+            error_msg "Invalid option [ ${1} ]!"
+            ;;
+        esac
+        shift
+    done
+
+    # Receive the value entered by the [ -r ] parameter
+    input_r_value="${repo_owner//https\:\/\/github\.com\//}"
+    code_owner="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $1}')"
+    code_repo="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $2}')"
+    code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
+    #
+    [ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
+    [ -n "${code_branch}" ] || code_branch="${repo_branch}"
 }
 
 toolchain_check() {
@@ -256,7 +324,7 @@ compile_env_check() {
     mkdir -p ${out_kernel}/{chroot/{root/boot/,},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
-make_kernel() {
+compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set cross compilation parameters."
     # Set cross compilation parameters
@@ -455,112 +523,60 @@ clean_tmp() {
     echo -e "${SUCCESS} All processes have been completed."
 }
 
-while [ "${1}" ]; do
-    case "${1}" in
-    -d | --default)
-        : ${build_kernel:="${build_kernel}"}
-        : ${auto_kernel:="${auto_kernel}"}
-        : ${custom_name:="${custom_name}"}
-        : ${repo_owner:="${repo_owner}"}
-        ;;
-    -k | --kernel)
-        if [ -n "${2}" ]; then
-            oldIFS=$IFS
-            IFS=_
-            build_kernel=(${2})
-            IFS=$oldIFS
-            shift
-        else
-            error_msg "Invalid -k parameter [ ${2} ]!"
-        fi
-        ;;
-    -a | --autoKernel)
-        if [ -n "${2}" ]; then
-            auto_kernel="${2}"
-            shift
-        else
-            error_msg "Invalid -a parameter [ ${2} ]!"
-        fi
-        ;;
-    -n | --customName)
-        if [ -n "${2}" ]; then
-            custom_name="${2}"
-            shift
-        else
-            error_msg "Invalid -n parameter [ ${2} ]!"
-        fi
-        ;;
-    -r | --repo)
-        if [ -n "${2}" ]; then
-            repo_owner="${2}"
-            shift
-        else
-            error_msg "Invalid -r parameter [ ${2} ]!"
-        fi
-        ;;
-    *)
-        error_msg "Invalid option [ ${1} ]!"
-        ;;
-    esac
-    shift
-done
+loop_recompile() {
+    cd ${make_path}
 
-# Receive the value entered by the [ -r ] parameter
-input_r_value="${repo_owner//https\:\/\/github\.com\//}"
-code_owner="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $1}')"
-code_repo="$(echo "${input_r_value}" | awk -F '@' '{print $1}' | awk -F '/' '{print $2}')"
-code_branch="$(echo "${input_r_value}" | awk -F '@' '{print $2}')"
-#
-[ -n "${code_owner}" ] || error_msg "The [ -r ] parameter is invalid."
-[ -n "${code_branch}" ] || code_branch="${repo_branch}"
+    k=1
+    for x in ${build_kernel[*]}; do
+        # kernel_version, such as [ 5.4.170 ]
+        kernel_version="${x}"
+        # kernel_verpatch, such as [ 5.4 ]
+        kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
+        # kernel_sub, such as [ 170 ]
+        kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
+
+        # The loop variable assignment
+        if [ "${code_owner}" == "kernel.org" ]; then
+            server_kernel_repo="${kernel_org_repo}"
+            local_kernel_path="linux-${kernel_version}"
+        elif [ -z "${code_repo}" ]; then
+            server_kernel_repo="${code_owner}/linux-${kernel_verpatch}.y"
+            local_kernel_path="linux-${kernel_verpatch}.y"
+        else
+            server_kernel_repo="${code_owner}/${code_repo}"
+            local_kernel_path="${code_repo}-${code_branch}"
+        fi
+
+        # Execute the following functions in sequence
+        download_kernel
+        compile_env_check
+        compile_kernel
+        generate_uinitrd
+        packit_kernel
+        clean_tmp
+
+        let k++
+    done
+}
 
 # Show welcome message
 echo -e "Welcome to compile kernel! \n"
 [ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
 [[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
-[[ "${auto_kernel}" == "true" ]] && query_version
-toolchain_check
-#
+# Show server start information
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+# Initialize variables and download the kernel source code
+init_var "${@}"
+[[ "${auto_kernel}" == "true" ]] && query_version
 echo -e "Kernel from: [ ${code_owner} ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "Ready, start compile kernel... \n"
-
-# Start loop compilation
-k=1
-for x in ${build_kernel[*]}; do
-    # kernel_version, such as [ 5.4.170 ]
-    kernel_version="${x}"
-    # kernel_verpatch, such as [ 5.4 ]
-    kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
-    # kernel_sub, such as [ 170 ]
-    kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
-
-    # The loop variable assignment
-    if [ "${code_owner}" == "kernel.org" ]; then
-        server_kernel_repo="${kernel_org_repo}"
-        local_kernel_path="linux-${kernel_version}"
-    elif [ -z "${code_repo}" ]; then
-        server_kernel_repo="${code_owner}/linux-${kernel_verpatch}.y"
-        local_kernel_path="linux-${kernel_verpatch}.y"
-    else
-        server_kernel_repo="${code_owner}/${code_repo}"
-        local_kernel_path="${code_repo}-${code_branch}"
-    fi
-
-    # Execute the following functions in sequence
-    download_kernel
-    compile_env_check
-    make_kernel
-    generate_uinitrd
-    packit_kernel
-    clean_tmp
-
-    let k++
-done
-
-sync
+# Check the toolchain and loop to compile the kernel
+toolchain_check
+loop_recompile
+# Show server end information
 echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
-exit 0
+# All process completed
+wait
