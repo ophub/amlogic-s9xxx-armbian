@@ -651,13 +651,13 @@ clean_tmp() {
 loop_rebuild() {
     cd ${make_path}
 
-    k=1
+    j=1
     for b in ${build_armbian[*]}; do
 
         i=1
-        for x in ${build_kernel[*]}; do
+        for k in ${build_kernel[*]}; do
             {
-                echo -n "(${k}.${i}) Start building Armbian [ ${b} - ${x} ]. "
+                echo -n "(${j}.${i}) Start building Armbian [ ${b} - ${k} ]. "
                 now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
                 if [[ "${now_remaining_space}" -le "2" ]]; then
                     echo "Remaining space is less than 2G, exit this build. \n"
@@ -668,7 +668,7 @@ loop_rebuild() {
 
                 # The loop variable assignment
                 soc="${b}"
-                kernel="${x}"
+                kernel="${k}"
 
                 # Execute the following functions in sequence
                 make_image
@@ -677,12 +677,12 @@ loop_rebuild() {
                 copy_files
                 clean_tmp
 
-                echo -e "(${k}.${i}) Armbian build successfully. \n"
+                echo -e "(${j}.${i}) Armbian build successfully. \n"
                 let i++
             }
         done
 
-        let k++
+        let j++
     done
 }
 
@@ -693,6 +693,7 @@ echo -e "Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+#
 # Initialize variables and download the kernel
 init_var "${@}"
 find_rebuild && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
@@ -701,6 +702,7 @@ echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 # Loop to rebuild armbian firmware
 loop_rebuild
+#
 # Show server end information
 echo -e "Server space usage after compilation: \n$(df -hT ${PWD}) \n"
 # All process completed
