@@ -1,5 +1,6 @@
 #!/bin/bash
-#=================================================================================
+#==================================================================================
+#
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
@@ -11,11 +12,35 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
+#========= Install the basic packages of rebuild armbian for Ubuntu 20.04 =========
+#
+# sudo apt-get update -y
+# sudo apt-get full-upgrade -y
+# sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
+#
 # Command: sudo ./rebuild -d
 # Command optional parameters please refer to the source code repository
-#=================================================================================
-
-#===== Do not modify the following parameter settings, Start =====
+#
+#================================= Functions list =================================
+#
+# error_msg          : Output error message
+# process_msg        : Output process message
+#
+# init_var           : Initialize all variables
+# find_rebuild       : Find rebuild Armbian file (*.img)
+# download_kernel    : Download the latest kernel
+#
+# make_image         : Making Armbian files
+# extract_armbian    : Extract Armbian firmware files
+# replace_kernel     : Replace the Armbian kernel
+# copy_files         : Copy the Armbian file
+# clean_tmp          : Clear temporary files
+#
+# loop_rebuild       : Loop to rebuild Armbian firmware
+#
+#========================= Set make environment variables =========================
+#
+# Related file storage path
 make_path="${PWD}"
 armbian_outputpath="${make_path}/build/output/images"
 armbian_rebuild_file="${armbian_outputpath}/*.img"
@@ -34,17 +59,20 @@ os_release_file="etc/os-release"           # Get armbian ${VERSION_CODENAME}: su
 armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
 ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
 build_armbian=("s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
-
+#
+# Latest kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 #kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 build_kernel=("5.10.90" "5.4.170")
 auto_kernel="true"
-
+#
+# Set Armbian firmware size (BOOT_MB >= 256, ROOT_MB >= 2000)
 SKIP_MB=68
 BOOT_MB=256
 ROOT_MB=2748
-#===== Do not modify the following parameter settings, End =======
+#
+#==================================================================================
 
 error_msg() {
     echo -e " [\033[1;91m Error \033[0m] ${1}"
@@ -55,6 +83,75 @@ process_msg() {
     echo -e " [\033[1;92m ${soc} - ${kernel} \033[0m] ${1}"
 }
 
+init_var() {
+    cd ${make_path}
+
+    # If it is followed by [ : ], it means that the option requires a parameter value
+    get_all_ver=$(getopt "db:k:a:v:s:" "${@}")
+
+    while [ -n "${1}" ]; do
+        case "${1}" in
+        -d | --default)
+            : ${version_branch:="${version_branch}"}
+            : ${build_armbian:="${build_armbian}"}
+            : ${build_kernel:="${build_kernel}"}
+            : ${ROOT_MB:="${ROOT_MB}"}
+            ;;
+        -b | --build)
+            if [ -n "${2}" ]; then
+                unset build_armbian
+                oldIFS=$IFS
+                IFS=_
+                build_armbian=(${2})
+                IFS=$oldIFS
+                shift
+            else
+                error_msg "Invalid -b parameter [ ${2} ]!"
+            fi
+            ;;
+        -k | --kernel)
+            if [ -n "${2}" ]; then
+                oldIFS=$IFS
+                IFS=_
+                build_kernel=(${2})
+                IFS=$oldIFS
+                shift
+            else
+                error_msg "Invalid -k parameter [ ${2} ]!"
+            fi
+            ;;
+        -a | --autokernel)
+            if [ -n "${2}" ]; then
+                auto_kernel="${2}"
+                shift
+            else
+                error_msg "Invalid -a parameter [ ${2} ]!"
+            fi
+            ;;
+        -v | --versionbranch)
+            if [ -n "${2}" ]; then
+                version_branch="${2}"
+                shift
+            else
+                error_msg "Invalid -v parameter [ ${2} ]!"
+            fi
+            ;;
+        -s | --size)
+            if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
+                ROOT_MB="${2}"
+                shift
+            else
+                error_msg "Invalid -s parameter [ ${2} ]!"
+            fi
+            ;;
+        *)
+            error_msg "Invalid option [ ${1} ]!"
+            ;;
+        esac
+        shift
+    done
+}
+
 find_rebuild() {
     cd ${make_path}
 
@@ -62,8 +159,11 @@ find_rebuild() {
     armbian_rebuild_name=$(ls ${armbian_rebuild_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')
     [[ -n "${armbian_rebuild_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_rebuild_file} ]"
     # Find armbian version info: such as [ 22.02.0 ]
-    armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '2[0-9].[0-9]{1,2}[.]*[0-9]{1,2}' | head -n 1)"
-    [[ -z "${armbian_rebuild_version}" ]] && armbian_rebuild_version="22.02.02" && echo -e "Missing armbian version info!"
+    armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '[2-9][0-9].[0-9]{1,2}.[0-9]{1,2}' | head -n 1)"
+    [[ -n "${armbian_rebuild_version}" ]] || {
+        armbian_rebuild_version="22.02.02"
+        echo -e "Missing armbian version info!"
+    }
 }
 
 download_kernel() {
@@ -548,115 +648,60 @@ clean_tmp() {
     sync
 }
 
-while [ "${1}" ]; do
-    case "${1}" in
-    -d | --default)
-        : ${version_branch:="${version_branch}"}
-        : ${build_armbian:="${build_armbian}"}
-        : ${build_kernel:="${build_kernel}"}
-        : ${ROOT_MB:="${ROOT_MB}"}
-        ;;
-    -b | --build)
-        if [ -n "${2}" ]; then
-            unset build_armbian
-            oldIFS=$IFS
-            IFS=_
-            build_armbian=(${2})
-            IFS=$oldIFS
-            shift
-        else
-            error_msg "Invalid -b parameter [ ${2} ]!"
-        fi
-        ;;
-    -k | --kernel)
-        if [ -n "${2}" ]; then
-            oldIFS=$IFS
-            IFS=_
-            build_kernel=(${2})
-            IFS=$oldIFS
-            shift
-        else
-            error_msg "Invalid -k parameter [ ${2} ]!"
-        fi
-        ;;
-    -a | --autokernel)
-        if [ -n "${2}" ]; then
-            auto_kernel="${2}"
-            shift
-        else
-            error_msg "Invalid -a parameter [ ${2} ]!"
-        fi
-        ;;
-    -v | --versionbranch)
-        if [ -n "${2}" ]; then
-            version_branch="${2}"
-            shift
-        else
-            error_msg "Invalid -v parameter [ ${2} ]!"
-        fi
-        ;;
-    -s | --size)
-        if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
-            ROOT_MB="${2}"
-            shift
-        else
-            error_msg "Invalid -s parameter [ ${2} ]!"
-        fi
-        ;;
-    *)
-        error_msg "Invalid option [ ${1} ]!"
-        ;;
-    esac
-    shift
-done
+loop_rebuild() {
+    cd ${make_path}
+
+    k=1
+    for b in ${build_armbian[*]}; do
+
+        i=1
+        for x in ${build_kernel[*]}; do
+            {
+                echo -n "(${k}.${i}) Start building Armbian [ ${b} - ${x} ]. "
+                now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
+                if [[ "${now_remaining_space}" -le "2" ]]; then
+                    echo "Remaining space is less than 2G, exit this build. \n"
+                    break
+                else
+                    echo "Remaining space is ${now_remaining_space}G."
+                fi
+
+                # The loop variable assignment
+                soc="${b}"
+                kernel="${x}"
+
+                # Execute the following functions in sequence
+                make_image
+                extract_armbian
+                replace_kernel
+                copy_files
+                clean_tmp
+
+                echo -e "(${k}.${i}) Armbian build successfully. \n"
+                let i++
+            }
+        done
+
+        let k++
+    done
+}
 
 # Show welcome message
 echo -e "Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
 [ $(id -u) = 0 ] || error_msg "please run this script as root: [ sudo ./$0 ]"
-find_rebuild && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
-[ "${auto_kernel}" == "true" ] && download_kernel
-#
-echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+# Show server start information
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
-
-# Start loop compilation
-k=1
-for b in ${build_armbian[*]}; do
-
-    i=1
-    for x in ${build_kernel[*]}; do
-        {
-            echo -n "(${k}.${i}) Start building Armbian [ ${b} - ${x} ]. "
-            now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
-            if [[ "${now_remaining_space}" -le "2" ]]; then
-                echo "Remaining space is less than 2G, exit this build. \n"
-                break
-            else
-                echo "Remaining space is ${now_remaining_space}G."
-            fi
-
-            # The loop variable assignment
-            soc="${b}"
-            kernel="${x}"
-
-            # Execute the following functions in sequence
-            make_image
-            extract_armbian
-            replace_kernel
-            copy_files
-            clean_tmp
-
-            echo -e "(${k}.${i}) Armbian build successfully. \n"
-            let i++
-        }
-    done
-
-    let k++
-done
-
+# Initialize variables and download the kernel
+init_var "${@}"
+find_rebuild && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+[ "${auto_kernel}" == "true" ] && download_kernel
+echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+# Loop to rebuild armbian firmware
+loop_rebuild
+# Show server end information
 echo -e "Server space usage after compilation: \n$(df -hT ${PWD}) \n"
-sync
-exit 0
+# All process completed
+wait
