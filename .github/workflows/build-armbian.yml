@@ -20,7 +20,12 @@ on:
       more_settings:
         description: "Rebuild: More parameter settings"
         required: false
-        default: ""
+        default: "s905x2_a311d"
+      ssh:
+        description: 'SSH connection to Actions'
+        required: false
+        default: 'false'
+        
   #schedule:
     #- cron: "0 17 * * 0"
 
@@ -68,6 +73,10 @@ jobs:
         id: down
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
+          
+      - name: SSH connection to Actions
+        uses: P3TERX/ssh2actions@v1.0.0
+        if: (github.event.inputs.ssh == 'true' && github.event.inputs.ssh  != 'false') || contains(github.event.action, 'ssh')
 
       - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
         id: compile
