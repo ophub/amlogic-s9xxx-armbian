@@ -526,10 +526,10 @@ clean_tmp() {
 loop_recompile() {
     cd ${make_path}
 
-    k=1
-    for x in ${build_kernel[*]}; do
+    j=1
+    for k in ${build_kernel[*]}; do
         # kernel_version, such as [ 5.4.170 ]
-        kernel_version="${x}"
+        kernel_version="${k}"
         # kernel_verpatch, such as [ 5.4 ]
         kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
         # kernel_sub, such as [ 170 ]
@@ -555,7 +555,7 @@ loop_recompile() {
         packit_kernel
         clean_tmp
 
-        let k++
+        let j++
     done
 }
 
@@ -567,15 +567,16 @@ echo -e "Welcome to compile kernel! \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+#
 # Initialize variables and download the kernel source code
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
 echo -e "Kernel from: [ ${code_owner} ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
-echo -e "Ready, start compile kernel... \n"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 # Check the toolchain and loop to compile the kernel
 toolchain_check
 loop_recompile
+#
 # Show server end information
 echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
 # All process completed
