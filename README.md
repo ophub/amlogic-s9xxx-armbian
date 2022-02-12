@@ -243,6 +243,13 @@ First of all, I would like to thank [150balbes](https://github.com/150balbes) fo
 
 Because of these [innovations and contributors](CONTRIBUTOR.md), we can have the company of the box in the long river of years. We have grown up many years later, but this beautiful memory will always stay deep in the memory for a long time. From now on (This source code repository was created on 2021-09-19), record the achievements of these pioneers and leave them to the new friends who have joined the box circle.
 
+
+## Acknowledgments
+
+- [armbian/build](https://github.com/armbian/build)
+- [unifreq/kernel](https://github.com/unifreq)
+- [kernel.org](https://kernel.org)
+
 ## License
 
 The amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/LICENSE)
