@@ -2,7 +2,9 @@
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
-Compile a custom kernel as needed. This kernel can be used in [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) and [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) systems. Commonly used in systems made with the [unifreq](https://github.com/unifreq/openwrt_packit) standard.
+- This kernel can be used in [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) and [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) systems. Commonly used in systems made with the [unifreq](https://github.com/unifreq) standard.
+
+- You can adjust the configuration of the kernel as needed, such as adding drivers and patches. It is also possible to compile personalized signature kernels with special meanings according to mood, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` and so on.
 
 ## Local compile command description
 
@@ -17,11 +19,11 @@ Compile a custom kernel as needed. This kernel can be used in [Armbian](https://
 - `sudo ./recompile -d`: Use the default configuration to compiled kernel.
 - `sudo ./recompile -d -k 5.4.180`: Use the default configuration, and use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
 - `sudo ./recompile -d -k 5.4.180 -a true`: Use the default configuration, and use the `-a` parameter to set whether to automatically upgrade to the latest kernel of the same series when compiling the kernel.
-- `sudo ./recompile -d -k 5.4.180 -n -xiaoming`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
+- `sudo ./recompile -d -k 5.4.180 -n -good-luck`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
 - `sudo ./recompile -d -k 5.4.180 -r kernel.org`: Use the default configuration, and set the kernel source code repository through the `-r` parameter.
-- `sudo ./recompile -d -k 5.10.100_5.4.180 -a true -n -xiaoming -r kernel.org`: Use the default configuration, and set through multiple parameters.
+- `sudo ./recompile -d -k 5.10.100_5.4.180 -a true -n -good-luck -r kernel.org`: Use the default configuration, and set through multiple parameters.
 
-💡Tip: Recommended Use the [.config](https://github.com/unifreq/arm64-kernel-configs) template and source code of `unifreq` to compile the `latest version` of [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.15](https://github.com/unifreq/linux-5.15.y), etc. `Other series or historical versions` can be compiled with [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/). You can also use other kernel source code repositories.
+💡Tip: It is recommended to use the kernel source code of unifreq's [5.4](https://github.com/unifreq/linux-5.4.y), [5.10](https://github.com/unifreq/linux-5.10.y), [5.15](https://github.com/unifreq/linux-5.15.y) and other repositories for compilation. He has added drivers and patches for related boxes. It is recommended to use the templates in [tools/config](tools/config), which have been pre-configured according to the relevant boxes and can be customized on this basis. Other kernel sources such as [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) can also be used to compile.
 
 - ### Local compilation
 
@@ -54,7 +56,7 @@ You can call the kernel compilation script of this repository through Actions in
     build_target: kernel
     kernel_version: 5.10.100_5.4.180
     kernel_auto: true
-    kernel_sign: -meson64-dev
+    kernel_sign: -good-luck
 ```
 
 - GitHub Action Input parameter description
@@ -68,7 +70,7 @@ The relevant parameters correspond to the `local compilation commands`, please r
 | kernel_version | 5.10.100_5.4.180 | Specify [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) name, such as `5.4.180`. Function reference `-k` |
 | kernel_auto | true | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
 | kernel_sign | -meson64-dev | Set the kernel custom signature. The default is `-meson64-dev`. Function reference `-n` |
-| kernel_config | null | The default uses the configuration templates in the [compile-kernel/tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . The kernel configuration templates of each series stored in this directory must start with the name of `config-5.x`. For example, templates for compiling `5.4` series kernels can be named with various names starting with `config-5.4`, such as `config-5.4`, `config-5.4.174` or `config-5.4.174-xiaoming`, etc., When there are multiple files starting with `config-5.4`, the file with the highest version number will be used. Default: `compile-kernel/tools/config` |
+| kernel_config | null | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . The kernel configuration templates of each series stored in this directory must start with the name of `config-5.x`. For example, templates for compiling `5.4` series kernels can be named with various names starting with `config-5.4`, such as `config-5.4`, `config-5.4.174` or `config-5.4.174-good-luck`, etc., When there are multiple files starting with `config-5.4`, the file with the highest version number will be used. |
 
 - GitHub Action Output variable description
 
