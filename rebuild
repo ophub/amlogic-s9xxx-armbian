@@ -68,9 +68,9 @@ build_kernel=("5.10.100" "5.4.180")
 auto_kernel="true"
 #
 # Set Armbian firmware size (BOOT_MB >= 256, ROOT_MB >= 2000)
-SKIP_MB=68
-BOOT_MB=256
-ROOT_MB=2748
+SKIP_MB="68"
+BOOT_MB="256"
+ROOT_MB="2748"
 #
 #==================================================================================
 
@@ -457,14 +457,19 @@ copy_files() {
 
     # Reorganize the /boot partition
     mkdir -p ${tmp_build}/boot
+    #
     # Copy the original boot core file
     cp -rf ${tmp_armbian}/boot/*-${kernel}-* ${tmp_build}/boot && sync
     (cd ${tmp_build}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && chmod +x * && sync)
+    #
+    # Complete the u-boot file to facilitate the booting of the 5.10+ kernel
+    cp -f ${uboot_path}/* ${tmp_build}/boot && sync
+    chmod +x ${tmp_build}/boot/u-boot-*.bin
+    #
     # Unzip the relevant files
     tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
     tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tmp_armbian}
-    # Complete the u-boot file to facilitate the booting of the 5.10+ kernel
-    cp -f ${uboot_path}/* ${tmp_build}/boot && sync
+    #
     # Complete the dtb file
     cp -rf ${dtb_path}/* ${tmp_build}/boot/dtb/amlogic && sync
     cp -rf ${tmp_armbian}/boot/dtb/amlogic/* ${tmp_build}/boot/dtb/amlogic && sync
@@ -493,6 +498,7 @@ copy_files() {
     if [ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]; then
         cp -rf ${configfiles_path}/files/* ${tag_rootfs} && sync
     fi
+    #
     # Find ID in ${os_release_file}: such as [ubuntu/debian]
     release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
     [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
