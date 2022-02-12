@@ -243,6 +243,12 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 因为有不断的 [创新与贡献者](CONTRIBUTOR.md) ，我们才能在岁月的长河里，拥有盒子的陪伴。很多年后我们都长大了，但这个美好的回忆总会长久地留在记忆深处。从现在开始（2021-09-19创建此源码库），把这些开创者们的成果记录起来，留给新加入盒子圈的新朋友们。
 
+## 鸣谢
+
+- [armbian/build](https://github.com/armbian/build)
+- [unifreq/kernel](https://github.com/unifreq)
+- [kernel.org](https://kernel.org)
+
 ## License
 
 The amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/LICENSE)
