@@ -61,7 +61,7 @@ kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
-build_kernel=("5.4.170" "5.10.90")
+build_kernel=("5.4.180" "5.10.100")
 auto_kernel="true"
 custom_name="-meson64-dev"
 #
@@ -220,7 +220,7 @@ query_version() {
         MAIN_LINE="${MAIN_LINE_M}.${MAIN_LINE_V}"
 
         if [ "${code_owner}" == "kernel.org" ]; then
-            # latest_version="5.4.170"
+            # latest_version="5.4.180"
             latest_version=$(curl -s ${kernel_org_repo} | grep -oE linux-${MAIN_LINE}.[0-9]+.tar.xz | sort -rV | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${latest_version}"
@@ -232,7 +232,7 @@ query_version() {
             if [ -z "${code_repo}" ]; then linux_repo="linux-${MAIN_LINE}.y"; else linux_repo="${code_repo}"; fi
             github_kernel_repo="${code_owner}/${linux_repo}/${code_branch}"
             github_kernel_ver="https://raw.githubusercontent.com/${github_kernel_repo}/Makefile"
-            # latest_version="160"
+            # latest_version="180"
             latest_version="$(curl -s ${github_kernel_ver} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
             if [[ "$?" -eq "0" && ! -z "${latest_version}" ]]; then
                 tmp_arr_kernels[${i}]="${MAIN_LINE}.${latest_version}"
@@ -528,11 +528,11 @@ loop_recompile() {
 
     j=1
     for k in ${build_kernel[*]}; do
-        # kernel_version, such as [ 5.4.170 ]
+        # kernel_version, such as [ 5.4.180 ]
         kernel_version="${k}"
         # kernel_verpatch, such as [ 5.4 ]
         kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
-        # kernel_sub, such as [ 170 ]
+        # kernel_sub, such as [ 180 ]
         kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
 
         # The loop variable assignment
