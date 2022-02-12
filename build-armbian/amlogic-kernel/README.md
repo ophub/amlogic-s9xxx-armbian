@@ -5,8 +5,8 @@
 - 在 `amlogic-kernel` 目录下创建版本号对应的文件夹，如 `5.4.170` ，并将 4 个需要的内核文件放入此目录 (其他内核文件不需要，放入也不影响使用)。多个内核依次创建目录并放入对应的内核文件。内核文件可以从 [kernel](https://github.com/ophub/kernel) 仓库下载，也可以[自定义编译](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel)。如果没有手动下载存放内核文件，在编译时脚本也会自动从 kernel 仓库下载。
 
 ```yaml
-~/amlogic-s9xxx-openwrt
-    └── amlogic-s9xxx
+~/amlogic-s9xxx-armbian
+    └── build-armbian
         └── amlogic-kernel
             ├── 5.4.170
             │   ├── header-5.4.170-xxx.tar.gz
