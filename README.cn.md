@@ -176,7 +176,9 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 3. 在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Lepotato_current_5.10.90.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.10.90`）请保留，它将在重构后用作 Armbian 固件的名称。
 
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.4.170` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
+4. 在 `~/amlogic-s9xxx-armbian/build-armbian/amlogic-kernel` 目录下创建版本号对应的文件夹，如 `5.4.170` ，并将内核文件放入此目录。使用方法见 [build-armbian/amlogic-kernel/README.md](build-armbian/amlogic-kernel/README.md)
+
+5. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.4.170` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
 - ### 使用 GitHub Action 进行编译
 
