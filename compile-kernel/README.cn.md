@@ -2,7 +2,9 @@
 
 查看英文说明 | [View English description](README.md)
 
-根据需要，编译自定义内核。此内核可用于 [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) 和 [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) 系统，在以 [unifreq](https://github.com/unifreq/openwrt_packit) 标准制作的同类系统中可通用。
+- 此内核可用于 [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) 和 [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) 系统，在以 [unifreq](https://github.com/unifreq) 标准制作的同类系统中可通用。
+
+- 你可以根据需要对内核的配置进行调整，如添加驱动和补丁。也可以根据心情编译具有特殊意义的个性化签名内核，如 `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` 等等。
 
 ## 本地编译命令说明
 
@@ -17,11 +19,11 @@
 - `sudo ./recompile -d` : 使用默认配置编译内核。
 - `sudo ./recompile -d -k 5.4.180` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
 - `sudo ./recompile -d -k 5.4.180 -a true` : 使用默认配置，并通过 `-a` 参数设置编译内核时，是否自动升级到同系列最新内核。
-- `sudo ./recompile -d -k 5.4.180 -n -xiaoming` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
+- `sudo ./recompile -d -k 5.4.180 -n -good-luck` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
 - `sudo ./recompile -d -k 5.4.180 -r kernel.org` : 使用默认配置，并通过 `-r` 参数设置内核源代码仓库。
-- `sudo ./recompile -d -k 5.10.100_5.4.180 -a true -n -xiaoming -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
+- `sudo ./recompile -d -k 5.10.100_5.4.180 -a true -n -good-luck -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
 
-💡提示：推荐使用 `unifreq` 的 [.config](https://github.com/unifreq/arm64-kernel-configs) 模板和源码编译 [5.4](https://github.com/unifreq/linux-5.4.y) / [5.10](https://github.com/unifreq/linux-5.10.y) / [5.15](https://github.com/unifreq/linux-5.15.y) 等内核的 `最新版本` 。`其他系列或历史版本` 可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 编译。你也可以使用其他内核源代码仓库。
+💡提示：推荐使用 `unifreq` 的 [5.4](https://github.com/unifreq/linux-5.4.y), [5.10](https://github.com/unifreq/linux-5.10.y), [5.15](https://github.com/unifreq/linux-5.15.y) 等仓库的内核源代码进行编译，他针对相关盒子添加了驱动和补丁。推荐使用 [tools/config](tools/config) 中的模板，已经根据相关盒子进行了预配置，可以在此基础上进行个性化定制。也可以使用 [kernel.org](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 等其他内核源代码进行编译。
 
 - ### 本地编译
 
@@ -54,7 +56,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
     build_target: kernel
     kernel_version: 5.10.100_5.4.180
     kernel_auto: true
-    kernel_sign: -meson64-dev
+    kernel_sign: -good-luck
 ```
 
 - GitHub Action 输入参数说明
@@ -68,7 +70,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | kernel_version    | 5.10.100_5.4.180 | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `5.4.180`。功能参考 `-k` |
 | kernel_auto       | true             | 设置是否自动采用同系列最新版本内核。默认值为 `true`。功能参考 `-a`  |
 | kernel_sign       | -meson64-dev     | 设置内核自定义签名。默认值为 `-meson64-dev`。功能参考 `-n`       |
-| kernel_config     | 无               | 默认值使用 [compile-kernel/tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-xiaoming` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
+| kernel_config     | 无               | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-good-luck` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
 
 - GitHub Action 输出变量说明
 
