@@ -176,7 +176,9 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Lepotato_current_5.10.90.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.10.90`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.4.170` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Create a folder corresponding to the version number in the `~/amlogic-s9xxx-armbian/build-armbian/amlogic-kernel` directory, such as `5.4.170` , and put the kernel files in this directory. For usage, see [build-armbian/amlogic-kernel/README.md](build-armbian/amlogic-kernel/README.md)
+
+5. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.4.170` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
 - ### Use GitHub Action to build
 
