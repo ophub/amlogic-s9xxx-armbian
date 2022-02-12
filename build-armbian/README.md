@@ -1,4 +1,4 @@
-# amlogic-s9xxx kernel related files
+# Description of Amlogic s9xxx series related documents
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
@@ -25,8 +25,8 @@ When using the 5.10 kernel version, you need to copy the corresponding [u-boot-*
 - files: The files in the `common-files/files` directory are custom files, which must be completely consistent with the structure and file naming and storage under the ***`ROOTFS`*** partiton in Armbian. If there are files in this directory, they will be automatically copied to the Armbian directory during `sudo ./rebuild`. E.g:
 
 ```yaml
-etc/config/network
-lib/u-boot
+etc/network/interfaces
+usr/sbin
 ```
 
 - patches: This is the directory where patch files are stored. You can place extension files, patches, etc. in this directory.
