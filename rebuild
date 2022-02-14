@@ -27,16 +27,16 @@
 # process_msg        : Output process message
 #
 # init_var           : Initialize all variables
-# find_rebuild       : Find rebuild Armbian file (*.img)
+# find_armbian       : Find Armbian file (build/output/images/*.img)
 # download_kernel    : Download the latest kernel
 #
-# make_image         : Making Armbian files
-# extract_armbian    : Extract Armbian firmware files
+# make_image         : Making Armbian file
+# extract_armbian    : Extract Armbian files
 # replace_kernel     : Replace the Armbian kernel
-# copy_files         : Copy the Armbian file
+# copy_files         : Copy the Armbian files
 # clean_tmp          : Clear temporary files
 #
-# loop_rebuild       : Loop to rebuild Armbian firmware
+# loop_rebuild       : Loop to rebuild Armbian files
 #
 #========================= Set make environment variables =========================
 #
@@ -152,7 +152,7 @@ init_var() {
     done
 }
 
-find_rebuild() {
+find_armbian() {
     cd ${make_path}
 
     # Get armbian release and version
@@ -702,7 +702,7 @@ echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 #
 # Initialize variables and download the kernel
 init_var "${@}"
-find_rebuild && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+find_armbian && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 [ "${auto_kernel}" == "true" ] && download_kernel
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
