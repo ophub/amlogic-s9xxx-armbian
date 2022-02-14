@@ -44,7 +44,7 @@ armbian-install
 armbian-update
 ```
 
-如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。你也可以查询[可选内核](https://github.com/ophub/kernel/tree/main/pub/stable)版本，进行指定版本更新：`armbian-update 5.4.180`。在设备支持的可选内核里可以自由更新，如从 5.4.180 内核更新为 5.10.100 内核。内核更新脚本会在开发中不断更新，可使用此命令同步更新本地的脚本：`wget -O /usr/sbin/armbian-update git.io/armbian-update` 。或者直接使用服务器端最新脚本进行内核更新：`bash <(curl -fsSL git.io/armbian-update) 5.4.180`
+如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。你也可以查询[可选内核](https://github.com/ophub/kernel/tree/main/pub/stable)版本，进行指定版本更新：`armbian-update 5.4.180`。在设备支持的可选内核里可以自由更新，如从 5.4.180 内核更新为 5.10.100 内核。内核更新脚本会在开发中不断更新，可使用此命令同步更新本地的脚本：`wget -O /usr/sbin/armbian-update git.io/armbian-update` 。或者直接使用服务器端最新脚本进行内核更新：`bash <(curl -fsSL git.io/armbian-update) 5.4.180`
 
 内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 dev` 。默认会自动安装主线 u-boot，这对使用 5.10 以上版本的内核有更好的支持，如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.180 stable no`
 
@@ -180,17 +180,17 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 5. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.4.180` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
-- ### 使用 GitHub Action 进行编译
+- ### 使用 GitHub Actions 进行编译
 
 1. 关于 Workflows 文件的配置在 [.yml](.github/workflows/build-armbian.yml) 文件里。可以设置需要编译的盒子的 `SOC` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
 
-2. 全新编译：在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build armbian`*** ，根据 Armbian 官方支持的 OS 版本，可在 [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/) 里选择 Ubuntu 系列：`focal`，或者 Debian 系列：`bullseye` / `buster` 。在 `BOARD` 里可选 `lepotato` / `odroidn2` 等。可根据需要在 `More build options` 里为 `compile.sh` 添加更多设置选项。点击 ***`Run workflow`*** 按钮即可编译。
+2. 全新编译：在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build armbian`*** ，根据 Armbian 官方支持的 OS 版本，可在 [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/) 里选择 Ubuntu 系列：`focal`，或者 Debian 系列：`bullseye` / `buster` 。在 `BOARD` 里可选 `lepotato` / `odroidn2` 等。可根据需要在 `More build options` 里为 `compile.sh` 添加更多设置选项。点击 ***`Run workflow`*** 按钮即可编译。
 
-3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 soc 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
+3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 soc 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
 
-- ### 仅单独引入 GitHub Action 进行 Armbian 重构
+- ### 仅单独引入 GitHub Actions 进行 Armbian 重构
 
-你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用。在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Rebuild armbian`*** ，输入 Armbian 的网络下载地址如 `https://dl.armbian.com/*/Armbian_*.img.xz` ，或者在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中通过 `armbian_path` 参数设定重构文件的加载路径。代码如下:
+你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Rebuild armbian`*** ，输入 Armbian 的网络下载地址如 `https://dl.armbian.com/*/Armbian_*.img.xz` ，或者在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中通过 `armbian_path` 参数设定重构文件的加载路径。代码如下:
 
 ```yaml
 - name: Rebuild the Armbian for Amlogic s9xxx
@@ -202,7 +202,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
     armbian_kernel: 5.10.100_5.4.180
 ```
 
-- GitHub Action 输入参数说明
+- GitHub Actions 输入参数说明
 
 相关参数与`本地打包命令`相对应，请参考上面的说明。
 
@@ -215,7 +215,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`      |
 | armbian_size     | 2748              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`           |
 
-- GitHub Action 输出变量说明
+- GitHub Actions 输出变量说明
 
 | 参数                                      | 默认值             | 说明                       |
 |------------------------------------------|-------------------|---------------------------|
