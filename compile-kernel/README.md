@@ -1,12 +1,12 @@
-# Compile the kernel
+# Kernel compilation and usage instructions
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
-- This kernel can be used in [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) and [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) systems. Commonly used in systems made with the [unifreq](https://github.com/unifreq) standard.
+This kernel can be used in `Armbian` and `OpenWrt` systems. For example [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions) and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit). It can be integrated when compiling firmware, or it can be installed into an existing system for use.
 
-- You can adjust the configuration of the kernel as needed, such as adding drivers and patches. It is also possible to compile personalized signature kernels with special meanings according to mood, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` and so on.
+## Kernel compilation instructions
 
-## Local compile command description
+You can adjust the configuration of the kernel as needed, such as adding drivers and patches. It is also possible to compile personalized signature kernels with special meanings according to mood, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` and so on.
 
 | Parameter | Meaning | Description |
 | ---- | ---- | ---- |
@@ -80,4 +80,34 @@ The relevant parameters correspond to the `local compilation commands`, please r
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | kernel files storage path         |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | compile date                      |
 | ${{ env.PACKAGED_STATUS }}        | success                  | Compile status. success / failure |
+
+
+## Kernel usage Instructions
+
+This kernel can be used in `Armbian` and `OpenWrt` systems. Take ophub's project as an example.
+
+- ### Use on Armbian systems
+
+The following describes how to integrate when compiling Armbian firmware and how to install it into an existing system.
+
+- #### Compiling Armbian firmware with the kernel
+
+Compiling Armbian firmware supports localized operations and online compilation using Actions from github.com. For details on how to use localized compilation, see: [Local build instructions](../README.md#local-build-instructions), For details on how to compile online with Actions: [Use GitHub Action to build](../README.md#use-github-action-to-build)
+
+- #### Install the kernel to an existing Armbian system
+
+The compiled kernel can be installed into an existing Armbian system using the `armbian-update` command, For specific operation methods, please refer to: [Update Armbian Kernel](../README.md#update-armbian-kernel)
+
+
+- ### Use in OpenWrt system
+
+The following describes the integration when compiling the OpenWrt firmware and how to install it in an existing system.
+
+- #### Compile OpenWrt firmware with kernel
+
+Compiling OpenWrt firmware supports localized operations, as well as online compilation using Actions from github.com. For details on how to use localized compilation, see: [Local packaging instructions](https://github.com/ophub/amlogic-s9xxx-openwrt#local-packaging-instructions), For details on how to compile online with Actions: [Github.com One-stop compilation instructions](https://github.com/ophub/amlogic-s9xxx-openwrt#githubcom-one-stop-compilation-instructions)
+
+- #### Install the kernel to an existing OpenWrt system
+
+You can use the [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.cn.md) plugin to install the compiled kernel into the existing OpenWrt system, For specific operation methods, please refer to: [Update OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt#update-openwrt)
 
