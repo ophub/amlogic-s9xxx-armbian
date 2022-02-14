@@ -1,12 +1,12 @@
-# 编译内核
+# 内核编译和使用说明
 
 查看英文说明 | [View English description](README.md)
 
-- 此内核可用于 [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian) 和 [OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt) 系统，在以 [unifreq](https://github.com/unifreq) 标准制作的同类系统中可通用。
+此内核可用于 `Armbian` 和 `OpenWrt` 系统。例如 [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions) 和 [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) 等项目。可以在编译固件时集成，也可以安装到已有的系统中使用。
 
-- 你可以根据需要对内核的配置进行调整，如添加驱动和补丁。也可以根据心情编译具有特殊意义的个性化签名内核，如 `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` 等等。
+## 内核编译说明
 
-## 本地编译命令说明
+你可以根据需要对内核的配置进行调整，如添加驱动和补丁。也可以根据心情编译具有特殊意义的个性化签名内核，如 `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` 等等。
 
 | 参数 | 含义 | 说明 |
 | ---- | ---- | ---- |
@@ -80,4 +80,33 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | 编译完成的内核所在文件夹的路径  |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | 编译日期                    |
 | ${{ env.PACKAGED_STATUS }}        | success                  | 编译状态：success / failure  |
+
+## 内核使用说明
+
+此内核可用于 `Armbian` 和 `OpenWrt` 系统。以 ophub 的项目进行举例说明。
+
+- ### 在 Armbian 系统中使用
+
+下面分别对在编译 Armbian 固件时集成，以及如何安装到已有的系统中使用进行说明。
+
+- #### 使用内核编译 Armbian 固件
+
+编译 Armbian 固件支持本地化操作，也支持使用 github.com 的 Actions 在线编译。其中本地化编译时的使用方法详见：[本地化打包](../README.cn.md#本地化打包), 使用 Actions 在线编译的方法详见：[Actions 编译](../README.cn.md#使用-github-actions-进行编译)
+
+- #### 将内核安装到已有的 Armbian 系统
+
+可以使用 `armbian-update` 命令将编译好的内核安装到已有的 Armbian 系统中，具体操作方法详见：[更新 Armbian 内核](../README.cn.md#更新-armbian-内核)
+
+
+- ### 在 OpenWrt 系统中使用
+
+下面分别对在 OpenWrt 系统中编译固件时集成和安装到已有的系统中使用进行介绍。
+
+- #### 使用内核编译 OpenWrt 固件
+
+编译 OpenWrt 固件支持本地化操作，也支持使用 github.com 的 Actions 在线编译。其中本地化编译时的使用方法详见：[本地化打包](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#本地化打包), 使用 Actions 在线编译的方法详见：[Actions 编译](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#githubcom-一站式编译和打包)
+
+- #### 将内核安装到已有的 OpenWrt 系统
+
+可以使用 [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.cn.md) 插件将编译好的内核安装到已有的 OpenWrt 系统中，具体操作方法详见：[升级 OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#升级-openwrt)
 
