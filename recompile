@@ -26,13 +26,13 @@
 # error_msg          : Output error message
 #
 # init_var           : Initialize all variables
-# toolchain_check    : Check and install the cross-compilation toolchain (gcc, clang, armbian)
+# toolchain_check    : Check and install the cross-compilation toolchain (GCC, Clang, Armbian)
 # query_version      : Query the latest kernel version
 #
-# download_kernel    : Download the kernel source code
-# compile_env_check  : Check local build environment
+# get_kernel_source  : Get the kernel source code
+# env_check          : Check the environment for compile kernel
 # compile_kernel     : Compile the kernel
-# generate_uinitrd   : Chroot into armbian to generate initrd.img and uInitrd
+# generate_uinitrd   : Chroot into Armbian to generate initrd.img and uInitrd
 # packit_kernel      : Package the full set of kernel files
 # clean_tmp          : Clear temporary files
 #
@@ -68,14 +68,14 @@ custom_name="-meson64-dev"
 # Cross compile toolchain download mirror, run on ubuntu-20.04
 dev_repo="https://github.com/ophub/script/releases/download/dev"
 #
-# armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
+# Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
 #
-# gcc download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
+# GCC download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
 #gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
 gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
 #
-# clang download from: https://github.com/llvm/llvm-project/releases
+# Clang download from: https://github.com/llvm/llvm-project/releases
 #clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
 #
@@ -250,7 +250,7 @@ query_version() {
     build_kernel=${tmp_arr_kernels[*]}
 }
 
-download_kernel() {
+get_kernel_source() {
     cd ${make_path}
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
     echo -e "${STEPS} Start query and download the kernel."
@@ -304,7 +304,7 @@ download_kernel() {
     sync
 }
 
-compile_env_check() {
+env_check() {
     cd ${make_path}
     echo -e "${STEPS} Start checking local compilation environments."
 
@@ -548,8 +548,8 @@ loop_recompile() {
         fi
 
         # Execute the following functions in sequence
-        download_kernel
-        compile_env_check
+        get_kernel_source
+        env_check
         compile_kernel
         generate_uinitrd
         packit_kernel
