@@ -443,18 +443,6 @@ copy_files() {
     # Batch file
     cd ${make_path}
 
-    # Write the specified bootloader
-    if [[ "${MAINLINE_UBOOT}" != "" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
-        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
-        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
-    elif [[ "${ANDROID_UBOOT}" != "" && -f "${tag_rootfs}/usr${ANDROID_UBOOT}" ]]; then
-        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
-        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
-    fi
-    sync
-
     # Reorganize the /boot partition
     mkdir -p ${tmp_build}/boot
     #
@@ -632,16 +620,27 @@ copy_files() {
 
     cd ${make_path}
 
-    umount -f ${tmp_armbian} 2>/dev/null
-    umount -f ${tag_rootfs} 2>/dev/null
-    umount -f ${tag_bootfs} 2>/dev/null
-    losetup -D 2>/dev/null
-
+    # Write the bootloader
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
+        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
+        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr${ANDROID_UBOOT}" ]]; then
+        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
+        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+    fi
     sync
 }
 
 clean_tmp() {
     process_msg " (5/5) clear temp files."
+
+    cd ${make_path}
+    umount -f ${tmp_armbian} 2>/dev/null
+    umount -f ${tag_rootfs} 2>/dev/null
+    umount -f ${tag_bootfs} 2>/dev/null
+    losetup -D 2>/dev/null
 
     cd ${tmp_outpath}
     # Rename version
