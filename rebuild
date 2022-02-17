@@ -30,9 +30,8 @@
 # find_armbian       : Find Armbian file (build/output/images/*.img)
 # download_kernel    : Download the latest kernel
 #
-
+# confirm_version    : Confirm version type
 # extract_armbian    : Extract Armbian files
-# replace_kernel     : Replace the Armbian kernel
 # refactor_files     : Refactor related files
 # make_image         : Making Armbian file
 # copy_files         : Copy the Armbian files
@@ -225,9 +224,120 @@ download_kernel() {
     sync
 }
 
-extract_armbian() {
-    process_msg " (1/6) Extract old armbian files."
+confirm_version() {
+    process_msg " (1/6) Confirm version type."
+    cd ${make_path}
 
+    # Confirm kernel branch
+    k510_ver=$(echo "${kernel}" | cut -d '.' -f1)
+    k510_maj=$(echo "${kernel}" | cut -d '.' -f2)
+    if [ "${k510_ver}" -eq "5" ]; then
+        if [ "${k510_maj}" -ge "10" ]; then
+            K510="1"
+        else
+            K510="0"
+        fi
+    elif [ "${k510_ver}" -gt "5" ]; then
+        K510="1"
+    else
+        K510="0"
+    fi
+
+    # Confirm soc branch
+    case "${soc}" in
+    s905x3 | x96 | hk1 | h96 | ugoosx3)
+        FDTFILE="meson-sm1-x96-max-plus-100m.dtb"
+        UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
+        MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin"
+        ANDROID_UBOOT="/lib/u-boot/hk1box-bootloader.img"
+        ;;
+    s905x2 | x96max4g | x96max2g)
+        FDTFILE="meson-g12a-x96-max.dtb"
+        UBOOT_OVERLOAD="u-boot-x96max.bin"
+        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        ;;
+    s905x2-km3)
+        FDTFILE="meson-g12a-sei510.dtb"
+        UBOOT_OVERLOAD="u-boot-x96max.bin"
+        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        ;;
+    s905x | hg680p | b860h)
+        FDTFILE="meson-gxl-s905x-p212.dtb"
+        UBOOT_OVERLOAD="u-boot-p212.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s905w | x96mini | tx3mini)
+        FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
+        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s905d | n1)
+        FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
+        UBOOT_OVERLOAD="u-boot-n1.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
+        ;;
+    s905d-ki)
+        FDTFILE="meson-gxl-s905d-mecool-ki-pro.dtb"
+        UBOOT_OVERLOAD="u-boot-p201.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s905 | beelinkminimx | mxqpro+)
+        FDTFILE="meson-gxbb-vega-s95-telos.dtb"
+        #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
+        UBOOT_OVERLOAD="u-boot-s905.bin"
+        #UBOOT_OVERLOAD="u-boot-p201.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s912 | h96proplus | octopus)
+        FDTFILE="meson-gxm-octopus-planet.dtb"
+        UBOOT_OVERLOAD="u-boot-zyxq.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s912-t95z | s912-t95z-plus)
+        FDTFILE="meson-gxm-t95z-plus.dtb"
+        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s922x | belink | belinkpro | ugoos)
+        FDTFILE="meson-g12b-gtking-pro.dtb"
+        UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
+        MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        ;;
+    s922x-n2 | odroid-n2 | n2)
+        FDTFILE="meson-g12b-odroid-n2.dtb"
+        UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
+        MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        ;;
+    s922x-reva)
+        FDTFILE="meson-g12b-gtking-pro.dtb"
+        UBOOT_OVERLOAD="u-boot-gtkingpro-rev-a.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    *)
+        error_msg "Have no this soc: [ ${soc} ]"
+        ;;
+    esac
+
+    # Confirm UUID
+    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
+    [ -z "${ROOTFS_UUID}" ] && error_msg "The uuidgen is invalid, cannot continue."
+}
+
+extract_armbian() {
+    process_msg " (2/6) Extract old armbian files."
     cd ${make_path}
 
     rm -rf ${tmp_dir} 2>/dev/null && sync
@@ -246,177 +356,13 @@ extract_armbian() {
     fi
 
     cd ${tmp_armbian}
-    # Delete soft link (ln -sf TrueFile Link)
-    rm -rf boot/* bin lib sbin tmp var/sbin 2>/dev/null && sync
-
-    # Unzip the relevant files
-    tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_armbian}/boot
-    tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tmp_armbian}
-
-    sync
-}
-
-replace_kernel() {
-    process_msg " (2/6) Replace kernel for armbian."
-
-    cd ${make_path}
-
-    build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
-    build_dtb=$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
-    build_modules=$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
-    build_header=$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
-
-    # 01 For /boot five files
-    tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
-    [ "$(ls ${tmp_armbian}/boot/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || error_msg "boot/ 5 files is missing."
-    (cd ${tmp_armbian}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
-
-    # 02 For dtb files
-    cp -rf ${dtb_path}/* ${tmp_armbian}/boot/dtb/amlogic && sync
-    tar -xzf ${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
-
-    # 03 For usr/lib/modules/*
-    (cd ${tmp_armbian}/usr/lib/modules && rm -rf * 2>/dev/null && sync)
-    tar -xzf ${build_modules} -C ${tmp_armbian}/usr/lib/modules && sync
-    (cd ${tmp_armbian}/usr/lib/modules/*/ && echo "build source" | xargs rm -f && sync)
-    if [ "$(ls ${tmp_armbian}/usr/lib/modules/${kernel}* -l 2>/dev/null | grep "^d" | wc -l)" -ne "1" ]; then
-        error_msg "${tmp_armbian}/usr/lib/modules/${kernel}-* kernel folder is missing."
-    fi
-
-    # 04 For header files, usr/local/include
-    if [[ -n "${build_header}" && -f "${build_header}" ]]; then
-        rm -rf ${tmp_armbian}/usr/local/include/* 2>/dev/null && sync
-        tar -xzf ${build_header} -C ${tmp_armbian}/usr/local && sync
-    fi
-
-    sync
+    rm -rf boot/* 2>/dev/null
+    rm -rf bin lib sbin tmp usr/lib/modules/* usr/local/include/* var/sbin 2>/dev/null
+    sync && sleep 3
 }
 
 refactor_files() {
     process_msg " (3/6) Refactor related files."
-
-    cd ${tmp_armbian}
-
-    #Check if writing to EMMC is supported
-    KERNEL_VERSION=$(ls usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-    [ -z "${KERNEL_VERSION}" ] && error_msg "Failed to query the current kernel version."
-    #echo -e "This Kernel version [ ${KERNEL_VERSION} ]"
-
-    k510_ver=$(echo "${KERNEL_VERSION}" | cut -d '.' -f1)
-    k510_maj=$(echo "${KERNEL_VERSION}" | cut -d '.' -f2)
-    if [ "${k510_ver}" -eq "5" ]; then
-        if [ "${k510_maj}" -ge "10" ]; then
-            K510="1"
-        else
-            K510="0"
-        fi
-    elif [ "${k510_ver}" -gt "5" ]; then
-        K510="1"
-    else
-        K510="0"
-    fi
-    #echo -e "K510: [ ${K510} ]"
-
-    case "${soc}" in
-    s905x3 | x96 | hk1 | h96 | ugoosx3)
-        FDTFILE="meson-sm1-x96-max-plus-100m.dtb"
-        UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin"
-        ANDROID_UBOOT="/lib/u-boot/hk1box-bootloader.img"
-        AMLOGIC_SOC="s905x3"
-        ;;
-    s905x2 | x96max4g | x96max2g)
-        FDTFILE="meson-g12a-x96-max.dtb"
-        UBOOT_OVERLOAD="u-boot-x96max.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905x2"
-        ;;
-    s905x2-km3)
-        FDTFILE="meson-g12a-sei510.dtb"
-        UBOOT_OVERLOAD="u-boot-x96max.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905x2"
-        ;;
-    s905x | hg680p | b860h)
-        FDTFILE="meson-gxl-s905x-p212.dtb"
-        UBOOT_OVERLOAD="u-boot-p212.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905x"
-        ;;
-    s905w | x96mini | tx3mini)
-        FDTFILE="meson-gxl-s905w-tx3-mini.dtb"
-        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905w"
-        ;;
-    s905d | n1)
-        FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
-        UBOOT_OVERLOAD="u-boot-n1.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
-        AMLOGIC_SOC="s905d"
-        ;;
-    s905d-ki)
-        FDTFILE="meson-gxl-s905d-mecool-ki-pro.dtb"
-        UBOOT_OVERLOAD="u-boot-p201.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905d"
-        ;;
-    s905 | beelinkminimx | mxqpro+)
-        FDTFILE="meson-gxbb-vega-s95-telos.dtb"
-        #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
-        UBOOT_OVERLOAD="u-boot-s905.bin"
-        #UBOOT_OVERLOAD="u-boot-p201.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s905"
-        ;;
-    s912 | h96proplus | octopus)
-        FDTFILE="meson-gxm-octopus-planet.dtb"
-        UBOOT_OVERLOAD="u-boot-zyxq.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s912"
-        ;;
-    s912-t95z | s912-t95z-plus)
-        FDTFILE="meson-gxm-t95z-plus.dtb"
-        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s912"
-        ;;
-    s922x | belink | belinkpro | ugoos)
-        FDTFILE="meson-g12b-gtking-pro.dtb"
-        UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-        MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s922x"
-        ;;
-    s922x-n2 | odroid-n2 | n2)
-        FDTFILE="meson-g12b-odroid-n2.dtb"
-        UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-        MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s922x"
-        ;;
-    s922x-reva)
-        FDTFILE="meson-g12b-gtking-pro.dtb"
-        UBOOT_OVERLOAD="u-boot-gtkingpro-rev-a.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        AMLOGIC_SOC="s922x"
-        ;;
-    *)
-        error_msg "Have no this soc: [ ${soc} ]"
-        ;;
-    esac
-
-    # Batch file
     cd ${make_path}
 
     # Create a dual-partition general directory
@@ -424,15 +370,19 @@ refactor_files() {
     tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
-    # Move rootfs files
-    mv -f ${tmp_armbian}/boot/* ${tag_bootfs} 2>/dev/null && sync
-    # Copy the base files of the release for ROOTFS
-    cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
+    # Copy the full Armbian image
+    mv -f ${tmp_armbian}/* ${tag_rootfs}
+    sync && sleep 3
+
+    # Unzip the relevant files
+    tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tag_bootfs}
+    tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tag_rootfs}
+
     # Copy the same files of the release for ROOTFS
-    if [ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]; then
-        cp -rf ${configfiles_path}/files/* ${tag_rootfs} && sync
-    fi
-    #
+    [[ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/files/* ${tag_rootfs}
+    # Copy the patches files
+    [ -f "${tag_rootfs}/usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen ${tag_rootfs}/usr/bin
+
     # Find ID in ${os_release_file}: such as [ubuntu/debian]
     release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
     [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
@@ -446,22 +396,43 @@ refactor_files() {
         mv -f ${tag_rootfs}/etc/apt/sources.list ${tag_rootfs}/etc/apt/sources.list.bak
         mv -f ${tag_rootfs}/etc/apt/sources.list.d/armbian.list ${tag_rootfs}/etc/apt/sources.list.d/armbian.list.bak
         # Copy custom source
-        cp -rf ${diff_release_files}/* ${tag_rootfs} && sync
+        cp -rf ${diff_release_files}/* ${tag_rootfs}
     fi
+    sync
 
-    # Generate UUID
-    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
-    [ -z "${ROOTFS_UUID}" ] && error_msg "The uuidgen is invalid, cannot continue."
+    # Replace the kernel
+    build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_dtb=$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_modules=$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    build_header=$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
+    [[ -n "${build_boot}" && -n "${build_dtb}" && -n "${build_modules}" && -n "${build_header}" ]] || error_msg "The 4 kernel missing."
+
+    # 01 For /boot five files
+    tar -xzf ${build_boot} -C ${tag_bootfs} && sync
+    [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
+    (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
+
+    # 02 For dtb files
+    cp -rf ${dtb_path}/* ${tag_bootfs}/dtb/amlogic && sync
+    tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
+
+    # 03 For usr/lib/modules/*
+    tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
+    (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source 2>/dev/null && sync)
+    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "Missing kernel."
+
+    # 04 For header files, usr/local/include
+    tar -xzf ${build_header} -C ${tag_rootfs}/usr/local && sync
 
     # Processing partition files: bootfs
     cd ${tag_bootfs}
 
-    cp -f ${uboot_path}/* . && sync
     # Add u-boot.ext for 5.10 kernel
+    cp -f ${uboot_path}/* . && sync
     if [[ "${K510}" -eq "1" ]]; then
         if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
-            cp -f ${UBOOT_OVERLOAD} u-boot.ext && sync && chmod +x u-boot.ext
+            cp -f ${UBOOT_OVERLOAD} u-boot.ext
+            chmod +x u-boot.ext
         else
             error_msg "${soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
         fi
@@ -480,13 +451,17 @@ refactor_files() {
     # Processing partition files: rootfs
     cd ${tag_rootfs}
 
-    # Add soft connection
-    ln -sf usr/bin bin
-    ln -sf usr/lib lib
-    ln -sf usr/sbin sbin
-    ln -sf var/tmp tmp
-    ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
-    rm -f usr/sbin/ddbr 2>/dev/null && ln -sf armbian-ddbr usr/sbin/ddbr
+    # Delete related files
+    rm -f etc/apt/sources.list.save 2>/dev/null
+    rm -f etc/apt/*.gpg~ 2>/dev/null
+    rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
+    rm -rf usr/share/doc/linux-image-current-meson64 2>/dev/null
+    rm -rf usr/lib/linux-image-current-meson64 2>/dev/null
+    rm -f usr/sbin/ddbr 2>/dev/null
+    rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
+
+    # Renaming/disabling related files
+    mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
     # Fix permission
     chmod 777 var/tmp
@@ -499,26 +474,13 @@ refactor_files() {
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
     chmod 755 etc/update-motd.d/* 2>/dev/null
 
-    # Delete related files
-    rm -rf boot 2>/dev/null && mkdir -p boot && sync
-    rm -rf usr/share/doc/linux-image-current-meson64 2>/dev/null
-    rm -rf usr/lib/linux-image-current-meson64 2>/dev/null
-    rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
-    rm -f etc/apt/sources.list.save 2>/dev/null
-    rm -f etc/apt/*.gpg~ 2>/dev/null
-    rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
-
-    # Renaming/disabling related files
-    mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
-
-    # Add tasks that need to be executed on initial startup
-    armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
-    #armbian_firstlogin="usr/lib/armbian/armbian-firstlogin"
-    #sed -i 's/warranty.*implied/#&/g' ${armbian_firstlogin} 2>/dev/null
-
-    # Add other files
-    [ -f "usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen usr/bin/
+    # Add soft connection
+    ln -sf usr/bin bin
+    ln -sf usr/lib lib
+    ln -sf usr/sbin sbin
+    ln -sf var/tmp tmp
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
+    ln -sf armbian-ddbr usr/sbin/ddbr
 
     # Add custom firmware information
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
@@ -527,8 +489,8 @@ refactor_files() {
     echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
     echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
-    echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
+    echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
+    echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 
@@ -537,17 +499,23 @@ refactor_files() {
     sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
 
     # Custom banner name
-    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${AMLOGIC_SOC}\"|g" ${armbian_release_file}
+    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
+
+    # Add tasks that need to be executed on initial startup
+    armbian_firstrun="usr/lib/armbian/armbian-firstrun"
+    sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
+    #armbian_firstlogin="usr/lib/armbian/armbian-firstlogin"
+    #sed -i 's/warranty.*implied/#&/g' ${armbian_firstlogin} 2>/dev/null
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
     mac_end=$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')
     random_macaddr="9E:61${mac_end}"
-
+    #
     # Set interfaces macaddr
     interfaces_file="etc/network/interfaces"
     [ -f "${interfaces_file}" ] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
+    #
     # Optimize wifi/bluetooth module
     [ -d "usr/lib/firmware/brcm" ] && (
         cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
@@ -569,14 +537,10 @@ refactor_files() {
     )
 
     sync
-
-    cd ${make_path}
-
 }
 
 make_image() {
     process_msg " (4/6) Make new armbian image."
-
     cd ${make_path}
 
     # Make Amlogic s9xxx armbian
@@ -615,7 +579,6 @@ make_image() {
 
 copy_files() {
     process_msg " (5/6) Copy the Armbian files."
-
     cd ${make_path}
 
     build_image_bootfs="${tmp_outpath}/bootfs"
@@ -630,19 +593,23 @@ copy_files() {
     fi
 
     cp -rf ${tag_bootfs}/* ${build_image_bootfs}
-    cp -rf ${tag_rootfs}/* ${build_image_rootfs}
-    sync
-
-    umount -f ${tmp_armbian} 2>/dev/null
-    umount -f ${build_image_bootfs} 2>/dev/null
-    umount -f ${build_image_rootfs} 2>/dev/null
-    losetup -D 2>/dev/null
+    mv -f ${tag_rootfs}/* ${build_image_rootfs}
+    sync && sleep 3
 }
 
 clean_tmp() {
     process_msg " (6/6) Clear temp files."
+    cd ${make_path}
+
+    umount -f ${tmp_armbian} 2>/dev/null
+    losetup -d ${loop_old} 2>/dev/null
+
+    umount -f ${build_image_bootfs} 2>/dev/null
+    umount -f ${build_image_rootfs} 2>/dev/null
+    losetup -d ${loop_new} 2>/dev/null
 
     cd ${tmp_outpath}
+
     # Rename version
     [[ "${release_codename}" != "focal" ]] && rename "s/focal/${release_codename}/g" *.img 2>/dev/null && sync
     gzip *.img && sync && mv -f *.img.gz ${armbian_outputpath}
@@ -676,8 +643,8 @@ loop_rebuild() {
                 kernel="${k}"
 
                 # Execute the following functions in sequence
+                confirm_version
                 extract_armbian
-                replace_kernel
                 refactor_files
                 make_image
                 copy_files
