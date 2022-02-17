@@ -30,9 +30,11 @@
 # find_armbian       : Find Armbian file (build/output/images/*.img)
 # download_kernel    : Download the latest kernel
 #
-# make_image         : Making Armbian file
+
 # extract_armbian    : Extract Armbian files
 # replace_kernel     : Replace the Armbian kernel
+# refactor_files     : Refactor related files
+# make_image         : Making Armbian file
 # copy_files         : Copy the Armbian files
 # clean_tmp          : Clear temporary files
 #
@@ -223,44 +225,13 @@ download_kernel() {
     sync
 }
 
-make_image() {
-    process_msg " (1/5) make new armbian image."
+extract_armbian() {
+    process_msg " (1/6) Extract old armbian files."
 
     cd ${make_path}
 
     rm -rf ${tmp_dir} 2>/dev/null && sync
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
-
-    # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_focal_${kernel}_$(date +"%Y.%m.%d.%H%M").img"
-    rm -f ${build_image_file} 2>/dev/null && sync
-
-    IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
-
-    dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
-    sync
-
-    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
-    [ -z "${ROOTFS_UUID}" ] && error_msg "The uuidgen is invalid, cannot continue."
-
-    parted -s ${build_image_file} mklabel msdos 2>/dev/null
-    parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))M $((SKIP_MB + BOOT_MB - 1))M 2>/dev/null
-    parted -s ${build_image_file} mkpart primary ext4 $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
-    sync
-
-    loop_new=$(losetup -P -f --show "${build_image_file}")
-    [ ${loop_new} ] || error_msg "losetup ${build_image_file} failed."
-
-    mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
-    mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
-    sync
-}
-
-extract_armbian() {
-    process_msg " (2/5) extract old armbian files."
-
-    cd ${make_path}
 
     armbian_image_file="${tmp_aml_image}/armbian_${soc}_${kernel}.img"
     rm -f ${armbian_image_file} 2>/dev/null && sync
@@ -276,12 +247,17 @@ extract_armbian() {
 
     cd ${tmp_armbian}
     # Delete soft link (ln -sf TrueFile Link)
-    rm -rf bin lib sbin tmp var/sbin
+    rm -rf boot/* bin lib sbin tmp var/sbin 2>/dev/null && sync
+
+    # Unzip the relevant files
+    tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_armbian}/boot
+    tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tmp_armbian}
+
     sync
 }
 
 replace_kernel() {
-    process_msg " (3/5) replace kernel for armbian."
+    process_msg " (2/6) Replace kernel for armbian."
 
     cd ${make_path}
 
@@ -291,12 +267,12 @@ replace_kernel() {
     build_header=$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
 
     # 01 For /boot five files
-    (cd ${tmp_armbian}/boot && rm -rf * 2>/dev/null && sync)
     tar -xzf ${build_boot} -C ${tmp_armbian}/boot && sync
     [ "$(ls ${tmp_armbian}/boot/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ] || error_msg "boot/ 5 files is missing."
+    (cd ${tmp_armbian}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
 
     # 02 For dtb files
-    mkdir -p ${tmp_armbian}/boot/dtb/amlogic && sync
+    cp -rf ${dtb_path}/* ${tmp_armbian}/boot/dtb/amlogic && sync
     tar -xzf ${build_dtb} -C ${tmp_armbian}/boot/dtb/amlogic && sync
 
     # 03 For usr/lib/modules/*
@@ -316,8 +292,8 @@ replace_kernel() {
     sync
 }
 
-copy_files() {
-    process_msg " (4/5) copy files to new image."
+refactor_files() {
+    process_msg " (3/6) Refactor related files."
 
     cd ${tmp_armbian}
 
@@ -443,43 +419,13 @@ copy_files() {
     # Batch file
     cd ${make_path}
 
-    # Reorganize the /boot partition
-    mkdir -p ${tmp_build}/boot
-    #
-    # Copy the original boot core file
-    cp -rf ${tmp_armbian}/boot/*-${kernel}-* ${tmp_build}/boot && sync
-    (cd ${tmp_build}/boot && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && chmod +x * && sync)
-    #
-    # Complete the u-boot file to facilitate the booting of the 5.10+ kernel
-    cp -f ${uboot_path}/* ${tmp_build}/boot && sync
-    chmod +x ${tmp_build}/boot/u-boot-*.bin
-    #
-    # Unzip the relevant files
-    tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tmp_build}/boot
-    tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tmp_armbian}
-    #
-    # Complete the dtb file
-    cp -rf ${dtb_path}/* ${tmp_build}/boot/dtb/amlogic && sync
-    cp -rf ${tmp_armbian}/boot/dtb/amlogic/* ${tmp_build}/boot/dtb/amlogic && sync
-    chmod +x ${tmp_build}/boot/dtb/amlogic/*
-
     # Create a dual-partition general directory
-    tag_bootfs="${tmp_outpath}/bootfs"
-    tag_rootfs="${tmp_outpath}/rootfs"
+    tag_bootfs="${tmp_build}/bootfs"
+    tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
-    if ! mount ${loop_new}p2 ${tag_rootfs}; then
-        error_msg "mount ${loop_new}p2 failed!"
-    fi
-    if ! mount ${loop_new}p1 ${tag_bootfs}; then
-        error_msg "mount ${loop_new}p1 failed!"
-    fi
-
-    # Copy boot files
-    cp -rf ${tmp_build}/boot/* ${tag_bootfs} && sync
-
-    # Copy rootfs files
-    rm -rf ${tmp_armbian}/boot/* 2>/dev/null
+    # Move rootfs files
+    mv -f ${tmp_armbian}/boot/* ${tag_bootfs} 2>/dev/null && sync
     # Copy the base files of the release for ROOTFS
     cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
     # Copy the same files of the release for ROOTFS
@@ -503,9 +449,15 @@ copy_files() {
         cp -rf ${diff_release_files}/* ${tag_rootfs} && sync
     fi
 
+    # Generate UUID
+    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
+    [ -z "${ROOTFS_UUID}" ] && error_msg "The uuidgen is invalid, cannot continue."
+
     # Processing partition files: bootfs
     cd ${tag_bootfs}
 
+    cp -f ${uboot_path}/* . && sync
     # Add u-boot.ext for 5.10 kernel
     if [[ "${K510}" -eq "1" ]]; then
         if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
@@ -620,6 +572,34 @@ copy_files() {
 
     cd ${make_path}
 
+}
+
+make_image() {
+    process_msg " (4/6) Make new armbian image."
+
+    cd ${make_path}
+
+    # Make Amlogic s9xxx armbian
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_focal_${kernel}_$(date +"%Y.%m.%d.%H%M").img"
+    rm -f ${build_image_file} 2>/dev/null && sync
+
+    IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
+
+    dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
+    sync
+
+    parted -s ${build_image_file} mklabel msdos 2>/dev/null
+    parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))M $((SKIP_MB + BOOT_MB - 1))M 2>/dev/null
+    parted -s ${build_image_file} mkpart primary ext4 $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
+    sync
+
+    loop_new=$(losetup -P -f --show "${build_image_file}")
+    [ ${loop_new} ] || error_msg "losetup ${build_image_file} failed."
+
+    mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
+    mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
+    sync
+
     # Write the bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
         dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
@@ -633,14 +613,34 @@ copy_files() {
     sync
 }
 
-clean_tmp() {
-    process_msg " (5/5) clear temp files."
+copy_files() {
+    process_msg " (5/6) Copy the Armbian files."
 
     cd ${make_path}
+
+    build_image_bootfs="${tmp_outpath}/bootfs"
+    build_image_rootfs="${tmp_outpath}/rootfs"
+    mkdir -p ${build_image_bootfs} ${build_image_rootfs} && sync
+
+    if ! mount ${loop_new}p2 ${build_image_rootfs}; then
+        error_msg "mount ${loop_new}p2 failed!"
+    fi
+    if ! mount ${loop_new}p1 ${build_image_bootfs}; then
+        error_msg "mount ${loop_new}p1 failed!"
+    fi
+
+    cp -rf ${tag_bootfs}/* ${build_image_bootfs}
+    cp -rf ${tag_rootfs}/* ${build_image_rootfs}
+    sync
+
     umount -f ${tmp_armbian} 2>/dev/null
-    umount -f ${tag_rootfs} 2>/dev/null
-    umount -f ${tag_bootfs} 2>/dev/null
+    umount -f ${build_image_bootfs} 2>/dev/null
+    umount -f ${build_image_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
+}
+
+clean_tmp() {
+    process_msg " (6/6) Clear temp files."
 
     cd ${tmp_outpath}
     # Rename version
@@ -676,9 +676,10 @@ loop_rebuild() {
                 kernel="${k}"
 
                 # Execute the following functions in sequence
-                make_image
                 extract_armbian
                 replace_kernel
+                refactor_files
+                make_image
                 copy_files
                 clean_tmp
 
