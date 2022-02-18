@@ -116,6 +116,9 @@ AMLOGIC_MODEL_LIST="
 57:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 58:Ugoos X3(OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 
+# Amlogic G12B-A311D Family
+61:Khadas VIM3:a311d:meson-g12b-a311d-khadas-vim3.dtb:u-boot-gtkingpro.bin:/lib/u-boot/khadas-vim3-u-boot.sd.bin:NA:4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Net,Wifi
+
 # Other
 0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
 "
