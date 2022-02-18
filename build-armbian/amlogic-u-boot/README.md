@@ -32,5 +32,6 @@ When using the 5.10+ kernel version, you need to copy the corresponding `u-boot-
 <tr><td>58</td><td>Ugoos X3(OverClock)</td><td>s905x3</td><td>meson-sm1-ugoos-x3.dtb</td><td>u-boot-ugoos-x3.bin</td><td>NA</td><td>NA</td><td>4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi</td></tr>
 <tr><td>61</td><td>Beelink Mini MX 2G</td><td>s905</td><td>meson-gxbb-vega-s95-telos.dtb</td><td>u-boot-s905.bin</td><td>NA</td><td>NA</td><td>Mali-450 GPU 2.4GHz / 5.8GHz WiFi 2GB RAM 16GB ROM Support 1000M LAN</td></tr>
 <tr><td>62</td><td>MXQ PRO+ 4K</td><td>s905</td><td>meson-gxbb-mxq-pro-plus.dtb</td><td>u-boot-p201.bin</td><td>NA</td><td>NA</td><td>2GB RAM 16GB ROM 2.4G/5.8G Support 1000M LAN</td></tr>
+<tr><td>63</td><td>Khadas VIM3</td><td>a311d</td><td>meson-g12b-a311d-khadas-vim3.dtb</td><td>u-boot-gtkingpro.bin</td><td>/lib/u-boot/khadas-vim3-u-boot.sd.bin</td><td>NA</td><td>4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Net,Wifi</td></tr>
 </table>
 
