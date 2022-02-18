@@ -371,7 +371,7 @@ refactor_files() {
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
     # Copy the full Armbian image
-    mv -f ${tmp_armbian}/* ${tag_rootfs}
+    cp -rf ${tmp_armbian}/* ${tag_rootfs}
     sync && sleep 3
 
     # Unzip the relevant files
@@ -472,7 +472,7 @@ refactor_files() {
     chown 0 usr/lib/sudo/sudoers.so
     chmod 644 usr/lib/sudo/sudoers.so
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    chmod 755 etc/update-motd.d/* 2>/dev/null
+    chmod 755 etc/update-motd.d/*
 
     # Add soft connection
     ln -sf usr/bin bin
@@ -593,7 +593,7 @@ copy_files() {
     fi
 
     cp -rf ${tag_bootfs}/* ${build_image_bootfs}
-    mv -f ${tag_rootfs}/* ${build_image_rootfs}
+    cp -rf ${tag_rootfs}/* ${build_image_rootfs}
     sync && sleep 3
 }
 
