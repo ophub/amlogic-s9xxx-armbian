@@ -220,7 +220,6 @@ download_kernel() {
 
         let i++
     done
-
     sync
 }
 
@@ -535,7 +534,6 @@ refactor_files() {
         # new ugoos x3 is brm43456
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:06/" "brcmfmac43456-sdio.txt" >"brcmfmac43456-sdio.amlogic,sm1.txt"
     )
-
     sync
 }
 
@@ -574,7 +572,7 @@ make_image() {
         dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
         #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
-    sync
+    sync && sleep 3
 }
 
 copy_files() {
