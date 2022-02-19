@@ -111,11 +111,11 @@ AMLOGIC_MODEL_LIST="
 51:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Net
 52:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Net
 53:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
-54:HK1 Box (OveClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+54:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
 55:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
-56:H96 Max X3:s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+56:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
 57:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
-58:Ugoos X3(OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
+58:Ugoos X3 (OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 
 # Other
 0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
