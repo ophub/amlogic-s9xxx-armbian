@@ -28,6 +28,7 @@
 #
 # init_var           : Initialize all variables
 # find_armbian       : Find Armbian file (build/output/images/*.img)
+# download_depends   : Download the dependency files
 # download_kernel    : Download the latest kernel
 #
 # confirm_version    : Confirm version type
@@ -61,9 +62,11 @@ armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as
 ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
 build_armbian=("a311d" "s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
 #
+# Dependency files repository, Download u-boot and dtb to the local directory
+depends_repo="https://github.com/ophub/kernel/tree/main/depends"
+#
 # Latest kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-#kernel_repo="https://github.com/ophub/kernel/trunk/pub"
 version_branch="stable"
 build_kernel=("5.10.100" "5.4.180")
 auto_kernel="true"
@@ -165,6 +168,20 @@ find_armbian() {
         armbian_rebuild_version="22.02.02"
         echo -e "Missing armbian version info!"
     }
+}
+
+download_depends() {
+    cd ${make_path}
+
+    # Convert depends library address to svn format
+    if [[ ${depends_repo} == http* && $(echo ${depends_repo} | grep "tree/main") != "" ]]; then
+        depends_repo="${depends_repo//tree\/main/trunk}"
+    fi
+
+    # Download all dependent files to a local directory
+    echo -e "Download all dependent files from [ ${depends_repo} ]"
+    svn export ${depends_repo} ${build_path} --force
+    sync
 }
 
 download_kernel() {
@@ -388,6 +405,12 @@ refactor_files() {
     # Copy the patches files
     [ -f "${tag_rootfs}/usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen ${tag_rootfs}/usr/bin
 
+    # Copy the bootloader files
+    [ -d "${tag_rootfs}/usr/lib/u-boot" ] || mkdir -p ${tag_rootfs}/usr/lib/u-boot
+    cp -f ${uboot_path}/bootloader/* ${tag_rootfs}/usr/lib/u-boot
+    # Copy the overload files
+    cp -f ${uboot_path}/overload/* ${tag_bootfs}
+
     # Find ID in ${os_release_file}: such as [ubuntu/debian]
     release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
     [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
@@ -433,7 +456,6 @@ refactor_files() {
     cd ${tag_bootfs}
 
     # Add u-boot.ext for 5.10 kernel
-    cp -f ${uboot_path}/* . && sync
     if [[ "${K510}" -eq "1" ]]; then
         if [[ -f "${UBOOT_OVERLOAD}" && -n "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext
@@ -671,9 +693,13 @@ echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 #
-# Initialize variables and download the kernel
+# Initialize variables
 init_var "${@}"
+# Find rebuild files
 find_armbian && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+# Download the dependency files
+download_depends
+# Download the latest kernel
 [ "${auto_kernel}" == "true" ] && download_kernel
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
