@@ -264,19 +264,19 @@ confirm_version() {
     s905x3 | x96 | hk1 | h96 | ugoosx3)
         FDTFILE="meson-sm1-x96-max-plus-100m.dtb"
         UBOOT_OVERLOAD="u-boot-x96maxplus.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96maxplus-u-boot.bin.sd.bin"
-        ANDROID_UBOOT="/lib/u-boot/hk1box-bootloader.img"
+        MAINLINE_UBOOT="x96maxplus-u-boot.bin.sd.bin"
+        ANDROID_UBOOT="hk1box-bootloader.img"
         ;;
     s905x2 | x96max4g | x96max2g)
         FDTFILE="meson-g12a-x96-max.dtb"
         UBOOT_OVERLOAD="u-boot-x96max.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
+        MAINLINE_UBOOT="x96max-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         ;;
     s905x2-km3)
         FDTFILE="meson-g12a-sei510.dtb"
         UBOOT_OVERLOAD="u-boot-x96max.bin"
-        MAINLINE_UBOOT="/lib/u-boot/x96max-u-boot.bin.sd.bin"
+        MAINLINE_UBOOT="x96max-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         ;;
     s905x | hg680p | b860h)
@@ -295,7 +295,7 @@ confirm_version() {
         FDTFILE="meson-gxl-s905d-phicomm-n1.dtb"
         UBOOT_OVERLOAD="u-boot-n1.bin"
         MAINLINE_UBOOT=""
-        ANDROID_UBOOT="/lib/u-boot/u-boot-2015-phicomm-n1.bin"
+        ANDROID_UBOOT="u-boot-2015-phicomm-n1.bin"
         ;;
     s905d-ki)
         FDTFILE="meson-gxl-s905d-mecool-ki-pro.dtb"
@@ -326,13 +326,13 @@ confirm_version() {
     s922x | belink | belinkpro | ugoos)
         FDTFILE="meson-g12b-gtking-pro.dtb"
         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-        MAINLINE_UBOOT="/lib/u-boot/gtkingpro-u-boot.bin.sd.bin"
+        MAINLINE_UBOOT="gtkingpro-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         ;;
     s922x-n2 | odroid-n2 | n2)
         FDTFILE="meson-g12b-odroid-n2.dtb"
         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-        MAINLINE_UBOOT="/lib/u-boot/odroid-n2-u-boot.bin.sd.bin"
+        MAINLINE_UBOOT="odroid-n2-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         ;;
     s922x-reva)
@@ -344,7 +344,7 @@ confirm_version() {
     a311d | khadas-vim3 | vim3)
         FDTFILE="meson-g12b-a311d-khadas-vim3.dtb"
         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
-        MAINLINE_UBOOT="/lib/u-boot/khadas-vim3-u-boot.sd.bin"
+        MAINLINE_UBOOT="khadas-vim3-u-boot.sd.bin"
         ANDROID_UBOOT=""
         ;;
     *)
@@ -514,8 +514,8 @@ refactor_files() {
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
     echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
-    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+    echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+    echo "ANDROID_UBOOT='/usr/lib/u-boot/${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
     echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
@@ -591,13 +591,13 @@ make_image() {
     sync
 
     # Write the bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr${MAINLINE_UBOOT}" ]]; then
-        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
-        dd if=${tag_rootfs}/usr${MAINLINE_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
         #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr${ANDROID_UBOOT}" ]]; then
-        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=1 count=444 conv=fsync 2>/dev/null
-        dd if=${tag_rootfs}/usr${ANDROID_UBOOT} of=${loop_new} bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
         #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
     sync && sleep 3
