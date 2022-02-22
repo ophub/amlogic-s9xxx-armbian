@@ -1,9 +1,7 @@
 !.gitignore
 /build
 /tmp_dir
-/build-armbian/amlogic-dtb
 /build-armbian/amlogic-kernel
-/build-armbian/amlogic-u-boot
 /compile-kernel/kernel
 /compile-kernel/output
 /compile-kernel/tools/armbian
