@@ -15,8 +15,8 @@
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install mainline u-boot.
 # When there is no mainline u-boot file in related directory, the script will auto try to download the file from the server:
-# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot"
-# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/lib/u-boot
+# UBOOT_OVERLOAD: https://github.com/ophub/kernel/tree/main/depends/amlogic-u-boot/overload
+# MAINLINE_UBOOT: https://github.com/ophub/kernel/tree/main/depends/amlogic-u-boot/bootloader
 #
 # Command: armbian-update
 # Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
@@ -29,7 +29,7 @@
 tmp_path="${PWD}"
 kernel_pub="https://github.com/ophub/kernel/tree/main/pub"
 kernel_repo="https://api.github.com/repos/ophub/kernel/contents/pub"
-depends_repo="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian"
+depends_repo="https://raw.githubusercontent.com/ophub/kernel/main/depends/amlogic-u-boot"
 ophub_release_file="/etc/ophub-release"
 old_ophub_release_file="/etc/armbian-aml-release"
 github_api_kernel_files="${tmp_path}/github_api_kernel_files"
@@ -247,7 +247,7 @@ if [ "${V510}" -lt "${K510}" ]; then
     if [[ -n "${UBOOT_OVERLOAD}" ]]; then
         if [[ ! -s "/boot/${UBOOT_OVERLOAD}" ]]; then
             echo -e "Try to download the ${UBOOT_OVERLOAD} file from the server."
-            GITHUB_UBOOT_OVERLOAD="${depends_repo}/amlogic-u-boot/${UBOOT_OVERLOAD}"
+            GITHUB_UBOOT_OVERLOAD="${depends_repo}/overload/${UBOOT_OVERLOAD}"
             #echo -e "UBOOT_OVERLOAD: ${GITHUB_UBOOT_OVERLOAD}"
             wget -c "${GITHUB_UBOOT_OVERLOAD}" -O "/boot/${UBOOT_OVERLOAD}" >/dev/null 2>&1 && sync
             if [[ "$?" -eq "0" && -s "/boot/${UBOOT_OVERLOAD}" ]]; then
@@ -266,10 +266,10 @@ if [ "${V510}" -lt "${K510}" ]; then
     if [[ -n "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
         if [[ ! -s "${MAINLINE_UBOOT}" ]]; then
             echo -e "Try to download the MAINLINE_UBOOT file from the server."
-            GITHUB_MAINLINE_UBOOT="${depends_repo}/common-files/files/usr${MAINLINE_UBOOT}"
+            GITHUB_MAINLINE_UBOOT="${depends_repo}/bootloader/${MAINLINE_UBOOT}"
             #echo -e "MAINLINE_UBOOT: ${GITHUB_MAINLINE_UBOOT}"
             [ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
-            wget -c "${GITHUB_MAINLINE_UBOOT}" -O "${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
+            wget -c "${GITHUB_MAINLINE_UBOOT}" -O "/usr/lib/u-boot/${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
             if [[ "$?" -eq "0" && -s "${MAINLINE_UBOOT}" ]]; then
                 echo -e "The MAINLINE_UBOOT file download is complete."
             else
@@ -290,14 +290,14 @@ if [ "${V510}" -lt "${K510}" ]; then
     fi
 
     # Write bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
+    if [[ -n "${MAINLINE_UBOOT}" && -f "/usr/lib/u-boot/${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
         echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
-        dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        dd if="/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
         echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
-        dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
+        dd if="/usr/lib/u-boot/${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="/usr/lib/u-boot/${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
     fi
 
 fi

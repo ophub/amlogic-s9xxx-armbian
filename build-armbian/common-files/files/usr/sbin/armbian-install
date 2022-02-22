@@ -80,8 +80,8 @@ AMLOGIC_MODEL_LIST="
 # 1.id  2.model  3.soc  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.description
 
 # Amlogic GXL Family
-11:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Net,Wifi
-12:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
+11:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Net,Wifi
+12:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
 13:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,1Gb Net
 14:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100M Net
 15:MECOOL KI Pro:s905d:meson-gxl-s905d-mecool-ki-pro.dtb:u-boot-p201.bin:NA:NA:2G/16G,1000M Net
@@ -94,26 +94,26 @@ AMLOGIC_MODEL_LIST="
 25:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band Wi-Fi/10-1000M LAN 64Bit BT4.0
 
 # Amlogic G12A Family
-31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
-32:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100M Net
-33:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100M Net
+31:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Net
+32:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100M Net
+33:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100M Net
 
 # Amlogic G12B Family
-41:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
-42:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
-43:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Net,Wifi
+41:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/usr/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+42:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+43:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Net,Wifi
 44:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro-rev-a.bin:NA:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
-45:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
-46:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
-47:Khadas VIM3:a311d:meson-g12b-a311d-khadas-vim3.dtb:u-boot-gtkingpro.bin:/lib/u-boot/khadas-vim3-u-boot.sd.bin:NA:4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Net,Wifi
+45:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net
+46:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Net,Wifi
+47:Khadas VIM3:a311d:meson-g12b-a311d-khadas-vim3.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/khadas-vim3-u-boot.sd.bin:NA:4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Net,Wifi
 
 # Amlogic SM1 Family
-51:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Net
-52:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Net
-53:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
-54:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
-55:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
-56:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+51:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Net
+52:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Net
+53:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
+54:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
+55:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Net,Wifi
+56:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Net,Wifi
 57:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 58:Ugoos X3 (OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Net,Wifi
 
@@ -200,18 +200,18 @@ sync
 
 # Write the uboot
 echo "Start write u-boot"
-if [[ -n "${MAINLINE_UBOOT}" && -f ${MAINLINE_UBOOT} && "${auto_mainline_uboot}" == "yes" ]]; then
+if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
     echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-    dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
-    dd if=${MAINLINE_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
 elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
     echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-    dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=1 count=444 conv=fsync
-    dd if=${ANDROID_UBOOT} of=${DEV_EMMC} bs=512 skip=1 seek=1 conv=fsync
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
 elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
     echo "Restore the mybox u-boot"
-    dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=442
-    dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
 fi
 
 echo "Start copy system for eMMC."
