@@ -164,6 +164,7 @@ find_armbian() {
         armbian_rebuild_version="22.02.02"
         echo -e "Missing armbian version info!"
     }
+    echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 }
 
 download_kernel() {
@@ -678,7 +679,7 @@ echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 # Initialize variables
 init_var "${@}"
 # Find rebuild files
-find_armbian && echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+find_armbian
 # Download the latest kernel
 [ "${auto_kernel}" == "true" ] && download_kernel
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
