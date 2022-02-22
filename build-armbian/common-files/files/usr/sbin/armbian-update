@@ -15,8 +15,8 @@
 #
 # When the kernel version is upgraded from 5.10 or lower to 5.10 or higher, need to install mainline u-boot.
 # When there is no mainline u-boot file in related directory, the script will auto try to download the file from the server:
-# UBOOT_OVERLOAD: https://github.com/ophub/kernel/tree/main/depends/amlogic-u-boot/overload
-# MAINLINE_UBOOT: https://github.com/ophub/kernel/tree/main/depends/amlogic-u-boot/bootloader
+# UBOOT_OVERLOAD: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot/overload
+# MAINLINE_UBOOT: https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/amlogic-u-boot/bootloader
 #
 # Command: armbian-update
 # Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
@@ -27,9 +27,8 @@
 
 # Set default value
 tmp_path="${PWD}"
-kernel_pub="https://github.com/ophub/kernel/tree/main/pub"
 kernel_repo="https://api.github.com/repos/ophub/kernel/contents/pub"
-depends_repo="https://raw.githubusercontent.com/ophub/kernel/main/depends/amlogic-u-boot"
+depends_repo="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian/amlogic-u-boot"
 ophub_release_file="/etc/ophub-release"
 old_ophub_release_file="/etc/armbian-aml-release"
 github_api_kernel_files="${tmp_path}/github_api_kernel_files"
@@ -133,7 +132,7 @@ fi
 # Check 3 kernel files
 if [[ "$(ls ${tmp_path}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
     echo -e "Kernel version: ${inputs_kernel}"
-    echo -e "Start downloading from [ ${kernel_pub}/${version_branch}/${inputs_kernel} ] to [ ${tmp_path} ]..."
+    echo -e "Start downloading kernel to [ ${tmp_path} ]..."
 
     # Delete tmp files
     rm -f ${tmp_path}/*${inputs_kernel}*.tar.gz 2>/dev/null
