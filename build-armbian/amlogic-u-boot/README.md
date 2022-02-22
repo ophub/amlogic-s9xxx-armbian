@@ -1,6 +1,8 @@
-# u-boot files of amlogic-s9xxx 5.10+ kernel
+# The u-boot files description
 
-When using the 5.10+ kernel version, you need to copy the corresponding `u-boot-*.bin` file to `u-boot.ext` (TF/SD card boot file) and `u-boot.emmc` (EMMC boot file).
+When you use Armbian with 5.10 kernel, you need to copy the corresponding u-boot file in the overload directory as `u-boot.ext`, when using in EMMC, you need to copy the u-boot file as `u-boot.emmc ` . Some devices need to write the corresponding bootloader file.
+
+These duplications are automated in the repository's packaging and install/upgrade scripts, eliminating the need for manual duplication.
 
 ## Correspondence for Amlogic s9xxx tv box
 
