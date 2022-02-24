@@ -1,8 +1,8 @@
-# The u-boot files description
+# The files description
 
-When you use Armbian with 5.10 kernel, you need to copy the corresponding u-boot file in the overload directory as `u-boot.ext`, when using in EMMC, you need to copy the u-boot file as `u-boot.emmc ` . Some devices need to write the corresponding bootloader file.
+When you are using Armbian with kernel version 5.10.y and above, you need to copy the corresponding `u-boot-xxx.bin` file in the `overload` directory as `u-boot.ext`, when using in eMMC, you need to copy as `u-boot.emmc`. Some devices need to write the corresponding `bootloader` file.
 
-These duplications are automated in the repository's packaging and install/upgrade scripts, eliminating the need for manual duplication.
+These duplications are automated in the repository's packaging and install/update scripts, eliminating the need for manual duplication.
 
 ## Correspondence for Amlogic s9xxx tv box
 
