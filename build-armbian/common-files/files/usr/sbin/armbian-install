@@ -1,5 +1,5 @@
 #!/bin/bash
-#=========================================================================
+#==========================================================================
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
@@ -12,13 +12,14 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
-# The kernel above version 5.10 needs to install mainline u-boot
+# Kernel version 5.10.y or newer is recommended to install mainline u-boot
 # The mainline u-boot is installed by default: armbian-install
 # Don't write mainline u-boot command: armbian-install no
-#=========================================================================
+#==========================================================================
 
-SKIP=700
-BOOT=256
+# Set partition size(MB), It is recommended to skip the 700M partition table
+SKIP="700"
+BOOT="256"
 
 # Receive one-key command related parameters
 if [[ "${1}" == "no" ]]; then
@@ -77,12 +78,12 @@ echo "ROOTFS_UUID: ${ROOTFS_UUID}"
 
 # Set model list, begin ------------
 AMLOGIC_MODEL_LIST="
-# 1.id  2.model  3.soc  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.description
+# 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.DESCRIPTION
 
 # Amlogic GXL Family
 11:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Net,Wifi
 12:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
-13:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,1Gb Net
+13:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,100M Net
 14:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100M Net
 15:MECOOL KI Pro:s905d:meson-gxl-s905d-mecool-ki-pro.dtb:u-boot-p201.bin:NA:NA:2G/16G,1000M Net
 
