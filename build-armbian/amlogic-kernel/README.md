@@ -14,11 +14,11 @@
             │   ├── dtb-amlogic-5.4.180-xxx.tar.gz
             │   └── modules-5.4.180-xxx.tar.gz
             │
-            ├── 5.10.100
-            │   ├── header-5.10.100-xxx.tar.gz
-            │   ├── boot-5.10.100-xxx.tar.gz
-            │   ├── dtb-amlogic-5.10.100-xxx.tar.gz
-            │   └── modules-5.10.100-xxx.tar.gz
+            ├── 5.15.25
+            │   ├── header-5.15.25-xxx.tar.gz
+            │   ├── boot-5.15.25-xxx.tar.gz
+            │   ├── dtb-amlogic-5.15.25-xxx.tar.gz
+            │   └── modules-5.15.25-xxx.tar.gz
             │
             ├── more kernel...
 ```
