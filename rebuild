@@ -220,6 +220,7 @@ download_kernel() {
 
         let i++
     done
+
     sync
 }
 
@@ -350,8 +351,7 @@ extract_armbian() {
 
     armbian_image_file="${tmp_aml_image}/armbian_${soc}_${kernel}.img"
     rm -f ${armbian_image_file} 2>/dev/null && sync
-    cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}"
-    sync && sleep 3
+    cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}" && sync
 
     loop_old=$(losetup -P -f --show "${armbian_image_file}")
     [ ${loop_old} ] || error_msg "losetup ${armbian_image_file} failed."
@@ -361,9 +361,14 @@ extract_armbian() {
     fi
 
     cd ${tmp_armbian}
+    # Delete all files of /boot partition and replace it later
     rm -rf boot/* 2>/dev/null
-    rm -rf bin lib sbin tmp usr/lib/modules/* usr/local/include/* var/sbin 2>/dev/null
-    sync && sleep 3
+    # Delete the kernel files and replace it later
+    rm -rf usr/lib/modules/* usr/local/include/* 2>/dev/null
+    # Delete the symbolic link files and relink it later
+    rm -rf bin lib sbin tmp var/sbin 2>/dev/null
+
+    sync
 }
 
 refactor_files() {
@@ -376,8 +381,7 @@ refactor_files() {
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
     # Copy the full Armbian image
-    cp -rf ${tmp_armbian}/* ${tag_rootfs}
-    sync && sleep 3
+    cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
 
     # Unzip the relevant files
     tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tag_bootfs}
@@ -409,7 +413,8 @@ refactor_files() {
         # Copy custom source
         cp -rf ${diff_release_files}/* ${tag_rootfs}
     fi
-    sync
+
+    sync && sleep 3
 
     # Replace the kernel
     build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
@@ -454,9 +459,7 @@ refactor_files() {
     sed -i "s|meson.*.dtb|${FDTFILE}|g" uEnv.txt
 
     # For s912-t95z-plus /boot/extlinux/extlinux.conf
-    [ "${FDTFILE}" == "meson-gxm-t95z-plus.dtb" ] && cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* .
-
-    sync
+    [ "${FDTFILE}" == "meson-gxm-t95z-plus.dtb" ] && cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* . && sync
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
@@ -484,13 +487,13 @@ refactor_files() {
     chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
     chmod 755 etc/update-motd.d/*
 
-    # Add soft connection
-    ln -sf usr/bin bin
-    ln -sf usr/lib lib
-    ln -sf usr/sbin sbin
-    ln -sf var/tmp tmp
+    # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
+    ln -sf /usr/bin bin
+    ln -sf /usr/lib lib
+    ln -sf /usr/sbin sbin
+    ln -sf /var/tmp tmp
     ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
-    ln -sf armbian-ddbr usr/sbin/ddbr
+    ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
     # Add custom firmware information
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
@@ -545,6 +548,7 @@ refactor_files() {
         # new ugoos x3 is brm43456
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:06/" "brcmfmac43456-sdio.txt" >"brcmfmac43456-sdio.amlogic,sm1.txt"
     )
+
     sync
 }
 
@@ -583,7 +587,8 @@ make_image() {
         dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
         #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
-    sync && sleep 3
+
+    sync
 }
 
 copy_files() {
@@ -603,6 +608,7 @@ copy_files() {
 
     cp -rf ${tag_bootfs}/* ${build_image_bootfs}
     cp -rf ${tag_rootfs}/* ${build_image_rootfs}
+
     sync && sleep 3
 }
 
@@ -626,6 +632,7 @@ clean_tmp() {
 
     cd ${make_path}
     rm -rf ${tmp_dir} 2>/dev/null
+
     sync
 }
 
