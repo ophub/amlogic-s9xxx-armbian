@@ -267,7 +267,7 @@ if [ "${V510}" -lt "${K510}" ]; then
             echo -e "Try to download the MAINLINE_UBOOT file from the server."
             GITHUB_MAINLINE_UBOOT="${depends_repo}/bootloader/${MAINLINE_UBOOT}"
             #echo -e "MAINLINE_UBOOT: ${GITHUB_MAINLINE_UBOOT}"
-            [ -d "/lib/u-boot" ] || mkdir -p /lib/u-boot
+            [ -d "/usr/lib/u-boot" ] || mkdir -p /usr/lib/u-boot
             wget -c "${GITHUB_MAINLINE_UBOOT}" -O "/usr/lib/u-boot/${MAINLINE_UBOOT}" >/dev/null 2>&1 && sync
             if [[ "$?" -eq "0" && -s "${MAINLINE_UBOOT}" ]]; then
                 echo -e "The MAINLINE_UBOOT file download is complete."
