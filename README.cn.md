@@ -206,6 +206,8 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - GitHub Actions 输入参数说明
 
+GitHUB RELEASES_TOKEN 相关设置参考 https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md
+
 相关参数与`本地打包命令`相对应，请参考上面的说明。
 
 | 参数              | 默认值             | 说明                                            |
