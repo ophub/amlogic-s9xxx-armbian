@@ -16,7 +16,7 @@ on:
       more_settings:
         description: "Rebuild: More parameter settings"
         required: false
-        default: "-b s905l3a -k 5.4.170_5.15.13"
+        default: ""
 
 env:
   TZ: Asia/Shanghai

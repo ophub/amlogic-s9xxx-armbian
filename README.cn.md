@@ -4,7 +4,7 @@
 
 [Armbian](https://www.armbian.com/) 系统是基于 Debian/Ubuntu 而构建的专门用于 ARM 芯片的轻量级 Linux 系统。Armbian 系统精益、干净，并且 100% 兼容并继承了 Debian/Ubuntu 系统的功能和丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 里。
 
-现在你可以将使用 Amlogic 芯片的电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。本项目为 Amlogic s9xxx 电视盒子构建 Armbian 系统。支持写入 EMMC 中使用，支持更新内核等功能。支持的 Amlogic S9xxx 系列型号有 ***`a311d, s922x, s905x3, s905x2, s912, s905d, s905x, s905w, s905`*** 等，例如 ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`*** 等盒子。
+现在你可以将使用 Amlogic 芯片的电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。本项目为 Amlogic s9xxx 电视盒子构建 Armbian 系统。支持写入 EMMC 中使用，支持更新内核等功能。支持的 Amlogic S9xxx 系列型号有 ***`a311d, s922x, s905x3, s905x2, s905l3a, s912, s905d, s905x, s905w, s905`*** 等，例如 ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`*** 等盒子。
 
 最新的 Armbian 固件可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
@@ -150,7 +150,7 @@ armbian-ddbr
 | 参数  | 含义       | 说明        |
 | ---- | ---------- | ---------- |
 | -d   | Defaults   | 使用默认配置 |
-| -b   | BuildSoC   | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 可以指定的型号有: `a311d`, `s905x3`, `s905x2`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` 。说明：`s922x-reva` 是 `s922x-gtking-pro-rev_a`，`s922x-n2` 是 `s922x-odroid-n2` ，`s912-t95z` 是 `s912-t95z-plus` ，`s905d-ki` 是 `s912-mecool-ki-pro`，`s905x2-km3` 是 `s905x2-mecool-km3` |
+| -b   | BuildSoC   | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 可以指定的型号有: `a311d`, `s905x3`, `s905x2`, `s905l3a`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-t95z` 。说明：`s922x-reva` 是 `s922x-gtking-pro-rev_a`，`s922x-n2` 是 `s922x-odroid-n2` ，`s912-t95z` 是 `s912-t95z-plus` ，`s905d-ki` 是 `s912-mecool-ki-pro`，`s905x2-km3` 是 `s905x2-mecool-km3` |
 | -v   | Version    | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，如 `-v stable` 。指定的名称须与分支目录名称相同。默认使用 `stable` 分支版本。 |
 | -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) 名称，如 `-k 5.4.180` . 多个内核使用 `_` 进行连接，如 `-k 5.15.25_5.4.180` |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.4.180 的 5.4 同系列是否有更新的版本，如有 5.4.180 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
@@ -206,9 +206,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 
 - GitHub Actions 输入参数说明
 
-GitHUB RELEASES_TOKEN 相关设置参考 https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md
-
-相关参数与`本地打包命令`相对应，请参考上面的说明。
+关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md#3-fork-仓库并设置-releases_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
 
 | 参数              | 默认值             | 说明                                            |
 |------------------|-------------------|------------------------------------------------|
