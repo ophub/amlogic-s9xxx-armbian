@@ -294,9 +294,9 @@ confirm_version() {
         ANDROID_UBOOT=""
         ;;
     s905 | beelinkminimx | mxqpro+)
-        FDTFILE="meson-gxbb-vega-s95-telos.dtb"
-        #FDTFILE="meson-gxbb-beelink-mini-mx.dtb"
+        FDTFILE="meson-gxbb-beelink-mini-mx.dtb"
         #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
+        #FDTFILE="meson-gxbb-vega-s95-telos.dtb"
         UBOOT_OVERLOAD="u-boot-s905.bin"
         #UBOOT_OVERLOAD="u-boot-p201.bin"
         MAINLINE_UBOOT=""
