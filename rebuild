@@ -257,16 +257,16 @@ confirm_version() {
         MAINLINE_UBOOT="x96max-u-boot.bin.sd.bin"
         ANDROID_UBOOT=""
         ;;
-    s905l3a | e900v22c | e900v22d)
-        FDTFILE="meson-g12a-u200.dtb"
-        UBOOT_OVERLOAD="u-boot-u200.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        ;;
     s905x2-km3)
         FDTFILE="meson-g12a-sei510.dtb"
         UBOOT_OVERLOAD="u-boot-x96max.bin"
         MAINLINE_UBOOT="x96max-u-boot.bin.sd.bin"
+        ANDROID_UBOOT=""
+        ;;
+    s905l3a | e900v22c | e900v22d)
+        FDTFILE="meson-g12a-u200.dtb"
+        UBOOT_OVERLOAD="u-boot-u200.bin"
+        MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         ;;
     s905x | hg680p | b860h)
