@@ -521,6 +521,9 @@ refactor_files() {
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
 
+    # Make the .bashrc take effect
+    echo '[ -f "${HOME}/.bashrc" ] && . ${HOME}/.bashrc' >>etc/profile
+
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
     sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
