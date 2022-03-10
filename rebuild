@@ -392,7 +392,7 @@ refactor_files() {
 
     # Unzip the relevant files
     tar -xJf "${armbian_path}/boot-common.tar.xz" -C ${tag_bootfs}
-    tar -xzf "${armbian_path}/firmware.tar.xz" -C ${tag_rootfs}/usr
+    tar -xJf "${armbian_path}/firmware.tar.xz" -C ${tag_rootfs}/usr
 
     # Copy the same files of the release for ROOTFS
     [[ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/files/* ${tag_rootfs}
