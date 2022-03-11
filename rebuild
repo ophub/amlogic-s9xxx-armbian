@@ -526,7 +526,7 @@ refactor_files() {
 
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
+    sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun} 2>/dev/null
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
