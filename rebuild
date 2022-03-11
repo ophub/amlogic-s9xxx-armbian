@@ -436,7 +436,7 @@ refactor_files() {
     (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
 
     # 02 For dtb files
-    cp -rf ${dtb_path}/* ${tag_bootfs}/dtb/amlogic && sync
+    cp -f ${dtb_path}/*.dtb ${tag_bootfs}/dtb/amlogic && sync
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
 
     # 03 For usr/lib/modules/*
