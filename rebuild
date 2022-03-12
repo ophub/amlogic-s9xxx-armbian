@@ -59,7 +59,7 @@ tmp_aml_image="${tmp_dir}/tmp_aml_image"
 os_release_file="etc/os-release"           # Get armbian ${VERSION_CODENAME}: such as [ focal ]
 armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
 ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
-build_armbian=("a311d" "s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905l3a" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
+build_armbian=("a311d" "s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905l3a" "s905x2-km3" "s912" "s912-t95z" "s912-m8s" "s905d" "s905d-ki" "s905x" "s905w" "s905")
 #
 # Latest kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
@@ -310,6 +310,12 @@ confirm_version() {
         ;;
     s912-t95z | s912-t95z-plus)
         FDTFILE="meson-gxm-t95z-plus.dtb"
+        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT=""
+        ;;
+    s912-m8s | s912-m8s-pro)
+        FDTFILE="meson-gxm-q201.dtb"
         UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
