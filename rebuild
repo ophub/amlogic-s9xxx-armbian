@@ -56,18 +56,29 @@ tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
-os_release_file="etc/os-release"           # Get armbian ${VERSION_CODENAME}: such as [ focal ]
-armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
-ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
-build_armbian=("a311d" "s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905l3a" "s905x2-km3" "s912" "s912-t95z" "s912-m8s" "s905d" "s905d-ki" "s905x" "s905w" "s905")
-#
-# Latest kernel download repository
+# Get armbian ${VERSION_CODENAME}: such as [ focal ]
+os_release_file="etc/os-release"
+# Set banner's ${BOARD_NAME}: such as [ s905x3 ]
+armbian_release_file="etc/armbian-release"
+# Add custom armbian firmware information
+ophub_release_file="etc/ophub-release"
+# Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch="stable"
 build_kernel=("5.15.25" "5.4.180")
 auto_kernel="true"
-#
-# Set Armbian firmware size (BOOT_MB >= 256, ROOT_MB >= 2000)
+# Set supported SoC
+build_armbian=(
+    "s922x" "s922x-n2" "s922x-reva" "a311d"
+    "s905x3"
+    "s905x2" "s905x2-km3" "s905l3a"
+    "s912" "s912-t95z" "s912-m8s"
+    "s905d" "s905d-ki"
+    "s905x"
+    "s905w"
+    "s905"
+)
+# Set Armbian firmware size (SKIP_MB >= 4, BOOT_MB >= 256, ROOT_MB >= 2000)
 SKIP_MB="68"
 BOOT_MB="256"
 ROOT_MB="2748"
