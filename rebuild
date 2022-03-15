@@ -65,8 +65,8 @@ ophub_release_file="etc/ophub-release"
 # Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch="stable"
-build_kernel=("5.15.25" "5.4.180")
 auto_kernel="true"
+build_kernel=("5.15.25" "5.4.180")
 # Set supported SoC
 build_armbian=(
     "s922x" "s922x-n2" "s922x-reva" "a311d"
@@ -385,6 +385,14 @@ extract_armbian() {
     fi
 
     cd ${tmp_armbian}
+
+    # Find ID in ${os_release_file}: such as [ubuntu/debian]
+    release_codeid="$(cat ${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
+    [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
+    # Find VERSION_CODENAME in ${os_release_file}: such as [focal/bullseye/buster]
+    release_codename="$(cat ${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
+    [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
+
     # Delete all files of /boot partition and replace it later
     rm -rf boot/* 2>/dev/null
     # Delete the kernel files and replace it later
@@ -421,24 +429,6 @@ refactor_files() {
     cp -f ${uboot_path}/bootloader/* ${tag_rootfs}/usr/lib/u-boot
     # Copy the overload files
     cp -f ${uboot_path}/overload/* ${tag_bootfs}
-
-    # Find ID in ${os_release_file}: such as [ubuntu/debian]
-    release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
-    [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
-    # Find VERSION_CODENAME in ${os_release_file}: such as [focal/bullseye/buster]
-    release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
-    [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
-    # Copy the different files of the release for ROOTFS
-    diff_release_files="${configfiles_path}/release/${release_codename}"
-    if [[ -n "${release_codename}" && -d "${diff_release_files}" ]]; then
-        # Backup source
-        mv -f ${tag_rootfs}/etc/apt/sources.list ${tag_rootfs}/etc/apt/sources.list.bak
-        mv -f ${tag_rootfs}/etc/apt/sources.list.d/armbian.list ${tag_rootfs}/etc/apt/sources.list.d/armbian.list.bak
-        # Copy custom source
-        cp -rf ${diff_release_files}/* ${tag_rootfs}
-    fi
-
-    sync && sleep 3
 
     # Replace the kernel
     build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
