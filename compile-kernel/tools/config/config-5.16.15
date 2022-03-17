@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.16.14 Kernel Configuration
+# Linux/arm64 5.16.15 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="clang version 13.0.0 (https://github.com/llvm/llvm-project/ 24c8eaec9467b2aaf70b0db33a4e4dd415139a50)"
 CONFIG_GCC_VERSION=0
@@ -403,7 +403,6 @@ CONFIG_HZ=300
 CONFIG_SCHED_HRTICK=y
 CONFIG_ARCH_SPARSEMEM_ENABLE=y
 CONFIG_HW_PERF_EVENTS=y
-CONFIG_ARCH_HAS_FILTER_PGPROT=y
 CONFIG_CC_HAVE_SHADOW_CALL_STACK=y
 # CONFIG_PARAVIRT is not set
 # CONFIG_PARAVIRT_TIME_ACCOUNTING is not set
