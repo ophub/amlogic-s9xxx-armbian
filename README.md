@@ -83,6 +83,21 @@ Login in to armbian → input command:
 armbian-swap 1
 ```
 
+- ### Controlling the LED display
+
+Login in to armbian → input command:
+
+```yaml
+armbian-led
+```
+
+Debug according to [LED test instructions](build-armbian/armbian-docs/led.md). After the screen is displayed normally, you can add it to the self-starting task at boot, Please modify the `15` in the following command according to the serial number corresponding to the box in the `armbian-led` option:
+
+```yaml
+sed -i '/armbian-led/d' /etc/rc.local
+sed -i '/exit 0/i\armbian-led 15' /etc/rc.local
+```
+
 - ### Use Armbian in TF/SD/USB
 
 To activate the remaining space of TF/SD/USB, please login in to armbian → input command:
