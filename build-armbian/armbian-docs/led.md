@@ -17,9 +17,20 @@ vfd_gpio_dat='0,69,0'
 
 - Name the configuration file `diy.conf` and upload it to the `/usr/share/openvfd/conf` directory, enter the command `armbian-led 99` to test.
 
-- You can disable the LED display and clear system processes with the command `armbian-led 0` or `armbian-led stop`, before each test a new configuration, please execute this disable command first, and then execute `armbian-led 99` to make changes After the configuration test.
+- You can disable the LED display and clear system processes with the command `armbian-led 0`, before each test a new configuration, please execute this disable command first, and then execute `armbian-led 99` to make changes After the configuration test.
 
 - You are welcome to share the conf file(xxx.conf) of your own devices after testing, so that more people can benefit.
+
+|     Box    |    Command     |   Function  |
+| ---------- | -------------- | ----------- |
+| -          | armbian-led 0  | Disable LED |
+| x96max     | armbian-led 10 | Enable LED  |
+| x96maxplus | armbian-led 11 | Enable LED  |
+| h96max-x3  | armbian-led 12 | Enable LED  |
+| hk1-x3     | armbian-led 13 | Enable LED  |
+| hk1box     | armbian-led 14 | Enable LED  |
+| tx3        | armbian-led 15 | Enable LED  |
+| diy        | armbian-led 99 | Enable LED  |
 
 
 # LED 测试说明
@@ -41,7 +52,17 @@ vfd_gpio_dat='0,69,0'
 
 - 将配置文件命名为 `diy.conf` 并上传至 `/usr/share/openvfd/conf` 目录下，输入命令 `armbian-led 99` 进行测试。
 
-- 通过命令 `armbian-led 0` 或 `armbian-led stop`  可以禁用 LED 显示并清除系统进程，在每次测试新的配置前，请先执行此禁用命令，再执行 `armbian-led 99` 进行更改后的配置测试。
+- 通过命令 `armbian-led 0` 可以禁用 LED 显示并清除系统进程，在每次测试新的配置前，请先执行此禁用命令，再执行 `armbian-led 99` 进行更改后的配置测试。
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
 
+|     盒子    |      命令      |   功能   |
+| ---------- | -------------- | ------- |
+| -          | armbian-led 0  | 禁用 LED |
+| x96max     | armbian-led 10 | 启用 LED |
+| x96maxplus | armbian-led 11 | 启用 LED |
+| h96max-x3  | armbian-led 12 | 启用 LED |
+| hk1-x3     | armbian-led 13 | 启用 LED |
+| hk1box     | armbian-led 14 | 启用 LED |
+| tx3        | armbian-led 15 | 启用 LED |
+| diy        | armbian-led 99 | 启用 LED |
