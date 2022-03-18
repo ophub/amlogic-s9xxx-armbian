@@ -1,5 +1,7 @@
 # LED test instructions
 
+- The configuration file is located in the [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) directory of the Armbian system, and the command file is [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led), which cannot be uploaded manually in the current firmware.
+
 - Upgrade the kernel to version 5.4.185, 5.10.106, 5.15.29, 5.16.15 or later via the `armbian-update` command.
 
 - Currently, six devices have been tested, including `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, and `tx3.conf`. The configuration of other devices can be viewed: [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) to modify, It is necessary to adjust the corresponding content in the configuration files of these two websites, and use it after subtracting `1` from the value of the second field, such as:
@@ -36,6 +38,8 @@ vfd_gpio_dat='0,69,0'
 
 
 # LED 测试说明
+
+- 配置文件在 Armbian 系统的 [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) 目录下，命令文件为 [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led)，当前固件中没有的可以手动上传。
 
 - 通过 `armbian-update` 命令将内核升级到 5.4.185、5.10.106、5.15.29、5.16.15 或更高版本。
 
