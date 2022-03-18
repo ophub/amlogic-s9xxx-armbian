@@ -25,17 +25,16 @@ vfd_gpio_dat='0,69,0'
 
 - You are welcome to share the conf file(xxx.conf) of your own devices after testing, so that more people can benefit.
 
-|     Box    |    Command     |   Function  |
-| ---------- | -------------- | ----------- |
-| -          | armbian-led 0  | Disable LED |
-| x96max     | armbian-led 10 | Enable LED  |
-| x96maxplus | armbian-led 11 | Enable LED  |
-| h96max-x3  | armbian-led 12 | Enable LED  |
-| hk1-x3     | armbian-led 13 | Enable LED  |
-| hk1box     | armbian-led 14 | Enable LED  |
-| tx3        | armbian-led 15 | Enable LED  |
-| diy        | armbian-led 99 | Enable LED  |
-
+|     Box    |   ID   |  Armbian Command  |   OpenWrt Command   |  Function   |
+| ---------- |  ----- | ----------------- | ------------------- | ----------- |
+| -          |  0     |  armbian-led 0    |   openwrt-led 0     | Disable LED |
+| x96max     |  10    |  armbian-led 10   |   openwrt-led 10    | Enable LED  |
+| x96maxplus |  11    |  armbian-led 11   |   openwrt-led 11    | Enable LED  |
+| h96max-x3  |  12    |  armbian-led 12   |   openwrt-led 12    | Enable LED  |
+| hk1-x3     |  13    |  armbian-led 13   |   openwrt-led 13    | Enable LED  |
+| hk1box     |  14    |  armbian-led 14   |   openwrt-led 14    | Enable LED  |
+| tx3        |  15    |  armbian-led 15   |   openwrt-led 15    | Enable LED  |
+| diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 
 # LED 测试说明
 
@@ -64,13 +63,13 @@ vfd_gpio_dat='0,69,0'
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
 
-|     盒子    |      命令      |   功能   |
-| ---------- | -------------- | ------- |
-| -          | armbian-led 0  | 禁用 LED |
-| x96max     | armbian-led 10 | 启用 LED |
-| x96maxplus | armbian-led 11 | 启用 LED |
-| h96max-x3  | armbian-led 12 | 启用 LED |
-| hk1-x3     | armbian-led 13 | 启用 LED |
-| hk1box     | armbian-led 14 | 启用 LED |
-| tx3        | armbian-led 15 | 启用 LED |
-| diy        | armbian-led 99 | 启用 LED |
+|     盒子    |  编号  |  Armbian 使用命令  |   OpenWrt 使用命令   |   功能   |
+| ---------- |  ----- | ----------------- | ------------------- | ------- |
+| -          |  0     |  armbian-led 0    |   openwrt-led 0     | 禁用 LED |
+| x96max     |  10    |  armbian-led 10   |   openwrt-led 10    | 启用 LED |
+| x96maxplus |  11    |  armbian-led 11   |   openwrt-led 11    | 启用 LED |
+| h96max-x3  |  12    |  armbian-led 12   |   openwrt-led 12    | 启用 LED |
+| hk1-x3     |  13    |  armbian-led 13   |   openwrt-led 13    | 启用 LED |
+| hk1box     |  14    |  armbian-led 14   |   openwrt-led 14    | 启用 LED |
+| tx3        |  15    |  armbian-led 15   |   openwrt-led 15    | 启用 LED |
+| diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
