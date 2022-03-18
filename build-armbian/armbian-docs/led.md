@@ -15,6 +15,8 @@ vfd_gpio_clk='0,68,0'
 vfd_gpio_dat='0,69,0'
 ```
 
+- Take the configuration of [x96maxplus](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/share/openvfd/conf/x96maxplus.conf) as an example: if the displayed time and text order is not correct, you can adjust the numerical order of `vfd_chars='4,0,1,2,3'` to `vfd_chars='1,2,3,4,0'`, etc. for testing. If the time is displayed in reverse, you can adjust the `first value 0x02` in `vfd_display_type='0x02,0x00,0x01,0x00'` to `0x01`, etc. for testing.
+
 - Name the configuration file `diy.conf` and upload it to the `/usr/share/openvfd/conf` directory, enter the command `armbian-led 99` to test.
 
 - You can disable the LED display and clear system processes with the command `armbian-led 0`, before each test a new configuration, please execute this disable command first, and then execute `armbian-led 99` to make changes After the configuration test.
@@ -49,6 +51,8 @@ vfd_gpio_dat='0,70,0'
 vfd_gpio_clk='0,68,0'
 vfd_gpio_dat='0,69,0'
 ```
+
+- 以 [x96maxplus](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/share/openvfd/conf/x96maxplus.conf) 的配置为例：如果显示的时间文字顺序不正确，可以调整 `vfd_chars='4,0,1,2,3'` 的数字顺序为 `vfd_chars='1,2,3,4,0'` 等进行测试。如果时间是翻转显示，可以调整 `vfd_display_type='0x02,0x00,0x01,0x00'` 中的 `第一个值 0x02` 为 `0x01` 等进行测试。
 
 - 将配置文件命名为 `diy.conf` 并上传至 `/usr/share/openvfd/conf` 目录下，输入命令 `armbian-led 99` 进行测试。
 
