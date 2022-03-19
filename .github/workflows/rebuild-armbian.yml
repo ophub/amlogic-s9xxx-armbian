@@ -13,6 +13,18 @@ on:
         description: "Input armbian path"
         required: false
         default: ""
+      armbian_soc:
+        description: "Input armbian soc"
+        required: false
+        default: "s905x3_s905d"
+      armbian_kernel:
+        description: "Input armbian kernel"
+        required: false
+        default: "5.15.25_5.4.180"
+      armbian_size:
+        description: "Input armbian size"
+        required: false
+        default: "2748"
 
 env:
   TZ: Asia/Shanghai
@@ -46,7 +58,7 @@ jobs:
               armbian_name="Armbian.*focal.*.img.xz"
               armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [ -n "${armbian_file}" ]; then
-                  armbian_url="${armbian_site}/${armbian_file}"
+                  armbian_url="${armbian_site}${armbian_file}"
               else
                   echo -e "Invalid download path: [ ${armbian_site} ]"
                   exit 1
@@ -70,10 +82,12 @@ jobs:
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
+        if: env.ARMBIAN_URL != '' && !cancelled()
         with:
           armbian_path: ${{ env.ARMBIAN_URL }}
-          armbian_soc: s905x3_s905d
-          armbian_kernel: 5.15.25_5.4.180
+          armbian_soc: ${{ github.event.inputs.armbian_soc }}
+          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
+          armbian_size: ${{ github.event.inputs.armbian_size }}
 
       - name: Upload Armbian image to Release
         id: release
