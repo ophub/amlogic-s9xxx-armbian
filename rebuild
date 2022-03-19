@@ -473,7 +473,11 @@ refactor_files() {
     sed -i "s|meson.*.dtb|${FDTFILE}|g" uEnv.txt
 
     # For s912-t95z-plus /boot/extlinux/extlinux.conf
-    [ "${FDTFILE}" == "meson-gxm-t95z-plus.dtb" ] && cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* . && sync
+    [ "${soc}" == "s912-t95z" ] && (
+        cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* . && sync
+        sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" extlinux/extlinux.conf
+        sed -i "s|meson.*.dtb|${FDTFILE}|g" extlinux/extlinux.conf
+    )
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
