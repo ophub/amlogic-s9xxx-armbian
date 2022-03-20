@@ -91,12 +91,7 @@ Login in to armbian → input command:
 armbian-led
 ```
 
-Debug according to [LED test instructions](build-armbian/armbian-docs/led.md). After the screen is displayed normally, you can add it to the self-starting task at boot, Please modify the `15` in the following command according to the serial number corresponding to the box in the `armbian-led` option:
-
-```yaml
-sed -i '/armbian-led/d' /etc/rc.local
-sed -i '/exit 0/i\armbian-led 15' /etc/rc.local
-```
+Debug according to [LED screen display control instructions](build-armbian/armbian-docs/led_screen_display_control.md).
 
 - ### Use Armbian in TF/SD/USB
 
