@@ -1,4 +1,4 @@
-# LED test instructions
+# LED screen display control instructions
 
 - The configuration file is placed in the [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) directory of the `Armbian/OpenWrt` system, and the command file for `Armbian` systems is located at [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led), and the command file for `OpenWrt` systems is located at [/usr/sbin/openwrt-led](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/files/usr/sbin/openwrt-led). If it is not in the current firmware, it can be uploaded manually, And give the file execute permission: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-led`
 
@@ -48,7 +48,7 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | tx3        |  16    |  armbian-led 16   |   openwrt-led 16    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 
-# LED 测试说明
+# LED 屏显示控制说明
 
 - 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-led](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/files/usr/sbin/openwrt-led)。如果当前固件中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-led`
 
