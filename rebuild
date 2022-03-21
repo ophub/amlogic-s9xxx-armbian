@@ -468,13 +468,13 @@ refactor_files() {
     fi
 
     # Edit the uEnv.txt (s912-t95z-plus is /boot/extlinux/extlinux.conf)
-    #if [[ "${soc}" == *s912-t95z* ]]; then
-    boot_conf_file="extlinux/extlinux.conf"
-    cp -rf ${configfiles_path}/patches/bootfs/extlinux .
-    #else
-    #    boot_conf_file="uEnv.txt"
-    #    cp -f ${configfiles_path}/patches/bootfs/uEnv.txt .
-    #fi
+    if [[ "${FDTFILE}" == *t95z* ]]; then
+        boot_conf_file="extlinux/extlinux.conf"
+        cp -rf ${configfiles_path}/patches/bootfs/extlinux .
+    else
+        boot_conf_file="uEnv.txt"
+        cp -f ${configfiles_path}/patches/bootfs/uEnv.txt .
+    fi
     #
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
     sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" ${boot_conf_file}
