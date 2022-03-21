@@ -524,6 +524,10 @@ refactor_files() {
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
 
+    # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
+    network_service="usr/lib/systemd/system/networking.service"
+    sed -i "s|TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service} 2>/dev/null
+
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
     sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun} 2>/dev/null
