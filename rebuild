@@ -72,7 +72,7 @@ build_armbian=(
     "s922x" "s922x-n2" "s922x-reva" "a311d"
     "s905x3"
     "s905x2" "s905x2-km3" "s905l3a"
-    "s912" "s912-t95z" "s912-m8s"
+    "s912" "s912-m8s"
     "s905d" "s905d-ki"
     "s905x"
     "s905w"
@@ -319,12 +319,6 @@ confirm_version() {
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         ;;
-    s912-t95z | s912-t95z-plus)
-        FDTFILE="meson-gxm-t95z-plus.dtb"
-        UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
-        MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
-        ;;
     s912-m8s | s912-m8s-pro)
         FDTFILE="meson-gxm-q201.dtb"
         UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
@@ -467,15 +461,9 @@ refactor_files() {
         fi
     fi
 
-    # Edit the uEnv.txt (s912-t95z-plus is /boot/extlinux/extlinux.conf)
-    if [[ "${FDTFILE}" == *t95z* ]]; then
-        boot_conf_file="extlinux/extlinux.conf"
-        cp -rf ${configfiles_path}/patches/bootfs/extlinux .
-    else
-        boot_conf_file="uEnv.txt"
-        cp -f ${configfiles_path}/patches/bootfs/uEnv.txt .
-    fi
-    #
+    # Edit the uEnv.txt
+    cp -f ${configfiles_path}/patches/bootfs/uEnv.txt .
+    boot_conf_file="uEnv.txt"
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
     sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
