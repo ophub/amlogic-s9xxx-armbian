@@ -47,7 +47,6 @@ armbian_outputpath="${make_path}/build/output/images"
 armbian_rebuild_file="${armbian_outputpath}/*.img"
 build_path="${make_path}/build-armbian"
 armbian_path="${build_path}/amlogic-armbian"
-dtb_path="${build_path}/amlogic-dtb"
 kernel_path="${build_path}/amlogic-kernel"
 uboot_path="${build_path}/amlogic-u-boot"
 configfiles_path="${build_path}/common-files"
@@ -437,7 +436,6 @@ refactor_files() {
     (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
 
     # 02 For dtb files
-    cp -f ${dtb_path}/*.dtb ${tag_bootfs}/dtb/amlogic && sync
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
 
     # 03 For usr/lib/modules/*
