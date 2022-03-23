@@ -2,9 +2,9 @@
 
 - The configuration file is placed in the [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) directory of the `Armbian/OpenWrt` system, and the command file for `Armbian` systems is located at [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led), and the command file for `OpenWrt` systems is located at [/usr/sbin/openwrt-led](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/files/usr/sbin/openwrt-led). If it is not in the current firmware, it can be uploaded manually, And give the file execute permission: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-led`
 
-- Upgrade your system's kernel to version 5.4.185, 5.10.106, 5.15.29, 5.16.15 or later. `Armbian` systems are updated using the `armbian-update` command. For `OpenWrt` system, use `System menu` → `Amlogic Service` → `Online Download Update` to upgrade the function.
+- Upgrade your system's kernel to version 5.4.187, 5.10.108, 5.15.31, 5.16.17 or later. `Armbian` systems are updated using the `armbian-update` command. For `OpenWrt` system, use `System menu` → `Amlogic Service` → `Online Download Update` to upgrade the function.
 
-- Currently, six devices have been tested, including `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, and `tx3.conf`. The configuration of other devices can be viewed: [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) to modify, It is necessary to adjust the corresponding content in the configuration files of these two websites, and use it after subtracting `1` from the value of the second field, such as:
+- At present, there are several boxes such as `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, `tx3.conf`, `x96air.conf` etc. that have passed the test. The configuration of other devices can be viewed: [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) to modify, It is necessary to adjust the corresponding content in the configuration files of these two websites, and use it after subtracting `1` from the value of the second field, such as:
 
 ```yaml
 vfd_gpio_clk='0,69,0'
@@ -46,15 +46,16 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | hk1-x3     |  14    |  armbian-led 14   |   openwrt-led 14    | Enable LED  |
 | hk1box     |  15    |  armbian-led 15   |   openwrt-led 15    | Enable LED  |
 | tx3        |  16    |  armbian-led 16   |   openwrt-led 16    | Enable LED  |
+| x96air     |  17    |  armbian-led 17   |   openwrt-led 17    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 
 # LED 屏显示控制说明
 
 - 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/files/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-led](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/common-files/files/usr/sbin/armbian-led)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-led](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/files/usr/sbin/openwrt-led)。如果当前固件中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-led`
 
-- 将系统的内核升级到 5.4.185、5.10.106、5.15.29、5.16.15 或更高版本。`Armbian` 系统使用 `armbian-update` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
+- 将系统的内核升级到 5.4.187、5.10.108、5.15.31、5.16.17 或更高版本。`Armbian` 系统使用 `armbian-update` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
 
-- 目前有 `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf` 共六个设备经过测试，其他设备的配置可以查看：[arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) 和 [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) 进行修改，需要把这两个网站中配置文件里对应内容中进行调整，把第二个字段的值减 `1` 后使用，如：
+- 目前有 `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf`、`x96air.conf` 等设备经过测试，其他设备的配置可以查看：[arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) 和 [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) 进行修改，需要把这两个网站中配置文件里对应内容中进行调整，把第二个字段的值减 `1` 后使用，如：
 
 ```yaml
 vfd_gpio_clk='0,69,0'
@@ -96,4 +97,5 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | hk1-x3     |  14    |  armbian-led 14   |   openwrt-led 14    | 启用 LED |
 | hk1box     |  15    |  armbian-led 15   |   openwrt-led 15    | 启用 LED |
 | tx3        |  16    |  armbian-led 16   |   openwrt-led 16    | 启用 LED |
+| x96air     |  17    |  armbian-led 17   |   openwrt-led 17    | 启用 LED |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
