@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.106 Kernel Configuration
+# Linux/arm64 5.10.108 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="clang version 13.0.0 (https://github.com/llvm/llvm-project/ 24c8eaec9467b2aaf70b0db33a4e4dd415139a50)"
 CONFIG_GCC_VERSION=0
