@@ -1,0 +1,109 @@
+#!/bin/bash
+#=========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: Create swap for armbian system
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-swap 1
+# The input parameter unit is GB, the default is 1
+#=========================================================================
+
+# Set the swap size in GB
+my_swap_gb="${1}"
+format_gb="$(echo "${my_swap_gb}" | awk -F "." '{print $1}')"
+if [[ -n "$(echo "${format_gb}" | sed -n "/^[0-9]\+$/p")" ]]; then
+    swap_gb="${format_gb}"
+else
+    swap_gb="1"
+fi
+
+# Find the partition where root is located
+ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
+if [ "${ROOT_PTNAME}" == "" ]; then
+    echo "Cannot find the partition corresponding to the root file system!"
+    exit 1
+fi
+
+# Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+case ${ROOT_PTNAME} in
+mmcblk?p[1-4])
+    EMMC_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')
+    PARTITION_NAME="p"
+    LB_PRE="EMMC_"
+    ;;
+[hsv]d[a-z][1-4])
+    EMMC_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')
+    PARTITION_NAME=""
+    LB_PRE=""
+    ;;
+*)
+    echo "Unable to recognize the disk type of ${ROOT_PTNAME}!"
+    exit 1
+    ;;
+esac
+
+# Find out if the extended partition is created using the armbian-TF command in TF/USB
+find_right_path="/mnt/${EMMC_NAME}${PARTITION_NAME}3"
+if [ -d "${find_right_path}" ]; then
+    PARTITION_PATH="${find_right_path}"
+else
+    PARTITION_PATH="/mnt"
+fi
+
+available_space="$(df -hT ${PARTITION_PATH} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
+if [ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]; then
+    echo -e "The path is not available, the remaining space cannot be obtained."
+    exit 1
+fi
+if [[ "${available_space}" -lt "${swap_gb}" ]]; then
+    echo -e "The remaining space is [ ${available_space} ] GB, and [ ${swap_gb} ] GB swap cannot be created."
+    exit 1
+fi
+
+SWAP_PATH="${PARTITION_PATH}/.swap"
+mkdir -p ${SWAP_PATH} && sync
+
+echo -e "Prepare to create [ ${swap_gb} ] GB swap in the [ ${SWAP_PATH} ] directory."
+
+# delete current swap
+delete_current_swap() {
+    echo -e "Current swap size is: [ ${1} ] bytes, start to delete..."
+    current_swap_file="$(cat /proc/swaps | sed -n '$p' | awk '{print $1}' | echo $(xargs))"
+    swapoff ${current_swap_file} 2>/dev/null && sync
+    rm -f ${current_swap_file} 2>/dev/null && sync
+    echo -e "Delete successfully!"
+}
+
+# create new swap
+create_new_swap() {
+    echo -e "Start creating a new swap..."
+    dd_count=$((1000000 * ${swap_gb}))
+    echo -e "The swap size is: [ ${swap_gb} ] GB, Please wait..."
+    dd if=/dev/zero of=${SWAP_PATH}/swapfile bs=1024 count=${dd_count} conv=fsync && sync
+    chmod 600 ${SWAP_PATH}/swapfile
+    mkswap -L SWAP ${SWAP_PATH}/swapfile
+    swapon ${SWAP_PATH}/swapfile
+    sync
+    # Add swap to the mount point
+    echo "${SWAP_PATH}/swapfile swap swap defaults 0 0" >>/etc/fstab
+    #
+    echo -e "Created successfully!"
+    echo -e "Current swap: \n$(cat /proc/swaps) \n"
+}
+
+current_swap="$(free -m | sed -n '$p' | awk '{print $2}' | echo $(xargs))"
+if [ "${current_swap}" -gt "0" ]; then
+    delete_current_swap ${current_swap}
+    create_new_swap ${swap_gb}
+else
+    create_new_swap ${swap_gb}
+fi
+sync
+exit 0
