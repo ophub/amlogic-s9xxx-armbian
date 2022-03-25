@@ -176,7 +176,7 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
 - `sudo ./rebuild -d -k 5.15.25_5.4.180`: Use the default configuration. Specify multiple cores, use `_` to connect.
 - `sudo ./rebuild -d -k 5.15.25_5.4.180 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -d -s 2748 -k 5.4.180`: Use the default configuration and set the partition size to 2748m, and only compile the armbian firmware with the kernel version 5.4.180.
+- `sudo ./rebuild -d -t btrfs -s 2748 -k 5.4.180`: Use the default configuration, set the file system to btrfs format and the partition size to 2748M, and only compile the armbian firmware with the kernel version 5.4.180.
 
 - ### Local build instructions
 
