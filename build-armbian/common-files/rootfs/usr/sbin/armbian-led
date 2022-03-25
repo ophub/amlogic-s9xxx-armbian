@@ -1,0 +1,106 @@
+#!/bin/bash
+#=========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: LED display control
+# Copyright (C) 2022- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2022- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-led
+#=========================================================================
+
+do_start() {
+    openvfd_path="/usr/share/openvfd"
+    conf_file="${openvfd_path}/conf/${1}"
+    openvfd_service="${openvfd_path}/vfdservice"
+
+    if [[ -f "${conf_file}" && -f "${openvfd_service}" ]]; then
+        source ${conf_file}
+        echo "Using LED Profiles: ${conf_file}"
+    else
+        echo "The LED profile [ ${conf_file} ] does not exist!"
+        exit 1
+    fi
+
+    modprobe openvfd vfd_gpio_clk=${vfd_gpio_clk} \
+        vfd_gpio_dat=${vfd_gpio_dat} \
+        vfd_gpio_stb=${vfd_gpio_stb:-0,0,0xFF} \
+        vfd_gpio0=${vfd_gpio0:-0,0,0xFF} \
+        vfd_gpio1=${vfd_gpio1:-0,0,0xFF} \
+        vfd_gpio2=${vfd_gpio2:-0,0,0xFF} \
+        vfd_gpio3=${vfd_gpio3:-0,0,0xFF} \
+        vfd_gpio_protocol=${vfd_gpio_protocol:-0,0} \
+        vfd_chars=${vfd_chars} vfd_dot_bits=${vfd_dot_bits} \
+        vfd_display_type=${vfd_display_type}
+
+    "${openvfd_service}" &
+
+    trap "killall ${openvfd_service}; rmmod openvfd; exit" 2 3 15
+
+    if [ -n "${functions}" ]; then
+        for func in ${functions}; do
+            echo "turn led ${func} on ... "
+            echo "${func}" >/sys/class/leds/openvfd/led_on 2>/dev/null
+        done
+    fi
+
+    echo "Enable LED display!"
+    exit 0
+}
+
+do_stop() {
+    killall -9 vfdservice 2>/dev/null
+    rmmod openvfd -f 2>/dev/null
+
+    echo "Disable LED display!"
+    exit 0
+}
+
+do_select_box() {
+    case "${1}" in
+        11 | x96max)      do_start x96max.conf ;;
+        12 | x96maxplus)  do_start x96maxplus.conf ;;
+        13 | h96max-x3)   do_start h96max-x3.conf ;;
+        14 | hk1-x3)      do_start hk1-x3.conf ;;
+        15 | hk1box)      do_start hk1box.conf ;;
+        16 | tx3)         do_start tx3.conf ;;
+        17 | x96air)      do_start x96air.conf ;;
+        99 | diy)         do_start diy.conf ;;
+         0 | o | stop)    do_stop ;;
+         1 | * | quit)    echo "quit!" && exit 0 ;;
+    esac
+}
+
+if [ -z "${1}" ]; then
+    clear
+    cat <<EOF
+
+        ┌────────[ Enable LED ]─────────┐
+        │                               │
+        │        11. x96max             │
+        │        12. x96maxplus         │
+        │        13. h96max-x3          │
+        │        14. hk1-x3             │
+        │        15. hk1box             │
+        │        16. tx3                │
+        │        17. x96air             │
+        │        99. diy                │
+        │                               │
+        ├────[ Disable LED or Quit ]────┤
+        │                               │
+        │         0. stop               │
+        │         1. quit               │
+        │                               │
+        └───────────────────────────────┘
+
+EOF
+    read -p "Please Input ID: " box
+    do_select_box "${box}"
+else
+    do_select_box "${1}"
+fi
