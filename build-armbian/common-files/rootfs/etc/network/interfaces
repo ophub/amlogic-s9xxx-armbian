@@ -1,9 +1,5 @@
 source /etc/network/interfaces.d/*
 # Network is managed by Network manager
-auto lo
-iface lo inet loopback
-auto wlan0
-iface wlan0 inet dhcp
 auto eth0
 iface eth0 inet dhcp
         hwaddress ether 12:34:56:78:9A:BC
