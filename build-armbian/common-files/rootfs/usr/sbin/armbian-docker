@@ -1,0 +1,123 @@
+#!/bin/bash
+#=========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: Install docker to armbian
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-docker
+#=========================================================================
+
+# Set font color
+blue_font_prefix="\033[94m"
+purple_font_prefix="\033[95m"
+green_font_prefix="\033[92m"
+yellow_font_prefix="\033[93m"
+red_font_prefix="\033[91m"
+font_color_suffix="\033[0m"
+INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+OPT="[${yellow_font_prefix}OPT${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+# Get custom firmware information
+ophub_release_file="/etc/ophub-release"
+
+echo -e "${INFO} Welcome to docker installation tool."
+
+# Get version info
+source ${ophub_release_file}
+VERSION_CODEID="${VERSION_CODEID}"     #ubuntu  -  debian
+VERSION_CODENAME="${VERSION_CODENAME}" #focal   -  bullseye/buster
+if [[ -z "${VERSION_CODEID}" ]]; then
+    echo -ne "${OPT} Please Input VERSION_CODEID Name [ubuntu/debian]: "
+    read VERSION_CODEID
+    VERSION_CODEID=${VERSION_CODEID}
+fi
+if [[ -z "${VERSION_CODENAME}" ]]; then
+    echo -ne "${OPT} Please Input VERSION_CODENAME Name [focal/bullseye/buster]: "
+    read VERSION_CODENAME
+    VERSION_CODENAME=${VERSION_CODENAME}
+fi
+echo -e "${INFO} VERSION_CODEID: ${VERSION_CODEID}"
+echo -e "${INFO} VERSION_CODENAME: ${VERSION_CODENAME}"
+
+echo -e "${STEPS} Initialize the docker installation environment ... "
+sudo apt-get update
+sudo apt-get remove -y docker docker-engine docker.io containerd runc
+sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+# Install GPG certificate
+# sudo curl -fsSL https://download.docker.com/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Add software source information
+# echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
+echo -e "${STEPS} Install docker related packages ... "
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
+
+echo -e "${STEPS} Install docker accelerator ... "
+[ -d "/etc/docker" ] || mkdir -p /etc/docker
+sudo cat >/etc/docker/daemon.json <<EOF
+{
+  "bip": "172.31.0.1/24",
+  "data-root": "/var/lib/docker/",
+  "log-level": "warn",
+  "log-driver": "json-file",
+  "log-opts": {
+     "max-size": "10m",
+     "max-file": "5"
+   },
+  "registry-mirrors": [
+     "https://mirror.baidubce.com/",
+     "https://hub-mirror.c.163.com"
+   ]
+}
+EOF
+sync
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+
+# Set up ordinary users to run docker directly
+sudo usermod -a -G docker $USER 2>/dev/null
+
+echo -e "${SUCCESS} Docker installed successfully."
+
+# No SSL certificate, http LAN access
+portainer_lan() {
+    echo -e "${STEPS} Select Install Portainer (No SSL certificate, http LAN access)... "
+    sudo docker volume create portainer_data
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:linux-arm64
+    echo -e "${SUCCESS} The portainer address [ http://ip:9000 ]"
+}
+
+# Have SSL certificate, install domain name certificate https access
+portainer_domain() {
+    echo -e "${STEPS} Select Install Portainer (Have SSL certificate, install domain name certificate https access)... "
+    sudo docker volume create portainer_data
+    sudo docker run -d -p 9000:9000 --name portainer --restart always --name=portainer --label owner=portainer -v /var/run/docker.sock:/var/run/docker.sock -v /etc/ssl:/certs -v portainer_data:/data portainer/portainer-ce:linux-arm64 --ssl --sslcert /certs/portainer.crt --sslkey /certs/portainer.key
+    echo -e "${INFO} Please rename and upload the domain certificate [ portainer.crt & portainer.key ] to the [ /etc/ssl/ ] directory."
+    echo -e "${SUCCESS} The portainer address [ https://domain:9000 ]"
+}
+
+# Check if portainer container is installed
+if [ -z "$(docker ps -q -f name=portainer)" ]; then
+    echo -ne "${OPT} Select Install Portainer-ce?  No=(n) / LAN ip access=(h) / Domain cert access=(s): "
+    read pt
+    case ${pt} in
+        h | H | http) portainer_lan ;;
+        s | S | https) portainer_domain ;;
+        *) echo -e "${INFO} Finish the installation." && exit 0 ;;
+    esac
+fi
+
+exit 0

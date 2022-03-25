@@ -1,0 +1,172 @@
+#!/bin/bash
+#=========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: Create TF/USB remaining space partition
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-tf
+#=========================================================================
+
+# Set font color
+blue_font_prefix="\033[94m"
+purple_font_prefix="\033[95m"
+green_font_prefix="\033[92m"
+yellow_font_prefix="\033[93m"
+red_font_prefix="\033[91m"
+font_color_suffix="\033[0m"
+INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+OPT="[${yellow_font_prefix}OPT${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+
+echo -e "${INFO} Welcome to use TF/SD/USB partition management tool."
+
+# Find the partition where root is located
+ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
+if [ "${ROOT_PTNAME}" == "" ]; then
+    echo -e "${ERROR} Cannot find the partition corresponding to the root file system!"
+    exit 1
+fi
+
+# Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+case ${ROOT_PTNAME} in
+mmcblk?p[1-4])
+    DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')
+    PT_PRE="${DISK_NAME}p"
+    LB_PRE="EMMC_"
+    ;;
+[hsv]d[a-z][1-4])
+    DISK_NAME=$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')
+    PT_PRE="${DISK_NAME}"
+    LB_PRE=""
+    ;;
+*)
+    echo -e "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
+    exit 1
+    ;;
+esac
+
+# Create new partition
+create_new_part() {
+    echo -e "${STEPS} Start creating a new partition ... "
+
+    # Set the type of file system
+    cat <<EOF
+--------------------------------------------
+Please select the type of file system:
+1. ext4
+2. btrfs
+--------------------------------------------
+EOF
+    read -p "Please Input ID: " filetype
+    if [[ "${filetype}" -eq "2" ]]; then
+        file_system_type="btrfs"
+        fstab_mount_string="defaults,noatime,compress=zstd:6"
+    else
+        file_system_type="ext4"
+        fstab_mount_string="defaults,noatime,errors=remount-ro"
+    fi
+    echo "Input Type ID: [ ${filetype} ]"
+    echo "The type of file system: [ ${file_system_type} ]"
+
+    # Confirm UUID
+    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
+    [ -z "${ROOTFS_UUID}" ] && echo "The uuidgen is invalid, cannot continue." && exit 1
+    echo "ROOTFS_UUID: ${ROOTFS_UUID}"
+
+    # Get the starting position of the p3 partition
+    START_P3=$(fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | echo $(($(xargs) + 1)))
+    if [[ -z "${START_P3}" || -z "$(echo ${START_P3} | sed -n "/^[0-9]\+$/p")" ]]; then
+        echo -e "${ERROR} Unable to get starting position!"
+        exit 1
+    fi
+    TOTAL_SIZE=$(lsblk -l -b -o NAME,SIZE | awk "\$1 ~ /^${DISK_NAME}\$/ {print \$2}")
+    END_P3=$((TOTAL_SIZE / 512 - 1))
+
+    cat >/tmp/fdisk.script <<EOF
+n
+p
+3
+$START_P3
+$END_P3
+Y
+t
+3
+83
+w
+EOF
+    sync
+
+    echo -e "${STEPS} Fdisk starting ... "
+    fdisk /dev/${DISK_NAME} </tmp/fdisk.script 2>/dev/null
+    if [ $? -ne 0 ]; then
+        echo -e "${ERROR} fdisk failed!"
+        exit 1
+    fi
+    sync
+
+    echo -e "${STEPS} Create data filesystem ... "
+    # Set mount path
+    data_path="/data"
+    mkdir -p ${data_path} && sync
+
+    if [[ "${file_system_type}" == "btrfs" ]]; then
+        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -m single "/dev/${PT_PRE}3"
+        mount -t btrfs -o compress=zstd:6 "/dev/${PT_PRE}3" "${data_path}"
+    else
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" "/dev/${PT_PRE}3"
+        mount -t ext4 "/dev/${PT_PRE}3" "${data_path}"
+    fi
+
+    # Add auto mount to /etc/fstab
+    echo "UUID=${ROOTFS_UUID}  ${data_path}  ${file_system_type}  ${fstab_mount_string}  0 0" >>/etc/fstab
+
+    echo -e "${INFO} The new partition information: \n$(df -hT /dev/${PT_PRE}3)"
+    echo -e "${SUCCESS} Create partition successfully, mount it in [ ${data_path} ]"
+    rm -f /usr/sbin/armbian-tf 2>/dev/null && sync
+    sync
+    exit 0
+}
+
+# Expand the current partition
+expand_current_part() {
+    echo -e "${STEPS} Start to expand the current partition ... "
+
+    echo -e "${STEPS} Install growpart or xfsprogs expansion and formatting tool ... "
+    apt-get update
+    apt-get install cloud-guest-utils xfsprogs -y
+
+    echo -e "${STEPS} Expansion Partition ... "
+    growpart /dev/${DISK_NAME} 2
+
+    echo -e "${STEPS} Expansion file system ... "
+    ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
+    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+        btrfs filesystem resize max /
+    else
+        resize2fs /dev/${ROOT_PTNAME}
+    fi
+
+    echo -e "${INFO} Current partition information: \n$(df -hT /)"
+    echo -e "${SUCCESS} The current partition expansion is successful."
+    rm -f /usr/sbin/armbian-tf 2>/dev/null && sync
+    sync
+    exit 0
+}
+
+echo -ne "${OPT} Do you want to expand or create partitions? Expand=(e) Create=(c): "
+read ec
+case ${ec} in
+    e | E | expand) expand_current_part ;;
+    c | C | create) create_new_part ;;
+    *) exit 0 ;;
+esac
