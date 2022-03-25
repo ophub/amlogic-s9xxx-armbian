@@ -25,6 +25,10 @@ on:
         description: "Input armbian size"
         required: false
         default: "2748"
+      armbian_fstype:
+        description: "Input rootfs type: [ ext4 / btrfs ]"
+        required: false
+        default: "ext4"
 
 env:
   TZ: Asia/Shanghai
@@ -88,6 +92,7 @@ jobs:
           armbian_soc: ${{ github.event.inputs.armbian_soc }}
           armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
+          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
 
       - name: Upload Armbian image to Release
         id: release
