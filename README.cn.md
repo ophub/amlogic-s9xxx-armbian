@@ -166,6 +166,7 @@ armbian-ddbr
 | -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) 名称，如 `-k 5.4.180` . 多个内核使用 `_` 进行连接，如 `-k 5.15.25_5.4.180` |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.4.180 的 5.4 同系列是否有更新的版本，如有 5.4.180 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -s   | Size       | 对固件的 ROOTFS 分区大小进行设置，默认大小为 2748M, 固件大小必须大于 2000M. 例如： `-s 2748` |
+| -t   | RootfsType | 对固件的 ROOTFS 分区的文件系统类型进行设置，默认为 `ext4` 类型，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs` |
 
 - `sudo ./rebuild -d` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -d -b s905x3 -k 5.4.180` : 推荐使用. 使用默认配置进行相关内核打包。
@@ -227,6 +228,7 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | armbian_kernel   | 5.15.25_5.4.180  | 设置内核 [版本](https://github.com/ophub/kernel/tree/main/pub/stable)，功能参考 `-k` |
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`      |
 | armbian_size     | 2748              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`           |
+| armbian_fstype   | ext4              | 设置固件 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 
 - GitHub Actions 输出变量说明
 
