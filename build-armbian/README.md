@@ -24,7 +24,7 @@ These duplications are automated in the repository's packaging and install/upgra
 
 ## common-files
 
-- rootfs: The files in the `common-files/files` directory are custom files, which must be completely consistent with the structure and file naming and storage under the ***`ROOTFS`*** partiton in Armbian. If there are files in this directory, they will be automatically copied to the Armbian directory during `sudo ./rebuild`. E.g:
+- rootfs: The files in the directory are custom files, which must be completely consistent with the structure and file naming and storage under the ***`ROOTFS`*** partiton in Armbian. If there are files in this directory, they will be automatically copied to the Armbian directory during `sudo ./rebuild`. E.g:
 
 ```yaml
 etc/network/interfaces
