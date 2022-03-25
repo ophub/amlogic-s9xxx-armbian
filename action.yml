@@ -28,6 +28,10 @@ inputs:
     description: "Set armbian rootfs size."
     required: false
     default: "2748"
+  armbian_fstype:
+    description: "Set armbian rootfs type."
+    required: false
+    default: "ext4"
   armbian_path:
     description: "Set armbian original file path."
     required: false
