@@ -1,0 +1,411 @@
+#!/bin/bash
+#==========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: Install armbian to EMMC
+# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-install
+# Kernel version 5.10.y or newer is recommended to install mainline u-boot
+# The mainline u-boot is installed by default: armbian-install
+# Don't write mainline u-boot command: armbian-install no
+#==========================================================================
+
+# Receive one-key command related parameters
+if [[ "${1}" == "no" ]]; then
+    auto_mainline_uboot="no"
+else
+    auto_mainline_uboot="yes"
+fi
+
+echo "Start install armbian to emmc..."
+
+root_devname=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')
+if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
+    echo "you are running in emmc mode, please boot system with usb or tf card!"
+    exit 1
+fi
+
+install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+if [[ "${install_emmc}" == "" ]]; then
+    echo "No emmc can be found to install the armbian system!"
+    exit 1
+fi
+
+DEV_EMMC="/dev/${install_emmc}"
+echo "DEV_EMMC: ${DEV_EMMC}"
+
+#Check if writing to EMMC is supported
+VERSION_NOW=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+if [ -z "${VERSION_NOW}" ]; then
+    echo "Failed to query the current version."
+    exit 1
+else
+    echo "This Kernel Version: [ ${VERSION_NOW} ]"
+fi
+
+# Check if the version is above 5.10, for u-boot.ext and u-boot.emmc
+k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
+k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
+if [ "${k510_ver}" -eq "5" ]; then
+    if [ "${k510_maj}" -ge "10" ]; then
+        K510="1"
+    else
+        K510="0"
+    fi
+elif [ "${k510_ver}" -gt "5" ]; then
+    K510="1"
+else
+    K510="0"
+fi
+echo "K510: [ ${K510} ]"
+
+# Generate New ROOTFS UUID
+ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+[ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
+[ -z "${ROOTFS_UUID}" ] && echo "The new UUID is invalid, cannot continue." && exit 1
+
+# Set model list, begin ------------
+AMLOGIC_MODEL_LIST="
+# 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.DESCRIPTION
+
+# Amlogic GXL Family
+101:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Nic,brcm43455 wifi
+102:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
+103:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,100Mb Nic
+104:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100Mb Nic
+105:MECOOL KI Pro:s905d:meson-gxl-s905d-mecool-ki-pro.dtb:u-boot-p201.bin:NA:NA:2G/16G,1Gb Nic
+
+# Amlogic GXM Family
+201:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic
+202:H96 Pro Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:2G/32G,1Gb Nic
+203:Tanix-TX92:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Nic
+204:VORKE-Z6-Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic
+205:MECOOL M8S Pro L:s912:meson-gxm-q201.dtb:u-boot-s905x-s912.bin:NA:NA:2G RAM,3G RAM,16G ROM,32G ROM,100Mb Nic
+
+# Amlogic G12A Family
+301:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Nic
+302:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100Mb Nic
+303:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic
+304:E900V22C/D:s905l3a:meson-g12a-u200.dtb:u-boot-u200.bin:NA:NA:4C@1908Mhz,S905L3A+B,2+8G,USB2.0x2,LAN 100Mb Nic,uwe5621ds wifi(no work)
+
+# Amlogic G12B Family
+401:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/usr/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
+402:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
+403:Beelink GT-King Pro H:s922x:meson-g12b-gtking-pro-h.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:S922X-H,2C@1800Mhz(A53)+4C@2208Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
+404:Beelink GT-King Pro Rev_A:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro-rev-a.bin:NA:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
+405:Hardkernel ODroid N2:s922x:meson-g12b-odroid-n2.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/odroid-n2-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic
+406:UGOOS AM6 Plus:s922x:meson-g12b-ugoos-am6.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4398 wifi
+407:Khadas VIM3:a311d:meson-g12b-a311d-khadas-vim3.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/khadas-vim3-u-boot.sd.bin:NA:4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Nic,brcm4398 wifi
+
+# Amlogic SM1 Family
+501:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Nic,rtl8822cs wifi
+502:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Nic,rtl8822cs wifi
+503:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+504:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+505:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+506:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+507:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
+508:Ugoos X3 (OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
+509:TX3 1Gb:s905x3:meson-sm1-tx3-qz.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
+510:TX3 1Gb (OverClock):s905x3:meson-sm1-tx3-qz-oc.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
+511:TX3 100Mb:s905x3:meson-sm1-tx3-bz.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
+512:TX3 100Mb (OverClock):s905x3:meson-sm1-tx3-bz-oc.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
+513:X96 Air 1Gb:s905x3:meson-sm1-x96-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
+514:X96 Air 100Mb:s905x3:meson-sm1-x96-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
+515:A95XF3 Air 1Gb:s905x3:meson-sm1-a95xf3-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
+516:A95XF3 Air 100Mb:s905x3:meson-sm1-a95xf3-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
+
+# Other
+0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
+"
+
+search_aml_model() {
+    local search_soc_id="${1}"
+    local ret_count=$(echo "${AMLOGIC_MODEL_LIST}" | grep -E "^${search_soc_id}:" | wc -l)
+    if [ "${ret_count}" -eq "1" ]; then
+        echo "${AMLOGIC_MODEL_LIST}" | grep -E "^${search_soc_id}:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g'
+    fi
+}
+
+# Display the model list
+printf "%-s\n" "--------------------------------------------------------------------------------------"
+printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
+printf "%-s\n" "--------------------------------------------------------------------------------------"
+printf "%-5s %-10s %-30s %-50s\n" $(echo "${AMLOGIC_MODEL_LIST}" | grep -E "^[0-9]{1,9}:" | sed -e 's/[ ][ ]*/-/g' | awk -F ':' '{print $1,$3,$2,$4}')
+printf "%-s\n" "--------------------------------------------------------------------------------------"
+
+read -p "Please Input ID: " boxtype
+if [[ "${boxtype}" -eq "0" ]]; then
+    read -p "Please Input SoC Name: " AMLOGIC_SOC
+    AMLOGIC_SOC="${AMLOGIC_SOC}"
+    #
+    read -p "Please Input DTB Name: " FDTFILE
+    FDTFILE="${FDTFILE}"
+    #
+    read -p "Please Input UBOOT_OVERLOAD Name: " UBOOT_OVERLOAD
+    UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
+    #
+    read -p "Please Input MAINLINE_UBOOT Name: " MAINLINE_UBOOT
+    MAINLINE_UBOOT="${MAINLINE_UBOOT}"
+    #
+    read -p "Please Input ANDROID_UBOOT Name: " ANDROID_UBOOT
+    ANDROID_UBOOT="${ANDROID_UBOOT}"
+else
+    ret=$(search_aml_model "${boxtype}")
+    if [ "${ret}" == "" ]; then
+        echo "Input error, exit!"
+        exit 1
+    fi
+
+    AMLOGIC_SOC="$(echo "${ret}" | awk -F ':' '{print $3}')"
+    FDTFILE="$(echo "${ret}" | awk -F ':' '{print $4}')"
+    UBOOT_OVERLOAD="$(echo "${ret}" | awk -F ':' '{print $5}')"
+    MAINLINE_UBOOT="$(echo "${ret}" | awk -F ':' '{print $6}')"
+    ANDROID_UBOOT="$(echo "${ret}" | awk -F ':' '{print $7}')"
+fi
+# Set model list, end ------------
+
+echo "Input Box ID: [ ${boxtype} ]"
+echo "FDTFILE: [ ${FDTFILE} ]"
+echo "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
+
+[[ -z "${FDTFILE}" || -z "${UBOOT_OVERLOAD}" || ! -f "/boot/${UBOOT_OVERLOAD}" ]] && echo "The DTB or UBOOT_OVERLOAD is invalid, stop the install." && exit 1
+
+# Set the type of file system
+cat <<EOF
+--------------------------------------------
+Please select the type of file system:
+1. ext4
+2. btrfs
+--------------------------------------------
+EOF
+read -p "Please Input ID: " filetype
+if [[ "${filetype}" -eq "2" ]]; then
+    file_system_type="btrfs"
+    uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
+    fstab_mount_string="defaults,noatime,compress=zstd:6"
+else
+    file_system_type="ext4"
+    uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
+    fstab_mount_string="defaults,noatime,errors=remount-ro"
+fi
+echo "Input Type ID: [ ${filetype} ]"
+echo "The type of file system: [ ${file_system_type} ]"
+
+# Disable the system's partition adjustment service
+systemctl stop armbian-resize-filesystem.service
+systemctl disable armbian-resize-filesystem.service
+
+# Backup the bootloader, if necessary for system recovery
+[ -d "/usr/lib/u-boot" ] || mkdir -p /usr/lib/u-boot
+MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
+if [ ! -f "${MYBOX_UBOOT}" ]; then
+    echo "Start backup default bootloader"
+    dd if="${DEV_EMMC}" of=${MYBOX_UBOOT} bs=1M count=4 conv=fsync
+fi
+sync
+
+# Clear emmc disk data
+exists_pts=$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)
+if [ "${exists_pts}" -gt "0" ]; then
+    i=1
+    while [ "${i}" -le "${exists_pts}" ]; do
+        parted -s ${DEV_EMMC} rm ${i} 2>/dev/null
+        let i++
+    done
+fi
+dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
+sync
+
+# Set partition size(MB)
+if [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
+    BLANK1="68"
+    BOOT="512"
+    BLANK2="220"
+elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
+    BLANK1="700"
+    BOOT="160"
+    BLANK2="0"
+else
+    BLANK1="68"
+    BOOT="256"    # A total of [ 1120MB ] can be used in this block, and the remaining [ 864MB ] can be used.
+    BLANK2="1026" # Can set the rootfs partition after [ 1350MB ] of the total disk.
+fi
+
+# Format emmc disk
+echo "Start create MBR and partittion"
+parted -s "${DEV_EMMC}" mklabel msdos 2>/dev/null
+parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))M $((BLANK1 + BOOT - 1))M 2>/dev/null
+parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))M 100% 2>/dev/null
+sync
+
+# Write the uboot
+echo "Start write u-boot"
+if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+    echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+    echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+    echo "Restore the mybox u-boot"
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+fi
+
+echo "Start copy system for eMMC."
+mkdir -p /ddbr
+chmod 777 /ddbr
+
+PART_BOOT="${DEV_EMMC}p1"
+PART_ROOT="${DEV_EMMC}p2"
+DIR_INSTALL="/ddbr/install"
+
+if [ -d ${DIR_INSTALL} ]; then
+    rm -rf ${DIR_INSTALL}
+fi
+mkdir -p ${DIR_INSTALL}
+sync
+
+if grep -q ${PART_BOOT} /proc/mounts; then
+    echo "Unmounting BOOT partiton."
+    umount -f ${PART_BOOT}
+fi
+echo "Formatting BOOTFS partition..."
+mkfs.vfat -n "BOOT_EMMC" ${PART_BOOT}
+
+mount -o rw ${PART_BOOT} ${DIR_INSTALL}
+[ "$?" -ne "0" ] && echo "Failed to mount BOOTFS partition" && exit 1
+
+echo "Start copy BOOT_EMMC partition data..."
+cp -rf /boot/* ${DIR_INSTALL} && sync
+rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
+
+echo "Generate the new uEnv.txt file."
+rm -f ${DIR_INSTALL}/uEnv.txt 2>/dev/null && sync
+cat >${DIR_INSTALL}/uEnv.txt <<EOF
+LINUX=/zImage
+INITRD=/uInitrd
+FDT=/dtb/amlogic/${FDTFILE}
+APPEND=root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
+EOF
+
+rm ${DIR_INSTALL}/s9*
+rm ${DIR_INSTALL}/aml*
+mv -f ${DIR_INSTALL}/boot-emmc.ini ${DIR_INSTALL}/boot.ini
+sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
+mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
+mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
+
+if [ "${K510}" -eq "1" ]; then
+    if [[ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]]; then
+        echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
+        if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
+            cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
+        else
+            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.ext
+            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
+        fi
+        chmod +x ${DIR_INSTALL}/u-boot.ext
+        chmod +x ${DIR_INSTALL}/u-boot.emmc
+    else
+        echo "Have no the u-boot file."
+        exit 1
+    fi
+fi
+
+sync
+sleep 3
+
+umount ${DIR_INSTALL}
+
+if grep -q ${PART_ROOT} /proc/mounts; then
+    echo "Unmounting ROOT partiton."
+    umount -f ${PART_ROOT}
+fi
+
+echo "Formatting ROOTFS partition..."
+if [[ "${file_system_type}" == "btrfs" ]]; then
+    mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -m single ${PART_ROOT}
+    sleep 3
+    mount -t btrfs -o compress=zstd:6 ${PART_ROOT} ${DIR_INSTALL}
+else
+    mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" ${PART_ROOT}
+    sleep 3
+    mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
+fi
+[ "$?" -ne "0" ] && echo "Failed to mount ROOTFS partition" && exit 1
+
+echo "Start copy ROOTFS_EMMC partition data..."
+cd /
+# Create relevant directories
+mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/} && sync
+# Copy the relevant directory
+COPY_SRC="etc home lib64 opt root selinux srv usr var"
+for src in ${COPY_SRC}; do
+    echo "copy [ ${src} ] ..."
+    tar -cf - ${src} | (
+        cd ${DIR_INSTALL}
+        tar -xf -
+    )
+    sync
+done
+# Create relevant symbolic link
+ln -sf /usr/bin ${DIR_INSTALL}/bin
+ln -sf /usr/lib ${DIR_INSTALL}/lib
+ln -sf /usr/sbin ${DIR_INSTALL}/sbin
+ln -sf /var/tmp ${DIR_INSTALL}/tmp
+sync
+echo "Copy complete."
+
+echo "Generate the new fstab file."
+rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
+cat >${DIR_INSTALL}/etc/fstab <<EOF
+UUID=${ROOTFS_UUID}  /        ${file_system_type}     ${fstab_mount_string}     0 1
+LABEL=BOOT_EMMC      /boot    vfat                    defaults                  0 2
+tmpfs                /tmp     tmpfs                   defaults,nosuid           0 0
+
+EOF
+
+echo "Update the relevant parameters"
+ophub_release_file="${DIR_INSTALL}/etc/ophub-release"
+#
+sed -i '/FDTFILE/d' ${ophub_release_file} 2>/dev/null
+echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/UBOOT_OVERLOAD/d' ${ophub_release_file} 2>/dev/null
+echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/MAINLINE_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/MYBOX_UBOOT/d' ${ophub_release_file} 2>/dev/null
+echo "MYBOX_UBOOT='${MYBOX_UBOOT}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
+echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
+sync
+
+rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
+sync
+
+cd /
+umount ${DIR_INSTALL}
+sleep 3
+
+echo "*************************************************************************************************"
+echo "Successful installed, please unplug the USB, re-insert the power supply to start the armbian."
+echo "*************************************************************************************************"
+exit 0
