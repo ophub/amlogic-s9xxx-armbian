@@ -166,6 +166,7 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 | -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.4.180` . Multiple kernel use `_` connection such as `-k 5.15.25_5.4.180` |
 | -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.180 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
+| -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.4.180`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
@@ -227,6 +228,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | armbian_kernel     | 5.15.25_5.4.180  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k` |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | armbian_size       | 2748             | Set the size of the firmware ROOTFS partition, function reference `-s` |
+| armbian_fstype     | ext4             | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
 
 - GitHub Actions Output variable description
 
