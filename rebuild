@@ -81,6 +81,8 @@ build_armbian=(
 SKIP_MB="68"
 BOOT_MB="256"
 ROOT_MB="2748"
+# Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
+ROOTFS_TYPE="ext4"
 #
 #==================================================================================
 
@@ -152,6 +154,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
+            fi
+            ;;
+        -t | --rootfstype)
+            if [[ -n "${2}" ]]; then
+                ROOTFS_TYPE="${2}"
+                shift
+            else
+                error_msg "Invalid -t parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -446,6 +456,15 @@ refactor_files() {
     # 04 For header files, usr/local/include
     tar -xzf ${build_header} -C ${tag_rootfs}/usr/local && sync
 
+    # Set the type of file system
+    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
+        fstab_mount_string="defaults,noatime,compress=zstd:6"
+    else
+        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
+        fstab_mount_string="defaults,noatime,errors=remount-ro"
+    fi
+
     # Processing partition files: bootfs
     cd ${tag_bootfs}
 
@@ -460,10 +479,10 @@ refactor_files() {
     fi
 
     # Edit the uEnv.txt
-    cp -f ${configfiles_path}/patches/bootfs/uEnv.txt .
     boot_conf_file="uEnv.txt"
+    cp -f ${configfiles_path}/patches/bootfs/${boot_conf_file} .
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
-    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" ${boot_conf_file}
+    sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
 
     # Processing partition files: rootfs
@@ -514,7 +533,8 @@ refactor_files() {
 
     # Edit the etc/fstab
     [ -f "etc/fstab" ] || error_msg "The etc/fstab File does not exist."
-    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
+    sed -i '/LABEL=ROOTFS/d' etc/fstab 2>/dev/null
+    echo "UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 0" >>etc/fstab
 
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
@@ -577,15 +597,18 @@ make_image() {
 
     parted -s ${build_image_file} mklabel msdos 2>/dev/null
     parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))M $((SKIP_MB + BOOT_MB - 1))M 2>/dev/null
-    parted -s ${build_image_file} mkpart primary btrfs $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
+    parted -s ${build_image_file} mkpart primary ${ROOTFS_TYPE} $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
     sync
 
     loop_new=$(losetup -P -f --show "${build_image_file}")
     [ ${loop_new} ] || error_msg "losetup ${build_image_file} failed."
 
     mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
-    mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
-    sync
+    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
+    else
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
+    fi
 
     # Write the bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
@@ -700,7 +723,8 @@ find_armbian
 # Download the latest kernel
 [ "${auto_kernel}" == "true" ] && download_kernel
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
 # Loop to rebuild armbian firmware
 loop_rebuild
 #
