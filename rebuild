@@ -423,7 +423,7 @@ refactor_files() {
     tar -xJf "${armbian_path}/firmware.tar.xz" -C ${tag_rootfs}/usr
 
     # Copy the same files of the release for ROOTFS
-    [[ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/files/* ${tag_rootfs}
+    [[ "$(ls ${configfiles_path}/rootfs 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/rootfs/* ${tag_rootfs}
     # Copy the patches files
     [ -f "${tag_rootfs}/usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen ${tag_rootfs}/usr/bin
 
@@ -480,7 +480,7 @@ refactor_files() {
 
     # Edit the uEnv.txt
     boot_conf_file="uEnv.txt"
-    cp -f ${configfiles_path}/patches/bootfs/${boot_conf_file} .
+    cp -f ${configfiles_path}/bootfs/${boot_conf_file} .
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
     sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}

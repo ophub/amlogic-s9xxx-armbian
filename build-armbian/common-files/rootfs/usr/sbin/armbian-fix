@@ -1,0 +1,30 @@
+#!/bin/bash
+#============================================================================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Dependent script: /usr/lib/armbian/armbian-firstrun
+# Function: Fix permissions and related settings(Executed at system initialization)
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-fix
+#============================================================================================================================
+
+# Fix permissions
+sudo apt-get -qq purge -y linux-image-current-meson64
+sudo chmod 777 /var/tmp
+sudo chown man:root /var/cache/man -R
+sudo chmod g+s /var/cache/man -R
+sudo chown root:root /usr/bin/sudo
+sudo chmod 4755 /usr/bin/sudo
+sudo chown 0 /usr/lib/sudo/sudoers.so
+sudo chmod 644 /usr/lib/sudo/sudoers.so
+sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1
+sudo chmod 755 /etc/update-motd.d/*
+
+echo -e "armbian-fix: Loading finished."
+
