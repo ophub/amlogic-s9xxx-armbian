@@ -24,14 +24,12 @@ These duplications are automated in the repository's packaging and install/upgra
 
 ## common-files
 
-- rootfs: The files in the directory are custom files, which must be completely consistent with the structure and file naming and storage under the ***`ROOTFS`*** partiton in Armbian. If there are files in this directory, they will be automatically copied to the Armbian directory during `sudo ./rebuild`. E.g:
+- files: The files in the `common-files/files` directory are custom files, which must be completely consistent with the structure and file naming and storage under the ***`ROOTFS`*** partiton in Armbian. If there are files in this directory, they will be automatically copied to the Armbian directory during `sudo ./rebuild`. E.g:
 
 ```yaml
 etc/network/interfaces
 usr/sbin
 ```
-
-- bootfs: This is the personalized configuration file in the `/boot` directory of the Armbian system.
 
 - patches: This is the directory where patch files are stored. You can place extension files, patches, etc. in this directory.
 
