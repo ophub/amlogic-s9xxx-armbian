@@ -47,6 +47,7 @@ armbian_outputpath="${make_path}/build/output/images"
 armbian_rebuild_file="${armbian_outputpath}/*.img"
 build_path="${make_path}/build-armbian"
 armbian_path="${build_path}/amlogic-armbian"
+dtb_path="${build_path}/amlogic-dtb"
 kernel_path="${build_path}/amlogic-kernel"
 uboot_path="${build_path}/amlogic-u-boot"
 configfiles_path="${build_path}/common-files"
@@ -55,34 +56,21 @@ tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
-# Get armbian ${VERSION_CODENAME}: such as [ focal ]
-os_release_file="etc/os-release"
-# Set banner's ${BOARD_NAME}: such as [ s905x3 ]
-armbian_release_file="etc/armbian-release"
-# Add custom armbian firmware information
-ophub_release_file="etc/ophub-release"
-# Kernel files download repository
+os_release_file="etc/os-release"           # Get armbian ${VERSION_CODENAME}: such as [ focal ]
+armbian_release_file="etc/armbian-release" # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
+ophub_release_file="etc/ophub-release"     # Add custom armbian firmware information
+build_armbian=("a311d" "s922x" "s922x-n2" "s922x-reva" "s905x3" "s905x2" "s905l3a" "s905x2-km3" "s912" "s912-t95z" "s905d" "s905d-ki" "s905x" "s905w" "s905")
+#
+# Latest kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch="stable"
-auto_kernel="true"
 build_kernel=("5.15.25" "5.4.180")
-# Set supported SoC
-build_armbian=(
-    "s922x" "s922x-n2" "s922x-reva" "a311d"
-    "s905x3"
-    "s905x2" "s905x2-km3" "s905l3a"
-    "s912" "s912-m8s"
-    "s905d" "s905d-ki"
-    "s905x"
-    "s905w"
-    "s905"
-)
-# Set Armbian firmware size (SKIP_MB >= 4, BOOT_MB >= 256, ROOT_MB >= 2000)
+auto_kernel="true"
+#
+# Set Armbian firmware size (BOOT_MB >= 256, ROOT_MB >= 2000)
 SKIP_MB="68"
 BOOT_MB="256"
 ROOT_MB="2748"
-# Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
-ROOTFS_TYPE="ext4"
 #
 #==================================================================================
 
@@ -154,14 +142,6 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
-            fi
-            ;;
-        -t | --rootfstype)
-            if [[ -n "${2}" ]]; then
-                ROOTFS_TYPE="${2}"
-                shift
-            else
-                error_msg "Invalid -t parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -328,8 +308,8 @@ confirm_version() {
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         ;;
-    s912-m8s | s912-m8s-pro)
-        FDTFILE="meson-gxm-q201.dtb"
+    s912-t95z | s912-t95z-plus)
+        FDTFILE="meson-gxm-t95z-plus.dtb"
         UBOOT_OVERLOAD="u-boot-s905x-s912.bin"
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
@@ -388,14 +368,6 @@ extract_armbian() {
     fi
 
     cd ${tmp_armbian}
-
-    # Find ID in ${os_release_file}: such as [ubuntu/debian]
-    release_codeid="$(cat ${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
-    [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
-    # Find VERSION_CODENAME in ${os_release_file}: such as [focal/bullseye/buster]
-    release_codename="$(cat ${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
-    [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
-
     # Delete all files of /boot partition and replace it later
     rm -rf boot/* 2>/dev/null
     # Delete the kernel files and replace it later
@@ -419,11 +391,11 @@ refactor_files() {
     cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
 
     # Unzip the relevant files
-    tar -xJf "${armbian_path}/boot-common.tar.xz" -C ${tag_bootfs}
-    tar -xJf "${armbian_path}/firmware.tar.xz" -C ${tag_rootfs}/usr
+    tar -xzf "${armbian_path}/boot-common.tar.gz" -C ${tag_bootfs}
+    tar -xzf "${armbian_path}/root-common.tar.gz" -C ${tag_rootfs}
 
     # Copy the same files of the release for ROOTFS
-    [[ "$(ls ${configfiles_path}/rootfs 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/rootfs/* ${tag_rootfs}
+    [[ "$(ls ${configfiles_path}/files 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/files/* ${tag_rootfs}
     # Copy the patches files
     [ -f "${tag_rootfs}/usr/bin/uuidgen" ] || cp -f ${configfiles_path}/patches/rootfs/usr/bin/uuidgen ${tag_rootfs}/usr/bin
 
@@ -432,6 +404,24 @@ refactor_files() {
     cp -f ${uboot_path}/bootloader/* ${tag_rootfs}/usr/lib/u-boot
     # Copy the overload files
     cp -f ${uboot_path}/overload/* ${tag_bootfs}
+
+    # Find ID in ${os_release_file}: such as [ubuntu/debian]
+    release_codeid="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
+    [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
+    # Find VERSION_CODENAME in ${os_release_file}: such as [focal/bullseye/buster]
+    release_codename="$(cat ${tag_rootfs}/${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
+    [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
+    # Copy the different files of the release for ROOTFS
+    diff_release_files="${configfiles_path}/release/${release_codename}"
+    if [[ -n "${release_codename}" && -d "${diff_release_files}" ]]; then
+        # Backup source
+        mv -f ${tag_rootfs}/etc/apt/sources.list ${tag_rootfs}/etc/apt/sources.list.bak
+        mv -f ${tag_rootfs}/etc/apt/sources.list.d/armbian.list ${tag_rootfs}/etc/apt/sources.list.d/armbian.list.bak
+        # Copy custom source
+        cp -rf ${diff_release_files}/* ${tag_rootfs}
+    fi
+
+    sync && sleep 3
 
     # Replace the kernel
     build_boot=$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
@@ -446,6 +436,7 @@ refactor_files() {
     (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
 
     # 02 For dtb files
+    cp -rf ${dtb_path}/* ${tag_bootfs}/dtb/amlogic && sync
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
 
     # 03 For usr/lib/modules/*
@@ -455,15 +446,6 @@ refactor_files() {
 
     # 04 For header files, usr/local/include
     tar -xzf ${build_header} -C ${tag_rootfs}/usr/local && sync
-
-    # Set the type of file system
-    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
-        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
-        fstab_mount_string="defaults,noatime,compress=zstd:6"
-    else
-        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
-        fstab_mount_string="defaults,noatime,errors=remount-ro"
-    fi
 
     # Processing partition files: bootfs
     cd ${tag_bootfs}
@@ -479,11 +461,12 @@ refactor_files() {
     fi
 
     # Edit the uEnv.txt
-    boot_conf_file="uEnv.txt"
-    cp -f ${configfiles_path}/bootfs/${boot_conf_file} .
-    [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
-    sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
-    sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
+    [ -f "uEnv.txt" ] || error_msg "The uEnv.txt File does not exist."
+    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" uEnv.txt
+    sed -i "s|meson.*.dtb|${FDTFILE}|g" uEnv.txt
+
+    # For s912-t95z-plus /boot/extlinux/extlinux.conf
+    [ "${FDTFILE}" == "meson-gxm-t95z-plus.dtb" ] && cp -rf ${configfiles_path}/patches/boot/s912-t95z-plus/* . && sync
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
@@ -533,22 +516,17 @@ refactor_files() {
 
     # Edit the etc/fstab
     [ -f "etc/fstab" ] || error_msg "The etc/fstab File does not exist."
-    sed -i '/LABEL=ROOTFS/d' etc/fstab 2>/dev/null
-    echo "UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 0" >>etc/fstab
+    sed -i "s|LABEL=ROOTFS|UUID=${ROOTFS_UUID}|g" etc/fstab
 
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
 
-    # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
-    echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
-
-    # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
-    network_service="usr/lib/systemd/system/networking.service"
-    sed -i "s|TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service} 2>/dev/null
+    # Make the .bashrc take effect
+    echo '[ -f "${HOME}/.bashrc" ] && . ${HOME}/.bashrc' >>etc/profile
 
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun} 2>/dev/null
+    sed -i '/armbian-release/i\sudo apt-get -qq purge -y linux-image-current-meson64' ${armbian_firstrun} 2>/dev/null
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
@@ -597,18 +575,15 @@ make_image() {
 
     parted -s ${build_image_file} mklabel msdos 2>/dev/null
     parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))M $((SKIP_MB + BOOT_MB - 1))M 2>/dev/null
-    parted -s ${build_image_file} mkpart primary ${ROOTFS_TYPE} $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
+    parted -s ${build_image_file} mkpart primary ext4 $((SKIP_MB + BOOT_MB))M 100% 2>/dev/null
     sync
 
     loop_new=$(losetup -P -f --show "${build_image_file}")
     [ ${loop_new} ] || error_msg "losetup ${build_image_file} failed."
 
     mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
-    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
-        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
-    else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
-    fi
+    mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
+    sync
 
     # Write the bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
@@ -723,8 +698,7 @@ find_armbian
 # Download the latest kernel
 [ "${auto_kernel}" == "true" ] && download_kernel
 echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
-echo -e "ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
+echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 # Loop to rebuild armbian firmware
 loop_rebuild
 #
