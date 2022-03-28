@@ -41,8 +41,7 @@
 #=============================== Set make environment variables ===============================
 #
 # Related file storage path
-make_path=${PWD}
-moredtb_path="${make_path}/build-armbian/amlogic-dtb"
+make_path="${PWD}"
 compile_path="${make_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
@@ -52,7 +51,7 @@ armbian_file="${armbian_path}/armbian.img"
 out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
-arch_info=$(arch)
+arch_info="$(arch)"
 toolchain_path="/usr/local/toolchain"
 #
 # Set the default value of the [ -r ] parameter
@@ -306,16 +305,9 @@ env_check() {
     cd ${make_path}
     echo -e "${STEPS} Start checking local compilation environments."
 
-    # Check whether the kernel of the same name has been installed locally
+    # Get kernel output name
     kernel_outname="${kernel_version}${custom_name}"
-    local_kernel="$(ls /lib/modules -l | grep -E '^d' | awk '{print $9}' | grep -w "${kernel_outname}")"
-    [ -n "${local_kernel}" ] && error_msg "The current system has the same named kernel [ ${kernel_outname} ], stop compiling!"
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
-
-    # Get current kernel version
-    kernel_v=$(echo "${kernel_version}" | cut -d '.' -f1)
-    kernel_p=$(echo "${kernel_version}" | cut -d '.' -f2)
-    kernel_s=$(echo "${kernel_version}" | cut -d '.' -f3)
 
     # Create a temp directory
     rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
@@ -376,7 +368,9 @@ compile_kernel() {
     sync
 
     # Enable/Disabled Linux Kernel Clang LTO
-    if [[ "${kernel_v}" -ge "6" ]] || [[ "${kernel_v}" -eq "5" && "${kernel_p}" -ge "12" ]]; then
+    kernel_x=$(echo "${kernel_version}" | cut -d '.' -f1)
+    kernel_y=$(echo "${kernel_version}" | cut -d '.' -f2)
+    if [[ "${kernel_x}" -ge "6" ]] || [[ "${kernel_x}" -eq "5" && "${kernel_y}" -ge "12" ]]; then
         scripts/config -e LTO_CLANG_THIN
     else
         scripts/config -d LTO_CLANG_THIN
@@ -391,13 +385,12 @@ compile_kernel() {
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
-    make ${MAKE_SET_STRING} modules_install
+    make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${out_kernel}/modules modules_install
     [ $? -eq 0 ] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
-    header_path="${out_kernel}/header"
-    make ${MAKE_SET_STRING} headers_install INSTALL_HDR_PATH=${header_path}
+    make ${MAKE_SET_STRING} INSTALL_HDR_PATH=${out_kernel}/header headers_install
     [ $? -eq 0 ] && echo -e "${SUCCESS} The headers is installed successfully."
 }
 
@@ -429,9 +422,9 @@ generate_uinitrd() {
     sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
-    rm -rf ${tag_rootfs}/lib/modules/* 2>/dev/null && sync
-    cp -rf /lib/modules/${kernel_outname} ${tag_rootfs}/lib/modules && sync
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/lib/modules) \n"
+    rm -rf ${tag_rootfs}/usr/lib/modules/* 2>/dev/null && sync
+    cp -rf ${out_kernel}/modules ${tag_rootfs}/usr/lib/modules && sync
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
@@ -453,8 +446,8 @@ generate_uinitrd() {
 
     cd ${make_path}
     # Copy the generated uInitrd file to the current system
-    echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot/ ]"
-    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${out_kernel}/boot/ && sync
+    echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot ]"
+    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${out_kernel}/boot && sync
 
     # Unmount the armbian system
     umount ${tag_rootfs}/boot 2>/dev/null
@@ -469,37 +462,35 @@ packit_kernel() {
     cd ${out_kernel}/boot
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/allwinner
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
     tar -czf dtb-allwinner-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
-    [ -d ${moredtb_path} ] && cp -f ${moredtb_path}/*.dtb . && chmod +x * && sync
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
     tar -czf dtb-amlogic-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/rockchip
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
     tar -czf dtb-rockchip-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/modules
-    mv -f /lib/modules/${kernel_outname} . && sync
     tar -czf modules-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/header
     tar -czf header-${kernel_outname}.tar.gz * && sync
-    cp -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}
