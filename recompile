@@ -69,14 +69,12 @@ custom_name="-meson64-dev"
 dev_repo="https://github.com/ophub/script/releases/download/dev"
 #
 # Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
-armbian_rootfs_file="armbian_22.02.0_Aml_s922x_bullseye_5.10.93.tar.xz"
+armbian_rootfs_file="armbian_22.05.0_aml_s922x_focal_5.15.31.tar.xz"
 #
-# GCC download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-a/downloads
-#gcc_repo="https://developer.arm.com/-/media/Files/downloads/gnu-a/10.3-2021.07/binrel"
-gcc_file="gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu.tar.xz"
+# GCC download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/downloads
+gcc_file="gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu.tar.xz"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
-#clang_repo="https://github.com/llvm/llvm-project/releases/download/llvmorg-13.0.0"
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
 #
 # QEMU BINARY
