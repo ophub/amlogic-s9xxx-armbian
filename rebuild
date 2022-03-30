@@ -99,15 +99,17 @@ init_var() {
     cd ${make_path}
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver=$(getopt "db:k:a:v:s:" "${@}")
+    get_all_ver=$(getopt "db:k:a:v:s:t:" "${@}")
 
     while [ -n "${1}" ]; do
         case "${1}" in
         -d | --default)
-            : ${version_branch:="${version_branch}"}
             : ${build_armbian:="${build_armbian}"}
             : ${build_kernel:="${build_kernel}"}
+            : ${auto_kernel:="${auto_kernel}"}
+            : ${version_branch:="${version_branch}"}
             : ${ROOT_MB:="${ROOT_MB}"}
+            : ${ROOTFS_TYPE:="${ROOTFS_TYPE}"}
             ;;
         -b | --build)
             if [ -n "${2}" ]; then
