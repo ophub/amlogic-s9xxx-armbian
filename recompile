@@ -423,7 +423,7 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/usr/lib/modules/* 2>/dev/null && sync
-    cp -rf ${out_kernel}/modules ${tag_rootfs}/usr/lib/modules && sync
+    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} ${tag_rootfs}/usr/lib/modules && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
@@ -483,7 +483,7 @@ packit_kernel() {
     mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
 
-    cd ${out_kernel}/modules
+    cd ${out_kernel}/modules/lib/modules
     tar -czf modules-${kernel_outname}.tar.gz * && sync
     mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
