@@ -9,12 +9,16 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      set_branch:
+        description: "Branch: legacy / current / edge"
+        required: false
+        default: "current"
       set_release:
-        description: "RELEASE: focal / bullseye / buster"
+        description: "Release: jammy / focal / bullseye"
         required: false
         default: "focal"
       set_board:
-        description: "BOARD: lepotato / odroidn2"
+        description: "Board: lepotato / odroidn2"
         required: false
         default: "lepotato"
       more_settings:
@@ -22,7 +26,7 @@ on:
         required: false
         default: ""
   #schedule:
-    #- cron: "0 17 * * 0"
+  #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
@@ -50,6 +54,13 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
+          ARR_BRANCH=("legacy" "current" "edge")
+          set_branch="${{ github.event.inputs.set_branch }}"
+          if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
+              set_branch="current"
+          fi
+          echo "ARMBIAN_BRANCH=${set_branch}" >> $GITHUB_ENV
+
           ARR_RELEASE=("focal" "bullseye" "buster")
           set_release="${{ github.event.inputs.set_release }}"
           if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
@@ -74,7 +85,7 @@ jobs:
         run: |
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=${{ env.ARMBIAN_BOARD }} RELEASE=${{ env.ARMBIAN_RELEASE }} BRANCH=current \
+          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
                             BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
                             CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
