@@ -16,15 +16,15 @@
 
 # Fix permissions
 sudo apt-get -qq purge -y linux-image-current-meson64
-sudo chmod 777 /var/tmp
-sudo chown man:root /var/cache/man -R
-sudo chmod g+s /var/cache/man -R
-sudo chown root:root /usr/bin/sudo
-sudo chmod 4755 /usr/bin/sudo
-sudo chown 0 /usr/lib/sudo/sudoers.so
-sudo chmod 644 /usr/lib/sudo/sudoers.so
-sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1
-sudo chmod 755 /etc/update-motd.d/*
+sudo chmod 777 /var/tmp 2>/dev/null
+sudo chown man:root /var/cache/man -R 2>/dev/null
+sudo chmod g+s /var/cache/man -R 2>/dev/null
+sudo chown root:root /usr/bin/sudo 2>/dev/null
+sudo chmod 4755 /usr/bin/sudo 2>/dev/null
+sudo chown 0 /usr/lib/sudo/sudoers.so 2>/dev/null
+sudo chmod 644 /usr/lib/sudo/sudoers.so 2>/dev/null
+sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null
+sudo chmod 755 /etc/update-motd.d/* 2>/dev/null
 
 echo -e "armbian-fix: Loading finished."
 
