@@ -501,15 +501,15 @@ refactor_files() {
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
     # Fix permission
-    chmod 777 var/tmp
-    chown man:root var/cache/man -R
-    chmod g+s var/cache/man -R
-    chown root:root usr/bin/sudo
-    chmod 4755 usr/bin/sudo
-    chown 0 usr/lib/sudo/sudoers.so
-    chmod 644 usr/lib/sudo/sudoers.so
-    chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    chmod 755 etc/update-motd.d/*
+    chmod 777 var/tmp 2>/dev/null
+    chown man:root var/cache/man -R 2>/dev/null
+    chmod g+s var/cache/man -R 2>/dev/null
+    chown root:root usr/bin/sudo 2>/dev/null
+    chmod 4755 usr/bin/sudo 2>/dev/null
+    chown 0 usr/lib/sudo/sudoers.so 2>/dev/null
+    chmod 644 usr/lib/sudo/sudoers.so 2>/dev/null
+    chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null
+    chmod 755 etc/update-motd.d/* 2>/dev/null
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
     ln -sf /usr/bin bin
