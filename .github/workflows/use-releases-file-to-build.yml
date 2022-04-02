@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       sel_tags_keywords:
-        description: "RELEASE: focal / bullseye / buster"
+        description: "Release: jammy / focal / bullseye"
         required: false
         default: "focal"
       more_settings:
@@ -58,7 +58,7 @@ jobs:
 
           set_release="_"
           out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
-          ARR_RELEASE=("bionic" "focal" "hirsute" "bullseye" "buster" "stretch")
+          ARR_RELEASE=("jammy" "focal" "bullseye" "buster")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${out_releasename}" == *${r}* ]]; then
