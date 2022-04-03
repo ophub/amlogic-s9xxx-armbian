@@ -42,11 +42,12 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | -          |  0     |  armbian-led 0    |   openwrt-led 0     | Disable LED |
 | x96max     |  11    |  armbian-led 11   |   openwrt-led 11    | Enable LED  |
 | x96maxplus |  12    |  armbian-led 12   |   openwrt-led 12    | Enable LED  |
-| h96max-x3  |  13    |  armbian-led 13   |   openwrt-led 13    | Enable LED  |
-| hk1-x3     |  14    |  armbian-led 14   |   openwrt-led 14    | Enable LED  |
-| hk1box     |  15    |  armbian-led 15   |   openwrt-led 15    | Enable LED  |
-| tx3        |  16    |  armbian-led 16   |   openwrt-led 16    | Enable LED  |
-| x96air     |  17    |  armbian-led 17   |   openwrt-led 17    | Enable LED  |
+| x96air     |  13    |  armbian-led 13   |   openwrt-led 13    | Enable LED  |
+| h96max-x3  |  14    |  armbian-led 14   |   openwrt-led 14    | Enable LED  |
+| hk1-x3     |  15    |  armbian-led 15   |   openwrt-led 15    | Enable LED  |
+| hk1box     |  16    |  armbian-led 16   |   openwrt-led 16    | Enable LED  |
+| tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | Enable LED  |
+| tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 
 # LED 屏显示控制说明
@@ -93,9 +94,10 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | -          |  0     |  armbian-led 0    |   openwrt-led 0     | 禁用 LED |
 | x96max     |  11    |  armbian-led 11   |   openwrt-led 11    | 启用 LED |
 | x96maxplus |  12    |  armbian-led 12   |   openwrt-led 12    | 启用 LED |
-| h96max-x3  |  13    |  armbian-led 13   |   openwrt-led 13    | 启用 LED |
-| hk1-x3     |  14    |  armbian-led 14   |   openwrt-led 14    | 启用 LED |
-| hk1box     |  15    |  armbian-led 15   |   openwrt-led 15    | 启用 LED |
-| tx3        |  16    |  armbian-led 16   |   openwrt-led 16    | 启用 LED |
-| x96air     |  17    |  armbian-led 17   |   openwrt-led 17    | 启用 LED |
+| x96air     |  13    |  armbian-led 13   |   openwrt-led 13    | 启用 LED |
+| h96max-x3  |  14    |  armbian-led 14   |   openwrt-led 14    | 启用 LED |
+| hk1-x3     |  15    |  armbian-led 15   |   openwrt-led 15    | 启用 LED |
+| hk1box     |  16    |  armbian-led 16   |   openwrt-led 16    | 启用 LED |
+| tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | 启用 LED |
+| tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | 启用 LED |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
