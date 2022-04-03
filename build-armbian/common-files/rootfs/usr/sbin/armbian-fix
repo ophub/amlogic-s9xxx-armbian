@@ -14,17 +14,23 @@
 # Command: armbian-fix
 #============================================================================================================================
 
-# Fix permissions
-sudo apt-get -qq purge -y linux-image-current-meson64
-sudo chmod 777 /var/tmp 2>/dev/null
-sudo chown man:root /var/cache/man -R 2>/dev/null
-sudo chmod g+s /var/cache/man -R 2>/dev/null
-sudo chown root:root /usr/bin/sudo 2>/dev/null
-sudo chmod 4755 /usr/bin/sudo 2>/dev/null
-sudo chown 0 /usr/lib/sudo/sudoers.so 2>/dev/null
-sudo chmod 644 /usr/lib/sudo/sudoers.so 2>/dev/null
-sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null
-sudo chmod 755 /etc/update-motd.d/* 2>/dev/null
+# Fix permissions, common path
+[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ] && sudo apt-get -qq purge -y linux-image-edge-meson64
+[ -n "$(dpkg -l | grep linux-image-current-meson64)" ] && sudo apt-get -qq purge -y linux-image-current-meson64
+[ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ] && sudo apt-get -qq purge -y linux-image-legacy-meson64
+[ -d "/var/tmp" ] && sudo chmod 777 /var/tmp
+[ -d "/var/cache/man" ] && sudo chown man:root /var/cache/man -R
+[ -d "/var/cache/man" ] && sudo chmod g+s /var/cache/man -R
+[ -f "/usr/bin/sudo" ] && sudo chown root:root /usr/bin/sudo
+[ -f "/usr/bin/sudo" ] && sudo chmod 4755 /usr/bin/sudo
+[ -d "/etc/update-motd.d" ] && sudo chmod 755 /etc/update-motd.d/*
+# For focal
+[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chown 0 /usr/lib/sudo/sudoers.so
+[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chmod 644 /usr/lib/sudo/sudoers.so
+[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1
+# For jammy
+[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chown 0 /usr/libexec/sudo/sudoers.so
+[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chmod 644 /usr/libexec/sudo/sudoers.so
+[ -f "/usr/libexec/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1
 
 echo -e "armbian-fix: Loading finished."
-
