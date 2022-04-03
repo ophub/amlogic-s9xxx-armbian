@@ -492,24 +492,29 @@ refactor_files() {
     rm -f etc/apt/sources.list.save 2>/dev/null
     rm -f etc/apt/*.gpg~ 2>/dev/null
     rm -f etc/systemd/system/basic.target.wants/armbian-resize-filesystem.service 2>/dev/null
-    rm -rf usr/share/doc/linux-image-current-meson64 2>/dev/null
-    rm -rf usr/lib/linux-image-current-meson64 2>/dev/null
+    rm -rf usr/share/doc/linux-image-*-meson64 2>/dev/null
+    rm -rf usr/lib/linux-image-*-meson64 2>/dev/null
     rm -f usr/sbin/ddbr 2>/dev/null
     rm -f var/lib/dpkg/info/linux-image* 2>/dev/null
 
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
-    # Fix permission
-    chmod 777 var/tmp 2>/dev/null
-    chown man:root var/cache/man -R 2>/dev/null
-    chmod g+s var/cache/man -R 2>/dev/null
-    chown root:root usr/bin/sudo 2>/dev/null
-    chmod 4755 usr/bin/sudo 2>/dev/null
-    chown 0 usr/lib/sudo/sudoers.so 2>/dev/null
-    chmod 644 usr/lib/sudo/sudoers.so 2>/dev/null
-    chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null
-    chmod 755 etc/update-motd.d/* 2>/dev/null
+    # Fix permissions, common path
+    [ -d "var/tmp" ] && sudo chmod 777 var/tmp
+    [ -d "var/cache/man" ] && sudo chown man:root var/cache/man -R
+    [ -d "var/cache/man" ] && sudo chmod g+s var/cache/man -R
+    [ -f "usr/bin/sudo" ] && sudo chown root:root usr/bin/sudo
+    [ -f "usr/bin/sudo" ] && sudo chmod 4755 usr/bin/sudo
+    [ -d "etc/update-motd.d" ] && sudo chmod 755 etc/update-motd.d/*
+    # For focal
+    [ -f "usr/lib/sudo/sudoers.so" ] && sudo chown 0 usr/lib/sudo/sudoers.so
+    [ -f "usr/lib/sudo/sudoers.so" ] && sudo chmod 644 usr/lib/sudo/sudoers.so
+    [ -f "usr/lib/policykit-1/polkit-agent-helper-1" ] && sudo chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
+    # For jammy
+    [ -f "usr/libexec/sudo/sudoers.so" ] && sudo chown 0 usr/libexec/sudo/sudoers.so
+    [ -f "usr/libexec/sudo/sudoers.so" ] && sudo chmod 644 usr/libexec/sudo/sudoers.so
+    [ -f "usr/libexec/polkit-agent-helper-1" ] && sudo chmod 4755 usr/libexec/polkit-agent-helper-1
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
     ln -sf /usr/bin bin
