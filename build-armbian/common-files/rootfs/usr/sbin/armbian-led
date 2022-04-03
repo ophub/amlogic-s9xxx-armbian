@@ -65,11 +65,12 @@ do_select_box() {
     case "${1}" in
         11 | x96max)      do_start x96max.conf ;;
         12 | x96maxplus)  do_start x96maxplus.conf ;;
-        13 | h96max-x3)   do_start h96max-x3.conf ;;
-        14 | hk1-x3)      do_start hk1-x3.conf ;;
-        15 | hk1box)      do_start hk1box.conf ;;
-        16 | tx3)         do_start tx3.conf ;;
-        17 | x96air)      do_start x96air.conf ;;
+        13 | x96air)      do_start x96air.conf ;;
+        14 | h96max-x3)   do_start h96max-x3.conf ;;
+        15 | hk1-x3)      do_start hk1-x3.conf ;;
+        16 | hk1box)      do_start hk1box.conf ;;
+        17 | tx3)         do_start tx3.conf ;;
+        18 | tx3-mini)    do_start tx3-mini.conf ;;
         99 | diy)         do_start diy.conf ;;
          0 | o | stop)    do_stop ;;
          1 | * | quit)    echo "quit!" && exit 0 ;;
@@ -84,11 +85,12 @@ if [ -z "${1}" ]; then
         │                               │
         │        11. x96max             │
         │        12. x96maxplus         │
-        │        13. h96max-x3          │
-        │        14. hk1-x3             │
-        │        15. hk1box             │
-        │        16. tx3                │
-        │        17. x96air             │
+        │        13. x96air             │
+        │        14. h96max-x3          │
+        │        15. hk1-x3             │
+        │        16. hk1box             │
+        │        17. tx3                │
+        │        18. tx3-mini           │
         │        99. diy                │
         │                               │
         ├────[ Disable LED or Quit ]────┤
