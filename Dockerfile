@@ -5,9 +5,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 RUN set -e \
     && sed -i 's/archive.ubuntu.com/mirrors.nju.edu.cn/g' /etc/apt/sources.list \
-    && apt update
-
-RUN set -e \
+    && apt-get update \
     && apt-get install --no-install-recommends -y \
     # sorting by https://build.moz.one
     antlr3 asciidoc autoconf automake  \
