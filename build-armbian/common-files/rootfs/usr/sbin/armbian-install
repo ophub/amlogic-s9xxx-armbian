@@ -93,7 +93,6 @@ AMLOGIC_MODEL_LIST="
 301:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Nic
 302:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100Mb Nic
 303:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic
-304:E900V22C/D:s905l3a:meson-g12a-u200.dtb:u-boot-u200.bin:NA:NA:4C@1908Mhz,S905L3A+B,2+8G,USB2.0x2,LAN 100Mb Nic,uwe5621ds wifi(no work)
 
 # Amlogic G12B Family
 401:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/usr/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
