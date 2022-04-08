@@ -14,23 +14,25 @@
 # Command: armbian-fix
 #============================================================================================================================
 
-# Fix permissions, common path
-[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ] && sudo apt-get -qq purge -y linux-image-edge-meson64
-[ -n "$(dpkg -l | grep linux-image-current-meson64)" ] && sudo apt-get -qq purge -y linux-image-current-meson64
-[ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ] && sudo apt-get -qq purge -y linux-image-legacy-meson64
-[ -d "/var/tmp" ] && sudo chmod 777 /var/tmp
-[ -d "/var/cache/man" ] && sudo chown man:root /var/cache/man -R
-[ -d "/var/cache/man" ] && sudo chmod g+s /var/cache/man -R
-[ -f "/usr/bin/sudo" ] && sudo chown root:root /usr/bin/sudo
-[ -f "/usr/bin/sudo" ] && sudo chmod 4755 /usr/bin/sudo
-[ -d "/etc/update-motd.d" ] && sudo chmod 755 /etc/update-motd.d/*
-# For focal
-[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chown 0 /usr/lib/sudo/sudoers.so
-[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chmod 644 /usr/lib/sudo/sudoers.so
-[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1
-# For jammy
-[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chown 0 /usr/libexec/sudo/sudoers.so
-[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chmod 644 /usr/libexec/sudo/sudoers.so
-[ -f "/usr/libexec/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1
+# Fix common releases permissions
+[ -d "/var/tmp" ] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
+[ -d "/etc/update-motd.d" ] && sudo chmod 755 /etc/update-motd.d/* && echo "02. Fix update-motd.d permissions"
+[ -d "/var/cache/man" ] && sudo chown man:root /var/cache/man -R && echo "03. Fix man permissions"
+[ -d "/var/cache/man" ] && sudo chmod g+s /var/cache/man -R && echo "04. Fix man permissions"
+[ -f "/usr/bin/sudo" ] && sudo chown root:root /usr/bin/sudo && echo "05. Fix sudo permissions"
+[ -f "/usr/bin/sudo" ] && sudo chmod 4755 /usr/bin/sudo && echo "06. Fix sudo permissions"
+# Fix focal permissions
+[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chown 0 /usr/lib/sudo/sudoers.so && echo "07. Fix sudoers.so permissions"
+[ -f "/usr/lib/sudo/sudoers.so" ] && sudo chmod 644 /usr/lib/sudo/sudoers.so && echo "08. Fix sudoers.so permissions"
+[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 && echo "09. Fix polkit-agent-helper-1 permissions"
+# Fix jammy permissions
+[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "10. Fix sudoers.so permissions"
+[ -f "/usr/libexec/sudo/sudoers.so" ] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "11. Fix sudoers.so permissions"
+[ -f "/usr/libexec/polkit-agent-helper-1" ] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "12. Fix polkit-agent-helper-1 permissions"
 
-echo -e "armbian-fix: Loading finished."
+# Remove packages
+[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ] && sudo apt-get -qq purge -y linux-image-edge-meson64 && echo "Remove linux-image-edge-meson64"
+[ -n "$(dpkg -l | grep linux-image-current-meson64)" ] && sudo apt-get -qq purge -y linux-image-current-meson64 && echo "Remove linux-image-current-meson64"
+[ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ] && sudo apt-get -qq purge -y linux-image-legacy-meson64 && echo "Remove linux-image-legacy-meson64"
+
+echo "armbian-fix: Loading finished."
