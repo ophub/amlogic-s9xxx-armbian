@@ -500,18 +500,18 @@ refactor_files() {
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
-    # Fix permissions, common path
+    # Fix common releases permissions
     [ -d "var/tmp" ] && sudo chmod 777 var/tmp
+    [ -d "etc/update-motd.d" ] && sudo chmod 755 etc/update-motd.d/*
     [ -d "var/cache/man" ] && sudo chown man:root var/cache/man -R
     [ -d "var/cache/man" ] && sudo chmod g+s var/cache/man -R
     [ -f "usr/bin/sudo" ] && sudo chown root:root usr/bin/sudo
     [ -f "usr/bin/sudo" ] && sudo chmod 4755 usr/bin/sudo
-    [ -d "etc/update-motd.d" ] && sudo chmod 755 etc/update-motd.d/*
-    # For focal
+    # Fix focal permissions
     [ -f "usr/lib/sudo/sudoers.so" ] && sudo chown 0 usr/lib/sudo/sudoers.so
     [ -f "usr/lib/sudo/sudoers.so" ] && sudo chmod 644 usr/lib/sudo/sudoers.so
     [ -f "usr/lib/policykit-1/polkit-agent-helper-1" ] && sudo chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
-    # For jammy
+    # Fix jammy permissions
     [ -f "usr/libexec/sudo/sudoers.so" ] && sudo chown 0 usr/libexec/sudo/sudoers.so
     [ -f "usr/libexec/sudo/sudoers.so" ] && sudo chmod 644 usr/libexec/sudo/sudoers.so
     [ -f "usr/libexec/polkit-agent-helper-1" ] && sudo chmod 4755 usr/libexec/polkit-agent-helper-1
