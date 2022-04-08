@@ -104,9 +104,10 @@ runs:
           make_command=" -d"
           [ -n ${{ inputs.armbian_soc }} ] && make_command="${make_command} -b ${{ inputs.armbian_soc }}"
           [ -n ${{ inputs.armbian_kernel }} ] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
-          [ -n ${{ inputs.version_branch }} ] && make_command="${make_command} -v ${{ inputs.version_branch }}"
           [ -n ${{ inputs.auto_kernel }} ] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
+          [ -n ${{ inputs.version_branch }} ] && make_command="${make_command} -v ${{ inputs.version_branch }}"
           [ -n ${{ inputs.armbian_size }} ] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
+          [ -n ${{ inputs.armbian_fstype }} ] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
           sudo chmod +x rebuild
           sudo ./rebuild ${make_command}
 
@@ -146,11 +147,10 @@ runs:
           fi
 
           make_command=" -d"
-          [ -n ${{ inputs.kernel_repo }} ] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
           [ -n ${{ inputs.kernel_version }} ] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
           [ -n ${{ inputs.kernel_auto }} ] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
           [ -n ${{ inputs.kernel_sign }} ] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
-
+          [ -n ${{ inputs.kernel_repo }} ] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
           sudo chmod +x recompile
           sudo ./recompile ${make_command}
 
