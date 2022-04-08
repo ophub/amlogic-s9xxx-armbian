@@ -20,10 +20,10 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 | s905d | [MECOOL-KI-Pro](https://www.gearbest.com/tv-box-mini-pc/pp_629409.html), Phicomm-N1 | All | armbian_aml_s905d_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://www.zte.com.cn/global/products/cocloud/201707261551/IP-STB/ZXV10-B860H), [TBee-Box](https://www.tbee.com/product/tbee-box/) | All | armbian_aml_s905x_*.img |
 | s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.4.y | armbian_aml_s905w_*.img |
-| s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | 5.15.y | armbian_aml_s905l3a_*.img |
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-Pro+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | All | armbian_aml_s905_*.img |
+| s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | 5.15.y | armbian_aml_s905l3a_*.img |
 
-💡Tip: The current box of ***`s905 and s905l3a`*** can only be used in `TF/SD/USB`, and other types of boxes can also be used in `EMMC` at the same time. The ***`s905w`*** boxs currently only support `5.4.y` kernels, Cannot use kernel version 5.10.y and above, Other devices can be freely selected. Please refer to the [instructions](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md) for dtb and u-boot of each device.
+💡Tip: The current ***`s905w`*** series of boxes only support the use of the `5.4.y` kernel, and cannot use the 5.10.y or higher version. Other types of boxes can use optional kernel versions. Currently ***`s905 and s905l3a`*** boxes can only be used in `TF/SD/USB`, other types of boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md) for dtb and u-boot of each device.
 
 ## Install to EMMC and update instructions
 
@@ -162,9 +162,9 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 | ------ | ---------- | ----------------------------------------- |
 | -d     | Defaults   | Compile all cores and all firmware types. |
 | -b     | BuildSoC   | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . You can use these codes: `a311d`, `s905x3`, `s905x2`, `s905l3a`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-m8s` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-m8s` is `s912-mecool-m8s-pro-l`, `s905d-ki` is `s912-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3`. |
-| -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.4.180` . Multiple kernel use `_` connection such as `-k 5.15.25_5.4.180` |
 | -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.4.180 version. If there is the latest version of 5.4 same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 
@@ -224,9 +224,9 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 |--------------------|-------------------|---------------------------------------------------------------|
 | armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
 | armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged box, function reference `-b`    |
-| version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
 | armbian_kernel     | 5.15.25_5.4.180  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k` |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
+| version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
 | armbian_size       | 2748             | Set the size of the firmware ROOTFS partition, function reference `-s` |
 | armbian_fstype     | ext4             | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
 
