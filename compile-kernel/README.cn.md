@@ -66,10 +66,10 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | 参数               | 默认值            | 说明                                                      |
 |-------------------|------------------|-----------------------------------------------------------|
 | build_target      | kernel           | 固定参数 `kernel`，设置编译目标为内核。                        |
-| kernel_repo       | unifreq          | 指定编译内核的源代码仓库。默认值为 `unifreq` 。功能参考 `-r`      |
 | kernel_version    | 5.15.25_5.4.180 | 指定 [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) 名称，如 `5.4.180`。功能参考 `-k` |
 | kernel_auto       | true             | 设置是否自动采用同系列最新版本内核。默认值为 `true`。功能参考 `-a`  |
 | kernel_sign       | -meson64-dev     | 设置内核自定义签名。默认值为 `-meson64-dev`。功能参考 `-n`       |
+| kernel_repo       | unifreq          | 指定编译内核的源代码仓库。默认值为 `unifreq` 。功能参考 `-r`      |
 | kernel_config     | 无               | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.4` 系列内核的模板可命名为以 `config-5.4` 开头的各种名字，如 `config-5.4` 、 `config-5.4.174` 或者 `config-5.4.174-good-luck` 等，有多个以 `config-5.4` 为开头的文件时，将使用版本号最大的文件。 |
 
 - GitHub Action 输出变量说明
