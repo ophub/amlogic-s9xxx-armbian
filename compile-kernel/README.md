@@ -66,10 +66,10 @@ The relevant parameters correspond to the `local compilation commands`, please r
 | Parameter | Defaults | Description |
 | ---- | ---- | ---- |
 | build_target   | kernel   | Fixed parameter `kernel`, set the compilation target to the kernel. |
-| kernel_repo    | unifreq  | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
 | kernel_version | 5.15.25_5.4.180 | Specify [kernel](https://cdn.kernel.org/pub/linux/kernel/v5.x/) name, such as `5.4.180`. Function reference `-k` |
 | kernel_auto | true | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
 | kernel_sign | -meson64-dev | Set the kernel custom signature. The default is `-meson64-dev`. Function reference `-n` |
+| kernel_repo    | unifreq  | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
 | kernel_config | null | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . The kernel configuration templates of each series stored in this directory must start with the name of `config-5.x`. For example, templates for compiling `5.4` series kernels can be named with various names starting with `config-5.4`, such as `config-5.4`, `config-5.4.174` or `config-5.4.174-good-luck`, etc., When there are multiple files starting with `config-5.4`, the file with the highest version number will be used. |
 
 - GitHub Action Output variable description
