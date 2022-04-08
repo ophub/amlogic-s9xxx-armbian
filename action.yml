@@ -8,16 +8,20 @@ inputs:
     required: false
     default: "armbian"
   # For build armbian -----
+  armbian_path:
+    description: "Set armbian original file path."
+    required: false
+    default: "build/output/images/*.img"
   armbian_soc:
     description: "Set Amlogic SoC."
     required: false
     default: "s905d_s905x3"
   armbian_kernel:
-    description: "Set kernel."
+    description: "Set kernel version."
     required: false
     default: "5.15.25_5.4.180"
   version_branch:
-    description: "Set kernel."
+    description: "Set kernel branch."
     required: false
     default: "stable"
   auto_kernel:
@@ -32,15 +36,7 @@ inputs:
     description: "Set armbian rootfs type."
     required: false
     default: "ext4"
-  armbian_path:
-    description: "Set armbian original file path."
-    required: false
-    default: "build/output/images/*.img"
   # For compile kernel -----
-  kernel_repo:
-    description: "select kernel repository"
-    required: false
-    default: "unifreq"
   kernel_version:
     description: "select kernel version"
     required: false
@@ -53,6 +49,10 @@ inputs:
     description: "Set the kernel custom signature"
     required: false
     default: "-meson64-dev"
+  kernel_repo:
+    description: "select kernel repository"
+    required: false
+    default: "unifreq"
   kernel_config:
     description: "Set the path of kernel .config"
     required: false
