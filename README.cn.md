@@ -238,9 +238,9 @@ sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058   | 打包日期                    |
 | ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
 
-## 编译自定义内核
+## 编译内核
 
-自定义内核的编译方法详见 [compile-kernel](compile-kernel/README.cn.md)
+内核的编译方法详见 [compile-kernel](compile-kernel/README.cn.md)
 
 ```yaml
 - name: Compile the kernel for Amlogic s9xxx
