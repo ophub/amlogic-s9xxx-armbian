@@ -156,6 +156,10 @@ armbian-ddbr
 
 根据提示输入 `b` 进行系统备份，输入 `r` 进行系统恢复。
 
+- ### 更多使用说明
+
+详见 [armbian-docs](build-armbian/armbian-docs/README.md)
+
 ## 打包命令的相关参数说明
 
 | 参数  | 含义       | 说明        |
