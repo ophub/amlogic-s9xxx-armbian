@@ -158,7 +158,7 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 
 - ### More instructions for use
 
-See [armbian-docs](build-armbian/armbian-docs/README.md) for details.
+In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs) for some common problems that may be encountered.
 
 ## Detailed build compile command
 
