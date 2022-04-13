@@ -158,7 +158,7 @@ armbian-ddbr
 
 - ### 更多使用说明
 
-详见 [armbian-docs](build-armbian/armbian-docs/README.md)
+在 Armbian 的使用中，一些可能遇到的常见问题详见 [armbian-docs](build-armbian/armbian-docs/README.cn.md)
 
 ## 打包命令的相关参数说明
 
