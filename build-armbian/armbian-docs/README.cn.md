@@ -16,16 +16,13 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
   - [6. 保存固件](#6-保存固件)
-    - [6.1 保存到 Github Actions](#61-保存到-github-actions)
-    - [6.2 保存到 GitHub Releases](#62-保存到-github-releases)
-    - [6.3 保存到第三方](#63-保存到第三方)
   - [7. 下载固件](#7-下载固件)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
   - [9. 更新 Armbian 内核](#9-更新-armbian-内核)
   - [10. 常见问题](#10-常见问题)
     - [10.1 每个盒子的 dtb 和 u-boot 对应关系表](#101-每个盒子的-dtb-和-u-boot-对应关系表)
-    - [10.2 如何恢复原安卓 TV 系统](#102-如何恢复原安卓-tv-系统)
-    - [10.3 LED 屏显示控制说明](#103-led-屏显示控制说明)
+    - [10.2 LED 屏显示控制说明](#102-led-屏显示控制说明)
+    - [10.3 如何恢复原安卓 TV 系统](#103-如何恢复原安卓-tv-系统)
     - [10.4 设置盒子从 USB/TF/SD 中启动](#104-设置盒子从-usbtfsd-中启动)
     - [10.5 禁用红外接收器](#105-禁用红外接收器)
 
@@ -98,21 +95,7 @@ schedule:
 
 ## 6. 保存固件
 
-固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Actions 和 Releases 里面，或者上传到第三方（ 如 WeTransfer ）。
-
-现在 github 里 Actions 的最长保存期是 90 天，Releases 是永久，第三方如 WeTransfer 是 7 天。首先我们感谢这些服务商提供的免费支持，但是也请各位节约使用，我们提倡合理使用免费服务。
-
-### 6.1 保存到 Github Actions
-
-```yaml
-- name: Upload artifact to Actions
-  uses: kittaakos/upload-artifact-as-is@master
-  if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-  with:
-    path: ${{ env.FILEPATH }}/
-```
-
-### 6.2 保存到 GitHub Releases
+固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Releases 里面。
 
 ```yaml
 - name: Upload Armbian Firmware to Release
@@ -128,16 +111,6 @@ schedule:
       * Firmware information
       Default username: root
       Default password: 1234
-```
-### 6.3 保存到第三方
-
-```yaml
-- name: Upload Armbian Firmware to WeTransfer
-  if: steps.build.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-  run: |
-    curl -fsSL git.io/file-transfer | sh
-    ./transfer wet -s -p 16 --no-progress ${{ env.FILEPATH }}/Armbian_* 2>&1 | tee wetransfer.log
-    echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
 ```
 
 ## 7. 下载固件
@@ -183,17 +156,45 @@ armbian-update
 
 请查阅[说明](config_correspondence_of_amlogic_s9xxx_tv_box.md)
 
-### 10.2 如何恢复原安卓 TV 系统
-
-请查阅[说明](how_to_restore_the_original_android_tv_system.md)
-
-### 10.3 LED 屏显示控制说明
+### 10.2 LED 屏显示控制说明
 
 请查阅[说明](led_screen_display_control.md)
 
+### 10.3 如何恢复原安卓 TV 系统
+
+- 一般情况下，重新插入电源，如果可以从 USB 中启动，只要重新安装即可，多试几次。
+
+- 如果接入显示器后，屏幕是黑屏状态，无法从 USB 启动，就需要进行盒子的短接初始化了。先将盒子恢复到原来的安卓系统，再重新刷入 Armbian 系统。首先下载 [amlogic_usb_burning_tool](https://github.com/ophub/script/releases/download/dev/amlogic_usb_burning_tool_v3.2.0_and_driver.tar.gz) 系统恢复工具并安装好。准备一条 [USB 双公头数据线](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png)，准备一个 [曲别针](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png)。
+
+- 以 x96max+ 为例，在盒子的主板上确认 [短接点](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) 的位置，下载盒子的 [Android TV 固件包](https://xdafirmware.com/x96-max-plus-2)。
+
+```
+操作方法：
+
+1. 打开刷机软件 USB Burning Tool:
+   [ 文件 → 导入固件包 ]: X96Max_Plus2_20191213-1457_ATV9_davietPDA_v1.5.img
+   [ 选择 ]：擦除 flash
+   [ 选择 ]：擦除 bootloader
+   点击 [ 开始 ] 按钮
+2. 使用 [ 曲别针 ] 将盒子主板上的 [ 两个短接点进行短接连接 ]，
+   并同时使用 [ USB 双公头数据线 ] 将 [ 盒子 ] 与 [ 电脑 ] 进行连接。
+3. 当看到 [ 进度条开始走动 ] 后，拿走曲别针，不再短接。
+4. 当看到 [ 进度条 100% ], 则刷机完成，盒子已经恢复成 Android TV 系统。
+   点击 [ 停止 ] 按钮, 拔掉 [ 盒子 ] 和 [ 电脑 ] 之间的 [ USB 双公头数据线] 。
+5. 如果以上某个步骤失败，就再来一次，直至成功。
+   如果进度条没有走动，可以尝试插入电源。通长情况下不用电源支持供电，只 USB 双公头的供电即可满足刷机要求。
+```
+
+当完成恢复出厂设置，盒子已经恢复成 Android TV 系统，其他安装 Armbian 系统的操作，就和你之前第一次安装系统时的要求一样了，再来一遍即可。
+
 ### 10.4 设置盒子从 USB/TF/SD 中启动
 
-请查阅[说明](set_the_box_to_boot_from_usb_tf_sd.md)
+- 把刷好固件的 USB/TF/SD 插入盒子。
+- 开启开发者模式: 设置 → 关于本机 → 版本号 (如: X96max plus...), 在版本号上快速连击 5 次鼠标左键, 看到系统显示 `开启开发者模式` 的提示。
+- 开启 USB 调试模式: 系统 → 高级选选 → 开发者选项 (设置 `开启USB调试` 为启用)。启用 `ADB` 调试。
+- 安装 ADB 工具：下载 [adb](https://github.com/ophub/script/releases/download/dev/adb.tar.gz) 并解压，将 `adb.exe`，`AdbWinApi.dll`，`AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，然后打开 `cmd` 命令面板，使用 `adb --version` 命令，如果有显示就表示可以使用了。
+- 进入 `cmd` 命令模式。输入 `adb connect 192.168.1.137` 命令（其中的 ip 根据你的盒子修改，可以到盒子所接入的路由器设备里查看），如果链接成功会显示 `connected to 192.168.1.137:5555`
+- 输入 `adb shell reboot update` 命令，盒子将重启并从你插入的 USB/TF/SD 启动，从浏览器访问固件的 IP 地址，或者 SSH 访问即可进入固件。
 
 ### 10.5 禁用红外接收器
 
@@ -204,4 +205,3 @@ blacklist meson_ir
 ```
 
 至 `/etc/modprobe.d/blacklist.conf` 并重启。
-
