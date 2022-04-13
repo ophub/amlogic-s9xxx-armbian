@@ -16,16 +16,13 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [5.1 Manual compilation](#51-manual-compilation)
     - [5.2 Compile at the agreed time](#52-compile-at-the-agreed-time)
   - [6. Save the firmware](#6-save-the-firmware)
-    - [6.1 Save to GitHub Actions](#61-save-to-github-actions)
-    - [6.2 Save to GitHub Releases](#62-save-to-github-releases)
-    - [6.3 Save to a third party](#63-save-to-a-third-party)
   - [7. Download the firmware](#7-download-the-firmware)
   - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
   - [9. Update Armbian Kernel](#9-update-armbian-kernel)
   - [10. common problem](#10-common-problem)
     - [10.1 dtb and u-boot correspondence table for each box](#101-dtb-and-u-boot-correspondence-table-for-each-box)
-    - [10.2 How to restore the original Android TV system](#102-how-to-restore-the-original-android-tv-system)
-    - [10.3 LED screen display control instructions](#103-led-screen-display-control-instructions)
+    - [10.2 LED screen display control instructions](#102-led-screen-display-control-instructions)
+    - [10.3 How to restore the original Android TV system](#103-how-to-restore-the-original-android-tv-system)
     - [10.4 Set the box to boot from USB/TF/SD](#104-set-the-box-to-boot-from-usbtfsd)
     - [10.5 Disable infrared receiver](#105-disable-infrared-receiver)
 
@@ -98,21 +95,7 @@ schedule:
 
 ## 6. Save the firmware
 
-The settings saved by the firmware are also controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. We will automatically upload the compiled firmware to the `Actions` and `Releases` officially provided by `GitHub` through scripts, or upload it to a `third party` (such as WeTransfer).
-
-Now the longest storage period of `Actions in GitHub is 90 days`, `Releases is permanent`, and third parties such as WeTransfer are 7 days. First of all, we thank these service providers for their free support, but we also ask you to use it sparingly. We advocate the reasonable use of free services.
-
-### 6.1 Save to GitHub Actions
-
-```yaml
-- name: Upload artifact to Actions
-  uses: kittaakos/upload-artifact-as-is@master
-  if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-  with:
-    path: ${{ env.FILEPATH }}/
-```
-
-### 6.2 Save to GitHub Releases
+The settings saved by the firmware are also controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. We will automatically upload the compiled firmware to the `Releases` officially provided by `GitHub` through scripts.
 
 ```yaml
 - name: Upload Armbian Firmware to Release
@@ -128,16 +111,6 @@ Now the longest storage period of `Actions in GitHub is 90 days`, `Releases is p
       * Firmware information
       Default username: root
       Default password: 1234
-```
-### 6.3 Save to a third party
-
-```yaml
-- name: Upload Armbian Firmware to WeTransfer
-  if: steps.build.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-  run: |
-    curl -fsSL git.io/file-transfer | sh
-    ./transfer wet -s -p 16 --no-progress ${{ env.FILEPATH }}/Armbian_* 2>&1 | tee wetransfer.log
-    echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
 ```
 
 ## 7. Download the firmware
@@ -183,17 +156,46 @@ In the use of Armbian, some common problems that may be encountered are summariz
 
 Please refer to [Description](config_correspondence_of_amlogic_s9xxx_tv_box.md)
 
-### 10.2 How to restore the original Android TV system
-
-Please refer to [Description](how_to_restore_the_original_android_tv_system.md)
-
-### 10.3 LED screen display control instructions
+### 10.2 LED screen display control instructions
 
 Please refer to [Description](led_screen_display_control.md)
 
+### 10.3 How to restore the original Android TV system
+
+- Under normal circumstances, re-insert the USB hard disk and install it again.
+
+- If you cannot start the Armbian system from the USB hard disk again, connect the Amlogic s9xxx tv box to the computer monitor. If the screen is completely black and there is nothing, you need to restore the Amlogic s9xxx tv box to factory settings first, and then reinstall it. First download the [amlogic_usb_burning_tool](https://github.com/ophub/script/releases/download/dev/amlogic_usb_burning_tool_v3.2.0_and_driver.tar.gz) system recovery tool and install it. Prepare a [USB dual male data cable](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png), Prepare a [paper clip](https://www.ebay.com/itm/133577738858).
+
+- Take x96max+ as an example. Find the two [short-circuit points](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) on the motherboard, Download the [Android TV firmware](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png).
+
+```
+Operation method:
+
+1. Open the USB Burning Tool:
+   [ File → Import image ]: X96Max_Plus2_20191213-1457_ATV9_davietPDA_v1.5.img
+   [ Check ]：Erase flash
+   [ Check ]：Erase bootloader
+   Click the [ Start ] button
+2. Use a [ paper clip ] to connect the [ two shorting points ] on the main board of the box,
+   and use a [ USB dual male data cable ] to connect the [ box ] to the [ computer ] at the same time.
+3. Loosen the short contact after seeing the [ progress bar moving ].
+4. After the [ progress bar is 100% ], the restoration of the original Android TV system is completed.
+   Click [ stop ], unplug the [ USB male-to-male data cable ] and [ power ].
+5. If the progress bar is interrupted, repeat the above steps until it succeeds.
+   If the progress bar does not respond after the short-circuit, plug in the [ power ] supply after the short-circuit.
+   Generally, there is no need to plug in the power supply.
+```
+
+When the factory reset is completed, the box has been restored to the Android TV system, and other operations to install the Armbian system are the same as the requirements when you installed the system for the first time before, just do it again.
+
 ### 10.4 Set the box to boot from USB/TF/SD
 
-Please refer to [Description](set_the_box_to_boot_from_usb_tf_sd.md)
+- Write the firmware to USB/TF/SD, insert it into the box after writing.
+- Open the developer mode: Settings → About this machine → Version number (for example: X96max plus...), click on the version number for 5 times in quick succession, See the prompt of `Enable Developer Mode` displayed by the system.
+- Turn on USB debugging: System → Advanced options → Developer options again (after entering, confirm that the status is on, and the `USB debugging` status in the list is also on). Enable `ADB` debugging.
+- Install ADB tools: Download [adb](https://github.com/ophub/script/releases/download/dev/adb.tar.gz) and unzip it, copy the three files `adb.exe`, `AdbWinApi.dll`, and `AdbWinUsbApi.dll` to the two files `system32` and `syswow64` under the directory of `c://windows/` Folder, then open the `cmd` command panel, use `adb --version` command, if it is displayed, it is ready to use.
+- Enter the `cmd` command mode. Enter the `adb connect 192.168.1.137` command (the ip is modified according to your box, and you can check it in the router device connected to the box), If the link is successful, it will display `connected to 192.168.1.137:5555`
+- Enter the `adb shell reboot update` command, the box will restart and boot from the USB/TF/SD you inserted, access the firmware IP address from a browser, or SSH to enter the firmware.
 
 ### 10.5 Disable infrared receiver
 
@@ -204,4 +206,3 @@ blacklist meson_ir
 ```
 
 to `/etc/modprobe.d/blacklist.conf` and reboot.
-
