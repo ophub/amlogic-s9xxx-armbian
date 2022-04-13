@@ -1,4 +1,4 @@
-# 使用 GitHub Actions 云编译 OpenWrt
+# 使用 GitHub Actions 云编译 Armbian
 
 查看英文说明 | [View English description](README.md)
 
@@ -6,7 +6,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 # 目录
 
-- [使用 GitHub Actions 云编译 OpenWrt](#使用-github-actions-云编译-openwrt)
+- [使用 GitHub Actions 云编译 Armbian](#使用-github-actions-云编译-armbian)
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
   - [2. 设置隐私变量 GITHUB_TOKEN](#2-设置隐私变量-github_token)
@@ -20,9 +20,6 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [6.2 保存到 GitHub Releases](#62-保存到-github-releases)
     - [6.3 保存到第三方](#63-保存到第三方)
   - [7. 下载固件](#7-下载固件)
-    - [7.1 从 Github Actions 下载](#71-从-github-actions-下载)
-    - [7.2 从 Github Releases 下载](#72-从-github-releases-下载)
-    - [7.3 从第三方下载](#73-从第三方下载)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
   - [9. 更新 Armbian 内核](#9-更新-armbian-内核)
   - [10. 常见问题](#10-常见问题)
@@ -51,11 +48,11 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 
 ## 3. Fork 仓库并设置 RELEASES_TOKEN
 
-现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-openwrt ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-openwrt 。在右上角的 Settings > Secrets > New repostiory secret ( Name: RELEASES_TOKEN, Value: 填写刚才GITHUB_TOKEN的值 )，保存。图示如下：
+现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-armbian ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-armbian 。在右上角的 Settings > Secrets > New repostiory secret ( Name: RELEASES_TOKEN, Value: 填写刚才GITHUB_TOKEN的值 )，保存。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418571-12467f80-7a04-11eb-878e-012c2ba11772.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163203032-f044c63f-d113-4076-bf94-41f86c7dd0ce.png width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/109418579-1c687e00-7a04-11eb-9941-3d37be9012ef.jpg width="300" />
 </div>
@@ -85,9 +82,9 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 在自己仓库的导航栏中，点击 Actions 按钮，再依次点击 Build armbian > Run workflow > Run workflow ，开始编译，等待大约 3 个小时，全部流程都结束后就完成编译了。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418662-a0226a80-7a04-11eb-97f6-aeb893336e8c.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418663-a31d5b00-7a04-11eb-8d34-57d430696901.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418666-a7497880-7a04-11eb-9ed0-be738e22f7ae.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163203938-e7762b09-e6b8-4cf5-b1f1-9c67c1a29953.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204044-9c7a7429-47ee-4fce-b7dd-e217bebf6133.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204127-6b16b558-7e78-4c22-a28a-7b37b5a34fa3.png width="300" />
 </div>
 
 ### 5.2 定时编译
@@ -145,39 +142,11 @@ schedule:
 
 ## 7. 下载固件
 
-下载我们已经编译好并上传至相关存储位置的 OpenWrt 固件。
-
-### 7.1 从 Github Actions 下载
-
-点击仓库导航条里的 Actions 按钮，在 All workflows 列表里，点击已经编译完成的固件列表，在里面的固件列表里，选择和自己盒子型号对应的固件。图示如下：
-
-<div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418782-08714c00-7a05-11eb-9556-91575640a4bb.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418785-0ad3a600-7a05-11eb-9fdd-519835a14eaa.jpg width="300" />
-</div>
-
-### 7.2 从 Github Releases 下载
-
 从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的固件。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418828-466e7000-7a05-11eb-8f69-a89a1d158a4b.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418841-55edb900-7a05-11eb-9650-7100ebd6042c.jpg width="300" />
-</div>
-
-### 7.3 从第三方下载
-
-在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里，我们默认关闭了上传至第三方的选项，如果你需要，把 false 改为 ture ，下次编译完成就上传到第三方了。第三方的网址可以在固件编译流程的日志里看到，也可以输出到编译信息里。
-
-```yaml
-UPLOAD_COWTRANSFER: false
-UPLOAD_WETRANSFER: false
-```
-
-上传至第三方的支持来自 https://github.com/Mikubill/transfer ，如果你需要，可以根据他的说明添加更多第三方支持（控制你的创造力，不要浪费太多的免费资源）。图示如下：
-
-<div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418921-b5e45f80-7a05-11eb-80ba-02edb0698270.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204879-4898babf-fa00-4e63-89ea-235129e2ce1d.png width="300" />
 </div>
 
 ## 8. 安装 Armbian 到 EMMC
