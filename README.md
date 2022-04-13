@@ -156,6 +156,16 @@ armbian-ddbr
 
 According to the prompt, enter `b` to perform system backup, and enter `r` to perform system recovery.
 
+ ### Disable infrared receiver
+
+Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your box off by mistake. To completely disable IR, add the line:
+
+```
+blacklist meson_ir
+```
+
+to `/etc/modprobe.d/blacklist.conf` and reboot.
+
 ## Detailed build compile command
 
 | Parameter | Meaning | Description |
