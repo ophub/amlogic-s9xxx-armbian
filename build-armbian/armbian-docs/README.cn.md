@@ -1,0 +1,238 @@
+# 使用 GitHub Actions 云编译 OpenWrt
+
+查看英文说明 | [View English description](README.md)
+
+Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非常不错的虚拟服务器环境，基于它可以进行构建、测试、打包、部署项目。对于公开仓库可免费无时间限制地使用，且单次编译时间长达 6 个小时，这对于编译 Armbian 来说是够用的（我们一般在3小时左右可以完成一次编译工作）。分享只是为了交流经验，不足的地方请大家理解，请不要在网络上发起各种不好的攻击行为，也不要恶意使用 GitHub Actions。
+
+# 目录
+
+- [使用 GitHub Actions 云编译 OpenWrt](#使用-github-actions-云编译-openwrt)
+- [目录](#目录)
+  - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
+  - [2. 设置隐私变量 GITHUB_TOKEN](#2-设置隐私变量-github_token)
+  - [3. Fork 仓库并设置 RELEASES_TOKEN](#3-fork-仓库并设置-releases_token)
+  - [4. 个性化 Armbian 固件定制文件说明](#4-个性化-armbian-固件定制文件说明)
+  - [5. 编译固件](#5-编译固件)
+    - [5.1 手动编译](#51-手动编译)
+    - [5.2 定时编译](#52-定时编译)
+  - [6. 保存固件](#6-保存固件)
+    - [6.1 保存到 Github Actions](#61-保存到-github-actions)
+    - [6.2 保存到 GitHub Releases](#62-保存到-github-releases)
+    - [6.3 保存到第三方](#63-保存到第三方)
+  - [7. 下载固件](#7-下载固件)
+    - [7.1 从 Github Actions 下载](#71-从-github-actions-下载)
+    - [7.2 从 Github Releases 下载](#72-从-github-releases-下载)
+    - [7.3 从第三方下载](#73-从第三方下载)
+  - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
+  - [9. 更新 Armbian 内核](#9-更新-armbian-内核)
+  - [10. 常见问题](#10-常见问题)
+    - [10.1 每个盒子的 dtb 和 u-boot 对应关系表](#101-每个盒子的-dtb-和-u-boot-对应关系表)
+    - [10.2 如何恢复原安卓 TV 系统](#102-如何恢复原安卓-tv-系统)
+    - [10.3 LED 屏显示控制说明](#103-led-屏显示控制说明)
+    - [10.4 设置盒子从 USB/TF/SD 中启动](#104-设置盒子从-usbtfsd-中启动)
+    - [10.5 禁用红外接收器](#105-禁用红外接收器)
+
+## 1. 注册自己的 Github 的账户
+
+注册自己的账户，以便进行固件个性化定制的继续操作。点击 giuhub.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
+
+## 2. 设置隐私变量 GITHUB_TOKEN
+
+设置 Github 隐私变量 `GITHUB_TOKEN` 。在固件编译完成后，我们需要上传固件到 Releases ，我们根据 Github 官方的要求设置这个变量，方法如下：
+Personal center: Settings > Developer settings > Personal access tokens > Generate new token ( Name: GITHUB_TOKEN, Select: public_repo )。其他选项根据自己需要可以多选。提交保存，复制系统生成的加密 KEY 的值，先保存到自己电脑的记事本，下一步会用到这个值。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418474-85032b00-7a03-11eb-85a2-759b0320cc2a.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418479-8b91a280-7a03-11eb-8383-9d970f4fffb6.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418483-90565680-7a03-11eb-8320-0df1174b0267.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418493-9815fb00-7a03-11eb-862e-deca4a976374.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418485-93514700-7a03-11eb-848d-36de784a4438.jpg width="300" />
+</div>
+
+## 3. Fork 仓库并设置 RELEASES_TOKEN
+
+现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-openwrt ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-openwrt 。在右上角的 Settings > Secrets > New repostiory secret ( Name: RELEASES_TOKEN, Value: 填写刚才GITHUB_TOKEN的值 )，保存。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418571-12467f80-7a04-11eb-878e-012c2ba11772.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418579-1c687e00-7a04-11eb-9941-3d37be9012ef.jpg width="300" />
+</div>
+
+## 4. 个性化 Armbian 固件定制文件说明
+
+固件编译的流程在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译固件时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
+
+```yaml
+- name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
+  id: compile
+  run: |
+    cd build/
+    sudo chmod +x compile.sh
+    sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
+                      BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
+                      CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+    echo "::set-output name=status::success"
+```
+
+## 5. 编译固件
+
+固件编译的方式很多，可以设置定时编译，手动编译，或者设置一些特定事件来触发编译。我们先从简单的操作开始。
+
+### 5.1 手动编译
+
+在自己仓库的导航栏中，点击 Actions 按钮，再依次点击 Build armbian > Run workflow > Run workflow ，开始编译，等待大约 3 个小时，全部流程都结束后就完成编译了。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418662-a0226a80-7a04-11eb-97f6-aeb893336e8c.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418663-a31d5b00-7a04-11eb-8d34-57d430696901.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418666-a7497880-7a04-11eb-9ed0-be738e22f7ae.jpg width="300" />
+</div>
+
+### 5.2 定时编译
+
+在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里，使用 Cron 设置定时编译，5 个不同位置分别代表的意思为 分钟 (0 - 59) / 小时 (0 - 23) / 日期 (1 - 31) / 月份 (1 - 12) / 星期几 (0 - 6)(星期日 - 星期六)。通过修改不同位置的数值来设定时间。系统默认使用 UTC 标准时间，请根据你所在国家时区的不同进行换算。
+
+```yaml
+schedule:
+  - cron: '0 17 * * *'
+```
+
+## 6. 保存固件
+
+固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Actions 和 Releases 里面，或者上传到第三方（ 如 WeTransfer ）。
+
+现在 github 里 Actions 的最长保存期是 90 天，Releases 是永久，第三方如 WeTransfer 是 7 天。首先我们感谢这些服务商提供的免费支持，但是也请各位节约使用，我们提倡合理使用免费服务。
+
+### 6.1 保存到 Github Actions
+
+```yaml
+- name: Upload artifact to Actions
+  uses: kittaakos/upload-artifact-as-is@master
+  if: steps.build.outputs.status == 'success' && env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+  with:
+    path: ${{ env.FILEPATH }}/
+```
+
+### 6.2 保存到 GitHub Releases
+
+```yaml
+- name: Upload Armbian Firmware to Release
+  uses: ncipollo/release-action@v1
+  if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+  with:
+    tag: Armbian_${{ env.FILE_DATE }}
+    artifacts: ${{ env.FILEPATH }}/*
+    allowUpdates: true
+    token: ${{ secrets.GITHUB_TOKEN }}
+    body: |
+      This is Armbian firmware for Amlogic s9xxx tv box
+      * Firmware information
+      Default username: root
+      Default password: 1234
+```
+### 6.3 保存到第三方
+
+```yaml
+- name: Upload Armbian Firmware to WeTransfer
+  if: steps.build.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
+  run: |
+    curl -fsSL git.io/file-transfer | sh
+    ./transfer wet -s -p 16 --no-progress ${{ env.FILEPATH }}/Armbian_* 2>&1 | tee wetransfer.log
+    echo "WET_URL=$(cat wetransfer.log | grep https | cut -f3 -d" ")" >> $GITHUB_ENV
+```
+
+## 7. 下载固件
+
+下载我们已经编译好并上传至相关存储位置的 OpenWrt 固件。
+
+### 7.1 从 Github Actions 下载
+
+点击仓库导航条里的 Actions 按钮，在 All workflows 列表里，点击已经编译完成的固件列表，在里面的固件列表里，选择和自己盒子型号对应的固件。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418782-08714c00-7a05-11eb-9556-91575640a4bb.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418785-0ad3a600-7a05-11eb-9fdd-519835a14eaa.jpg width="300" />
+</div>
+
+### 7.2 从 Github Releases 下载
+
+从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的固件。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418828-466e7000-7a05-11eb-8f69-a89a1d158a4b.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418841-55edb900-7a05-11eb-9650-7100ebd6042c.jpg width="300" />
+</div>
+
+### 7.3 从第三方下载
+
+在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里，我们默认关闭了上传至第三方的选项，如果你需要，把 false 改为 ture ，下次编译完成就上传到第三方了。第三方的网址可以在固件编译流程的日志里看到，也可以输出到编译信息里。
+
+```yaml
+UPLOAD_COWTRANSFER: false
+UPLOAD_WETRANSFER: false
+```
+
+上传至第三方的支持来自 https://github.com/Mikubill/transfer ，如果你需要，可以根据他的说明添加更多第三方支持（控制你的创造力，不要浪费太多的免费资源）。图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418921-b5e45f80-7a05-11eb-80ba-02edb0698270.jpg width="300" />
+</div>
+
+## 8. 安装 Armbian 到 EMMC
+
+登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+
+```yaml
+armbian-install
+```
+
+默认将安装主线 u-boot，以便支持 5.10 及以上内核的使用。如果选择不安装，请在第 `1` 个输入参数中指定，如 `armbian-install no`
+
+## 9. 更新 Armbian 内核
+
+登录 Armbian 系统 → 输入命令：
+
+```yaml
+# 使用 root 用户运行 (sudo -i)
+# 如果不指定其他参数，以下更新命令将更新到当前同系列内核的最新版本。
+armbian-update
+```
+
+如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。你也可以查询[可选内核](https://github.com/ophub/kernel/tree/main/pub/stable)版本，进行指定版本更新：`armbian-update 5.4.180`。在设备支持的可选内核里可以自由更新，如从 5.4.180 内核更新为 5.15.25 内核。内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 dev` 。默认会自动安装主线 u-boot，这对使用 5.10 以上版本的内核有更好的支持，如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.4.180 stable no`
+
+内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。在编译应用程序的时候，在 `GCC` 的 `CFLAG` 参数中添加 `-I /usr/local/include` 即可找到头文件。
+
+内核更新脚本会在开发中不断更新，可使用此命令同步更新本地的脚本：`wget -O /usr/sbin/armbian-update git.io/armbian-update` 。或者直接使用服务器端最新脚本进行内核更新：`bash <(curl -fsSL git.io/armbian-update) 5.4.180`
+
+## 10. 常见问题
+
+在 Armbian 的使用中，一些可能遇到的常见问题汇总如下。
+
+### 10.1 每个盒子的 dtb 和 u-boot 对应关系表
+
+请查阅[说明](config_correspondence_of_amlogic_s9xxx_tv_box.md)
+
+### 10.2 如何恢复原安卓 TV 系统
+
+请查阅[说明](how_to_restore_the_original_android_tv_system.md)
+
+### 10.3 LED 屏显示控制说明
+
+请查阅[说明](led_screen_display_control.md)
+
+### 10.4 设置盒子从 USB/TF/SD 中启动
+
+请查阅[说明](set_the_box_to_boot_from_usb_tf_sd.md)
+
+### 10.5 禁用红外接收器
+
+默认情况下启用对红外接收器的支持，但如果您将电视盒用作服务器，那么您可能希望禁用 IR 内核模块以防止错误地关闭您的盒子。 要完全禁用 IR，请添加以下行：
+
+```yaml
+blacklist meson_ir
+```
+
+至 `/etc/modprobe.d/blacklist.conf` 并重启。
+
