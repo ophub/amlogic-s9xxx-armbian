@@ -1,4 +1,4 @@
-# Use GitHub Actions to compile OpenWrt
+# Use GitHub Actions to compile Armbian
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
@@ -6,7 +6,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
 
 # Tutorial directory
 
-- [Use GitHub Actions to compile OpenWrt](#use-github-actions-to-compile-openwrt)
+- [Use GitHub Actions to compile Armbian](#use-github-actions-to-compile-armbian)
 - [Tutorial directory](#tutorial-directory)
   - [1. Register your own GitHub account](#1-register-your-own-github-account)
   - [2. Set the privacy variable GitHub_TOKEN](#2-set-the-privacy-variable-github_token)
@@ -20,9 +20,6 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [6.2 Save to GitHub Releases](#62-save-to-github-releases)
     - [6.3 Save to a third party](#63-save-to-a-third-party)
   - [7. Download the firmware](#7-download-the-firmware)
-    - [7.1 Download from GitHub Actions](#71-download-from-github-actions)
-    - [7.2 Download from GitHub Releases](#72-download-from-github-releases)
-    - [7.3 Download from third parties](#73-download-from-third-parties)
   - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
   - [9. Update Armbian Kernel](#9-update-armbian-kernel)
   - [10. common problem](#10-common-problem)
@@ -51,11 +48,11 @@ Set the GitHub privacy variable `GitHub_TOKEN`. After the firmware is compiled, 
 
 ## 3. Fork repository and set RELEASES_TOKEN
 
-Now you can `Fork` the `repository`, open the repository [https://github.com/ophub/amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), click the `Fork` button on the `upper right`, Will copy a copy of the repository code to your account, `wait a few seconds`, and prompt the Fork to complete Later, go to your account to access `amlogic-s9xxx-openwrt` in `your repository`. In the upper right corner of `Settings` > `Secrets` > `New repostiory secret` (Name: `RELEASES_TOKEN`, Value: `Fill in the value of GitHub_TOKEN` just now), `save it`. The icons are as follows:
+Now you can `Fork` the `repository`, open the repository [https://github.com/ophub/amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), click the `Fork` button on the `upper right`, Will copy a copy of the repository code to your account, `wait a few seconds`, and prompt the Fork to complete Later, go to your account to access `amlogic-s9xxx-armbian` in `your repository`. In the upper right corner of `Settings` > `Secrets` > `New repostiory secret` (Name: `RELEASES_TOKEN`, Value: `Fill in the value of GitHub_TOKEN` just now), `save it`. The icons are as follows:
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418571-12467f80-7a04-11eb-878e-012c2ba11772.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163203032-f044c63f-d113-4076-bf94-41f86c7dd0ce.png width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/109418579-1c687e00-7a04-11eb-9941-3d37be9012ef.jpg width="300" />
 </div>
@@ -85,9 +82,9 @@ There are many ways to compile firmware, you can set timed compilation, manual c
 In the `navigation bar of your repository`, click the `Actions` button, and then click `Build armbian` > `Run workflow` > `Run workflow` to start the compilation, wait about `3 hours`, and complete the compilation after all the processes are over. The icons are as follows:
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418662-a0226a80-7a04-11eb-97f6-aeb893336e8c.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418663-a31d5b00-7a04-11eb-8d34-57d430696901.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418666-a7497880-7a04-11eb-9ed0-be738e22f7ae.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163203938-e7762b09-e6b8-4cf5-b1f1-9c67c1a29953.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204044-9c7a7429-47ee-4fce-b7dd-e217bebf6133.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204127-6b16b558-7e78-4c22-a28a-7b37b5a34fa3.png width="300" />
 </div>
 
 ### 5.2 Compile at the agreed time
@@ -145,39 +142,11 @@ Now the longest storage period of `Actions in GitHub is 90 days`, `Releases is p
 
 ## 7. Download the firmware
 
-Download our compiled openwrt firmware.
-
-### 7.1 Download from GitHub Actions
-
-Click the `Actions` button in the `repository navigation bar`. In the `All workflows` list, click the compiled firmware list. In the firmware list inside, select the firmware corresponding to the model of your `Amlogic s9xxx tv box`. The icons are as follows:
-
-<div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418782-08714c00-7a05-11eb-9556-91575640a4bb.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418785-0ad3a600-7a05-11eb-9fdd-519835a14eaa.jpg width="300" />
-</div>
-
-### 7.2 Download from GitHub Releases
-
 Enter from the GitHub `Releases` section at the bottom right corner of the `repository homepage`, and select the firmware corresponding to the model of your `Amlogic s9xxx tv box`. The icons are as follows:
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418828-466e7000-7a05-11eb-8f69-a89a1d158a4b.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418841-55edb900-7a05-11eb-9650-7100ebd6042c.jpg width="300" />
-</div>
-
-### 7.3 Download from third parties
-
-In the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file, upload to the third party is closed by default. If you need, change `false` to `true`, and upload to the third party when the compilation is completed next time. The third-party URL can be seen `in the log` of the firmware compilation process, and can also be output to the compilation information.
-
-```yaml
-UPLOAD_COWTRANSFER: false
-UPLOAD_WETRANSFER: false
-```
-
-The support for uploading to a third party comes from [Mikubill/transfer](https://github.com/Mikubill/transfer). If you need it, you can add more third-party support according to his instructions (control your creativity and don't waste too many free resources). The icons are as follows:
-
-<div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418921-b5e45f80-7a05-11eb-80ba-02edb0698270.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204879-4898babf-fa00-4e63-89ea-235129e2ce1d.png width="300" />
 </div>
 
 ## 8. Install Armbian to EMMC
