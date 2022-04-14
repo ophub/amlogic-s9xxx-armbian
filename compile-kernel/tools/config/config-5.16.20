@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.16.19 Kernel Configuration
+# Linux/arm64 5.16.20 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="clang version 13.0.0 (https://github.com/llvm/llvm-project/ 24c8eaec9467b2aaf70b0db33a4e4dd415139a50)"
 CONFIG_GCC_VERSION=0
@@ -7408,7 +7408,7 @@ CONFIG_NFSD_V4=y
 # CONFIG_NFSD_BLOCKLAYOUT is not set
 # CONFIG_NFSD_SCSILAYOUT is not set
 # CONFIG_NFSD_FLEXFILELAYOUT is not set
-# CONFIG_NFSD_V4_2_INTER_SSC is not set
+CONFIG_NFSD_V4_2_INTER_SSC=y
 # CONFIG_NFSD_V4_SECURITY_LABEL is not set
 CONFIG_GRACE_PERIOD=m
 CONFIG_LOCKD=m
