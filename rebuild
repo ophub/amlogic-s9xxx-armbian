@@ -251,15 +251,16 @@ confirm_version() {
     cd ${make_path}
 
     # Confirm kernel branch
-    k510_ver=$(echo "${kernel}" | cut -d '.' -f1)
-    k510_maj=$(echo "${kernel}" | cut -d '.' -f2)
-    if [ "${k510_ver}" -eq "5" ]; then
-        if [ "${k510_maj}" -ge "10" ]; then
+    kernel_mainversion=$(echo "${kernel}" | cut -d '.' -f1)
+    kernel_patchlevel=$(echo "${kernel}" | cut -d '.' -f2)
+    if [ "${kernel_mainversion}" -eq "5" ]; then
+        # The 5.4.y and 5.15.y kernels have TEXT_OFFSET patch and do not need u-boot support
+        if [[ "${kernel_patchlevel}" -ge "10" && "${kernel_patchlevel}" -ne "15" ]]; then
             K510="1"
         else
             K510="0"
         fi
-    elif [ "${k510_ver}" -gt "5" ]; then
+    elif [ "${kernel_mainversion}" -gt "5" ]; then
         K510="1"
     else
         K510="0"
@@ -533,7 +534,6 @@ refactor_files() {
     echo "ANDROID_UBOOT='/usr/lib/u-boot/${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
     echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
-    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 
     # Edit the etc/fstab
@@ -615,15 +615,17 @@ make_image() {
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
     fi
 
-    # Write the bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+    if [[ "${K510}" -eq "1" ]]; then
+        # Write the bootloader
+        if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
+            dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+            dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+            #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+        elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
+            dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+            dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+            #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+        fi
     fi
 
     sync

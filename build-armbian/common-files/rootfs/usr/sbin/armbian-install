@@ -42,24 +42,25 @@ DEV_EMMC="/dev/${install_emmc}"
 echo "DEV_EMMC: ${DEV_EMMC}"
 
 #Check if writing to EMMC is supported
-VERSION_NOW=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-if [ -z "${VERSION_NOW}" ]; then
+kernel_customversion=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+if [ -z "${kernel_customversion}" ]; then
     echo "Failed to query the current version."
     exit 1
 else
-    echo "This Kernel Version: [ ${VERSION_NOW} ]"
+    echo "This Kernel Version: [ ${kernel_customversion} ]"
 fi
 
 # Check if the version is above 5.10, for u-boot.ext and u-boot.emmc
-k510_ver=$(echo "${VERSION_NOW}" | cut -d '.' -f1)
-k510_maj=$(echo "${VERSION_NOW}" | cut -d '.' -f2)
-if [ "${k510_ver}" -eq "5" ]; then
-    if [ "${k510_maj}" -ge "10" ]; then
+kernel_mainversion=$(echo "${kernel_customversion}" | cut -d '.' -f1)
+kernel_patchlevel=$(echo "${kernel_customversion}" | cut -d '.' -f2)
+if [ "${kernel_mainversion}" -eq "5" ]; then
+    # The 5.4.y and 5.15.y kernels have TEXT_OFFSET patch and do not need u-boot support
+    if [[ "${kernel_patchlevel}" -ge "10" && "${kernel_patchlevel}" -ne "15" ]]; then
         K510="1"
     else
         K510="0"
     fi
-elif [ "${k510_ver}" -gt "5" ]; then
+elif [ "${kernel_mainversion}" -gt "5" ]; then
     K510="1"
 else
     K510="0"
@@ -245,22 +246,6 @@ parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))M $((BLANK1 + BOOT - 1))
 parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))M 100% 2>/dev/null
 sync
 
-# Write the uboot
-echo "Start write u-boot"
-if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-    echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-    echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
-    echo "Restore the mybox u-boot"
-    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
-    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
-fi
-
 echo "Start copy system for eMMC."
 mkdir -p /ddbr
 chmod 777 /ddbr
@@ -306,6 +291,7 @@ mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
 mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
 if [ "${K510}" -eq "1" ]; then
+    # Copy u-boot.ext and u-boot.emmc
     if [[ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]]; then
         echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
         if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
@@ -319,6 +305,22 @@ if [ "${K510}" -eq "1" ]; then
     else
         echo "Have no the u-boot file."
         exit 1
+    fi
+
+    # Write the uboot
+    echo "Start write u-boot"
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+        echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+        echo "Restore the mybox u-boot"
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 fi
 

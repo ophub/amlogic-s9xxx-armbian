@@ -67,19 +67,7 @@ current_kernel_v=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | gre
 [ -z "${current_kernel_v}" ] && error_msg "Failed to query the current version."
 main_line_ver=$(echo "${current_kernel_v}" | cut -d '.' -f1)
 main_line_maj=$(echo "${current_kernel_v}" | cut -d '.' -f2)
-main_line_now=$(echo "${current_kernel_v}" | cut -d '.' -f3)
 main_line_version="${main_line_ver}.${main_line_maj}"
-if [ "${main_line_ver}" -eq "5" ]; then
-    if [ "${main_line_maj}" -ge "10" ]; then
-        V510=1
-    else
-        V510=0
-    fi
-elif [ "${main_line_ver}" -gt "5" ]; then
-    V510=1
-else
-    V510=0
-fi
 
 # Receive one-key command related parameters
 # Specify the kernel, such as: 5.10.70
@@ -190,17 +178,17 @@ if [ $(ls ${tmp_path}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc 
         custom_kernel_name=${build_boot/boot-/} && custom_kernel_name=${custom_kernel_name/.tar.gz/}
         echo -e "custom_kernel_name: ${custom_kernel_name}"
 
-        kernel_version=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-        kernel_vermaj=$(echo ${kernel_version} | grep -oE '^[1-9].[0-9]{1,3}')
-        k510_ver=${kernel_vermaj%%.*}
-        k510_maj=${kernel_vermaj##*.}
-        if [ ${k510_ver} -eq "5" ]; then
-            if [ "${k510_maj}" -ge "10" ]; then
+        kernel_customversion=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
+        kernel_mainversion=$(echo "${kernel_customversion}" | cut -d '.' -f1)
+        kernel_patchlevel=$(echo "${kernel_customversion}" | cut -d '.' -f2)
+        if [ ${kernel_mainversion} -eq "5" ]; then
+            # The 5.4.y and 5.15.y kernels have TEXT_OFFSET patch and do not need u-boot support
+            if [[ "${kernel_patchlevel}" -ge "10" && "${kernel_patchlevel}" -ne "15" ]]; then
                 K510=1
             else
                 K510=0
             fi
-        elif [ ${k510_ver} -gt "5" ]; then
+        elif [ ${kernel_mainversion} -gt "5" ]; then
             K510=1
         else
             K510=0
@@ -231,18 +219,16 @@ else
 fi
 
 # Check version consistency
-if [ "${V510}" -lt "${K510}" ]; then
+if [[ "${K510}" -eq "1" ]]; then
     echo -e "Update to kernel 5.10 or higher"
 
     # Copy u-boot.ext and u-boot.emmc
-    if [ "${K510}" -eq "1" ]; then
-        if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
-            [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-            [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
-            echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
-        else
-            error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
-        fi
+    if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
+        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+    else
+        error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
     fi
 
     # Write bootloader
@@ -255,7 +241,6 @@ if [ "${V510}" -lt "${K510}" ]; then
         dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
         dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
     fi
-
 fi
 
 # Remove u-boot.ext files in kernels below 5.10
@@ -344,9 +329,7 @@ rm -f ${tmp_path}/*${custom_kernel_name}*.tar.gz 2>/dev/null
 
 # 06. Update
 sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
-echo "KERNEL_VERSION='${kernel_version}'" >>${ophub_release_file} 2>/dev/null
-sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
-echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+echo "KERNEL_VERSION='${kernel_customversion}'" >>${ophub_release_file} 2>/dev/null
 
 sync
 wait
