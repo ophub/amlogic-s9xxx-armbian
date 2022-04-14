@@ -246,6 +246,24 @@ parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))M $((BLANK1 + BOOT - 1))
 parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))M 100% 2>/dev/null
 sync
 
+# Write the uboot
+if [ "${K510}" -eq "1" ]; then
+    echo "Start write u-boot"
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+        echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+        echo "Restore the mybox u-boot"
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+    fi
+fi
+
 echo "Start copy system for eMMC."
 mkdir -p /ddbr
 chmod 777 /ddbr
@@ -290,8 +308,8 @@ sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
 mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
 mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
+# Copy u-boot.ext and u-boot.emmc
 if [ "${K510}" -eq "1" ]; then
-    # Copy u-boot.ext and u-boot.emmc
     if [[ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]]; then
         echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
         if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
@@ -305,22 +323,6 @@ if [ "${K510}" -eq "1" ]; then
     else
         echo "Have no the u-boot file."
         exit 1
-    fi
-
-    # Write the uboot
-    echo "Start write u-boot"
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-        echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-        echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
-        echo "Restore the mybox u-boot"
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 fi
 
