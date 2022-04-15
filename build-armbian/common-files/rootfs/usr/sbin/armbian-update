@@ -354,6 +354,8 @@ rm -f ${tmp_path}/*${custom_kernel_name}*.tar.gz 2>/dev/null
 # Update ophub_release_file
 sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
 echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
+sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
+echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
 
 sync
 wait
