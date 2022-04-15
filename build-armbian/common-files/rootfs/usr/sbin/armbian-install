@@ -41,31 +41,24 @@ fi
 DEV_EMMC="/dev/${install_emmc}"
 echo "DEV_EMMC: ${DEV_EMMC}"
 
-#Check if writing to EMMC is supported
-kernel_customversion=$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-if [ -z "${kernel_customversion}" ]; then
-    echo "Failed to query the current version."
-    exit 1
-else
-    echo "This Kernel Version: [ ${kernel_customversion} ]"
-fi
-
-# Check if the version is above 5.10, for u-boot.ext and u-boot.emmc
-kernel_mainversion=$(echo "${kernel_customversion}" | cut -d '.' -f1)
-kernel_patchlevel=$(echo "${kernel_customversion}" | cut -d '.' -f2)
-if [ "${kernel_mainversion}" -eq "5" ]; then
-    # The 5.4.y and 5.15.y kernels have TEXT_OFFSET patch and do not need u-boot support
-    if [[ "${kernel_patchlevel}" -ge "10" && "${kernel_patchlevel}" -ne "15" ]]; then
-        K510="1"
-    else
-        K510="0"
-    fi
-elif [ "${kernel_mainversion}" -gt "5" ]; then
-    K510="1"
-else
-    K510="0"
-fi
-echo "K510: [ ${K510} ]"
+# Check the text_offset of zImage, For u-boot.ext and u-boot.emmc
+temp_script="$(mktemp)"
+cat >${temp_script} <<EOF
+use strict;
+my \$filename = \$ARGV[0];
+open my \$fh, '<', \$filename or die;
+binmode \$fh;
+seek \$fh, 0x8, 0;
+my \$buf = "";
+read \$fh, \$buf, 0x4;
+close(\$fh);
+my \$str = unpack 'H*', \$buf;
+print "\$str\n";
+EOF
+K510="1"
+vmlinuz_text_offset="$(perl "${temp_script}" "/boot/zImage")"
+[ "${vmlinuz_text_offset}" == "00000801" ] && K510="0"
+rm -f ${temp_script} 2>/dev/null
 
 # Generate New ROOTFS UUID
 ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
@@ -175,6 +168,7 @@ fi
 echo "Input Box ID: [ ${boxtype} ]"
 echo "FDTFILE: [ ${FDTFILE} ]"
 echo "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
+echo "K510: [ ${K510} ]"
 
 [[ -z "${FDTFILE}" || -z "${UBOOT_OVERLOAD}" || ! -f "/boot/${UBOOT_OVERLOAD}" ]] && echo "The DTB or UBOOT_OVERLOAD is invalid, stop the install." && exit 1
 
