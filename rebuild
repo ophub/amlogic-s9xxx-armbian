@@ -541,6 +541,7 @@ refactor_files() {
     echo "ANDROID_UBOOT='/usr/lib/u-boot/${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
     echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
+    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 
     # Edit the etc/fstab
