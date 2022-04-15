@@ -15,7 +15,6 @@
 #
 # Command: armbian-update
 # Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
-# The kernel above version 5.10 needs to install mainline u-boot
 # The mainline u-boot is installed by default: armbian-update
 # Don't write mainline u-boot command: armbian-update 5.4.170 stable no
 #===================================================================================================
@@ -34,10 +33,18 @@ error_msg() {
     exit 1
 }
 
-get_k510_from_vmlinuz() {
-    local vmlinuz="${1}"
-    local temp_script="$(mktemp)"
-    cat >$temp_script <<EOF
+# Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
+get_textoffset_from_tgz() {
+    boot_tgz_file="${1}"
+    vmlinuz_name="${2}"
+    K510="1"
+    temp_dir="$(mktemp -d)"
+    (
+        cd ${temp_dir}
+        tar -xzf "${boot_tgz_file}" "${vmlinuz_name}"
+    )
+    temp_script="$(mktemp)"
+    cat >${temp_script} <<EOF
 use strict;
 my \$filename = \$ARGV[0];
 open my \$fh, '<', \$filename or die;
@@ -49,24 +56,8 @@ close(\$fh);
 my \$str = unpack 'H*', \$buf;
 print "\$str\n";
 EOF
-    local result="1"
-    local text_offset="$(perl "${temp_script}" "${vmlinuz}")"
-    [ "${text_offset}" == "00000801" ] && result="0"
-    rm -f $temp_script
-    echo "${result}"
-}
-
-get_k510_from_boot_tgz() {
-    local boot_tgz="${1}"
-    local vmlinuz="${2}"
-    local temp_dir="$(mktemp -d)"
-    (
-        cd ${temp_dir}
-        tar xzf "${boot_tgz}" "${vmlinuz}"
-    )
-    local result=$(get_k510_from_vmlinuz "${temp_dir}/${vmlinuz}")
-    rm -rf ${temp_dir} 2>/dev/null
-    echo "${result}"
+    [[ "$(perl "${temp_script}" "${temp_dir}/${vmlinuz_name}")" == "00000801" ]] && K510="0"
+    rm -rf ${temp_script} ${temp_dir} 2>/dev/null
 }
 
 # Check release file
@@ -214,7 +205,7 @@ if [ $(ls ${tmp_path}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc 
         KERNEL_VERSION=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
         echo -e "custom_kernel_name: ${custom_kernel_name}"
 
-        K510="$(get_k510_from_boot_tgz "${build_boot_abs}" "vmlinuz-${custom_kernel_name}")"
+        get_textoffset_from_tgz "${build_boot_abs}" "vmlinuz-${custom_kernel_name}"
         echo -e "K510 [ ${K510} ]"
         if [[ "${K510}" -eq "1" ]]; then
             [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
