@@ -393,6 +393,9 @@ echo "MYBOX_UBOOT='${MYBOX_UBOOT}'" >>${ophub_release_file} 2>/dev/null
 #
 sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
 echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
+#
+sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
+echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
 sync
 
 rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
