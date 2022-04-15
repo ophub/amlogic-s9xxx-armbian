@@ -34,6 +34,41 @@ error_msg() {
     exit 1
 }
 
+get_k510_from_vmlinuz() {
+    local vmlinuz="${1}"
+    local temp_script="$(mktemp)"
+    cat >$temp_script <<EOF
+use strict;
+my \$filename = \$ARGV[0];
+open my \$fh, '<', \$filename or die;
+binmode \$fh;
+seek \$fh, 0x8, 0;
+my \$buf = "";
+read \$fh, \$buf, 0x4;
+close(\$fh);
+my \$str = unpack 'H*', \$buf;
+print "\$str\n";
+EOF
+    local result="1"
+    local text_offset="$(perl "${temp_script}" "${vmlinuz}")"
+    [ "${text_offset}" == "00000801" ] && result="0"
+    rm -f $temp_script
+    echo "${result}"
+}
+
+get_k510_from_boot_tgz() {
+    local boot_tgz="${1}"
+    local vmlinuz="${2}"
+    local temp_dir="$(mktemp -d)"
+    (
+        cd ${temp_dir}
+        tar xzf "${boot_tgz}" "${vmlinuz}"
+    )
+    local result=$(get_k510_from_vmlinuz "${temp_dir}/${vmlinuz}")
+    rm -rf ${temp_dir} 2>/dev/null
+    echo "${result}"
+}
+
 # Check release file
 if [ -f "${ophub_release_file}" ]; then
     source "${ophub_release_file}" 2>/dev/null
@@ -174,24 +209,15 @@ fi
 # Check kernel files list
 if [ $(ls ${tmp_path}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 3 ]; then
     if [ $(ls ${tmp_path}/boot-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l) -ge 1 ]; then
-        build_boot=$(ls ${tmp_path}/boot-${inputs_kernel}-*.tar.gz | head -n 1) && build_boot=${build_boot##*/}
+        build_boot_abs=$(ls ${tmp_path}/boot-${inputs_kernel}-*.tar.gz | head -n 1) && build_boot=${build_boot_abs##*/}
         custom_kernel_name=${build_boot/boot-/} && custom_kernel_name=${custom_kernel_name/.tar.gz/}
+        KERNEL_VERSION=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
         echo -e "custom_kernel_name: ${custom_kernel_name}"
 
-        kernel_customversion=$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')
-        kernel_mainversion=$(echo "${kernel_customversion}" | cut -d '.' -f1)
-        kernel_patchlevel=$(echo "${kernel_customversion}" | cut -d '.' -f2)
-        if [ ${kernel_mainversion} -eq "5" ]; then
-            # The 5.4.y and 5.15.y kernels have TEXT_OFFSET patch and do not need u-boot support
-            if [[ "${kernel_patchlevel}" -ge "10" && "${kernel_patchlevel}" -ne "15" ]]; then
-                K510=1
-            else
-                K510=0
-            fi
-        elif [ ${kernel_mainversion} -gt "5" ]; then
-            K510=1
-        else
-            K510=0
+        K510="$(get_k510_from_boot_tgz "${build_boot_abs}" "vmlinuz-${custom_kernel_name}")"
+        echo -e "K510 [ ${K510} ]"
+        if [[ "${K510}" -eq "1" ]]; then
+            [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
         fi
     else
         error_msg "Have no boot-*.tar.gz file found in the ${tmp_path} directory."
@@ -216,37 +242,6 @@ if [ $(ls ${tmp_path}/*${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc 
     fi
 else
     error_msg "Please upload the kernel files to [ ${tmp_path} ], then run [ $0 ] again."
-fi
-
-# Check version consistency
-if [[ "${K510}" -eq "1" ]]; then
-    echo -e "Update to kernel 5.10 or higher"
-
-    # Copy u-boot.ext and u-boot.emmc
-    if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
-        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
-        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
-    else
-        error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
-    fi
-
-    # Write bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-        echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    fi
-fi
-
-# Remove u-boot.ext files in kernels below 5.10
-if [ "${K510}" -eq "0" ]; then
-    rm -f /boot/u-boot.ext 2>/dev/null && sync
-    rm -f /boot/u-boot.emmc 2>/dev/null && sync
 fi
 
 echo -e "Unpack [ ${custom_kernel_name} ] related files ..."
@@ -324,12 +319,41 @@ if [[ -n "${build_header}" && -f "${tmp_path}/${build_header}" ]]; then
     sleep 3
 fi
 
-# 05. Delete kernel files
+# Check version consistency
+if [[ "${K510}" -eq "1" ]]; then
+    echo -e "Update to kernel 5.10 or higher"
+
+    # Copy u-boot.ext and u-boot.emmc
+    if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
+        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+    else
+        error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
+    fi
+
+    # Write bootloader
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    fi
+else
+    # Remove u-boot.ext files in kernels below 5.10
+    rm -f /boot/u-boot.ext 2>/dev/null && sync
+    rm -f /boot/u-boot.emmc 2>/dev/null && sync
+fi
+
+# Delete kernel files
 rm -f ${tmp_path}/*${custom_kernel_name}*.tar.gz 2>/dev/null
 
-# 06. Update
+# Update ophub_release_file
 sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
-echo "KERNEL_VERSION='${kernel_customversion}'" >>${ophub_release_file} 2>/dev/null
+echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
 
 sync
 wait
