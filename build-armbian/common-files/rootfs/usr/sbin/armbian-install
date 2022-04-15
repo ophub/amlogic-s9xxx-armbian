@@ -12,7 +12,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
-# Kernel version 5.10.y or newer is recommended to install mainline u-boot
+# Command optional parameters: armbian-install <mainline_u-boot>
 # The mainline u-boot is installed by default: armbian-install
 # Don't write mainline u-boot command: armbian-install no
 #==========================================================================
@@ -41,7 +41,8 @@ fi
 DEV_EMMC="/dev/${install_emmc}"
 echo "DEV_EMMC: ${DEV_EMMC}"
 
-# Check the text_offset of zImage, For u-boot.ext and u-boot.emmc
+# Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
+K510="1"
 temp_script="$(mktemp)"
 cat >${temp_script} <<EOF
 use strict;
@@ -55,9 +56,7 @@ close(\$fh);
 my \$str = unpack 'H*', \$buf;
 print "\$str\n";
 EOF
-K510="1"
-vmlinuz_text_offset="$(perl "${temp_script}" "/boot/zImage")"
-[ "${vmlinuz_text_offset}" == "00000801" ] && K510="0"
+[[ "$(perl "${temp_script}" "/boot/zImage")" == "00000801" ]] && K510="0"
 rm -f ${temp_script} 2>/dev/null
 
 # Generate New ROOTFS UUID
