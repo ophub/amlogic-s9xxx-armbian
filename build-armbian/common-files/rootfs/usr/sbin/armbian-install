@@ -24,18 +24,21 @@ else
     auto_mainline_uboot="yes"
 fi
 
+error_msg() {
+    echo -e " [\033[1;91m Error \033[0m] ${1}"
+    exit 1
+}
+
 echo "Start install armbian to emmc..."
 
 root_devname=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')
 if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-    echo "you are running in emmc mode, please boot system with usb or tf card!"
-    exit 1
+    error_msg "you are running in emmc mode, please boot system with usb or tf card!"
 fi
 
 install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
 if [[ "${install_emmc}" == "" ]]; then
-    echo "No emmc can be found to install the armbian system!"
-    exit 1
+    error_msg "No emmc can be found to install the armbian system!"
 fi
 
 DEV_EMMC="/dev/${install_emmc}"
@@ -62,7 +65,7 @@ rm -f ${temp_script} 2>/dev/null
 # Generate New ROOTFS UUID
 ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
 [ -z "${ROOTFS_UUID}" ] && ROOTFS_UUID="$(uuidgen)"
-[ -z "${ROOTFS_UUID}" ] && echo "The new UUID is invalid, cannot continue." && exit 1
+[ -z "${ROOTFS_UUID}" ] && error_msg "The new UUID is invalid, cannot continue."
 
 # Set model list, begin ------------
 AMLOGIC_MODEL_LIST="
@@ -152,8 +155,7 @@ if [[ "${boxtype}" -eq "0" ]]; then
 else
     ret=$(search_aml_model "${boxtype}")
     if [ "${ret}" == "" ]; then
-        echo "Input error, exit!"
-        exit 1
+        error_msg "Input error, exit!"
     fi
 
     AMLOGIC_SOC="$(echo "${ret}" | awk -F ':' '{print $3}')"
@@ -169,7 +171,11 @@ echo "FDTFILE: [ ${FDTFILE} ]"
 echo "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
 echo "K510: [ ${K510} ]"
 
-[[ -z "${FDTFILE}" || -z "${UBOOT_OVERLOAD}" || ! -f "/boot/${UBOOT_OVERLOAD}" ]] && echo "The DTB or UBOOT_OVERLOAD is invalid, stop the install." && exit 1
+[[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The DTB is missing, stop the install."
+
+if [[ "${K510}" -eq "1" ]]; then
+    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD is missing, stop the install."
+fi
 
 # Set the type of file system
 cat <<EOF
@@ -240,21 +246,19 @@ parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BL
 sync
 
 # Write the uboot
-if [ "${K510}" -eq "1" ]; then
-    echo "Start write u-boot"
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-        echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-        echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
-        echo "Restore the mybox u-boot"
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
-    fi
+echo "Start write u-boot"
+if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+    echo "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+    echo "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+    echo "Restore the mybox u-boot"
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=442
+    dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
 fi
 
 echo "Start copy system for eMMC."
@@ -279,7 +283,7 @@ echo "Formatting BOOTFS partition..."
 mkfs.vfat -n "BOOT_EMMC" ${PART_BOOT}
 
 mount -o rw ${PART_BOOT} ${DIR_INSTALL}
-[ "$?" -ne "0" ] && echo "Failed to mount BOOTFS partition" && exit 1
+[ "$?" -ne "0" ] && error_msg "Failed to mount BOOTFS partition"
 
 echo "Start copy BOOT_EMMC partition data..."
 cp -rf /boot/* ${DIR_INSTALL} && sync
@@ -302,21 +306,16 @@ mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
 mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
 # Copy u-boot.ext and u-boot.emmc
-if [ "${K510}" -eq "1" ]; then
-    if [[ -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ]]; then
-        echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
-        if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
-            cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
-        else
-            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.ext
-            cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
-        fi
-        chmod +x ${DIR_INSTALL}/u-boot.ext
-        chmod +x ${DIR_INSTALL}/u-boot.emmc
+if [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
+    echo "Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
+    if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
+        cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
     else
-        echo "Have no the u-boot file."
-        exit 1
+        cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.ext
+        cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.emmc
     fi
+    chmod +x ${DIR_INSTALL}/u-boot.ext
+    chmod +x ${DIR_INSTALL}/u-boot.emmc
 fi
 
 sync
@@ -339,7 +338,7 @@ else
     sleep 3
     mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
 fi
-[ "$?" -ne "0" ] && echo "Failed to mount ROOTFS partition" && exit 1
+[ "$?" -ne "0" ] && error_msg "Failed to mount ROOTFS partition"
 
 echo "Start copy ROOTFS_EMMC partition data..."
 cd /
