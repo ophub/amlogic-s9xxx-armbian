@@ -310,33 +310,22 @@ if [[ -n "${build_header}" && -f "${tmp_path}/${build_header}" ]]; then
     sleep 3
 fi
 
-# Check version consistency
-if [[ "${K510}" -eq "1" ]]; then
-    echo -e "Update to kernel 5.10 or higher"
+# Copy u-boot.ext and u-boot.emmc
+if [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+    [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+    [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+    echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+fi
 
-    # Copy u-boot.ext and u-boot.emmc
-    if [ -f "/boot/${UBOOT_OVERLOAD}" ]; then
-        [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-        [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
-        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
-    else
-        error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
-    fi
-
-    # Write bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-        echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-    fi
-else
-    # Remove u-boot.ext files in kernels below 5.10
-    rm -f /boot/u-boot.ext 2>/dev/null && sync
-    rm -f /boot/u-boot.emmc 2>/dev/null && sync
+# Write bootloader
+if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+    echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+    echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
 fi
 
 # Delete kernel files
