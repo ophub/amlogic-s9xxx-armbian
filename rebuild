@@ -477,13 +477,11 @@ refactor_files() {
     cd ${tag_bootfs}
 
     # Add u-boot.ext for 5.10 kernel
-    if [[ "${K510}" -eq "1" ]]; then
-        if [[ -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
-            cp -f ${UBOOT_OVERLOAD} u-boot.ext
-            chmod +x u-boot.ext
-        else
-            error_msg "${soc} have no the 5.10 kernel u-boot file: [ ${UBOOT_OVERLOAD} ]"
-        fi
+    if [[ -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
+        cp -f ${UBOOT_OVERLOAD} u-boot.ext
+        chmod +x u-boot.ext
+    elif [[ "${K510}" -eq "1" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
+        error_msg "${soc} SoC does not support using ${kernel} kernel, missing u-boot."
     fi
 
     # Edit the uEnv.txt
@@ -623,16 +621,14 @@ make_image() {
     fi
 
     # Write the specified bootloader
-    if [[ "${K510}" -eq "1" ]]; then
-        if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
-            dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-            dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-            #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
-        elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
-            dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-            dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
-            #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
-        fi
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
 
     sync
