@@ -235,8 +235,8 @@ fi
 # Format emmc disk
 echo "Start create MBR and partittion"
 parted -s "${DEV_EMMC}" mklabel msdos 2>/dev/null
-parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))M $((BLANK1 + BOOT - 1))M 2>/dev/null
-parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))M 100% 2>/dev/null
+parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB 2>/dev/null
+parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100% 2>/dev/null
 sync
 
 # Write the uboot
