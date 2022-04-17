@@ -20,7 +20,7 @@ on:
       armbian_kernel:
         description: "Input armbian kernel"
         required: false
-        default: "5.15.25_5.4.180"
+        default: "5.15.25_5.10.100"
       armbian_size:
         description: "Input armbian size"
         required: false
