@@ -19,11 +19,11 @@
 | s912 | [H96-Pro-Plus](https://www.gearbest.com/tv-box-mini-pc/pp_503486.html), [Tanix-TX92](http://www.tanix-box.com/project-view/tanix-tx92-android-tv-box-powered-amlogic-s912/), [VORKE-Z6-Plus](http://www.vorke.com/project/vorke-z6-2/), [Mecool-M8S-PRO-L](https://www.gearbest.com/tv-box/pp_3005746210753315.html), Octopus-Planet | 全部 | armbian_aml_s912_*.img |
 | s905d | [MECOOL-KI-Pro](https://www.gearbest.com/tv-box-mini-pc/pp_629409.html), Phicomm-N1 | 全部 | armbian_aml_s905d_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://www.zte.com.cn/global/products/cocloud/201707261551/IP-STB/ZXV10-B860H), [TBee-Box](https://www.tbee.com/product/tbee-box/) | 全部 | armbian_aml_s905x_*.img |
-| s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.4/5.15 | armbian_aml_s905w_*.img |
+| s905w | [X96-Mini](https://tokopedia.link/ro207Hsjqeb), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.15.y | armbian_aml_s905w_*.img |
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-Pro+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | 全部 | armbian_aml_s905_*.img |
-| s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | 5.15 | armbian_aml_s905l3a_*.img |
+| s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | 5.15.y | armbian_aml_s905l3a_*.img |
 
-💡提示：当前 ***`s905w`*** 系列的盒子只支持使用 `5.4/5.15` 内核，其他型号的盒子可任选内核版本使用。当前 ***`s905 和 s905l3a`*** 的盒子只能在 `TF/SD/USB` 中使用，其他型号的盒子同时支持写入 `EMMC` 中使用。每个盒子的 dtb 和 u-boot 请查阅[说明](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md)。
+💡提示：当前 ***`s905w`*** 系列的盒子只支持使用 `5.15.y` 内核，其他型号的盒子可任选内核版本使用。当前 ***`s905 和 s905l3a`*** 的盒子只能在 `TF/SD/USB` 中使用，其他型号的盒子同时支持写入 `EMMC` 中使用。每个盒子的 dtb 和 u-boot 请查阅[说明](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md)。
 
 ## 安装及升级 Armbian 的相关说明
 
