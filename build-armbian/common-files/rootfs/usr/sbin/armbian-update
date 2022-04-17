@@ -311,10 +311,12 @@ if [[ -n "${build_header}" && -f "${tmp_path}/${build_header}" ]]; then
 fi
 
 # Copy u-boot.ext and u-boot.emmc
-if [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
     [ ! -f "/boot/u-boot.ext" ] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
     [ ! -f "/boot/u-boot.emmc" ] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
     echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+elif [[ "${K510}" -eq "0" ]]; then
+    rm -f "/boot/u-boot.ext" "/boot/u-boot.emmc" 2>/dev/null
 fi
 
 # Write bootloader
