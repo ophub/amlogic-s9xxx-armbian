@@ -158,7 +158,24 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 
 In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs) for some common problems that may be encountered.
 
-## Detailed build compile command
+## Local build instructions
+
+1. Install the necessary packages (E.g Ubuntu 20.04 LTS user)
+
+```yaml
+sudo apt-get update -y
+sudo apt-get full-upgrade -y
+sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
+```
+
+2. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Lepotato_current_5.15.25.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.25`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
+
+4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.100` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+
+
+- ### Description of localized packaging parameters
 
 | Parameter | Meaning | Description |
 | ------ | ---------- | ----------------------------------------- |
@@ -180,23 +197,7 @@ In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs
 - `sudo ./rebuild -d -k 5.15.25_5.10.100 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
 - `sudo ./rebuild -d -t btrfs -s 2748 -k 5.10.100`: Use the default configuration, set the file system to btrfs format and the partition size to 2748M, and only compile the armbian firmware with the kernel version 5.10.100.
 
-- ### Local build instructions
-
-1. Install the necessary packages (E.g Ubuntu 20.04 LTS user)
-
-```yaml
-sudo apt-get update -y
-sudo apt-get full-upgrade -y
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
-```
-
-2. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
-
-3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Lepotato_current_5.15.25.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.25`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
-
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.100` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
-
-- ### Use GitHub Actions to build
+## Use GitHub Actions to build
 
 1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `SOC` you want to build in `Rebuild Armbian for amlogic s9xxx`.
 
@@ -204,9 +205,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build armbian` of different soc. Select ***`Use Releases file to build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
-- ### Only import GitHub Actions for Armbian rebuild
-
-You can use other methods to build the Armbian system. Or use [Armbian](https://armbian.tnahosting.net/dl/) officially provided [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) and other branch firmware. and only import the Actions from this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) to rebuild Armbian to adapt to the use of Amlogic S9xxx series boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
+4. You can use other methods to build the Armbian system. Or use [Armbian](https://armbian.tnahosting.net/dl/) officially provided [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) and other branch firmware. and only import the Actions from this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) to rebuild Armbian to adapt to the use of Amlogic S9xxx series boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
 
 ```yaml
 - name: Rebuild the Armbian for Amlogic s9xxx
@@ -218,7 +217,7 @@ You can use other methods to build the Armbian system. Or use [Armbian](https://
     armbian_kernel: 5.15.25_5.10.100
 ```
 
-- GitHub Actions Input parameter description
+- ### GitHub Actions Input parameter description
 
 For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.md#3-fork-repository-and-set-releases_token). The relevant parameters correspond to the `local packaging command`, please refer to the above description.
 
@@ -232,7 +231,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | armbian_size       | 2748             | Set the size of the firmware ROOTFS partition, function reference `-s` |
 | armbian_fstype     | ext4             | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
 
-- GitHub Actions Output variable description
+- ### GitHub Actions Output variable description
 
 | Parameter                                | For example       | Description                       |
 |------------------------------------------|-------------------|-----------------------------------|
@@ -253,6 +252,14 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
     kernel_auto: true
     kernel_sign: -meson64-dev
 ```
+
+## Armbian firmware default information
+
+| Name | Value |
+| ---- | ---- |
+| Default IP | Get IP from the router |
+| Default username | root |
+| Default password | 1234 |
 
 ## Armbian contributor list
 
