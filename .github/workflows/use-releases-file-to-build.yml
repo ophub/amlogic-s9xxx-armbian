@@ -65,8 +65,8 @@ jobs:
           down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           [ -z "${down_file}" ] && echo "Invalid download file." && exit 1
-          wget -q -P "${armbian_buildpath}" "${down_file}"
-          [[ "$?" -ne "0" ]] && echo "Invalid download file." && exit 1
+          wget -q -P "${armbian_buildpath}" "${down_file}" && sync
+          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
           set_release="_"
           out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
