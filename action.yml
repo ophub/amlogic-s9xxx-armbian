@@ -76,7 +76,7 @@ runs:
           armbian_file="${{ inputs.armbian_path }}"
           armbian_filepath="build/output/images"
           echo -e "Get armbian file input parameters: [ ${armbian_file} ]"
-          [ -z "${armbian_file}" ] && armbian_file="$(ls ${armbian_filepath} -l 2>/dev/null | grep "^-" | awk '{print $9}' | head -n 1)"
+          [ -z "${armbian_file}" ] && echo -e "The [ armbian_path ] variable must be specified." && exit 1
           [ -d "${armbian_filepath}" ] || sudo mkdir -p ${armbian_filepath}
           if [[ "${armbian_file}" == http* ]]; then
             echo -e "Use wget to download file: [ ${armbian_file} ]"
