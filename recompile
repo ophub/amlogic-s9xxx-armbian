@@ -65,7 +65,7 @@ auto_kernel="true"
 custom_name="-meson64-dev"
 #
 # Cross compile toolchain download mirror, run on ubuntu-20.04
-dev_repo="https://github.com/ophub/script/releases/download/dev"
+dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 #
 # Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian_22.05.0_aml_s922x_focal_5.15.31.tar.xz"
