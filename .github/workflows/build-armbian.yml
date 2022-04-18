@@ -21,10 +21,6 @@ on:
         description: "Board: lepotato / odroidn2"
         required: false
         default: "lepotato"
-      more_settings:
-        description: "Rebuild: More parameter settings"
-        required: false
-        default: ""
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
