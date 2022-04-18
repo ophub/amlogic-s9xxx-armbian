@@ -76,16 +76,14 @@ runs:
           armbian_file="${{ inputs.armbian_path }}"
           armbian_filepath="build/output/images"
           echo -e "Get armbian file input parameters: [ ${armbian_file} ]"
-          [ -z "${armbian_file}" ] && armbian_file="build/output/images/*.img"
+          [ -z "${armbian_file}" ] && armbian_file="$(ls ${armbian_filepath} -l 2>/dev/null | grep "^-" | awk '{print $9}' | head -n 1)"
           [ -d "${armbian_filepath}" ] || sudo mkdir -p ${armbian_filepath}
           if [[ "${armbian_file}" == http* ]]; then
             echo -e "Use wget to download file: [ ${armbian_file} ]"
             sudo wget ${armbian_file} -q -P ${armbian_filepath} 2>/dev/null
-          elif [[ "${armbian_file:0:6}" != "build/" && "${armbian_file:0:8}" != "./build/" ]]; then
+          else
             echo -e "Copy files: [ ${armbian_file} ]"
             sudo cp -f ${GITHUB_WORKSPACE}/${armbian_file} ${armbian_filepath} 2>/dev/null
-          else
-            echo -e "Use armbian files: [ ${armbian_file} ]"
           fi
           sync
           echo -e "About the ${armbian_filepath} directory: \n $(ls ${armbian_filepath} -l 2>/dev/null)"
