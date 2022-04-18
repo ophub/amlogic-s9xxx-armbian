@@ -158,7 +158,23 @@ armbian-ddbr
 
 在 Armbian 的使用中，一些可能遇到的常见问题详见 [armbian-docs](build-armbian/armbian-docs/README.cn.md)
 
-## 打包命令的相关参数说明
+## 本地化打包
+
+1. 安装必要的软件包（如 Ubuntu 20.04 LTS 用户）
+
+```yaml
+sudo apt-get update -y
+sudo apt-get full-upgrade -y
+sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
+```
+
+2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+3. 在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Lepotato_current_5.15.25.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.25`）请保留，它将在重构后用作 Armbian 固件的名称。
+
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.10.100` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
+
+- ### 本地化打包参数说明
 
 | 参数  | 含义       | 说明        |
 | ---- | ---------- | ---------- |
@@ -180,23 +196,7 @@ armbian-ddbr
 - `sudo ./rebuild -d -k 5.15.25_5.10.100 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
 - `sudo ./rebuild -d -t btrfs -s 2748 -k 5.10.100` : 使用默认配置，设置文件系统为 btrfs 格式，分区大小为 2748M, 并指定内核为 5.10.100 ，对全部型号电视盒子进行打包。
 
-- ### 本地化打包
-
-1. 安装必要的软件包（如 Ubuntu 20.04 LTS 用户）
-
-```yaml
-sudo apt-get update -y
-sudo apt-get full-upgrade -y
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
-```
-
-2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
-
-3. 在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Lepotato_current_5.15.25.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.25`）请保留，它将在重构后用作 Armbian 固件的名称。
-
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.10.100` 命令即可生成指定 soc 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
-
-- ### 使用 GitHub Actions 进行编译
+## 使用 GitHub Actions 进行编译
 
 1. 关于 Workflows 文件的配置在 [.yml](.github/workflows/build-armbian.yml) 文件里。可以设置需要编译的盒子的 `SOC` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
 
@@ -204,9 +204,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 soc 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
 
-- ### 仅单独引入 GitHub Actions 进行 Armbian 重构
-
-你可以使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Rebuild armbian`*** ，输入 Armbian 的网络下载地址如 `https://dl.armbian.com/*/Armbian_*.img.xz` ，或者在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中通过 `armbian_path` 参数设定重构文件的加载路径。代码如下:
+4. 使用其他方式构建 Armbian 固件。或者使用 [Armbian](https://armbian.tnahosting.net/dl/) 官方提供的 [lepotato](https://armbian.tnahosting.net/dl/lepotato/archive/) 等分支的固件，仅在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中引入本仓库的脚本进行 Armbian 重构，适配 Amlogic S9xxx 系列盒子的使用。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Rebuild armbian`*** ，输入 Armbian 的网络下载地址如 `https://dl.armbian.com/*/Armbian_*.img.xz` ，或者在流程控制文件 [.yml](.github/workflows/rebuild-armbian.yml) 中通过 `armbian_path` 参数设定重构文件的加载路径。代码如下:
 
 ```yaml
 - name: Rebuild the Armbian for Amlogic s9xxx
@@ -218,7 +216,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
     armbian_kernel: 5.15.25_5.10.100
 ```
 
-- GitHub Actions 输入参数说明
+- ### GitHub Actions 输入参数说明
 
 关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md#3-fork-仓库并设置-releases_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
 
@@ -232,7 +230,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | armbian_size     | 2748              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`           |
 | armbian_fstype   | ext4              | 设置固件 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 
-- GitHub Actions 输出变量说明
+- ### GitHub Actions 输出变量说明
 
 | 参数                                      | 默认值             | 说明                       |
 |------------------------------------------|-------------------|---------------------------|
@@ -253,6 +251,13 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
     kernel_auto: true
     kernel_sign: -meson64-dev
 ```
+## Armbian 固件默认信息
+
+| 名称 | 值 |
+| ---- | ---- |
+| 默认 IP | 从路由器获取 IP |
+| 默认账号 | root |
+| 默认密码 | 1234 |
 
 ## Armbian 贡献者名单
 
