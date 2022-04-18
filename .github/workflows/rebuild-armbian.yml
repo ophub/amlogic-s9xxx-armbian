@@ -95,7 +95,6 @@ jobs:
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
 
       - name: Upload Armbian image to Release
-        id: release
         uses: ncipollo/release-action@v1
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
