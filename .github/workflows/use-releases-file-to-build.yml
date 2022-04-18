@@ -13,10 +13,22 @@ on:
         description: "Release: jammy / focal / bullseye"
         required: false
         default: "focal"
-      more_settings:
-        description: "Rebuild: More parameter settings"
+      armbian_soc:
+        description: "Set Amlogic SoC."
         required: false
-        default: ""
+        default: "all"
+      armbian_kernel:
+        description: "Set kernel version."
+        required: false
+        default: "5.15.25_5.10.100"
+      armbian_size:
+        description: "Set armbian rootfs size."
+        required: false
+        default: "2748"
+      armbian_fstype:
+        description: "Set armbian rootfs type."
+        required: false
+        default: "ext4"
 
 env:
   TZ: Asia/Shanghai
@@ -43,7 +55,7 @@ jobs:
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for amlogic s9xxx
-        id: rebuild
+        id: down
         if: (!cancelled())
         run: |
           armbian_buildpath="build/output/images"
@@ -53,8 +65,8 @@ jobs:
           down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           [ -z "${down_file}" ] && echo "Invalid download file." && exit 1
-          wget -q -P "${armbian_buildpath}" "${down_file}" && sync
-          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
+          wget -q -P "${armbian_buildpath}" "${down_file}"
+          [[ "$?" -ne "0" ]] && echo "Invalid download file." && exit 1
 
           set_release="_"
           out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
@@ -68,22 +80,25 @@ jobs:
               let i++
           done
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
-
-          cd ${GITHUB_WORKSPACE}
-          sudo chmod +x rebuild
-          sudo ./rebuild -d ${{ github.event.inputs.more_settings }}
-          cd ./build/output/images && sudo gzip *.img && sync
-          echo "FILEPATH=$PWD" >> $GITHUB_ENV
-          echo "FILE_DATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
-      - name: Upload Armbian image to Release
-        id: release
-        uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && !cancelled()
+      - name: Rebuild Armbian for Amlogic s9xxx
+        uses: ophub/amlogic-s9xxx-armbian@main
+        if: steps.down.outputs.status == 'success' && !cancelled()
         with:
-          tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.FILE_DATE }}
-          artifacts: ${{ env.FILEPATH }}/*
+          build_target: armbian
+          armbian_path: build/output/images/*.img
+          armbian_soc: ${{ github.event.inputs.armbian_soc }}
+          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
+          armbian_size: ${{ github.event.inputs.armbian_size }}
+          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
+
+      - name: Upload Armbian image to Release
+        uses: ncipollo/release-action@v1
+        if: env.PACKAGED_STATUS == 'success' && !cancelled()
+        with:
+          tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
