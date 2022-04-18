@@ -25,8 +25,24 @@ on:
         description: "Rebuild: More parameter settings"
         required: false
         default: ""
+      armbian_soc:
+        description: "Set Amlogic SoC."
+        required: false
+        default: "all"
+      armbian_kernel:
+        description: "Set kernel version."
+        required: false
+        default: "5.15.25_5.10.100"
+      armbian_size:
+        description: "Set armbian rootfs size."
+        required: false
+        default: "2748"
+      armbian_fstype:
+        description: "Set armbian rootfs type."
+        required: false
+        default: "ext4"
   #schedule:
-  #- cron: "0 17 * * 0"
+    #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
@@ -90,24 +106,23 @@ jobs:
                             CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
-      - name: Rebuild Armbian for amlogic s9xxx
-        id: rebuild
+      - name: Rebuild Armbian for Amlogic s9xxx
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: steps.compile.outputs.status == 'success' && !cancelled()
-        run: |
-          sudo chmod +x rebuild
-          sudo ./rebuild -d ${{ github.event.inputs.more_settings }}
-          cd build/output/images/ && sudo gzip *.img && sync
-          echo "FILEPATH=$PWD" >> $GITHUB_ENV
-          echo "FILE_DATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+        with:
+          build_target: armbian
+          armbian_path: build/output/images/*.img
+          armbian_soc: ${{ github.event.inputs.armbian_soc }}
+          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
+          armbian_size: ${{ github.event.inputs.armbian_size }}
+          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
 
       - name: Upload Armbian image to Release
-        id: release
         uses: ncipollo/release-action@v1
-        if: steps.rebuild.outputs.status == 'success' && !cancelled()
+        if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
-          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.FILE_DATE }}
-          artifacts: ${{ env.FILEPATH }}/*
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
