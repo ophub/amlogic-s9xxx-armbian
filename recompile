@@ -12,12 +12,6 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-#============= Install the basic packages of compile the kernel for Ubuntu 20.04 ==============
-#
-# sudo apt-get update -y
-# sudo apt-get full-upgrade -y
-# sudo apt-get install -y $(curl -fsSL git.io/ubuntu-2004-server)
-#
 # Command: sudo ./recompile -d
 # Command optional parameters please refer to the source code repository
 #
