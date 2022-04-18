@@ -54,7 +54,7 @@ jobs:
           sudo timedatectl set-timezone "$TZ"
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
-      - name: Rebuild Armbian for amlogic s9xxx
+      - name: Download Armbian from Releases
         id: down
         if: (!cancelled())
         run: |
