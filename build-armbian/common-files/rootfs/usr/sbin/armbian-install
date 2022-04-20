@@ -47,7 +47,7 @@ echo "DEV_EMMC: ${DEV_EMMC}"
 # Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
 # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
 K510="1"
-[[ "$(hexdump -x "/boot/zImage" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+[[ "$(hexdump -n 15 -x "/boot/zImage" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
 
 # Generate New ROOTFS UUID
 ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
