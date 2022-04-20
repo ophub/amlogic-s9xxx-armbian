@@ -93,21 +93,8 @@ process_msg() {
 get_textoffset() {
     vmlinuz_name="${1}"
     K510="1"
-    temp_script="$(mktemp)"
-    cat >${temp_script} <<EOF
-use strict;
-my \$filename = \$ARGV[0];
-open my \$fh, '<', \$filename or die;
-binmode \$fh;
-seek \$fh, 0x8, 0;
-my \$buf = "";
-read \$fh, \$buf, 0x4;
-close(\$fh);
-my \$str = unpack 'H*', \$buf;
-print "\$str\n";
-EOF
-    [[ "$(perl "${temp_script}" "${vmlinuz_name}")" == "00000801" ]] && K510="0"
-    rm -f ${temp_script} 2>/dev/null
+    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
+    [[ "$(hexdump -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
 }
 
 init_var() {
