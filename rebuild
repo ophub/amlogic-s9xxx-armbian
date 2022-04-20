@@ -94,7 +94,7 @@ get_textoffset() {
     vmlinuz_name="${1}"
     K510="1"
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
-    [[ "$(hexdump -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+    [[ "$(hexdump -n 15 -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
 }
 
 init_var() {
