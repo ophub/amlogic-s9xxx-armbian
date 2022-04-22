@@ -275,8 +275,8 @@ confirm_version() {
         ANDROID_UBOOT=""
         ;;
     s905l3a | e900v22c | e900v22d)
-        FDTFILE="meson-g12a-u200.dtb"
-        UBOOT_OVERLOAD="u-boot-u200.bin"
+        FDTFILE="meson-g12a-s905l3a-e900v22c.dtb"
+        UBOOT_OVERLOAD="u-boot-e900v22c.bin"
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         ;;
