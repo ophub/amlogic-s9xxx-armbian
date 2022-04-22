@@ -66,7 +66,7 @@ build_armbian=(
     "s922x" "s922x-n2" "s922x-reva" "a311d"
     "s905x3"
     "s905x2" "s905x2-km3" "s905l3a"
-    "s912" "s912-m8s"
+    "s912" "s912-m8s" "s912-zyxq-f2"
     "s905d" "s905d-ki"
     "s905x"
     "s905w"
@@ -317,7 +317,13 @@ confirm_version() {
         FDTFILE="meson-gxm-octopus-planet.dtb"
         UBOOT_OVERLOAD="u-boot-zyxq.bin"
         MAINLINE_UBOOT=""
-        ANDROID_UBOOT="zyxq-bootloader.img"
+        ANDROID_UBOOT=""
+        ;;
+    s912-zyxq-f2 | s912-fake-octopus-planet)
+        FDTFILE="meson-gxm-octopus-planet.dtb"
+        UBOOT_OVERLOAD="u-boot-zyxq.bin"
+        MAINLINE_UBOOT=""
+        ANDROID_UBOOT="bl-fake-octopus-planet.bin"
         ;;
     s912-m8s | s912-m8s-pro)
         FDTFILE="meson-gxm-q201.dtb"
