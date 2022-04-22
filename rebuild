@@ -317,7 +317,7 @@ confirm_version() {
         FDTFILE="meson-gxm-octopus-planet.dtb"
         UBOOT_OVERLOAD="u-boot-zyxq.bin"
         MAINLINE_UBOOT=""
-        ANDROID_UBOOT=""
+        ANDROID_UBOOT="zyxq-bootloader.img"
         ;;
     s912-m8s | s912-m8s-pro)
         FDTFILE="meson-gxm-q201.dtb"
