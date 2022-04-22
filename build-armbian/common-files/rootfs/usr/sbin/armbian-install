@@ -67,7 +67,7 @@ AMLOGIC_MODEL_LIST="
 
 # Amlogic GXM Family
 201:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic
-202:Octopus Planet(FAKE):s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:/usr/lib/u-boot/bl-fake-octopus-planet.bin:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic
+202:Octopus Planet (FAKE):s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:/usr/lib/u-boot/bl-fake-octopus-planet.bin:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic
 203:H96 Pro Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:2G/32G,1Gb Nic
 204:Tanix-TX92:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Nic
 205:VORKE-Z6-Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic
