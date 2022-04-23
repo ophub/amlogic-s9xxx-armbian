@@ -164,7 +164,7 @@ Please refer to [Description](led_screen_display_control.md)
 
 - If you cannot start the Armbian system from the USB hard disk again, connect the Amlogic s9xxx tv box to the computer monitor. If the screen is completely black and there is nothing, you need to restore the Amlogic s9xxx tv box to factory settings first, and then reinstall it. First download the [amlogic_usb_burning_tool](https://github.com/ophub/kernel/releases/tag/tools) system recovery tool and install it. Prepare a [USB dual male data cable](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png), Prepare a [paper clip](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png).
 
-- Take x96max+ as an example. Find the two [short-circuit points](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) on the motherboard, Download the [Android TV firmware](https://github.com/ophub/kernel/releases/tag/tools).
+- Take x96max+ as an example. Find the two [short-circuit points](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) on the motherboard, Download the [Android TV firmware](https://github.com/ophub/kernel/releases/tag/tools). The Android TV system firmware of other common devices and the corresponding short circuit diagrams can also be [downloaded and viewed here](https://github.com/ophub/kernel/releases/tag/tools).
 
 ```
 Operation method:
