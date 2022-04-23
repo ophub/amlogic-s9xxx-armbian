@@ -25,3 +25,5 @@ The `kernel` / `u-boot` and other resources used by this system are mainly copie
 | [lx7741](https://github.com/lx7741) | 15. [2022-03-23] After his test in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/192), in the `X96 Air` `s905x3` box, the `x96air.conf` can be used normally. Same configuration as x96max.conf |
 | [danboid](https://github.com/danboid) | 16. [2022-04-13] In [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pull/234) he shares the how-to to disable the IR receiver |
 | [KryptonLee](https://github.com/KryptonLee) | 17. [2022-04-22] He developed and shared `u-boot-e900v22c.bin`. After his test, the firmware that supports `e900v22c` is written to eMMC for use. |
+| [lanyucomputer](https://github.com/lanyucomputer) | 18. [2022-04-22] After his test in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/253), Determined the `octopus-planet (fake)` usage scheme, added the corresponding `bootloader` ([bl-fake-octopus-planet.bin](build-armbian/amlogic-u-boot/bootloader/bl-fake-octopus-planet.bin)) and `armbian-install` options. |
+
