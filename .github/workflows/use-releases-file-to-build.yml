@@ -70,7 +70,7 @@ jobs:
 
           set_release="_"
           out_releasename=$(ls -l *-trunk_* 2>/dev/null | awk '{print $9}' | head -n 1)
-          ARR_RELEASE=("jammy" "focal" "bullseye" "buster")
+          ARR_RELEASE=("jammy" "focal" "bullseye")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${out_releasename}" == *${r}* ]]; then
