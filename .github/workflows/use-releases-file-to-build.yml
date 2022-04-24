@@ -12,7 +12,7 @@ on:
       sel_tags_keywords:
         description: "Release: jammy / focal / bullseye"
         required: false
-        default: "focal"
+        default: "jammy"
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
