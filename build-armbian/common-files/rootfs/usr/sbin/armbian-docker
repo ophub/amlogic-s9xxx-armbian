@@ -34,14 +34,14 @@ echo -e "${INFO} Welcome to docker installation tool."
 # Get version info
 source ${ophub_release_file}
 VERSION_CODEID="${VERSION_CODEID}"     # ubuntu       -  debian
-VERSION_CODENAME="${VERSION_CODENAME}" # jammy/focal  -  bullseye/buster
+VERSION_CODENAME="${VERSION_CODENAME}" # jammy/focal  -  bullseye
 if [[ -z "${VERSION_CODEID}" ]]; then
     echo -ne "${OPT} Please Input VERSION_CODEID Name [ubuntu/debian]: "
     read VERSION_CODEID
     VERSION_CODEID=${VERSION_CODEID}
 fi
 if [[ -z "${VERSION_CODENAME}" ]]; then
-    echo -ne "${OPT} Please Input VERSION_CODENAME Name [jammy/focal/bullseye/buster]: "
+    echo -ne "${OPT} Please Input VERSION_CODENAME Name [jammy/focal/bullseye]: "
     read VERSION_CODENAME
     VERSION_CODENAME=${VERSION_CODENAME}
 fi
