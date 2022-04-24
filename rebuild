@@ -383,7 +383,7 @@ extract_armbian() {
     # Find ID in ${os_release_file}: such as [ubuntu/debian]
     release_codeid="$(cat ${os_release_file} | grep -oE "^ID=.*" | cut -d"=" -f2)"
     [ -z "${release_codeid}" ] && error_msg "The [ ${os_release_file}: ID ] is invalid."
-    # Find VERSION_CODENAME in ${os_release_file}: such as [jammy/focal/bullseye/buster]
+    # Find VERSION_CODENAME in ${os_release_file}: such as [jammy/focal/bullseye]
     release_codename="$(cat ${os_release_file} | grep -oE "^VERSION_CODENAME=.*" | cut -d"=" -f2)"
     [ -z "${release_codename}" ] && error_msg "The [ ${os_release_file}: VERSION_CODENAME ] is invalid."
 
