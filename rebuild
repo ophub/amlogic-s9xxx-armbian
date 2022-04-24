@@ -50,7 +50,7 @@ tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
-# Get armbian ${VERSION_CODENAME}: such as [ focal ]
+# Get armbian ${VERSION_CODENAME}: such as [ jammy ]
 os_release_file="etc/os-release"
 # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
 armbian_release_file="etc/armbian-release"
