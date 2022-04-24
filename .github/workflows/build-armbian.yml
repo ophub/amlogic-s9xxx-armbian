@@ -12,11 +12,11 @@ on:
       set_branch:
         description: "Branch: edge / current / legacy"
         required: false
-        default: "current"
+        default: "edge"
       set_release:
         description: "Release: jammy / focal / bullseye"
         required: false
-        default: "focal"
+        default: "jammy"
       set_board:
         description: "Board: lepotato / odroidn2"
         required: false
