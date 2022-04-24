@@ -77,7 +77,7 @@ AMLOGIC_MODEL_LIST="
 301:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Nic
 302:X96 Max 2GB:s905x2:meson-g12a-x96-max-rmii.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,2GB Mem,100Mb Nic
 303:MECOOL KM3 4G:s905x2:meson-g12a-sei510.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic
-304:E900V22C-D:s905l3a:meson-g12a-s905l3a-e900v22c.dtb:u-boot-e900v22c.bin:NA:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic
+304:E900V22C-D:s905l3a:meson-g12a-s905l3a-e900v22c.dtb:u-boot-e900v22c.bin:/usr/lib/u-boot/e900v22c-u-boot.bin.sd.bin:NA:4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic
 
 # Amlogic G12B Family
 401:Beelink GT-King:s922x:meson-g12b-gtking.dtb:u-boot-gtking.bin:/usr/lib/u-boot/gtking-u-boot.bin.sd.bin:NA:2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,brcm4356 wifi
@@ -220,6 +220,10 @@ if [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
 elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
     BLANK1="700"
     BOOT="160"
+    BLANK2="0"
+elif [[ "${AMLOGIC_SOC}" == "s905l3a" ]]; then
+    BLANK1="4"
+    BOOT="256"
     BLANK2="0"
 else
     BLANK1="68"
