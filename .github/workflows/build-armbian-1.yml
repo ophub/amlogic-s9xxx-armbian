@@ -14,7 +14,7 @@ on:
         required: false
         default: "current"
       set_release:
-        description: "Release: jammy / focal / bullseye"
+        description: "Release: jammy / focal / bullseye /buster"
         required: false
         default: "focal"
       set_board:
