@@ -91,20 +91,21 @@ AMLOGIC_MODEL_LIST="
 # Amlogic SM1 Family
 501:X96 Max+:s905x3:meson-sm1-x96-max-plus.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2100Mhz,4GB Mem,1Gb Nic,rtl8822cs wifi
 502:X96 Max+ (OverClock):s905x3:meson-sm1-x96-max-plus-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Nic,rtl8822cs wifi
-503:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
-504:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
-505:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
-506:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
-507:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
-508:Ugoos X3 (OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
-509:TX3 1Gb:s905x3:meson-sm1-tx3-qz.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
-510:TX3 1Gb (OverClock):s905x3:meson-sm1-tx3-qz-oc.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
-511:TX3 100Mb:s905x3:meson-sm1-tx3-bz.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
-512:TX3 100Mb (OverClock):s905x3:meson-sm1-tx3-bz-oc.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
-513:X96 Air 1Gb:s905x3:meson-sm1-x96-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
-514:X96 Air 100Mb:s905x3:meson-sm1-x96-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
-515:A95XF3 Air 1Gb:s905x3:meson-sm1-a95xf3-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
-516:A95XF3 Air 100Mb:s905x3:meson-sm1-a95xf3-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
+503:X96 Max+ (IP1001M phy):s905x3:meson-sm1-x96-max-plus-ip1001m.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/x96maxplus-u-boot.bin.sd.bin:/usr/lib/u-boot/hk1box-bootloader.img:4C@2208Mhz,4GB Mem,1Gb Nic (IP1001M phy),brcm4354 wifi
+504:HK1 Box:s905x3:meson-sm1-hk1box-vontar-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+505:HK1 Box (OverClock):s905x3:meson-sm1-hk1box-vontar-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/hk1box-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+506:H96 Max X3:s905x3:meson-sm1-h96-max-x3.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2100Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+507:H96 Max X3 (OverClock):s905x3:meson-sm1-h96-max-x3-oc.dtb:u-boot-x96maxplus.bin:/usr/lib/u-boot/h96maxx3-u-boot.bin.sd.bin:NA:4C@2208Mhz,4GB Mem,1Gb Nic,brcm4339 wifi
+508:Ugoos X3:s905x3:meson-sm1-ugoos-x3.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2100Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
+509:Ugoos X3 (OverClock):s905x3:meson-sm1-ugoos-x3-oc.dtb:u-boot-ugoos-x3.bin:NA:NA:4C@2208Mhz,2(Cube)/4(Pro,Plus)GB Mem,1Gb Nic,brcm43455/43456 wifi
+510:TX3 1Gb:s905x3:meson-sm1-tx3-qz.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
+511:TX3 1Gb (OverClock):s905x3:meson-sm1-tx3-qz-oc.dtb:u-boot-tx3-qz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,1Gb Nic,bcm4330 wifi
+512:TX3 100Mb:s905x3:meson-sm1-tx3-bz.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
+513:TX3 100Mb (OverClock):s905x3:meson-sm1-tx3-bz-oc.dtb:u-boot-tx3-bz.bin:/lib/u-boot/x96maxplus-u-boot.bin.sd.bin::4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi
+514:X96 Air 1Gb:s905x3:meson-sm1-x96-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
+515:X96 Air 100Mb:s905x3:meson-sm1-x96-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
+516:A95XF3 Air 1Gb:s905x3:meson-sm1-a95xf3-air-gbit.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,1Gb Nic,Wifi
+517:A95XF3 Air 100Mb:s905x3:meson-sm1-a95xf3-air.dtb:u-boot-x96maxplus.bin:NA:NA:4C@2100Mhz,2GB Mem,100Mb Nic,Wifi
 
 # Other
 0:Unknown:Other:Import-custom-dtb-file:NA:NA:NA:Enter the dtb file name of your box
