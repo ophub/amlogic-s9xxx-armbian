@@ -1,4 +1,17 @@
+# The file path: /etc/default/cpufrequtils
+# Call file: /etc/init.d/cpufrequtils
+#
+# View setup results:
+# cat /sys/devices/system/cpu/cpufreq/policy0/scaling_governor
+# cat /sys/devices/system/cpu/cpufreq/policy0/scaling_min_freq
+# cat /sys/devices/system/cpu/cpufreq/policy0/scaling_max_freq
+
+# Set ENABLE to "true" to let the script run at boot time
 ENABLE="true"
+
+# MIN_SPEED and MAX_SPEED listed in: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies
 MIN_SPEED="$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $(NF/2)}')"
 MAX_SPEED="$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $NF}')"
+
+# GOVERNOR listed in: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
 GOVERNOR="schedutil"
