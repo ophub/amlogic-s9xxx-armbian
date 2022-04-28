@@ -15,16 +15,16 @@ These duplications are automated in the repository's packaging and install/updat
 <tr><td>105</td><td>MECOOL KI Pro</td><td>s905d</td><td>meson-gxl-s905d-mecool-ki-pro.dtb</td><td>u-boot-p201.bin</td><td>NA</td><td>NA</td><td>2G/16G,1Gb Nic</td></tr>
 
 <tr><td>201</td><td>Octopus Planet</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
-<tr><td>202</td><td>H96 Pro Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
-<tr><td>203</td><td>Tanix-TX92</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Nic</td></tr>
-<tr><td>204</td><td>VORKE-Z6-Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic</td></tr>
-<tr><td>205</td><td>T95Z Plus</td><td>s912</td><td>meson-gxm-t95z-plus.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>3G+32G,Octa-Core,2.4/5.8G Dual-Band WiFi,1Gb Nic 64Bit BT4.0</td></tr>
+<tr><td>202</td><td>Octopus Planet (FAKE)</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>bl-fake-octopus-planet.bin</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
+<tr><td>203</td><td>H96 Pro Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
+<tr><td>204</td><td>Tanix-TX92</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Nic</td></tr>
+<tr><td>205</td><td>VORKE-Z6-Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic</td></tr>
 <tr><td>206</td><td>MECOOL M8S Pro L</td><td>s912</td><td>meson-gxm-q201.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>2G RAM,3G RAM,16G ROM,32G ROM,100Mb Nic</td></tr>
 
 <tr><td>301</td><td>X96 Max 4GB</td><td>s905x2</td><td>meson-g12a-x96-max.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,4GB Mem,1Gb Nic</td></tr>
 <tr><td>302</td><td>X96 Max 2GB</td><td>s905x2</td><td>meson-g12a-x96-max-rmii.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,2GB Mem,100Mb Nic</td></tr>
 <tr><td>303</td><td>MECOOL KM3 4G</td><td>s905x2</td><td>meson-g12a-sei510.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic</td></tr>
-<tr><td>304</td><td>E900V22C/D</td><td>s905l3a</td><td>meson-g12a-u200.dtb</td><td>u-boot-u200.bin</td><td>NA</td><td>NA</td><td>4C@1908Mhz,S905L3A+B,2+8G,USB2.0x2,LAN 100Mb Nic,uwe5621ds wifi(no work)</td></tr>
+<tr><td>304</td><td>E900V22C/D</td><td>s905l3a</td><td>meson-g12a-s905l3a-e900v22c.dtb</td><td>u-boot-e900v22c.bin</td><td>e900v22c-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,S905L3A+B,2+8G,USB2.0x2,LAN 100Mb Nic,uwe5621ds wifi(no work)</td></tr>
 
 <tr><td>401</td><td>Beelink GT-King</td><td>s922x</td><td>meson-g12b-gtking.dtb</td><td>u-boot-gtking.bin</td><td>gtking-u-boot.bin.sd.bin</td><td>NA</td><td>2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>402</td><td>Beelink GT-King Pro</td><td>s922x</td><td>meson-g12b-gtking-pro.dtb</td><td>u-boot-gtkingpro.bin</td><td>gtkingpro-u-boot.bin.sd.bin</td><td>NA</td><td>2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,Wifi</td></tr>
@@ -54,5 +54,6 @@ These duplications are automated in the repository's packaging and install/updat
 
 <tr><td>-</td><td>Beelink Mini MX 2G</td><td>s905</td><td>meson-gxbb-beelink-mini-mx.dtb</td><td>u-boot-s905.bin</td><td>NA</td><td>NA</td><td>Mali-450 GPU 2.4GHz / 5.8GHz WiFi 2GB RAM 16GB ROM,1Gb Nic</td></tr>
 <tr><td>-</td><td>MXQ PRO+ 4K</td><td>s905</td><td>meson-gxbb-mxq-pro-plus.dtb</td><td>u-boot-p201.bin</td><td>NA</td><td>NA</td><td>2GB RAM 16GB ROM 2.4G/5.8G,1Gb Nic</td></tr>
+<tr><td>-</td><td>T95Z Plus</td><td>s912</td><td>meson-gxm-t95z-plus.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>3G+32G,Octa-Core,2.4/5.8G Dual-Band WiFi,1Gb Nic 64Bit BT4.0(Use: extlinux/extlinux.conf)</td></tr>
 </table>
 
