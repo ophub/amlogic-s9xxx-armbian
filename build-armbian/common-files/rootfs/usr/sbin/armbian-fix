@@ -34,5 +34,8 @@
 [ -n "$(dpkg -l | grep linux-image-edge-meson64)" ] && sudo apt-get -qq purge -y linux-image-edge-meson64 && echo "Remove linux-image-edge-meson64"
 [ -n "$(dpkg -l | grep linux-image-current-meson64)" ] && sudo apt-get -qq purge -y linux-image-current-meson64 && echo "Remove linux-image-current-meson64"
 [ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ] && sudo apt-get -qq purge -y linux-image-legacy-meson64 && echo "Remove linux-image-legacy-meson64"
+[ -n "$(dpkg -l | grep linux-dtb-edge-meson64)" ] && sudo apt-get -qq purge -y linux-dtb-edge-meson64 && echo "Remove linux-dtb-edge-meson64"
+[ -n "$(dpkg -l | grep linux-dtb-current-meson64)" ] && sudo apt-get -qq purge -y linux-dtb-current-meson64 && echo "Remove linux-dtb-current-meson64"
+[ -n "$(dpkg -l | grep linux-dtb-legacy-meson64)" ] && sudo apt-get -qq purge -y linux-dtb-legacy-meson64 && echo "Remove linux-dtb-legacy-meson64"
 
-echo "armbian-fix: Loading finished."
+sync && echo "armbian-fix: Loading finished."
