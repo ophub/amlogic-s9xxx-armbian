@@ -34,8 +34,8 @@ These duplications are automated in the repository's packaging and install/updat
 <tr><td>406</td><td>UGOOS AM6 Plus</td><td>s922x</td><td>meson-g12b-ugoos-am6.dtb</td><td>u-boot-gtkingpro.bin</td><td>gtkingpro-u-boot.bin.sd.bin</td><td>NA</td><td>2C@1800Mhz(A53)+4C@1908Mhz(A73),4GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>407</td><td>Khadas VIM3</td><td>a311d</td><td>meson-g12b-a311d-khadas-vim3.dtb</td><td>u-boot-gtkingpro.bin</td><td>khadas-vim3-u-boot.sd.bin</td><td>NA</td><td>4C@2.2Ghz+2C@1.8Ghz,PCIe+USB 3.0,1Gb Nic,Wifi</td></tr>
 
-<tr><td>501</td><td>X96 Max+</td><td>s905x3</td><td>meson-sm1-x96-max-plus.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2100Mhz,4GB Mem,1Gb Nic</td></tr>
-<tr><td>502</td><td>X96 Max+ (OverClock)</td><td>s905x3</td><td>meson-sm1-x96-max-plus-oc.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic</td></tr>
+<tr><td>501</td><td>X96 Max+</td><td>s905x3</td><td>meson-sm1-x96-max-plus.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2100Mhz,4GB Mem,1Gb Nic,AM7256 wifi</td></tr>
+<tr><td>502</td><td>X96 Max+ (OverClock)</td><td>s905x3</td><td>meson-sm1-x96-max-plus-oc.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,AM7256 wifi</td></tr>
 <tr><td>503</td><td>X96 Max+ (IP1001M phy)</td><td>s905x3</td><td>meson-sm1-x96-max-plus-ip1001m.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic (IP1001M phy),brcm4354 wifi</td></tr>
 <tr><td>504</td><td>HK1 Box</td><td>s905x3</td><td>meson-sm1-hk1box-vontar-x3.dtb</td><td>u-boot-x96maxplus.bin</td><td>hk1box-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,4GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>505</td><td>HK1 Box (OverClock)</td><td>s905x3</td><td>meson-sm1-hk1box-vontar-x3-oc.dtb</td><td>u-boot-x96maxplus.bin</td><td>hk1box-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,Wifi</td></tr>
