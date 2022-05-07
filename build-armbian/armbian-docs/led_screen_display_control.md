@@ -48,6 +48,7 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | hk1box     |  16    |  armbian-led 16   |   openwrt-led 16    | Enable LED  |
 | tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | Enable LED  |
 | tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | Enable LED  |
+| t95m       |  19    |  armbian-led 19   |   openwrt-led 19    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 
 # LED 屏显示控制说明
@@ -100,4 +101,5 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | hk1box     |  16    |  armbian-led 16   |   openwrt-led 16    | 启用 LED |
 | tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | 启用 LED |
 | tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | 启用 LED |
+| t95m       |  19    |  armbian-led 19   |   openwrt-led 19    | 启用 LED |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
