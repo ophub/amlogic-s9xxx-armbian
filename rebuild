@@ -472,6 +472,12 @@ refactor_files() {
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
     sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
+    # Edit extlinux/extlinux.conf
+    boot_extlinux_file="extlinux/extlinux.conf"
+    [ -f "${boot_extlinux_file}" ] && {
+        sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_extlinux_file}
+        sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+    }
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
