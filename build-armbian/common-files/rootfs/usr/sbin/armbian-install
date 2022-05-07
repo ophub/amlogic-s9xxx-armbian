@@ -285,7 +285,7 @@ cp -rf /boot/* ${DIR_INSTALL} && sync
 rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
 
 echo "Generate the new uEnv.txt and extlinux.conf files."
-rm -rf ${DIR_INSTALL}/uEnv.txt ${DIR_INSTALL}/extlinux/extlinux.conf 2>/dev/null && sync
+rm -f ${DIR_INSTALL}/uEnv.txt ${DIR_INSTALL}/extlinux/extlinux.conf 2>/dev/null && sync
 # Create a new uEnv.txt file
 cat >${DIR_INSTALL}/uEnv.txt <<EOF
 LINUX=/zImage
