@@ -71,7 +71,7 @@ do_select_box() {
         16 | hk1box)      do_start hk1box.conf ;;
         17 | tx3)         do_start tx3.conf ;;
         18 | tx3-mini)    do_start tx3-mini.conf ;;
-        19 | t95m)        do_start t95m.conf ;;
+        19 | t95)         do_start t95.conf ;;
         99 | diy)         do_start diy.conf ;;
          0 | stop)        do_stop ;;
          1 | * | quit)    echo "quit!" && exit 0 ;;
@@ -92,7 +92,7 @@ if [ -z "${1}" ]; then
         │    16. hk1box (s905x3)        │
         │    17. tx3 (s905x3)           │
         │    18. tx3-mini (s905w)       │
-        │    19. t95m (s905x)           │
+        │    19. t95 (s905x)            │
         │    99. diy                    │
         │                               │
         ├────[ Disable LED or Quit ]────┤
