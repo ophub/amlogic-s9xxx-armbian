@@ -95,13 +95,12 @@ jobs:
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
 
       - name: Upload Armbian image to Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@main
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
           tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             This is Armbian image for Amlogic s9xxx tv box
             * Firmware information
