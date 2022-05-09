@@ -58,7 +58,7 @@ jobs:
           # Get the url of the rebuild armbian file
           armbian_url="${{ github.event.inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
-              armbian_site="https://armbian.tnahosting.net/dl/lepotato/archive/"
+              armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
               armbian_name="Armbian.*jammy.*.img.xz"
               armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [ -n "${armbian_file}" ]; then
