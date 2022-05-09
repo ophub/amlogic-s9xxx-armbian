@@ -18,9 +18,9 @@ on:
         required: false
         default: "jammy"
       set_board:
-        description: "Board: lepotato / odroidn2"
+        description: "Board: odroidn2 / lepotato"
         required: false
-        default: "lepotato"
+        default: "odroidn2"
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
