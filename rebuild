@@ -472,12 +472,16 @@ refactor_files() {
     [ -f "${boot_conf_file}" ] || error_msg "The [ ${boot_conf_file} ] file does not exist."
     sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
-    # Edit extlinux/extlinux.conf
+    # Edit extlinux/extlinux.conf (Temporarily tested in 5.10 kernel)
     boot_extlinux_file="extlinux/extlinux.conf"
-    [ -f "${boot_extlinux_file}" ] && {
-        sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_extlinux_file}
-        sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
-    }
+    if [[ -f "${boot_extlinux_file}" ]]; then
+        if [[ "${K510}" -eq "1" ]]; then
+            sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_extlinux_file}
+            sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+        else
+            rm -rf extlinux 2>/dev/null
+        fi
+    fi
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
