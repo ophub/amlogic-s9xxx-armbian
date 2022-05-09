@@ -65,12 +65,11 @@ jobs:
           kernel_config: ${{ github.event.inputs.kernel_config }}
 
       - name: Upload Kernel to Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@main
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
           tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
-          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
