@@ -59,7 +59,7 @@ jobs:
           armbian_url="${{ github.event.inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
               armbian_site="https://armbian.tnahosting.net/dl/lepotato/archive/"
-              armbian_name="Armbian.*focal.*.img.xz"
+              armbian_name="Armbian.*jammy.*.img.xz"
               armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [ -n "${armbian_file}" ]; then
                   armbian_url="${armbian_site}${armbian_file}"
