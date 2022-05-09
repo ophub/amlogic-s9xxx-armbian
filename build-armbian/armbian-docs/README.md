@@ -99,13 +99,12 @@ The settings saved by the firmware are also controlled in the [.github/workflows
 
 ```yaml
 - name: Upload Armbian Firmware to Release
-  uses: ncipollo/release-action@v1
+  uses: ncipollo/release-action@main
   if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
   with:
     tag: Armbian_${{ env.FILE_DATE }}
     artifacts: ${{ env.FILEPATH }}/*
     allowUpdates: true
-    token: ${{ secrets.GITHUB_TOKEN }}
     body: |
       This is Armbian firmware for Amlogic s9xxx tv box
       * Firmware information
