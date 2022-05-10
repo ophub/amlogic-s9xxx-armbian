@@ -70,6 +70,8 @@ The relevant parameters correspond to the `local compilation commands`, please r
 
 - ### GitHub Action Output variable description
 
+To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`, see the [instructions for details](../build-armbian/armbian-docs#2-set-the-privacy-variable-github_token).
+
 | Parameter                         | For example              | Description                       |
 |-----------------------------------|--------------------------|-----------------------------------|
 | ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.25_5.10.100         | The name of the compiled kernel   |
