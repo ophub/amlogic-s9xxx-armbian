@@ -52,7 +52,7 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 <img src=https://user-images.githubusercontent.com/68696949/163203032-f044c63f-d113-4076-bf94-41f86c7dd0ce.png width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/167579714-fdb331f3-5198-406f-b850-13da0024b245.png width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/167581376-e2578b7f-13f7-40a1-84fc-a00d666a8856.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/167585338-841d3b05-8d98-4d73-ba72-475aad4a95a9.png width="300" />
 </div>
 
 ## 4. 个性化 Armbian 固件定制文件说明
