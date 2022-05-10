@@ -70,6 +70,8 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 - ### GitHub Action 输出变量说明
 
+上传到 `Releases` 需要给仓库添加 `GITHUB_TOKEN` 和 `GH_TOKEN` 并设置 `Workflow 读写权限`，详见[使用说明](../build-armbian/armbian-docs/README.cn.md#2-设置隐私变量-github_token)。
+
 | 参数                               | 默认值                    | 说明                       |
 |-----------------------------------|--------------------------|----------------------------|
 | ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.25_5.10.100         | 编译好的内核的名称            |
