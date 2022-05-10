@@ -233,6 +233,8 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 
 - ### GitHub Actions Output variable description
 
+To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`, see the [instructions for details](build-armbian/armbian-docs#2-set-the-privacy-variable-github_token).
+
 | Parameter                                | For example       | Description                       |
 |------------------------------------------|-------------------|-----------------------------------|
 | ${{ env.PACKAGED_OUTPUTPATH }}           | out               | OpenWrt firmware storage path     |
