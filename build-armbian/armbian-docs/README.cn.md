@@ -10,7 +10,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
   - [2. 设置隐私变量 GITHUB_TOKEN](#2-设置隐私变量-github_token)
-  - [3. Fork 仓库并设置 RELEASES_TOKEN](#3-fork-仓库并设置-releases_token)
+  - [3. Fork 仓库并设置 GH_TOKEN](#3-fork-仓库并设置-gh_token)
   - [4. 个性化 Armbian 固件定制文件说明](#4-个性化-armbian-固件定制文件说明)
   - [5. 编译固件](#5-编译固件)
     - [5.1 手动编译](#51-手动编译)
@@ -43,9 +43,9 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 <img src=https://user-images.githubusercontent.com/68696949/109418485-93514700-7a03-11eb-848d-36de784a4438.jpg width="300" />
 </div>
 
-## 3. Fork 仓库并设置 RELEASES_TOKEN
+## 3. Fork 仓库并设置 GH_TOKEN
 
-现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-armbian ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-armbian 。在右上角的 Settings > Secrets > New repostiory secret ( Name: RELEASES_TOKEN, Value: 填写刚才GITHUB_TOKEN的值 )，保存。图示如下：
+现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-armbian ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-armbian 。在右上角的 `Settings` > `Secrets` > `Actions` > `New repostiory secret` ( Name: `GH_TOKEN`, Value: `填写刚才GITHUB_TOKEN的值` )，保存。并在左侧导航栏的 `Actions` > `General` > `Workflow permissions` 下选择 `Read and write permissions` 并保存。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
