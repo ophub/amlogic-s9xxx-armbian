@@ -232,6 +232,8 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 - ### GitHub Actions 输出变量说明
 
+上传到 `Releases` 需要给仓库添加 `GITHUB_TOKEN` 和 `GH_TOKEN` 并设置 `Workflow 读写权限`，详见[使用说明](build-armbian/armbian-docs/README.cn.md#2-设置隐私变量-github_token)。
+
 | 参数                                      | 默认值             | 说明                       |
 |------------------------------------------|-------------------|---------------------------|
 | ${{ env.PACKAGED_OUTPUTPATH }}           | out               | 打包后的固件所在文件夹的路径   |
