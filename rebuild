@@ -1,5 +1,5 @@
 #!/bin/bash
-#==================================================================================
+#========================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -8,14 +8,14 @@
 # This file is a part of the Armbian Rebuild and kernel Recompile script
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on Ubuntu-20.04-x86_64, Build armbian for Amlogic s9xxx tv box
+# Description: Run on x86_64 Ubuntu-20.04/22.04, Build armbian for Amlogic s9xxx tv box
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: sudo ./rebuild -d
 # Command optional parameters please refer to the source code repository
 #
-#================================= Functions list =================================
+#==================================== Functions list ====================================
 #
 # error_msg          : Output error message
 # process_msg        : Output process message
@@ -34,7 +34,7 @@
 #
 # loop_rebuild       : Loop to rebuild Armbian files
 #
-#========================= Set make environment variables =========================
+#============================ Set make environment variables ============================
 #
 # Related file storage path
 make_path="${PWD}"
@@ -81,7 +81,7 @@ ROOT_MB="2748"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 ROOTFS_TYPE="ext4"
 #
-#==================================================================================
+#========================================================================================
 
 error_msg() {
     echo -e " [\033[1;91m Error \033[0m] ${1}"
