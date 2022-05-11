@@ -46,6 +46,7 @@ out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info="$(arch)"
+host_release="$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)"
 toolchain_path="/usr/local/toolchain"
 #
 # Set the default value of the [ -r ] parameter
@@ -164,24 +165,34 @@ toolchain_check() {
     cd ${make_path}
     echo -e "${STEPS} Check the cross-compilation environment ..."
 
-    [ -d "${toolchain_path}" ] || mkdir -p ${toolchain_path}
+    if [[ "${host_release}" == "jammy" ]]; then
+        # Install dependencies for jammy
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-armbian-depends)
+    else
+        # Install dependencies for focal
+        sudo apt-get -qq update
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2004-armbian-depends)
 
-    # Download gcc
-    if [ ! -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ]; then
-        echo -e "${INFO} Download gcc [ ${gcc_file} ] ..."
-        wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_path}/${gcc_file}" >/dev/null 2>&1 && sync
-        tar -xJf ${toolchain_path}/${gcc_file} -C ${toolchain_path} && sync
-        rm -f ${toolchain_path}/${gcc_file} && sync
-        [ -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
-    fi
+        [ -d "${toolchain_path}" ] || mkdir -p ${toolchain_path}
 
-    # Download clang
-    if [ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]; then
-        echo -e "${INFO} Download clang [ ${clang_file} ] ..."
-        wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1 && sync
-        tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path} && sync
-        rm -f ${toolchain_path}/${clang_file} && sync
-        [ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
+        # Download gcc for Ubuntu focal
+        if [[ ! -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ]]; then
+            echo -e "${INFO} Download gcc [ ${gcc_file} ] ..."
+            wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_path}/${gcc_file}" >/dev/null 2>&1 && sync
+            tar -xJf ${toolchain_path}/${gcc_file} -C ${toolchain_path} && sync
+            rm -f ${toolchain_path}/${gcc_file} && sync
+            [ -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ] || error_msg "The gcc is not set!"
+        fi
+
+        # Download clang for Ubuntu focal
+        if [[ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]]; then
+            echo -e "${INFO} Download clang [ ${clang_file} ] ..."
+            wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1 && sync
+            tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path} && sync
+            rm -f ${toolchain_path}/${clang_file} && sync
+            [ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ] || error_msg "The clang is not set!"
+        fi
     fi
 
     # Download armbian
@@ -311,28 +322,35 @@ env_check() {
 compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set cross compilation parameters."
+
     # Set cross compilation parameters
-    path_ubuntu2004="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-    path_clang="${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_ubuntu2004}"
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
-    export PATH=${path_clang}
-    export CROSS_COMPILE=${toolchain_path}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
-    export CC=${toolchain_path}/${clang_file//.tar.xz/}/bin/clang
-    export LD=${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld
-    # Set $PATH variable for ~/.bashrc
-    sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-    echo "PATH=${path_clang}" >>~/.bashrc && sync
-    source ~/.bashrc
-    # Set $PATH variable for /etc/profile
-    sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-    echo "PATH=${path_clang}" >>/etc/profile && sync
-    source /etc/profile
+    if [[ "${host_release}" == "jammy" ]]; then
+        export CROSS_COMPILE=aarch64-linux-gnu-
+        export CC=clang
+        export LD=ld.lld
+    else
+        export CROSS_COMPILE=${toolchain_path}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-
+        export CC=${toolchain_path}/${clang_file//.tar.xz/}/bin/clang
+        export LD=${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld
+        #
+        # Add $PATH variable
+        path_ubuntu="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+        path_clang=${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_ubuntu}
+        # Set $PATH variable for ~/.bashrc
+        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
+        echo "PATH=${path_clang}" >>~/.bashrc && sync
+        source ~/.bashrc
+        # Set $PATH variable for /etc/profile
+        sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
+        echo "PATH=${path_clang}" >>/etc/profile && sync
+        source /etc/profile
+    fi
 
     # Show variable
     echo -e "${INFO} ARCH: [ ${ARCH} ]"
     echo -e "${INFO} LOCALVERSION: [ ${LOCALVERSION} ]"
-    echo -e "${INFO} PATH: [ ${PATH} ]"
     echo -e "${INFO} CROSS_COMPILE: [ ${CROSS_COMPILE} ]"
     echo -e "${INFO} CC: [ ${CC} ]"
     echo -e "${INFO} LD: [ ${LD} ]"
@@ -542,22 +560,24 @@ loop_recompile() {
     done
 }
 
-# Show welcome message
+# Check script permission, supports running on x86_64 Ubuntu: [ jammy / focal ]
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./$0 ]"
+[[ -n "${host_release}" && "jammy focal" == *"${host_release}"* ]] || error_msg "Supports running on Ubuntu: [ jammy / focal ]"
+[[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
+# Show welcome and server start information
 echo -e "Welcome to compile kernel! \n"
-[ $(id -u) = 0 ] || error_msg "Please run this script as root: [ sudo ./$0 ]"
-[[ ${arch_info} == "x86_64" ]] || error_msg "Please run this script on ubuntu-20.04"
-# Show server start information
+echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
 echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
 #
-# Initialize variables and download the kernel source code
+# Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
 echo -e "Kernel from: [ ${code_owner} ]"
 echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
-# Check the toolchain and loop to compile the kernel
 toolchain_check
+# Loop to compile the kernel
 loop_recompile
 #
 # Show server end information
