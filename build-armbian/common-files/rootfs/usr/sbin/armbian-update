@@ -224,7 +224,7 @@ fi
 
 echo -e "Unpack [ ${custom_kernel_name} ] related files ..."
 
-# 01. for /boot five files
+# 01. For /boot five files
 rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-* 2>/dev/null && sync
 rm -f /boot/uInitrd /boot/zImage 2>/dev/null && sync
 tar -xzf ${tmp_path}/${build_boot} -C /boot && sync
@@ -275,13 +275,13 @@ fi
 echo -e "02.01 Unpack [ ${build_boot} ] complete."
 sleep 3
 
-# 02. for /boot/dtb/amlogic/*
+# 02. For /boot/dtb/amlogic/*
 tar -xzf ${tmp_path}/${build_dtb} -C /boot/dtb/amlogic && sync
 [ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ] || error_msg "/boot/dtb/amlogic file is missing."
 echo -e "02.02 Unpack [ ${build_dtb} ] complete."
 sleep 3
 
-# 03. for /usr/lib/modules/*
+# 03. For /usr/lib/modules/*
 rm -rf /usr/lib/modules/* 2>/dev/null && sync
 tar -xzf ${tmp_path}/${build_modules} -C /usr/lib/modules && sync
 (cd /usr/lib/modules/${custom_kernel_name} && echo "build source" | xargs rm -f)
@@ -289,10 +289,9 @@ tar -xzf ${tmp_path}/${build_modules} -C /usr/lib/modules && sync
 echo -e "02.03 Unpack [ ${build_modules} ] complete."
 sleep 3
 
-# 04. for /usr/local/include/*
+# 04. For /usr/include/*
 if [[ -n "${build_header}" && -f "${tmp_path}/${build_header}" ]]; then
-    rm -rf /usr/local/include/* 2>/dev/null && sync
-    tar -xzf ${tmp_path}/${build_header} -C /usr/local && sync
+    tar -xzf ${tmp_path}/${build_header} -C /usr && sync
     echo -e "02.04 Unpack [ ${build_header} ] complete."
     sleep 3
 fi
