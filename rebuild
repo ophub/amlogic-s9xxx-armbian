@@ -392,7 +392,7 @@ extract_armbian() {
     # Delete all files of /boot partition and replace it later
     rm -rf boot/* 2>/dev/null
     # Delete the kernel files and replace it later
-    rm -rf usr/lib/modules/* usr/local/include/* 2>/dev/null
+    rm -rf usr/lib/modules/* 2>/dev/null
     # Delete the symbolic link files and relink it later
     rm -rf bin lib sbin tmp var/sbin 2>/dev/null
 
@@ -432,22 +432,22 @@ refactor_files() {
     build_header=$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)
     [[ -n "${build_boot}" && -n "${build_dtb}" && -n "${build_modules}" && -n "${build_header}" ]] || error_msg "The 4 kernel missing."
 
-    # 01 For /boot five files
+    # 01. For /boot five files
     tar -xzf ${build_boot} -C ${tag_bootfs} && sync
     [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
     get_textoffset "${tag_bootfs}/zImage"
 
-    # 02 For dtb files
+    # 02. For /boot/dtb/amlogic/*
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
 
-    # 03 For usr/lib/modules/*
+    # 03. For /usr/lib/modules/*
     tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
     (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source 2>/dev/null && sync)
     [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "Missing kernel."
 
-    # 04 For header files, usr/local/include
-    tar -xzf ${build_header} -C ${tag_rootfs}/usr/local && sync
+    # 04. For /usr/include/*
+    tar -xzf ${build_header} -C ${tag_rootfs}/usr && sync
 
     # Set the type of file system
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
