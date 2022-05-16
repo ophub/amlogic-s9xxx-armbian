@@ -21,6 +21,10 @@ on:
         description: "Board: odroidn2 / lepotato"
         required: false
         default: "odroidn2"
+      set_desktop:
+        description: "Build Desktop: no / gnome / xfce"
+        required: false
+        default: "no"
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
@@ -87,6 +91,16 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
+          ARR_DESKTOP=("no" "gnome" "xfce")
+          set_desktop="${{ github.event.inputs.set_desktop }}"
+          if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
+              # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
+              str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
+          else
+              str_desktop="BUILD_DESKTOP=no"
+          fi
+          echo "ARMBIAN_DESKTOP=${str_desktop}" >> $GITHUB_ENV
+
       - name: Download source code
         id: down
         run: |
@@ -95,11 +109,11 @@ jobs:
       - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
         id: compile
         run: |
+          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
-                            BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
-                            CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP }} \
+                            HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for Amlogic s9xxx
