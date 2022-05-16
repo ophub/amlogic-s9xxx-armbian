@@ -77,7 +77,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 |-----------------------------------|--------------------------|----------------------------|
 | ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.25_5.10.100         | 编译好的内核的名称            |
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | 编译完成的内核所在文件夹的路径  |
-| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | 编译日期                    |
+| ${{ env.PACKAGED_OUTPUTDATE }}    | 04.13.1058               | 编译日期（月.日.时分）        |
 | ${{ env.PACKAGED_STATUS }}        | success                  | 编译状态：success / failure  |
 
 ## 内核使用说明
