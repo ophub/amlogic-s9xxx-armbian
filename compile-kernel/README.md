@@ -13,10 +13,8 @@ You can adjust the configuration of the kernel as needed, such as adding drivers
 ```yaml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-# Ubuntu-20.04
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2004-armbian-depends)
-# Ubuntu-22.04
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2204-armbian-depends)
+# For Ubuntu-22.04
+sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
 2. Clone the repository to local: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
