@@ -99,20 +99,21 @@ jobs:
           else
               str_desktop="BUILD_DESKTOP=no"
           fi
-          echo "ARMBIAN_DESKTOP=${str_desktop}" >> $GITHUB_ENV
+          echo "ARMBIAN_DESKTOP_OPT=${set_desktop}" >> $GITHUB_ENV
+          echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
 
       - name: Download source code
         id: down
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
+      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Desktop is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP }} \
+          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP_STR }} \
                             HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
@@ -142,3 +143,4 @@ jobs:
             Default password: 1234
             Install command: armbian-install
             Update command: armbian-update
+            Desktop: ${{ env.ARMBIAN_DESKTOP_OPT }}
