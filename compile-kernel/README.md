@@ -73,12 +73,12 @@ The relevant parameters correspond to the `local compilation commands`, please r
 
 To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`, see the [instructions for details](../build-armbian/armbian-docs#2-set-the-privacy-variable-github_token).
 
-| Parameter                         | For example              | Description                       |
-|-----------------------------------|--------------------------|-----------------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.25_5.10.100         | The name of the compiled kernel   |
-| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | kernel files storage path         |
-| ${{ env.PACKAGED_OUTPUTDATE }}    | 2021.04.13.1058          | compile date                      |
-| ${{ env.PACKAGED_STATUS }}        | success                  | Compile status. success / failure |
+| Parameter                         | For example              | Description                         |
+|-----------------------------------|--------------------------|-------------------------------------|
+| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.25_5.10.100         | The name of the compiled kernel     |
+| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | kernel files storage path           |
+| ${{ env.PACKAGED_OUTPUTDATE }}    | 04.13.1058               | compile date(month.day.hour.minute) |
+| ${{ env.PACKAGED_STATUS }}        | success                  | Compile status. success / failure   |
 
 
 ## Kernel usage Instructions
