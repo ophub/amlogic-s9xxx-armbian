@@ -168,11 +168,11 @@ toolchain_check() {
     if [[ "${host_release}" == "jammy" ]]; then
         # Install dependencies for jammy
         sudo apt-get -qq update
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-armbian-depends)
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
     else
         # Install dependencies for focal
         sudo apt-get -qq update
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2004-armbian-depends)
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2004-build-armbian-depends)
 
         [ -d "${toolchain_path}" ] || mkdir -p ${toolchain_path}
 
@@ -447,13 +447,13 @@ generate_uinitrd() {
     [ -f "/usr/bin/${qemu_binary_arm64}" ] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/ && sync
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
-    cp -f ${script_path}/generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
-    chmod +x ${tag_rootfs}/root/generate_uinitrd.sh 2>/dev/null
+    cp -f ${script_path}/chroot_generate_uinitrd.sh ${tag_rootfs}/root 2>/dev/null && sync
+    chmod +x ${tag_rootfs}/root/chroot_generate_uinitrd.sh 2>/dev/null
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
     echo -e "${INFO} Enter the chroot armbian system..."
-    chroot ${tag_rootfs} /bin/bash -c "/root/generate_uinitrd.sh ${kernel_outname}"
+    chroot ${tag_rootfs} /bin/bash -c "/root/chroot_generate_uinitrd.sh ${kernel_outname}"
     [[ $? -ne 0 || ! -f "${tag_rootfs}"/boot/uInitrd-${kernel_outname} ]] && error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
     cd ${make_path}
