@@ -115,10 +115,10 @@ runs:
             cd ${GITHUB_ACTION_PATH}
             echo -e "Output environment variables."
             echo "PACKAGED_OUTPUTPATH=${PWD}/${armbian_filepath}" >> $GITHUB_ENV
-            echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+            echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
             echo "PACKAGED_STATUS=success" >> $GITHUB_ENV
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${armbian_filepath}"
-            echo -e "PACKAGED_OUTPUTDATE: $(date +"%Y.%m.%d.%H%M")"
+            echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
             echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${armbian_filepath} 2>/dev/null)"
 
@@ -155,11 +155,11 @@ runs:
             echo -e "Output environment variables."
             echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> $GITHUB_ENV
             echo "PACKAGED_OUTPUTPATH=${PWD}/${kernel_outpath}" >> $GITHUB_ENV
-            echo "PACKAGED_OUTPUTDATE=$(date +"%Y.%m.%d.%H%M")" >> $GITHUB_ENV
+            echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
             echo "PACKAGED_STATUS=success" >> $GITHUB_ENV
             echo -e "PACKAGED_OUTPUTTAGS: ${output_tags}"
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${kernel_outpath}"
-            echo -e "PACKAGED_OUTPUTDATE: $(date +"%Y.%m.%d.%H%M")"
+            echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
             echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${kernel_outpath} 2>/dev/null)"
 
