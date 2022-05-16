@@ -236,7 +236,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | 参数                                      | 默认值             | 说明                       |
 |------------------------------------------|-------------------|---------------------------|
 | ${{ env.PACKAGED_OUTPUTPATH }}           | out               | 打包后的固件所在文件夹的路径   |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 2021.04.13.1058   | 打包日期                    |
+| ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | 打包日期（月.日.时分）        |
 | ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
 
 ## 编译内核
