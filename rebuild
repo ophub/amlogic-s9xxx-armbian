@@ -686,7 +686,7 @@ loop_rebuild() {
         for k in ${build_kernel[*]}; do
             {
                 echo -n "(${j}.${i}) Start building Armbian [ ${b} - ${k} ]. "
-                now_remaining_space=$(df -hT ${PWD} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
+                now_remaining_space=$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
                 if [[ "${now_remaining_space}" -le "2" ]]; then
                     echo "Remaining space is less than 2G, exit this build. \n"
                     break
@@ -722,7 +722,7 @@ echo -e "Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
 echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+echo -e "Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
 #
 # Initialize variables
 init_var "${@}"
@@ -737,6 +737,6 @@ echo -e "ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
 loop_rebuild
 #
 # Show server end information
-echo -e "Server space usage after compilation: \n$(df -hT ${PWD}) \n"
+echo -e "Server space usage after compilation: \n$(df -hT ${make_path}) \n"
 # All process completed
 wait
