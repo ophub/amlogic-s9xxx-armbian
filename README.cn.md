@@ -152,6 +152,14 @@ armbian-ddbr
 
 根据提示输入 `b` 进行系统备份，输入 `r` 进行系统恢复。
 
+- ### 编译内核
+
+在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。启动 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-kernel -d -k 5.10.100
+```
+
 - ### 更多使用说明
 
 在 Armbian 的使用中，一些可能遇到的常见问题详见 [armbian-docs](build-armbian/armbian-docs/README.cn.md)
