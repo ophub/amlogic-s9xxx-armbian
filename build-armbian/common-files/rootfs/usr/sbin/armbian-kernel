@@ -104,8 +104,8 @@ help_info() {
     Command: cd ${make_path} && armbian-kernel -d -k 5.15.1
     -d : Defaults     Compile all kernels with default configuration.
     -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
-    -a : AutoKernel	  Set whether to automatically adopt the latest version, such as [ -a true ]
-    -n : CustomName	  Set the kernel custom signature, such as [ -n -xiaoming ]
+    -a : AutoKernel   Set whether to automatically adopt the latest version, such as [ -a true ]
+    -n : CustomName   Set the kernel custom signature, such as [ -n -xiaoming ]
     -r : Repo         Specifies the source code repository for the compiled kernel.
 ======================================================================================================
 EOF
