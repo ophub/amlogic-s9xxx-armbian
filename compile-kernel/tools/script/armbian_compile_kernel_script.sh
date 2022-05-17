@@ -516,9 +516,10 @@ loop_recompile() {
 # Show welcome and server start information
 echo -e "Welcome to compile kernel! \n"
 echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "Server running path [ ${make_path} ] \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${PWD}) \n"
+echo -e "Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
 #
 # Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
@@ -530,6 +531,6 @@ toolchain_check
 loop_recompile
 #
 # Show server end information
-echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${PWD}) \n"
+echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
 # All process completed
 wait
