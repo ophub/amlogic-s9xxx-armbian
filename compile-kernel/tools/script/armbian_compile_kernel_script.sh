@@ -20,13 +20,13 @@
 # error_msg          : Output error message
 #
 # init_var           : Initialize all variables
-# toolchain_check    : Check and install the cross-compilation toolchain (GCC, Clang, Armbian)
+# toolchain_check    : Check and install the toolchain
 # query_version      : Query the latest kernel version
 #
 # get_kernel_source  : Get the kernel source code
 # env_check          : Check the environment for compile kernel
 # compile_kernel     : Compile the kernel
-# generate_uinitrd   : Chroot into Armbian to generate initrd.img and uInitrd
+# generate_uinitrd   : Generate initrd.img and uInitrd
 # packit_kernel      : Package the full set of kernel files
 # clean_tmp          : Clear temporary files
 #
@@ -55,7 +55,7 @@ build_kernel=("5.10.100" "5.15.25")
 auto_kernel="true"
 custom_name="-meson64-dev"
 #
-# Cross compile toolchain download mirror, run on ubuntu-20.04
+# Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
@@ -157,7 +157,7 @@ toolchain_check() {
 
     if [[ "${host_release}" != "jammy" ]]; then
         [ -d "${toolchain_path}" ] || mkdir -p ${toolchain_path}
-        # Download clang for Ubuntu focal
+        # Download clang for Armbian
         if [[ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Download clang [ ${clang_file} ] ..."
             wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1 && sync
@@ -282,9 +282,9 @@ env_check() {
 
 compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
-    echo -e "${STEPS} Set cross compilation parameters."
+    echo -e "${STEPS} Set compilation parameters."
 
-    # Set cross compilation parameters
+    # Set compilation parameters
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
     if [[ "${host_release}" == "jammy" ]]; then
@@ -316,7 +316,7 @@ compile_kernel() {
     MAKE_SET_STRING=" ARCH=${ARCH} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
-    #make ${MAKE_SET_STRING} clean
+    make ${MAKE_SET_STRING} clean
 
     # Make menuconfig
     #make ${MAKE_SET_STRING} menuconfig
@@ -413,10 +413,11 @@ generate_uinitrd() {
 
     echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${kernel_outname})"
 
-    # Restore original system files
-    mv -f /boot/*${kernel_outname} ${out_kernel}/boot && sync
-    mv -f ${boot_backup_path}/* /boot && sync && rm -rf ${boot_backup_path}
-    #
+    # Restore the files in the [ /boot ] directory
+    mv -f *${kernel_outname} ${out_kernel}/boot && sync
+    mv -f ${boot_backup_path}/* . && sync && rm -rf ${boot_backup_path}
+
+    # Restore the files in the [ /usr/lib/modules ] directory
     rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null && sync
     mv ${modules_backup_path}/* /usr/lib/modules && sync && rm -rf ${modules_backup_path}
 }
@@ -515,7 +516,7 @@ loop_recompile() {
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # Show welcome and server start information
 echo -e "Welcome to compile kernel! \n"
-echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "Server running path [ ${make_path} ] \n"
 echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "Server memory usage: \n$(free -h) \n"
