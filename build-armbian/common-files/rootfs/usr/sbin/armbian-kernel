@@ -61,6 +61,10 @@ update_script() {
     cd ${make_path}
     echo -e "${STEPS} Start update script..."
 
+    # Install dependencies
+    sudo apt-get -qq update
+    sudo apt-get -qq install -y subversion git curl wget tar
+
     # Convert script repository address to svn format
     if [[ ${script_repo} == http* && $(echo ${script_repo} | grep "tree/main") != "" ]]; then
         script_repo="${script_repo//tree\/main/trunk}"
