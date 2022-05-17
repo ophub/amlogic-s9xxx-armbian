@@ -61,6 +61,7 @@ update_script() {
     cd ${make_path}
     echo -e "${STEPS} Start update script..."
 
+    echo -e "${INFO} Start installing dependencies..."
     # Install dependencies
     sudo apt-get -qq update
     sudo apt-get -qq install -y subversion git curl wget tar
@@ -70,6 +71,7 @@ update_script() {
         script_repo="${script_repo//tree\/main/trunk}"
     fi
 
+    echo -e "${INFO} Start update script..."
     # Update related files
     svn co ${script_repo} ${compile_path} --force
     cp -f ${script_name} ${compile_script}
@@ -92,7 +94,7 @@ clean_tmp() {
 help_info() {
     clear
     cat <<EOF
-=================================================================================================
+======================================================================================================
 01. Script assist functions
     Command: armbian-kernel -update
     -update  : Update local scripts to the latest
@@ -105,7 +107,7 @@ help_info() {
     -a : AutoKernel	  Set whether to automatically adopt the latest version, such as [ -a true ]
     -n : CustomName	  Set the kernel custom signature, such as [ -n -xiaoming ]
     -r : Repo         Specifies the source code repository for the compiled kernel.
-=================================================================================================
+======================================================================================================
 EOF
     exit 0
 }
@@ -117,13 +119,13 @@ EOF
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
 remaining_space=$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
 [[ "${remaining_space}" -ge "10" ]] || error_msg "Compiling the kernel requires 10Gb running space"
+# Check if script exists
+[[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -update ] to download the compile kernel script."
 
 # Execute script assist functions
-[[ "${1}" == "-help" || "${1}" == "--help" ]] && help_info
-[[ "${1}" == "-clean" || "${1}" == "--clean" ]] && clean_tmp
-[[ "${1}" == "-update" || "${1}" == "--update" ]] && update_script
-
-# Run the compiled kernel script
-cd ${make_path}
-[[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -update ] to download the compile kernel script."
-${compile_script} "${@}"
+case "${1}" in
+    -help)   help_info ;;
+    -clean)  clean_tmp ;;
+    -update) update_script ;;
+    *)       cd ${make_path} && sudo ${compile_script} "${@}" ;;
+esac
