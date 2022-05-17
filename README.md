@@ -152,6 +152,14 @@ armbian-ddbr
 
 According to the prompt, enter `b` to perform system backup, and enter `r` to perform system recovery.
 
+- ### Compile the kernel
+
+For the usage of compiling the kernel in Armbian, see the [compile-kernel](compile-kernel) documentation. please login in to armbian → input command:
+
+```yaml
+armbian-kernel -d -k 5.10.100
+```
+
 - ### More instructions for use
 
 In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs) for some common problems that may be encountered.
