@@ -8,7 +8,7 @@ You can adjust the configuration of the kernel as needed, such as adding drivers
 
 ## Local compilation
 
-- Run under Ubuntu system
+- ### Run under Ubuntu system
 
 1. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
 
@@ -23,7 +23,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 3. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.10.100` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
-- Run under Armbian system
+- ### Run under Armbian system
 
 1. Install the necessary packages
 

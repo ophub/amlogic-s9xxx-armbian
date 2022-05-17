@@ -8,7 +8,7 @@
 
 ## 本地编译
 
-- 在 Ubuntu 系统下运行
+- ### 在 Ubuntu 系统下运行
 
 1. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
 
@@ -23,7 +23,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
-- 在 Armbian 系统下运行
+- ### 在 Armbian 系统下运行
 
 1. 安装必要的软件包
 
