@@ -1,0 +1,125 @@
+#!/bin/bash
+#==============================================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian Rebuild and kernel Recompile script
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Run on Armbian, Compile the kernel for Amlogic s9xxx tv box
+# Copyright (C) 2021- https://github.com/unifreq
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-kernel
+# Command optional parameters please refer to the source code repository
+#
+#======================================= Functions list =======================================
+#
+# error_msg          : Output error message
+# update_script      : Update scripts
+# clean_tmp          : Clear temporary files
+#
+#=============================== Set make environment variables ===============================
+#
+# Related file storage path
+make_path="/opt/kernel"
+compile_script="${make_path}/recompile"
+compile_path="${make_path}/compile-kernel"
+config_path="${compile_path}/tools/config"
+script_path="${compile_path}/tools/script"
+script_name="${script_path}/armbian_compile_kernel_script.sh"
+kernel_path="${compile_path}/kernel"
+out_kernel="${compile_path}/output"
+arch_info="$(arch)"
+#
+# Kernel compilation script download repository
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel"
+#
+# Set font color
+blue_font_prefix="\033[94m"
+purple_font_prefix="\033[95m"
+green_font_prefix="\033[92m"
+yellow_font_prefix="\033[93m"
+red_font_prefix="\033[91m"
+font_color_suffix="\033[0m"
+INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
+STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
+SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
+WARNING="[${yellow_font_prefix}WARNING${font_color_suffix}]"
+ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+#
+#==============================================================================================
+
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+update_script() {
+    cd ${make_path}
+    echo -e "${STEPS} Start update script..."
+
+    # Convert script repository address to svn format
+    if [[ ${script_repo} == http* && $(echo ${script_repo} | grep "tree/main") != "" ]]; then
+        script_repo="${script_repo//tree\/main/trunk}"
+    fi
+
+    # Update related files
+    svn co ${script_repo} ${compile_path} --force
+    cp -f ${script_name} ${compile_script}
+    chmod +x ${compile_script}
+
+    echo -e "${STEPS} Script update complete."
+    exit 0
+}
+
+clean_tmp() {
+    cd ${make_path}
+    echo -e "${STEPS} Clear the space..."
+
+    rm -rf ${kernel_path} ${out_kernel} 2>/dev/null && sync
+
+    echo -e "${SUCCESS} Space clearing complete."
+    exit 0
+}
+
+help_info() {
+    clear
+    cat <<EOF
+=================================================================================================
+01. Script assist functions
+    Command: armbian-kernel -update
+    -update  : Update local scripts to the latest
+    -clean   : Clear local kernel source and makefiles
+
+02. Detailed instructions for compiling the kernel
+    Command: cd ${make_path} && armbian-kernel -d -k 5.15.1
+    -d : Defaults     Compile all kernels with default configuration.
+    -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
+    -a : AutoKernel	  Set whether to automatically adopt the latest version, such as [ -a true ]
+    -n : CustomName	  Set the kernel custom signature, such as [ -n -xiaoming ]
+    -r : Repo         Specifies the source code repository for the compiled kernel.
+=================================================================================================
+EOF
+    exit 0
+}
+
+# Check script permission, supports running on Armbian system.
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./$0 ]"
+[[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
+# 10Gb free space required
+[[ -d "${make_path}" ]] || mkdir -p ${make_path}
+remaining_space=$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
+[[ "${remaining_space}" -ge "10" ]] || error_msg "Compiling the kernel requires 10Gb running space"
+
+# Execute script assist functions
+[[ "${1}" == "-help" || "${1}" == "--help" ]] && help_info
+[[ "${1}" == "-clean" || "${1}" == "--clean" ]] && clean_tmp
+[[ "${1}" == "-update" || "${1}" == "--update" ]] && update_script
+
+# Run the compiled kernel script
+cd ${make_path}
+[[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -update ] to download the compile kernel script."
+${compile_script} "${@}"
