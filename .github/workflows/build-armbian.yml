@@ -91,6 +91,7 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
+          # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
           ARR_DESKTOP=("no" "budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
           set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
