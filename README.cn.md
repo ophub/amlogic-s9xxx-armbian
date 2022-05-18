@@ -259,7 +259,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
     build_target: kernel
     kernel_version: 5.15.25_5.10.100
     kernel_auto: true
-    kernel_sign: -meson64-dev
+    kernel_sign: -ophub
 ```
 ## Armbian 固件默认信息
 
