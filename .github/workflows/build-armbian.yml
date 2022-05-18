@@ -42,7 +42,7 @@ on:
         required: false
         default: "ext4"
   #schedule:
-    #- cron: "0 17 * * 0"
+  #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
@@ -96,10 +96,11 @@ jobs:
           if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
               str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
+              echo "ARMBIAN_DESKTOP_OPT=${set_desktop}_desktop" >> $GITHUB_ENV
           else
               str_desktop="BUILD_DESKTOP=no"
+              echo "ARMBIAN_DESKTOP_OPT=server" >> $GITHUB_ENV
           fi
-          echo "ARMBIAN_DESKTOP_OPT=${set_desktop}" >> $GITHUB_ENV
           echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
 
       - name: Download source code
@@ -107,7 +108,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Desktop is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
@@ -132,7 +133,7 @@ jobs:
         uses: ncipollo/release-action@main
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
-          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.ARMBIAN_DESKTOP_OPT }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
@@ -143,4 +144,4 @@ jobs:
             Default password: 1234
             Install command: armbian-install
             Update command: armbian-update
-            Desktop: ${{ env.ARMBIAN_DESKTOP_OPT }}
+            Edition: ${{ env.ARMBIAN_DESKTOP_OPT }}
