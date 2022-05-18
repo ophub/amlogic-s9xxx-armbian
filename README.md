@@ -260,7 +260,7 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
     build_target: kernel
     kernel_version: 5.15.25_5.10.100
     kernel_auto: true
-    kernel_sign: -meson64-dev
+    kernel_sign: -ophub
 ```
 
 ## Armbian firmware default information
