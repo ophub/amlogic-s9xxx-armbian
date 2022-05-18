@@ -53,7 +53,7 @@ repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("5.10.100" "5.15.25")
 auto_kernel="true"
-custom_name="-meson64-dev"
+custom_name="-ophub"
 #
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
