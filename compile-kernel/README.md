@@ -34,7 +34,7 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/armbian-compile-kernel-depends)
 ```
 
-2. Update the local compile environment: `armbian-kernel -update`
+2. Update the local compile environment and config files: `armbian-kernel -update`
 
 3. Compile the kernel: Run `armbian-kernel -d -k 5.10.100` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `/opt/kernel/compile-kernel/output` directory.
 
