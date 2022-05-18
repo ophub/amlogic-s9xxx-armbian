@@ -154,9 +154,10 @@ armbian-ddbr
 
 - ### 编译内核
 
-在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。启动 Armbian 系统 → 输入命令：
+在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。登录 Armbian 系统 → 输入命令：
 
 ```yaml
+armbian-kernel -update
 armbian-kernel -d -k 5.10.100
 ```
 
