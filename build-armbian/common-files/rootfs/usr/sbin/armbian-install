@@ -74,6 +74,7 @@ AMLOGIC_MODEL_LIST="
 205:VORKE-Z6-Plus:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic
 206:MECOOL M8S Pro L:s912:meson-gxm-q201.dtb:u-boot-s905x-s912.bin:NA:NA:2G RAM,3G RAM,16G ROM,32G ROM,100Mb Nic
 207:T95Z Plus:s912:meson-gxm-t95z-plus.dtb:u-boot-s905x-s912.bin:NA:NA:3G+32G,Octa-Core,2.4/5.8G Dual-Band WiFi,1Gb Nic
+208:TX9 Pro:s912:meson-gxm-tx9-pro.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,3G RAM,32G ROM,Bluetooth 4.1,1Gb Nic,brcm43455 wifi
 
 # Amlogic G12A Family
 301:X96 Max 4GB:s905x2:meson-g12a-x96-max.dtb:u-boot-x96max.bin:/usr/lib/u-boot/x96max-u-boot.bin.sd.bin:NA:4C@1908Mhz,4GB Mem,1Gb Nic
