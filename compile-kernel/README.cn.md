@@ -34,7 +34,7 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/armbian-compile-kernel-depends)
 ```
 
-2. 更新本地编译环境：`armbian-kernel -update`
+2. 更新本地编译环境和配置文件：`armbian-kernel -update`
 
 3. 编译内核：运行 `armbian-kernel -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
 
