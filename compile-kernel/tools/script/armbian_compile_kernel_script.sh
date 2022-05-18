@@ -12,7 +12,7 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: sudo ./recompile -d
+# Command: armbian-kernel -update && armbian-kernel -d -k 5.10.100
 # Command optional parameters please refer to the source code repository
 #
 #======================================= Functions list =======================================
