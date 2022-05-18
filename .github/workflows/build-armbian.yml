@@ -22,7 +22,7 @@ on:
         required: false
         default: "odroidn2"
       set_desktop:
-        description: "Build Desktop: no / gnome / xfce"
+        description: "Build Desktop: no / gnome / xfce, etc."
         required: false
         default: "no"
       armbian_soc:
@@ -91,7 +91,7 @@ jobs:
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
-          ARR_DESKTOP=("no" "gnome" "xfce")
+          ARR_DESKTOP=("no" "budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
           set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
