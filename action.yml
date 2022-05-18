@@ -48,7 +48,7 @@ inputs:
   kernel_sign:
     description: "Set the kernel custom signature"
     required: false
-    default: "-meson64-dev"
+    default: "-ophub"
   kernel_repo:
     description: "select kernel repository"
     required: false
