@@ -249,6 +249,14 @@ To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the re
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | Packing date(month.day.hour.minute) |
 | ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure   |
 
+## Armbian firmware default information
+
+| Name | Value |
+| ---- | ---- |
+| Default IP | Get IP from the router |
+| Default username | root |
+| Default password | 1234 |
+
 ## Compile the kernel using GitHub Actions
 
 For the compilation method of the kernel, see [compile-kernel](compile-kernel)
@@ -263,15 +271,7 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
     kernel_sign: -ophub
 ```
 
-## Armbian firmware default information
-
-| Name | Value |
-| ---- | ---- |
-| Default IP | Get IP from the router |
-| Default username | root |
-| Default password | 1234 |
-
-## Armbian contributor list
+## Armbian Contributors
 
 First of all, I would like to thank [150balbes](https://github.com/150balbes) for his outstanding contributions and a good foundation for using Armbian in the Amlogic box. The [armbian](https://github.com/armbian/build) system compiled here directly uses the latest official source code for real-time compilation. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
 
