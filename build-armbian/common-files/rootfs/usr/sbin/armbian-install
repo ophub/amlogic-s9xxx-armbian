@@ -129,8 +129,8 @@ printf "%-s\n" "----------------------------------------------------------------
 printf "%-5s %-10s %-30s %-50s\n" $(echo "${AMLOGIC_MODEL_LIST}" | grep -E "^[0-9]{1,9}.*:" | sed -e 's/[ ][ ]*/-/g' | awk -F ':' '{print $1,$3,$2,$4}')
 printf "%-s\n" "--------------------------------------------------------------------------------------"
 
-read -p "Please Input ID: " boxtype
-if [[ "${boxtype}" -eq "0" ]]; then
+read -p "Please Input ID: " box_id
+if [[ "${box_id}" -eq "0" ]]; then
     read -p "Please Input SoC Name: " AMLOGIC_SOC
     AMLOGIC_SOC="${AMLOGIC_SOC}"
     #
@@ -146,7 +146,7 @@ if [[ "${boxtype}" -eq "0" ]]; then
     read -p "Please Input ANDROID_UBOOT Name: " ANDROID_UBOOT
     ANDROID_UBOOT="${ANDROID_UBOOT}"
 else
-    ret=$(search_aml_model "${boxtype}")
+    ret=$(search_aml_model "${box_id}")
     if [ "${ret}" == "" ]; then
         error_msg "Input error, exit!"
     fi
@@ -159,7 +159,7 @@ else
 fi
 # Set model list, end ------------
 
-echo "Input Box ID: [ ${boxtype} ]"
+echo "Input Box ID: [ ${box_id} ]"
 echo "FDTFILE: [ ${FDTFILE} ]"
 echo "UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
 echo "K510: [ ${K510} ]"
@@ -283,18 +283,20 @@ mount -o rw ${PART_BOOT} ${DIR_INSTALL}
 
 echo "Start copy BOOT_EMMC partition data..."
 cp -rf /boot/* ${DIR_INSTALL} && sync
+rm -rf ${DIR_INSTALL}/uEnv.txt ${DIR_INSTALL}/extlinux 2>/dev/null && sync
 rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
 
 echo "Generate the new uEnv.txt file."
-rm -rf ${DIR_INSTALL}/uEnv.txt ${DIR_INSTALL}/extlinux 2>/dev/null && sync
 cat >${DIR_INSTALL}/uEnv.txt <<EOF
 LINUX=/zImage
 INITRD=/uInitrd
 FDT=/dtb/amlogic/${FDTFILE}
 APPEND=root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 EOF
-# Create a new extlinux.conf file (Temporarily tested in 5.10 kernel)
-if [[ "${K510}" -eq "1" ]]; then
+
+# Create a new extlinux.conf file, Equipment known to be required (106:T95, 207:T95Z-Plus)
+use_extlinux_soc=("106" "207")
+if [[ -n "${use_extlinux_soc}" && -n "$(echo "${use_extlinux_soc[@]}" | grep -w "${box_id}")" ]]; then
     echo "Generate the new extlinux.conf file."
     mkdir -p ${DIR_INSTALL}/extlinux
     cat >${DIR_INSTALL}/extlinux/extlinux.conf <<EOF
