@@ -248,6 +248,14 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | 打包日期（月.日.时分）        |
 | ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
 
+## Armbian 固件默认信息
+
+| 名称 | 值 |
+| ---- | ---- |
+| 默认 IP | 从路由器获取 IP |
+| 默认账号 | root |
+| 默认密码 | 1234 |
+
 ## 使用 GitHub Actions 编译内核
 
 内核的编译方法详见 [compile-kernel](compile-kernel/README.cn.md)
@@ -261,15 +269,8 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
     kernel_auto: true
     kernel_sign: -ophub
 ```
-## Armbian 固件默认信息
 
-| 名称 | 值 |
-| ---- | ---- |
-| 默认 IP | 从路由器获取 IP |
-| 默认账号 | root |
-| 默认密码 | 1234 |
-
-## Armbian 贡献者名单
+## Armbian 贡献者
 
 首先感谢 [150balbes](https://github.com/150balbes) 为在 Amlogic 盒子中使用 Armbian 所做出的杰出贡献和奠定的良好基础。这里编译的 [armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在 Amlogic s9xxx 盒子里使用 Armbian 系统。
 
