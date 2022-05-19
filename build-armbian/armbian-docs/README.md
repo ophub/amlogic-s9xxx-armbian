@@ -25,6 +25,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [10.3 How to restore the original Android TV system](#103-how-to-restore-the-original-android-tv-system)
     - [10.4 Set the box to boot from USB/TF/SD](#104-set-the-box-to-boot-from-usbtfsd)
     - [10.5 Disable infrared receiver](#105-disable-infrared-receiver)
+    - [10.6 Selection of bootstrap file](#106-selection-of-bootstrap-file)
 
 ## 1. Register your own GitHub account
 
@@ -205,3 +206,8 @@ blacklist meson_ir
 ```
 
 to `/etc/modprobe.d/blacklist.conf` and reboot.
+
+### 10.6 Selection of bootstrap file
+
+In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
+

@@ -283,10 +283,10 @@ mount -o rw ${PART_BOOT} ${DIR_INSTALL}
 
 echo "Start copy BOOT_EMMC partition data..."
 cp -rf /boot/* ${DIR_INSTALL} && sync
-rm -rf ${DIR_INSTALL}/uEnv.txt ${DIR_INSTALL}/extlinux 2>/dev/null && sync
 rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
 
 echo "Generate the new uEnv.txt file."
+rm -f ${DIR_INSTALL}/uEnv.txt && sync
 cat >${DIR_INSTALL}/uEnv.txt <<EOF
 LINUX=/zImage
 INITRD=/uInitrd
@@ -294,10 +294,10 @@ FDT=/dtb/amlogic/${FDTFILE}
 APPEND=root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 EOF
 
-# Create a new extlinux.conf file, Equipment known to be required (106:T95, 207:T95Z-Plus)
-use_extlinux_boxid=("106" "207")
-if [[ -n "${use_extlinux_boxid}" && -n "$(echo "${use_extlinux_boxid[@]}" | grep -w "${boxid}")" ]]; then
+# If the [ /boot/extlinux/extlinux.conf ] file exists, create a new one.
+if [[ -f "${DIR_INSTALL}/extlinux/extlinux.conf" ]]; then
     echo "Generate the new extlinux.conf file."
+    rm -rf ${DIR_INSTALL}/extlinux && sync
     mkdir -p ${DIR_INSTALL}/extlinux
     cat >${DIR_INSTALL}/extlinux/extlinux.conf <<EOF
 label Armbian
@@ -306,6 +306,8 @@ label Armbian
     fdt /dtb/amlogic/${FDTFILE}
     append root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 loglevel=1 voutmode=hdmi disablehpd=false overscan=100 sdrmode=auto
 EOF
+else
+    rm -rf ${DIR_INSTALL}/extlinux 2>/dev/null
 fi
 
 rm ${DIR_INSTALL}/s9*
