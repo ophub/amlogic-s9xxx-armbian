@@ -105,7 +105,7 @@ init_var() {
     cd ${make_path}
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver=$(getopt "db:k:a:v:s:t:" "${@}")
+    get_all_ver=$(getopt "db:k:a:v:s:t:n:" "${@}")
 
     while [ -n "${1}" ]; do
         case "${1}" in
