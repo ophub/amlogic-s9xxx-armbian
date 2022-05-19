@@ -25,6 +25,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [10.3 如何恢复原安卓 TV 系统](#103-如何恢复原安卓-tv-系统)
     - [10.4 设置盒子从 USB/TF/SD 中启动](#104-设置盒子从-usbtfsd-中启动)
     - [10.5 禁用红外接收器](#105-禁用红外接收器)
+    - [10.6 启动引导文件的选择](#106-启动引导文件的选择)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -204,3 +205,8 @@ blacklist meson_ir
 ```
 
 至 `/etc/modprobe.d/blacklist.conf` 并重启。
+
+### 10.6 启动引导文件的选择
+
+一般情况下，使用 /boot/uEnv.txt 即可。个别设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，如 T95（s905x） / T95Z-Plus（s912）等设备。如果需要，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
+
