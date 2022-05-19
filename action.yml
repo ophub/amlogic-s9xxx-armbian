@@ -36,6 +36,10 @@ inputs:
     description: "Set armbian rootfs type."
     required: false
     default: "ext4"
+  armbian_sign:
+    description: "Set armbian custom name."
+    required: false
+    default: ""
   # For compile kernel -----
   kernel_version:
     description: "select kernel version"
@@ -46,7 +50,7 @@ inputs:
     required: false
     default: "true"
   kernel_sign:
-    description: "Set the kernel custom signature"
+    description: "Set the kernel custom name"
     required: false
     default: "-ophub"
   kernel_repo:
@@ -106,6 +110,7 @@ runs:
             [ -n ${{ inputs.version_branch }} ] && make_command="${make_command} -v ${{ inputs.version_branch }}"
             [ -n ${{ inputs.armbian_size }} ] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [ -n ${{ inputs.armbian_fstype }} ] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
+            [ -n ${{ inputs.armbian_sign }} ] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
             sudo chmod +x rebuild
             sudo ./rebuild ${make_command}
 
