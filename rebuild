@@ -80,6 +80,8 @@ BOOT_MB="256"
 ROOT_MB="2748"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 ROOTFS_TYPE="ext4"
+# Custom name in firmware name: ${build_image_file}, e.g. server_ or gnome_desktop_
+custom_name=""
 #
 #========================================================================================
 
@@ -114,8 +116,9 @@ init_var() {
             : ${version_branch:="${version_branch}"}
             : ${ROOT_MB:="${ROOT_MB}"}
             : ${ROOTFS_TYPE:="${ROOTFS_TYPE}"}
+            : ${custom_name:="${custom_name}"}
             ;;
-        -b | --build)
+        -b | --Build)
             if [ -n "${2}" ]; then
                 if [[ "${2}" != "all" ]]; then
                     unset build_armbian
@@ -129,7 +132,7 @@ init_var() {
                 error_msg "Invalid -b parameter [ ${2} ]!"
             fi
             ;;
-        -k | --kernel)
+        -k | --Kernel)
             if [ -n "${2}" ]; then
                 oldIFS=$IFS
                 IFS=_
@@ -140,7 +143,7 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
-        -a | --autokernel)
+        -a | --Autokernel)
             if [ -n "${2}" ]; then
                 auto_kernel="${2}"
                 shift
@@ -148,7 +151,7 @@ init_var() {
                 error_msg "Invalid -a parameter [ ${2} ]!"
             fi
             ;;
-        -v | --versionbranch)
+        -v | --Versionbranch)
             if [ -n "${2}" ]; then
                 version_branch="${2}"
                 shift
@@ -156,7 +159,7 @@ init_var() {
                 error_msg "Invalid -v parameter [ ${2} ]!"
             fi
             ;;
-        -s | --size)
+        -s | --Size)
             if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
                 ROOT_MB="${2}"
                 shift
@@ -164,12 +167,20 @@ init_var() {
                 error_msg "Invalid -s parameter [ ${2} ]!"
             fi
             ;;
-        -t | --rootfstype)
+        -t | --rootfsType)
             if [[ -n "${2}" ]]; then
                 ROOTFS_TYPE="${2}"
                 shift
             else
                 error_msg "Invalid -t parameter [ ${2} ]!"
+            fi
+            ;;
+        -n | --customName)
+            if [ -n "${2}" ]; then
+                custom_name="${2}"
+                shift
+            else
+                error_msg "Invalid -n parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -592,7 +603,7 @@ make_image() {
     cd ${make_path}
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}_$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}_${custom_name}$(date +"%Y.%m.%d.%H%M").img"
     rm -f ${build_image_file} 2>/dev/null && sync
 
     IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))

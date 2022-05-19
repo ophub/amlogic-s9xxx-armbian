@@ -194,6 +194,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
+| -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `server_`, `gnome_desktop_` or `ophub_` as needed. Do not include spaces when setting custom signatures. |
 
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
@@ -231,13 +232,14 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 
 | Parameter          | Defaults          | Description                                                   |
 |--------------------|-------------------|---------------------------------------------------------------|
-| armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
+| armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
 | armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged box, function reference `-b`    |
-| armbian_kernel     | 5.15.25_5.10.100  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k` |
+| armbian_kernel     | 5.15.25_5.10.100  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
-| armbian_size       | 2748             | Set the size of the firmware ROOTFS partition, function reference `-s` |
-| armbian_fstype     | ext4             | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
+| armbian_size       | 2748              | Set the size of the firmware ROOTFS partition, function reference `-s`             |
+| armbian_fstype     | ext4              | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
+| armbian_sign       | no                | Set the signature part of the firmware name, function reference `-n`               |
 
 - ### GitHub Actions Output variable description
 
