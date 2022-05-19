@@ -475,7 +475,7 @@ refactor_files() {
     sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_conf_file}
     sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
 
-    # Edit extlinux/extlinux.conf (Add alternate files for devices like T95Z. change name to remove .bak)
+    # Add an alternate file (/boot/extlinux/extlinux.conf) for devices like T95Z. If needed, rename delete .bak
     boot_extlinux_file="extlinux/extlinux.conf.bak"
     if [[ -f "${boot_extlinux_file}" ]]; then
         sed -i "s|LABEL=ROOTFS|${uenv_mount_string}|g" ${boot_extlinux_file}
