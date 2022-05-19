@@ -18,14 +18,15 @@ View Chinese description  |  [查看中文说明](README.cn.md)
   - [6. Save the firmware](#6-save-the-firmware)
   - [7. Download the firmware](#7-download-the-firmware)
   - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
-  - [9. Update Armbian Kernel](#9-update-armbian-kernel)
-  - [10. common problem](#10-common-problem)
-    - [10.1 dtb and u-boot correspondence table for each box](#101-dtb-and-u-boot-correspondence-table-for-each-box)
-    - [10.2 LED screen display control instructions](#102-led-screen-display-control-instructions)
-    - [10.3 How to restore the original Android TV system](#103-how-to-restore-the-original-android-tv-system)
-    - [10.4 Set the box to boot from USB/TF/SD](#104-set-the-box-to-boot-from-usbtfsd)
-    - [10.5 Disable infrared receiver](#105-disable-infrared-receiver)
-    - [10.6 Selection of bootstrap file](#106-selection-of-bootstrap-file)
+  - [9. Compile the Armbian kernel](#9-compile-the-armbian-kernel)
+  - [10. Update Armbian Kernel](#10-update-armbian-kernel)
+  - [11. common problem](#11-common-problem)
+    - [11.1 dtb and u-boot correspondence table for each box](#111-dtb-and-u-boot-correspondence-table-for-each-box)
+    - [11.2 LED screen display control instructions](#112-led-screen-display-control-instructions)
+    - [11.3 How to restore the original Android TV system](#113-how-to-restore-the-original-android-tv-system)
+    - [11.4 Set the box to boot from USB/TF/SD](#114-set-the-box-to-boot-from-usbtfsd)
+    - [11.5 Disable infrared receiver](#115-disable-infrared-receiver)
+    - [11.6 Selection of bootstrap file](#116-selection-of-bootstrap-file)
 
 ## 1. Register your own GitHub account
 
@@ -134,7 +135,11 @@ armbian-install
 
 The mainline u-boot is installed by default, In order to support the use of 5.10 and above kernels. If you choose not to install, specify it in the `1` input parameter, e.g. `armbian-install no`
 
-## 9. Update Armbian Kernel
+## 9. Compile the Armbian kernel
+
+Supports compiling the kernel in Ubuntu20.04/22.04 or Armbian system. It supports local compilation and cloud compilation using GitHub Actions. For details, see [Kernel Compilation Instructions](../../compile-kernel).
+
+## 10. Update Armbian Kernel
 
 Login in to armbian → input command:
 
@@ -148,19 +153,19 @@ If there is a set of kernel files in the current directory, it will be updated w
 
 The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
-## 10. common problem
+## 11. common problem
 
 In the use of Armbian, some common problems that may be encountered are summarized below.
 
-### 10.1 dtb and u-boot correspondence table for each box
+### 11.1 dtb and u-boot correspondence table for each box
 
 Please refer to [Description](config_correspondence_of_amlogic_s9xxx_tv_box.md)
 
-### 10.2 LED screen display control instructions
+### 11.2 LED screen display control instructions
 
 Please refer to [Description](led_screen_display_control.md)
 
-### 10.3 How to restore the original Android TV system
+### 11.3 How to restore the original Android TV system
 
 - Under normal circumstances, re-insert the USB hard disk and install it again.
 
@@ -188,7 +193,7 @@ Operation method:
 
 When the factory reset is completed, the box has been restored to the Android TV system, and other operations to install the Armbian system are the same as the requirements when you installed the system for the first time before, just do it again.
 
-### 10.4 Set the box to boot from USB/TF/SD
+### 11.4 Set the box to boot from USB/TF/SD
 
 - Write the firmware to USB/TF/SD, insert it into the box after writing.
 - Open the developer mode: Settings → About this machine → Version number (for example: X96max plus...), click on the version number for 5 times in quick succession, See the prompt of `Enable Developer Mode` displayed by the system.
@@ -197,7 +202,7 @@ When the factory reset is completed, the box has been restored to the Android TV
 - Enter the `cmd` command mode. Enter the `adb connect 192.168.1.137` command (the ip is modified according to your box, and you can check it in the router device connected to the box), If the link is successful, it will display `connected to 192.168.1.137:5555`
 - Enter the `adb shell reboot update` command, the box will restart and boot from the USB/TF/SD you inserted, access the firmware IP address from a browser, or SSH to enter the firmware.
 
-### 10.5 Disable infrared receiver
+### 11.5 Disable infrared receiver
 
 Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your box off by mistake. To completely disable IR, add the line:
 
@@ -207,7 +212,7 @@ blacklist meson_ir
 
 to `/etc/modprobe.d/blacklist.conf` and reboot.
 
-### 10.6 Selection of bootstrap file
+### 11.6 Selection of bootstrap file
 
 In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
 

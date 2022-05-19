@@ -152,7 +152,7 @@ armbian-ddbr
 
 根据提示输入 `b` 进行系统备份，输入 `r` 进行系统恢复。
 
-- ### 编译内核
+- ### 在 Armbian 中编译内核
 
 在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。登录 Armbian 系统 → 输入命令：
 
@@ -248,7 +248,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | 打包日期（月.日.时分）        |
 | ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
 
-## 编译内核
+## 使用 GitHub Actions 编译内核
 
 内核的编译方法详见 [compile-kernel](compile-kernel/README.cn.md)
 
