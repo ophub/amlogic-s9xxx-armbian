@@ -152,7 +152,7 @@ armbian-ddbr
 
 According to the prompt, enter `b` to perform system backup, and enter `r` to perform system recovery.
 
-- ### Compile the kernel
+- ### Compile the kernel in Armbian
 
 For the usage of compiling the kernel in Armbian, see the [compile-kernel](compile-kernel) documentation. please login in to armbian → input command:
 
@@ -249,7 +249,7 @@ To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the re
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | Packing date(month.day.hour.minute) |
 | ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure   |
 
-## Compile the kernel
+## Compile the kernel using GitHub Actions
 
 For the compilation method of the kernel, see [compile-kernel](compile-kernel)
 
