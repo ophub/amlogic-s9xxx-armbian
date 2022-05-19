@@ -193,6 +193,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | -v   | Version    | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，如 `-v stable` 。指定的名称须与分支目录名称相同。默认使用 `stable` 分支版本。 |
 | -s   | Size       | 对固件的 ROOTFS 分区大小进行设置，默认大小为 2748M, 固件大小必须大于 2000M. 例如： `-s 2748` |
 | -t   | RootfsType | 对固件的 ROOTFS 分区的文件系统类型进行设置，默认为 `ext4` 类型，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs` |
+| -n   | CustomName | 设置固件名称中的签名部分。默认值为空。可根据需要添加签名如 `server_`，`gnome_desktop_` 或 `ophub_` 等，设置自定义签名时请勿包含空格。 |
 
 - `sudo ./rebuild -d` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100` : 推荐使用. 使用默认配置进行相关内核打包。
@@ -228,15 +229,16 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md#3-fork-仓库并设置-releases_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
 
-| 参数              | 默认值             | 说明                                            |
-|------------------|-------------------|------------------------------------------------|
+| 参数              | 默认值             | 说明                                             |
+|------------------|-------------------|--------------------------------------------------|
 | armbian_path     | no                | 设置原版 Armbian 文件的路径，支持使用当前工作流中的文件路径如 `build/output/images/*.img` ，也支持使用网络下载地址如： `https://dl.armbian.com/*/Armbian_*.img.xz` |
-| armbian_soc      | s905d_s905x3      | 设置打包盒子的 `SOC` ，功能参考 `-b`                |
+| armbian_soc      | s905d_s905x3      | 设置打包盒子的 `SOC` ，功能参考 `-b`                 |
 | armbian_kernel   | 5.15.25_5.10.100  | 设置内核 [版本](https://github.com/ophub/kernel/tree/main/pub/stable)，功能参考 `-k` |
-| auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`      |
+| auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | version_branch   | stable            | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，功能参考 `-v` |
-| armbian_size     | 2748              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`           |
+| armbian_size     | 2748              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`            |
 | armbian_fstype   | ext4              | 设置固件 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
+| armbian_sign     | no                | 设置固件名称中的签名部分，功能参考 `-n`               |
 
 - ### GitHub Actions 输出变量说明
 
