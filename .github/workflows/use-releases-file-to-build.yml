@@ -89,6 +89,7 @@ jobs:
           armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
+          armbian_sign: ${{ env.ARMBIAN_DESKTOP_OPT }}_
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
