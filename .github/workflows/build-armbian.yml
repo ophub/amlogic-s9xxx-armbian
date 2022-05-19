@@ -41,8 +41,12 @@ on:
         description: "Set armbian rootfs type."
         required: false
         default: "ext4"
+      armbian_sign:
+        description: "Set armbian custom name."
+        required: false
+        default: ""
   #schedule:
-  #- cron: "0 17 * * 0"
+    #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
@@ -97,12 +101,17 @@ jobs:
           if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
               str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
-              echo "ARMBIAN_DESKTOP_OPT=${set_desktop}_desktop" >> $GITHUB_ENV
+              edition_name="${set_desktop}_desktop"
           else
               str_desktop="BUILD_DESKTOP=no"
-              echo "ARMBIAN_DESKTOP_OPT=server" >> $GITHUB_ENV
+              edition_name="server"
           fi
           echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
+          echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
+
+          set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
+          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="${edition_name}_"
+          echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
 
       - name: Download source code
         id: down
@@ -129,6 +138,7 @@ jobs:
           armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
+          armbian_sign: ${{ env.ARMBIAN_CUSTOM_NAME }}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
