@@ -4,7 +4,7 @@ When you are using Armbian with kernel version 5.10.y and above, you need to cop
 
 These duplications are automated in the repository's packaging and install/update scripts, eliminating the need for manual duplication.
 
-## Correspondence for Amlogic s9xxx tv box
+## Correspondence for Amlogic TV Boxes
 
 <table cellpadding="0" cellspacing="0">
 <tr><td>ID</td><td>Model Name</td><td>SOC</td><td>FDTFILE</td><td>UBOOT_OVERLOAD</td><td>MAINLINE_UBOOT</td><td>ANDROID_UBOOT</td><td>Brief Description</td></tr>

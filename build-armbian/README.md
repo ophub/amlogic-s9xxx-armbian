@@ -1,8 +1,8 @@
-# Description of Amlogic s9xxx series related documents
+# Description of related documents
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
-Some files needed for compilation related to amlogic-s9xxx kernel are stored in the directory.
+The files needed to compile Armbian are stored in the relevant directory.
 
 ## amlogic-armbian
 
