@@ -167,16 +167,17 @@ armbian-kernel -d -k 5.10.100
 
 ## 本地化打包
 
-1. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
+1. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+2. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
 
 ```yaml
+cd amlogic-s9xxx-armbian
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
-sudo apt-get install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
-
-2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
 3. 在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Odroidn2_current_5.15.25.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.25`）请保留，它将在重构后用作 Armbian 固件的名称。
 
