@@ -193,7 +193,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | -v   | Version    | 指定内核 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 名称，如 `-v stable` 。指定的名称须与分支目录名称相同。默认使用 `stable` 分支版本。 |
 | -s   | Size       | 对固件的 ROOTFS 分区大小进行设置，默认大小为 2748M, 固件大小必须大于 2000M. 例如： `-s 2748` |
 | -t   | RootfsType | 对固件的 ROOTFS 分区的文件系统类型进行设置，默认为 `ext4` 类型，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs` |
-| -n   | CustomName | 设置固件名称中的签名部分。默认值为空。可根据需要添加签名如 `server_`，`gnome_desktop_` 或 `ophub_` 等，设置自定义签名时请勿包含空格。 |
+| -n   | CustomName | 设置固件名称中的签名部分。默认值为空。可根据需要添加签名如 `_server_`，`_gnome_desktop_` 或 `_ophub` 等，设置自定义签名时请勿包含空格。 |
 
 - `sudo ./rebuild -d` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100` : 推荐使用. 使用默认配置进行相关内核打包。
