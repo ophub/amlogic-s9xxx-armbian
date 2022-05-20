@@ -10,33 +10,25 @@
 
 - ### 在 Ubuntu 系统下运行
 
-1. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
+1. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+2. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
 
 ```yaml
+cd amlogic-s9xxx-armbian
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
-sudo apt-get install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
-
-2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
 3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
 - ### 在 Armbian 系统下运行
 
-1. 安装必要的软件包
+1. 更新本地编译环境和配置文件：`armbian-kernel -update`
 
-```yaml
-sudo apt-get update -y
-sudo apt-get full-upgrade -y
-# For Armbian
-sudo apt-get install -y $(curl -fsSL https://is.gd/depends_armbian)
-```
-
-2. 更新本地编译环境和配置文件：`armbian-kernel -update`
-
-3. 编译内核：运行 `armbian-kernel -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
+2. 编译内核：运行 `armbian-kernel -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
 
 - ### 本地编译参数说明
 
