@@ -61,21 +61,25 @@ update_script() {
     cd ${make_path}
     echo -e "${STEPS} Start update script..."
 
-    echo -e "${INFO} Start installing dependencies..."
-    # Install dependencies
-    sudo apt-get -qq update
-    sudo apt-get -qq install -y subversion git curl wget tar
+    # Install subversion
+    echo -e "${INFO} Start installing subversion..."
+    sudo apt-get update
+    sudo apt-get install -y subversion
 
     # Convert script repository address to svn format
     if [[ ${script_repo} == http* && $(echo ${script_repo} | grep "tree/main") != "" ]]; then
         script_repo="${script_repo//tree\/main/trunk}"
     fi
 
-    echo -e "${INFO} Start update script..."
     # Update related files
+    echo -e "${INFO} Start update script..."
     svn co ${script_repo} ${compile_path} --force
     cp -f ${script_name} ${compile_script}
     chmod +x ${compile_script}
+
+    # Install dependencies
+    echo -e "${INFO} Start installing dependencies..."
+    sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
 
     echo -e "${STEPS} Script update complete."
     exit 0
