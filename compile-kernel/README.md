@@ -55,7 +55,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 - `sudo ./recompile -d -k 5.10.100 -r kernel.org`: Use the default configuration, and set the kernel source code repository through the `-r` parameter.
 - `sudo ./recompile -d -k 5.15.25_5.10.100 -a true -n -ophub -r kernel.org`: Use the default configuration, and set through multiple parameters.
 
-💡Tip: It is recommended to use the kernel source code of unifreq's [5.10](https://github.com/unifreq/linux-5.10.y), [5.15](https://github.com/unifreq/linux-5.15.y) and other repositories for compilation. He has added drivers and patches for related boxes. It is recommended to use the templates in [tools/config](tools/config), which have been pre-configured according to the relevant boxes and can be customized on this basis.
+💡Tip: It is recommended to use the kernel source code of unifreq's [5.10](https://github.com/unifreq/linux-5.10.y), [5.15](https://github.com/unifreq/linux-5.15.y) and other repositories for compilation. He has added drivers and patches for related TV Boxes. It is recommended to use the templates in [tools/config](tools/config), which have been pre-configured according to the relevant TV Boxes and can be customized on this basis.
 
 ## Compile the kernel using GitHub Actions
 
