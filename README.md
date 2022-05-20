@@ -1,10 +1,10 @@
-# Armbian for Amlogic s9xxx tv box
+# Armbian for Amlogic TV Boxes
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
 The [Armbian](https://www.armbian.com/) system is a lightweight Linux system based on Debian/Ubuntu built specifically for ARM chips. The Armbian system is lean, clean, and 100% compatible and inherits the functions and rich software ecosystem of the Debian/Ubuntu system. It can run safely and stably in TF/SD/USB and the eMMC of the device.
 
-Now you can replace the Android TV system of the TV box with the Amlogic chip with the Armbian system, making it a powerful server. This project builds Armbian system for Amlogic s9xxx TV box. including install to EMMC and update related functions. Support Amlogic s9xxx tv box are ***`a311d, s922x, s905x3, s905x2, s905l3a, s912, s905d, s905x, s905w, s905`***, etc. such as ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`***, etc. Please refer to the [Armbian Documentation](build-armbian/armbian-docs) for the usage method.
+Now you can replace the Android TV system of the TV box with the Amlogic chip with the Armbian system, making it a powerful server. This project builds Armbian system for Amlogic s9xxx TV box. including install to EMMC and update related functions. Support Amlogic s9xxx TV Boxes are ***`a311d, s922x, s905x3, s905x2, s905l3a, s912, s905d, s905x, s905w, s905`***, etc. such as ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`***, etc. Please refer to the [Armbian Documentation](build-armbian/armbian-docs) for the usage method.
 
 The latest version of the Armbian firmware can be downloaded in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize it. If it is useful to you, you can click on the `Star` in the upper right corner of the warehouse to show your support.
 
@@ -23,11 +23,11 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-Pro+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | All | armbian_aml_s905_*.img |
 | s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | All | armbian_aml_s905l3a_*.img |
 
-💡Tip: The current ***`s905w`*** series of boxes only support the use of the `5.15.y` kernel, Other types of boxes can use optional kernel versions. Currently ***`s905`*** boxes can only be used in `TF/SD/USB`, other types of boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md) for dtb and u-boot of each device.
+💡Tip: The current ***`s905w`*** series of TV Boxes only support the use of the `5.15.y` kernel, Other types of TV Boxes can use optional kernel versions. Currently ***`s905`*** TV Boxes can only be used in `TF/SD/USB`, other types of TV Boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md) for dtb and u-boot of each device.
 
 ## Install to EMMC and update instructions
 
-Choose the corresponding firmware according to your box. Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the box. Common for all `Amlogic s9xxx tv box`.
+Choose the corresponding firmware according to your box. Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the box. Common for all `Amlogic s9xxx TV Boxes`.
 
 - ### Install Armbian to EMMC
 
@@ -196,7 +196,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 | -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `_server`, `_gnome_desktop` or `_ophub` as needed. Do not include spaces when setting custom signatures. |
 
-- `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
+- `sudo ./rebuild -d`: Use the default configuration to pack all TV Boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.15.25_5.10.100`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
@@ -214,7 +214,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build armbian` of different soc. Select ***`Use Releases file to build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
-4. Use other Armbian firmware, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian firmware download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of Amlogic S9xxx series boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
+4. Use other Armbian firmware, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian firmware download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of Amlogic S9xxx series TV Boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
 
 ```yaml
 - name: Rebuild the Armbian for Amlogic s9xxx
@@ -233,7 +233,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | Parameter          | Defaults          | Description                                                   |
 |--------------------|-------------------|---------------------------------------------------------------|
 | armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
-| armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged box, function reference `-b`    |
+| armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged TV Boxes, function reference `-b`    |
 | armbian_kernel     | 5.15.25_5.10.100  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
@@ -275,9 +275,9 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
 
 ## Armbian Contributors
 
-First of all, I would like to thank [150balbes](https://github.com/150balbes) for his outstanding contributions and a good foundation for using Armbian in the Amlogic box. The [armbian](https://github.com/armbian/build) system compiled here directly uses the latest official source code for real-time compilation. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx box.
+First of all, I would like to thank [150balbes](https://github.com/150balbes) for his outstanding contributions and a good foundation for using Armbian in the Amlogic TV Boxes. The [armbian](https://github.com/armbian/build) system compiled here directly uses the latest official source code for real-time compilation. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armbian system in the Amlogic s9xxx TV Boxes.
 
-The `kernel` / `u-boot` and other resources used by this system are mainly copied from the project of [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit), Some files are shared by users in [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) and [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) of [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) / [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian) / [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic) / [kernel](https://github.com/ophub/kernel) and other projects. To thank these pioneers and sharers, From now on (This source code repository was created on 2021-09-19), I have recorded them in [CONTRIBUTOR.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTOR.md). Thanks again everyone for giving new life and meaning to the box.
+The `kernel` / `u-boot` and other resources used by this system are mainly copied from the project of [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit), Some files are shared by users in [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) and [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) of [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) / [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian) / [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic) / [kernel](https://github.com/ophub/kernel) and other projects. To thank these pioneers and sharers, From now on (This source code repository was created on 2021-09-19), I have recorded them in [CONTRIBUTOR.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTOR.md). Thanks again everyone for giving new life and meaning to the TV Boxes.
 
 ## Acknowledgments
 
