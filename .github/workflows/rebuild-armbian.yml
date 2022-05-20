@@ -76,7 +76,7 @@ jobs:
           ARR_RELEASE=("jammy" "focal" "bullseye")
           i=1
           for r in ${ARR_RELEASE[*]}; do
-              if [[ "${armbian_url}" == *${r}* ]]; then
+              if [[ "${armbian_url}" == *"${r}"* ]]; then
                   set_release="_${r}_"
                   break
               fi

@@ -80,7 +80,7 @@ BOOT_MB="256"
 ROOT_MB="2748"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 ROOTFS_TYPE="ext4"
-# Custom name in firmware name: ${build_image_file}, e.g. server_ or gnome_desktop_
+# Custom name in firmware name: ${build_image_file}, e.g. _server or _gnome_desktop
 custom_name=""
 #
 #========================================================================================
@@ -603,7 +603,7 @@ make_image() {
     cd ${make_path}
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}_${custom_name}$(date +"%Y.%m.%d.%H%M").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
     rm -f ${build_image_file} 2>/dev/null && sync
 
     IMG_SIZE=$((SKIP_MB + BOOT_MB + ROOT_MB))
