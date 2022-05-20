@@ -1,4 +1,4 @@
-# 可以安装在 Amlogic s9xxx 电视盒子中使用的 Armbian 系统
+# Armbian for Amlogic TV Boxes / 晶晨岸边
 
 查看英文说明 | [View English description](README.md)
 
