@@ -167,16 +167,17 @@ In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs
 
 ## Local build instructions
 
-1. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
+1. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+2. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
 
 ```yaml
+cd amlogic-s9xxx-armbian
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
-sudo apt-get install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
-
-2. Clone the repository to the local. `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
 3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.25.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.25`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
 
