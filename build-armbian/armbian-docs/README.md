@@ -1,4 +1,4 @@
-# Use GitHub Actions to compile Armbian
+# How to build and use Armbian
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
@@ -6,7 +6,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
 
 # Tutorial directory
 
-- [Use GitHub Actions to compile Armbian](#use-github-actions-to-compile-armbian)
+- [How to build and use Armbian](#how-to-build-and-use-armbian)
 - [Tutorial directory](#tutorial-directory)
   - [1. Register your own GitHub account](#1-register-your-own-github-account)
   - [2. Set the privacy variable GitHub_TOKEN](#2-set-the-privacy-variable-github_token)
@@ -110,7 +110,7 @@ The settings saved by the firmware are also controlled in the [.github/workflows
     allowUpdates: true
     token: ${{ secrets.GH_TOKEN }}
     body: |
-      This is Armbian firmware for Amlogic s9xxx tv box
+      This is Armbian firmware for Amlogic s9xxx TV Boxes
       * Firmware information
       Default username: root
       Default password: 1234
@@ -118,7 +118,7 @@ The settings saved by the firmware are also controlled in the [.github/workflows
 
 ## 7. Download the firmware
 
-Enter from the GitHub `Releases` section at the bottom right corner of the `repository homepage`, and select the firmware corresponding to the model of your `Amlogic s9xxx tv box`. The icons are as follows:
+Enter from the GitHub `Releases` section at the bottom right corner of the `Repository homepage`, and select the firmware corresponding to the model of your `Amlogic s9xxx TV Boxes`. The icons are as follows:
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />
@@ -169,7 +169,7 @@ Please refer to [Description](led_screen_display_control.md)
 
 - Under normal circumstances, re-insert the USB hard disk and install it again.
 
-- If you cannot start the Armbian system from the USB hard disk again, connect the Amlogic s9xxx tv box to the computer monitor. If the screen is completely black and there is nothing, you need to restore the Amlogic s9xxx tv box to factory settings first, and then reinstall it. First download the [amlogic_usb_burning_tool](https://github.com/ophub/kernel/releases/tag/tools) system recovery tool and install it. Prepare a [USB dual male data cable](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png), Prepare a [paper clip](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png).
+- If you cannot start the Armbian system from the USB hard disk again, connect the Amlogic s9xxx TV Boxes to the computer monitor. If the screen is completely black and there is nothing, you need to restore the Amlogic s9xxx TV Boxes to factory settings first, and then reinstall it. First download the [amlogic_usb_burning_tool](https://github.com/ophub/kernel/releases/tag/tools) system recovery tool and install it. Prepare a [USB dual male data cable](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png), Prepare a [paper clip](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png).
 
 - Take x96max+ as an example. Find the two [short-circuit points](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) on the motherboard, Download the [Android TV firmware](https://github.com/ophub/kernel/releases/tag/tools). The Android TV system firmware of other common devices and the corresponding short circuit diagrams can also be [downloaded and viewed here](https://github.com/ophub/kernel/releases/tag/tools).
 
@@ -204,7 +204,7 @@ When the factory reset is completed, the box has been restored to the Android TV
 
 ### 11.5 Disable infrared receiver
 
-Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your box off by mistake. To completely disable IR, add the line:
+Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your TV box off by mistake. To completely disable IR, add the line:
 
 ```yaml
 blacklist meson_ir
