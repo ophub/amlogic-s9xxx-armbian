@@ -194,7 +194,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 | -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
-| -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `server_`, `gnome_desktop_` or `ophub_` as needed. Do not include spaces when setting custom signatures. |
+| -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `_server`, `_gnome_desktop` or `_ophub` as needed. Do not include spaces when setting custom signatures. |
 
 - `sudo ./rebuild -d`: Use the default configuration to pack all boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.10.100`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
