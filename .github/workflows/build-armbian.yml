@@ -110,7 +110,7 @@ jobs:
           echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
 
           set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
-          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="${edition_name}_"
+          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
           echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
 
       - name: Download source code
