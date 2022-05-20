@@ -61,10 +61,11 @@ AMLOGIC_MODEL_LIST="
 # Amlogic GXL Family
 101:Phicomm N1:s905d:meson-gxl-s905d-phicomm-n1.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:4C@1512Mhz,2GB Mem,1Gb Nic,brcm43455 wifi
 102:Phicomm N1 (DMA thresh):s905d:meson-gxl-s905d-phicomm-n1-thresh.dtb:u-boot-n1.bin:NA:/usr/lib/u-boot/u-boot-2015-phicomm-n1.bin:Same as above, when ethmac flow control is off
-103:hg680p & b860h:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,100Mb Nic
+103:hg680p:s905x:meson-gxl-s905x-p212.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,100Mb Nic
 104:X96-Mini & TX3-Mini:s905w:meson-gxl-s905w-tx3-mini.dtb:u-boot-s905x-s912.bin:NA:NA:4C@1512Mhz,100Mb Nic
 105:MECOOL KI Pro:s905d:meson-gxl-s905d-mecool-ki-pro.dtb:u-boot-p201.bin:NA:NA:2G/16G,1Gb Nic
 106:T95:s905x:meson-gxl-s905x-p212.dtb:u-boot-s905x-s912.bin:NA:NA:2G/16G,1Gb Nic
+107:b860h:s905x:meson-gxl-s905x-b680h.dtb:u-boot-p212.bin:NA:NA:4C@1512Mhz,100Mb Nic
 
 # Amlogic GXM Family
 201:Octopus Planet:s912:meson-gxm-octopus-planet.dtb:u-boot-zyxq.bin:NA:NA:4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic
