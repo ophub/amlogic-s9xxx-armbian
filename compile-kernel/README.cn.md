@@ -16,7 +16,7 @@
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+sudo apt-get install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
 ```
 
 2. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
@@ -31,7 +31,7 @@ sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/aml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Armbian
-sudo apt-get install -y $(curl -fsSL https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/compile-kernel/tools/script/armbian-compile-kernel-depends)
+sudo apt-get install -y $(curl -fsSL https://is.gd/depends_armbian)
 ```
 
 2. 更新本地编译环境和配置文件：`armbian-kernel -update`
