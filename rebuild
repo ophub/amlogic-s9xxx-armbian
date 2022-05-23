@@ -721,6 +721,11 @@ loop_rebuild() {
 
         let j++
     done
+
+    cd ${armbian_outputpath}
+
+    # Generate sha256sum check file
+    sha256sum * >sha256sums && sync
 }
 
 # Check script permission
