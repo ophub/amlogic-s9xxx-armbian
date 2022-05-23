@@ -505,6 +505,9 @@ packit_kernel() {
     mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 
+    cd ${out_kernel}/${kernel_version}
+    sha256sum * >sha256sums && sync
+
     cd ${out_kernel}
     tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
 
