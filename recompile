@@ -507,6 +507,7 @@ packit_kernel() {
 
     cd ${out_kernel}/${kernel_version}
     sha256sum * >sha256sums && sync
+    echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
     cd ${out_kernel}
     tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
