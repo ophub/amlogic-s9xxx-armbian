@@ -1,5 +1,6 @@
 #!/bin/bash
-#===================================================================================================
+#==================================================================================================
+#
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
@@ -17,16 +18,33 @@
 # Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
 # The mainline u-boot is installed by default: armbian-update
 # Don't write mainline u-boot command: armbian-update 5.4.170 stable no
-#===================================================================================================
-
+#
+#========================================= Functions list =========================================
+#
+# error_msg          : Output error message
+# get_textoffset     : Get kernel TEXT_OFFSET
+#
+# init_var           : Initialize all variables
+# download_kernel    : Download the kernel
+# check_kernel       : Check kernel files list
+# update_kernel      : Update the kernel
+# update_uboot       : Update the uboot
+#
+#===================================== Set update parameters ======================================
+#
 # Set the kernel download path
 tmp_path="${PWD}"
+# Set the kernel download repository
+kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
+# Set default kernel branch
+kernel_branch=("stable" "dev")
+version_branch="stable"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
-# Set the kernel download repository
-kernel_repo="https://api.github.com/repos/ophub/kernel/contents/pub"
-# Set the kernel API file
-github_api_kernel_files="${tmp_path}/github_api_kernel_files"
+# Set default installation mainline u-boot
+auto_mainline_uboot="yes"
+#
+#==================================================================================================
 
 echo -e "Ready to update, please wait..."
 
@@ -37,7 +55,7 @@ error_msg() {
 }
 
 # Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
-get_textoffset_from_tgz() {
+get_textoffset() {
     boot_tgz_file="${1}"
     vmlinuz_name="${2}"
     K510="1"
@@ -50,319 +68,222 @@ get_textoffset_from_tgz() {
     [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
 }
 
-cd ${tmp_path}
+# Initialize all variables
+init_var() {
+    cd ${tmp_path}
 
-# Check release file
-if [ -f "${ophub_release_file}" ]; then
-    source "${ophub_release_file}" 2>/dev/null
-    UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
-    MAINLINE_UBOOT="${MAINLINE_UBOOT}"
-    ANDROID_UBOOT="${ANDROID_UBOOT}"
-else
-    error_msg "${ophub_release_file} file is missing!"
-fi
+    # Specify the kernel, such as: 5.10.70
+    [[ -n "${1}" ]] && inputs_kernel="${1}"
 
-# Find the partition where root is located
-ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
-[ -z "${ROOT_PTNAME}" ] && error_msg "Cannot find the partition corresponding to the root file system!"
+    # Specify version branch, such as: stable
+    [[ -n "${2}" && -n "$(echo "${kernel_branch[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
 
-# Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
-case "${ROOT_PTNAME}" in
-mmcblk?p[1-4])
-    EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
-    ;;
-[hsv]d[a-z][1-4])
-    EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
-    ;;
-*)
-    error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
-    ;;
-esac
-DEV_EMMC="/dev/${EMMC_NAME}"
+    # Specify whether to brush into the mainline u-boot, such as: yes
+    [[ "${3}" == "no" ]] && auto_mainline_uboot="no"
 
-# Query the current version
-current_kernel_v="$(ls /usr/lib/modules/ 2>/dev/null | sort -rV | head -n 1 | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
-[[ -z "${current_kernel_v}" ]] && error_msg "Failed to query the current version."
-main_line_ver="$(echo "${current_kernel_v}" | cut -d '.' -f1)"
-main_line_maj="$(echo "${current_kernel_v}" | cut -d '.' -f2)"
-main_line_version="${main_line_ver}.${main_line_maj}"
+    # Convert kernel library address to svn format
+    [[ "${kernel_repo}" == http* && $(echo "${kernel_repo}" | grep "tree/main") != "" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
+    kernel_repo="${kernel_repo}/${version_branch}"
 
-# Receive one-key command related parameters
-# Specify the kernel, such as: 5.10.70
-if [[ -n "${1}" ]]; then
-    inputs_kernel="${1}"
-elif [[ "$(ls *.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -gt "3" ]]; then
-    try_boot="$(ls boot-*.tar.gz 2>/dev/null | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')"
-    [[ -n "${try_boot}" ]] && inputs_kernel="${try_boot}"
-fi
+    # Convert kernel library address to API format
+    kernel_api="${kernel_repo#*com\/}"
+    kernel_api="${kernel_api//trunk/contents}"
+    kernel_api="https://api.github.com/repos/${kernel_api}"
 
-# Specify version branch, such as: stable
-arr_branch=("stable" "dev" "eol")
-if [[ -n "${2}" && -n "$(echo "${arr_branch[@]}" | grep -w "${2}")" ]]; then
-    version_branch="${2}"
-else
-    version_branch="stable"
-fi
-kernel_down="${kernel_repo}/${version_branch}"
-
-# Specify whether to brush into the mainline u-boot, such as: yes
-if [[ "${3}" == "no" ]]; then
-    auto_mainline_uboot="no"
-else
-    auto_mainline_uboot="yes"
-fi
-
-# Automatically query the latest kernel version
-if [[ -z "${inputs_kernel}" ]]; then
-    latest_version="$(curl -s "${kernel_down}" | grep "name" | grep -oE "${main_line_version}.[0-9]+" | sed -e "s/${main_line_version}.//g" | sort -n | sed -n '$p')"
-    #latest_version="160"
-    [[ ! -z "${latest_version}" ]] || error_msg "Failed to get the version on the server."
-    echo -e "current version: ${current_kernel_v}, Latest version: ${main_line_version}.${latest_version}"
-    inputs_kernel="${main_line_version}.${latest_version}"
-fi
-
-# version comparison
-if [[ "${current_kernel_v}" == "${inputs_kernel}" ]]; then
-    echo -e "Already the latest version, no need to update."
-    exit 1
-fi
-
-# Check 3 kernel files
-if [[ "$(ls *${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "3" ]]; then
-    echo -e "Kernel version: ${inputs_kernel}"
-    echo -e "Start downloading kernel..."
-
-    # Delete tmp files
-    rm -f *${inputs_kernel}*.tar.gz sha256sums 2>/dev/null
-    sync
-
-    curl -s "${kernel_down}/${inputs_kernel}" >${github_api_kernel_files} && sync
-    sleep 1
-
-    # Download boot file
-    server_kernel_boot="$(cat "${github_api_kernel_files}" | grep "download_url" | grep -o "https.*/boot-.*.tar.gz" | head -n 1)"
-    server_kernel_boot_name="${server_kernel_boot##*/}"
-    server_kernel_boot_name="${server_kernel_boot_name//%2B/+}"
-    wget -c "${server_kernel_boot}" -O "${server_kernel_boot_name}" >/dev/null 2>&1 && sync
-    if [[ "$?" -eq "0" && -s "${server_kernel_boot_name}" ]]; then
-        echo -e "01.01 The boot file download complete."
+    # Check release file
+    if [[ -f "${ophub_release_file}" ]]; then
+        source "${ophub_release_file}" 2>/dev/null
+        UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
+        MAINLINE_UBOOT="${MAINLINE_UBOOT}"
+        ANDROID_UBOOT="${ANDROID_UBOOT}"
     else
-        error_msg "01.01 The boot file failed to download."
+        error_msg "${ophub_release_file} file is missing!"
     fi
 
-    # Download dtb file
-    server_kernel_dtb="$(cat "${github_api_kernel_files}" | grep "download_url" | grep -o "https.*/dtb-amlogic-.*.tar.gz" | head -n 1)"
-    server_kernel_dtb_name="${server_kernel_dtb##*/}"
-    server_kernel_dtb_name="${server_kernel_dtb_name//%2B/+}"
-    wget -c "${server_kernel_dtb}" -O "${server_kernel_dtb_name}" >/dev/null 2>&1 && sync
-    if [[ "$?" -eq "0" && -s "${server_kernel_dtb_name}" ]]; then
-        echo -e "01.02 The dtb file download complete."
-    else
-        error_msg "01.02 The dtb file failed to download."
-    fi
+    # Find the partition where root is located
+    ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
+    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
 
-    # Download modules file
-    server_kernel_modules="$(cat "${github_api_kernel_files}" | grep "download_url" | grep -o "https.*/modules-.*.tar.gz" | head -n 1)"
-    server_kernel_modules_name="${server_kernel_modules##*/}"
-    server_kernel_modules_name="${server_kernel_modules_name//%2B/+}"
-    wget -c "${server_kernel_modules}" -O "${server_kernel_modules_name}" >/dev/null 2>&1 && sync
-    if [[ "$?" -eq "0" && -s "${server_kernel_modules_name}" ]]; then
-        echo -e "01.03 The modules file download complete."
-    else
-        error_msg "01.03 The modules file failed to download."
-    fi
+    # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+    case "${ROOT_PTNAME}" in
+    mmcblk?p[1-4])
+        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        ;;
+    [hsv]d[a-z][1-4])
+        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
+        ;;
+    *)
+        error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
+        ;;
+    esac
+    DEV_EMMC="/dev/${EMMC_NAME}"
+}
 
-    # Download header file
-    server_kernel_header="$(cat "${github_api_kernel_files}" | grep "download_url" | grep -o "https.*/header-.*.tar.gz" | head -n 1)"
-    if [[ -n "${server_kernel_header}" ]]; then
-        server_kernel_header_name="${server_kernel_header##*/}"
-        server_kernel_header_name="${server_kernel_header_name//%2B/+}"
-        wget -c "${server_kernel_header}" -O "${server_kernel_header_name}" >/dev/null 2>&1 && sync
-        if [[ "$?" -eq "0" && -s "${server_kernel_header_name}" ]]; then
-            echo -e "01.04 The header file download complete."
-        else
-            error_msg "01.04 The header file failed to download."
+# Download the kernel
+download_kernel() {
+    cd ${tmp_path}
+
+    # The local kernel file is preferred, followed by the specified version, and finally the latest version of the same series is used
+    if [[ "$(ls *.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]]; then
+        try_boot="$(ls boot-*.tar.gz 2>/dev/null | head -n 1 | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')"
+        [[ -n "${try_boot}" ]] && inputs_kernel="${try_boot}" && echo -e "Use local kernel files: ${inputs_kernel}"
+    else
+        # Query the current version
+        current_kernel="$(echo "$(uname -r)" | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
+        [[ -z "${current_kernel}" ]] && error_msg "Failed to query the current kernel version."
+        # kernel_verpatch, such as [ 5.10 ]
+        kernel_verpatch="$(echo ${current_kernel} | awk -F '.' '{print $1"."$2}')"
+
+        # Automatically query the latest kernel version
+        if [[ -z "${inputs_kernel}" ]]; then
+            latest_version="$(curl -s "${kernel_api}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
+            #latest_version="160"
+            [[ ! -z "${latest_version}" ]] || error_msg "Failed to get the version on the server."
+            echo -e "current version: ${current_kernel}, Latest version: ${kernel_verpatch}.${latest_version}"
+            inputs_kernel="${kernel_verpatch}.${latest_version}"
         fi
-    fi
 
-    # Download sha256sums file
-    server_kernel_sha256sums="$(cat "${github_api_kernel_files}" | grep "download_url" | grep -o "https.*/sha256sums" | head -n 1)"
-    if [[ -n "${server_kernel_sha256sums}" ]]; then
-        server_kernel_sha256sums_name="sha256sums"
-        wget -c "${server_kernel_sha256sums}" -O "${server_kernel_sha256sums_name}" >/dev/null 2>&1 && sync
-        if [[ "$?" -eq "0" && -s "${server_kernel_sha256sums_name}" ]]; then
-            echo -e "01.05 The sha256sums file download complete."
-        else
-            error_msg "01.05 The sha256sums file failed to download."
+        # version comparison
+        if [[ "${current_kernel}" == "${inputs_kernel}" ]]; then
+            echo -e "Already the latest version, no need to update."
+            exit 1
         fi
-    fi
 
-    rm -f ${github_api_kernel_files} 2>/dev/null && sync
-    sync
-fi
+        # Delete tmp files
+        rm -f *${inputs_kernel}*.tar.gz sha256sums 2>/dev/null && sync
+
+        # Download kernel
+        echo -e "Download kernel from [ ${kernel_repo/trunk/tree\/main}/${inputs_kernel} ]..."
+        svn export ${kernel_repo}/${inputs_kernel} ${tmp_path} --force
+        [[ "${?}" -eq "0" ]] && echo -e "Kernel download complete."
+    fi
+}
 
 # Check kernel files list
-if [[ "$(ls *${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -ge "3" ]]; then
+check_kernel() {
+    cd ${tmp_path}
+
+    # Check the sha256sums file
     sha256sums_file="sha256sums"
     [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] && sha256sums_check="1" || sha256sums_check="0"
     [[ "${sha256sums_check}" == "1" ]] && echo -e "Enable sha256sum checksum."
 
-    if [ "$(ls boot-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -ge "1" ]; then
-        build_boot="$(ls boot-${inputs_kernel}-*.tar.gz | head -n 1)"
-        custom_kernel_name="${build_boot/boot-/}" && custom_kernel_name="${custom_kernel_name/.tar.gz/}"
-        KERNEL_VERSION="$(echo ${custom_kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
-        echo -e "Kernel name: ${custom_kernel_name}"
+    # Determine custom kernel filename
+    kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz | head -n 1)"
+    kernel_name="${kernel_boot/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
+    KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
+    echo -e "Kernel name: ${kernel_name}"
 
-        get_textoffset_from_tgz "${tmp_path}/${build_boot}" "vmlinuz-${custom_kernel_name}"
-        echo -e "K510 [ ${K510} ]"
-        if [[ "${K510}" -eq "1" ]]; then
-            [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
-        fi
-
-        if [[ "${sha256sums_check}" == "1" ]]; then
-            [[ -n "$(cat ${sha256sums_file} | grep -o "$(sha256sum ${build_boot})")" ]] || error_msg "${build_boot}: sha256sum verification failed."
-        fi
-    else
-        error_msg "Have no boot-*.tar.gz file found."
-    fi
-
-    if [[ -f "dtb-amlogic-${custom_kernel_name}.tar.gz" ]]; then
-        build_dtb="dtb-amlogic-${custom_kernel_name}.tar.gz"
-        if [[ "${sha256sums_check}" == "1" ]]; then
-            [[ -n "$(cat ${sha256sums_file} | grep -o "$(sha256sum ${build_dtb})")" ]] || error_msg "${build_dtb}: sha256sum verification failed."
-        fi
-    else
-        error_msg "Have no dtb-amlogic-*.tar.gz file found."
-    fi
-
-    if [[ -f "modules-${custom_kernel_name}.tar.gz" ]]; then
-        build_modules="modules-${custom_kernel_name}.tar.gz"
-        if [[ "${sha256sums_check}" == "1" ]]; then
-            [[ -n "$(cat ${sha256sums_file} | grep -o "$(sha256sum ${build_modules})")" ]] || error_msg "${build_modules}: sha256sum verification failed."
-        fi
-    else
-        error_msg "Have no modules-*.tar.gz file found."
-    fi
-
-    if [[ -f "header-${custom_kernel_name}.tar.gz" ]]; then
-        build_header="header-${custom_kernel_name}.tar.gz"
-        if [[ "${sha256sums_check}" == "1" ]]; then
-            [[ -n "$(cat ${sha256sums_file} | grep -o "$(sha256sum ${build_header})")" ]] || error_msg "${build_header}: sha256sum verification failed."
-        fi
-    else
-        build_header=""
-    fi
-else
-    error_msg "Please upload the kernel files, then run [ $0 ] again."
-fi
-
-echo -e "Unpack [ ${custom_kernel_name} ] related files ..."
-
-# 01. For /boot five files
-rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-* 2>/dev/null && sync
-rm -f /boot/uInitrd /boot/zImage 2>/dev/null && sync
-tar -xzf ${build_boot} -C /boot && sync
-
-if [[ -f "/boot/uInitrd-${custom_kernel_name}" ]]; then
+    # Loop check file
+    kernel_list=("boot" "dtb-amlogic" "modules" "header")
     i="1"
-    max_try="10"
-    while [[ "${i}" -le "${max_try}" ]]; do
-        cp -f /boot/uInitrd-${custom_kernel_name} /boot/uInitrd 2>/dev/null && sync
-        uInitrd_original="$(md5sum /boot/uInitrd-${custom_kernel_name} | awk '{print $1}')"
-        uInitrd_new="$(md5sum /boot/uInitrd | awk '{print $1}')"
-        if [[ "${uInitrd_original}" == "${uInitrd_new}" ]]; then
-            break
-        else
-            rm -f /boot/uInitrd && sync
-            let i++
-            continue
+    for kernel_file in ${kernel_list[*]}; do
+        # Set check filename
+        tmp_file="${kernel_file}-${kernel_name}.tar.gz"
+        # Check if file exists
+        [[ -f "${tmp_file}" ]] || error_msg "The [ ${kernel_file} ] file is missing."
+        # Check if the file sha256sum is correct
+        if [[ "${sha256sums_check}" -eq "1" ]]; then
+            tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
+            tmp_checkcode="$(cat ${sha256sums_file} | grep ${tmp_file} | awk '{print $1}')"
+            [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
         fi
+        let i++
     done
-    [[ "${i}" -eq "10" ]] && error_msg "/boot/uInitrd-${custom_kernel_name} file copy failed."
-else
-    error_msg "/boot/uInitrd-${custom_kernel_name} file is missing."
-fi
 
-if [[ -f "/boot/vmlinuz-${custom_kernel_name}" ]]; then
-    i="1"
-    max_try="10"
-    while [ "${i}" -le "${max_try}" ]; do
-        cp -f /boot/vmlinuz-${custom_kernel_name} /boot/zImage 2>/dev/null && sync
-        vmlinuz_original="$(md5sum /boot/vmlinuz-${custom_kernel_name} | awk '{print $1}')"
-        vmlinuz_new="$(md5sum /boot/zImage | awk '{print $1}')"
-        if [[ "${vmlinuz_original}" == "${vmlinuz_new}" ]]; then
-            break
-        else
-            rm -f /boot/zImage && sync
-            let i++
-            continue
-        fi
-    done
-    [[ "${i}" -eq "10" ]] && error_msg "/boot/vmlinuz-${custom_kernel_name} file copy failed."
-else
-    error_msg "/boot/vmlinuz-${custom_kernel_name} file is missing."
-fi
+    # Check if the file is added with TEXT_OFFSET patch
+    get_textoffset "${tmp_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
+    echo -e "K510 [ ${K510} ]"
+    if [[ "${K510}" -eq "1" ]]; then
+        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
+    fi
+}
 
-[[ -f "/boot/config-${custom_kernel_name}" ]] || error_msg "/boot/config-${custom_kernel_name} file is missing."
-[[ -f "/boot/System.map-${custom_kernel_name}" ]] || error_msg "/boot/System.map-${custom_kernel_name} file is missing."
+# Update the kernel
+update_kernel() {
+    cd ${tmp_path}
 
-echo -e "02.01 Unpack [ ${build_boot} ] complete."
-sleep 3
+    # 01. For /boot five files
+    rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-* 2>/dev/null && sync
+    rm -f /boot/uInitrd /boot/zImage 2>/dev/null && sync
+    #
+    tar -xzf boot-${kernel_name}.tar.gz -C /boot && sync
+    [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
+    (
+        cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage && sync
+        [[ "$(sha256sum uInitrd-${kernel_name} | awk '{print $1}')" == "$(sha256sum uInitrd | awk '{print $1}')" ]] || cp -f uInitrd-${kernel_name} uInitrd
+        [[ "$(sha256sum vmlinuz-${kernel_name} | awk '{print $1}')" == "$(sha256sum zImage | awk '{print $1}')" ]] || cp -f vmlinuz-${kernel_name} zImage
+    )
+    echo -e "01. Unpack [ boot-${kernel_name}.tar.gz ] complete."
 
-# 02. For /boot/dtb/amlogic/*
-tar -xzf ${build_dtb} -C /boot/dtb/amlogic && sync
-[[ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic file is missing."
-echo -e "02.02 Unpack [ ${build_dtb} ] complete."
-sleep 3
+    # 02. For /boot/dtb/amlogic/*
+    tar -xzf dtb-amlogic-${kernel_name}.tar.gz -C /boot/dtb/amlogic && sync
+    [[ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic file is missing."
+    echo -e "02. Unpack [ dtb-amlogic-${kernel_name}.tar.gz ] complete."
 
-# 03. For /usr/lib/modules/*
-rm -rf /usr/lib/modules/* 2>/dev/null && sync
-tar -xzf ${build_modules} -C /usr/lib/modules && sync
-(cd /usr/lib/modules/${custom_kernel_name} && echo "build source" | xargs rm -f)
-[[ -d "/usr/lib/modules/${custom_kernel_name}" ]] || error_msg "/usr/lib/modules/${custom_kernel_name} kernel folder is missing."
-echo -e "02.03 Unpack [ ${build_modules} ] complete."
-sleep 3
+    # 03. For /usr/lib/modules/*
+    rm -rf /usr/lib/modules/* 2>/dev/null && sync
+    tar -xzf modules-${kernel_name}.tar.gz -C /usr/lib/modules && sync
+    (cd /usr/lib/modules/${kernel_name} && echo "build source" | xargs rm -f)
+    [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
+    echo -e "03. Unpack [ modules-${kernel_name}.tar.gz ] complete."
 
-# 04. For /usr/include/*
-if [[ -n "${build_header}" && -f "${build_header}" ]]; then
-    tar -xzf ${build_header} -C /usr && sync
-    echo -e "02.04 Unpack [ ${build_header} ] complete."
-    sleep 3
-fi
+    # 04. For /usr/include/*
+    tar -xzf header-${kernel_name}.tar.gz -C /usr && sync
+    [[ -d "/usr/include" ]] || error_msg "/usr/include folder is missing."
+    echo -e "04. Unpack [ header-${kernel_name}.tar.gz ] complete."
 
-# Copy u-boot.ext and u-boot.emmc
-if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
-    [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
-    [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
-    echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
-elif [[ "${K510}" -eq "0" ]]; then
-    rm -f "/boot/u-boot.ext" "/boot/u-boot.emmc" 2>/dev/null
-fi
+    # Delete kernel tmpfiles
+    rm -f *${kernel_name}*.tar.gz sha256sums 2>/dev/null
+}
 
-# Write bootloader
-if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
-    echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-    dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
-    echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-    dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
-fi
+# Update the uboot
+update_uboot() {
+    cd ${tmp_path}
 
-# Delete kernel files
-rm -f *${custom_kernel_name}*.tar.gz sha256sums 2>/dev/null
+    # Copy u-boot.ext and u-boot.emmc
+    if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+        [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
+        [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
+        echo -e "The ${UBOOT_OVERLOAD} file copy is complete."
+    elif [[ "${K510}" -eq "0" ]]; then
+        rm -f "/boot/u-boot.ext" "/boot/u-boot.emmc" 2>/dev/null
+    fi
 
-# Update ophub_release_file
-sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
-echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
-sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
-echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+    # Write bootloader
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+        echo -e "Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        echo -e "Write Android bootloader: [ ${ANDROID_UBOOT} ]"
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+    fi
+
+    # Update ophub_release_file
+    sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
+    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
+    sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
+    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+}
+
+# Check script permission
+[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ./$0 ]"
+# Check for necessary dependencies
+[[ -z "$(dpkg-query -l | grep subversion)" || -z "$(dpkg-query -l | grep tar)" ]] && sudo apt-get update && sudo apt-get install -y subversion tar
+# Initialize all variables
+init_var "${@}"
+# Download the kernel
+download_kernel
+# Check kernel files list
+check_kernel
+# Update the kernel
+update_kernel
+# Update the uboot
+update_uboot
 
 sync
-wait
-
 echo "Successfully updated, automatic restarting..."
-sleep 3
 reboot
 exit 0
