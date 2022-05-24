@@ -30,7 +30,7 @@
 # update_kernel      : Update the kernel
 # update_uboot       : Update the uboot
 #
-#===================================== Set update parameters ======================================
+#===================================== Set default parameters =====================================
 #
 # Set the kernel download path
 tmp_path="${PWD}"
@@ -45,8 +45,6 @@ ophub_release_file="/etc/ophub-release"
 auto_mainline_uboot="yes"
 #
 #==================================================================================================
-
-echo -e "Ready to update, please wait..."
 
 # Encountered a serious error, abort the script execution
 error_msg() {
@@ -268,8 +266,9 @@ update_uboot() {
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
 }
 
+echo -e "Ready to update, please wait..."
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ./$0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
 # Check for necessary dependencies
 [[ -z "$(dpkg-query -l | grep subversion)" || -z "$(dpkg-query -l | grep tar)" ]] && sudo apt-get update && sudo apt-get install -y subversion tar
 # Initialize all variables
@@ -283,7 +282,7 @@ update_kernel
 # Update the uboot
 update_uboot
 
-sync
+sync && sleep 3
 echo "Successfully updated, automatic restarting..."
 reboot
 exit 0
