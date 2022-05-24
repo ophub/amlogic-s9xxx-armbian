@@ -81,6 +81,7 @@ update_script() {
     echo -e "${INFO} Start installing dependencies..."
     sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
 
+    sync && sleep 3
     echo -e "${STEPS} Script update complete."
     exit 0
 }
@@ -117,7 +118,7 @@ EOF
 }
 
 # Check script permission, supports running on Armbian system.
-[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./$0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # 10Gb free space required
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
@@ -133,3 +134,4 @@ case "${1}" in
     -update) update_script ;;
     *)       cd ${make_path} && sudo ${compile_script} "${@}" ;;
 esac
+
