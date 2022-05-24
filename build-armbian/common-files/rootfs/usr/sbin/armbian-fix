@@ -1,5 +1,6 @@
 #!/bin/bash
-#============================================================================================================================
+#=====================================================================================
+#
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
@@ -12,7 +13,8 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-fix
-#============================================================================================================================
+#
+#=====================================================================================
 
 # Fix common releases permissions
 [ -d "/var/tmp" ] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
