@@ -5,12 +5,12 @@
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-# This file is a part of the Armbian Rebuild and kernel Recompile script
+# This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Function: Create swap for armbian system
-# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-swap 1
 # The input parameter unit is GB, the default is 1
@@ -19,7 +19,7 @@
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " [ERROR] ${1}"
+    echo -e " [\033[1;91m Error \033[0m] ${1}"
     exit 1
 }
 
