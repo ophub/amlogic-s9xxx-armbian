@@ -251,7 +251,7 @@ download_kernel() {
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
         if [ ! -d "${kernel_path}/${KERNEL_VAR}" ]; then
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo}/${KERNEL_VAR} ]"
+            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${KERNEL_VAR} ]"
             svn export ${kernel_repo}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} --force
         else
             echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
