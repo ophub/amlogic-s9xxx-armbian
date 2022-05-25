@@ -159,7 +159,7 @@ armbian-update
 
 ### 11.1 每个盒子的 dtb 和 u-boot 对应关系表
 
-请查阅[说明](config_correspondence_of_amlogic_s9xxx_tv_box.md)
+请查阅[说明](amlogic_model_database.md)
 
 ### 11.2 LED 屏显示控制说明
 
