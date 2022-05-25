@@ -159,7 +159,7 @@ In the use of Armbian, some common problems that may be encountered are summariz
 
 ### 11.1 dtb and u-boot correspondence table for each box
 
-Please refer to [Description](config_correspondence_of_amlogic_s9xxx_tv_box.md)
+Please refer to [Description](amlogic_model_database.md)
 
 ### 11.2 LED screen display control instructions
 
