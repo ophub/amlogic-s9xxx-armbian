@@ -5,12 +5,12 @@
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-# This file is a part of the Armbian Rebuild and kernel Recompile script
+# This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Function: Install docker to armbian
-# Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
-# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-docker
 #
@@ -36,7 +36,7 @@ ophub_release_file="/etc/ophub-release"
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " [ERROR] ${1}"
+    echo -e " ${ERROR} ${1}"
     exit 1
 }
 
