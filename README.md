@@ -23,7 +23,7 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-Pro+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | All | armbian_aml_s905_*.img |
 | s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | All | armbian_aml_s905l3a_*.img |
 
-💡Tip: The current ***`s905w`*** series of TV Boxes only support the use of the `5.15.y` kernel, Other types of TV Boxes can use optional kernel versions. Currently ***`s905`*** TV Boxes can only be used in `TF/SD/USB`, other types of TV Boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/config_correspondence_of_amlogic_s9xxx_tv_box.md) for dtb and u-boot of each device.
+💡Tip: The current ***`s905w`*** series of TV Boxes only support the use of the `5.15.y` kernel, Other types of TV Boxes can use optional kernel versions. Currently ***`s905`*** TV Boxes can only be used in `TF/SD/USB`, other types of TV Boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/amlogic_model_database.md) for dtb and u-boot of each device.
 
 ## Install to EMMC and update instructions
 
