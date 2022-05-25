@@ -8,7 +8,7 @@
 # This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Install armbian to EMMC
+# Function: Install armbian to eMMC
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -89,7 +89,10 @@ search_aml_model() {
     fi
 }
 
-# Display the model list
+# Functions: Displays a list of supported amlogic devices
+# Configure: View ${model_database}
+# Explain:   1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT
+# Example:   402:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA
 show_aml_model() {
     printf "%-s\n" "--------------------------------------------------------------------------------------"
     printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
