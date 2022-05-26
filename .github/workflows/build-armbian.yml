@@ -16,7 +16,7 @@ on:
       set_release:
         description: "Release: jammy / focal / bullseye"
         required: false
-        default: "jammy"
+        default: "bullseye"
       set_board:
         description: "Board: odroidn2 / lepotato"
         required: false
@@ -24,7 +24,7 @@ on:
       set_desktop:
         description: "Build Desktop: no / gnome / xfce, etc."
         required: false
-        default: "no"
+        default: "xfce"
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
@@ -45,8 +45,8 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
-  #schedule:
-    #- cron: "0 17 * * 0"
+  schedule:
+    - cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
