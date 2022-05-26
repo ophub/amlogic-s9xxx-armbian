@@ -24,6 +24,8 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [11.1 dtb and u-boot correspondence table for each box](#111-dtb-and-u-boot-correspondence-table-for-each-box)
     - [11.2 LED screen display control instructions](#112-led-screen-display-control-instructions)
     - [11.3 How to restore the original Android TV system](#113-how-to-restore-the-original-android-tv-system)
+      - [11.3.1 Restoring using armbian-ddbr backup](#1131-restoring-using-armbian-ddbr-backup)
+      - [11.3.2 Restoring with Amlogic usb burning tool](#1132-restoring-with-amlogic-usb-burning-tool)
     - [11.4 Set the box to boot from USB/TF/SD](#114-set-the-box-to-boot-from-usbtfsd)
     - [11.5 Disable infrared receiver](#115-disable-infrared-receiver)
     - [11.6 Selection of bootstrap file](#116-selection-of-bootstrap-file)
@@ -166,6 +168,14 @@ Please refer to [Description](amlogic_model_database.md)
 Please refer to [Description](led_screen_display_control.md)
 
 ### 11.3 How to restore the original Android TV system
+
+Usually use armbian-ddbr backup to restore, or use Amlogic usb burning tool to restore the original Android TV system.
+
+#### 11.3.1 Restoring using armbian-ddbr backup
+
+It is recommended that you make a backup of the original Android TV system that comes with the current box before installing the Armbian system in a new box, so that you can use it when you need to restore the system. Please boot the Armbian system from `TF/SD/USB`, enter the `armbian-ddbr` command, and then enter `b` according to the prompts to backup the system. The backup file is stored in the path `/ddbr/BACKUP-arm-64-emmc. img.gz` , please download and save. When you need to restore the Android TV system, upload the previously backed up files to the same path of the `TF/SD/USB` device, enter the `armbian-ddbr` command, and then enter `r` according to the prompt to restore the system.
+
+#### 11.3.2 Restoring with Amlogic usb burning tool
 
 - Under normal circumstances, re-insert the USB hard disk and install it again.
 
