@@ -151,26 +151,35 @@ download_kernel() {
         rm -f *${inputs_kernel}*.tar.gz sha256sums 2>/dev/null && sync
 
         # Download kernel
-        echo -e "Download kernel from [ ${kernel_repo/trunk/tree\/main}/${inputs_kernel} ]..."
+        echo -e "Start downloading the kernel from [ ${kernel_repo/trunk/tree\/main}/${inputs_kernel} ]..."
         svn export ${kernel_repo}/${inputs_kernel} ${tmp_path} --force
-        [[ "${?}" -eq "0" ]] && echo -e "Kernel download complete."
+        [[ "${?}" -ne "0" ]] && error_msg "Kernel download failed."
     fi
+
+    sync && echo ""
 }
 
 # Check kernel files list
 check_kernel() {
     cd ${tmp_path}
 
-    # Check the sha256sums file
-    sha256sums_file="sha256sums"
-    [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] && sha256sums_check="1" || sha256sums_check="0"
-    [[ "${sha256sums_check}" == "1" ]] && echo -e "Enable sha256sum checksum."
-
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz | head -n 1)"
     kernel_name="${kernel_boot/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
     KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
     echo -e "Kernel name: ${kernel_name}"
+
+    # Check if the file is added with TEXT_OFFSET patch
+    get_textoffset "${tmp_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
+    echo -e "K510 [ ${K510} ]"
+    if [[ "${K510}" -eq "1" ]]; then
+        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
+    fi
+
+    # Check the sha256sums file
+    sha256sums_file="sha256sums"
+    [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] && sha256sums_check="1" || sha256sums_check="0"
+    [[ "${sha256sums_check}" == "1" ]] && echo -e "Enable sha256sum checking..."
 
     # Loop check file
     kernel_list=("boot" "dtb-amlogic" "modules" "header")
@@ -185,21 +194,19 @@ check_kernel() {
             tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
             tmp_checkcode="$(cat ${sha256sums_file} | grep ${tmp_file} | awk '{print $1}')"
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
+            echo -e "(${i}/4) [ ${tmp_file} ] file sha256sum check same."
         fi
         let i++
     done
 
-    # Check if the file is added with TEXT_OFFSET patch
-    get_textoffset "${tmp_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
-    echo -e "K510 [ ${K510} ]"
-    if [[ "${K510}" -eq "1" ]]; then
-        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
-    fi
+    sync && echo ""
 }
 
 # Update the kernel
 update_kernel() {
     cd ${tmp_path}
+
+    echo -e "Start unpacking the kernel..."
 
     # 01. For /boot five files
     rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-* 2>/dev/null && sync
@@ -212,27 +219,29 @@ update_kernel() {
         [[ "$(sha256sum uInitrd-${kernel_name} | awk '{print $1}')" == "$(sha256sum uInitrd | awk '{print $1}')" ]] || cp -f uInitrd-${kernel_name} uInitrd
         [[ "$(sha256sum vmlinuz-${kernel_name} | awk '{print $1}')" == "$(sha256sum zImage | awk '{print $1}')" ]] || cp -f vmlinuz-${kernel_name} zImage
     )
-    echo -e "01. Unpack [ boot-${kernel_name}.tar.gz ] complete."
+    echo -e "(1/4) Unpacking [ boot-${kernel_name}.tar.gz ] done."
 
     # 02. For /boot/dtb/amlogic/*
     tar -xzf dtb-amlogic-${kernel_name}.tar.gz -C /boot/dtb/amlogic && sync
     [[ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic file is missing."
-    echo -e "02. Unpack [ dtb-amlogic-${kernel_name}.tar.gz ] complete."
+    echo -e "(2/4) Unpacking [ dtb-amlogic-${kernel_name}.tar.gz ] done."
 
     # 03. For /usr/lib/modules/*
     rm -rf /usr/lib/modules/* 2>/dev/null && sync
     tar -xzf modules-${kernel_name}.tar.gz -C /usr/lib/modules && sync
     (cd /usr/lib/modules/${kernel_name} && echo "build source" | xargs rm -f)
     [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
-    echo -e "03. Unpack [ modules-${kernel_name}.tar.gz ] complete."
+    echo -e "(3/4) Unpacking [ modules-${kernel_name}.tar.gz ] done."
 
     # 04. For /usr/include/*
     tar -xzf header-${kernel_name}.tar.gz -C /usr && sync
     [[ -d "/usr/include" ]] || error_msg "/usr/include folder is missing."
-    echo -e "04. Unpack [ header-${kernel_name}.tar.gz ] complete."
+    echo -e "(4/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums 2>/dev/null
+
+    sync && echo ""
 }
 
 # Update the uboot
@@ -264,6 +273,8 @@ update_uboot() {
     echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
     sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+
+    sync && echo ""
 }
 
 echo -e "Ready to update, please wait..."
