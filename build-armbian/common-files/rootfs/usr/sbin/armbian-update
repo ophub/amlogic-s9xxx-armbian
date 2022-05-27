@@ -22,8 +22,8 @@
 #========================================= Functions list =========================================
 #
 # error_msg          : Output error message
+# check_depends      : Check dependencies
 # get_textoffset     : Get kernel TEXT_OFFSET
-#
 # init_var           : Initialize all variables
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files list
@@ -50,6 +50,23 @@ auto_mainline_uboot="yes"
 error_msg() {
     echo -e " [\033[1;91m Error \033[0m] ${1}"
     exit 1
+}
+
+# Check dependencies
+check_depends() {
+    i="1"
+    is_missing="0"
+    necessary_packages=("subversion" "tar" "coreutils")
+    for package in ${necessary_packages[*]}; do
+        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_missing="1"
+        let i++
+    done
+
+    if [[ "${is_missing}" -eq "1" ]]; then
+        echo -e "Start installing the necessary dependencies..."
+        sudo apt-get update
+        sudo apt-get install -y ${necessary_packages[*]}
+    fi
 }
 
 # Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
@@ -178,7 +195,8 @@ check_kernel() {
 
     # Check the sha256sums file
     sha256sums_file="sha256sums"
-    [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] && sha256sums_check="1" || sha256sums_check="0"
+    sha256sums_check="1"
+    [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] || sha256sums_check="0"
     [[ "${sha256sums_check}" == "1" ]] && echo -e "Enable sha256sum checking..."
 
     # Loop check file
@@ -280,8 +298,9 @@ update_uboot() {
 echo -e "Ready to update, please wait..."
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
-# Check for necessary dependencies
-[[ -z "$(dpkg-query -l | grep subversion)" || -z "$(dpkg-query -l | grep tar)" ]] && sudo apt-get update && sudo apt-get install -y subversion tar
+#
+# Check dependencies
+check_depends
 # Initialize all variables
 init_var "${@}"
 # Download the kernel
@@ -292,7 +311,7 @@ check_kernel
 update_kernel
 # Update the uboot
 update_uboot
-
+#
 sync && sleep 3
 echo "Successfully updated, automatic restarting..."
 reboot
