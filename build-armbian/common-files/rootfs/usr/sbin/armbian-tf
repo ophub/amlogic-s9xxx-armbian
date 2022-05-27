@@ -33,7 +33,7 @@ ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " ${ERROR} ${1}"
+    echo -e "${ERROR} ${1}"
     exit 1
 }
 
