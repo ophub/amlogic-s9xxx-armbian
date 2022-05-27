@@ -36,7 +36,7 @@ ophub_release_file="/etc/ophub-release"
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " ${ERROR} ${1}"
+    echo -e "${ERROR} ${1}"
     exit 1
 }
 
