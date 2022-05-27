@@ -43,7 +43,7 @@ tmp_path="/ddbr"
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " [\033[1;91m Error \033[0m] ${1}"
+    echo -e "[\033[1;91m Error \033[0m] ${1}"
     exit 1
 }
 
