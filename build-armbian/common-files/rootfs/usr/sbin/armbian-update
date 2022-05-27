@@ -48,7 +48,7 @@ auto_mainline_uboot="yes"
 
 # Encountered a serious error, abort the script execution
 error_msg() {
-    echo -e " [\033[1;91m Error \033[0m] ${1}"
+    echo -e "[\033[1;91m Error \033[0m] ${1}"
     exit 1
 }
 
@@ -196,8 +196,8 @@ check_kernel() {
     # Check the sha256sums file
     sha256sums_file="sha256sums"
     sha256sums_check="1"
-    [[ -f "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] || sha256sums_check="0"
-    [[ "${sha256sums_check}" == "1" ]] && echo -e "Enable sha256sum checking..."
+    [[ -s "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] || sha256sums_check="0"
+    [[ "${sha256sums_check}" -eq "1" ]] && echo -e "Enable sha256sum checking..."
 
     # Loop check file
     kernel_list=("boot" "dtb-amlogic" "modules" "header")
@@ -206,7 +206,7 @@ check_kernel() {
         # Set check filename
         tmp_file="${kernel_file}-${kernel_name}.tar.gz"
         # Check if file exists
-        [[ -f "${tmp_file}" ]] || error_msg "The [ ${kernel_file} ] file is missing."
+        [[ -s "${tmp_file}" ]] || error_msg "The [ ${kernel_file} ] file is missing."
         # Check if the file sha256sum is correct
         if [[ "${sha256sums_check}" -eq "1" ]]; then
             tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
