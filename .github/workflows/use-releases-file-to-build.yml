@@ -26,7 +26,7 @@ on:
         required: false
         default: "2748"
       armbian_fstype:
-        description: "Set armbian rootfs type."
+        description: "Set armbian rootfs type: ext4 / btrfs"
         required: false
         default: "ext4"
 
