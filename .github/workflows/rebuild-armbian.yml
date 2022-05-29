@@ -10,23 +10,23 @@ on:
   workflow_dispatch:
     inputs:
       armbian_url:
-        description: "Input armbian path"
+        description: "Set armbian path."
         required: false
         default: ""
       armbian_soc:
-        description: "Input armbian soc"
+        description: "Set Amlogic SoC."
         required: false
         default: "s905x3_s905d"
       armbian_kernel:
-        description: "Input armbian kernel"
+        description: "Set kernel version."
         required: false
         default: "5.15.25_5.10.100"
       armbian_size:
-        description: "Input armbian size(Unit: MiB)"
+        description: "Set armbian rootfs size(Unit: MiB)."
         required: false
         default: "2748"
       armbian_fstype:
-        description: "Input rootfs type: [ ext4 / btrfs ]"
+        description: "Set armbian rootfs type: ext4 / btrfs"
         required: false
         default: "ext4"
 
