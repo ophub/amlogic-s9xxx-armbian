@@ -32,7 +32,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 1. 注册自己的 Github 的账户
 
-注册自己的账户，以便进行固件个性化定制的继续操作。点击 giuhub.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
+注册自己的账户，以便进行固件个性化定制的继续操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
 
 ## 2. 设置隐私变量 GITHUB_TOKEN
 
