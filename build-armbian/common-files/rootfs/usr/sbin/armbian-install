@@ -193,7 +193,7 @@ create_partition() {
     dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
     sync
 
-    # Set partition size(MB)
+    # Set partition size (Unit: MiB)
     if [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
         BLANK1="68"
         BOOT="512"
@@ -208,8 +208,8 @@ create_partition() {
         BLANK2="0"
     else
         BLANK1="68"
-        BOOT="256"    # A total of [ 1120MB ] can be used in this block, and the remaining [ 864MB ] can be used.
-        BLANK2="1026" # Can set the rootfs partition after [ 1350MB ] of the total disk.
+        BOOT="256"    # A total of [ 1120MiB ] can be used in this block, and the remaining [ 864MiB ] can be used.
+        BLANK2="1026" # Can set the rootfs partition after [ 1350MiB ] of the total disk.
     fi
 
     # Format emmc disk
