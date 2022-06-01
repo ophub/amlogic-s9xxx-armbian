@@ -337,7 +337,7 @@ confirm_version() {
         MAINLINE_UBOOT=""
         ANDROID_UBOOT=""
         ;;
-    s905x | hg680p | b860h)
+    s905x | hg680p | tbee | b860h)
         FDTFILE="meson-gxl-s905x-p212.dtb"
         UBOOT_OVERLOAD="u-boot-p212.bin"
         MAINLINE_UBOOT=""
