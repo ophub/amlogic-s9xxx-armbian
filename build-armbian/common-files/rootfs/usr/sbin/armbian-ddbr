@@ -17,25 +17,19 @@
 #
 #========================= Set default parameters ==========================
 #
-# Set font color
-blue_font_prefix="\033[94m"
-purple_font_prefix="\033[95m"
-green_font_prefix="\033[92m"
-yellow_font_prefix="\033[93m"
-red_font_prefix="\033[91m"
-font_color_suffix="\033[0m"
-INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
-STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
-SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
-OPT="[${yellow_font_prefix}OPT${font_color_suffix}]"
-ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
-#
 # Check the output path
 out_path="/ddbr"
 # File name for backup/restore
 ddbr_image="BACKUP-arm-64-emmc.img.gz"
 # Need remaining space, unit: GB
 need_space="2"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
 #
 #===========================================================================
 
@@ -53,7 +47,7 @@ do_checkemmc() {
 
     # Find the EMMC drive
     emmc="$(lsblk -l -o NAME | grep -oE "mmcblk[0-9]boot0" | sort | uniq | sed "s/boot0//g")"
-    if [[ "${emmc}" == "" ]]; then
+    if [[ -z "${emmc}" ]]; then
         error_msg "No emmc can be found to install the openwrt system!"
     fi
     echo -e "${INFO} The device EMMC name: [ /dev/${emmc} ]"
@@ -66,11 +60,11 @@ do_checkemmc() {
 
     # Check emmc partition size
     dev_intsize="$(fdisk -s /dev/${emmc})"
-    [ -z "$(echo "${dev_intsize}" | sed -n "/^[0-9]\+$/p")" ] && error_msg "Unable to get EMMC size."
+    [[ -z "$(echo "${dev_intsize}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to get EMMC size."
     echo -e "${INFO} The device EMMC size: [ $(($dev_intsize / 1024 / 1024))GB ]"
 
     # check directory
-    [ -d "${out_path}" ] || mkdir -p ${out_path}
+    [[ -d "${out_path}" ]] || mkdir -p ${out_path}
     echo -e "${INFO} The ddbr file path: [ ${out_path}/${ddbr_image} ]\n"
 }
 
@@ -94,7 +88,7 @@ do_backup() {
     echo -e "${INFO} Saving and Compressing [ /dev/${emmc} ] to [ ${out_path}/${ddbr_image} ], Please wait..."
     rm -f ${out_path}/${ddbr_image} 2>/dev/null && sync
     dd if=/dev/${emmc} | pv -s ${dev_intsize}"K" | gzip >${out_path}/${ddbr_image}
-    [ "$?" -eq "0" ] && sync && echo -e "${SUCCESS} Backup is complete."
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Backup is complete."
     sync && sleep 3
     exit 0
 }
@@ -102,10 +96,10 @@ do_backup() {
 # Restore the emmc system
 do_restore() {
     echo -e "${STEPS} Start to restore the system in emmc."
-    [ ! -f "${out_path}/${ddbr_image}" ] && error_msg "The [ ${out_path}/${ddbr_image} ] File not found."
+    [[ ! -f "${out_path}/${ddbr_image}" ]] && error_msg "The [ ${out_path}/${ddbr_image} ] File not found."
     echo -e "${INFO} Restoring [ ${out_path}/${ddbr_image} ] to [ /dev/${emmc} ], Please wait..."
     gunzip -c ${out_path}/${ddbr_image} | pv -s ${dev_intsize}"K" | dd of=/dev/${emmc}
-    [ "$?" -eq "0" ] && sync && echo -e "${SUCCESS} Restore is complete."
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Restore is complete."
     sync && sleep 3
     exit 0
 }
@@ -116,7 +110,7 @@ echo -e "${STEPS} Welcome to use the EMMC system backup/restore service."
 # Check emmc
 do_checkemmc
 # Prompt the user to select Backup/Restore
-echo -ne "${OPT} Do you want to backup or restore? Backup=(b) Restore=(r): "
+echo -ne "${OPTIONS} Do you want to backup or restore? Backup=(b) Restore=(r): "
 read br
 case "${br}" in
     b | B | backup)  do_backup ;;
