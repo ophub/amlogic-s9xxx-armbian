@@ -22,7 +22,7 @@ do_start() {
     openvfd_service="${openvfd_path}/vfdservice"
 
     if [[ -f "${conf_file}" && -f "${openvfd_service}" ]]; then
-        source ${conf_file}
+        source "${conf_file}"
         echo "Using LED Profiles: ${conf_file}"
     else
         echo "The LED profile [ ${conf_file} ] does not exist!"
@@ -44,7 +44,7 @@ do_start() {
 
     trap "killall ${openvfd_service}; rmmod openvfd; exit" 2 3 15
 
-    if [ -n "${functions}" ]; then
+    if [[ -n "${functions}" ]]; then
         for func in ${functions}; do
             echo "turn led ${func} on ... "
             echo "${func}" >/sys/class/leds/openvfd/led_on 2>/dev/null
@@ -81,7 +81,7 @@ do_select_box() {
     esac
 }
 
-if [ -z "${1}" ]; then
+if [[ -z "${1}" ]]; then
     clear
     cat <<EOF
 

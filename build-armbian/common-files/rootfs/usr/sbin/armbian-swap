@@ -27,7 +27,7 @@ error_msg() {
 do_checkdisk() {
     # Find the partition where root is located
     ROOT_PTNAME=$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')
-    if [ "${ROOT_PTNAME}" == "" ]; then
+    if [[ -z "${ROOT_PTNAME}" ]]; then
         error_msg "Cannot find the partition corresponding to the root file system!"
     fi
 
@@ -50,7 +50,7 @@ do_checkdisk() {
 
     # Find out if the extended partition is created using the armbian-TF command in TF/USB
     find_right_path="/mnt/${EMMC_NAME}${PARTITION_NAME}3"
-    if [ -d "${find_right_path}" ]; then
+    if [[ -d "${find_right_path}" ]]; then
         PARTITION_PATH="${find_right_path}"
     else
         PARTITION_PATH="/mnt"
@@ -58,7 +58,7 @@ do_checkdisk() {
 
     # Check if there is enough free space
     available_space="$(df -hT ${PARTITION_PATH} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
-    if [ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]; then
+    if [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
         error_msg "The path is not available, the remaining space cannot be obtained."
     fi
     if [[ "${available_space}" -lt "${swap_gb}" ]]; then
