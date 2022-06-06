@@ -20,17 +20,11 @@ chroot_arch_info="$(arch)"
 chroot_kernel_version="${1}"
 #
 # Set font color
-blue_font_prefix="\033[94m"
-purple_font_prefix="\033[95m"
-green_font_prefix="\033[92m"
-yellow_font_prefix="\033[93m"
-red_font_prefix="\033[91m"
-font_color_suffix="\033[0m"
-INFO="[${blue_font_prefix}INFO${font_color_suffix}]"
-STEPS="[${purple_font_prefix}STEPS${font_color_suffix}]"
-SUCCESS="[${green_font_prefix}SUCCESS${font_color_suffix}]"
-WARNING="[${yellow_font_prefix}WARNING${font_color_suffix}]"
-ERROR="[${red_font_prefix}ERROR${font_color_suffix}]"
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+WARNING="[\033[93m WARNING \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
 #
 #==========================================================================
 
