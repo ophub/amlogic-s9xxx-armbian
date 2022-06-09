@@ -10,9 +10,9 @@ on:
   workflow_dispatch:
     inputs:
       set_branch:
-        description: "Branch: edge / current / legacy"
+        description: "Branch: current / edge"
         required: false
-        default: "edge"
+        default: "current"
       set_release:
         description: "Release: jammy / focal / bullseye"
         required: false
@@ -22,7 +22,7 @@ on:
         required: false
         default: "odroidn2"
       set_desktop:
-        description: "Build Desktop: no / gnome / xfce, etc."
+        description: "Build Desktop: no / xfce"
         required: false
         default: "no"
       armbian_soc:
@@ -74,7 +74,7 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_BRANCH=("edge" "current" "legacy")
+          ARR_BRANCH=("edge" "current")
           set_branch="${{ github.event.inputs.set_branch }}"
           if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
               set_branch="current"
@@ -88,10 +88,10 @@ jobs:
           fi
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
-          ARR_BOARD=("lepotato" "odroidn2")
+          ARR_BOARD=("odroidn2" "lepotato")
           set_board="${{ github.event.inputs.set_board }}"
           if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
-              set_board="lepotato"
+              set_board="odroidn2"
           fi
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
