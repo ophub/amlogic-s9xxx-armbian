@@ -32,7 +32,7 @@
 # Set default installation mainline u-boot
 auto_mainline_uboot="yes"
 # Set install list profile
-model_database="$(cat /etc/amlogic_model_database.conf)"
+model_conf="/etc/amlogic_model_database.conf"
 # Add custom armbian firmware information
 ophub_release_file="/etc/ophub-release"
 # Set the installation file preprocessing directory
@@ -60,6 +60,11 @@ init_var() {
     # Specify whether to brush into the mainline u-boot, such as: yes
     [[ "${1}" == "no" ]] && auto_mainline_uboot="no"
 
+    # Check if the ${model_conf} file exists
+    [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
+    model_database="$(cat ${model_conf} | grep -E "^[0-9]{1,9}.*:")"
+    [[ -n "${model_database}" ]] || error_msg "[ ${model_conf} ] file is empty!"
+
     # Check the current system running disk
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
     if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
@@ -73,8 +78,8 @@ init_var() {
     echo -e "${INFO} DEV_EMMC: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
+    [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/* 2>/dev/null && sync
     DIR_INSTALL="${tmp_path}/install"
-    [[ -d "${DIR_INSTALL}" ]] && rm -rf ${DIR_INSTALL}
     mkdir -p ${DIR_INSTALL} && chmod 777 ${tmp_path}
 
     # Generate New ROOTFS UUID
