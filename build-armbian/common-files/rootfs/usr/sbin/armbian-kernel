@@ -17,9 +17,9 @@
 #
 #======================================= Functions list =======================================
 #
-# error_msg          : Output error message
-# update_script      : Update scripts
-# clean_tmp          : Clear temporary files
+# error_msg       : Output error message
+# update_script   : Update compile scripts
+# clean_tmp       : Clear temporary files
 #
 #=============================== Set make environment variables ===============================
 #
@@ -34,7 +34,7 @@ kernel_path="${compile_path}/kernel"
 out_kernel="${compile_path}/output"
 arch_info="$(arch)"
 #
-# Kernel compilation script download repository
+# The compile kernel scripts download repository
 script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel"
 #
 # Set font color
@@ -95,16 +95,16 @@ help_info() {
     cat <<EOF
 ===================================================================================================
 01. Script assist functions
-    Command: armbian-kernel -update
-    -update : Update local scripts to the latest
-    -clean  : Clear local kernel source and makefiles
+    Command: armbian-kernel -u
+    -u : Update       Update the local compile script to the latest version.
+    -c : Clear        Clear the local kernel source and generated files.
 
 02. Detailed instructions for compiling the kernel
-    Command: armbian-kernel -d -k 5.15.1
+    Command: armbian-kernel -d -k 5.10.100
     -d : Defaults     Compile all kernels with default configuration.
     -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
     -a : AutoKernel   Set whether to automatically adopt the latest version, such as [ -a true ]
-    -n : CustomName   Set the kernel custom signature, such as [ -n -xiaoming ]
+    -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
     -r : Repo         Specifies the source code repository for the compiled kernel.
 ===================================================================================================
 EOF
@@ -116,16 +116,15 @@ EOF
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # 10Gb free space required
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
-remaining_space=$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')
+remaining_space="$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
 [[ "${remaining_space}" -ge "10" ]] || error_msg "Compiling the kernel requires 10Gb running space"
 # Check if script exists
-[[ -f "${compile_script}" ]] || echo -e "${INFO} Please run [ armbian-kernel -update ] to download the compile kernel script."
+[[ -f "${compile_script}" ]] || echo -e "${INFO} Please run [ armbian-kernel -u ] to update the compile kernel script."
 
 # Execute script assist functions
 case "${1}" in
-    -help)   help_info ;;
-    -clean)  clean_tmp ;;
-    -update) update_script ;;
-    *)       cd ${make_path} && sudo ${compile_script} "${@}" ;;
+    -u | -update)  update_script ;;
+    -c | -clean)   clean_tmp ;;
+    -h | -help)    help_info ;;
+    *)             cd ${make_path} && sudo ${compile_script} "${@}" ;;
 esac
-
