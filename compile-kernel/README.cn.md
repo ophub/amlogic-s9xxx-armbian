@@ -26,7 +26,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### 在 Armbian 系统下运行
 
-1. 更新本地编译环境和配置文件：`armbian-kernel -update`
+1. 更新本地编译环境和配置文件：`armbian-kernel -u`
 
 2. 编译内核：运行 `armbian-kernel -d -k 5.10.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
 
