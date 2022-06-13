@@ -26,7 +26,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### Run under Armbian system
 
-1. Update the local compile environment and config files: `armbian-kernel -update`
+1. Update the local compile environment and config files: `armbian-kernel -u`
 
 2. Compile the kernel: Run `armbian-kernel -d -k 5.10.100` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `/opt/kernel/compile-kernel/output` directory.
 
