@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.4.197 Kernel Configuration
+# Linux/arm64 5.4.198 Kernel Configuration
 #
 
 #
@@ -12,6 +12,7 @@ CONFIG_LD_IS_LLD=y
 CONFIG_CLANG_VERSION=140000
 CONFIG_CC_CAN_LINK=y
 CONFIG_CC_HAS_ASM_GOTO=y
+CONFIG_CC_HAS_ASM_GOTO_OUTPUT=y
 CONFIG_TOOLS_SUPPORT_RELR=y
 CONFIG_CC_HAS_ASM_INLINE=y
 CONFIG_IRQ_WORK=y
