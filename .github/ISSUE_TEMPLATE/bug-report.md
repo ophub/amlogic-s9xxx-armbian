@@ -6,7 +6,7 @@ labels: ''
 assignees: ''
 ---
 
-# Before You Open ISSUE, Make Sure You have Read [https://github.com/ophub/amlogic-s9xxx-armbian#armbian-firmware-instructions](https://github.com/ophub/amlogic-s9xxx-armbian#armbian-firmware-instructions)
+### Before You Open ISSUE, Make Sure You have Read [Armbian Firmware Instructions](https://github.com/ophub/amlogic-s9xxx-armbian#armbian-firmware-instructions) and [Documentation](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-docs)
 
 
 **Describe the bug**
