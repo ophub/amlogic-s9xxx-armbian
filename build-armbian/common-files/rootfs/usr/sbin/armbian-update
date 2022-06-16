@@ -236,12 +236,12 @@ update_kernel() {
     rm -f /boot/uInitrd /boot/zImage 2>/dev/null && sync
     #
     tar -xzf boot-${kernel_name}.tar.gz -C /boot && sync
-    [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     (
         cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage && sync
         [[ "$(sha256sum uInitrd-${kernel_name} | awk '{print $1}')" == "$(sha256sum uInitrd | awk '{print $1}')" ]] || cp -f uInitrd-${kernel_name} uInitrd
         [[ "$(sha256sum vmlinuz-${kernel_name} | awk '{print $1}')" == "$(sha256sum zImage | awk '{print $1}')" ]] || cp -f vmlinuz-${kernel_name} zImage
     )
+    [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     echo -e "${INFO} (1/4) Unpacking [ boot-${kernel_name}.tar.gz ] done."
 
     # 02. For /boot/dtb/amlogic/*
@@ -253,7 +253,7 @@ update_kernel() {
     header_path="$(echo ${inputs_kernel} | awk -F "." '{print "linux-"$1"."$2".y"}')"
     rm -rf "/usr/src/linux-*" 2>/dev/null && mkdir -p "/usr/src/${header_path}" && sync
     tar -xzf header-${kernel_name}.tar.gz -C /usr/src/${header_path} && sync
-    [[ -d "/usr/include" ]] || error_msg "/usr/include folder is missing."
+    [[ -d "/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
     echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
 
     # 04. For /usr/lib/modules/*
