@@ -439,8 +439,8 @@ refactor_files() {
     # Replace the kernel
     build_boot="$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     build_dtb="$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    build_modules="$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     build_header="$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    build_modules="$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     [[ -n "${build_boot}" && -n "${build_dtb}" && -n "${build_modules}" && -n "${build_header}" ]] || error_msg "The 4 kernel missing."
 
     # 01. For /boot five files
@@ -452,13 +452,15 @@ refactor_files() {
     # 02. For /boot/dtb/amlogic/*
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
 
-    # 03. For /usr/lib/modules/*
-    tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
-    (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source 2>/dev/null && sync)
-    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "Missing kernel."
+    # 03. For /usr/src/linux-5.x.y
+    header_path="$(echo ${kernel} | awk -F "." '{print "linux-"$1"."$2".y"}')"
+    rm -rf "/usr/src/linux-*" 2>/dev/null && mkdir -p "/usr/src/${header_path}" && sync
+    tar -xzf ${build_header} -C ${tag_rootfs}/usr/src/${header_path} && sync
 
-    # 04. For /usr/include/*
-    tar -xzf ${build_header} -C ${tag_rootfs}/usr && sync
+    # 04. For /usr/lib/modules/*
+    tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
+    (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source && ln -sf /usr/src/${header_path} build && ln -sf /usr/src/${header_path} source)
+    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "Missing kernel."
 
     # Set the type of file system
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
