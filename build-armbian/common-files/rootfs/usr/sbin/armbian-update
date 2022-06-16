@@ -206,7 +206,7 @@ check_kernel() {
     [[ "${sha256sums_check}" -eq "1" ]] && echo -e "${INFO} Enable sha256sum checking..."
 
     # Loop check file
-    kernel_list=("boot" "dtb-amlogic" "modules" "header")
+    kernel_list=("boot" "dtb-amlogic" "header" "modules")
     i="1"
     for kernel_file in ${kernel_list[*]}; do
         # Set check filename
@@ -249,17 +249,19 @@ update_kernel() {
     [[ "$(ls /boot/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic file is missing."
     echo -e "${INFO} (2/4) Unpacking [ dtb-amlogic-${kernel_name}.tar.gz ] done."
 
-    # 03. For /usr/lib/modules/*
+    # 03. For /usr/src/linux-5.x.y
+    header_path="$(echo ${inputs_kernel} | awk -F "." '{print "linux-"$1"."$2".y"}')"
+    rm -rf "/usr/src/linux-*" 2>/dev/null && mkdir -p "/usr/src/${header_path}" && sync
+    tar -xzf header-${kernel_name}.tar.gz -C /usr/src/${header_path} && sync
+    [[ -d "/usr/include" ]] || error_msg "/usr/include folder is missing."
+    echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
+
+    # 04. For /usr/lib/modules/*
     rm -rf /usr/lib/modules/* 2>/dev/null && sync
     tar -xzf modules-${kernel_name}.tar.gz -C /usr/lib/modules && sync
-    (cd /usr/lib/modules/${kernel_name} && echo "build source" | xargs rm -f)
+    (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build && ln -sf /usr/src/${header_path} source)
     [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
-    echo -e "${INFO} (3/4) Unpacking [ modules-${kernel_name}.tar.gz ] done."
-
-    # 04. For /usr/include/*
-    tar -xzf header-${kernel_name}.tar.gz -C /usr && sync
-    [[ -d "/usr/include" ]] || error_msg "/usr/include folder is missing."
-    echo -e "${INFO} (4/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
+    echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] done."
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums 2>/dev/null
