@@ -445,22 +445,24 @@ refactor_files() {
 
     # 01. For /boot five files
     tar -xzf ${build_boot} -C ${tag_bootfs} && sync
-    [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
+    [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     get_textoffset "${tag_bootfs}/zImage"
 
     # 02. For /boot/dtb/amlogic/*
     tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
+    [[ "$(ls ${tag_bootfs}/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic files is missing."
 
     # 03. For /usr/src/linux-5.x.y
     header_path="$(echo ${kernel} | awk -F "." '{print "linux-"$1"."$2".y"}')"
-    rm -rf "/usr/src/linux-*" 2>/dev/null && mkdir -p "/usr/src/${header_path}" && sync
+    rm -rf "${tag_rootfs}/usr/src/linux-*" 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
     tar -xzf ${build_header} -C ${tag_rootfs}/usr/src/${header_path} && sync
+    [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/*
     tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
     (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source && ln -sf /usr/src/${header_path} build && ln -sf /usr/src/${header_path} source)
-    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "Missing kernel."
+    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 
     # Set the type of file system
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
