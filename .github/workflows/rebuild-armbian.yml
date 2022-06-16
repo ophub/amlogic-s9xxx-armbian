@@ -29,6 +29,10 @@ on:
         description: "Set armbian rootfs type: ext4 / btrfs"
         required: false
         default: "ext4"
+        type: choice
+        options:
+        - ext4
+        - btrfs
 
 env:
   TZ: Asia/Shanghai
