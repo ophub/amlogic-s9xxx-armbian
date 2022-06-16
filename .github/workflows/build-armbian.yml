@@ -43,13 +43,45 @@ on:
           - server
           - xfce
       armbian_soc:
-        description: "Set Amlogic SoC."
+        description: "Select Amlogic SoC."
         required: false
         default: "all"
+        type: choice
+        options:
+          - all
+          - s905x3_s905d_s912
+          - a311d
+          - s922x
+          - s922x-n2
+          - s922x-reva
+          - s905x3
+          - s905x2
+          - s905x2-km3
+          - s912
+          - s912-m8s
+          - s905d
+          - s905d-ki
+          - s905x
+          - s905w
+          - s905
+          - s905l3a
       armbian_kernel:
-        description: "Set kernel version."
+        description: "Select kernel version."
         required: false
-        default: "5.15.25_5.10.100"
+        default: "5.15.45_5.10.100"
+        type: choice
+        options:
+          - 5.15.45_5.10.100
+          - 5.15.45_5.18.1
+          - 5.18.1
+          - 5.15.45
+          - 5.10.100
+          - 5.4.190
+      auto_kernel:
+        description: "Auto use the latest kernel."
+        required: false
+        default: true
+        type: boolean
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
@@ -157,6 +189,7 @@ jobs:
           armbian_path: build/output/images/*.img
           armbian_soc: ${{ github.event.inputs.armbian_soc }}
           armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
+          auto_kernel: ${{ github.event.inputs.auto_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
           armbian_sign: ${{ env.ARMBIAN_CUSTOM_NAME }}

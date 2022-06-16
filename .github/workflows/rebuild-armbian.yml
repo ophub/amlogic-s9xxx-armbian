@@ -14,13 +14,40 @@ on:
         required: false
         default: ""
       armbian_soc:
-        description: "Set Amlogic SoC."
+        description: "Select Amlogic SoC."
         required: false
-        default: "s905x3_s905d"
+        default: "s905x3_s905d_s912"
+        type: choice
+        options:
+          - all
+          - s905x3_s905d_s912
+          - a311d
+          - s922x
+          - s922x-n2
+          - s922x-reva
+          - s905x3
+          - s905x2
+          - s905x2-km3
+          - s912
+          - s912-m8s
+          - s905d
+          - s905d-ki
+          - s905x
+          - s905w
+          - s905
+          - s905l3a
       armbian_kernel:
-        description: "Set kernel version."
+        description: "Select kernel version."
         required: false
-        default: "5.15.25_5.10.100"
+        default: "5.15.45_5.10.100"
+        type: choice
+        options:
+          - 5.15.45_5.10.100
+          - 5.15.45_5.18.1
+          - 5.18.1
+          - 5.15.45
+          - 5.10.100
+          - 5.4.190
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
