@@ -20,7 +20,8 @@ on:
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
-        default: "true"
+        default: true
+        type: boolean
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
