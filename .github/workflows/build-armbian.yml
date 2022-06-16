@@ -10,38 +10,38 @@ on:
   workflow_dispatch:
     inputs:
       set_branch:
-        description: "Branch"
+        description: "Select kernel and u-boot branch."
         required: false
         default: "current"
         type: choice
         options:
-        - current
-        - edge
+          - current
+          - edge
       set_release:
-        description: "Release"
+        description: "Select OS Release."
         required: false
         default: "jammy"
         type: choice
         options:
-        - jammy
-        - focal
-        - bullseye
+          - jammy
+          - focal
+          - bullseye
       set_board:
-        description: "Board"
+        description: "Select board name."
         required: false
         default: "odroidn2"
         type: choice
         options:
-        - odroidn2
-        - lepotato
+          - odroidn2
+          - lepotato
       set_desktop:
-        description: "Build Desktop"
+        description: "Select build server or desktop image."
         required: false
-        default: "no"
+        default: "server"
         type: choice
         options:
-        - no
-        - xfce
+          - server
+          - xfce
       armbian_soc:
         description: "Set Amlogic SoC."
         required: false
@@ -55,19 +55,19 @@ on:
         required: false
         default: "2748"
       armbian_fstype:
-        description: "Set armbian rootfs type."
+        description: "Select armbian rootfs type."
         required: false
         default: "ext4"
         type: choice
         options:
-        - ext4
-        - btrfs
+          - ext4
+          - btrfs
       armbian_sign:
         description: "Set armbian custom name."
         required: false
         default: ""
   #schedule:
-    #- cron: "0 17 * * 0"
+  #- cron: "0 17 * * 0"
 
 env:
   TZ: Asia/Shanghai
@@ -117,9 +117,9 @@ jobs:
           echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
 
           # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
-          ARR_DESKTOP=("no" "budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
+          ARR_DESKTOP=("budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
           set_desktop="${{ github.event.inputs.set_desktop }}"
-          if  [[ "${set_desktop}" != "no" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
+          if  [[ "${set_desktop}" != "server" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
               str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
               edition_name="${set_desktop}_desktop"

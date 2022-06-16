@@ -10,9 +10,13 @@ on:
   workflow_dispatch:
     inputs:
       kernel_repo:
-        description: "Source: kernel.org / unifreq"
+        description: "Choose to compile kernel sources"
         required: false
         default: "unifreq"
+        type: choice
+        options:
+          - unifreq
+          - kernel.org
       kernel_version:
         description: "Kernel version: 5.10.100"
         required: false
