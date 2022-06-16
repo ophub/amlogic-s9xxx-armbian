@@ -18,9 +18,17 @@ on:
           - unifreq
           - kernel.org
       kernel_version:
-        description: "Kernel version: 5.10.100"
+        description: "Select kernel version"
         required: false
-        default: "5.15.25_5.10.100"
+        default: "5.15.45_5.10.100"
+        type: choice
+        options:
+          - 5.15.45_5.10.100
+          - 5.15.45_5.18.1
+          - 5.18.1
+          - 5.15.45
+          - 5.10.100
+          - 5.4.190
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
