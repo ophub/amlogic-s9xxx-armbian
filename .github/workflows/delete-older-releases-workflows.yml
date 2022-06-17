@@ -1,0 +1,127 @@
+#==========================================================================
+# https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Automatically delete older releases and workflows
+#==========================================================================
+
+name: Delete older releases and workflows
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      delete_older_releases:
+        description: "Delete older Releases?"
+        required: false
+        default: true
+        type: boolean
+      delete_tags:
+        description: "Delete related Tags?"
+        required: false
+        default: true
+        type: boolean
+      keep_latest:
+        description: "Choose how many Releases to keep."
+        required: false
+        default: "4"
+        type: choice
+        options:
+          - 30
+          - 20
+          - 10
+          - 9
+          - 8
+          - 7
+          - 6
+          - 5
+          - 4
+          - 3
+          - 2
+          - 1
+          - 0
+      delete_tag_pattern:
+        description: "Set the Releases Keywords to match."
+        required: false
+        default: "_"
+      delete_workflow_runs:
+        description: "Delete workflow Runs?"
+        required: false
+        default: true
+        type: boolean
+      retain_days:
+        description: "Choose how many Days to keep."
+        required: false
+        default: "1"
+        type: choice
+        options:
+          - 30
+          - 20
+          - 10
+          - 9
+          - 8
+          - 7
+          - 6
+          - 5
+          - 4
+          - 3
+          - 2
+          - 1
+          - 0
+      keep_minimum_runs:
+        description: "Choose how many Runs to keep."
+        required: false
+        default: "0"
+        type: choice
+        options:
+          - 30
+          - 20
+          - 10
+          - 9
+          - 8
+          - 7
+          - 6
+          - 5
+          - 4
+          - 3
+          - 2
+          - 1
+          - 0
+  #schedule:
+  #- cron: "0 23 * * 0"
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo timedatectl set-timezone "${TZ}"
+          echo "DELETE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+
+      - name: Delete older releases
+        uses: dev-drprasad/delete-older-releases@master
+        if: ${{ github.event.inputs.delete_older_releases }} == 'true'
+        with:
+          keep_latest: ${{ github.event.inputs.keep_latest }}
+          delete_tags: ${{ github.event.inputs.delete_tags }}
+          delete_tag_pattern: ${{ github.event.inputs.delete_tag_pattern }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: Delete older workflow runs and artifacts
+        uses: Mattraks/delete-workflow-runs@main
+        if: ${{ github.event.inputs.delete_workflow_runs }} == 'true'
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ github.event.inputs.retain_days }}
+          keep_minimum_runs: ${{ github.event.inputs.keep_minimum_runs }}
