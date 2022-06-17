@@ -1,5 +1,5 @@
 #!/bin/bash
-#=====================================================================================
+#======================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -14,7 +14,14 @@
 #
 # Command: armbian-fix
 #
-#=====================================================================================
+#=============================== Set default parameters ===============================
+#
+# Set the armbian release check file
+armbian_release_file="/etc/armbian-release"
+# Set the ophub release check file
+ophub_release_file="/etc/ophub-release"
+#
+#======================================================================================
 
 # Fix common releases permissions
 [[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
@@ -31,6 +38,9 @@
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "10. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "11. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "12. Fix polkit-agent-helper-1 permissions"
+# Fix custom banner name
+[[ -f "${ophub_release_file}" ]] && source "${ophub_release_file}"
+[[ -f "${armbian_release_file}" && -n "${SOC}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${SOC}\"|g" ${armbian_release_file} && echo "13. Fix custom banner name: Aml ${SOC}"
 
 # Remove packages
 [[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ]] && sudo apt-get -qq purge -y linux-image-edge-meson64 && echo "Remove linux-image-edge-meson64"
