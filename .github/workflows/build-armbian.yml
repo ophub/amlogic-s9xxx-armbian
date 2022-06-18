@@ -169,7 +169,7 @@ jobs:
       - name: Download source code
         id: down
         run: |
-          git clone --depth 1 https://github.com/armbian/build.git
+          git clone --depth 1 https://github.com/xiayang0521/build.git
 
       - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         id: compile
