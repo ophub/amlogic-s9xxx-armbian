@@ -42,7 +42,7 @@ These duplications are automated in the repository's packaging and install/updat
 <tr><td>501</td><td>X96 Max+</td><td>s905x3</td><td>meson-sm1-x96-max-plus.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2100Mhz,4GB Mem,1Gb Nic,AM7256 wifi</td></tr>
 <tr><td>502</td><td>X96 Max+ (OverClock)</td><td>s905x3</td><td>meson-sm1-x96-max-plus-oc.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,AM7256 wifi</td></tr>
 <tr><td>503</td><td>X96 Max+ (IP1001M phy)</td><td>s905x3</td><td>meson-sm1-x96-max-plus-ip1001m.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic (IP1001M phy),brcm4354 wifi</td></tr>
-<tr><td>504</td><td>X96 Max+ Q2</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,qca9377 wifi</td></tr>
+<tr><td>504</td><td>X96 Max+ Q2</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>hk1box-bootloader.img</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,qca9377 wifi and Bluetooth</td></tr>
 <tr><td>505</td><td>X96 Max+ 100Mb</td><td>s905x3</td><td>meson-sm1-x96-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,4GB RAM,32GROM,100Mb Nic,AM7256 wifi</td></tr>
 <tr><td>506</td><td>HK1 Box</td><td>s905x3</td><td>meson-sm1-hk1box-vontar-x3.dtb</td><td>u-boot-x96maxplus.bin</td><td>hk1box-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,4GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>507</td><td>HK1 Box (OverClock)</td><td>s905x3</td><td>meson-sm1-hk1box-vontar-x3-oc.dtb</td><td>u-boot-x96maxplus.bin</td><td>hk1box-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2208Mhz,4GB Mem,1Gb Nic,Wifi</td></tr>
@@ -56,7 +56,7 @@ These duplications are automated in the repository's packaging and install/updat
 <tr><td>515</td><td>TX3 100Mb (OverClock)</td><td>s905x3</td><td>meson-sm1-tx3-bz-oc.dtb</td><td>u-boot-tx3-bz.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2208Mhz,4GB Mem,100Mb Nic,bcm4330 wifi</td></tr>
 <tr><td>516</td><td>X96 Air 1Gb</td><td>s905x3</td><td>meson-sm1-x96-air-gbit.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>517</td><td>X96 Air 100Mb</td><td>s905x3</td><td>meson-sm1-x96-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
-<tr><td>518</td><td>X96 Air Q1000</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,qca9377 wifi</td></tr>
+<tr><td>518</td><td>X96 Air Q1000</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,qca9377 wifi and Bluetooth</td></tr>
 <tr><td>519</td><td>A95XF3 Air 1Gb</td><td>s905x3</td><td>meson-sm1-a95xf3-air-gbit.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>520</td><td>A95XF3 Air 100Mb</td><td>s905x3</td><td>s905x3:meson-sm1-a95xf3-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 
