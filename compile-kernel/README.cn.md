@@ -65,6 +65,12 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     kernel_sign: -ophub
 ```
 
+💡 注意: 如果你 `fork` 仓库并进行了修改，使用时须将 Actions 的 `用户名` 改成你自己的仓库名称，并根据说明中的第 2-3 条 [添加 TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/armbian-docs/README.cn.md#2-设置隐私变量-github_token)，例如：
+
+```yaml
+uses: YOUR-REPO/amlogic-s9xxx-armbian@main
+```
+
 - ### GitHub Action 输入参数说明
 
 相关参数与`本地编译命令`相对应，请参考上面的说明。
