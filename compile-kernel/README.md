@@ -51,11 +51,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 ## Compile the kernel using GitHub Actions
 
-Note: If you fork the repository, change the Actions to use your own repository.
-Eg:
-```
-uses: YOUR-REPO/amlogic-s9xxx-armbian@main
-```
 This way you compile the kernel using your modified repository.
 
 1. Select ***`Compile the kernel`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
@@ -70,6 +65,12 @@ This way you compile the kernel using your modified repository.
     kernel_version: 5.15.25_5.10.100
     kernel_auto: true
     kernel_sign: -ophub
+```
+
+💡 Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [add TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-docs#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:
+
+```yaml
+uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 ```
 
 - ### GitHub Action Input parameter description
