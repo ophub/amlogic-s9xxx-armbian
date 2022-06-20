@@ -1,0 +1,176 @@
+#==========================================================================
+# Description: Build Armbian For Amlogic s9xxx tv box
+# Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+#==========================================================================
+
+name: Build armbian
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      set_branch:
+        description: "Select kernel and u-boot branch."
+        required: false
+        default: "current"
+        type: choice
+        options:
+          - current
+          - edge
+      set_release:
+        description: "Select OS Release."
+        required: false
+        default: "jammy"
+        type: choice
+        options:
+          - jammy
+          - focal
+          - bullseye
+      set_board:
+        description: "Select board name."
+        required: false
+        default: "nanopik2-s905"
+        type: choice
+        options:
+          - odroidn2
+          - lepotato
+      set_desktop:
+        description: "Select build server or desktop image."
+        required: false
+        default: "server"
+        type: choice
+        options:
+          - server
+          - xfce
+      armbian_soc:
+        description: "Select Amlogic SoC."
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - s905
+      armbian_kernel:
+        description: "Select kernel version."
+        required: false
+        default: "5.15.45_5.10.100"
+        type: choice
+        options:
+          - 5.15.45_5.10.100
+          - 5.15.45_5.18.1
+          - 5.18.1
+          - 5.15.45
+          - 5.10.100
+          - 5.4.190
+      auto_kernel:
+        description: "Auto use the latest kernel."
+        required: false
+        default: true
+        type: boolean
+      armbian_size:
+        description: "Set armbian rootfs size(Unit: MiB)."
+        required: false
+        default: "5000"
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
+      armbian_sign:
+        description: "Set armbian custom name."
+        required: false
+        default: ""
+  #schedule:
+  #- cron: "0 17 * * 0"
+
+env:
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    if: github.event.repository.owner.id == github.event.sender.id
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Initialization environment
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo -E apt-get -qq update
+          sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
+          sudo -E apt-get -qq autoremove --purge
+          sudo -E apt-get -qq clean
+          sudo timedatectl set-timezone "$TZ"
+          sudo mkdir -p /workdir
+          sudo chown $USER:$GROUPS /workdir
+          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+          ARR_BRANCH=("edge" "current")
+          set_branch="${{ github.event.inputs.set_branch }}"
+          if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
+              set_branch="current"
+          fi
+          echo "ARMBIAN_BRANCH=${set_branch}" >> $GITHUB_ENV
+          ARR_RELEASE=("jammy" "focal" "bullseye")
+          set_release="${{ github.event.inputs.set_release }}"
+          if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
+              set_release="focal"
+          fi
+          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+          ARR_BOARD=("odroidn2" "nanopik2-s905")
+          set_board="${{ github.event.inputs.set_board }}"
+          if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
+              set_board="nanopik2-s905"
+          fi
+          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
+          # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
+          ARR_DESKTOP=("budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
+          set_desktop="${{ github.event.inputs.set_desktop }}"
+          if  [[ "${set_desktop}" != "server" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
+              # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
+              str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
+              edition_name="${set_desktop}_desktop"
+          else
+              str_desktop="BUILD_DESKTOP=no"
+              edition_name="server"
+          fi
+          echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
+          echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
+          set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
+          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
+          echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
+      - name: Download source code
+        id: down
+        run: |
+          git clone --depth 1 https://github.com/xiayang0521/build.git
+      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+        id: compile
+        run: |
+          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
+          cd build/
+          sudo chmod +x compile.sh
+          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP_STR }} \
+                            HOST=armbian EXPERT=yes BUILD_MINIMAL=no INSTALL_HEADERS=yes KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+          echo "::set-output name=status::success"
+
+      - name: Upload Armbian image to Release
+        uses: ncipollo/release-action@main
+        if: env.PACKAGED_STATUS == 'success' && !cancelled()
+        with:
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.ARMBIAN_DESKTOP_OPT }}_${{ env.PACKAGED_OUTPUTDATE }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          allowUpdates: true
+          token: ${{ secrets.GH_TOKEN }}
+          body: |
+            This is Armbian image for Amlogic s9xxx tv box
+            * Firmware information
+            Default username: root
+            Default password: 1234
+            Install command: armbian-install
+            Update command: armbian-update
+            Edition: ${{ env.ARMBIAN_DESKTOP_OPT }}
