@@ -116,7 +116,7 @@ jobs:
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
 
       - name: Rebuild Armbian for Amlogic s9xxx
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: xiayang0521/amlogic-s9xxx-armbian@main
         if: env.ARMBIAN_URL != '' && !cancelled()
         with:
           armbian_path: ${{ env.ARMBIAN_URL }}
