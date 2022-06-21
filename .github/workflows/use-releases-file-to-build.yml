@@ -126,7 +126,7 @@ jobs:
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: xiayang0521/amlogic-s9xxx-armbian@main
         if: steps.down.outputs.status == 'success' && !cancelled()
         with:
           build_target: armbian
