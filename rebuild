@@ -348,12 +348,13 @@ confirm_version() {
         ANDROID_UBOOT=""
         ;;
     s905 | beelinkminimx | mxqpro+)
-        FDTFILE="meson-gxbb-beelink-mini-mx.dtb"
+        FDTFILE="meson-gxbb-nanopi-k2.dtb"
+        #FDTFILE="meson-gxbb-beelink-mini-mx.dtb"
         #FDTFILE="meson-gxbb-mxq-pro-plus.dtb"
         #FDTFILE="meson-gxbb-vega-s95-telos.dtb"
         UBOOT_OVERLOAD="u-boot-s905.bin"
         #UBOOT_OVERLOAD="u-boot-p201.bin"
-        MAINLINE_UBOOT=""
+        MAINLINE_UBOOT="u-boot-nanopik2.bin"
         ANDROID_UBOOT=""
         ;;
     s905l3a | e900v22c | e900v22d)
