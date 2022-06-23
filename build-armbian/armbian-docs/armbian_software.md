@@ -34,7 +34,7 @@ ID    NAME                                          STATE           MANAGE
 
 ## Software Center Development Instructions
 
-Software Center scripts/commands are centrally stored in the `/usr/share/armbian-software` directory. The file starting with a number is the one-click installation script of the corresponding software, and the file `software-command.sh` is the `unified instruction file` for installing/updating/deleting operations using commands. `software-list.conf` is the software list configuration file, described as follows:
+Software Center scripts/commands are centrally stored in the [/usr/share/armbian-software](../common-files/rootfs/usr/share/armbian-software) directory. The file starting with a number is the `one-click installation script` of the corresponding software, and the file [software-command.sh](../common-files/rootfs/usr/share/armbian-software/software-command.sh) is the `unified command file` for installing/updating/deleting operations using commands. [software-list.conf](../common-files/rootfs/usr/share/armbian-software/software-list.conf) is the software list configuration file, described as follows:
 
 ```yaml
 # software-list.conf description
@@ -95,7 +95,7 @@ ID    NAME                                          STATE           MANAGE
 
 ## 软件中心开发说明
 
-软件中心的脚本/命令集中存放在 `/usr/share/armbian-software` 目录下。其中以数字开头的文件是对应软件的一键安装脚本，文件 `software-command.sh` 是使用命令安装/更新/删除操作的`统一指令文件`。`software-list.conf` 是软件列表配置文件，说明如下：
+软件中心的脚本/命令集中存放在 [/usr/share/armbian-software](../common-files/rootfs/usr/share/armbian-software) 目录下。其中以数字开头的文件是对应软件的 `一键安装脚本` 文件。[software-command.sh](../common-files/rootfs/usr/share/armbian-software/software-command.sh) 是使用命令安装/更新/删除操作的`统一指令文件`。[software-list.conf](../common-files/rootfs/usr/share/armbian-software/software-list.conf) 是软件列表配置文件，说明如下：
 
 ```yaml
 # software-list.conf description
