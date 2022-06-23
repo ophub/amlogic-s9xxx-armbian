@@ -35,7 +35,7 @@ codename="$(lsb_release --codename --short)"
 arch_info="$(arch)"
 #
 # The compile kernel scripts download repository
-script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/rootfs/usr/share/ophub-software"
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/rootfs/usr/share/armbian-software"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -197,7 +197,6 @@ update_script() {
     fi
 
     # Update related files
-    echo -e "${INFO} Start update script..."
     [[ -d "${software_path}" ]] || mkdir -p ${software_path}
     svn co ${script_repo} ${software_path} --force
     chmod +x ${software_path}/*.sh
