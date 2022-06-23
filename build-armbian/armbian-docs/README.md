@@ -20,15 +20,16 @@ View Chinese description  |  [查看中文说明](README.cn.md)
   - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
   - [9. Compile the Armbian kernel](#9-compile-the-armbian-kernel)
   - [10. Update Armbian Kernel](#10-update-armbian-kernel)
-  - [11. common problem](#11-common-problem)
-    - [11.1 dtb and u-boot correspondence table for each box](#111-dtb-and-u-boot-correspondence-table-for-each-box)
-    - [11.2 LED screen display control instructions](#112-led-screen-display-control-instructions)
-    - [11.3 How to restore the original Android TV system](#113-how-to-restore-the-original-android-tv-system)
-      - [11.3.1 Restoring using armbian-ddbr backup](#1131-restoring-using-armbian-ddbr-backup)
-      - [11.3.2 Restoring with Amlogic usb burning tool](#1132-restoring-with-amlogic-usb-burning-tool)
-    - [11.4 Set the box to boot from USB/TF/SD](#114-set-the-box-to-boot-from-usbtfsd)
-    - [11.5 Disable infrared receiver](#115-disable-infrared-receiver)
-    - [11.6 Selection of bootstrap file](#116-selection-of-bootstrap-file)
+  - [11. Install common software](#11-install-common-software)
+  - [12. common problem](#12-common-problem)
+    - [12.1 dtb and u-boot correspondence table for each box](#121-dtb-and-u-boot-correspondence-table-for-each-box)
+    - [12.2 LED screen display control instructions](#122-led-screen-display-control-instructions)
+    - [12.3 How to restore the original Android TV system](#123-how-to-restore-the-original-android-tv-system)
+      - [12.3.1 Restoring using armbian-ddbr backup](#1231-restoring-using-armbian-ddbr-backup)
+      - [12.3.2 Restoring with Amlogic usb burning tool](#1232-restoring-with-amlogic-usb-burning-tool)
+    - [12.4 Set the box to boot from USB/TF/SD](#124-set-the-box-to-boot-from-usbtfsd)
+    - [12.5 Disable infrared receiver](#125-disable-infrared-receiver)
+    - [12.6 Selection of bootstrap file](#126-selection-of-bootstrap-file)
 
 ## 1. Register your own GitHub account
 
@@ -155,27 +156,37 @@ If there is a set of kernel files in the current directory, it will be updated w
 
 The `headers` files in the kernel is installed in the `/use/local/include` directory.
 
-## 11. common problem
+## 11. Install common software
+
+Login in to armbian → input command:
+
+```yaml
+armbian-software
+```
+
+According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), the commonly used software is gradually integrated to realize one-click installation/update/uninstallation and other quick operations. Including `docker images`, `desktop software`, `application services`, etc. See more [Description](armbian_software.md).
+
+## 12. common problem
 
 In the use of Armbian, some common problems that may be encountered are summarized below.
 
-### 11.1 dtb and u-boot correspondence table for each box
+### 12.1 dtb and u-boot correspondence table for each box
 
 Please refer to [Description](amlogic_model_database.md)
 
-### 11.2 LED screen display control instructions
+### 12.2 LED screen display control instructions
 
 Please refer to [Description](led_screen_display_control.md)
 
-### 11.3 How to restore the original Android TV system
+### 12.3 How to restore the original Android TV system
 
 Usually use armbian-ddbr backup to restore, or use Amlogic usb burning tool to restore the original Android TV system.
 
-#### 11.3.1 Restoring using armbian-ddbr backup
+#### 12.3.1 Restoring using armbian-ddbr backup
 
 It is recommended that you make a backup of the original Android TV system that comes with the current box before installing the Armbian system in a new box, so that you can use it when you need to restore the system. Please boot the Armbian system from `TF/SD/USB`, enter the `armbian-ddbr` command, and then enter `b` according to the prompts to backup the system. The backup file is stored in the path `/ddbr/BACKUP-arm-64-emmc. img.gz` , please download and save. When you need to restore the Android TV system, upload the previously backed up files to the same path of the `TF/SD/USB` device, enter the `armbian-ddbr` command, and then enter `r` according to the prompt to restore the system.
 
-#### 11.3.2 Restoring with Amlogic usb burning tool
+#### 12.3.2 Restoring with Amlogic usb burning tool
 
 - Under normal circumstances, re-insert the USB hard disk and install it again.
 
@@ -203,7 +214,7 @@ Operation method:
 
 When the factory reset is completed, the box has been restored to the Android TV system, and other operations to install the Armbian system are the same as the requirements when you installed the system for the first time before, just do it again.
 
-### 11.4 Set the box to boot from USB/TF/SD
+### 12.4 Set the box to boot from USB/TF/SD
 
 - Write the firmware to USB/TF/SD, insert it into the box after writing.
 - Open the developer mode: Settings → About this machine → Version number (for example: X96max plus...), click on the version number for 5 times in quick succession, See the prompt of `Enable Developer Mode` displayed by the system.
@@ -212,7 +223,7 @@ When the factory reset is completed, the box has been restored to the Android TV
 - Enter the `cmd` command mode. Enter the `adb connect 192.168.1.137` command (the ip is modified according to your box, and you can check it in the router device connected to the box), If the link is successful, it will display `connected to 192.168.1.137:5555`
 - Enter the `adb shell reboot update` command, the box will restart and boot from the USB/TF/SD you inserted, access the firmware IP address from a browser, or SSH to enter the firmware.
 
-### 11.5 Disable infrared receiver
+### 12.5 Disable infrared receiver
 
 Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your TV box off by mistake. To completely disable IR, add the line:
 
@@ -222,7 +233,7 @@ blacklist meson_ir
 
 to `/etc/modprobe.d/blacklist.conf` and reboot.
 
-### 11.6 Selection of bootstrap file
+### 12.6 Selection of bootstrap file
 
 In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
 
