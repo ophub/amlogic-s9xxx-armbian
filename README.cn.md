@@ -51,15 +51,15 @@ armbian-update
 
 如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。你也可以查询[可选内核](https://github.com/ophub/kernel/tree/main/pub/stable)版本，进行指定版本更新：`armbian-update 5.10.100`。在设备支持的可选内核里可以自由更新，如从 5.10.100 内核更新为 5.15.25 内核。内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.7.19 dev` 。默认会自动安装主线 u-boot，这对使用 5.10 以上版本的内核有更好的支持，如果选择不安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.10.100 stable no`
 
-- ### 安装 Docker 服务
+- ### 安装常用软件
 
 登录 Armbian 系统 → 输入命令：
 
 ```yaml
-armbian-docker
+armbian-software
 ```
 
-在安装 docker 结束后，可以选择是否安装 `portainer` 可视化管理面板。拟使用`局域网 IP` 进行管理的用户可选择（`h`）安装 `http://ip:9000` 版本；拟使用`域名`进行远程管理的用户可选择（`s`）安装 `https://domain:9000` 域名证书版本（请把域名 `SSL` 证书命名为 `portainer.crt` 和 `portainer.key` 上传至 `/etc/ssl/` 目录下）；`不需要`安装的用户可选择（`n`）结束安装。
+根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用软件，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](build-armbian/armbian-docs/armbian_software.md)。
 
 - ### 修改 Armbian 配置
 
