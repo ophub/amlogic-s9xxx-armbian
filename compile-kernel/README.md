@@ -67,7 +67,7 @@ This way you compile the kernel using your modified repository.
     kernel_sign: -ophub
 ```
 
-💡 Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [add TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-docs#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:
+💡Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [add TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-docs#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
