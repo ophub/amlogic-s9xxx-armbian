@@ -1,0 +1,250 @@
+#!/bin/bash
+#==============================================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Armbian for Amlogic TV Boxes
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Third-party software install/update/remove management
+# Copyright (C) 2021- https://github.com/unifreq
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-software
+#
+#======================================= Functions list =======================================
+#
+# error_msg               : Output error message
+# check_depends           : Check dependencies
+# check_software_status   : Initialize check
+# search_software_model   : Search for software model
+# show_software_list      : Display the software list
+# update_script           : Update compile scripts
+# clean_tmp               : Clear temporary files
+# help_info               : Show help info
+#
+#=============================== Set make environment variables ===============================
+#
+# Related file storage path
+software_path="/usr/share/armbian-software"
+software_conf="${software_path}/software-list.conf"
+software_command="${software_path}/software-command.sh"
+codename="$(lsb_release --codename --short)"
+arch_info="$(arch)"
+#
+# The compile kernel scripts download repository
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/rootfs/usr/share/ophub-software"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#==============================================================================================
+
+# Show error message
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Check dependencies
+check_depends() {
+    is_missing="0"
+    necessary_packages=("subversion" "tar" "coreutils" "systemd")
+    i="1"
+    for package in ${necessary_packages[*]}; do
+        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_missing="1"
+        let i++
+    done
+
+    if [[ "${is_missing}" -eq "1" ]]; then
+        echo -e "${STEPS} Start installing the necessary dependencies..."
+        sudo apt-get update
+        sudo apt-get install -y ${necessary_packages[*]}
+    fi
+}
+
+# Initialization check
+check_software_status() {
+    # Check if the ${software_conf} file exists
+    [[ -s "${software_conf}" ]] || error_msg "[ ${software_conf} ] file is missing!"
+    [[ -n "$(cat ${software_conf} | grep -E "^[0-9]{1,9}.*:")" ]] || error_msg "[ ${software_conf} ] file is empty!"
+
+    # Check software installation status
+    tmp_conf="$(mktemp)"
+    [[ -f "${tmp_conf}" ]] && rm -f ${tmp_conf} 2>/dev/null
+    cat ${software_conf} | grep -E "^[0-9]{1,9}.*:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | while read line; do
+        # Set initial value
+        local state="not-installed"
+        local manage="install"
+        local support="supported"
+        # Check software installation status
+        local auth_method="$(echo ${line} | awk -F ':' '{print $3}' | awk -F '@' '{print $1}')"
+        local package="$(echo ${line} | awk -F ':' '{print $3}' | awk -F '@' '{print $2}')"
+        # Check the software installation status by category
+        check_status="0"
+        case "${auth_method}" in
+            dpkg)   [[ -n "$(dpkg-query -l | grep "${package}")" ]] && check_status="1" ;;
+            docker) [[ -n "$(docker ps -q -f name=${package})" ]] && check_status="1" ;;
+            which)  [[ -n "$(which "${package}")" ]] && check_status="1" ;;
+            *)      check_status="0" ;;
+        esac
+        # Adjust software installation status
+        [[ "${check_status}" -eq "1" ]] && {
+            local state="installed"
+            local manage="update/remove"
+        }
+
+        # Check whether the software supports running on the current system
+        local release="$(echo ${line} | awk -F ':' '{print $5}')"
+        [[ "${release}" == *"${codename}"* ]] || {
+            local support="unsupported"
+            local manage="-"
+        }
+
+        # Query results are written to a temporary file
+        [[ "${support}" == "supported" ]] && echo "${line}:${support}:${state}:${manage}" >>${tmp_conf} && sync
+    done
+    software_database="$(cat ${tmp_conf})"
+    [[ -n "${software_database}" ]] || error_msg "Software database is null."
+}
+
+# Search the software model
+search_software_model() {
+    local sid="${1}"
+    local ret_count="$(echo "${software_database}" | grep -E "^${sid}:" | wc -l)"
+    if [[ "${ret_count}" -eq "1" ]]; then
+        echo "${software_database}" | grep -E "^${sid}:"
+    fi
+}
+
+# Functions: Show software list
+# Explain: 1.ID   2.NAME   3.STATE          4.MANAGE
+# Example: 11     :frps    :not-installed   :install
+show_software_list() {
+    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${codename}\033[0m ]..."
+
+    # Check software status
+    check_software_status
+
+    # Show software list
+    printf "%-s\n" "-----------------------------------------------------------------------------------"
+    printf "%-5s %-45s %-15s %-15s\n" ID NAME STATE MANAGE
+    printf "%-s\n" "-----------------------------------------------------------------------------------"
+    printf "%-5s %-45s %-15s %-15s\n" $(echo "${software_database}" | grep -E "^[0-9]{1,9}.*:" | awk -F ':' '{print $1,$2,$7,$8}')
+    printf "%-s\n" "-----------------------------------------------------------------------------------"
+    #
+    echo -ne "${OPTIONS} Please Input Software ID: "
+    read software_id
+
+    # Check the validity of the selection
+    ret="$(search_software_model "${software_id}")"
+    [[ -z "${ret}" ]] && error_msg "Software ID [ ${software_id} ] was not found, exit!"
+    #echo -e "${INFO} Software Model: [ ${ret} ]"
+
+    # Display selected software information
+    software_name="$(echo "${ret}" | awk -F ':' '{print $2}')"
+    software_command_shell="$(echo "${ret}" | awk -F ':' '{print $4}')"
+    software_release="$(echo "${ret}" | awk -F ':' '{print $5}')"
+    software_support="$(echo "${ret}" | awk -F ':' '{print $6}')"
+    software_state="$(echo "${ret}" | awk -F ':' '{print $7}')"
+    software_manage="$(echo "${ret}" | awk -F ':' '{print $8}')"
+    if [[ "${software_support}" == "supported" ]]; then
+        echo -e "${INFO} Software ID: [ ${software_id} ]"
+        echo -e "${INFO} Software Name: [ ${software_name} ]"
+        echo -e "${INFO} Software Command or Shell: [ ${software_command_shell} ]"
+    else
+        error_msg "The software does not support the current system, only supports [ ${software_release//@/ \| } ]."
+    fi
+
+    # Select Installed Software Update or Remove
+    [[ "${software_state}" == "installed" ]] && {
+        echo -ne "${OPTIONS} [ ${software_name} ] software Update=(u) / Remove=(r), Options u/r: "
+        read optid
+        optid="${optid/U/u}" && optid="${optid/R/r}"
+        [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Input error, Update=(u) / Remove=(r), Options u/r"
+        [[ "${optid:0:1}" == "u" ]] && software_manage="update" || software_manage="remove"
+    }
+
+    echo -e "${STEPS} Start processing software: [ ${software_manage} ${software_name} ]..."
+
+    # Perform software install/update/remove operations
+    if [[ "${software_command_shell}" == "command" ]]; then
+        # Execute by command
+        sudo ${software_command} -s ${software_id} -m ${software_manage}
+    else
+        # Execute by script
+        sudo ${software_path}/${software_command_shell} ${software_manage}
+    fi
+}
+
+# Update related scripts and configuration files
+update_script() {
+    cd ${software_path}
+    echo -e "${STEPS} Start update script..."
+
+    # Check dependencies
+    check_depends
+
+    # Convert script repository address to svn format
+    if [[ "${script_repo}" == http* && -n "$(echo ${script_repo} | grep "tree/main")" ]]; then
+        script_repo="${script_repo//tree\/main/trunk}"
+    fi
+
+    # Update related files
+    echo -e "${INFO} Start update script..."
+    [[ -d "${software_path}" ]] || mkdir -p ${software_path}
+    svn co ${script_repo} ${software_path} --force
+    chmod +x ${software_path}/*.sh
+
+    sync && sleep 3
+    echo -e "${SUCCESS} Script update complete."
+    exit 0
+}
+
+# Clear software management related files
+clean_tmp() {
+    cd ${software_path}
+    echo -e "${STEPS} Clear the space..."
+
+    rm -rf ${software_path} 2>/dev/null && sync
+
+    echo -e "${SUCCESS} Space clearing complete."
+    exit 0
+}
+
+# show help info
+help_info() {
+    clear
+    cat <<EOF
+=====================================================================
+Command Example: armbian-software -u
+            -u : Update    Update install software script.
+            -c : Clear     Clear the local install software script.
+            -h : Help      Help information display.
+            -q : Quit      Quit install software services.
+             * : Other     Show software list.
+=====================================================================
+EOF
+    exit 0
+}
+
+# Check script permission, supports running on Armbian system.
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
+[[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
+# Check for the existence of software management scripts
+[[ -f "${software_command}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
+
+# Execute script assist functions
+case "${1}" in
+    -u | -update) update_script ;;
+    -c | -clean)  clean_tmp ;;
+    -h | -help)   help_info ;;
+    -q | -quit)   echo "quit!" && exit 0 ;;
+    *)            show_software_list ;;
+esac
