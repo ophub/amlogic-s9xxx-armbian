@@ -51,15 +51,15 @@ armbian-update
 
 If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. You can also query the [optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) version and update the specified version: `armbian-update 5.10.100`. The optional kernel supported by the device can be freely updated, such as from 5.10.100 kernel to 5.15.25 kernel. When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `2` parameter, such as `armbian-update 5.7.19 dev` . The mainline u-boot will be installed automatically by default, which has better support for kernels using versions above 5.10. If you choose not to install, please specify it in the `3` input parameter, such as `armbian-update 5.10.100 stable no `
 
-- ### Install Docker Service
+- ### Install common software
 
 Login in to armbian → input command:
 
 ```yaml
-armbian-docker
+armbian-software
 ```
 
-After installing docker, you can choose whether to install the `portainer` visual management panel. Users who intend to use the `LAN IP` for management can choose (`h`) to install the `http://ip:9000` version; Users who intend to use the `domain name` for remote management can choose (`s`) to install the `https://domain:9000` domain name certificate version (Please name the domain name `SSL` certificate as `portainer.crt` and `portainer.key` and upload it to the `/etc/ssl/` directory); Users who `do not need` to install can choose (`n`) to end the installation.
+According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), the commonly used software is gradually integrated to realize one-click installation/update/uninstallation and other quick operations. Including `docker images`, `desktop software`, `application services`, etc. See more [Description](build-armbian/armbian-docs/armbian_software.md).
 
 - ### Modify Armbian Config
 
