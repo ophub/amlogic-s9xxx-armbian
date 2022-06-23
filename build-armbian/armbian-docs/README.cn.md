@@ -20,15 +20,16 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
   - [10. 更新 Armbian 内核](#10-更新-armbian-内核)
-  - [11. 常见问题](#11-常见问题)
-    - [11.1 每个盒子的 dtb 和 u-boot 对应关系表](#111-每个盒子的-dtb-和-u-boot-对应关系表)
-    - [11.2 LED 屏显示控制说明](#112-led-屏显示控制说明)
-    - [11.3 如何恢复原安卓 TV 系统](#113-如何恢复原安卓-tv-系统)
-      - [11.3.1 使用 armbian-ddbr 备份恢复](#1131-使用-armbian-ddbr-备份恢复)
-      - [11.3.2 使用 Amlogic 刷机工具恢复](#1132-使用-amlogic-刷机工具恢复)
-    - [11.4 设置盒子从 USB/TF/SD 中启动](#114-设置盒子从-usbtfsd-中启动)
-    - [11.5 禁用红外接收器](#115-禁用红外接收器)
-    - [11.6 启动引导文件的选择](#116-启动引导文件的选择)
+  - [11. 安装常用软件](#11-安装常用软件)
+  - [12. 常见问题](#12-常见问题)
+    - [12.1 每个盒子的 dtb 和 u-boot 对应关系表](#121-每个盒子的-dtb-和-u-boot-对应关系表)
+    - [12.2 LED 屏显示控制说明](#122-led-屏显示控制说明)
+    - [12.3 如何恢复原安卓 TV 系统](#123-如何恢复原安卓-tv-系统)
+      - [12.3.1 使用 armbian-ddbr 备份恢复](#1231-使用-armbian-ddbr-备份恢复)
+      - [12.3.2 使用 Amlogic 刷机工具恢复](#1232-使用-amlogic-刷机工具恢复)
+    - [12.4 设置盒子从 USB/TF/SD 中启动](#124-设置盒子从-usbtfsd-中启动)
+    - [12.5 禁用红外接收器](#125-禁用红外接收器)
+    - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -155,27 +156,37 @@ armbian-update
 
 内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
 
-## 11. 常见问题
+## 11. 安装常用软件
+
+登录 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-software
+```
+
+根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用软件，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](armbian_software.md)。
+
+## 12. 常见问题
 
 在 Armbian 的使用中，一些可能遇到的常见问题汇总如下。
 
-### 11.1 每个盒子的 dtb 和 u-boot 对应关系表
+### 12.1 每个盒子的 dtb 和 u-boot 对应关系表
 
 请查阅[说明](amlogic_model_database.md)
 
-### 11.2 LED 屏显示控制说明
+### 12.2 LED 屏显示控制说明
 
 请查阅[说明](led_screen_display_control.md)
 
-### 11.3 如何恢复原安卓 TV 系统
+### 12.3 如何恢复原安卓 TV 系统
 
 通常使用 armbian-ddbr 备份恢复，或者使用 Amlogic 刷机工具恢复原安卓 TV 系统。
 
-#### 11.3.1 使用 armbian-ddbr 备份恢复
+#### 12.3.1 使用 armbian-ddbr 备份恢复
 
 建议您在全新的盒子里安装 Armbian 系统前，先对当前盒子自带的原安卓 TV 系统进行备份，以便在需要恢复系统时使用。请从 `TF/SD/USB` 启动 Armbian 系统，输入 `armbian-ddbr` 命令，然后根据提示输入 `b` 进行系统备份，备份文件的存放路径为 `/ddbr/BACKUP-arm-64-emmc.img.gz` ，请下载保存。在需要恢复安卓 TV 系统时，将之前备份的文件上传至 `TF/SD/USB` 设备的相同路径下，输入 `armbian-ddbr` 命令，然后根据提示输入 `r` 进行系统恢复。
 
-#### 11.3.2 使用 Amlogic 刷机工具恢复
+#### 12.3.2 使用 Amlogic 刷机工具恢复
 
 - 一般情况下，重新插入电源，如果可以从 USB 中启动，只要重新安装即可，多试几次。
 
@@ -202,7 +213,7 @@ armbian-update
 
 当完成恢复出厂设置，盒子已经恢复成 Android TV 系统，其他安装 Armbian 系统的操作，就和你之前第一次安装系统时的要求一样了，再来一遍即可。
 
-### 11.4 设置盒子从 USB/TF/SD 中启动
+### 12.4 设置盒子从 USB/TF/SD 中启动
 
 - 把刷好固件的 USB/TF/SD 插入盒子。
 - 开启开发者模式: 设置 → 关于本机 → 版本号 (如: X96max plus...), 在版本号上快速连击 5 次鼠标左键, 看到系统显示 `开启开发者模式` 的提示。
@@ -211,7 +222,7 @@ armbian-update
 - 进入 `cmd` 命令模式。输入 `adb connect 192.168.1.137` 命令（其中的 ip 根据你的盒子修改，可以到盒子所接入的路由器设备里查看），如果链接成功会显示 `connected to 192.168.1.137:5555`
 - 输入 `adb shell reboot update` 命令，盒子将重启并从你插入的 USB/TF/SD 启动，从浏览器访问固件的 IP 地址，或者 SSH 访问即可进入固件。
 
-### 11.5 禁用红外接收器
+### 12.5 禁用红外接收器
 
 默认情况下启用对红外接收器的支持，但如果您将电视盒用作服务器，那么您可能希望禁用 IR 内核模块以防止错误地关闭您的盒子。 要完全禁用 IR，请添加以下行：
 
@@ -221,7 +232,7 @@ blacklist meson_ir
 
 至 `/etc/modprobe.d/blacklist.conf` 并重启。
 
-### 11.6 启动引导文件的选择
+### 12.6 启动引导文件的选择
 
 一般情况下，使用 /boot/uEnv.txt 即可。个别设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，如 T95（s905x） / T95Z-Plus（s912）等设备。如果需要，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
 
