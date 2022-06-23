@@ -132,22 +132,21 @@ software_102() {
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
-    echo -ne "${OPTIONS} Select Install Portainer-ce?  No=(n) / LAN ip access=(h) / Domain cert access=(s): "
-    read pt
-    case "${pt}" in
-    h | H | http)
-        soft_opt="portainer_lan"
-        ;;
-    s | S | https)
-        soft_opt="portainer_domain"
-        ;;
-    *)
-        echo -e "${INFO} Finish the installation." && exit 0
-        ;;
-    esac
-
     case "${software_manage}" in
     install)
+        echo -ne "${OPTIONS} Select Install Portainer-ce?  No=(n) / LAN ip access=(h) / Domain cert access=(s): "
+        read pt
+        case "${pt}" in
+        h | H | http)
+            soft_opt="portainer_lan"
+            ;;
+        s | S | https)
+            soft_opt="portainer_domain"
+            ;;
+        *)
+            echo -e "${INFO} Finish the installation." && exit 0
+            ;;
+        esac
         armbian-docker ${soft_opt}
         ;;
     update)
