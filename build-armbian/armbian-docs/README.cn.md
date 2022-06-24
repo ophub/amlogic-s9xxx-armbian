@@ -30,9 +30,10 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.4 设置盒子从 USB/TF/SD 中启动](#124-设置盒子从-usbtfsd-中启动)
     - [12.5 禁用红外接收器](#125-禁用红外接收器)
     - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
-    - [12.7 设置静态 IP 或 DHCP 动态 分配 IP](#127-设置静态-ip-或-dhcp-动态-分配-ip)
+    - [12.7 手动设置静态 IP 地址 或 DHCP 动态分配 IP 地址](#127-手动设置静态-ip-地址-或-dhcp-动态分配-ip-地址)
       - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
       - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
+    - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -239,7 +240,7 @@ blacklist meson_ir
 
 一般情况下，使用 /boot/uEnv.txt 即可。个别设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，如 T95（s905x） / T95Z-Plus（s912）等设备。如果需要，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
 
-### 12.7 设置静态 IP 或 DHCP 动态 分配 IP
+### 12.7 手动设置静态 IP 地址 或 DHCP 动态分配 IP 地址
 
 网络配置文件 [/etc/network/interfaces](../common-files/rootfs/etc/network/interfaces) 的内容如下：
 
@@ -294,3 +295,8 @@ netmask 255.255.255.0
 gateway 192.168.1.1
 dns-nameservers 192.168.1.1
 ```
+
+### 12.8 如何添加开机启动任务
+
+系统中已经添加了自定义开机启动任务脚本文件，在 Armbian 系统中的路径是 [/usr/share/ophub/start_service.sh](../common-files/rootfs/usr/share/ophub/start_service.sh) 文件，可以根据个人需求在该脚本中自定义添加相关任务。
+
