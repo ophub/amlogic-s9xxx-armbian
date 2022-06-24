@@ -89,9 +89,9 @@ check_software_status() {
         # Check the software installation status by category
         check_status="0"
         case "${auth_method}" in
-            dpkg)   [[ -n "$(dpkg-query -l | grep "${package}")" ]] && check_status="1" ;;
-            docker) [[ -n "$(docker ps -q -f name=${package})" ]] && check_status="1" ;;
-            which)  [[ -n "$(which "${package}")" ]] && check_status="1" ;;
+            dpkg)   [[ -n "$(dpkg-query -l | grep "${package}" 2>/dev/null)" ]] && check_status="1" ;;
+            docker) [[ -n "$(docker ps -q -f name=${package} 2>/dev/null)" ]] && check_status="1" ;;
+            which)  [[ -n "$(which "${package}" 2>/dev/null)" ]] && check_status="1" ;;
             *)      check_status="0" ;;
         esac
         # Adjust software installation status
@@ -197,8 +197,9 @@ update_script() {
     fi
 
     # Update related files
+    echo -e "${STEPS} Start syncing files..."
     [[ -d "${software_path}" ]] || mkdir -p ${software_path}
-    svn co ${script_repo} ${software_path} --force
+    svn export ${script_repo} ${software_path} --force
     chmod +x ${software_path}/*.sh
 
     sync && sleep 3
