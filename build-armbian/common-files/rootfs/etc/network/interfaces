@@ -1,5 +1,21 @@
 source /etc/network/interfaces.d/*
+
 # Network is managed by Network manager
+# You can choose one of the following two IP setting methods:
+# Use # to disable another setting method
+
+
+# 01. Enable dynamic DHCP to assign IP
 auto eth0
 iface eth0 inet dhcp
         hwaddress ether 12:34:56:78:9A:BC
+
+
+# 02. Enable static IP settings(IP is modified according to the actual)
+#auto eth0
+#allow-hotplug eth0
+#iface eth0 inet static
+#address 192.168.1.100
+#netmask 255.255.255.0
+#gateway 192.168.1.6
+#dns-nameservers 192.168.1.6
