@@ -30,6 +30,9 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.4 设置盒子从 USB/TF/SD 中启动](#124-设置盒子从-usbtfsd-中启动)
     - [12.5 禁用红外接收器](#125-禁用红外接收器)
     - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
+    - [12.7 设置静态 IP 或 DHCP 动态 分配 IP](#127-设置静态-ip-或-dhcp-动态-分配-ip)
+      - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
+      - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -236,3 +239,58 @@ blacklist meson_ir
 
 一般情况下，使用 /boot/uEnv.txt 即可。个别设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，如 T95（s905x） / T95Z-Plus（s912）等设备。如果需要，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
 
+### 12.7 设置静态 IP 或 DHCP 动态 分配 IP
+
+网络配置文件 [/etc/network/interfaces](../common-files/rootfs/etc/network/interfaces) 的内容如下：
+
+```yaml
+source /etc/network/interfaces.d/*
+
+# Network is managed by Network manager
+# You can choose one of the following two IP setting methods:
+# Use # to disable another setting method
+
+
+# 01. Enable dynamic DHCP to assign IP
+auto eth0
+iface eth0 inet dhcp
+        hwaddress ether 12:34:56:78:9A:BC
+
+
+# 02. Enable static IP settings(IP is modified according to the actual)
+#auto eth0
+#allow-hotplug eth0
+#iface eth0 inet static
+#address 192.168.1.100
+#netmask 255.255.255.0
+#gateway 192.168.1.6
+#dns-nameservers 192.168.1.6
+```
+
+默认采用 DHCP 动态 分配 IP 的策略（方法1），由 Armbian 所接入的网络路由器自动分配 IP。如果想改为静态 IP，可以把设置方法 1 禁用或删除，启用方法 2 的静态 IP 设置。
+
+#### 12.7.1 由 DHCP 动态分配 IP 地址
+
+```yaml
+source /etc/network/interfaces.d/*
+
+auto eth0
+iface eth0 inet dhcp
+        hwaddress ether 12:34:56:78:9A:BC
+```
+
+#### 12.7.2 手动设置静态 IP 地址
+
+其中的 IP 和网关和 DNS 根据自己的网络情况修改。
+
+```yaml
+source /etc/network/interfaces.d/*
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet static
+address 192.168.1.100
+netmask 255.255.255.0
+gateway 192.168.1.1
+dns-nameservers 192.168.1.1
+```
