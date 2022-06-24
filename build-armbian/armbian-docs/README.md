@@ -30,9 +30,10 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [12.4 Set the box to boot from USB/TF/SD](#124-set-the-box-to-boot-from-usbtfsd)
     - [12.5 Disable infrared receiver](#125-disable-infrared-receiver)
     - [12.6 Selection of bootstrap file](#126-selection-of-bootstrap-file)
-    - [12.7 Set static IP or DHCP dynamically assign IP](#127-set-static-ip-or-dhcp-dynamically-assign-ip)
+    - [12.7 Manually set a static IP address or DHCP dynamically assigns a IP address](#127-manually-set-a-static-ip-address-or-dhcp-dynamically-assigns-a-ip-address)
       - [12.7.1 Dynamic IP address assignment by DHCP](#1271-dynamic-ip-address-assignment-by-dhcp)
       - [12.7.2 Manually set a static IP address](#1272-manually-set-a-static-ip-address)
+    - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
 
 ## 1. Register your own GitHub account
 
@@ -240,7 +241,7 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
 
-### 12.7 Set static IP or DHCP dynamically assign IP
+### 12.7 Manually set a static IP address or DHCP dynamically assigns a IP address
 
 The content of the network configuration file [/etc/network/interfaces](../common-files/rootfs/etc/network/interfaces) is as follows:
 
@@ -295,3 +296,8 @@ netmask 255.255.255.0
 gateway 192.168.1.1
 dns-nameservers 192.168.1.1
 ```
+
+### 12.8 How to add startup tasks
+
+A custom startup task script file has been added to the system, and the path in the Armbian system is [/usr/share/ophub/start_service.sh](../common-files/rootfs/usr/share/ophub/start_service.sh) file, you can customize and add related tasks in this script according to your personal needs.
+
