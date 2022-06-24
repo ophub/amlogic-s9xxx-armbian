@@ -632,12 +632,12 @@ make_image() {
 
     # Write the specified bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
         #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
     elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=1 count=444 conv=fsync 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" bs=512 skip=1 seek=1 conv=fsync 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
         #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
 
