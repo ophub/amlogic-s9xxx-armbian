@@ -242,15 +242,15 @@ create_partition() {
     # Write bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
         echo -e "${INFO} Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
         echo -e "${INFO} Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=1 count=444 conv=fsync
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" bs=512 skip=1 seek=1 conv=fsync
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} Restore the mybox bootloader: [ ${MYBOX_UBOOT} ]"
-        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=442
+        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=444
         dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 }
