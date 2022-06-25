@@ -17,6 +17,7 @@
 #======================================= Functions list =======================================
 #
 # error_msg               : Output error message
+# check_release           : Check firmware information
 # check_depends           : Check dependencies
 # check_software_status   : Initialize check
 # search_software_model   : Search for software model
@@ -31,7 +32,7 @@
 software_path="/usr/share/ophub/armbian-software"
 software_conf="${software_path}/software-list.conf"
 software_command="${software_path}/software-command.sh"
-codename="$(lsb_release --codename --short)"
+ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
 #
 # The compile kernel scripts download repository
@@ -50,6 +51,18 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+check_release() {
+    if [[ -f "${ophub_release_file}" ]]; then
+        source "${ophub_release_file}" 2>/dev/null
+        VERSION_CODEID="${VERSION_CODEID}"
+        VERSION_CODENAME="${VERSION_CODENAME}"
+    else
+        error_msg "${ophub_release_file} file is missing!"
+    fi
+
+    [[ -n "${VERSION_CODEID}" && -n "${VERSION_CODENAME}" ]] || error_msg "${ophub_release_file} value is missing!"
 }
 
 # Check dependencies
@@ -78,7 +91,7 @@ check_software_status() {
     # Check software installation status
     tmp_conf="$(mktemp)"
     [[ -f "${tmp_conf}" ]] && rm -f ${tmp_conf} 2>/dev/null
-    cat ${software_conf} | grep -E "^[0-9]{1,9}.*:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | while read line; do
+    cat ${software_conf} 2>/dev/null | grep -E "^[0-9]{1,9}.*:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | while read line; do
         # Set initial value
         local state="not-installed"
         local manage="install"
@@ -102,7 +115,7 @@ check_software_status() {
 
         # Check whether the software supports running on the current system
         local release="$(echo ${line} | awk -F ':' '{print $5}')"
-        [[ "${release}" == *"${codename}"* ]] || {
+        [[ "${release}" == *"${VERSION_CODENAME}"* ]] || {
             local support="unsupported"
             local manage="-"
         }
@@ -110,8 +123,8 @@ check_software_status() {
         # Query results are written to a temporary file
         [[ "${support}" == "supported" ]] && echo "${line}:${support}:${state}:${manage}" >>${tmp_conf} && sync
     done
-    software_database="$(cat ${tmp_conf})"
-    [[ -n "${software_database}" ]] || error_msg "Software database is null."
+    software_database="$(cat ${tmp_conf} 2>/dev/null)"
+    [[ -n "${software_database}" ]] || error_msg "There is no suitable software for [ ${VERSION_CODEID}:${VERSION_CODENAME} ]."
 }
 
 # Search the software model
@@ -127,7 +140,7 @@ search_software_model() {
 # Explain: 1.ID   2.NAME   3.STATE          4.MANAGE
 # Example: 11     :frps    :not-installed   :install
 show_software_list() {
-    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${codename}\033[0m ]..."
+    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${VERSION_CODEID}:${VERSION_CODENAME}\033[0m ]..."
 
     # Check software status
     check_software_status
@@ -239,6 +252,8 @@ EOF
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # Check for the existence of software management scripts
 [[ -f "${software_command}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
+# Check firmware information
+check_release
 
 # Execute script assist functions
 case "${1}" in
