@@ -29,6 +29,7 @@
 # software_101      : For docker
 # software_102      : For portainer(docker)
 # software_103      : For transmission(docker)
+# software_104      : For qbittorrent(docker)
 #
 # software_201      : For desktop
 # software_202      : For vlc-media-player(desktop)
@@ -38,6 +39,8 @@
 #
 # Get custom firmware information
 ophub_release_file="/etc/ophub-release"
+docker_path="/opt/docker"
+download_path="/opt/downloads"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -59,11 +62,12 @@ check_release() {
     if [[ -f "${ophub_release_file}" ]]; then
         source "${ophub_release_file}" 2>/dev/null
         VERSION_CODEID="${VERSION_CODEID}"
+        VERSION_CODENAME="${VERSION_CODEID}"
     else
         error_msg "${ophub_release_file} file is missing!"
     fi
 
-    [[ -n "${VERSION_CODEID}" ]] || error_msg "${ophub_release_file} value is missing!"
+    [[ -n "${VERSION_CODEID}" && -n "${VERSION_CODENAME}" ]] || error_msg "${ophub_release_file} value is missing!"
 }
 
 software_install() {
@@ -173,7 +177,7 @@ software_103() {
     # Generate random account
     random_account="$(cat /proc/sys/kernel/random/uuid)"
     # transmission installation path
-    tr_path="/opt/docker/transmission"
+    tr_path="${docker_path}/transmission"
     tr_default_user="admin"
     tr_default_pass="${random_account:0:18}"
 
@@ -194,6 +198,8 @@ software_103() {
         [[ -z "${tr_pass}" ]] && tr_pass="${tr_default_pass}"
         echo -e "${INFO} Login password: [ ${tr_pass} ]"
 
+        [[ -d "${tr_path}" ]] || mkdir -p ${tr_path}
+
         # Instructions: https://github.com/linuxserver/docker-transmission
         echo -e "${STEPS} Start pulling the docker image: [ linuxserver/transmission:arm64v8-latest ]..."
         docker run -d --name=transmission \
@@ -207,8 +213,8 @@ software_103() {
             -p 51413:51413 \
             -p 51413:51413/udp \
             -v ${tr_path}/config:/config \
-            -v ${tr_path}/downloads:/downloads \
             -v ${tr_path}/watch/folder:/watch \
+            -v ${download_path}:/downloads \
             --restart unless-stopped \
             linuxserver/transmission:arm64v8-latest
 
@@ -224,16 +230,16 @@ software_103() {
         exit 0
         ;;
     update)
-        # update transmission docker image
+        # Update transmission docker image
         echo -e "${STEPS} Start updating the transmission docker image..."
         docker pull linuxserver/transmission:arm64v8-latest
 
-        # Set the transmission-web-control
+        # Update transmission-web-control
         echo -e "${STEPS} Start updating the interface: [ transmission-web-control ]..."
         tr_cn_url="https://github.com/ronggang/transmission-web-control/raw/master/release/install-tr-control-cn.sh"
         bash <(curl -fsSL ${tr_cn_url}) ${tr_path}
 
-        # Set the transmission-web-control
+        # Restart transmission
         echo -e "${STEPS} Restart the transmission docker container..."
         docker restart $(docker ps -aq --filter name=transmission)
         ;;
@@ -247,10 +253,81 @@ software_103() {
         echo -e "${INFO} Start removing transmission image..."
         docker image rm $(docker images -q --filter reference=linuxserver/transmission*:*)
 
-        # Delete the Transmission installation directory
+        # Delete the transmission installation directory
         [[ -d "${tr_path}" ]] && rm -rf ${tr_path}
 
-        echo -e "${SUCCESS} Transmission removed successfully."
+        echo -e "${SUCCESS} transmission removed successfully."
+        exit 0
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For qbittorrent
+software_104() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ qbittorrent ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # qbittorrent installation path
+    qb_path="${docker_path}/qbittorrent"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ qbittorrent ]..."
+
+        # Check script permission
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 104 -m install ]"
+
+        [[ -d "${qb_path}" ]] || mkdir -p ${qb_path}
+
+        # Instructions: https://hub.docker.com/r/linuxserver/qbittorrent
+        echo -e "${STEPS} Start pulling the docker image: [ linuxserver/qbittorrent:arm64v8-latest ]..."
+        docker run -d --name=qbittorrent \
+            -e PUID=1000 \
+            -e PGID=1000 \
+            -e TZ=Asia/Shanghai \
+            -e WEBUI_PORT=8080 \
+            -p 8080:8080 \
+            -p 6881:6881 \
+            -p 6881:6881/udp \
+            -v ${qb_path}/appdata/config:/config \
+            -v ${download_path}:/downloads \
+            --restart unless-stopped \
+            linuxserver/qbittorrent:arm64v8-latest
+
+        sync && sleep 3
+        echo -e "${NOTE} The qbittorrent address [ http://ip:8080 ]"
+        echo -e "${NOTE} The qbittorrent account [ username:admin  /  password:adminadmin ]"
+        echo -e "${SUCCESS} qbittorrent installed successfully."
+        exit 0
+        ;;
+    update)
+        # Update qbittorrent docker image
+        echo -e "${STEPS} Start updating the qbittorrent docker image..."
+        docker pull linuxserver/qbittorrent:arm64v8-latest
+
+        # Restart qbittorrent
+        echo -e "${STEPS} Restart the qbittorrent docker container..."
+        docker restart $(docker ps -aq --filter name=qbittorrent)
+        ;;
+    remove)
+        # Query the container ID based on the image name and delete it
+        echo -e "${INFO} Start removing qbittorrent container..."
+        docker stop $(docker ps -aq --filter name=qbittorrent)
+        docker rm $(docker ps -aq --filter name=qbittorrent)
+
+        # Query the image ID based on the image name and delete it
+        echo -e "${INFO} Start removing qbittorrent image..."
+        docker image rm $(docker images -q --filter reference=linuxserver/qbittorrent*:*)
+
+        # Delete the qbittorrent installation directory
+        [[ -d "${qb_path}" ]] && rm -rf ${qb_path}
+
+        echo -e "${SUCCESS} qbittorrent removed successfully."
         exit 0
         ;;
     *)
