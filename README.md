@@ -49,7 +49,7 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. You can also query the [optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) version and update the specified version: `armbian-update 5.10.100`. The optional kernel supported by the device can be freely updated, such as from 5.10.100 kernel to 5.15.25 kernel. When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `2` parameter, such as `armbian-update 5.7.19 dev` . The mainline u-boot will be installed automatically by default, which has better support for kernels using versions above 5.10. If you choose not to install, please specify it in the `3` input parameter, such as `armbian-update 5.10.100 stable no `
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. You can also query the [optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) version and update the specified version: `armbian-update 5.10.125`. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel. When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `2` parameter, such as `armbian-update 5.10.125 dev` . The mainline u-boot will be installed automatically by default, which has better support for kernels using versions above 5.10. If you choose not to install, please specify it in the `3` input parameter, such as `armbian-update 5.10.125 stable no `
 
 - ### Install common software
 
@@ -158,7 +158,7 @@ For the usage of compiling the kernel in Armbian, see the [compile-kernel](compi
 
 ```yaml
 armbian-kernel -update
-armbian-kernel -d -k 5.10.100
+armbian-kernel -d -k 5.10.125
 ```
 
 - ### More instructions for use
@@ -179,9 +179,9 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.25.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.25`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
+3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.50`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.100` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.125` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
 
 - ### Description of localized packaging parameters
@@ -190,22 +190,22 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | ------ | ---------- | ----------------------------------------- |
 | -d     | Defaults   | Compile all cores and all firmware types. |
 | -b     | BuildSoC   | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . Use `all` for all SoC models. You can use these codes: `a311d`, `s905x3`, `s905x2`, `s905l3a`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-m8s` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-m8s` is `s912-mecool-m8s-pro-l`, `s905d-ki` is `s912-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3` |
-| -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.10.100` . Multiple kernel use `_` connection such as `-k 5.15.25_5.10.100` |
-| -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.10.100 version. If there is the latest version of same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
+| -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.10.125` . Multiple kernel use `_` connection such as `-k 5.10.125_5.15.50` |
+| -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.10.125 version. If there is the latest version of same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
 | -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 | -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `_server`, `_gnome_desktop` or `_ophub` as needed. Do not include spaces when setting custom signatures. |
 
 - `sudo ./rebuild -d`: Use the default configuration to pack all TV Boxes.
-- `sudo ./rebuild -d -b s905x3 -k 5.10.100`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
-- `sudo ./rebuild -d -b s905x3_s905d -k 5.15.25_5.10.100`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
-- `sudo ./rebuild -d -b s905x3 -k 5.10.100 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
-- `sudo ./rebuild -d -b s905x3 -v dev -k 5.7.19`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
+- `sudo ./rebuild -d -b s905x3 -k 5.10.125`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
+- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
+- `sudo ./rebuild -d -b s905x3 -k 5.10.125 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./rebuild -d -b s905x3 -v dev -k 5.10.125`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
-- `sudo ./rebuild -d -k 5.15.25_5.10.100`: Use the default configuration. Specify multiple cores, use `_` to connect.
-- `sudo ./rebuild -d -k 5.15.25_5.10.100 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -d -t btrfs -s 2748 -k 5.10.100`: Use the default configuration, set the file system to btrfs format and the partition size to 2748M, and only compile the armbian firmware with the kernel version 5.10.100.
+- `sudo ./rebuild -d -k 5.10.125_5.15.50`: Use the default configuration. Specify multiple cores, use `_` to connect.
+- `sudo ./rebuild -d -k 5.10.125_5.15.50 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
+- `sudo ./rebuild -d -t btrfs -s 2748 -k 5.10.125`: Use the default configuration, set the file system to btrfs format and the partition size to 2748M, and only compile the armbian firmware with the kernel version 5.10.125.
 
 ## Use GitHub Actions to build
 
@@ -224,7 +224,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_soc: s905d_s905x3_s922x_s905x
-    armbian_kernel: 5.15.25_5.10.100
+    armbian_kernel: 5.10.125_5.15.50
 ```
 
 - ### GitHub Actions Input parameter description
@@ -235,7 +235,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 |--------------------|-------------------|---------------------------------------------------------------|
 | armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
 | armbian_soc        | s905d_s905x3      | Set the `SOC` of the packaged TV Boxes, function reference `-b`    |
-| armbian_kernel     | 5.15.25_5.10.100  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
+| armbian_kernel     | 5.10.125_5.15.50  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
 | armbian_size       | 2748              | Set the size of the firmware ROOTFS partition, function reference `-s`             |
@@ -269,7 +269,7 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.15.25_5.10.100
+    kernel_version: 5.10.125_5.15.50
     kernel_auto: true
     kernel_sign: -ophub
 ```
