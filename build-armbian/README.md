@@ -10,7 +10,7 @@ The files stored here are related files that need to be used when packaging Armb
 
 ## amlogic-kernel
 
-Create a folder corresponding to the version number in the `amlogic-kernel` directory, such as `5.15.25` , and put the 4 needed kernel files into this directory (Requires header-xxx.tar.gz, boot-xxx.tar.gz, dtb-amlogic-xxx.tar.gz, modules-xxx.tar.gz. Other kernel files are not required, and putting them in does not affect use). Multiple kernels create directories in turn and put corresponding kernel files. Kernel files can be downloaded from the [kernel](https://github.com/ophub/kernel) repository or [custom compilation](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel). If the kernel file is not downloaded and stored manually, the script will also be automatically downloaded from the kernel repository at compile time.
+Create a folder corresponding to the version number in the `amlogic-kernel` directory, such as `5.10.125` , and put the 4 needed kernel files into this directory (Requires header-xxx.tar.gz, boot-xxx.tar.gz, dtb-amlogic-xxx.tar.gz, modules-xxx.tar.gz. Other kernel files are not required, and putting them in does not affect use). Multiple kernels create directories in turn and put corresponding kernel files. Kernel files can be downloaded from the [kernel](https://github.com/ophub/kernel) repository or [custom compilation](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel). If the kernel file is not downloaded and stored manually, the script will also be automatically downloaded from the kernel repository at compile time.
 
 ## amlogic-u-boot
 
