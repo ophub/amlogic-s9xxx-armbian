@@ -89,7 +89,7 @@ on:
   #- cron: "0 23 * * 0"
 
 env:
-  TZ: Asia/Shanghai
+  TZ: America/New_York
 
 jobs:
   build:
