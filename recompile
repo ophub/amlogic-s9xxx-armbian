@@ -63,7 +63,7 @@ custom_name="-ophub"
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 #
 # Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
-armbian_rootfs_file="armbian_22.05.0_aml_s922x_focal_5.15.35.tar.xz"
+armbian_rootfs_file="armbian.tar.xz"
 #
 # GCC download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/downloads
 gcc_file="gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu.tar.xz"
@@ -195,7 +195,9 @@ toolchain_check() {
         rm -rf ${armbian_path} 2>/dev/null && mkdir -p ${armbian_path}
         wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_path}/${armbian_rootfs_file}" >/dev/null 2>&1 && sync
         tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path} && sync
-        mv -f ${armbian_path}/*.img ${armbian_file} && sync
+        # Change other names to armbian.img
+        [[ -f "${armbian_file}" ]] || mv -f ${armbian_path}/*.img ${armbian_file} && sync
+        # Delete download file
         rm -f ${armbian_path}/${armbian_rootfs_file} && sync
         [[ -f "${armbian_file}" ]] || error_msg "There is no armbian file: [ ${armbian_file} ]"
     fi
