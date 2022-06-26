@@ -1,6 +1,6 @@
 # Armbian Software Center
 
-According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), the commonly used software is gradually integrated to realize one-click installation/update/uninstallation and other quick operations. Including `docker images`, `desktop software`, `application services`, etc.
+According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrate commonly used [software](../common-files/rootfs/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click installation/update/uninstallation and other shortcut operations. Including `docker images`, `desktop software`, `application services`, etc.
 
 ## Software Center Instructions
 
@@ -20,11 +20,14 @@ ID    NAME                                          STATE           MANAGE
 -----------------------------------------------------------------------------------
 101   docker                                        installed       update/remove
 102   portainer(for-docker)                         installed       update/remove
-201   desktop                                       installed       update/remove
+103   transmission(for-docker)                      installed       update/remove
+104   qbittorrent(for-docker)                       installed       update/remove
+201   desktop                                       not-installed   install
 202   vlc-media-player(for-desktop)                 not-installed   install
-203   firefox(for-desktop)                          installed       update/remove
+203   firefox(for-desktop)                          not-installed   install
 301   frps                                          not-installed   install
 302   frpc                                          not-installed   install
+303   plex-media-server                             installed       update/remove
 -----------------------------------------------------------------------------------
 [ OPTIONS ] Please Input Software ID:
 ```
@@ -61,7 +64,7 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 
 # Armbian 软件中心
 
-根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用软件，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。
+根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](../common-files/rootfs/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。
 
 ## 软件中心使用说明
 
@@ -81,11 +84,14 @@ ID    NAME                                          STATE           MANAGE
 -----------------------------------------------------------------------------------
 101   docker                                        installed       update/remove
 102   portainer(for-docker)                         installed       update/remove
-201   desktop                                       installed       update/remove
+103   transmission(for-docker)                      installed       update/remove
+104   qbittorrent(for-docker)                       installed       update/remove
+201   desktop                                       not-installed   install
 202   vlc-media-player(for-desktop)                 not-installed   install
-203   firefox(for-desktop)                          installed       update/remove
+203   firefox(for-desktop)                          not-installed   install
 301   frps                                          not-installed   install
 302   frpc                                          not-installed   install
+303   plex-media-server                             installed       update/remove
 -----------------------------------------------------------------------------------
 [ OPTIONS ] Please Input Software ID:
 ```
