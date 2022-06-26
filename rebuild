@@ -85,10 +85,17 @@ ROOTFS_TYPE="ext4"
 # Custom name in firmware name: ${build_image_file}, e.g. _server or _gnome_desktop
 custom_name=""
 #
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+WARNING="[\033[93m WARNING \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
 #========================================================================================
 
 error_msg() {
-    echo -e "[\033[1;91m Error \033[0m] ${1}"
+    echo -e "${ERROR} ${1}"
     exit 1
 }
 
@@ -203,9 +210,9 @@ find_armbian() {
     armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '[2-9][0-9].[0-9]{1,2}.[0-9]{1,2}' | head -n 1)"
     [[ -n "${armbian_rebuild_version}" ]] || {
         armbian_rebuild_version="22.02.02"
-        echo -e "Missing armbian version info!"
+        echo -e "${WARNING} Missing armbian version info!"
     }
-    echo -e "Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
+    echo -e "${INFO} Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 }
 
 download_kernel() {
@@ -228,7 +235,7 @@ download_kernel() {
     # Query the latest kernel in a loop
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
-        echo -e "(${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
+        echo -e "${INFO} (${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
         # Identify the kernel mainline
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
         # Check the version on the server (e.g LATEST_VERSION="125")
@@ -238,7 +245,7 @@ download_kernel() {
         else
             tmp_arr_kernels[${i}]="${KERNEL_VAR}"
         fi
-        echo -e "(${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+        echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
         let i++
     done
@@ -251,10 +258,10 @@ download_kernel() {
     i=1
     for KERNEL_VAR in ${build_kernel[*]}; do
         if [[ ! -d "${kernel_path}/${KERNEL_VAR}" ]]; then
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${KERNEL_VAR} ]"
+            echo -e "${INFO} (${i}) [ ${KERNEL_VAR} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${KERNEL_VAR} ]"
             svn export ${kernel_repo}/${KERNEL_VAR} ${kernel_path}/${KERNEL_VAR} --force
         else
-            echo -e "(${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
+            echo -e "${INFO} (${i}) [ ${KERNEL_VAR} ] Kernel is in the local directory."
         fi
 
         let i++
@@ -641,11 +648,11 @@ make_image() {
     if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
         dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+        #echo -e "${INFO} For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
     elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
         dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+        #echo -e "${INFO} For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
 
     sync
@@ -740,14 +747,14 @@ loop_rebuild() {
 }
 
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ./${0} ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 # Show welcome and server start information
-echo -e "Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
-echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "Server memory usage: \n$(free -h) \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
-echo -e "Setting parameters: [ ${@} ] \n"
+echo -e "${INFO} Welcome to Rebuild Armbian for Amlogic s9xxx tv box!"
+echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+echo -e "${INFO} Server memory usage: \n$(free -h) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
+echo -e "${INFO} Setting parameters: [ ${@} ] \n"
 #
 # Initialize variables
 init_var "${@}"
@@ -755,13 +762,13 @@ init_var "${@}"
 find_armbian
 # Download the latest kernel
 [[ "${auto_kernel}" == "true" ]] && download_kernel
-echo -e "Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
-echo -e "ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
+echo -e "${INFO} Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
+echo -e "${INFO} ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
 # Loop to rebuild armbian firmware
 loop_rebuild
 #
 # Show server end information
-echo -e "Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
 # All process completed
 wait
