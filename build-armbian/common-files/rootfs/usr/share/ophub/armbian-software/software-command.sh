@@ -35,6 +35,8 @@
 # software_202      : For vlc-media-player(desktop)
 # software_203      : For firefox(desktop)
 #
+# software_303      : For plex-media-server
+#
 #========================== Set default parameters ==========================
 #
 # Get custom firmware information
@@ -429,6 +431,68 @@ software_203() {
     remove)
         [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_remove "firefox"
         [[ "${VERSION_CODEID}" == "debian" ]] && software_remove "firefox-esr"
+        ;;
+    update)
+        software_update
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For plex-media-server
+software_303() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ plex-media-server ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        # Install basic dependencies
+        echo -e "${STEPS} Start installing basic dependencies..."
+        software_install "wget curl gpg gnupg2 software-properties-common apt-transport-https lsb-release ca-certificates"
+
+        # Add Plex Media Server APT repository
+        echo -e "${STEPS} Start adding the Plex Media Server APT repository..."
+        echo "deb https://downloads.plex.tv/repo/deb public main" | sudo tee /etc/apt/sources.list.d/plexmediaserver.list
+
+        # Import GPG key
+        echo -e "${STEPS} Start importing GPG keys..."
+        wget https://downloads.plex.tv/plex-keys/PlexSign.key
+        cat PlexSign.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/PlexSigkey.gpg
+        rm -f PlexSign.key
+
+        # Installing Plex Media server
+        echo -e "${STEPS} Start installing Plex Media server..."
+        software_install "plexmediaserver"
+
+        # Ensure to open the port 32400 through the firewall
+        echo -e "${STEPS} Set firewall to open port 32400..."
+        sudo ufw allow 32400 2>/dev/null
+
+        # Enable Plex server to start automatically on system boot
+        echo -e "${STEPS} Start setting up the Plex server to start automatically at system boot..."
+        sudo systemctl daemon-reload
+        sudo systemctl start plexmediaserver.service
+        sudo systemctl enable plexmediaserver.service
+
+        # Check Plex Media Server Status
+        echo -e "${STEPS} Check Plex Media Server Status..."
+        systemctl status plexmediaserver.service
+
+        # Confirm the service is enabled
+        echo -e "${STEPS} Confirm the service is enabled..."
+        systemctl is-enabled plexmediaserver.service
+
+        # Configure Plex Media Server: http://<plex-media-server-ip>:32400/web
+        sync && sleep 3
+        echo -e "${NOTE} Plex Media Server address [ http://ip:32400/web ]"
+        echo -e "${SUCCESS} Plex Media Server installation is successful."
+        ;;
+    remove)
+        software_remove "plexmediaserver"
         ;;
     update)
         software_update
