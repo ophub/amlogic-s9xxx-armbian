@@ -80,7 +80,9 @@ software_install() {
     # Add frpc.ini
     echo -e "${INFO} Add frpc.ini to: [ ${software_conf} ]"
     [[ -d "/etc/frp" ]] || sudo mkdir -p "/etc/frp"
-    #sudo cp -f ${software_dir}/frpc.ini /etc/frp
+    # Copy the complete setup example
+    sudo cp -f ${software_dir}/frpc_full.ini /etc/frp
+    # Generate common custom settings file
     sudo cat >${software_conf} <<EOF
 [common]
 server_addr = 127.0.0.1
