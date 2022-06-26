@@ -87,7 +87,9 @@ software_install() {
     # Add frps.ini
     echo -e "${INFO} Add frps.ini to: [ ${software_conf} ]"
     [[ -d "/etc/frp" ]] || sudo mkdir -p "/etc/frp"
-    #sudo cp -f ${software_dir}/frps.ini /etc/frp
+    # Copy the complete setup example
+    sudo cp -f ${software_dir}/frps_full.ini /etc/frp
+    # Generate common custom settings file
     sudo cat >${software_conf} <<EOF
 [common]
 bind_addr = 0.0.0.0
