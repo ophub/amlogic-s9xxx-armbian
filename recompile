@@ -563,18 +563,18 @@ loop_recompile() {
 [[ -n "${host_release}" && "jammy focal" == *"${host_release}"* ]] || error_msg "Supports running on Ubuntu: [ jammy / focal ]"
 [[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
 # Show welcome and server start information
-echo -e "Welcome to compile kernel! \n"
-echo -e "Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "Server memory usage: \n$(free -h) \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
-echo -e "Setting parameters: [ ${@} ] \n"
+echo -e "${INFO} Welcome to compile kernel! \n"
+echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+echo -e "${INFO} Server memory usage: \n$(free -h) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
+echo -e "${INFO} Setting parameters: [ ${@} ] \n"
 #
 # Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
-echo -e "Kernel from: [ ${code_owner} ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+echo -e "${INFO} Kernel from: [ ${code_owner} ]"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 toolchain_check
 # Loop to compile the kernel
 loop_recompile
