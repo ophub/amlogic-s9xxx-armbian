@@ -59,7 +59,7 @@ Login in to armbian → input command:
 armbian-software
 ```
 
-According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), the commonly used software is gradually integrated to realize one-click installation/update/uninstallation and other quick operations. Including `docker images`, `desktop software`, `application services`, etc. See more [Description](build-armbian/armbian-docs/armbian_software.md).
+According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrate commonly used [software](build-armbian/common-files/rootfs/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click installation/update/uninstallation and other shortcut operations. Including `docker images`, `desktop software`, `application services`, etc. See more [Description](build-armbian/armbian-docs/armbian_software.md).
 
 - ### Modify Armbian Config
 
