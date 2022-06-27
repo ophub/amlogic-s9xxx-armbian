@@ -57,6 +57,7 @@ software_download() {
     software_latest_version="$(curl -s "${software_api}" | grep "tag_name" | awk -F '"' '{print $4}' | tr " " "\n" | sort -rV | head -n 1)"
     # Query download address, E.g: https://github.com/fatedier/frp/releases/download/v0.43.0/frp_0.43.0_linux_arm64.tar.gz
     software_url="$(curl -s "${software_api}" | grep -oE "https:.*${software_latest_version}.*linux_arm64.*.tar.gz")"
+    [[ -n "${software_url}" ]] || error_msg "The download address is empty!"
     echo -e "${INFO} Software download from: [ ${software_url} ]"
 
     # Download software, E.g: /tmp/tmp.xxx/frp_0.43.0_linux_arm64.tar.gz
