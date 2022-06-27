@@ -36,6 +36,7 @@
 # software_203      : For firefox(desktop)
 #
 # software_303      : For plex-media-server
+# software_304      : For emby-server
 #
 #========================== Set default parameters ==========================
 #
@@ -478,10 +479,6 @@ software_303() {
         sudo systemctl start plexmediaserver.service
         sudo systemctl enable plexmediaserver.service
 
-        # Check Plex Media Server Status
-        echo -e "${STEPS} Check Plex Media Server Status..."
-        systemctl status plexmediaserver.service
-
         # Confirm the service is enabled
         echo -e "${STEPS} Confirm the service is enabled..."
         systemctl is-enabled plexmediaserver.service
@@ -493,6 +490,63 @@ software_303() {
         ;;
     remove)
         software_remove "plexmediaserver"
+        ;;
+    update)
+        software_update
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For emby-server
+software_304() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ emby-server ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        # Software version query api
+        software_api="https://api.github.com/repos/MediaBrowser/Emby.Releases/releases"
+        # Check the latest version, E.g: 4.7.5.0
+        software_latest_version="$(curl -s "${software_api}" | grep "tag_name" | awk -F '"' '{print $4}' | grep -E [.]0$ | tr " " "\n" | sort -rV | head -n 1)"
+        # Query download address, E.g: https://github.com/MediaBrowser/Emby.Releases/releases/download/4.7.5.0/emby-server-deb_4.7.5.0_arm64.deb
+        software_url="$(curl -s "${software_api}" | grep -oE "https:.*${software_latest_version}.*_arm64.deb")"
+        [[ -n "${software_url}" ]] || error_msg "The download address is empty!"
+        echo -e "${INFO} Software download from: [ ${software_url} ]"
+
+        # Download software, E.g: /tmp/tmp.xxx/emby-server-deb_4.7.5.0_arm64.deb
+        tmp_download="$(mktemp -d)"
+        software_filename="${software_url##*/}"
+        echo -e "${STEPS} Start downloading Emby Server..."
+        wget -q -P ${tmp_download} ${software_url}
+        [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
+        echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
+
+        # Installing Emby Server
+        echo -e "${STEPS} Start installing Emby Server..."
+        sudo dpkg -i ${tmp_download}/${software_filename}
+
+        # Enable Emby Server to start automatically on system boot
+        echo -e "${STEPS} Start setting up the Emby Server to start automatically at system boot..."
+        sudo systemctl daemon-reload
+        sudo systemctl start emby-server.service
+        sudo systemctl enable emby-server.service
+
+        # Confirm the service is enabled
+        echo -e "${STEPS} Confirm the service is enabled..."
+        systemctl is-enabled emby-server.service
+
+        # Configure Emby Server: http://<plex-media-server-ip>:8096
+        sync && sleep 3
+        echo -e "${NOTE} Emby Server address [ http://ip:8096 ]"
+        echo -e "${SUCCESS} Emby Server installation is successful."
+        ;;
+    remove)
+        software_remove "emby-server"
         ;;
     update)
         software_update
