@@ -43,11 +43,12 @@ ophub_release_file="/etc/ophub-release"
 [[ -f "${armbian_release_file}" && -n "${SOC}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${SOC}\"|g" ${armbian_release_file} && echo "13. Fix custom banner name: Aml ${SOC}"
 
 # Remove packages
-[[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ]] && sudo apt-get -qq purge -y linux-image-edge-meson64 && echo "Remove linux-image-edge-meson64"
-[[ -n "$(dpkg -l | grep linux-image-current-meson64)" ]] && sudo apt-get -qq purge -y linux-image-current-meson64 && echo "Remove linux-image-current-meson64"
-[[ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ]] && sudo apt-get -qq purge -y linux-image-legacy-meson64 && echo "Remove linux-image-legacy-meson64"
-[[ -n "$(dpkg -l | grep linux-dtb-edge-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-edge-meson64 && echo "Remove linux-dtb-edge-meson64"
-[[ -n "$(dpkg -l | grep linux-dtb-current-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-current-meson64 && echo "Remove linux-dtb-current-meson64"
-[[ -n "$(dpkg -l | grep linux-dtb-legacy-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-legacy-meson64 && echo "Remove linux-dtb-legacy-meson64"
+[[ -n "$(dpkg -l | grep linux-image-edge-meson64)" ]] && sudo apt-get -qq purge -y linux-image-edge-meson64 && echo "14. Remove linux-image-edge-meson64"
+[[ -n "$(dpkg -l | grep linux-image-current-meson64)" ]] && sudo apt-get -qq purge -y linux-image-current-meson64 && echo "15. Remove linux-image-current-meson64"
+[[ -n "$(dpkg -l | grep linux-image-legacy-meson64)" ]] && sudo apt-get -qq purge -y linux-image-legacy-meson64 && echo "16. Remove linux-image-legacy-meson64"
+[[ -n "$(dpkg -l | grep linux-dtb-edge-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-edge-meson64 && echo "17. Remove linux-dtb-edge-meson64"
+[[ -n "$(dpkg -l | grep linux-dtb-current-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-current-meson64 && echo "18. Remove linux-dtb-current-meson64"
+[[ -n "$(dpkg -l | grep linux-dtb-legacy-meson64)" ]] && sudo apt-get -qq purge -y linux-dtb-legacy-meson64 && echo "19. Remove linux-dtb-legacy-meson64"
+[[ -n "$(dpkg -l | grep linux-u-boot-*)" ]] && sudo apt-get -qq purge -y linux-u-boot-* && echo "20. Remove linux-u-boot-*"
 
 sync && echo "armbian-fix: Loading finished."
