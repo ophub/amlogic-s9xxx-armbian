@@ -28,8 +28,10 @@
 #
 # software_101      : For docker
 # software_102      : For portainer(docker)
-# software_103      : For transmission(docker)
-# software_104      : For qbittorrent(docker)
+# software_103      : For yacht(docker)
+# software_104      : For transmission(docker)
+# software_105      : For qbittorrent(docker)
+# software_106      : For nextcloud(docker)
 #
 # software_201      : For desktop
 # software_202      : For vlc-media-player(desktop)
@@ -37,6 +39,7 @@
 #
 # software_303      : For plex-media-server
 # software_304      : For emby-server
+# software_305      : For openmediavault(OMV-6.x)
 #
 #========================== Set default parameters ==========================
 #
@@ -170,8 +173,81 @@ software_102() {
     esac
 }
 
-# For transmission
+# For yacht
 software_103() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ yacht ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # yacht installation path
+    ya_path="${docker_path}/yacht"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ yacht ]..."
+
+        # Check script permission
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 103 -m install ]"
+
+        [[ -d "${ya_path}" ]] || mkdir -p ${ya_path}
+
+        # Instructions: https://hub.docker.com/r/selfhostedpro/yacht
+        echo -e "${STEPS} Start pulling the docker image: [ selfhostedpro/yacht:latest ]..."
+        docker volume create yacht
+        docker run -d --name yacht \
+            -e PUID=1000 \
+            -e PGID=1000 \
+            -e TZ=Asia/Shanghai \
+            -p 8000:8000 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${ya_path}/yacht:/config \
+            --restart unless-stopped \
+            selfhostedpro/yacht:latest
+
+        sudo ufw allow 8000/tcp 2>/dev/null
+
+        sync && sleep 3
+        echo -e "${NOTE} The yacht address: [ http://ip:8000 ]"
+        echo -e "${NOTE} The yacht account: [ username:admin@yacht.local  /  password:pass ]"
+        echo -e "${NOTE} The yacht website: [ https://yacht.sh ]"
+        echo -e "${NOTE} The yacht template: [ https://raw.githubusercontent.com/SelfhostedPro/selfhosted_templates/yacht/Template/template.json ]"
+        echo -e "${SUCCESS} The yacht installed successfully."
+        exit 0
+        ;;
+    update)
+        # Update yacht docker image
+        echo -e "${STEPS} Start updating the yacht docker image..."
+        docker pull selfhostedpro/yacht:latest
+
+        # Restart yacht
+        echo -e "${STEPS} Restart the yacht docker container..."
+        docker restart $(docker ps -aq --filter name=yacht)
+        ;;
+    remove)
+        # Query the container ID based on the image name and delete it
+        echo -e "${INFO} Start removing yacht container..."
+        docker stop $(docker ps -aq --filter name=yacht)
+        docker rm $(docker ps -aq --filter name=yacht)
+
+        # Query the image ID based on the image name and delete it
+        echo -e "${INFO} Start removing yacht image..."
+        docker image rm $(docker images -q --filter reference=selfhostedpro/yacht*:*)
+
+        # Delete the yacht installation directory
+        [[ -d "${ya_path}" ]] && rm -rf ${ya_path}
+
+        echo -e "${SUCCESS} yacht removed successfully."
+        exit 0
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For transmission
+software_104() {
     echo -e "${STEPS} Start executing the command..."
     echo -e "${INFO} Software Name: [ transmission ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
@@ -189,7 +265,7 @@ software_103() {
         echo -e "${STEPS} Start installing the docker image: [ transmission ]..."
 
         # Check script permission
-        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 103 -m install ]"
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 104 -m install ]"
 
         echo -ne "${OPTIONS} Set login username, the default is [ ${tr_default_user} ]: "
         read tr_user
@@ -227,9 +303,9 @@ software_103() {
         bash <(curl -fsSL ${tr_cn_url}) ${tr_path}
 
         sync && sleep 3
-        echo -e "${NOTE} The transmission address [ http://ip:9091 ]"
-        echo -e "${NOTE} The transmission account [ username:${tr_user}  /  password:${tr_pass} ]"
-        echo -e "${SUCCESS} Transmission installed successfully."
+        echo -e "${NOTE} The transmission address: [ http://ip:9091 ]"
+        echo -e "${NOTE} The transmission account: [ username:${tr_user}  /  password:${tr_pass} ]"
+        echo -e "${SUCCESS} The transmission installed successfully."
         exit 0
         ;;
     update)
@@ -269,7 +345,7 @@ software_103() {
 }
 
 # For qbittorrent
-software_104() {
+software_105() {
     echo -e "${STEPS} Start executing the command..."
     echo -e "${INFO} Software Name: [ qbittorrent ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
@@ -283,7 +359,7 @@ software_104() {
         echo -e "${STEPS} Start installing the docker image: [ qbittorrent ]..."
 
         # Check script permission
-        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 104 -m install ]"
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 105 -m install ]"
 
         [[ -d "${qb_path}" ]] || mkdir -p ${qb_path}
 
@@ -303,9 +379,9 @@ software_104() {
             linuxserver/qbittorrent:arm64v8-latest
 
         sync && sleep 3
-        echo -e "${NOTE} The qbittorrent address [ http://ip:8080 ]"
-        echo -e "${NOTE} The qbittorrent account [ username:admin  /  password:adminadmin ]"
-        echo -e "${SUCCESS} qbittorrent installed successfully."
+        echo -e "${NOTE} The qbittorrent address: [ http://ip:8080 ]"
+        echo -e "${NOTE} The qbittorrent account: [ username:admin  /  password:adminadmin ]"
+        echo -e "${SUCCESS} The qbittorrent installed successfully."
         exit 0
         ;;
     update)
@@ -331,6 +407,75 @@ software_104() {
         [[ -d "${qb_path}" ]] && rm -rf ${qb_path}
 
         echo -e "${SUCCESS} qbittorrent removed successfully."
+        exit 0
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For nextcloud
+software_106() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ nextcloud ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # nextcloud installation path
+    nc_path="${docker_path}/nextcloud"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ nextcloud ]..."
+
+        # Check script permission
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 106 -m install ]"
+
+        [[ -d "${nc_path}" ]] || mkdir -p ${nc_path}
+
+        # Instructions: https://hub.docker.com/r/arm64v8/nextcloud
+        echo -e "${STEPS} Start pulling the docker image: [ arm64v8/nextcloud:latest ]..."
+        docker run -d --name=nextcloud \
+            -e PUID=1000 \
+            -e PGID=1000 \
+            -e TZ=Asia/Shanghai \
+            -p 8088:80 \
+            -v ${nc_path}/nextcloud:/var/www/html \
+            -v ${nc_path}/apps:/var/www/html/custom_apps \
+            -v ${nc_path}/config:/var/www/html/config \
+            -v ${nc_path}/data:/var/www/html/data \
+            --restart unless-stopped \
+            arm64v8/nextcloud:latest
+
+        sync && sleep 3
+        echo -e "${NOTE} The nextcloud address [ http://ip:8088 ]"
+        echo -e "${SUCCESS} nextcloud installed successfully."
+        exit 0
+        ;;
+    update)
+        # Update nextcloud docker image
+        echo -e "${STEPS} Start updating the nextcloud docker image..."
+        docker pull arm64v8/nextcloud:latest
+
+        # Restart nextcloud
+        echo -e "${STEPS} Restart the nextcloud docker container..."
+        docker restart $(docker ps -aq --filter name=nextcloud)
+        ;;
+    remove)
+        # Query the container ID based on the image name and delete it
+        echo -e "${INFO} Start removing nextcloud container..."
+        docker stop $(docker ps -aq --filter name=nextcloud)
+        docker rm $(docker ps -aq --filter name=nextcloud)
+
+        # Query the image ID based on the image name and delete it
+        echo -e "${INFO} Start removing nextcloud image..."
+        docker image rm $(docker images -q --filter reference=arm64v8/nextcloud*:*)
+
+        # Delete the nextcloud installation directory
+        [[ -d "${nc_path}" ]] && rm -rf ${nc_path}
+
+        echo -e "${SUCCESS} nextcloud removed successfully."
         exit 0
         ;;
     *)
@@ -483,10 +628,10 @@ software_303() {
         echo -e "${STEPS} Confirm the service is enabled..."
         systemctl is-enabled plexmediaserver.service
 
-        # Configure Plex Media Server: http://<plex-media-server-ip>:32400/web
+        # Configure Plex Media Server: http://ip:32400/web
         sync && sleep 3
-        echo -e "${NOTE} Plex Media Server address [ http://ip:32400/web ]"
-        echo -e "${SUCCESS} Plex Media Server installation is successful."
+        echo -e "${NOTE} The Plex Media Server address: [ http://ip:32400/web ]"
+        echo -e "${SUCCESS} The Plex Media Server installation is successful."
         ;;
     remove)
         software_remove "plexmediaserver"
@@ -540,13 +685,64 @@ software_304() {
         echo -e "${STEPS} Confirm the service is enabled..."
         systemctl is-enabled emby-server.service
 
-        # Configure Emby Server: http://<plex-media-server-ip>:8096
+        # Configure Emby Server: http://ip:8096
         sync && sleep 3
-        echo -e "${NOTE} Emby Server address [ http://ip:8096 ]"
-        echo -e "${SUCCESS} Emby Server installation is successful."
+        echo -e "${NOTE} The Emby Server address: [ http://ip:8096 ]"
+        echo -e "${SUCCESS} The Emby Server installation is successful."
         ;;
     remove)
         software_remove "emby-server"
+        ;;
+    update)
+        software_update
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For openmediavault(OMV-6.x)
+software_305() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ OpenMediaVault ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start checking the installation environment..."
+        # Check script permission
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 104 -m install ]"
+        # Check systemd running status
+        systemd="$(ps --no-headers -o comm 1)"
+        [[ "${systemd}" == "systemd" ]] || error_msg "This system is not running systemd."
+        # Check the system operating environment
+        [[ -z "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm')" ]] || error_msg "OpenMediaVault does not support running in desktop environment!"
+
+        # Download software, E.g: /tmp/tmp.xxx/install
+        tmp_download="$(mktemp -d)"
+        software_url="https://github.com/OpenMediaVault-Plugin-Developers/installScript/raw/master/install"
+        software_filename="${software_url##*/}"
+        echo -e "${STEPS} Start downloading the OpenMediaVault installation script..."
+        wget -q -P ${tmp_download} ${software_url}
+        [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
+        chmod +x ${tmp_download}/${software_filename}
+        echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
+
+        # Install OpenMediaVault and omv-extras extension: https://github.com/OpenMediaVault-Plugin-Developers/installScript
+        echo -e "${STEPS} Start installing OpenMediaVault and omv-extras extension..."
+        sudo ${tmp_download}/${software_filename} -n
+
+        # Configure OpenMediaVault: http://ip
+        sync && sleep 3
+        echo -e "${NOTE} The OpenMediaVault address: [ http://ip ]"
+        echo -e "${NOTE} The OpenMediaVault account: [ username:admin  /  password:openmediavault ]"
+        echo -e "${NOTE} How to use OpenMediaVault: [ https://forum.openmediavault.org/ ]"
+        echo -e "${SUCCESS} The OpenMediaVault installation is successful."
+        ;;
+    remove)
+        software_remove "openmediavault"
         ;;
     update)
         software_update
