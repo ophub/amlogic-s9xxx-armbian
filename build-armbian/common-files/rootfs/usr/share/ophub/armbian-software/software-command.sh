@@ -8,7 +8,7 @@
 # This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Execute software install/update/remove command
+# Function: Execute software install/update/uninstall command
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -27,11 +27,12 @@
 # init_var          : Initialize variables
 #
 # software_101      : For docker
-# software_102      : For portainer(docker)
-# software_103      : For yacht(docker)
-# software_104      : For transmission(docker)
-# software_105      : For qbittorrent(docker)
-# software_106      : For nextcloud(docker)
+# software_102      : For portainer:9000(docker)
+# software_103      : For yacht:8000(docker)
+# software_104      : For transmission:9091/51413(docker)
+# software_105      : For qbittorrent:8080/6881(docker)
+# software_106      : For nextcloud:8088(docker)
+# software_107      : For jellyfin:8096/8920/7359/1900(docker)
 #
 # software_201      : For desktop
 # software_202      : For vlc-media-player(desktop)
@@ -190,6 +191,7 @@ software_103() {
         # Check script permission
         [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 103 -m install ]"
 
+        # Create installation directory
         [[ -d "${ya_path}" ]] || mkdir -p ${ya_path}
 
         # Instructions: https://hub.docker.com/r/selfhostedpro/yacht
@@ -277,6 +279,7 @@ software_104() {
         [[ -z "${tr_pass}" ]] && tr_pass="${tr_default_pass}"
         echo -e "${INFO} Login password: [ ${tr_pass} ]"
 
+        # Create installation directory
         [[ -d "${tr_path}" ]] || mkdir -p ${tr_path}
 
         # Instructions: https://github.com/linuxserver/docker-transmission
@@ -361,6 +364,7 @@ software_105() {
         # Check script permission
         [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 105 -m install ]"
 
+        # Create installation directory
         [[ -d "${qb_path}" ]] || mkdir -p ${qb_path}
 
         # Instructions: https://hub.docker.com/r/linuxserver/qbittorrent
@@ -432,6 +436,7 @@ software_106() {
         # Check script permission
         [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 106 -m install ]"
 
+        # Create installation directory
         [[ -d "${nc_path}" ]] || mkdir -p ${nc_path}
 
         # Instructions: https://hub.docker.com/r/arm64v8/nextcloud
@@ -476,6 +481,78 @@ software_106() {
         [[ -d "${nc_path}" ]] && rm -rf ${nc_path}
 
         echo -e "${SUCCESS} nextcloud removed successfully."
+        exit 0
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For jellyfin
+software_107() {
+    echo -e "${STEPS} Start executing the command..."
+    echo -e "${INFO} Software Name: [ jellyfin ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # jellyfin installation path
+    jf_path="${docker_path}/jellyfin"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ jellyfin ]..."
+
+        # Check script permission
+        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 106 -m install ]"
+
+        # Create installation directory
+        [[ -d "${jf_path}" ]] || mkdir -p ${jf_path}
+
+        # Instructions: https://hub.docker.com/r/linuxserver/jellyfin
+        echo -e "${STEPS} Start pulling the docker image: [ linuxserver/jellyfin:arm64v8-latest ]..."
+        docker run -d --name=jellyfin \
+            -e PUID=1000 \
+            -e PGID=1000 \
+            -e TZ=Asia/Shanghai \
+            -p 8096:8096 \
+            -p 8920:8920 \
+            -p 7359:7359/udp \
+            -p 1900:1900/udp \
+            -v ${jf_path}/library:/config \
+            -v ${jf_path}/tvseries:/data/tvshows \
+            -v ${jf_path}/movies:/data/movies \
+            --restart unless-stopped \
+            linuxserver/jellyfin:arm64v8-latest
+
+        sync && sleep 3
+        echo -e "${NOTE} The jellyfin address [ http://ip:8096 / https://ip:8920 ]"
+        echo -e "${SUCCESS} jellyfin installed successfully."
+        exit 0
+        ;;
+    update)
+        # Update jellyfin docker image
+        echo -e "${STEPS} Start updating the jellyfin docker image..."
+        docker pull linuxserver/jellyfin:arm64v8-latest
+
+        # Restart jellyfin
+        echo -e "${STEPS} Restart the jellyfin docker container..."
+        docker restart $(docker ps -aq --filter name=jellyfin)
+        ;;
+    remove)
+        # Query the container ID based on the image name and delete it
+        echo -e "${INFO} Start removing jellyfin container..."
+        docker stop $(docker ps -aq --filter name=jellyfin)
+        docker rm $(docker ps -aq --filter name=jellyfin)
+
+        # Query the image ID based on the image name and delete it
+        echo -e "${INFO} Start removing jellyfin image..."
+        docker image rm $(docker images -q --filter reference=linuxserver/jellyfin*:*)
+
+        # Delete the jellyfin installation directory
+        [[ -d "${jf_path}" ]] && rm -rf ${jf_path}
+
+        echo -e "${SUCCESS} jellyfin removed successfully."
         exit 0
         ;;
     *)
