@@ -14,20 +14,25 @@ A list of currently integrated software quick installation/management will be di
 
 ```yaml
 root@armbian:~# armbian-software
-[ STEPS ] Start selecting software [ Current system: bullseye ]...
+[ STEPS ] Start selecting software [ Current system: debian:bullseye ]...
 -----------------------------------------------------------------------------------
 ID    NAME                                          STATE           MANAGE
 -----------------------------------------------------------------------------------
-101   docker                                        installed       update/remove
-102   portainer(for-docker)                         installed       update/remove
-103   transmission(for-docker)                      installed       update/remove
-104   qbittorrent(for-docker)                       installed       update/remove
-201   desktop                                       not-installed   install
-202   vlc-media-player(for-desktop)                 not-installed   install
-203   firefox(for-desktop)                          not-installed   install
-301   frps                                          not-installed   install
-302   frpc                                          not-installed   install
-303   plex-media-server                             installed       update/remove
+101   Docker                                        installed       update/remove
+102   Portainer                                     installed       update/remove
+103   Yacht                                         installed       update/remove
+104   Transmission                                  not-installed   install
+105   qBittorrent                                   not-installed   install
+106   NextCloud                                     not-installed   install
+107   Jellyfin                                      installed       update/remove
+201   Desktop                                       installed       update/remove
+202   VLC-Media-Player                              installed       update/remove
+203   Firefox                                       installed       update/remove
+301   Frps                                          not-installed   install
+302   Frpc                                          not-installed   install
+303   Plex-Media-Server                             not-installed   install
+304   Emby-Server                                   not-installed   install
+305   OpenMediaVault(OMV-6)                         not-installed   install
 -----------------------------------------------------------------------------------
 [ OPTIONS ] Please Input Software ID:
 ```
@@ -78,20 +83,25 @@ armbian-software
 
 ```yaml
 root@armbian:~# armbian-software
-[ STEPS ] Start selecting software [ Current system: bullseye ]...
+[ STEPS ] Start selecting software [ Current system: debian:bullseye ]...
 -----------------------------------------------------------------------------------
 ID    NAME                                          STATE           MANAGE
 -----------------------------------------------------------------------------------
-101   docker                                        installed       update/remove
-102   portainer(for-docker)                         installed       update/remove
-103   transmission(for-docker)                      installed       update/remove
-104   qbittorrent(for-docker)                       installed       update/remove
-201   desktop                                       not-installed   install
-202   vlc-media-player(for-desktop)                 not-installed   install
-203   firefox(for-desktop)                          not-installed   install
-301   frps                                          not-installed   install
-302   frpc                                          not-installed   install
-303   plex-media-server                             installed       update/remove
+101   Docker                                        installed       update/remove
+102   Portainer                                     installed       update/remove
+103   Yacht                                         installed       update/remove
+104   Transmission                                  not-installed   install
+105   qBittorrent                                   not-installed   install
+106   NextCloud                                     not-installed   install
+107   Jellyfin                                      installed       update/remove
+201   Desktop                                       installed       update/remove
+202   VLC-Media-Player                              installed       update/remove
+203   Firefox                                       installed       update/remove
+301   Frps                                          not-installed   install
+302   Frpc                                          not-installed   install
+303   Plex-Media-Server                             not-installed   install
+304   Emby-Server                                   not-installed   install
+305   OpenMediaVault(OMV-6)                         not-installed   install
 -----------------------------------------------------------------------------------
 [ OPTIONS ] Please Input Software ID:
 ```
