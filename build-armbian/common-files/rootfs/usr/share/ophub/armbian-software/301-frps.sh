@@ -8,7 +8,7 @@
 # This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Execute software install/update/remove script
+# Function: Execute software install/update/uninstall script
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
