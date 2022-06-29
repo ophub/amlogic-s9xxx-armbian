@@ -25,6 +25,8 @@ ID    NAME                                          STATE           MANAGE
 105   qBittorrent                                   not-installed   install
 106   NextCloud                                     not-installed   install
 107   Jellyfin                                      installed       update/remove
+108   HomeAssistant                                 installed       update/remove
+109   Kodbox                                        installed       update/remove
 201   Desktop                                       installed       update/remove
 202   VLC-Media-Player                              installed       update/remove
 203   Firefox                                       installed       update/remove
@@ -94,6 +96,8 @@ ID    NAME                                          STATE           MANAGE
 105   qBittorrent                                   not-installed   install
 106   NextCloud                                     not-installed   install
 107   Jellyfin                                      installed       update/remove
+108   HomeAssistant                                 installed       update/remove
+109   Kodbox                                        installed       update/remove
 201   Desktop                                       installed       update/remove
 202   VLC-Media-Player                              installed       update/remove
 203   Firefox                                       installed       update/remove
