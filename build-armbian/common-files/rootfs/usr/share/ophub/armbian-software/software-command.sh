@@ -26,7 +26,8 @@
 # software_remove           : Remove package
 # docker_container_remove   : Delete the docker container
 # docker_image_remove       : Delete the docker image
-# init_var                  : Initialize variables
+# docker_update             : Update docker
+# docker_remove             : Remove docker
 #
 # software_101              : For docker
 # software_102              : For portainer:9000(docker)
@@ -36,6 +37,7 @@
 # software_106              : For nextcloud:8088(docker)
 # software_107              : For jellyfin:8096/8920/7359/1900(docker)
 # software_108              : For homeassistant:8123(docker)
+# software_109              : For kodbox:8081(docker)
 #
 # software_201              : For desktop
 # software_202              : For vlc-media-player(desktop)
@@ -45,14 +47,19 @@
 # software_304              : For emby-server
 # software_305              : For openmediavault(OMV-6.x)
 #
+# init_var                  : Initialize variables
+#
 #========================== Set default parameters ==========================
 #
 # Get custom firmware information
+software_path="/usr/share/ophub/armbian-software"
+software_command="${software_path}/software-command.sh"
 ophub_release_file="/etc/ophub-release"
 docker_path="/opt/docker"
 download_path="/opt/downloads"
-software_path="/usr/share/ophub/armbian-software"
-software_command="${software_path}/software-command.sh"
+docker_puid="1000"
+docker_pgid="1000"
+docker_tz="Asia/Shanghai"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -248,9 +255,9 @@ software_103() {
         # Instructions: https://hub.docker.com/r/selfhostedpro/yacht
         docker volume create ${container_name}
         docker run -d --name ${container_name} \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -p 8000:8000 \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v ${install_path}/config:/config \
@@ -310,9 +317,9 @@ software_104() {
 
         # Instructions: https://github.com/linuxserver/docker-transmission
         docker run -d --name=${container_name} \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -e TRANSMISSION_WEB_HOME=/transmission-web-control/ \
             -e USER=${tr_user} \
             -e PASS=${tr_pass} \
@@ -363,9 +370,9 @@ software_105() {
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/qbittorrent
         docker run -d --name=${container_name} \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -e WEBUI_PORT=8080 \
             -p 8080:8080 \
             -p 6881:6881 \
@@ -408,9 +415,9 @@ software_106() {
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/arm64v8/nextcloud
         docker run -d --name=${container_name} \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -p 8088:80 \
             -v ${install_path}/nextcloud:/var/www/html \
             -v ${install_path}/apps:/var/www/html/custom_apps \
@@ -451,9 +458,9 @@ software_107() {
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/jellyfin
         docker run -d --name=${container_name} \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -p 8096:8096 \
             -p 8920:8920 \
             -p 7359:7359/udp \
@@ -497,16 +504,58 @@ software_108() {
         # Instructions: https://hub.docker.com/r/linuxserver/homeassistant
         docker run -d --name=${container_name} \
             --net=host \
-            -e PUID=1000 \
-            -e PGID=1000 \
-            -e TZ=Asia/Shanghai \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
             -p 8123:8123 \
             -v ${install_path}/data:/config \
             --restart unless-stopped \
             ${image_name}
 
         sync && sleep 3
+        echo -e "${NOTE} The ${container_name} app [ Home Assistant ]"
         echo -e "${NOTE} The ${container_name} address [ http://ip:8123 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update "${image_name}" "${container_name}"
+        ;;
+    remove)
+        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For kodbox
+software_109() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="kodbox"
+    image_name="kodcloud/kodbox:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/kodcloud/kodbox
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 8081:80 \
+            -v ${install_path}/data:/var/www/html \
+            -v ${install_path}/ssl:/etc/nginx/ssl \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8081 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
