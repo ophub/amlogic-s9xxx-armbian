@@ -47,11 +47,11 @@
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
-# software_203              : For vlc-media-player(desktop)
-# software_204              : For mpv-media-player(desktop)
+# software_203              : For vlc(desktop)
+# software_204              : For mpv(desktop)
 # software_205              : For gimp(desktop)
 #
-# software_303              : For plex-media-server
+# software_303              : For plex
 # software_304              : For emby-server
 # software_305              : For openmediavault(OMV-6.x)
 #
@@ -916,9 +916,9 @@ software_202() {
     esac
 }
 
-# For vlc-media-player
+# For vlc
 software_203() {
-    echo -e "${INFO} Software Name: [ vlc-media-player ]"
+    echo -e "${INFO} Software Name: [ vlc ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
@@ -938,9 +938,9 @@ software_203() {
     esac
 }
 
-# For mpv-media-player
+# For mpv
 software_204() {
-    echo -e "${INFO} Software Name: [ mpv-media-player ]"
+    echo -e "${INFO} Software Name: [ mpv ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
@@ -983,9 +983,9 @@ software_205() {
     esac
 }
 
-# For plex-media-server
+# For plex
 software_303() {
-    echo -e "${INFO} Software Name: [ plex-media-server ]"
+    echo -e "${INFO} Software Name: [ plex ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
