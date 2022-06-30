@@ -30,14 +30,15 @@
 # docker_remove             : Remove docker
 #
 # software_101              : For docker
-# software_102              : For portainer:9000(docker)
-# software_103              : For yacht:8000(docker)
+# software_102              : For portainer:8000/9443(docker)
+# software_103              : For yacht:8001(docker)
 # software_104              : For transmission:9091/51413(docker)
 # software_105              : For qbittorrent:8080/6881(docker)
 # software_106              : For nextcloud:8088(docker)
 # software_107              : For jellyfin:8096/8920/7359/1900(docker)
 # software_108              : For homeassistant:8123(docker)
 # software_109              : For kodbox:8081(docker)
+# software_110              : For sonarr:8989(docker)
 #
 # software_201              : For desktop
 # software_202              : For vlc-media-player(desktop)
@@ -57,6 +58,9 @@ software_command="${software_path}/software-command.sh"
 ophub_release_file="/etc/ophub-release"
 docker_path="/opt/docker"
 download_path="/opt/downloads"
+movie_path="/opt/movie"
+music_path="/opt/music"
+tv_path="/opt/tv"
 docker_puid="1000"
 docker_pgid="1000"
 docker_tz="Asia/Shanghai"
@@ -133,7 +137,7 @@ docker_container_remove() {
     [[ -n "${container_name}" ]] || error_msg "Docker container name is empty!"
 
     # Query the container ID based on the image name and delete it
-    echo -e "${STEPS} Start removing ${container_name} container..."
+    echo -e "${STEPS} Start removing container: [ ${container_name} ]..."
     docker stop $(docker ps -aq --filter name=${container_name})
     docker rm $(docker ps -aq --filter name=${container_name})
     echo -e "${SUCCESS} ${container_name} removed successfully."
@@ -145,18 +149,16 @@ docker_image_remove() {
     [[ -n "${image_name}" ]] || error_msg "Docker image name is empty!"
 
     # Query the image ID based on the image name and delete it
-    echo -e "${STEPS} Start removing ${image_name} image..."
+    echo -e "${STEPS} Start removing image: [ ${image_name} ]..."
     docker image rm $(docker images -q --filter reference=${image_name})
     echo -e "${SUCCESS} ${image_name} removed successfully."
 }
 
 # Update docker
 docker_update() {
-    local image_name="${1}"
-    local container_name="${2}"
     [[ -n "${image_name}" && -n "${container_name}" ]] || error_msg "Docker image or container name is empty!"
 
-    echo -e "${STEPS} Start updating the docker image..."
+    echo -e "${STEPS} Start updating the docker: [ ${container_name} ]..."
     # Update docker image
     docker pull "${image_name}"
     # Delete old container
@@ -167,12 +169,9 @@ docker_update() {
 
 # Remove docker
 docker_remove() {
-    local image_name="${1}"
-    local container_name="${2}"
-    local install_path="${3}"
     [[ -n "${image_name}" && -n "${container_name}" && -n "${install_path}" ]] || error_msg "Docker image, container or path is empty!"
 
-    echo -e "${STEPS} Start removing docker ${container_name}..."
+    echo -e "${STEPS} Start removing docker: [ ${container_name} ]..."
     # Delete old container
     docker_container_remove "${container_name}"
     # Delete old image
@@ -206,32 +205,37 @@ software_101() {
 
 # For portainer
 software_102() {
-    echo -e "${INFO} Software Name: [ portainer ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
+    # Set basic information
+    container_name="portainer"
+    image_name="portainer/portainer-ce:latest"
+    install_path="${docker_path}/${container_name}"
+
     case "${software_manage}" in
     install)
-        echo -ne "${OPTIONS} Select Install Portainer-ce?  No=(n) / LAN ip access=(h) / Domain cert access=(s): "
-        read pt
-        case "${pt}" in
-        h | H | http)
-            soft_opt="portainer_lan"
-            ;;
-        s | S | https)
-            soft_opt="portainer_domain"
-            ;;
-        *)
-            echo -e "${INFO} Finish the installation." && exit 0
-            ;;
-        esac
-        armbian-docker ${soft_opt}
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/portainer/portainer-ce
+        docker volume create ${container_name}_data
+        docker run -d --name ${container_name} \
+            -p 8000:8000 \
+            -p 9443:9443 \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v ${install_path}/portainer_data:/data \
+            --restart always \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address: [ https://ip:9443 ]"
+        echo -e "${SUCCESS} The ${container_name} installed successfully."
+        exit 0
         ;;
     update)
-        armbian-docker update
+        docker_update
         ;;
     remove)
-        armbian-docker portainer_remove
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -258,16 +262,16 @@ software_103() {
             -e PUID=${docker_puid} \
             -e PGID=${docker_pgid} \
             -e TZ=${docker_tz} \
-            -p 8000:8000 \
+            -p 8001:8000 \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v ${install_path}/config:/config \
             --restart unless-stopped \
             ${image_name}
 
-        sudo ufw allow 8000/tcp 2>/dev/null
+        sudo ufw allow 8001/tcp 2>/dev/null
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ http://ip:8000 ]"
+        echo -e "${NOTE} The ${container_name} address: [ http://ip:8001 ]"
         echo -e "${NOTE} The ${container_name} account: [ username:admin@yacht.local  /  password:pass ]"
         echo -e "${NOTE} The ${container_name} website: [ https://yacht.sh ]"
         echo -e "${NOTE} The ${container_name} template: [ https://raw.githubusercontent.com/SelfhostedPro/selfhosted_templates/yacht/Template/template.json ]"
@@ -275,10 +279,10 @@ software_103() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -344,10 +348,10 @@ software_104() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -389,10 +393,10 @@ software_105() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -432,10 +436,10 @@ software_106() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -477,10 +481,10 @@ software_107() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -519,10 +523,10 @@ software_108() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -560,10 +564,52 @@ software_109() {
         exit 0
         ;;
     update)
-        docker_update "${image_name}" "${container_name}"
+        docker_update
         ;;
     remove)
-        docker_remove "${image_name}" "${container_name}" "${install_path}"
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For sonarr
+software_110() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="sonarr"
+    image_name="linuxserver/sonarr:arm64v8-latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/linuxserver/sonarr
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 8989:8989 \
+            -v ${install_path}/data:/config \
+            -v ${tv_path}:/tv \
+            -v ${download_path}:/downloads \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8989 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
