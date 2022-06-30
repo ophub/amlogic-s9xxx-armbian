@@ -41,8 +41,10 @@
 # software_110              : For sonarr:8989(docker)
 #
 # software_201              : For desktop
-# software_202              : For vlc-media-player(desktop)
-# software_203              : For firefox(desktop)
+# software_202              : For firefox(desktop)
+# software_203              : For vlc-media-player(desktop)
+# software_204              : For mpv-media-player(desktop)
+# software_205              : For gimp(desktop)
 #
 # software_303              : For plex-media-server
 # software_304              : For emby-server
@@ -671,8 +673,32 @@ software_201() {
     esac
 }
 
-# For vlc-media-player
+# For firefox
 software_202() {
+    echo -e "${INFO} Software Name: [ firefox ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_install "firefox"
+        [[ "${VERSION_CODEID}" == "debian" ]] && software_install "firefox-esr"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_remove "firefox"
+        [[ "${VERSION_CODEID}" == "debian" ]] && software_remove "firefox-esr"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For vlc-media-player
+software_203() {
     echo -e "${INFO} Software Name: [ vlc-media-player ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
@@ -693,23 +719,44 @@ software_202() {
     esac
 }
 
-# For firefox
-software_203() {
-    echo -e "${INFO} Software Name: [ firefox ]"
+# For mpv-media-player
+software_204() {
+    echo -e "${INFO} Software Name: [ mpv-media-player ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
     case "${software_manage}" in
     install)
-        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_install "firefox"
-        [[ "${VERSION_CODEID}" == "debian" ]] && software_install "firefox-esr"
+        software_install "mpv"
         ;;
     update)
         software_update
         ;;
     remove)
-        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_remove "firefox"
-        [[ "${VERSION_CODEID}" == "debian" ]] && software_remove "firefox-esr"
+        software_remove "mpv"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For gimp
+software_205() {
+    echo -e "${INFO} Software Name: [ gimp ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        sudo add-apt-repository ppa:otto-kesselgulasch/gimp
+        software_install "gimp"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        software_remove "gimp"
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
