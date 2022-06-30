@@ -12,7 +12,10 @@
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: armbian-docker
+# Function         : Command
+# Install docker   : armbain-docker
+# Update  docker   : armbain-docker update
+# Remove  docker   : armbain-docker remove
 #
 #========================= Set default parameters ==========================
 #
@@ -137,30 +140,13 @@ docker_remove() {
     exit 0
 }
 
-# Help info
-docker_help() {
-    echo -e "${STEPS} Docker script usage instructions."
-
-    cat <<EOF
-============================================================================
- Function                          : [ Command ]
-----------------------------------------------------------------------------
- Install docker                    : [ armbain-docker install ]
- Update  docker                    : [ armbain-docker update  ]
- Remove  docker                    : [ armbain-docker remove  ]
-============================================================================
-EOF
-    exit 0
-}
-
-echo -e "${INFO} Welcome to docker installation tool."
+echo -e "${INFO} Welcome to the docker management tool."
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
 
 # Execute script assist functions
 case "${1}" in
-    install)          docker_install ;;
-    update)           docker_update ;;
-    remove)           docker_remove ;;
-    *)                docker_help ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *)      docker_install ;;
 esac
