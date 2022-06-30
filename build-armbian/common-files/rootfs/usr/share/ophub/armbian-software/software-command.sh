@@ -38,7 +38,12 @@
 # software_107              : For jellyfin:8096/8920/7359/1900(docker)
 # software_108              : For homeassistant:8123(docker)
 # software_109              : For kodbox:8081(docker)
-# software_110              : For sonarr:8989(docker)
+# software_110              : For couchpotato:5050(docker)
+# software_111              : For sonarr:8989(docker)
+# software_112              : For radarr:7878(docker)
+# software_113              : For syncthing:8384(docker)
+# software_114              : For filebrowser:8002(docker)
+# software_115              : For heimdall:8003/8004(docker)
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
@@ -60,7 +65,7 @@ software_command="${software_path}/software-command.sh"
 ophub_release_file="/etc/ophub-release"
 docker_path="/opt/docker"
 download_path="/opt/downloads"
-movie_path="/opt/movie"
+movie_path="/opt/movies"
 music_path="/opt/music"
 tv_path="/opt/tv"
 docker_puid="1000"
@@ -478,7 +483,7 @@ software_107() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8096 / https://ip:8920 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8096  /  https://ip:8920 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -577,8 +582,50 @@ software_109() {
     esac
 }
 
-# For sonarr
+# For couchpotato
 software_110() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="couchpotato"
+    image_name="linuxserver/couchpotato:arm64v8-latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/linuxserver/couchpotato
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 5050:5050 \
+            -v ${install_path}/appdata/config:/config \
+            -v ${download_path}:/downloads \
+            -v ${movie_path}:/movies \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:5050 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For sonarr
+software_111() {
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
@@ -604,6 +651,178 @@ software_110() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://ip:8989 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For radarr
+software_112() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="radarr"
+    image_name="linuxserver/radarr:arm64v8-latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/linuxserver/radarr
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 7878:7878 \
+            -v ${install_path}/data:/config \
+            -v ${movie_path}:/movies \
+            -v ${download_path}:/downloads \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:7878 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For syncthing
+software_113() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="syncthing"
+    image_name="linuxserver/syncthing:arm64v8-latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/linuxserver/syncthing
+        docker run -d --name=${container_name} \
+            --hostname=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 8384:8384 \
+            -p 22000:22000/tcp \
+            -p 22000:22000/udp \
+            -p 21027:21027/udp \
+            -v ${install_path}/appdata/config:/config \
+            -v ${install_path}/data1:/data1 \
+            -v ${install_path}/data2:/data2 \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8384 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For filebrowser
+software_114() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="filebrowser"
+    image_name="filebrowser/filebrowser:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/filebrowser/filebrowser
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 8002:80 \
+            -v ${install_path}/root:/srv \
+            -v ${install_path}/filebrowser.db:/database/filebrowser.db \
+            -v ${install_path}/settings.json:/config/settings.json \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8002 ]"
+        echo -e "${NOTE} The ${container_name} account: [ username:admin  /  password:admin ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update)
+        docker_update
+        ;;
+    remove)
+        docker_remove
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For heimdall
+software_115() {
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    # Set basic information
+    container_name="heimdall"
+    image_name="linuxserver/heimdall:arm64v8-latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/linuxserver/heimdall
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 8003:80 \
+            -p 8004:443 \
+            -v ${install_path}/config:/config \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:8003  /  https://ip:8004 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
