@@ -4,38 +4,38 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 
 ## Software introduction
 
-| ID | SoftwareName           | Website/Docker        | Port | Software introduction                             |
+| ID | SoftwareName           | Home | DockerHub:Port | Software introduction                             |
 | --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
-| 101 | Docker                | [Web](https://www.docker.com/) / [Docker](https://docs.docker.com/engine/install/) | -    | Docker is an open platform for developing, shipping, and running applications. |
-| 102 | Portainer             | [Web](https://www.portainer.io/) / [Docker](https://hub.docker.com/r/portainer/portainer-ce) | 9443 | The most popular container management platform in the world. |
-| 103 | Yacht                 | [Web](https://yacht.sh/) / [Docker](https://hub.docker.com/r/selfhostedpro/yacht) | 8001 | A container management UI with a focus on templates and 1-click deployments. |
-| 104 | Transmission          | [Web](https://transmissionbt.com/) / [Docker](https://github.com/linuxserver/docker-transmission) | 9091 | Transmission is a cross-platform BitTorrent client. |
-| 105 | qBittorrent           | [Web](https://www.qbittorrent.org/) / [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) | 8080 | qBittorrent is a BitTorrent client. |
-| 106 | NextCloud             | [Web](https://nextcloud.com/) / [Docker](https://hub.docker.com/r/arm64v8/nextcloud) | 8088 | Nextcloud offers an on-premise Universal File Access and sync platform with powerful collaboration capabilities and desktop, mobile and web interfaces. |
-| 107 | Jellyfin              | [Web](https://jellyfin.org/) / [Docker](https://hub.docker.com/r/linuxserver/jellyfin) | 8096 | Jellyfin is a Free Software Media System that puts you in control of managing and streaming your media. |
-| 108 | HomeAssistant         | [Web](https://www.home-assistant.io/) / [Docker](https://hub.docker.com/r/linuxserver/homeassistant) | 8123 | Home Assistant integrates with over a thousand different devices and services, Has powerful automation features. |
-| 109 | Kodbox                | [Web](https://kodcloud.com/) / [Docker](https://hub.docker.com/r/kodcloud/kodbox) | 8081 | Private cloud online document management solution. |
-| 110 | CouchPotato           | [Web](https://couchpota.to/) / [Docker](https://hub.docker.com/r/linuxserver/couchpotato) | 5050 | Couchpotato is an automatic NZB and torrent downloader, Automatically find movies you want to watch. |
-| 111 | Sonarr                | [Web](https://sonarr.tv/) / [Docker](https://hub.docker.com/r/linuxserver/sonarr) | 8989 | Sonarr is a PVR for Usenet and BitTorrent users. |
-| 112 | Radarr                | [Web](https://radarr.video/) / [Docker](https://hub.docker.com/r/linuxserver/radarr) | 7878 | Radarr is a movie collection manager for Usenet and BitTorrent users. |
-| 113 | Syncthing             | [Web](https://syncthing.net/) / [Docker](https://hub.docker.com/r/linuxserver/syncthing) | 8384 | Syncthing is a continuous file synchronization program. |
-| 114 | FileBrowser           | [Web](https://filebrowser.org/) / [Docker](https://hub.docker.com/r/filebrowser/filebrowser) | 8002 | File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. |
-| 115 | Heimdall              | [Web](https://heimdall.site/) / [Docker](https://hub.docker.com/r/linuxserver/heimdall) | 8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
-| 201 | Desktop               | [Web](https://www.armbian.com/) | -    | Install the desktop visual operation interface. |
-| 202 | Firefox               | [Web](https://www.mozilla.org/) | -    | An excellent web browser. |
-| 203 | Chromium              | [Web](https://www.chromium.org/) | -    | CChromium is an open-source browser project that aims to build a safer, faster, and more stable way for all users to experience the web. |
-| 204 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
-| 205 | MPV                   | [Web](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
-| 206 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
-| 207 | Krita                 | [Web](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
-| 208 | LibreOffice           | [Web](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
-| 209 | Shotcut               | [Web](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
-| 210 | Kdenlive              | [Web](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor |
-| 301 | Frps                  | [Web](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
-| 302 | Frpc                  | [Web](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
-| 303 | Plex                  | [Web](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
-| 304 | Emby-Server           | [Web](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
-| 305 | OpenMediaVault | [Web](https://www.openmediavault.org/) | -    | openmediavault is the next generation network attached storage (NAS) solution based on Debian. |
+| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker is an open platform for developing, shipping, and running applications. |
+| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | The most popular container management platform in the world. |
+| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | A container management UI with a focus on templates and 1-click deployments. |
+| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission is a cross-platform BitTorrent client. |
+| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent is a BitTorrent client. |
+| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud offers an on-premise Universal File Access and sync platform with powerful collaboration capabilities and desktop, mobile and web interfaces. |
+| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin is a Free Software Media System that puts you in control of managing and streaming your media. |
+| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant integrates with over a thousand different devices and services, Has powerful automation features. |
+| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | Private cloud online document management solution. |
+| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato is an automatic NZB and torrent downloader, Automatically find movies you want to watch. |
+| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr is a PVR for Usenet and BitTorrent users. |
+| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr is a movie collection manager for Usenet and BitTorrent users. |
+| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing is a continuous file synchronization program. |
+| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. |
+| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
+| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
+| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
+| 203 | Chromium              | [Home](https://www.chromium.org/) | -    | CChromium is an open-source browser project that aims to build a safer, faster, and more stable way for all users to experience the web. |
+| 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
+| 205 | MPV                   | [Home](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
+| 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
+| 207 | Krita                 | [Home](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
+| 208 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
+| 209 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
+| 210 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor |
+| 301 | Frps                  | [Home](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
+| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
+| 303 | Plex                  | [Home](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
+| 304 | Emby-Server           | [Home](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
+| 305 | OpenMediaVault | [Home](https://www.openmediavault.org/) | -    | openmediavault is the next generation network attached storage (NAS) solution based on Debian. |
 
 ## Software Center Instructions
 
@@ -71,7 +71,7 @@ Software Center scripts/commands are centrally stored in the [/usr/share/ophub/a
 ```yaml
 # 1.ID     2.SoftwareName     3.AuthMethod@Package      4.Command/Shell     5.SupportedRelease
 102        :portainer         :docker@portainer         :command            :jammy@focal@bullseye
-203        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
+202        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
 302        :frpc              :which@frpc               :302-frpc.sh        :jammy@focal@bullseye
 ...
 ```
@@ -97,38 +97,38 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 
 ## 软件介绍
 
-| ID | 软件名称               | Website/Docker        | 端口 | 软件介绍                                            |
+| ID | 软件名称               | Home | DockerHub:Port | 软件介绍                                            |
 | --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
-| 101 | Docker                | [Web](https://www.docker.com/) / [Docker](https://docs.docker.com/engine/install/) | -    | Docker 是一个用于开发、发布和运行应用程序的开放平台。 |
-| 102 | Portainer             | [Web](https://www.portainer.io/) / [Docker](https://hub.docker.com/r/portainer/portainer-ce) | 9443 | 全球最受欢迎的容器管理平台。 |
-| 103 | Yacht                 | [Web](https://yacht.sh/) / [Docker](https://hub.docker.com/r/selfhostedpro/yacht) | 8001 | 容器管理 UI，侧重于模板和一键式部署。 |
-| 104 | Transmission          | [Web](https://transmissionbt.com/) / [Docker](https://github.com/linuxserver/docker-transmission) | 9091 | Transmission 是一个跨平台的 BitTorrent 客户端。 |
-| 105 | qBittorrent           | [Web](https://www.qbittorrent.org/) / [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) | 8080 | qBittorrent 是一个 BitTorrent 客户端。  |
-| 106 | NextCloud             | [Web](https://nextcloud.com/) / [Docker](https://hub.docker.com/r/arm64v8/nextcloud) | 8088 | Nextcloud 提供了一个本地通用文件访问和同步平台，具有强大的协作功能以及桌面，移动和 Web 界面。 |
-| 107 | Jellyfin              | [Web](https://jellyfin.org/) / [Docker](https://hub.docker.com/r/linuxserver/jellyfin) | 8096 | Jellyfin 是一个自由软件媒体系统，让你控制管理和流媒体你的媒体。 |
-| 108 | HomeAssistant         | [Web](https://www.home-assistant.io/) / [Docker](https://hub.docker.com/r/linuxserver/homeassistant) | 8123 | Home Assistant 集成了一千多种不同的设备和服务，具有强大的自动化功能。 |
-| 109 | Kodbox                | [Web](https://kodcloud.com/) / [Docker](https://hub.docker.com/r/kodcloud/kodbox) | 8081 | 私有云在线文档管理解决方案。 |
-| 110 | CouchPotato           | [Web](https://couchpota.to/) / [Docker](https://hub.docker.com/r/linuxserver/couchpotato) | 5050 | Couchpotato 是一个自动 NZB 和 torrent 下载器，自动查找要观看的电影。 |
-| 111 | Sonarr                | [Web](https://sonarr.tv/) / [Docker](https://hub.docker.com/r/linuxserver/sonarr) | 8989 | Sonarr 是 Usenet 和 BitTorrent 用户的个人视频录像机。 |
-| 112 | Radarr                | [Web](https://radarr.video/) / [Docker](https://hub.docker.com/r/linuxserver/radarr) | 7878 | Radarr 是 Usenet 和 BitTorrent 用户的电影收藏管理器。 |
-| 113 | Syncthing             | [Web](https://syncthing.net/) / [Docker](https://hub.docker.com/r/linuxserver/syncthing) | 8384 | Syncthing 是一个连续的文件同步程序。 |
-| 114 | FileBrowser           | [Web](https://filebrowser.org/) / [Docker](https://hub.docker.com/r/filebrowser/filebrowser) | 8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
-| 115 | Heimdall              | [Web](https://heimdall.site/) / [Docker](https://hub.docker.com/r/linuxserver/heimdall) | 8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
-| 201 | Desktop               | [Web](https://www.armbian.com/) | -    | 安装桌面可视化操作界面。 |
-| 202 | Firefox               | [Web](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
-| 203 | Chromium              | [Web](https://www.chromium.org/) | -    | Chromium 是一个开源浏览器项目，旨在为所有用户构建一种更安全，更快速，更稳定的方式来体验网络。 |
-| 204 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
-| 205 | MPV                   | [Web](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
-| 206 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
-| 207 | Krita                 | [Web](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
-| 208 | LibreOffice           | [Web](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
-| 209 | Shotcut               | [Web](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
-| 210 | Kdenlive              | [Web](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
-| 301 | Frps                  | [Web](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
-| 302 | Frpc                  | [Web](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
-| 303 | Plex                  | [Web](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
-| 304 | Emby-Server           | [Web](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
-| 305 | OpenMediaVault | [Web](https://www.openmediavault.org/) | -    | openmediavault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
+| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker 是一个用于开发、发布和运行应用程序的开放平台。 |
+| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 全球最受欢迎的容器管理平台。 |
+| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | 容器管理 UI，侧重于模板和一键式部署。 |
+| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission 是一个跨平台的 BitTorrent 客户端。 |
+| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent 是一个 BitTorrent 客户端。  |
+| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud 提供了一个本地通用文件访问和同步平台，具有强大的协作功能以及桌面，移动和 Web 界面。 |
+| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin 是一个自由软件媒体系统，让你控制管理和流媒体你的媒体。 |
+| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant 集成了一千多种不同的设备和服务，具有强大的自动化功能。 |
+| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | 私有云在线文档管理解决方案。 |
+| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato 是一个自动 NZB 和 torrent 下载器，自动查找要观看的电影。 |
+| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr 是 Usenet 和 BitTorrent 用户的个人视频录像机。 |
+| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr 是 Usenet 和 BitTorrent 用户的电影收藏管理器。 |
+| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing 是一个连续的文件同步程序。 |
+| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
+| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
+| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
+| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
+| 203 | Chromium              | [Home](https://www.chromium.org/) | -    | Chromium 是一个开源浏览器项目，旨在为所有用户构建一种更安全，更快速，更稳定的方式来体验网络。 |
+| 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
+| 205 | MPV                   | [Home](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
+| 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
+| 207 | Krita                 | [Home](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
+| 208 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
+| 209 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
+| 210 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
+| 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
+| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
+| 303 | Plex                  | [Home](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
+| 304 | Emby-Server           | [Home](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
+| 305 | OpenMediaVault | [Home](https://www.openmediavault.org/) | -    | openmediavault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
 
 ## 软件中心使用说明
 
@@ -164,7 +164,7 @@ ID    NAME                STATE           MANAGE
 ```yaml
 # 1.ID     2.SoftwareName     3.AuthMethod@Package      4.Command/Shell     5.SupportedRelease
 102        :portainer         :docker@portainer         :command            :jammy@focal@bullseye
-203        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
+202        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
 302        :frpc              :which@frpc               :302-frpc.sh        :jammy@focal@bullseye
 ...
 ```
