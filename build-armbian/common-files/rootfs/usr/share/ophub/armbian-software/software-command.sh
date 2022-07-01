@@ -68,6 +68,8 @@
 software_path="/usr/share/ophub/armbian-software"
 software_command="${software_path}/software-command.sh"
 ophub_release_file="/etc/ophub-release"
+#
+# Docker-related default settings
 docker_path="/opt/docker"
 download_path="/opt/downloads"
 movie_path="/opt/movies"
@@ -195,31 +197,16 @@ docker_remove() {
 
 # For docker
 software_101() {
-    echo -e "${INFO} Software Name: [ docker ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        armbian-docker install
-        ;;
-    update)
-        armbian-docker update
-        ;;
-    remove)
-        armbian-docker remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) armbian-docker install ;;
+    update) armbian-docker update ;;
+    remove) armbian-docker remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For portainer
 software_102() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="portainer"
     image_name="portainer/portainer-ce:latest"
@@ -243,23 +230,14 @@ software_102() {
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For yacht
 software_103() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="yacht"
     image_name="selfhostedpro/yacht:latest"
@@ -290,23 +268,14 @@ software_103() {
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For transmission
 software_104() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="transmission"
     image_name="linuxserver/transmission:arm64v8-latest"
@@ -359,23 +328,14 @@ software_104() {
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For qbittorrent
 software_105() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="qbittorrent"
     image_name="linuxserver/qbittorrent:arm64v8-latest"
@@ -404,23 +364,14 @@ software_105() {
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For nextcloud
 software_106() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="nextcloud"
     image_name="arm64v8/nextcloud:latest"
@@ -447,23 +398,14 @@ software_106() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For jellyfin
 software_107() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="jellyfin"
     image_name="linuxserver/jellyfin:arm64v8-latest"
@@ -492,23 +434,14 @@ software_107() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For homeassistant
 software_108() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="homeassistant"
     image_name="linuxserver/homeassistant:arm64v8-latest"
@@ -534,23 +467,14 @@ software_108() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For kodbox
 software_109() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="kodbox"
     image_name="kodcloud/kodbox:latest"
@@ -575,23 +499,14 @@ software_109() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For couchpotato
 software_110() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="couchpotato"
     image_name="linuxserver/couchpotato:arm64v8-latest"
@@ -617,23 +532,14 @@ software_110() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For sonarr
 software_111() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="sonarr"
     image_name="linuxserver/sonarr:arm64v8-latest"
@@ -659,23 +565,14 @@ software_111() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For radarr
 software_112() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="radarr"
     image_name="linuxserver/radarr:arm64v8-latest"
@@ -701,23 +598,14 @@ software_112() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For syncthing
 software_113() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="syncthing"
     image_name="linuxserver/syncthing:arm64v8-latest"
@@ -747,23 +635,14 @@ software_113() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For filebrowser
 software_114() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="filebrowser"
     image_name="filebrowser/filebrowser:latest"
@@ -790,23 +669,14 @@ software_114() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For heimdall
 software_115() {
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     # Set basic information
     container_name="heimdall"
     image_name="linuxserver/heimdall:arm64v8-latest"
@@ -831,24 +701,14 @@ software_115() {
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
-    update)
-        docker_update
-        ;;
-    remove)
-        docker_remove
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For desktop
 software_201() {
-    echo -e "${INFO} Software Name: [ desktop ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
@@ -869,9 +729,7 @@ software_201() {
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
         ;;
-    update)
-        software_update
-        ;;
+    update) software_update ;;
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Remove ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
@@ -891,18 +749,12 @@ software_201() {
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
         ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For firefox
 software_202() {
-    echo -e "${INFO} Software Name: [ firefox ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         [[ "${VERSION_CODENAME}" == "jammy" ]] && {
@@ -913,9 +765,7 @@ software_202() {
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "firefox"
         [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "firefox-esr"
         ;;
-    update)
-        software_update
-        ;;
+    update) software_update ;;
     remove)
         [[ "${VERSION_CODENAME}" == "jammy" ]] && {
             software_remove "firefox-esr"
@@ -924,196 +774,98 @@ software_202() {
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "firefox"
         [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "firefox-esr"
         ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For chromium
 software_203() {
-    echo -e "${INFO} Software Name: [ chromium ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "chromium-browser"
         [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "chromium"
         ;;
-    update)
-        software_update
-        ;;
+    update) software_update ;;
     remove)
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "chromium-browser"
         [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "chromium"
         ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For vlc
 software_204() {
-    echo -e "${INFO} Software Name: [ vlc ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "vlc"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "vlc"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "vlc" ;;
+    update) software_update ;;
+    remove) software_remove "vlc" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For mpv
 software_205() {
-    echo -e "${INFO} Software Name: [ mpv ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "mpv"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "mpv"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "mpv" ;;
+    update) software_update ;;
+    remove) software_remove "mpv" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For gimp
 software_206() {
-    echo -e "${INFO} Software Name: [ gimp ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "gimp"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "gimp"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "gimp" ;;
+    update) software_update ;;
+    remove) software_remove "gimp" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For krita
 software_207() {
-    echo -e "${INFO} Software Name: [ krita ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "krita"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "krita"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "krita" ;;
+    update) software_update ;;
+    remove) software_remove "krita" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For libreoffice
 software_208() {
-    echo -e "${INFO} Software Name: [ libreoffice ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn" ;;
+    update) software_update ;;
+    remove) software_remove "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For shotcut
 software_209() {
-    echo -e "${INFO} Software Name: [ shotcut ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "shotcut"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "shotcut"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "shotcut" ;;
+    update) software_update ;;
+    remove) software_remove "shotcut" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For kdenlive
 software_210() {
-    echo -e "${INFO} Software Name: [ kdenlive ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
-    install)
-        software_install "kdenlive"
-        ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "kdenlive"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    install) software_install "kdenlive" ;;
+    update) software_update ;;
+    remove) software_remove "kdenlive" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For plex
 software_303() {
-    echo -e "${INFO} Software Name: [ plex ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         # Install basic dependencies
@@ -1153,24 +905,14 @@ software_303() {
         echo -e "${NOTE} The Plex Media Server address: [ http://ip:32400/web ]"
         echo -e "${SUCCESS} The Plex Media Server installation is successful."
         ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "plexmediaserver"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) software_update ;;
+    remove) software_remove "plexmediaserver" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For emby-server
 software_304() {
-    echo -e "${INFO} Software Name: [ emby-server ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         # Software version query api
@@ -1209,24 +951,14 @@ software_304() {
         echo -e "${NOTE} The Emby Server address: [ http://ip:8096 ]"
         echo -e "${SUCCESS} The Emby Server installation is successful."
         ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "emby-server"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) software_update ;;
+    remove) software_remove "emby-server" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
 # For openmediavault(OMV-6.x)
 software_305() {
-    echo -e "${INFO} Software Name: [ OpenMediaVault ]"
-    echo -e "${INFO} Software ID: [ ${software_id} ]"
-    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
-
     case "${software_manage}" in
     install)
         echo -e "${STEPS} Start checking the installation environment..."
@@ -1259,15 +991,9 @@ software_305() {
         echo -e "${NOTE} How to use OpenMediaVault: [ https://forum.openmediavault.org/ ]"
         echo -e "${SUCCESS} The OpenMediaVault installation is successful."
         ;;
-    update)
-        software_update
-        ;;
-    remove)
-        software_remove "openmediavault"
-        ;;
-    *)
-        error_msg "Invalid input parameter: [ ${@} ]"
-        ;;
+    update) software_update ;;
+    remove) software_remove "openmediavault" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
 
@@ -1309,6 +1035,7 @@ init_var() {
     # Get related variables
     check_release
     # Execute the corresponding operation command
+    echo -e "${INFO} Software Manage: [ ${software_id} / ${software_manage} ]"
     software_${software_id} ${software_manage}
 }
 
