@@ -47,9 +47,14 @@
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
-# software_203              : For vlc(desktop)
-# software_204              : For mpv(desktop)
-# software_205              : For gimp(desktop)
+# software_203              : For chromium(desktop)
+# software_204              : For vlc(desktop)
+# software_205              : For mpv(desktop)
+# software_206              : For gimp(desktop)
+# software_207              : For krita(desktop)
+# software_208              : For libreoffice(desktop)
+# software_209              : For shotcut(desktop)
+# software_210              : For kdenlive(desktop)
 #
 # software_303              : For plex
 # software_304              : For emby-server
@@ -92,7 +97,7 @@ check_release() {
     if [[ -f "${ophub_release_file}" ]]; then
         source "${ophub_release_file}" 2>/dev/null
         VERSION_CODEID="${VERSION_CODEID}"
-        VERSION_CODENAME="${VERSION_CODEID}"
+        VERSION_CODENAME="${VERSION_CODENAME}"
     else
         error_msg "${ophub_release_file} file is missing!"
     fi
@@ -131,7 +136,7 @@ software_remove() {
 
     # Update the package
     sudo apt-get update
-    [[ -n "${remove_list}" ]] && sudo apt-get remove -y ${remove_list}
+    [[ -n "${remove_list}" ]] && sudo apt-get remove --purge -y ${remove_list}
     sudo apt-get --purge autoremove -y
     sudo apt-get autoclean -y
 
@@ -900,15 +905,48 @@ software_202() {
 
     case "${software_manage}" in
     install)
-        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_install "firefox"
-        [[ "${VERSION_CODEID}" == "debian" ]] && software_install "firefox-esr"
+        [[ "${VERSION_CODENAME}" == "jammy" ]] && {
+            sudo add-apt-repository ppa:ubuntu-mozilla-security/ppa -y
+            sudo apt-get update
+            software_install "firefox-esr"
+        }
+        [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "firefox"
+        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "firefox-esr"
         ;;
     update)
         software_update
         ;;
     remove)
-        [[ "${VERSION_CODEID}" == "ubuntu" ]] && software_remove "firefox"
-        [[ "${VERSION_CODEID}" == "debian" ]] && software_remove "firefox-esr"
+        [[ "${VERSION_CODENAME}" == "jammy" ]] && {
+            software_remove "firefox-esr"
+            sudo add-apt-repository --remove ppa:mozillateam/ppa -y
+        }
+        [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "firefox"
+        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "firefox-esr"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For chromium
+software_203() {
+    echo -e "${INFO} Software Name: [ chromium ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "chromium-browser"
+        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "chromium"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "chromium-browser"
+        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "chromium"
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
@@ -917,7 +955,7 @@ software_202() {
 }
 
 # For vlc
-software_203() {
+software_204() {
     echo -e "${INFO} Software Name: [ vlc ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
@@ -939,7 +977,7 @@ software_203() {
 }
 
 # For mpv
-software_204() {
+software_205() {
     echo -e "${INFO} Software Name: [ mpv ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
@@ -961,14 +999,13 @@ software_204() {
 }
 
 # For gimp
-software_205() {
+software_206() {
     echo -e "${INFO} Software Name: [ gimp ]"
     echo -e "${INFO} Software ID: [ ${software_id} ]"
     echo -e "${INFO} Software Manage: [ ${software_manage} ]"
 
     case "${software_manage}" in
     install)
-        sudo add-apt-repository ppa:otto-kesselgulasch/gimp
         software_install "gimp"
         ;;
     update)
@@ -976,6 +1013,94 @@ software_205() {
         ;;
     remove)
         software_remove "gimp"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For krita
+software_207() {
+    echo -e "${INFO} Software Name: [ krita ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        software_install "krita"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        software_remove "krita"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For libreoffice
+software_208() {
+    echo -e "${INFO} Software Name: [ libreoffice ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        software_install "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        software_remove "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For shotcut
+software_209() {
+    echo -e "${INFO} Software Name: [ shotcut ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        software_install "shotcut"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        software_remove "shotcut"
+        ;;
+    *)
+        error_msg "Invalid input parameter: [ ${@} ]"
+        ;;
+    esac
+}
+
+# For kdenlive
+software_210() {
+    echo -e "${INFO} Software Name: [ kdenlive ]"
+    echo -e "${INFO} Software ID: [ ${software_id} ]"
+    echo -e "${INFO} Software Manage: [ ${software_manage} ]"
+
+    case "${software_manage}" in
+    install)
+        software_install "kdenlive"
+        ;;
+    update)
+        software_update
+        ;;
+    remove)
+        software_remove "kdenlive"
         ;;
     *)
         error_msg "Invalid input parameter: [ ${@} ]"
