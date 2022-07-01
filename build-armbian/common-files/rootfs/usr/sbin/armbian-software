@@ -67,18 +67,19 @@ check_release() {
 
 # Check dependencies
 check_depends() {
-    is_missing="0"
-    necessary_packages=("subversion" "tar" "coreutils" "systemd")
+    # Check the necessary dependencies for apt install
+    is_dpkg="0"
+    dpkg_packages=("subversion" "tar" "coreutils" "systemd" "software-properties-common" "apt-transport-https")
     i="1"
-    for package in ${necessary_packages[*]}; do
-        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_missing="1"
+    for package in ${dpkg_packages[*]}; do
+        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_dpkg="1"
         let i++
     done
-
-    if [[ "${is_missing}" -eq "1" ]]; then
+    # Install missing packages
+    if [[ "${is_dpkg}" -eq "1" ]]; then
         echo -e "${STEPS} Start installing the necessary dependencies..."
         sudo apt-get update
-        sudo apt-get install -y ${necessary_packages[*]}
+        sudo apt-get install -y ${dpkg_packages[*]}
     fi
 }
 
@@ -140,17 +141,17 @@ search_software_model() {
 # Explain: 1.ID   2.NAME   3.STATE          4.MANAGE
 # Example: 11     :frps    :not-installed   :install
 show_software_list() {
-    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${VERSION_CODEID}:${VERSION_CODENAME}\033[0m ]..."
+    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${VERSION_CODEID}/${VERSION_CODENAME}\033[0m ]..."
 
     # Check software status
     check_software_status
 
     # Show software list
-    printf "%-s\n" "-----------------------------------------------------------------------------------"
-    printf "%-5s %-45s %-15s %-15s\n" ID NAME STATE MANAGE
-    printf "%-s\n" "-----------------------------------------------------------------------------------"
-    printf "%-5s %-45s %-15s %-15s\n" $(echo "${software_database}" | grep -E "^[0-9]{1,9}.*:" | awk -F ':' '{print $1,$2,$7,$8}')
-    printf "%-s\n" "-----------------------------------------------------------------------------------"
+    printf "%-s\n" "--------------------------------------------------------------"
+    printf "%-5s %-25s %-15s %-15s\n" ID NAME STATE MANAGE
+    printf "%-s\n" "--------------------------------------------------------------"
+    printf "%-5s %-25s %-15s %-15s\n" $(echo "${software_database}" | grep -E "^[0-9]{1,9}.*:" | awk -F ':' '{print $1,$2,$7,$8}')
+    printf "%-s\n" "--------------------------------------------------------------"
     #
     echo -ne "${OPTIONS} Please Input Software ID: "
     read software_id

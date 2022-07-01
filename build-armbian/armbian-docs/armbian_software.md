@@ -23,9 +23,14 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 115 | Heimdall              | [Web](https://heimdall.site/) / [Docker](https://hub.docker.com/r/linuxserver/heimdall) | 8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
 | 201 | Desktop               | [Web](https://www.armbian.com/) | -    | Install the desktop visual operation interface. |
 | 202 | Firefox               | [Web](https://www.mozilla.org/) | -    | An excellent web browser. |
-| 203 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
-| 204 | MPV                   | [Web](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
-| 205 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
+| 203 | Chromium              | [Web](https://www.chromium.org/) | -    | CChromium is an open-source browser project that aims to build a safer, faster, and more stable way for all users to experience the web. |
+| 204 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
+| 205 | MPV                   | [Web](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
+| 206 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
+| 207 | Krita                 | [Web](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
+| 208 | LibreOffice           | [Web](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
+| 209 | Shotcut               | [Web](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
+| 210 | Kdenlive              | [Web](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor |
 | 301 | Frps                  | [Web](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
 | 302 | Frpc                  | [Web](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
 | 303 | Plex                  | [Web](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
@@ -111,9 +116,14 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 115 | Heimdall              | [Web](https://heimdall.site/) / [Docker](https://hub.docker.com/r/linuxserver/heimdall) | 8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
 | 201 | Desktop               | [Web](https://www.armbian.com/) | -    | 安装桌面可视化操作界面。 |
 | 202 | Firefox               | [Web](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
-| 203 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
-| 204 | MPV                   | [Web](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
-| 205 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
+| 203 | Chromium              | [Web](https://www.chromium.org/) | -    | Chromium 是一个开源浏览器项目，旨在为所有用户构建一种更安全，更快速，更稳定的方式来体验网络。 |
+| 204 | VLC                   | [Web](https://www.videolan.org/)            | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
+| 205 | MPV                   | [Web](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
+| 206 | GIMP                  | [Web](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
+| 207 | Krita                 | [Web](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
+| 208 | LibreOffice           | [Web](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
+| 209 | Shotcut               | [Web](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
+| 210 | Kdenlive              | [Web](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
 | 301 | Frps                  | [Web](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
 | 302 | Frpc                  | [Web](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
 | 303 | Plex                  | [Web](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
