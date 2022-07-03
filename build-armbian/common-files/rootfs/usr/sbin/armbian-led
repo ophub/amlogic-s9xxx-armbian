@@ -1,5 +1,5 @@
 #!/bin/bash
-#=========================================================================
+#==========================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -12,21 +12,76 @@
 # Copyright (C) 2022- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2022- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: armbian-led
+# Function          : Command
+# Default           : armbain-led
+# One-key to open   : armbian-led <boxid>
+# One-key to stop   : armbian-led 0
+# Update config     : armbian-led -u
 #
-#=========================================================================
+#============================= Functions list =============================
+#
+# do_start          : Turn on the led screen display
+# do_stop           : Turn off the led screen display
+# do_update_conf    : Update openvfd config files
+# do_select_box     : Call config based on options
+#
+#==========================================================================
+#
+# Openvfd files storage path
+openvfd_path="/usr/share/openvfd"
+openvfd_service="${openvfd_path}/vfdservice"
+# The openvfd files download repository
+openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/rootfs${openvfd_path}"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#==========================================================================
 
+# Show error message
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Update openvfd config files
+do_update_conf() {
+    echo -e "${STEPS} Start updating the openfvd config files..."
+
+    # Check dependencies
+    [[ -z "$(dpkg-query -l | grep "subversion")" ]] && sudo apt-get update && sudo apt-get install -y subversion
+
+    # Convert script repository address to svn format
+    if [[ "${openvfd_repo}" == http* && -n "$(echo ${openvfd_repo} | grep "tree/main")" ]]; then
+        openvfd_repo="${openvfd_repo//tree\/main/trunk}"
+    fi
+
+    # Update related files
+    echo -e "${STEPS} Start syncing files..."
+    [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
+    svn export ${openvfd_repo} ${openvfd_path} --force
+    chmod +x ${openvfd_path}/vfdservice
+
+    sync && sleep 3
+    echo -e "${SUCCESS} Openfvd config files update completed."
+    exit 0
+}
+
+# Turn on the led screen display
 do_start() {
-    openvfd_path="/usr/share/openvfd"
-    conf_file="${openvfd_path}/conf/${1}"
-    openvfd_service="${openvfd_path}/vfdservice"
+    echo -e "${STEPS} Start the led screen display..."
 
-    if [[ -f "${conf_file}" && -f "${openvfd_service}" ]]; then
-        source "${conf_file}"
-        echo "Using LED Profiles: ${conf_file}"
+    # Check config files and services
+    conf_file="${openvfd_path}/conf/${1}"
+    if [[ -s "${conf_file}" && -x "${openvfd_service}" ]]; then
+        source "${conf_file}" 2>/dev/null
+        echo -e "${INFO} Using LED Profiles: ${conf_file}"
     else
-        echo "The LED profile [ ${conf_file} ] does not exist!"
-        exit 1
+        error_msg "The LED profile [ ${conf_file} ] does not exist!"
     fi
 
     modprobe openvfd vfd_gpio_clk=${vfd_gpio_clk} \
@@ -46,23 +101,27 @@ do_start() {
 
     if [[ -n "${functions}" ]]; then
         for func in ${functions}; do
-            echo "turn led ${func} on ... "
+            echo -e "${INFO} turn led ${func} on ... "
             echo "${func}" >/sys/class/leds/openvfd/led_on 2>/dev/null
         done
     fi
 
-    echo "Enable LED display!"
+    echo -e "${SUCCESS} Enable LED display!"
     exit 0
 }
 
+# Turn off the led screen display
 do_stop() {
+    echo -e "${STEPS} Start to turn off the led screen display..."
+
     killall -9 vfdservice 2>/dev/null
     rmmod openvfd -f 2>/dev/null
 
-    echo "Disable LED display!"
+    echo -e "${SUCCESS} Disable LED display!"
     exit 0
 }
 
+# Call config based on options
 do_select_box() {
     case "${1}" in
         11 | x96max)      do_start x96max.conf ;;
@@ -77,13 +136,22 @@ do_select_box() {
         20 | tx9-pro)     do_start tx9-pro.conf ;;
         99 | diy)         do_start diy.conf ;;
          0 | stop)        do_stop ;;
-         1 | * | quit)    echo "quit!" && exit 0 ;;
+         1 | quit)        echo "quit!" && exit 0 ;;
+         *)               error_msg "Invalid input!" ;;
     esac
 }
 
-if [[ -z "${1}" ]]; then
-    clear
-    cat <<EOF
+# Execute according to the classification of input parameters
+case "${1}" in
+    -u | u | -update | update)
+        do_update_conf
+        ;;
+    [0-9]*)
+        do_select_box "${1}"
+        ;;
+    *)
+        clear
+        cat <<EOF
 
         ┌────────[ Enable LED ]─────────┐
         │                               │
@@ -99,16 +167,17 @@ if [[ -z "${1}" ]]; then
         │    20. tx9-pro (s912)         │
         │    99. diy                    │
         │                               │
-        ├────[ Disable LED or Quit ]────┤
+        ├──────[ Other Operations ]─────┤
         │                               │
+        │    -u. update                 │
         │     0. stop                   │
         │     1. quit                   │
         │                               │
         └───────────────────────────────┘
 
 EOF
-    read -p "Please Input ID: " box
-    do_select_box "${box}"
-else
-    do_select_box "${1}"
-fi
+        echo -ne "${OPTIONS} Please Input ID: "
+        read boxid
+        do_select_box "${boxid}"
+        ;;
+esac
