@@ -576,10 +576,10 @@ refactor_files() {
     sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun} 2>/dev/null
 
     # Add custom startup script
-    custom_startup_script="usr/share/ophub/start_service.sh"
+    custom_startup_script="etc/custom_service/start_service.sh"
     [[ -f "${custom_startup_script}" && -f "etc/rc.local" ]] && {
         chmod +x ${custom_startup_script}
-        sed -i '/exit 0/i\bash /usr/share/ophub/start_service.sh &' etc/rc.local 2>/dev/null
+        sed -i '/exit 0/i\bash /etc/custom_service/start_service.sh &' etc/rc.local 2>/dev/null
     }
 
     # Get random macaddr
