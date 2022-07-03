@@ -163,6 +163,12 @@ armbian-kernel -d -k 5.10.125
 
 - ### 更多使用说明
 
+将本地系统中的全部服务脚本更新到最新版本，可以登录 Armbian 系统 → 输入命令：
+
+```yaml
+armbian-sync
+```
+
 在 Armbian 的使用中，一些可能遇到的常见问题详见 [armbian-docs](build-armbian/armbian-docs/README.cn.md)
 
 ## 本地化打包
