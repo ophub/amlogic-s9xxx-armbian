@@ -163,6 +163,12 @@ armbian-kernel -d -k 5.10.125
 
 - ### More instructions for use
 
+To update all service scripts in the local system to the latest version, you can login in to armbian → input command:
+
+```yaml
+armbian-sync
+```
+
 In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs) for some common problems that may be encountered.
 
 ## Local build instructions
