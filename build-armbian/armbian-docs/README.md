@@ -34,6 +34,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.7.1 Dynamic IP address assignment by DHCP](#1271-dynamic-ip-address-assignment-by-dhcp)
       - [12.7.2 Manually set a static IP address](#1272-manually-set-a-static-ip-address)
     - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
+    - [12.9 How to update service scripts in the system](#129-how-to-update-service-scripts-in-the-system)
 
 ## 1. Register your own GitHub account
 
@@ -299,5 +300,9 @@ dns-nameservers 192.168.1.1
 
 ### 12.8 How to add startup tasks
 
-A custom startup task script file has been added to the system, and the path in the Armbian system is [/usr/share/ophub/start_service.sh](../common-files/rootfs/usr/share/ophub/start_service.sh) file, you can customize and add related tasks in this script according to your personal needs.
+A custom startup task script file has been added to the system, and the path in the Armbian system is [/etc/custom_service/start_service.sh](../common-files/rootfs/etc/custom_service/start_service.sh) file, you can customize and add related tasks in this script according to your personal needs.
+
+### 12.9 How to update service scripts in the system
+
+Use the `armbian-sync` command to update all service scripts on the local system to the latest version.
 
