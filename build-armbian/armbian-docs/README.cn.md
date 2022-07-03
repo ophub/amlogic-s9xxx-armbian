@@ -34,6 +34,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
       - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
+    - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -298,5 +299,9 @@ dns-nameservers 192.168.1.1
 
 ### 12.8 如何添加开机启动任务
 
-系统中已经添加了自定义开机启动任务脚本文件，在 Armbian 系统中的路径是 [/usr/share/ophub/start_service.sh](../common-files/rootfs/usr/share/ophub/start_service.sh) 文件，可以根据个人需求在该脚本中自定义添加相关任务。
+系统中已经添加了自定义开机启动任务脚本文件，在 Armbian 系统中的路径是 [/etc/custom_service/start_service.sh](../common-files/rootfs/etc/custom_service/start_service.sh) 文件，可以根据个人需求在该脚本中自定义添加相关任务。
+
+### 12.9 如何更新系统中的服务脚本
+
+使用 `armbian-sync` 命令可以一键将本地系统中的全部服务脚本更新到最新版本。
 
