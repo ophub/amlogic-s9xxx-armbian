@@ -39,7 +39,6 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 
 |     Box    |   ID   |  Armbian Command  |   OpenWrt Command   |  Function   |
 | ---------- |  ----- | ----------------- | ------------------- | ----------- |
-| -          |  0     |  armbian-led 0    |   openwrt-led 0     | Disable LED |
 | x96max     |  11    |  armbian-led 11   |   openwrt-led 11    | Enable LED  |
 | x96maxplus |  12    |  armbian-led 12   |   openwrt-led 12    | Enable LED  |
 | x96air     |  13    |  armbian-led 13   |   openwrt-led 13    | Enable LED  |
@@ -51,6 +50,8 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | t95        |  19    |  armbian-led 19   |   openwrt-led 19    | Enable LED  |
 | tx9-pro    |  20    |  armbian-led 20   |   openwrt-led 20    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
+| -          |  0     |  armbian-led 0    |   openwrt-led 0     | Disable LED |
+| -          |  -u    |  armbian-led -u   |   openwrt-led -u    | Update Conf |
 
 # LED 屏显示控制说明
 
@@ -91,9 +92,8 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
 
-|     盒子    |  编号  |  Armbian 使用命令  |   OpenWrt 使用命令   |   功能   |
+|     盒子    |  编号  |  Armbian 使用命令   |   OpenWrt 使用命令   |   功能   |
 | ---------- |  ----- | ----------------- | ------------------- | ------- |
-| -          |  0     |  armbian-led 0    |   openwrt-led 0     | 禁用 LED |
 | x96max     |  11    |  armbian-led 11   |   openwrt-led 11    | 启用 LED |
 | x96maxplus |  12    |  armbian-led 12   |   openwrt-led 12    | 启用 LED |
 | x96air     |  13    |  armbian-led 13   |   openwrt-led 13    | 启用 LED |
@@ -105,3 +105,6 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | t95        |  19    |  armbian-led 19   |   openwrt-led 19    | 启用 LED |
 | tx9-pro    |  20    |  armbian-led 20   |   openwrt-led 20    | 启用 LED |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
+| -          |  0     |  armbian-led 0    |   openwrt-led 0     | 禁用 LED |
+| -          |  -u    |  armbian-led -u   |   openwrt-led -u    | 更新配置  |
+
