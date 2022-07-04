@@ -758,7 +758,7 @@ software_202() {
     case "${software_manage}" in
     install)
         [[ "${VERSION_CODENAME}" == "jammy" ]] && {
-            sudo add-apt-repository ppa:ubuntu-mozilla-security/ppa -y
+            sudo add-apt-repository ppa:mozillateam/ppa -y
             sudo apt-get update
             software_install "firefox-esr"
         }
