@@ -55,6 +55,11 @@
 # software_208              : For libreoffice(desktop)
 # software_209              : For shotcut(desktop)
 # software_210              : For kdenlive(desktop)
+# software_211              : For thunderbird(desktop)
+# software_212              : For evolution(desktop)
+# software_213              : For gwenview(desktop)
+# software_214              : For eog(desktop)
+# software_215              : For gedit(desktop)
 #
 # software_303              : For plex
 # software_304              : For emby-server
@@ -860,6 +865,56 @@ software_210() {
     install) software_install "kdenlive" ;;
     update) software_update ;;
     remove) software_remove "kdenlive" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For thunderbird
+software_211() {
+    case "${software_manage}" in
+    install) software_install "thunderbird" ;;
+    update) software_update ;;
+    remove) software_remove "thunderbird" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For evolution
+software_212() {
+    case "${software_manage}" in
+    install) software_install "evolution" ;;
+    update) software_update ;;
+    remove) software_remove "evolution" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For gwenview
+software_213() {
+    case "${software_manage}" in
+    install) software_install "gwenview" ;;
+    update) software_update ;;
+    remove) software_remove "gwenview" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For eog
+software_214() {
+    case "${software_manage}" in
+    install) software_install "eog" ;;
+    update) software_update ;;
+    remove) software_remove "eog" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For gedit
+software_215() {
+    case "${software_manage}" in
+    install) software_install "gedit" ;;
+    update) software_update ;;
+    remove) software_remove "gedit" ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
