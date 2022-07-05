@@ -47,7 +47,7 @@
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
-# software_203              : For chromium(desktop)
+# software_203              : For visual.studio.code(desktop)
 # software_204              : For vlc(desktop)
 # software_205              : For mpv(desktop)
 # software_206              : For gimp(desktop)
@@ -783,18 +783,17 @@ software_202() {
     esac
 }
 
-# For chromium
+# For visual.studio.code
 software_203() {
     case "${software_manage}" in
     install)
-        [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "chromium-browser"
-        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "chromium"
+        tmp_download="$(mktemp -d)/code_arm64.deb"
+        curl -L https://aka.ms/linux-arm64-deb >${tmp_download}
+        [[ "${?}" -eq "0" && -s "${tmp_download}" ]] || error_msg "Software download failed!"
+        sudo dpkg -i ${tmp_download}
         ;;
     update) software_update ;;
-    remove)
-        [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "chromium-browser"
-        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "chromium"
-        ;;
+    remove) software_remove "code" ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }

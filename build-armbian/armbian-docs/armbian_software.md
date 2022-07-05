@@ -23,7 +23,7 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
-| 203 | Chromium              | [Home](https://www.chromium.org/) | -    | CChromium is an open-source browser project that aims to build a safer, faster, and more stable way for all users to experience the web. |
+| 203 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code is a lightweight but powerful source code editor. |
 | 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
 | 205 | MPV                   | [Home](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
 | 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
@@ -121,7 +121,7 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
-| 203 | Chromium              | [Home](https://www.chromium.org/) | -    | Chromium 是一个开源浏览器项目，旨在为所有用户构建一种更安全，更快速，更稳定的方式来体验网络。 |
+| 203 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
 | 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
 | 205 | MPV                   | [Home](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
 | 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
