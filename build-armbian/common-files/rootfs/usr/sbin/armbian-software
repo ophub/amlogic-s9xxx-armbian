@@ -67,9 +67,14 @@ check_release() {
 
 # Check dependencies
 check_depends() {
-    # Check the necessary dependencies for apt install
+    # List of required dependencies
+    dpkg_packages=(
+        "curl" "wget" "tar"
+        "subversion" "coreutils" "systemd"
+        "software-properties-common" "apt-transport-https" "ca-certificates"
+    )
+    # Cyclic check all dependencies
     is_dpkg="0"
-    dpkg_packages=("subversion" "tar" "coreutils" "systemd" "software-properties-common" "apt-transport-https")
     i="1"
     for package in ${dpkg_packages[*]}; do
         [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_dpkg="1"
