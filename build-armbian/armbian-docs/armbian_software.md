@@ -23,18 +23,18 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
-| 203 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code is a lightweight but powerful source code editor. |
-| 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
-| 205 | MPV                   | [Home](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
-| 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
-| 207 | Krita                 | [Home](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
-| 208 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
-| 209 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
-| 210 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor. |
-| 211 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird makes email better for you, bringing together speed, privacy and the latest technologies. |
-| 212 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution is a personal information management application that provides integrated mail, calendaring and address book functionality. |
-| 213 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview is a fast and easy to use image viewer by KDE, ideal for browsing and displaying a collection of images. |
-| 214 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME(eog) is a image viewer program.  It is meant to be a fast and functional image viewer. |
+| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
+| 204 | MPV                   | [Home](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
+| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
+| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
+| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
+| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
+| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor. |
+| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird makes email better for you, bringing together speed, privacy and the latest technologies. |
+| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution is a personal information management application that provides integrated mail, calendaring and address book functionality. |
+| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview is a fast and easy to use image viewer by KDE, ideal for browsing and displaying a collection of images. |
+| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME(eog) is a image viewer program.  It is meant to be a fast and functional image viewer. |
+| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code is a lightweight but powerful source code editor. |
 | 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit is a full-featured text editor for the GNOME desktop environment. You can use it to prepare simple notes and documents, or you can use some of its advanced features, making it your own software development environment. |
 | 301 | Frps                  | [Home](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
@@ -121,18 +121,18 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
-| 203 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
-| 204 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
-| 205 | MPV                   | [Home](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
-| 206 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
-| 207 | Krita                 | [Home](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
-| 208 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
-| 209 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
-| 210 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
-| 211 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird 将速度、隐私和最新技术结合在一起，让您更好地利用电子邮件。 |
-| 212 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution 是一个个人信息管理应用程序，提供集成的邮件、日历和地址簿功能。 |
-| 213 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview 是 KDE 出品的一款轻便易用的图像查看器，是浏览、显示多张图像时的理想工具。 |
-| 214 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）一个图像查看器程序。它旨在成为一个快速且功能强大的图像查看器。 |
+| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
+| 204 | MPV                   | [Home](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
+| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
+| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
+| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
+| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
+| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
+| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird 将速度、隐私和最新技术结合在一起，让您更好地利用电子邮件。 |
+| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution 是一个个人信息管理应用程序，提供集成的邮件、日历和地址簿功能。 |
+| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview 是 KDE 出品的一款轻便易用的图像查看器，是浏览、显示多张图像时的理想工具。 |
+| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）一个图像查看器程序。它旨在成为一个快速且功能强大的图像查看器。 |
+| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
 | 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit 是一个用于 GNOME 桌面环境的全功能文本编辑器。您可以使用它来准备简单的笔记和文档，也可以使用它的一些高级功能，使其成为您自己的软件开发环境。 |
 | 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
