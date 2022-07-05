@@ -47,18 +47,18 @@
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
-# software_203              : For visual.studio.code(desktop)
-# software_204              : For vlc(desktop)
-# software_205              : For mpv(desktop)
-# software_206              : For gimp(desktop)
-# software_207              : For krita(desktop)
-# software_208              : For libreoffice(desktop)
-# software_209              : For shotcut(desktop)
-# software_210              : For kdenlive(desktop)
-# software_211              : For thunderbird(desktop)
-# software_212              : For evolution(desktop)
-# software_213              : For gwenview(desktop)
-# software_214              : For eog(desktop)
+# software_203              : For vlc(desktop)
+# software_204              : For mpv(desktop)
+# software_205              : For gimp(desktop)
+# software_206              : For krita(desktop)
+# software_207              : For libreoffice(desktop)
+# software_208              : For shotcut(desktop)
+# software_209              : For kdenlive(desktop)
+# software_210              : For thunderbird(desktop)
+# software_211              : For evolution(desktop)
+# software_212              : For gwenview(desktop)
+# software_213              : For eog(desktop)
+# software_214              : For visual.studio.code(desktop)
 # software_215              : For gedit(desktop)
 #
 # software_303              : For plex
@@ -783,23 +783,8 @@ software_202() {
     esac
 }
 
-# For visual.studio.code
-software_203() {
-    case "${software_manage}" in
-    install)
-        tmp_download="$(mktemp -d)/code_arm64.deb"
-        curl -L https://aka.ms/linux-arm64-deb >${tmp_download}
-        [[ "${?}" -eq "0" && -s "${tmp_download}" ]] || error_msg "Software download failed!"
-        sudo dpkg -i ${tmp_download}
-        ;;
-    update) software_update ;;
-    remove) software_remove "code" ;;
-    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
-    esac
-}
-
 # For vlc
-software_204() {
+software_203() {
     case "${software_manage}" in
     install) software_install "vlc" ;;
     update) software_update ;;
@@ -809,7 +794,7 @@ software_204() {
 }
 
 # For mpv
-software_205() {
+software_204() {
     case "${software_manage}" in
     install) software_install "mpv" ;;
     update) software_update ;;
@@ -819,7 +804,7 @@ software_205() {
 }
 
 # For gimp
-software_206() {
+software_205() {
     case "${software_manage}" in
     install) software_install "gimp" ;;
     update) software_update ;;
@@ -829,7 +814,7 @@ software_206() {
 }
 
 # For krita
-software_207() {
+software_206() {
     case "${software_manage}" in
     install) software_install "krita" ;;
     update) software_update ;;
@@ -839,7 +824,7 @@ software_207() {
 }
 
 # For libreoffice
-software_208() {
+software_207() {
     case "${software_manage}" in
     install) software_install "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn" ;;
     update) software_update ;;
@@ -849,7 +834,7 @@ software_208() {
 }
 
 # For shotcut
-software_209() {
+software_208() {
     case "${software_manage}" in
     install) software_install "shotcut" ;;
     update) software_update ;;
@@ -859,7 +844,7 @@ software_209() {
 }
 
 # For kdenlive
-software_210() {
+software_209() {
     case "${software_manage}" in
     install) software_install "kdenlive" ;;
     update) software_update ;;
@@ -869,7 +854,7 @@ software_210() {
 }
 
 # For thunderbird
-software_211() {
+software_210() {
     case "${software_manage}" in
     install) software_install "thunderbird" ;;
     update) software_update ;;
@@ -879,7 +864,7 @@ software_211() {
 }
 
 # For evolution
-software_212() {
+software_211() {
     case "${software_manage}" in
     install) software_install "evolution" ;;
     update) software_update ;;
@@ -889,7 +874,7 @@ software_212() {
 }
 
 # For gwenview
-software_213() {
+software_212() {
     case "${software_manage}" in
     install) software_install "gwenview" ;;
     update) software_update ;;
@@ -899,11 +884,26 @@ software_213() {
 }
 
 # For eog
-software_214() {
+software_213() {
     case "${software_manage}" in
     install) software_install "eog" ;;
     update) software_update ;;
     remove) software_remove "eog" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For visual.studio.code
+software_214() {
+    case "${software_manage}" in
+    install)
+        tmp_download="$(mktemp -d)/code_arm64.deb"
+        curl -L https://aka.ms/linux-arm64-deb >${tmp_download}
+        [[ "${?}" -eq "0" && -s "${tmp_download}" ]] || error_msg "Software download failed!"
+        sudo dpkg -i ${tmp_download}
+        ;;
+    update) software_update ;;
+    remove) software_remove "code" ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
