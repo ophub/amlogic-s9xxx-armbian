@@ -8,7 +8,7 @@
 # This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on Armbian, generate uinitrd
+# Description: Run on Armbian, generate uInitrd
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -30,9 +30,11 @@ ERROR="[\033[91m ERROR \033[0m]"
 
 # Install the required dependencies
 chroot_env_init() {
-    echo -e "${STEPS} Install the required dependencies..."
-    sudo apt-get update -y
-    sudo apt-get install -y initramfs-tools
+    [[ -n "$(dpkg-query -l | grep "initramfs-tools")" ]] || {
+        echo -e "${STEPS} Install the required dependencies..."
+        sudo apt-get update -y
+        sudo apt-get install -y initramfs-tools
+    }
 }
 
 # Generate uInitrd
@@ -48,7 +50,8 @@ chroot_generate_uinitrd() {
 
     if [[ -f "uInitrd" ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${chroot_kernel_version} 2>/dev/null && sync
+        mv -f uInitrd uInitrd-${chroot_kernel_version}
+        sync && sleep 3
     else
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
@@ -60,8 +63,7 @@ echo -e "${INFO} Current system: [ ${chroot_arch_info} ]"
 echo -e "${INFO} Current path: [ ${chroot_make_path} ]"
 echo -e "${INFO} Compile the kernel version: [ ${chroot_kernel_version} ]"
 #
-# If dependencies such as initramfs-tools are missing, please enable the [ chroot_env_init ] method
-#chroot_env_init
+# Check dependencies
+chroot_env_init
+# Generate uInitrd
 chroot_generate_uinitrd
-
-sync
