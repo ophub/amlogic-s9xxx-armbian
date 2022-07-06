@@ -168,7 +168,7 @@ echo -e "${STEPS} Welcome to use TF/SD/USB partition management tool."
 # Check disk
 do_checkdisk
 # Prompt the user to select Expand/Create
-echo -ne "${OPTIONS} Do you want to expand or create partitions? Expand=(e) Create=(c): "
+echo -ne "${OPTIONS} Do you want to Expand=(e) or Create=(c) partitions? (e/c): "
 read ec
 case "${ec}" in
     e | E | expand) expand_current_part ;;
