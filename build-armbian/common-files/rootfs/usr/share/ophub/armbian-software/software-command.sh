@@ -719,40 +719,35 @@ software_201() {
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Install ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
             software_install "ubuntu-desktop lightdm"
-
-            sync && sleep 3
-            echo -e "${SUCCESS} Desktop installation is successful, restarting..."
-            reboot
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Install Xfce(lightdm) on Debian 11 (bullseye)
             software_install "task-xfce-desktop lightdm"
-
-            sync && sleep 3
-            echo -e "${SUCCESS} Desktop installation is successful, restarting..."
-            reboot
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
+
+        # Install Chinese desktop support
+        sudo ${software_path}/201-desktop-chinese-fonts.sh
+
+        sync && sleep 3
+        echo -e "${SUCCESS} Desktop installation is successful, restarting..."
+        reboot
         ;;
     update) software_update ;;
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Remove ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
             software_remove "ubuntu-desktop lightdm"
-
-            sync && sleep 3
-            echo -e "${SUCCESS} Desktop removed successfully, restarting..."
-            reboot
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Remove Xfce(lightdm) on Debian 11 (bullseye)
             software_remove "task-xfce-desktop lightdm"
-
-            sync && sleep 3
-            echo -e "${SUCCESS} Desktop removed successfully, restarting..."
-            reboot
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
+
+        sync && sleep 3
+        echo -e "${SUCCESS} Desktop removed successfully, restarting..."
+        reboot
         ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
