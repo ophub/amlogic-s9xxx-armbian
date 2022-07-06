@@ -176,14 +176,13 @@ show_software_list() {
     if [[ "${software_support}" == "supported" ]]; then
         echo -e "${INFO} Software ID: [ ${software_id} ]"
         echo -e "${INFO} Software Name: [ ${software_name} ]"
-        echo -e "${INFO} Software Command or Shell: [ ${software_command_shell} ]"
     else
         error_msg "The software does not support the current system, only supports [ ${software_release//@/ \| } ]."
     fi
 
     # Select Installed Software Update or Remove
     [[ "${software_state}" == "installed" ]] && {
-        echo -ne "${OPTIONS} Do you want to Update=(u) or Remove=(r) [ ${software_name} ]? (u/r): "
+        echo -ne "${OPTIONS} Do you want to Update=(u) or Remove=(r)? (u/r): "
         read optid
         optid="${optid/U/u}" && optid="${optid/R/r}"
         [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Input error!"
