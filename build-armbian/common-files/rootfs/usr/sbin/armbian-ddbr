@@ -110,7 +110,7 @@ echo -e "${STEPS} Welcome to use the EMMC system backup/restore service."
 # Check emmc
 do_checkemmc
 # Prompt the user to select Backup/Restore
-echo -ne "${OPTIONS} Do you want to backup or restore? Backup=(b) Restore=(r): "
+echo -ne "${OPTIONS} Do you want to Backup=(b) or Restore=(r) eMMC system? (b/r): "
 read br
 case "${br}" in
     b | B | backup)  do_backup ;;
