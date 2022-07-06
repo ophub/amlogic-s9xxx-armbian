@@ -158,7 +158,7 @@ docker_container_remove() {
     # Query the container ID based on the image name and delete it
     echo -e "${STEPS} Start removing container: [ ${container_name} ]..."
     docker stop $(docker ps -aq --filter name=${container_name})
-    docker rm $(docker ps -aq --filter name=${container_name})
+    docker rm -f $(docker ps -aq --filter name=${container_name})
     echo -e "${SUCCESS} ${container_name} removed successfully."
 }
 
@@ -169,7 +169,7 @@ docker_image_remove() {
 
     # Query the image ID based on the image name and delete it
     echo -e "${STEPS} Start removing image: [ ${image_name} ]..."
-    docker image rm $(docker images -q --filter reference=${image_name})
+    docker image rm -f $(docker images -q --filter reference=${image_name})
     echo -e "${SUCCESS} ${image_name} removed successfully."
 }
 
@@ -212,26 +212,39 @@ software_101() {
 
 # For portainer
 software_102() {
+    # Installation options
+    echo -ne "${OPTIONS} Do you choose Chinese=(c) or English=(e) version of portainer? (c/e): "
+    read optid
+    optid="${optid/C/c}" && optid="${optid/E/e}"
+    if [[ "${optid}" == "c" ]]; then
+        # Instructions(Chinese): https://hub.docker.com/r/6053537/portainer-ce
+        image_name="6053537/portainer-ce:linux-arm64"
+        image_port="-p 9000:9000"
+        image_url="http://ip:9000"
+    else
+        # Instructions(English): https://hub.docker.com/r/portainer/portainer-ce
+        image_name="portainer/portainer-ce:latest"
+        image_port="-p 8000:8000 -p 9443:9443"
+        image_url="https://ip:9443"
+    fi
+
     # Set basic information
     container_name="portainer"
-    image_name="portainer/portainer-ce:latest"
     install_path="${docker_path}/${container_name}"
 
     case "${software_manage}" in
     install)
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
-        # Instructions: https://hub.docker.com/r/portainer/portainer-ce
         docker volume create ${container_name}_data
         docker run -d --name ${container_name} \
-            -p 8000:8000 \
-            -p 9443:9443 \
+            ${image_port} \
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v ${install_path}/portainer_data:/data \
             --restart always \
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ https://ip:9443 ]"
+        echo -e "${NOTE} The ${container_name} address: [ ${image_url} ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
