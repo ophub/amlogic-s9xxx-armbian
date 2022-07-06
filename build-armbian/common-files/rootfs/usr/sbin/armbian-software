@@ -183,10 +183,10 @@ show_software_list() {
 
     # Select Installed Software Update or Remove
     [[ "${software_state}" == "installed" ]] && {
-        echo -ne "${OPTIONS} [ ${software_name} ] software Update=(u) / Remove=(r), Options u/r: "
+        echo -ne "${OPTIONS} Do you want to Update=(u) or Remove=(r) [ ${software_name} ]? (u/r): "
         read optid
         optid="${optid/U/u}" && optid="${optid/R/r}"
-        [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Input error, Update=(u) / Remove=(r), Options u/r"
+        [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Input error!"
         [[ "${optid:0:1}" == "u" ]] && software_manage="update" || software_manage="remove"
     }
 
