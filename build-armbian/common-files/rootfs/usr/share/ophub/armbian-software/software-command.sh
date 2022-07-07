@@ -44,6 +44,8 @@
 # software_113              : For syncthing:8384(docker)
 # software_114              : For filebrowser:8002(docker)
 # software_115              : For heimdall:8003/8004(docker)
+# software_116              : For node-red:1880(docker)
+# software_117              : For mosquitto:1883/9001(docker)
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
@@ -196,7 +198,7 @@ docker_remove() {
     # Delete old image
     docker_image_remove "${image_name}"
     # Delete the installation directory
-    [[ -d "${install_path}" ]] && rm -rf ${install_path}
+    [[ -d "${install_path}" ]] && rm -rf ${install_path} 2>/dev/null
     exit 0
 }
 
@@ -716,6 +718,83 @@ software_115() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://ip:8003  /  https://ip:8004 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For node-red
+software_116() {
+    # Set basic information
+    container_name="node-red"
+    image_name="nodered/node-red:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://nodered.org/docs/getting-started/docker
+        docker run -itd --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 1880:1880 \
+            -v node_red_data:/data \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:1880 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For mosquitto
+software_117() {
+    # Set basic information
+    container_name="mosquitto"
+    image_name="arm64v8/eclipse-mosquitto:latest"
+    install_path="${docker_path}/${container_name}"
+
+    # Create a local persistent directory
+    mkdir -p ${install_path}/{config/,data/,log/}
+    # Initialize the configuration file
+    mosquitto_conf="${install_path}/config/mosquitto.conf"
+    sudo cat >${mosquitto_conf} <<EOF
+persistence true
+persistence_location ${install_path}/data
+log_dest file ${install_path}/log/mosquitto.log
+EOF
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/arm64v8/eclipse-mosquitto/
+        docker run -itd --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 1883:1883 \
+            -p 9001:9001 \
+            -v ${install_path}/config/mosquitto.conf:/mosquitto/config/mosquitto.conf \
+            -v ${install_path}/data \
+            -v ${install_path}/log \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name}  address [ http://ip:1883  /  http://ip:9001 ]"
+        echo -e "${NOTE} The ${container_name} tutorial [ https://www.mosquitto.org/ ]"
+        echo -e "${NOTE} The ${container_name}  MQTT.fx [ https://softblade.de/en/download-2/ ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
