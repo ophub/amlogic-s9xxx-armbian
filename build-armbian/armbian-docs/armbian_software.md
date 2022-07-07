@@ -21,6 +21,8 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing is a continuous file synchronization program. |
 | 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. |
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
+| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED is a programming tool. It provides a browser-based editor that makes it easy to wire together flows using the wide range of nodes in the palette that can be deployed to its runtime in a single-click. |
+| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | The MQTT protocol provides a lightweight method of carrying out messaging using a publish/subscribe model. Eclipse Mosquitto is an open source implementation of a server for versions 5, 3.1.1, and 3.1 of the MQTT protocol. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
@@ -119,6 +121,8 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing 是一个连续的文件同步程序。 |
 | 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
+| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED 是一种编程工具。它提供了一个基于浏览器的编辑器，使得使用调色板中的各种节点轻松地将流连接在一起，只需单击一下即可部署运行。 |
+| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT 协议提供了一种使用发布/订阅模型执行消息传递的轻量级方法。Eclipse Mosquitto 是 MQTT 协议版本 5、3.1.1 和 3.1 的服务器的开源实现。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
