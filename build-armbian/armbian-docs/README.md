@@ -270,6 +270,7 @@ iface eth0 inet dhcp
 #gateway 192.168.1.6
 #dns-nameservers 192.168.1.6
 
+
 # 03. Docker install OpenWrt and communicate with each other
 #allow-hotplug eth0
 #no-auto-down eth0
