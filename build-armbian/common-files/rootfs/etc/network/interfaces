@@ -19,3 +19,19 @@ iface eth0 inet dhcp
 #netmask 255.255.255.0
 #gateway 192.168.1.6
 #dns-nameservers 192.168.1.6
+
+
+# 03. Docker install OpenWrt and communicate with each other
+#allow-hotplug eth0
+#no-auto-down eth0
+#auto eth0
+#iface eth0 inet manual
+#
+#auto macvlan
+#iface macvlan inet dhcp
+#        hwaddress ether 12:34:56:78:9a:bc
+#        pre-up ip link add macvlan link eth0 type macvlan mode bridge
+#        post-down ip link del macvlan link eth0 type macvlan mode bridge
+#
+#auto lo
+#iface lo inet loopback
