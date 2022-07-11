@@ -46,6 +46,7 @@
 # software_115              : For heimdall:8003/8004(docker)
 # software_116              : For node-red:1880(docker)
 # software_117              : For mosquitto:1883/9001(docker)
+# software_118              : For openwrt(docker)
 #
 # software_201              : For desktop
 # software_202              : For firefox(desktop)
@@ -795,6 +796,55 @@ EOF
         echo -e "${NOTE} The ${container_name}  address [ http://ip:1883  /  http://ip:9001 ]"
         echo -e "${NOTE} The ${container_name} tutorial [ https://www.mosquitto.org/ ]"
         echo -e "${NOTE} The ${container_name}  MQTT.fx [ https://softblade.de/en/download-2/ ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For openwrt
+software_118() {
+    # Set basic information
+    container_name="openwrt"
+    image_name="ophub/openwrt-aarch64:latest"
+    install_path="${docker_path}/${container_name}"
+
+    echo -ne "${OPTIONS} Please enter the docker image, the default is [ ${image_name} ]: "
+    read docker_img
+    [[ -n "${docker_img}" ]] && image_name="${docker_img}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+
+        # Create a virtual network: macvlan
+        my_gateway="$(route -n 2>/dev/null | grep eth0 | awk '($2!~/^0/){print $2}' | uniq | head -n1)"
+        my_macvlan="$(docker network ls 2>/dev/null | grep macvlan | awk '($2 == "macnet" && $3 == "macvlan"){print $2,$3}')"
+        [[ -z "${my_macvlan}" ]] && {
+            echo -ne "${OPTIONS} Add macvlan network, please input gateway, the default is [ ${my_gateway} ]: "
+            read gw
+            [[ -n "${gw}" ]] && my_gateway="${gw}"
+
+            my_subnet="${my_gateway%.*}.0"
+            docker network create -d macvlan --subnet=${my_subnet}/24 --gateway=${my_gateway} -o parent=eth0 macnet
+        }
+
+        # Instructions: https://hub.docker.com/r/ophub/openwrt-aarch64
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            --network macnet \
+            --privileged \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} enter the OpenWrt system [ docker exec -it openwrt bash ]"
+        echo -e "${NOTE} The ${container_name} instructions [ https://hub.docker.com/r/ophub/openwrt-aarch64 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
