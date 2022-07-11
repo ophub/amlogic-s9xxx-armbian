@@ -30,9 +30,10 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [12.4 Set the box to boot from USB/TF/SD](#124-set-the-box-to-boot-from-usbtfsd)
     - [12.5 Disable infrared receiver](#125-disable-infrared-receiver)
     - [12.6 Selection of bootstrap file](#126-selection-of-bootstrap-file)
-    - [12.7 Manually set a static IP address or DHCP dynamically assigns a IP address](#127-manually-set-a-static-ip-address-or-dhcp-dynamically-assigns-a-ip-address)
+    - [12.7 Network settings](#127-network-settings)
       - [12.7.1 Dynamic IP address assignment by DHCP](#1271-dynamic-ip-address-assignment-by-dhcp)
       - [12.7.2 Manually set a static IP address](#1272-manually-set-a-static-ip-address)
+      - [12.7.3 Use OpenWrt in docker to establish interworking network](#1273-use-openwrt-in-docker-to-establish-interworking-network)
     - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
     - [12.9 How to update service scripts in the system](#129-how-to-update-service-scripts-in-the-system)
 
@@ -242,7 +243,7 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
 
-### 12.7 Manually set a static IP address or DHCP dynamically assigns a IP address
+### 12.7 Network settings
 
 The content of the network configuration file [/etc/network/interfaces](../common-files/rootfs/etc/network/interfaces) is as follows:
 
@@ -268,6 +269,21 @@ iface eth0 inet dhcp
 #netmask 255.255.255.0
 #gateway 192.168.1.6
 #dns-nameservers 192.168.1.6
+
+# 03. Docker install OpenWrt and communicate with each other
+#allow-hotplug eth0
+#no-auto-down eth0
+#auto eth0
+#iface eth0 inet manual
+#
+#auto macvlan
+#iface macvlan inet dhcp
+#        hwaddress ether 12:34:56:78:9a:bc
+#        pre-up ip link add macvlan link eth0 type macvlan mode bridge
+#        post-down ip link del macvlan link eth0 type macvlan mode bridge
+#
+#auto lo
+#iface lo inet loopback
 ```
 
 By default, the DHCP dynamic IP allocation strategy (method 1) is used, and the IP is automatically allocated by the network router connected to Armbian. If you want to change to static IP, you can disable or delete the setting method 1, and enable the static IP setting of method 2.
@@ -296,6 +312,28 @@ address 192.168.1.100
 netmask 255.255.255.0
 gateway 192.168.1.1
 dns-nameservers 192.168.1.1
+```
+
+#### 12.7.3 Use OpenWrt in docker to establish interworking network
+
+The MAC address in it can be modified according to your needs.
+
+```yaml
+source /etc/network/interfaces.d/*
+
+allow-hotplug eth0
+no-auto-down eth0
+auto eth0
+iface eth0 inet manual
+
+auto macvlan
+iface macvlan inet dhcp
+        hwaddress ether 12:34:56:78:9a:bc
+        pre-up ip link add macvlan link eth0 type macvlan mode bridge
+        post-down ip link del macvlan link eth0 type macvlan mode bridge
+
+auto lo
+iface lo inet loopback
 ```
 
 ### 12.8 How to add startup tasks
