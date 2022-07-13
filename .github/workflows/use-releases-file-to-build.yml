@@ -17,7 +17,6 @@ on:
         options:
           - jammy
           - bullseye
-          - sid
       armbian_soc:
         description: "Select Amlogic SoC."
         required: false
