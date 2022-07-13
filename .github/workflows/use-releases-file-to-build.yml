@@ -120,7 +120,7 @@ jobs:
           echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
-      - name: Rebuild Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} ]
+      - name: Rebuild Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
         if: steps.down.outputs.status == 'success' && !cancelled()
         with:
