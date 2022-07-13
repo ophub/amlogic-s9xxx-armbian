@@ -9,14 +9,6 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      set_branch:
-        description: "Select kernel and u-boot branch."
-        required: false
-        default: "current"
-        type: choice
-        options:
-          - current
-          - edge
       set_release:
         description: "Select OS Release."
         required: false
@@ -25,7 +17,6 @@ on:
         options:
           - jammy
           - bullseye
-          - sid
       set_desktop:
         description: "Select build server or desktop image."
         required: false
@@ -140,7 +131,6 @@ jobs:
           [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
           echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
 
-          echo "ARMBIAN_BRANCH=${{ github.event.inputs.set_branch }}" >> $GITHUB_ENV
           echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
@@ -155,7 +145,7 @@ jobs:
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=odroidn2 BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_DESKTOP_STR }} \
+          sudo ./compile.sh BOARD=odroidn2 BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_DESKTOP_STR }} \
                             HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
