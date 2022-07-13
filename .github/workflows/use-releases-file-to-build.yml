@@ -112,21 +112,21 @@ jobs:
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
           #
-          # down_tag: Armbian_Aml_bullseye_gnome_desktop
-          down_tag="${down_filename%%/*}" && down_tag="${down_tag%_*}"
-          echo "ARMBIAN_RELEASE=${down_tag}" >> $GITHUB_ENV
+          # down_tags: Armbian_Aml_bullseye_gnome_desktop
+          down_tags="${down_filename%%/*}" && down_tags="${down_tags%_*}"
+          echo "ARMBIAN_TAGS=${down_tags}" >> $GITHUB_ENV
           #
-          # down_board: bullseye
-          down_board="$(echo ${down_tag} | cut -d"_" -f3)"
-          echo "ARMBIAN_BOARD=${down_board}" >> $GITHUB_ENV
+          # down_release: bullseye
+          down_release="$(echo ${down_tags} | cut -d"_" -f3)"
+          echo "ARMBIAN_RELEASE=${down_release}" >> $GITHUB_ENV
           #
           # down_edition: gnome_desktop
-          down_edition="$(echo ${down_tag} | cut -d"_" -f4-)"
+          down_edition="$(echo ${down_tags} | cut -d"_" -f4-)"
           echo "ARMBIAN_DESKTOP_OPT=${down_edition}" >> $GITHUB_ENV
           #
           echo "::set-output name=status::success"
 
-      - name: Rebuild Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+      - name: Rebuild Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
         if: steps.down.outputs.status == 'success' && !cancelled()
         with:
@@ -143,7 +143,7 @@ jobs:
         uses: ncipollo/release-action@main
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
-          tag: ${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: ${{ env.ARMBIAN_TAGS }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
