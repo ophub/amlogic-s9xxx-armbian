@@ -172,7 +172,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ Board is ${{ env.ARMBIAN_BOARD }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+      - name: Compile Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
