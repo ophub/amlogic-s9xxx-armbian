@@ -111,7 +111,7 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} ]
+      - name: Compile Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
