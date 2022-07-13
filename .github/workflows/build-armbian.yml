@@ -24,16 +24,8 @@ on:
         type: choice
         options:
           - jammy
-          - focal
           - bullseye
-      set_board:
-        description: "Select board name."
-        required: false
-        default: "odroidn2"
-        type: choice
-        options:
-          - odroidn2
-          - lepotato
+          - sid
       set_desktop:
         description: "Select build server or desktop image."
         required: false
@@ -41,6 +33,7 @@ on:
         type: choice
         options:
           - server
+          - gnome
           - xfce
       armbian_soc:
         description: "Select Amlogic SoC."
@@ -115,6 +108,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Initialization environment
+        id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -128,29 +122,8 @@ jobs:
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
-          ARR_BRANCH=("edge" "current")
-          set_branch="${{ github.event.inputs.set_branch }}"
-          if  [[ -z "${set_branch}" || -z "$(echo "${ARR_BRANCH[@]}" | grep -w "${set_branch}")" ]]; then
-              set_branch="current"
-          fi
-          echo "ARMBIAN_BRANCH=${set_branch}" >> $GITHUB_ENV
-
-          ARR_RELEASE=("jammy" "focal" "bullseye")
-          set_release="${{ github.event.inputs.set_release }}"
-          if  [[ -z "${set_release}" || -z "$(echo "${ARR_RELEASE[@]}" | grep -w "${set_release}")" ]]; then
-              set_release="focal"
-          fi
-          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
-
-          ARR_BOARD=("odroidn2" "lepotato")
-          set_board="${{ github.event.inputs.set_board }}"
-          if  [[ -z "${set_board}" || -z "$(echo "${ARR_BOARD[@]}" | grep -w "${set_board}")" ]]; then
-              set_board="odroidn2"
-          fi
-          echo "ARMBIAN_BOARD=${set_board}" >> $GITHUB_ENV
-
           # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
-          ARR_DESKTOP=("budgie" "cinnamon" "gnome" "mate" "xmonad" "xfce")
+          ARR_DESKTOP=("gnome" "budgie" "cinnamon" "xfce" "kde-plasma")
           set_desktop="${{ github.event.inputs.set_desktop }}"
           if  [[ "${set_desktop}" != "server" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
               # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
@@ -167,6 +140,10 @@ jobs:
           [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
           echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
 
+          echo "ARMBIAN_BRANCH=${{ github.event.inputs.set_branch }}" >> $GITHUB_ENV
+          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
+
       - name: Download source code
         id: down
         run: |
@@ -178,7 +155,7 @@ jobs:
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} ${{ env.ARMBIAN_DESKTOP_STR }} \
+          sudo ./compile.sh BOARD=odroidn2 BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_DESKTOP_STR }} \
                             HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
