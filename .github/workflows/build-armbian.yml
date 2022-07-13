@@ -17,15 +17,6 @@ on:
         options:
           - jammy
           - bullseye
-      set_desktop:
-        description: "Select build server or desktop image."
-        required: false
-        default: "server"
-        type: choice
-        options:
-          - server
-          - gnome
-          - xfce
       armbian_soc:
         description: "Select Amlogic SoC."
         required: false
@@ -112,25 +103,6 @@ jobs:
           sudo mkdir -p /workdir
           sudo chown $USER:$GROUPS /workdir
           echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
-
-          # Desktop Environment Options: https://github.com/armbian/build/tree/master/config/desktop/bullseye/environments
-          ARR_DESKTOP=("gnome" "budgie" "cinnamon" "xfce" "kde-plasma")
-          set_desktop="${{ github.event.inputs.set_desktop }}"
-          if  [[ "${set_desktop}" != "server" && -n "$(echo "${ARR_DESKTOP[@]}" | grep -w "${set_desktop}")" ]]; then
-              # Desktop configuration: https://github.com/armbian/build/tree/master/config/desktop
-              str_desktop="BUILD_DESKTOP=yes DESKTOP_ENVIRONMENT=${set_desktop} DESKTOP_ENVIRONMENT_CONFIG_NAME=config_basic"
-              edition_name="${set_desktop}_desktop"
-          else
-              str_desktop="BUILD_DESKTOP=no"
-              edition_name="server"
-          fi
-          echo "ARMBIAN_DESKTOP_STR=${str_desktop}" >> $GITHUB_ENV
-          echo "ARMBIAN_DESKTOP_OPT=${edition_name}" >> $GITHUB_ENV
-
-          set_armbian_sign="${{ github.event.inputs.armbian_sign }}"
-          [[ -z "${set_armbian_sign}" ]] && set_armbian_sign="_${edition_name}"
-          echo "ARMBIAN_CUSTOM_NAME=${set_armbian_sign}" >> $GITHUB_ENV
-
           echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
@@ -139,14 +111,14 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
 
-      - name: Compile Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} / Edition is ${{ env.ARMBIAN_DESKTOP_OPT }} ]
+      - name: Compile Armbian [ Release is ${{ env.ARMBIAN_RELEASE }} ]
         id: compile
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo chmod +x compile.sh
-          sudo ./compile.sh BOARD=odroidn2 BRANCH=current RELEASE=${{ env.ARMBIAN_RELEASE }} ${{ env.ARMBIAN_DESKTOP_STR }} \
-                            HOST=armbian EXPERT=yes BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+          sudo ./compile.sh RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=odroidn2 BRANCH=current BUILD_DESKTOP=no HOST=armbian EXPERT=yes \
+                            BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
           echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for Amlogic s9xxx
@@ -160,13 +132,13 @@ jobs:
           auto_kernel: ${{ github.event.inputs.auto_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
           armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
-          armbian_sign: ${{ env.ARMBIAN_CUSTOM_NAME }}
+          armbian_sign: ${{ github.event.inputs.armbian_sign }}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
         if: env.PACKAGED_STATUS == 'success' && !cancelled()
         with:
-          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.ARMBIAN_DESKTOP_OPT }}_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
@@ -177,4 +149,3 @@ jobs:
             Default password: 1234
             Install command: armbian-install
             Update command: armbian-update
-            Edition: ${{ env.ARMBIAN_DESKTOP_OPT }}
