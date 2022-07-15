@@ -18,6 +18,7 @@ on:
           - jammy
           - focal
           - bullseye
+          - buster
       armbian_soc:
         description: "Select Amlogic SoC."
         required: false
