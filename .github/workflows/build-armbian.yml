@@ -16,6 +16,8 @@ on:
         type: choice
         options:
           - jammy
+          - focal
+          - buster
           - bullseye
       armbian_soc:
         description: "Select Amlogic SoC."
