@@ -99,7 +99,7 @@ sync_config() {
     echo -e "${STEPS} Start syncing software service script..."
     [[ -d "${share_path}" ]] || mkdir -p ${share_path}
     svn export ${github_repo}/${share_path} ${share_path} --force
-    chmod +x ${share_path}/armbian-software/*.sh
+    find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
 
     # Update openvfd related files
     echo -e "${STEPS} Start syncing openvfd service script..."
