@@ -63,11 +63,11 @@
 # software_213              : For eog(desktop)
 # software_214              : For visual.studio.code(desktop)
 # software_215              : For gedit(desktop)
+# software_216              : For kvm(desktop)
 #
 # software_303              : For plex
 # software_304              : For emby-server
 # software_305              : For openmediavault(OMV-6.x)
-# software_306              : For kvm(kernel-based virtual machine)
 #
 # init_var                  : Initialize variables
 #
@@ -222,7 +222,7 @@ software_101() {
     esac
 }
 
-# For portainer
+# For portainer(docker)
 software_102() {
     # Installation options
     echo -ne "${OPTIONS} Do you choose Chinese=(c) or English=(e) version of portainer? (c/e): "
@@ -266,7 +266,7 @@ software_102() {
     esac
 }
 
-# For yacht
+# For yacht(docker)
 software_103() {
     # Set basic information
     container_name="yacht"
@@ -304,7 +304,7 @@ software_103() {
     esac
 }
 
-# For transmission
+# For transmission(docker)
 software_104() {
     # Set basic information
     container_name="transmission"
@@ -364,7 +364,7 @@ software_104() {
     esac
 }
 
-# For qbittorrent
+# For qbittorrent(docker)
 software_105() {
     # Set basic information
     container_name="qbittorrent"
@@ -400,7 +400,7 @@ software_105() {
     esac
 }
 
-# For nextcloud
+# For nextcloud(docker)
 software_106() {
     # Set basic information
     container_name="nextcloud"
@@ -434,7 +434,7 @@ software_106() {
     esac
 }
 
-# For jellyfin
+# For jellyfin(docker)
 software_107() {
     # Set basic information
     container_name="jellyfin"
@@ -470,7 +470,7 @@ software_107() {
     esac
 }
 
-# For homeassistant
+# For homeassistant(docker)
 software_108() {
     # Set basic information
     container_name="homeassistant"
@@ -503,7 +503,7 @@ software_108() {
     esac
 }
 
-# For kodbox
+# For kodbox(docker)
 software_109() {
     # Set basic information
     container_name="kodbox"
@@ -535,7 +535,7 @@ software_109() {
     esac
 }
 
-# For couchpotato
+# For couchpotato(docker)
 software_110() {
     # Set basic information
     container_name="couchpotato"
@@ -568,7 +568,7 @@ software_110() {
     esac
 }
 
-# For sonarr
+# For sonarr(docker)
 software_111() {
     # Set basic information
     container_name="sonarr"
@@ -601,7 +601,7 @@ software_111() {
     esac
 }
 
-# For radarr
+# For radarr(docker)
 software_112() {
     # Set basic information
     container_name="radarr"
@@ -634,7 +634,7 @@ software_112() {
     esac
 }
 
-# For syncthing
+# For syncthing(docker)
 software_113() {
     # Set basic information
     container_name="syncthing"
@@ -671,7 +671,7 @@ software_113() {
     esac
 }
 
-# For filebrowser
+# For filebrowser(docker)
 software_114() {
     # Set basic information
     container_name="filebrowser"
@@ -705,7 +705,7 @@ software_114() {
     esac
 }
 
-# For heimdall
+# For heimdall(docker)
 software_115() {
     # Set basic information
     container_name="heimdall"
@@ -737,7 +737,7 @@ software_115() {
     esac
 }
 
-# For node-red
+# For node-red(docker)
 software_116() {
     # Set basic information
     container_name="node-red"
@@ -768,7 +768,7 @@ software_116() {
     esac
 }
 
-# For mosquitto
+# For mosquitto(docker)
 software_117() {
     # Set basic information
     container_name="mosquitto"
@@ -814,7 +814,7 @@ EOF
     esac
 }
 
-# For openwrt
+# For openwrt(docker)
 software_118() {
     # Set basic information
     container_name="openwrt"
@@ -902,7 +902,7 @@ software_201() {
     esac
 }
 
-# For firefox
+# For firefox(desktop)
 software_202() {
     case "${software_manage}" in
     install)
@@ -927,7 +927,7 @@ software_202() {
     esac
 }
 
-# For vlc
+# For vlc(desktop)
 software_203() {
     case "${software_manage}" in
     install) software_install "vlc" ;;
@@ -937,7 +937,7 @@ software_203() {
     esac
 }
 
-# For mpv
+# For mpv(desktop)
 software_204() {
     case "${software_manage}" in
     install) software_install "mpv" ;;
@@ -947,7 +947,7 @@ software_204() {
     esac
 }
 
-# For gimp
+# For gimp(desktop)
 software_205() {
     case "${software_manage}" in
     install) software_install "gimp" ;;
@@ -957,7 +957,7 @@ software_205() {
     esac
 }
 
-# For krita
+# For krita(desktop)
 software_206() {
     case "${software_manage}" in
     install) software_install "krita" ;;
@@ -967,7 +967,7 @@ software_206() {
     esac
 }
 
-# For libreoffice
+# For libreoffice(desktop)
 software_207() {
     case "${software_manage}" in
     install) software_install "libreoffice libreoffice-l10n-zh-cn libreoffice-help-zh-cn" ;;
@@ -977,7 +977,7 @@ software_207() {
     esac
 }
 
-# For shotcut
+# For shotcut(desktop)
 software_208() {
     case "${software_manage}" in
     install) software_install "shotcut" ;;
@@ -987,7 +987,7 @@ software_208() {
     esac
 }
 
-# For kdenlive
+# For kdenlive(desktop)
 software_209() {
     case "${software_manage}" in
     install) software_install "kdenlive" ;;
@@ -997,7 +997,7 @@ software_209() {
     esac
 }
 
-# For thunderbird
+# For thunderbird(desktop)
 software_210() {
     case "${software_manage}" in
     install) software_install "thunderbird" ;;
@@ -1007,7 +1007,7 @@ software_210() {
     esac
 }
 
-# For evolution
+# For evolution(desktop)
 software_211() {
     case "${software_manage}" in
     install) software_install "evolution" ;;
@@ -1017,7 +1017,7 @@ software_211() {
     esac
 }
 
-# For gwenview
+# For gwenview(desktop)
 software_212() {
     case "${software_manage}" in
     install) software_install "gwenview" ;;
@@ -1027,7 +1027,7 @@ software_212() {
     esac
 }
 
-# For eog
+# For eog(desktop)
 software_213() {
     case "${software_manage}" in
     install) software_install "eog" ;;
@@ -1037,7 +1037,7 @@ software_213() {
     esac
 }
 
-# For visual.studio.code
+# For visual.studio.code(desktop)
 software_214() {
     case "${software_manage}" in
     install)
@@ -1052,12 +1052,88 @@ software_214() {
     esac
 }
 
-# For gedit
+# For gedit(desktop)
 software_215() {
     case "${software_manage}" in
     install) software_install "gedit" ;;
     update) software_update ;;
     remove) software_remove "gedit" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For kvm(desktop)
+software_216() {
+    my_network_br0="/etc/network/interfaces.d/br0"
+    case "${software_manage}" in
+    install)
+        # Check the system operating environment
+        [[ -n "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm|xfce')" ]] || error_msg "KVM requires a desktop environment, please install the desktop(Software ID: 201) first."
+
+        # Install KVM
+        echo -e "${STEPS} Start installing KVM and other related virtualization packages..."
+        software_install "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+
+        # Enable and start the libvirt daemon
+        echo -e "${STEPS} Start enabling and starting the libvirt daemon..."
+        sudo systemctl daemon-reload
+        sudo systemctl enable libvirtd
+        sudo systemctl start libvirtd
+
+        # Add the current logged-in user to the kvm​ and libvirt user groups
+        echo -e "${STEPS} Start adding the current logged-in user(${USER}) to the kvm and libvirt user groups..."
+        sudo usermod -aG kvm ${USER}
+        sudo usermod -aG libvirt ${USER}
+
+        # Add network bridge settings template
+        echo -e "${STEPS} Start adding bridged network settings template..."
+        [[ -z "${my_address}" || -z "${my_broadcast}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
+            echo -ne "${OPTIONS} Please input IP address, the default is [ ${my_address} ]: "
+            read get_address
+            [[ -n "${get_address}" ]] && my_address="${get_address}"
+
+            echo -ne "${OPTIONS} Please input broadcast, the default is [ ${my_broadcast} ]: "
+            read get_broadcast
+            [[ -n "${get_broadcast}" ]] && my_broadcast="${get_broadcast}"
+
+            echo -ne "${OPTIONS} Please input netmask, the default is [ ${my_netmask} ]: "
+            read get_netmask
+            [[ -n "${get_netmask}" ]] && my_netmask="${get_netmask}"
+
+            echo -ne "${OPTIONS} Please input gateway, the default is [ ${my_gateway} ]: "
+            read get_gateway
+            [[ -n "${get_gateway}" ]] && my_gateway="${get_gateway}"
+        }
+        sudo rm -f ${my_network_br0} 2>/dev/null
+        sudo cat >${my_network_br0} <<EOF
+# eth0 setup
+allow-hotplug eth0
+iface eth0 inet manual
+        pre-up ifconfig \$IFACE up
+        pre-down ifconfig \$IFACE down
+
+# Bridge setup: Please modify the [ address, broadcast, netmask, gateway and dns-nameservers ] to your own network
+auto br0
+iface br0 inet static
+        bridge_ports eth0
+        bridge_stp off
+        bridge_waitport 0
+        bridge_fd 0
+        address ${my_address}
+        broadcast ${my_broadcast}
+        netmask ${my_netmask}
+        gateway ${my_gateway}
+        dns-nameservers ${my_gateway}
+EOF
+        sync && sleep 3
+        echo -e "${NOTE} Please modify the bridge network settings: [ vi ${my_network_br0} ]"
+        echo -e "${SUCCESS} The KVM installation is successful."
+        ;;
+    update) software_update ;;
+    remove)
+        software_remove "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+        sudo rm -f ${my_network_br0} 2>/dev/null
+        ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
@@ -1189,82 +1265,6 @@ software_305() {
         ;;
     update) software_update ;;
     remove) software_remove "openmediavault" ;;
-    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
-    esac
-}
-
-# For kvm(kernel-based virtual machine)
-software_306() {
-    my_network_br0="/etc/network/interfaces.d/br0"
-    case "${software_manage}" in
-    install)
-        # Check the system operating environment
-        [[ -n "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm|xfce')" ]] || error_msg "KVM requires a desktop environment, please install the desktop(Software ID: 201) first."
-
-        # Install KVM
-        echo -e "${STEPS} Start installing KVM and other related virtualization packages..."
-        software_install "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
-
-        # Enable and start the libvirt daemon
-        echo -e "${STEPS} Start enabling and starting the libvirt daemon..."
-        sudo systemctl daemon-reload
-        sudo systemctl enable libvirtd
-        sudo systemctl start libvirtd
-
-        # Add the current logged-in user to the kvm​ and libvirt user groups
-        echo -e "${STEPS} Start adding the current logged-in user(${USER}) to the kvm and libvirt user groups..."
-        sudo usermod -aG kvm ${USER}
-        sudo usermod -aG libvirt ${USER}
-
-        # Add network bridge settings template
-        echo -e "${STEPS} Start adding bridged network settings template..."
-        [[ -z "${my_address}" || -z "${my_broadcast}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
-            echo -ne "${OPTIONS} Please input IP address, the default is [ ${my_address} ]: "
-            read get_address
-            [[ -n "${get_address}" ]] && my_address="${get_address}"
-
-            echo -ne "${OPTIONS} Please input broadcast, the default is [ ${my_broadcast} ]: "
-            read get_broadcast
-            [[ -n "${get_broadcast}" ]] && my_broadcast="${get_broadcast}"
-
-            echo -ne "${OPTIONS} Please input netmask, the default is [ ${my_netmask} ]: "
-            read get_netmask
-            [[ -n "${get_netmask}" ]] && my_netmask="${get_netmask}"
-
-            echo -ne "${OPTIONS} Please input gateway, the default is [ ${my_gateway} ]: "
-            read get_gateway
-            [[ -n "${get_gateway}" ]] && my_gateway="${get_gateway}"
-        }
-        sudo rm -f ${my_network_br0} 2>/dev/null
-        sudo cat >${my_network_br0} <<EOF
-# eth0 setup
-allow-hotplug eth0
-iface eth0 inet manual
-        pre-up ifconfig \$IFACE up
-        pre-down ifconfig \$IFACE down
-
-# Bridge setup: Please modify the [ address, broadcast, netmask, gateway and dns-nameservers ] to your own network
-auto br0
-iface br0 inet static
-        bridge_ports eth0
-        bridge_stp off
-        bridge_waitport 0
-        bridge_fd 0
-        address ${my_address}
-        broadcast ${my_broadcast}
-        netmask ${my_netmask}
-        gateway ${my_gateway}
-        dns-nameservers ${my_gateway}
-EOF
-        sync && sleep 3
-        echo -e "${NOTE} Please modify the bridge network settings: [ vi ${my_network_br0} ]"
-        echo -e "${SUCCESS} The KVM installation is successful."
-        ;;
-    update) software_update ;;
-    remove)
-        software_remove "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
-        sudo rm -f ${my_network_br0} 2>/dev/null
-        ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
