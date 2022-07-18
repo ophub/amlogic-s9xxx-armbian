@@ -67,6 +67,7 @@
 # software_303              : For plex
 # software_304              : For emby-server
 # software_305              : For openmediavault(OMV-6.x)
+# software_306              : For kvm(kernel-based virtual machine)
 #
 # init_var                  : Initialize variables
 #
@@ -86,6 +87,14 @@ tv_path="/opt/tv"
 docker_puid="1000"
 docker_pgid="1000"
 docker_tz="Asia/Shanghai"
+#
+# Get current network status
+my_ifconfig="$(ifconfig -a 2>/dev/null | grep inet | grep -v 'inet6.*' | grep -v 'inet 172.*' | grep -v 'inet 127.*' | head -n1)"
+my_address="$(echo ${my_ifconfig} | awk '{print $2}' | tr -d "addr:")"
+my_netmask="$(echo ${my_ifconfig} | awk '{print $4}')"
+my_broadcast="$(echo ${my_ifconfig} | awk '{print $6}')"
+my_gateway="$(route -n 2>/dev/null | grep eth0 | awk '($2!~/^0/){print $2}' | uniq | head -n1)"
+my_macvlan="$(docker network ls 2>/dev/null | grep macvlan | awk '($2 == "macnet" && $3 == "macvlan"){print $2,$3}')"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -821,8 +830,6 @@ software_118() {
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
 
         # Create a virtual network: macvlan
-        my_gateway="$(route -n 2>/dev/null | grep eth0 | awk '($2!~/^0/){print $2}' | uniq | head -n1)"
-        my_macvlan="$(docker network ls 2>/dev/null | grep macvlan | awk '($2 == "macnet" && $3 == "macvlan"){print $2,$3}')"
         [[ -z "${my_macvlan}" ]] && {
             echo -ne "${OPTIONS} Add macvlan network, please input gateway, the default is [ ${my_gateway} ]: "
             read gw
@@ -1084,8 +1091,8 @@ software_303() {
         # Enable Plex server to start automatically on system boot
         echo -e "${STEPS} Start setting up the Plex server to start automatically at system boot..."
         sudo systemctl daemon-reload
-        sudo systemctl start plexmediaserver.service
         sudo systemctl enable plexmediaserver.service
+        sudo systemctl start plexmediaserver.service
 
         # Confirm the service is enabled
         echo -e "${STEPS} Confirm the service is enabled..."
@@ -1130,8 +1137,8 @@ software_304() {
         # Enable Emby Server to start automatically on system boot
         echo -e "${STEPS} Start setting up the Emby Server to start automatically at system boot..."
         sudo systemctl daemon-reload
-        sudo systemctl start emby-server.service
         sudo systemctl enable emby-server.service
+        sudo systemctl start emby-server.service
 
         # Confirm the service is enabled
         echo -e "${STEPS} Confirm the service is enabled..."
@@ -1153,13 +1160,11 @@ software_305() {
     case "${software_manage}" in
     install)
         echo -e "${STEPS} Start checking the installation environment..."
-        # Check script permission
-        [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo ${0} -s 104 -m install ]"
         # Check systemd running status
         systemd="$(ps --no-headers -o comm 1)"
         [[ "${systemd}" == "systemd" ]] || error_msg "This system is not running systemd."
         # Check the system operating environment
-        [[ -z "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm')" ]] || error_msg "OpenMediaVault does not support running in desktop environment!"
+        [[ -z "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm|xfce')" ]] || error_msg "OpenMediaVault does not support running in desktop environment!"
 
         # Download software, E.g: /tmp/tmp.xxx/install
         tmp_download="$(mktemp -d)"
@@ -1184,6 +1189,82 @@ software_305() {
         ;;
     update) software_update ;;
     remove) software_remove "openmediavault" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For kvm(kernel-based virtual machine)
+software_306() {
+    my_network_br0="/etc/network/interfaces.d/br0"
+    case "${software_manage}" in
+    install)
+        # Check the system operating environment
+        [[ -n "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm|xfce')" ]] || error_msg "KVM requires a desktop environment, please install the desktop(Software ID: 201) first."
+
+        # Install KVM
+        echo -e "${STEPS} Start installing KVM and other related virtualization packages..."
+        software_install "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+
+        # Enable and start the libvirt daemon
+        echo -e "${STEPS} Start enabling and starting the libvirt daemon..."
+        sudo systemctl daemon-reload
+        sudo systemctl enable libvirtd
+        sudo systemctl start libvirtd
+
+        # Add the current logged-in user to the kvm​ and libvirt user groups
+        echo -e "${STEPS} Start adding the current logged-in user(${USER}) to the kvm and libvirt user groups..."
+        sudo usermod -aG kvm ${USER}
+        sudo usermod -aG libvirt ${USER}
+
+        # Add network bridge settings template
+        echo -e "${STEPS} Start adding bridged network settings template..."
+        [[ -z "${my_address}" || -z "${my_broadcast}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
+            echo -ne "${OPTIONS} Please input IP address, the default is [ ${my_address} ]: "
+            read get_address
+            [[ -n "${get_address}" ]] && my_address="${get_address}"
+
+            echo -ne "${OPTIONS} Please input broadcast, the default is [ ${my_broadcast} ]: "
+            read get_broadcast
+            [[ -n "${get_broadcast}" ]] && my_broadcast="${get_broadcast}"
+
+            echo -ne "${OPTIONS} Please input netmask, the default is [ ${my_netmask} ]: "
+            read get_netmask
+            [[ -n "${get_netmask}" ]] && my_netmask="${get_netmask}"
+
+            echo -ne "${OPTIONS} Please input gateway, the default is [ ${my_gateway} ]: "
+            read get_gateway
+            [[ -n "${get_gateway}" ]] && my_gateway="${get_gateway}"
+        }
+        sudo rm -f ${my_network_br0} 2>/dev/null
+        sudo cat >${my_network_br0} <<EOF
+# eth0 setup
+allow-hotplug eth0
+iface eth0 inet manual
+        pre-up ifconfig \$IFACE up
+        pre-down ifconfig \$IFACE down
+
+# Bridge setup: Please modify the [ address, broadcast, netmask, gateway and dns-nameservers ] to your own network
+auto br0
+iface br0 inet static
+        bridge_ports eth0
+        bridge_stp off
+        bridge_waitport 0
+        bridge_fd 0
+        address ${my_address}
+        broadcast ${my_broadcast}
+        netmask ${my_netmask}
+        gateway ${my_gateway}
+        dns-nameservers ${my_gateway}
+EOF
+        sync && sleep 3
+        echo -e "${NOTE} Please modify the bridge network settings: [ vi ${my_network_br0} ]"
+        echo -e "${SUCCESS} The KVM installation is successful."
+        ;;
+    update) software_update ;;
+    remove)
+        software_remove "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+        sudo rm -f ${my_network_br0} 2>/dev/null
+        ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
