@@ -1078,7 +1078,7 @@ software_216() {
     my_network_br0="/etc/network/interfaces.d/br0"
     kvm_package_list="\
         gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
-        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker dnsmasq-base dmidecode \
+        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 \
         "
 
     case "${software_manage}" in
@@ -1146,6 +1146,7 @@ iface br0 inet static
         gateway ${my_gateway}
         dns-nameservers ${my_gateway}
 EOF
+
         sync && sleep 3
         echo -e "${NOTE} Please modify the bridge network settings: [ vi ${my_network_br0} ]"
         echo -e "${SUCCESS} The KVM installation is successful."
