@@ -90,11 +90,11 @@ docker_tz="Asia/Shanghai"
 #
 # Get current network status
 my_ifconfig="$(ifconfig -a 2>/dev/null | grep inet | grep -v 'inet6.*' | grep -v 'inet 172.*' | grep -v 'inet 127.*' | head -n1)"
-my_address="$(echo ${my_ifconfig} | awk '{print $2}' | tr -d "addr:")"
+my_address="$(echo ${my_ifconfig} | awk '{print $2}')"
 my_netmask="$(echo ${my_ifconfig} | awk '{print $4}')"
 my_broadcast="$(echo ${my_ifconfig} | awk '{print $6}')"
-my_gateway="$(route -n 2>/dev/null | grep eth0 | awk '($2!~/^0/){print $2}' | uniq | head -n1)"
-my_macvlan="$(docker network ls 2>/dev/null | grep macvlan | awk '($2 == "macnet" && $3 == "macvlan"){print $2,$3}')"
+my_gateway="$(route -n 2>/dev/null | awk '($2~/^1/){print $2}' | head -n1)"
+my_macvlan="$(docker network ls 2>/dev/null | grep macvlan | awk '($2 == "macnet" && $3 == "macvlan"){print $2,$3}' | head -n1)"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -821,7 +821,7 @@ software_118() {
     image_name="ophub/openwrt-aarch64:latest"
     install_path="${docker_path}/${container_name}"
 
-    echo -ne "${OPTIONS} Please enter the docker image, the default is [ ${image_name} ]: "
+    echo -ne "${OPTIONS} Please input the docker image, the default is [ ${image_name} ]: "
     read docker_img
     [[ -n "${docker_img}" ]] && image_name="${docker_img}"
 
@@ -865,6 +865,16 @@ software_118() {
 software_201() {
     case "${software_manage}" in
     install)
+        # Add login desktop system user
+        echo -ne "${OPTIONS} Please input the login desktop system user(non-root): "
+        read get_desktop_user
+        if [[ -n "${get_desktop_user}" ]]; then
+            sudo adduser ${get_desktop_user}
+            sudo usermod -aG sudo ${get_desktop_user}
+        else
+            echo -e "${NOTE} You skipped adding the logged in desktop system user."
+        fi
+
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Install ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
             software_install "ubuntu-desktop lightdm"
@@ -1064,7 +1074,13 @@ software_215() {
 
 # For kvm(desktop)
 software_216() {
+    # kvm general settings
     my_network_br0="/etc/network/interfaces.d/br0"
+    kvm_package_list="\
+        gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
+        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker dnsmasq-base dmidecode \
+        "
+
     case "${software_manage}" in
     install)
         # Check the system operating environment
@@ -1072,18 +1088,23 @@ software_216() {
 
         # Install KVM
         echo -e "${STEPS} Start installing KVM and other related virtualization packages..."
-        software_install "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+        software_install "${kvm_package_list}"
 
-        # Enable and start the libvirt daemon
-        echo -e "${STEPS} Start enabling and starting the libvirt daemon..."
+        # Get desktop system login user
+        echo -ne "${OPTIONS} Please input the login desktop system user(non-root): "
+        read get_desktop_user
+        [[ -n "${get_desktop_user}" ]] && my_user="${get_desktop_user}" || my_user="${USER}"
+        # Add the login desktop system user to the kvm​ and libvirt user groups
+        echo -e "${STEPS} Start adding the current logged-in user(${my_user}) to the kvm and libvirt user groups..."
+        sudo usermod -aG kvm ${my_user}
+        sudo usermod -aG libvirt ${my_user}
+
+        # Enable and start the libvirtd.service daemon
+        echo -e "${STEPS} Start enabling and starting the libvirtd.service daemon..."
         sudo systemctl daemon-reload
-        sudo systemctl enable libvirtd
-        sudo systemctl start libvirtd
-
-        # Add the current logged-in user to the kvm​ and libvirt user groups
-        echo -e "${STEPS} Start adding the current logged-in user(${USER}) to the kvm and libvirt user groups..."
-        sudo usermod -aG kvm ${USER}
-        sudo usermod -aG libvirt ${USER}
+        sudo systemctl enable --now libvirtd.service
+        sudo systemctl start libvirtd.service
+        #sudo systemctl status libvirtd.service
 
         # Add network bridge settings template
         echo -e "${STEPS} Start adding bridged network settings template..."
@@ -1131,7 +1152,7 @@ EOF
         ;;
     update) software_update ;;
     remove)
-        software_remove "gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 cpu-checker"
+        software_remove "${kvm_package_list}"
         sudo rm -f ${my_network_br0} 2>/dev/null
         ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
@@ -1167,7 +1188,7 @@ software_303() {
         # Enable Plex server to start automatically on system boot
         echo -e "${STEPS} Start setting up the Plex server to start automatically at system boot..."
         sudo systemctl daemon-reload
-        sudo systemctl enable plexmediaserver.service
+        sudo systemctl enable --now plexmediaserver.service
         sudo systemctl start plexmediaserver.service
 
         # Confirm the service is enabled
@@ -1213,7 +1234,7 @@ software_304() {
         # Enable Emby Server to start automatically on system boot
         echo -e "${STEPS} Start setting up the Emby Server to start automatically at system boot..."
         sudo systemctl daemon-reload
-        sudo systemctl enable emby-server.service
+        sudo systemctl enable --now emby-server.service
         sudo systemctl start emby-server.service
 
         # Confirm the service is enabled
