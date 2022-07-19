@@ -69,9 +69,8 @@ check_release() {
 check_depends() {
     # List of required dependencies
     dpkg_packages=(
-        "curl" "wget" "tar"
-        "subversion" "coreutils" "systemd" "net-tools"
-        "software-properties-common" "apt-transport-https" "ca-certificates"
+        "curl" "wget" "tar" "software-properties-common" "apt-transport-https" "ca-certificates"
+        "subversion" "coreutils" "systemd" "net-tools" "cpu-checker" "dnsmasq-base" "dmidecode"
     )
     # Cyclic check all dependencies
     is_dpkg="0"
