@@ -70,7 +70,7 @@ check_depends() {
     # List of required dependencies
     dpkg_packages=(
         "curl" "wget" "tar"
-        "subversion" "coreutils" "systemd"
+        "subversion" "coreutils" "systemd" "net-tools"
         "software-properties-common" "apt-transport-https" "ca-certificates"
     )
     # Cyclic check all dependencies
