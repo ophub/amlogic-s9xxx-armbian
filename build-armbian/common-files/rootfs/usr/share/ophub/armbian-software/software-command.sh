@@ -64,6 +64,7 @@
 # software_214              : For visual.studio.code(desktop)
 # software_215              : For gedit(desktop)
 # software_216              : For kvm(desktop)
+# software_217              : For flameshot(desktop)
 #
 # software_303              : For plex
 # software_304              : For emby-server
@@ -1156,6 +1157,16 @@ EOF
         software_remove "${kvm_package_list}"
         sudo rm -f ${my_network_br0} 2>/dev/null
         ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For flameshot(desktop)
+software_217() {
+    case "${software_manage}" in
+    install) software_install "flameshot" ;;
+    update) software_update ;;
+    remove) software_remove "flameshot" ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
