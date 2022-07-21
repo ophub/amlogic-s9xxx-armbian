@@ -1148,7 +1148,7 @@ iface br0 inet static
 EOF
 
         sync && sleep 3
-        echo -e "${NOTE} Please modify the bridge network settings: [ vi ${my_network_br0} ]"
+        echo -e "${NOTE} The bridge network settings: [ ${my_network_br0} ]"
         echo -e "${SUCCESS} The KVM installation is successful."
         ;;
     update) software_update ;;
