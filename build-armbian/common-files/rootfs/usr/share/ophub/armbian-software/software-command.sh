@@ -69,6 +69,8 @@
 # software_303              : For plex
 # software_304              : For emby-server
 # software_305              : For openmediavault(OMV-6.x)
+# software_306              : For nps
+# software_307              : For npc
 #
 # init_var                  : Initialize variables
 #
@@ -1298,6 +1300,99 @@ software_305() {
         ;;
     update) software_update ;;
     remove) software_remove "openmediavault" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For nps
+software_306() {
+    case "${software_manage}" in
+    install)
+        # Software version query api
+        software_api="https://api.github.com/repos/ehang-io/nps/releases"
+        # Check the latest version, E.g: v0.26.10
+        software_latest_version="$(curl -s "${software_api}" | grep "tag_name" | awk -F '"' '{print $4}' | tr " " "\n" | sort -rV | head -n 1)"
+        # Query download address, E.g: https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_arm64_server.tar.gz
+        software_url="$(curl -s "${software_api}" | grep -oE "https:.*/${software_latest_version}/linux_arm64_server.tar.gz")"
+        [[ -n "${software_url}" ]] || error_msg "The download address is empty!"
+        echo -e "${INFO} Software download from: [ ${software_url} ]"
+
+        # Download software, E.g: /tmp/tmp.xxx/linux_arm64_server.tar.gz
+        tmp_download="$(mktemp -d)"
+        software_filename="${software_url##*/}"
+        echo -e "${STEPS} Start downloading NPS..."
+        wget -q -P ${tmp_download} ${software_url}
+        [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
+        echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
+
+        # Installing and start NPS
+        echo -e "${STEPS} Start the installation and start NPS..."
+        cd ${tmp_download} && tar -xf ${software_filename}
+        sudo ./nps install
+        sudo nps start
+
+        sync && sleep 3
+        echo -e "${NOTE} The NPS address: [ http://ip:8080 ]"
+        echo -e "${NOTE} The NPS account: [ username:admin  /  password:123 ]"
+        echo -e "${NOTE} The NPS Instructions for Use: [ https://ehang-io.github.io/nps ]"
+        echo -e "${SUCCESS} The NPS installation is successful."
+        ;;
+    update)
+        sudo nps stop && sudo nps-update update && sudo nps restart
+        echo -e "${SUCCESS} The NPS update and restart successfully."
+        ;;
+    remove)
+        sudo nps stop && sudo nps uninstall
+        sudo rm -rf /etc/nps /root/conf/nps.conf /usr/local/bin/nps /usr/local/bin/nps-update /usr/bin/nps /usr/bin/nps-update 2>/dev/null
+        echo -e "${SUCCESS} The NPS remove successfully."
+        ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For npc
+software_307() {
+    case "${software_manage}" in
+    install)
+        # Software version query api
+        software_api="https://api.github.com/repos/ehang-io/nps/releases"
+        # Check the latest version, E.g: v0.26.10
+        software_latest_version="$(curl -s "${software_api}" | grep "tag_name" | awk -F '"' '{print $4}' | tr " " "\n" | sort -rV | head -n 1)"
+        # Query download address, E.g: https://github.com/ehang-io/nps/releases/download/v0.26.10/linux_arm64_client.tar.gz
+        software_url="$(curl -s "${software_api}" | grep -oE "https:.*/${software_latest_version}/linux_arm64_client.tar.gz")"
+        [[ -n "${software_url}" ]] || error_msg "The download address is empty!"
+        echo -e "${INFO} Software download from: [ ${software_url} ]"
+
+        # Download software, E.g: /tmp/tmp.xxx/linux_arm64_client.tar.gz
+        tmp_download="$(mktemp -d)"
+        software_filename="${software_url##*/}"
+        echo -e "${STEPS} Start downloading NPC..."
+        wget -q -P ${tmp_download} ${software_url}
+        [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
+        echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
+
+        # Installing and start NPC
+        echo -e "${STEPS} Start the installation and start NPC..."
+        cd ${tmp_download} && tar -xf ${software_filename}
+        sudo mkdir -p /etc/npc && sudo cp -rf conf /etc/npc
+        sudo ./npc install
+        sudo npc start
+
+        sync && sleep 3
+        echo -e "${NOTE} The NPS config file path: [ /etc/npc/conf/npc.conf ]"
+        echo -e "${NOTE} The NPS enable config command: [ sudo npc -config=/etc/npc/conf/npc.conf ]"
+        echo -e "${NOTE} The NPC Instructions for Use: [ https://ehang-io.github.io/nps ]"
+        echo -e "${SUCCESS} The NPC installation is successful."
+        ;;
+    update)
+        sudo npc stop && sudo npc-update update && sudo npc restart
+        echo -e "${SUCCESS} The NPC update and restart successfully."
+        ;;
+    remove)
+        sudo npc stop && sudo npc uninstall
+        sudo rm -rf /etc/npc /root/conf/npc.conf /usr/local/bin/npc /usr/local/bin/npc-update /usr/bin/npc /usr/bin/npc-update 2>/dev/null
+        echo -e "${SUCCESS} The NPC remove successfully."
+        ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
