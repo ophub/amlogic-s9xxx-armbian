@@ -18,7 +18,7 @@
 #
 # error_msg               : Output error message
 # check_release           : Check firmware information
-# check_depends           : Check dependencies
+# check_depends           : Check runtime dependencies
 # check_software_status   : Initialize check
 # search_software_model   : Search for software model
 # show_software_list      : Display the software list
@@ -77,6 +77,7 @@ check_depends() {
     i="1"
     for package in ${dpkg_packages[*]}; do
         [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_dpkg="1"
+        #echo -e "${INFO} ${package}: ${is_dpkg}"
         let i++
     done
     # Install missing packages
@@ -205,9 +206,6 @@ update_script() {
     cd ${software_path}
     echo -e "${STEPS} Start update script..."
 
-    # Check dependencies
-    check_depends
-
     # Convert script repository address to svn format
     if [[ "${script_repo}" == http* && -n "$(echo ${script_repo} | grep "tree/main")" ]]; then
         script_repo="${script_repo//tree\/main/trunk}"
@@ -258,6 +256,8 @@ EOF
 [[ -f "${software_command}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
 # Check firmware information
 check_release
+# Check runtime dependencies
+check_depends
 
 # Execute script assist functions
 case "${1}" in
