@@ -279,8 +279,6 @@ update_uboot() {
         [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && sync && chmod +x /boot/u-boot.ext
         [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && sync && chmod +x /boot/u-boot.emmc
         echo -e "${INFO} The ${UBOOT_OVERLOAD} file copy is complete."
-    elif [[ "${K510}" -eq "0" ]]; then
-        rm -f "/boot/u-boot.ext" "/boot/u-boot.emmc" 2>/dev/null
     fi
 
     # Write bootloader
