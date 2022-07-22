@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.55 Kernel Configuration
+# Linux/arm64 5.15.56 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="Ubuntu clang version 14.0.0-1ubuntu1"
 CONFIG_GCC_VERSION=0
@@ -116,7 +116,8 @@ CONFIG_SCHED_THERMAL_PRESSURE=y
 # CONFIG_BSD_PROCESS_ACCT is not set
 CONFIG_TASKSTATS=y
 CONFIG_TASK_DELAY_ACCT=y
-# CONFIG_TASK_XACCT is not set
+CONFIG_TASK_XACCT=y
+CONFIG_TASK_IO_ACCOUNTING=y
 # CONFIG_PSI is not set
 # end of CPU/Task time and stats accounting
 
