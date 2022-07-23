@@ -45,7 +45,7 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
 | 303 | Plex                  | [Home](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
 | 304 | Emby-Server           | [Home](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
-| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | openmediavault is the next generation network attached storage (NAS) solution based on Debian. |
+| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault is the next generation network attached storage (NAS) solution based on Debian. |
 | 306 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS is a lightweight, high-performance, powerful intranet penetration proxy server, with a powerful web management terminal. |
 | 307 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPCs are clients of NPS. |
 
@@ -61,7 +61,7 @@ A list of currently integrated software quick installation/management will be di
 
 ```yaml
 root@armbian:~# armbian-software
-[ STEPS ] Start selecting software [ Current system: debian:bullseye ]...
+[ STEPS ] Start selecting software [ Current system: debian/bullseye ]...
 ----------------------------------------------------------
 ID    NAME                STATE           MANAGE
 ----------------------------------------------------------
@@ -150,7 +150,7 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
 | 303 | Plex                  | [Home](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
 | 304 | Emby-Server           | [Home](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
-| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | openmediavault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
+| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
 | 306 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS 服务端。一款轻量级、高性能、功能强大的内网渗透代理服务器，具有强大的 Web 管理终端。 |
 | 307 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC 是 NPS 的客户端。 |
 
@@ -166,7 +166,7 @@ armbian-software
 
 ```yaml
 root@armbian:~# armbian-software
-[ STEPS ] Start selecting software [ Current system: debian:bullseye ]...
+[ STEPS ] Start selecting software [ Current system: debian/bullseye ]...
 ----------------------------------------------------------
 ID    NAME                STATE           MANAGE
 ----------------------------------------------------------

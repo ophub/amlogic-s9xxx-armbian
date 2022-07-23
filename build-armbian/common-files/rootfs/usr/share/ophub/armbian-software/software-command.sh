@@ -28,6 +28,9 @@
 # docker_image_remove       : Delete the docker image
 # docker_update             : Update docker
 # docker_remove             : Remove docker
+# init_var                  : Initialize variables
+#
+#============================== Software list ===============================
 #
 # software_101              : For docker
 # software_102              : For portainer:8000/9443(docker)
@@ -71,8 +74,6 @@
 # software_305              : For openmediavault(OMV-6.x)
 # software_306              : For nps
 # software_307              : For npc
-#
-# init_var                  : Initialize variables
 #
 #========================== Set default parameters ==========================
 #
