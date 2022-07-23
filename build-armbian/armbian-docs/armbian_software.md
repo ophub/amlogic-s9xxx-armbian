@@ -125,7 +125,7 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr 是 Usenet 和 BitTorrent 用户的电影收藏管理器。 |
 | 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing 是一个连续的文件同步程序。 |
 | 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
-| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和Web应用程序的方法。 |
+| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和 Web 应用程序的方法。 |
 | 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED 是一种编程工具。它提供了一个基于浏览器的编辑器，使得使用调色板中的各种节点轻松地将流连接在一起，只需单击一下即可部署运行。 |
 | 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT 协议提供了一种使用发布/订阅模型执行消息传递的轻量级方法。Eclipse Mosquitto 是 MQTT 协议版本 5、3.1.1 和 3.1 的服务器的开源实现。 |
 | 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-aarch64) | OpenWrt 项目是一个针对嵌入式设备的 Linux 操作系统，它拥有超过 3000+ 个标准化应用软件包和非常丰富的第三方插件支持。 |
