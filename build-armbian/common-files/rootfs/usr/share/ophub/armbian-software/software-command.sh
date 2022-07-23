@@ -1082,7 +1082,7 @@ software_216() {
     my_network_br0="/etc/network/interfaces.d/br0"
     kvm_package_list="\
         gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
-        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 xauth \
+        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 xauth fonts-noto* \
         "
 
     case "${software_manage}" in
@@ -1102,6 +1102,10 @@ software_216() {
         echo -e "${STEPS} Start adding the current logged-in user(${my_user}) to the kvm and libvirt user groups..."
         sudo usermod -aG kvm ${my_user}
         sudo usermod -aG libvirt ${my_user}
+
+        # Enable X11Forwarding to run Linux GUI programs remotely
+        sed -i '/X11Forwarding/d' /etc/ssh/sshd_config 2>/dev/null
+        echo "X11Forwarding yes" >>/etc/ssh/sshd_config 2>/dev/null
 
         # Enable and start the libvirtd.service daemon
         echo -e "${STEPS} Start enabling and starting the libvirtd.service daemon..."
