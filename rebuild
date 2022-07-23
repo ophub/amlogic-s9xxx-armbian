@@ -169,7 +169,7 @@ init_var() {
             fi
             ;;
         -s | --Size)
-            if [[ -n "${2}" && "${2}" -ge "2000" ]]; then
+            if [[ -n "${2}" && "${2}" -ge "2048" ]]; then
                 ROOT_MB="${2}"
                 shift
             else
