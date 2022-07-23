@@ -31,7 +31,7 @@ inputs:
   armbian_size:
     description: "Set armbian rootfs size(Unit: MiB)."
     required: false
-    default: "2748"
+    default: "2560"
   armbian_fstype:
     description: "Set armbian rootfs type: ext4 / btrfs"
     required: false
