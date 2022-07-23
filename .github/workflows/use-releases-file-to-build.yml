@@ -61,7 +61,7 @@ on:
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
-        default: "2748"
+        default: "2560"
       armbian_fstype:
         description: "Select armbian rootfs type."
         required: false
