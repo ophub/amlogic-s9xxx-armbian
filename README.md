@@ -45,7 +45,7 @@ Login in to armbian → input command:
 
 ```yaml
 # Run as root user (sudo -i)
-# If no other parameters are specified, the following update command will update to the latest version of the current kernel of the same series.
+# If no parameter is specified, it will update to the latest version.
 armbian-update
 ```
 
@@ -199,19 +199,19 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k     | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/tree/main/pub/stable), Such as `-k 5.10.125` . Multiple kernel use `_` connection such as `-k 5.10.125_5.15.50` |
 | -a     | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.10.125 version. If there is the latest version of same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -v     | Version    | Specify the [version branch](https://github.com/ophub/kernel/tree/main/pub), Such as `-v stable`. The specified name must be the same as the branch directory name. The `stable` branch version is used by default. |
-| -s     | Size       | Specify the size of the ROOTFS partition in MB. The default is 2748, and the specified size must be greater than 2000. Such as `-s 2748` |
+| -s     | Size       | Specify the ROOTFS partition size for the firmware. The default is 2560MiB, and the specified size must be greater than 2000MiB. Such as `-s 2560` |
 | -t     | RootfsType | Set the file system type of the ROOTFS partition of the firmware, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 | -n   | CustomName | Set the signature part of the firmware name. The default value is empty. You can add signatures such as `_server`, `_gnome_desktop` or `_ophub` as needed. Do not include spaces when setting custom signatures. |
 
 - `sudo ./rebuild -d`: Use the default configuration to pack all TV Boxes.
 - `sudo ./rebuild -d -b s905x3 -k 5.10.125`: recommend. Use the default configuration, specify a kernel and a firmware for compilation.
 - `sudo ./rebuild -d -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, specify multiple cores, and multiple firmware for compilation. use `_` to connect.
-- `sudo ./rebuild -d -b s905x3 -k 5.10.125 -s 2748`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
+- `sudo ./rebuild -d -b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a firmware, and set the partition size for compilation.
 - `sudo ./rebuild -d -b s905x3 -v dev -k 5.10.125`: Use the default configuration, specify the model, specify the version branch, and specify the kernel for packaging.
 - `sudo ./rebuild -d -b s905x3_s905d`: Use the default configuration, specify multiple firmware, use `_` to connect. compile all kernels.
 - `sudo ./rebuild -d -k 5.10.125_5.15.50`: Use the default configuration. Specify multiple cores, use `_` to connect.
 - `sudo ./rebuild -d -k 5.10.125_5.15.50 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -d -t btrfs -s 2748 -k 5.10.125`: Use the default configuration, set the file system to btrfs format and the partition size to 2748M, and only compile the armbian firmware with the kernel version 5.10.125.
+- `sudo ./rebuild -d -t btrfs -s 2560 -k 5.10.125`: Use the default configuration, set the file system to btrfs format and the partition size to 2560MiB, and only compile the armbian firmware with the kernel version 5.10.125.
 
 ## Use GitHub Actions to build
 
@@ -244,7 +244,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | armbian_kernel     | 5.10.125_5.15.50  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | version_branch     | stable            | Specify the name of the kernel [version branch](https://github.com/ophub/kernel/tree/main/pub), function reference `-v` |
-| armbian_size       | 2748              | Set the size of the firmware ROOTFS partition, function reference `-s`             |
+| armbian_size       | 2560              | Set the size of the firmware ROOTFS partition, function reference `-s`             |
 | armbian_fstype     | ext4              | Set the file system type of the firmware ROOTFS partition, function reference `-t` |
 | armbian_sign       | no                | Set the signature part of the firmware name, function reference `-n`               |
 
