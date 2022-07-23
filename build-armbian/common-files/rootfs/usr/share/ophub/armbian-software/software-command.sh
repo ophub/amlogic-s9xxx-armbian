@@ -1081,7 +1081,7 @@ software_216() {
     my_network_br0="/etc/network/interfaces.d/br0"
     kvm_package_list="\
         gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
-        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 \
+        virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 xauth \
         "
 
     case "${software_manage}" in
@@ -1136,7 +1136,7 @@ iface eth0 inet manual
         pre-up ifconfig \$IFACE up
         pre-down ifconfig \$IFACE down
 
-# Bridge setup: Please modify the [ address, broadcast, netmask, gateway and dns-nameservers ] to your own network
+# Bridge setup
 auto br0
 iface br0 inet static
         bridge_ports eth0
@@ -1150,8 +1150,17 @@ iface br0 inet static
         dns-nameservers ${my_gateway}
 EOF
 
+        # Allow bridged network access to the network
+        sudo cat >>/etc/sysctl.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 0
+net.bridge.bridge-nf-call-iptables = 0
+net.bridge.bridge-nf-call-arptables = 0
+EOF
+
         sync && sleep 3
         echo -e "${NOTE} The bridge network settings: [ ${my_network_br0} ]"
+        echo -e "${NOTE} KVM can install OpenWrt, Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc."
+        echo -e "${NOTE} Making and using OpenWrt: [ https://github.com/unifreq/openwrt_packit ]"
         echo -e "${SUCCESS} The KVM installation is successful."
         ;;
     update) software_update ;;
