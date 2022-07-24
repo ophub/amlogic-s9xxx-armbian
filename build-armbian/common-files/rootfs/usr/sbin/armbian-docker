@@ -130,11 +130,13 @@ docker_remove() {
 
     # Remove the docker package
     sudo apt-get update
-    sudo apt-get remove -y docker-ce docker-ce-cli containerd.io docker-compose
+    sudo apt-get remove --purge -y docker-ce docker-ce-cli containerd.io docker-compose docker-ce-*
     sudo apt-get --purge autoremove -y
     sudo apt-get autoclean -y
     #
     sudo rm -rf /etc/docker 2>/dev/null
+    sudo rm -rf /var/lib/docker 2>/dev/null
+    sudo rm -rf /var/run/docker.sock 2>/dev/null
 
     echo -e "${SUCCESS} Docker removed successfully."
     exit 0
