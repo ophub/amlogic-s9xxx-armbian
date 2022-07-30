@@ -1081,7 +1081,7 @@ software_216() {
     # kvm general settings
     my_network_br0="/etc/network/interfaces.d/br0"
     kvm_package_list="\
-        gconf2 qemu-system qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
+        gconf2 qemu-system-arm qemu-utils qemu-efi libvirt-daemon-system libvirt-clients bridge-utils \
         virtinst virt-manager seabios vgabios gir1.2-spiceclientgtk-3.0 xauth fonts-noto* \
         "
 
