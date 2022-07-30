@@ -1111,7 +1111,7 @@ software_216() {
         echo -e "${STEPS} Start enabling and starting the libvirtd.service daemon..."
         sudo systemctl daemon-reload
         sudo systemctl enable --now libvirtd.service
-        sudo systemctl start libvirtd.service
+        sudo systemctl restart libvirtd.service
         #sudo systemctl status libvirtd.service
 
         # Add network bridge settings template
@@ -1155,12 +1155,14 @@ iface br0 inet static
         dns-nameservers ${my_gateway}
 EOF
 
-        # Allow bridged network access to the network
+        # Disable netfilter on KVM bridge
         sudo cat >>/etc/sysctl.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 0
 net.bridge.bridge-nf-call-iptables = 0
 net.bridge.bridge-nf-call-arptables = 0
 EOF
+        # Reload /etc/sysctl.conf
+        sudo sysctl -p /etc/sysctl.conf
 
         sync && sleep 3
         echo -e "${NOTE} The bridge network settings: [ ${my_network_br0} ]"
@@ -1217,7 +1219,7 @@ software_303() {
         echo -e "${STEPS} Start setting up the Plex server to start automatically at system boot..."
         sudo systemctl daemon-reload
         sudo systemctl enable --now plexmediaserver.service
-        sudo systemctl start plexmediaserver.service
+        sudo systemctl restart plexmediaserver.service
 
         # Confirm the service is enabled
         echo -e "${STEPS} Confirm the service is enabled..."
@@ -1263,7 +1265,7 @@ software_304() {
         echo -e "${STEPS} Start setting up the Emby Server to start automatically at system boot..."
         sudo systemctl daemon-reload
         sudo systemctl enable --now emby-server.service
-        sudo systemctl start emby-server.service
+        sudo systemctl restart emby-server.service
 
         # Confirm the service is enabled
         echo -e "${STEPS} Confirm the service is enabled..."
