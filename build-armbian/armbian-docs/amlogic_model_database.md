@@ -1,8 +1,6 @@
 # The files description
 
-The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt) When you are using Armbian with kernel version 5.10.y and above, you need to copy the corresponding `u-boot-xxx.bin` file in the `overload` directory as `u-boot.ext`, when using in eMMC, you need to copy as `u-boot.emmc`. Some devices need to write the corresponding `bootloader` file.
-
-These duplications are automated in the repository's packaging and install/update scripts, eliminating the need for manual duplication.
+The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt).
 
 ## The list of devices supported by Amlogic TV Boxes
 
