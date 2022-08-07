@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.4.208 Kernel Configuration
+# Linux/arm64 5.4.209 Kernel Configuration
 #
 
 #
@@ -776,7 +776,7 @@ CONFIG_MSDOS_PARTITION=y
 # CONFIG_KARMA_PARTITION is not set
 CONFIG_EFI_PARTITION=y
 # CONFIG_SYSV68_PARTITION is not set
-# CONFIG_CMDLINE_PARTITION is not set
+CONFIG_CMDLINE_PARTITION=y
 # end of Partition Types
 
 CONFIG_BLOCK_COMPAT=y
