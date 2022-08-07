@@ -14,7 +14,7 @@ Create a folder corresponding to the version number in the `amlogic-kernel` dire
 
 ## amlogic-u-boot
 
-When you use Armbian with 5.10 kernel, you need to copy the corresponding u-boot file in the overload directory as `u-boot.ext`, when using in EMMC, you need to copy the u-boot file as `u-boot.emmc ` . Some devices need to write the corresponding bootloader file. These duplications are automated in the repository's packaging and install/upgrade scripts, eliminating the need for manual duplication.
+The system starts the bootstrap file. According to different versions of the kernel, it will be automatically completed by related scripts such as install/update when needed.
 
 ## armbian-docs
 
