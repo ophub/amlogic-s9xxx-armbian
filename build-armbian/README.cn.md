@@ -14,7 +14,7 @@
 
 ## amlogic-u-boot
 
-当你使用 5.10 内核的 Armbian 时，需要将 overload 目录下对应的 u-boot 文件复制为 `u-boot.ext` ，在 EMMC 中使用时，需要将 u-boot 文件复制为 `u-boot.emmc` 。一些设备需要写入对应的 bootloader 文件。这些复制工作在仓库的打包和安装/升级脚本中均已自动化完成，无需在人工复制。
+系统启动引导文件，根据不同版本的内核，在需要使用时将由安装/更新等相关脚本自动化完成。
 
 ## armbian-docs
 
