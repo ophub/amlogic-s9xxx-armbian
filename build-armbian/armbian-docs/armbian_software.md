@@ -23,7 +23,8 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
 | 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED is a programming tool. It provides a browser-based editor that makes it easy to wire together flows using the wide range of nodes in the palette that can be deployed to its runtime in a single-click. |
 | 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | The MQTT protocol provides a lightweight method of carrying out messaging using a publish/subscribe model. Eclipse Mosquitto is an open source implementation of a server for versions 5, 3.1.1, and 3.1 of the MQTT protocol. |
-| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-aarch64) | The OpenWrt Project is a Linux operating system targeting embedded devices, it has more than 3000+ standardized application packages and a very rich third-party plug-in support. |
+| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-aarch64) :80 | The OpenWrt Project is a Linux operating system targeting embedded devices, it has more than 3000+ standardized application packages and a very rich third-party plug-in support. |
+| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata is distributed, real-time, performance and health monitoring for systems and applications. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
@@ -39,15 +40,15 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME(eog) is a image viewer program.  It is meant to be a fast and functional image viewer. |
 | 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code is a lightweight but powerful source code editor. |
 | 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit is a full-featured text editor for the GNOME desktop environment. You can use it to prepare simple notes and documents, or you can use some of its advanced features, making it your own software development environment. |
-| 216 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM (for Kernel-Based Virtual Machines) is a complete virtualization solution for Linux with virtualization extensions. The virt-manager application is a desktop user interface for managing virtual machines through libvirt. It primarily targets KVM VMs, but also manages Xen and LXC (linux containers). KVM virtual machine can install [OpenWrt](https://github.com/unifreq/openwrt_packit), Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc. |
-| 217 | Flameshot             | [Home](https://flameshot.org/) | -    | Powerful, yet simple to use open-source screenshot software. |
+| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | Powerful, yet simple to use open-source screenshot software. |
 | 301 | Frps                  | [Home](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
-| 303 | Plex                  | [Home](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
-| 304 | Emby-Server           | [Home](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
-| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault is the next generation network attached storage (NAS) solution based on Debian. |
-| 306 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS is a lightweight, high-performance, powerful intranet penetration proxy server, with a powerful web management terminal. |
-| 307 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPCs are clients of NPS. |
+| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS is a lightweight, high-performance, powerful intranet penetration proxy server, with a powerful web management terminal. |
+| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPCs are clients of NPS. |
+| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
+| 306 | Emby-Server           | [Home](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
+| 307 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault is the next generation network attached storage (NAS) solution based on Debian. |
+| 308 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM (for Kernel-Based Virtual Machines) is a complete virtualization solution for Linux with virtualization extensions. The virt-manager application is a desktop user interface for managing virtual machines through libvirt. It primarily targets KVM VMs, but also manages Xen and LXC (linux containers). KVM virtual machine can install [OpenWrt](https://github.com/unifreq/openwrt_packit), Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc. |
 
 ## Software Center Instructions
 
@@ -81,23 +82,24 @@ ID    NAME                STATE           MANAGE
 Software Center scripts/commands are centrally stored in the [/usr/share/ophub/armbian-software](../common-files/rootfs/usr/share/ophub/armbian-software) directory, use the `armbian-software -u` command to synchronously download this directory to the local and update the local software center list. The file starting with a number is the `one-click installation script` of the corresponding software, and the file [software-command.sh](../common-files/rootfs/usr/share/ophub/armbian-software/software-command.sh) is the `unified command file` for installing/updating/deleting operations using commands. [software-list.conf](../common-files/rootfs/usr/share/ophub/armbian-software/software-list.conf) is the software list configuration file, described as follows:
 
 ```yaml
-# 1.ID     2.SoftwareName     3.AuthMethod@Package      4.Command/Shell     5.SupportedRelease
-102        :portainer         :docker@portainer         :command            :jammy@focal@bullseye
-202        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
-302        :frpc              :which@frpc               :302-frpc.sh        :jammy@focal@bullseye
+# 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
+102        :Portainer          :docker@portainer         :command-docker.sh      :jammy@focal@bullseye
+202        :Firefox            :dpkg@firefox             :command-desktop.sh     :jammy@focal@bullseye
+302        :Frpc               :which@frpc               :302-frpc.sh            :jammy@focal@bullseye
+303        :NPS                :which@nps                :command-service.sh     :jammy@focal@bullseye
 ...
 ```
 
 - `ID`: The `unique serial number` of the software.
-- `SoftwareName`: `Software name` (Name length requirement is less than 40 characters).
+- `Software Name`: `Software name` (Name length requirement is less than 40 characters).
 - `AuthMethod@Package`: The `check method` of the software installation status, and the corresponding `package`, separated by the `@` symbol.
   - Use `docker` to check the image installed in the `docker` container. For example, to check whether the `portainer` image is installed, use `docker@portainer` to check;
   - Packages installed by `apt` are checked by `dpkg`. For example, to check whether the `firefox` package is installed, use `dpkg@firefox` to check;
   - Use `wget` to download and install the binary executable file, and use `which` to check. For example, to check whether the `frpc` service is installed, use `which@frpc` to check.
-- `Command/Shell`: Set the software to be managed using a `unified command file` or `stand-alone script`.
-  - For `reduced` operation commands, they are written in the `software-command.sh` file and named after the software serial number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`;
+- `Execute Selection`: Set the software to be managed using a `unified command file` or `stand-alone script`.
+  - For `reduced` operation commands, according to the software classification, they are written in the `command-docker.sh / command-desktop.sh / command-service.sh` files and named after the software serial number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`;
   - For `complex operations with long instruction contents`, independent script file management is performed. For example, the stand-alone script for installing `frpc` is named `302-frpc.sh` starting with the serial number.
-- `SupportedRelease`: Set the supported Armbian `System Release`. Use the `@` symbol to separate.
+- `Supported Release`: Set the supported Armbian `System Release`. Use the `@` symbol to separate.
 
 Welcome to add more software. Support requests are welcome in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues).
 
@@ -128,7 +130,8 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和 Web 应用程序的方法。 |
 | 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED 是一种编程工具。它提供了一个基于浏览器的编辑器，使得使用调色板中的各种节点轻松地将流连接在一起，只需单击一下即可部署运行。 |
 | 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT 协议提供了一种使用发布/订阅模型执行消息传递的轻量级方法。Eclipse Mosquitto 是 MQTT 协议版本 5、3.1.1 和 3.1 的服务器的开源实现。 |
-| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-aarch64) | OpenWrt 项目是一个针对嵌入式设备的 Linux 操作系统，它拥有超过 3000+ 个标准化应用软件包和非常丰富的第三方插件支持。 |
+| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-aarch64) :80 | OpenWrt 项目是一个针对嵌入式设备的 Linux 操作系统，它拥有超过 3000+ 个标准化应用软件包和非常丰富的第三方插件支持。 |
+| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata 是针对系统和应用程序的分布式实时性能和运行状况监控。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
@@ -144,15 +147,15 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）一个图像查看器程序。它旨在成为一个快速且功能强大的图像查看器。 |
 | 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
 | 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit 是一个用于 GNOME 桌面环境的全功能文本编辑器。您可以使用它来准备简单的笔记和文档，也可以使用它的一些高级功能，使其成为您自己的软件开发环境。 |
-| 216 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（用于基于内核的虚拟机）是包含虚拟化扩展适用于 Linux 的完整虚拟化解决方案。virt-manager 应用程序是一个桌面用户界面，用于通过 libvirt 管理虚拟机。它主要针对 KVM VM，但也管理 Xen 和 LXC（Linux 容器）。KVM 虚拟机可以安装 [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS 等等。 |
-| 217 | Flameshot             | [Home](https://flameshot.org/) | -    | 功能强大，但易于使用的开源屏幕截图软件。 |
+| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | 功能强大，但易于使用的开源屏幕截图软件。 |
 | 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
 | 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
-| 303 | Plex                  | [Home](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
-| 304 | Emby-Server           | [Home](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
-| 305 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
-| 306 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS 服务端。一款轻量级、高性能、功能强大的内网渗透代理服务器，具有强大的 Web 管理终端。 |
-| 307 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC 是 NPS 的客户端。 |
+| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS 服务端。一款轻量级、高性能、功能强大的内网渗透代理服务器，具有强大的 Web 管理终端。 |
+| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC 是 NPS 的客户端。 |
+| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
+| 306 | Emby-Server           | [Home](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
+| 307 | OpenMediaVault        | [Home](https://www.openmediavault.org/) | -    | OpenMediaVault 是基于 Debian 的下一代网络附加存储（NAS）解决方案。 |
+| 308 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（用于基于内核的虚拟机）是包含虚拟化扩展适用于 Linux 的完整虚拟化解决方案。virt-manager 应用程序是一个桌面用户界面，用于通过 libvirt 管理虚拟机。它主要针对 KVM VM，但也管理 Xen 和 LXC（Linux 容器）。KVM 虚拟机可以安装 [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS 等等。 |
 
 ## 软件中心使用说明
 
@@ -186,23 +189,24 @@ ID    NAME                STATE           MANAGE
 软件中心的脚本/命令集中存放在 [/usr/share/ophub/armbian-software](../common-files/rootfs/usr/share/ophub/armbian-software) 目录下，使用 `armbian-software -u` 命令可以同步下载此目录至本地，更新本地的软件中心列表。其中以数字开头的文件是对应软件的 `一键安装脚本` 文件。[software-command.sh](../common-files/rootfs/usr/share/ophub/armbian-software/software-command.sh) 是使用命令安装/更新/删除操作的`统一指令文件`。[software-list.conf](../common-files/rootfs/usr/share/ophub/armbian-software/software-list.conf) 是软件列表配置文件，说明如下：
 
 ```yaml
-# 1.ID     2.SoftwareName     3.AuthMethod@Package      4.Command/Shell     5.SupportedRelease
-102        :portainer         :docker@portainer         :command            :jammy@focal@bullseye
-202        :firefox           :dpkg@firefox             :command            :jammy@focal@bullseye
-302        :frpc              :which@frpc               :302-frpc.sh        :jammy@focal@bullseye
+# 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
+102        :Portainer          :docker@portainer         :command-docker.sh      :jammy@focal@bullseye
+202        :Firefox            :dpkg@firefox             :command-desktop.sh     :jammy@focal@bullseye
+302        :Frpc               :which@frpc               :302-frpc.sh            :jammy@focal@bullseye
+303        :NPS                :which@nps                :command-service.sh     :jammy@focal@bullseye
 ...
 ```
 
 - `ID`: 软件的 `唯一序号` 。
-- `SoftwareName`：`软件名称`（名称长度要求小于 40 个字符）。
+- `Software Name`：`软件名称`（名称长度要求小于 40 个字符）。
 - `AuthMethod@Package`：软件安装状态的`检查方法`，与对应的`软件包`，使用 `@` 符号分割。
   - 使用 `docker` 容器安装的镜像，采用 `docker` 方式检查，如检查是否安装了 `portainer` 镜像，使用 `docker@portainer` 进行检查；
   - 使用 `apt` 方式安装的软件包采用 `dpkg` 方式检查，如检查是否安装了 `firefox` 软件包，使用 `dpkg@firefox` 进行检查；
   - 使用 `wget` 等方式下载安装的二进制执行文件，采用 `which` 方式检查，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
-- `Command/Shell`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
-  - 对于 `比较精简` 的操作命令，集中写在 `software-command.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
+- `Execute Selection`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
+  - 对于 `比较精简` 的操作命令，按照软件分类，集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
   - 对于 `比较复杂、指令内容较长` 的操作，进行独立脚本文件管理。如安装 `frpc` 的独立脚本，以序号开头，命名为 `302-frpc.sh` 。
-- `SupportedRelease`：设置支持的 Armbian `系统版本`。使用 `@` 符号分割。
+- `Supported Release`：设置支持的 Armbian `系统版本`。使用 `@` 符号分割。
 
 欢迎大家补充更多软件。欢迎在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
 
