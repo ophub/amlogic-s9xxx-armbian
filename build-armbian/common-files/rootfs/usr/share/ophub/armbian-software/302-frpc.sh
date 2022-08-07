@@ -225,5 +225,3 @@ case "${1}" in
     remove)  software_remove ;;
     *)       software_help ;;
 esac
-
-exit 0
