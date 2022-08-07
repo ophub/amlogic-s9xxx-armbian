@@ -8,7 +8,7 @@
 # This file is a part of the Armbian for Amlogic TV Boxes
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Third-party software install/update/uninstall management
+# Description: Third-party software install/update/remove management
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -31,7 +31,6 @@
 # Related file storage path
 software_path="/usr/share/ophub/armbian-software"
 software_conf="${software_path}/software-list.conf"
-software_command="${software_path}/software-command.sh"
 ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
 #
@@ -168,7 +167,7 @@ show_software_list() {
 
     # Display selected software information
     software_name="$(echo "${ret}" | awk -F ':' '{print $2}')"
-    software_command_shell="$(echo "${ret}" | awk -F ':' '{print $4}')"
+    software_execute="$(echo "${ret}" | awk -F ':' '{print $4}')"
     software_release="$(echo "${ret}" | awk -F ':' '{print $5}')"
     software_support="$(echo "${ret}" | awk -F ':' '{print $6}')"
     software_state="$(echo "${ret}" | awk -F ':' '{print $7}')"
@@ -189,21 +188,20 @@ show_software_list() {
         [[ "${optid:0:1}" == "u" ]] && software_manage="update" || software_manage="remove"
     }
 
-    echo -e "${STEPS} Start processing software: [ ${software_manage} ${software_name} ]..."
+    echo -e "${STEPS} Start processing software: [ ${software_execute} ${software_manage} ${software_name} ]..."
 
     # Perform software install/update/remove operations
-    if [[ "${software_command_shell}" == "command" ]]; then
-        # Execute by command
-        sudo ${software_command} -s ${software_id} -m ${software_manage}
+    if [[ "${software_execute}" == "command-"* ]]; then
+        # Execute fixed scripts
+        sudo bash ${software_path}/${software_execute} -s ${software_id} -m ${software_manage}
     else
-        # Execute by script
-        sudo ${software_path}/${software_command_shell} ${software_manage}
+        # Execute dedicated scripts
+        sudo bash ${software_path}/${software_execute} ${software_manage}
     fi
 }
 
 # Update related scripts and configuration files
 update_script() {
-    cd ${software_path}
     echo -e "${STEPS} Start update script..."
 
     # Convert script repository address to svn format
@@ -213,9 +211,8 @@ update_script() {
 
     # Update related files
     echo -e "${STEPS} Start syncing files..."
-    [[ -d "${software_path}" ]] || mkdir -p ${software_path}
     svn export ${script_repo} ${software_path} --force
-    chmod +x ${software_path}/*.sh
+    chmod +x ${software_path}/*.sh 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} Script update complete."
@@ -224,7 +221,6 @@ update_script() {
 
 # Clear software management related files
 clean_tmp() {
-    cd ${software_path}
     echo -e "${STEPS} Clear the space..."
 
     rm -rf ${software_path} 2>/dev/null && sync
@@ -253,7 +249,7 @@ EOF
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # Check for the existence of software management scripts
-[[ -f "${software_command}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
+[[ -f "${software_conf}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
 # Check firmware information
 check_release
 # Check runtime dependencies
