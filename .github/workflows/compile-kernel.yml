@@ -25,11 +25,12 @@ on:
         options:
           - 5.4.200_5.10.125
           - 5.10.125_5.15.50
-          - 5.15.45_5.18.5
+          - 5.15.45_5.18.15
           - 5.4.200
           - 5.10.125
           - 5.15.50
-          - 5.18.5
+          - 5.18.15
+          - 5.19.1
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
