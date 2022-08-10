@@ -444,32 +444,39 @@ refactor_files() {
     cp -f ${uboot_path}/overload/* ${tag_bootfs}
 
     # Replace the kernel
-    build_boot="$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    build_dtb="$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    build_header="$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    build_modules="$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    [[ -n "${build_boot}" && -n "${build_dtb}" && -n "${build_modules}" && -n "${build_header}" ]] || error_msg "The 4 kernel missing."
+    kernel_boot="$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_dtb="$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_modules="$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_header_tar="$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_header_deb="$(ls ${kernel_path}/${kernel}/linux-headers-${kernel}-*_arm64.deb 2>/dev/null | head -n 1)"
+    kernel_name="${kernel_boot##*/}" && kernel_name="${kernel_name/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
+    [[ -n "${kernel_boot}" && -n "${kernel_dtb}" && -n "${kernel_modules}" ]] || error_msg "The 3 kernel missing."
+    [[ -n "${kernel_header_tar}" || -n "${kernel_header_deb}" ]] || error_msg "The header kernel missing."
 
     # 01. For /boot five files
-    tar -xzf ${build_boot} -C ${tag_bootfs} && sync
-    (cd ${tag_bootfs} && cp -f uInitrd-* uInitrd && cp -f vmlinuz-* zImage && sync)
+    tar -xzf ${kernel_boot} -C ${tag_bootfs} && sync
+    (cd ${tag_bootfs} && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage && sync)
     [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     get_textoffset "${tag_bootfs}/zImage"
 
     # 02. For /boot/dtb/amlogic/*
-    tar -xzf ${build_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
+    tar -xzf ${kernel_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
     [[ "$(ls ${tag_bootfs}/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic files is missing."
 
-    # 03. For /usr/src/linux-5.x.y
-    header_path="$(echo ${kernel} | awk -F "." '{print "linux-"$1"."$2".y"}')"
-    rm -rf "${tag_rootfs}/usr/src/linux-*" 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
-    tar -xzf ${build_header} -C ${tag_rootfs}/usr/src/${header_path} && sync
+    # 03. For /usr/src/linux-headers-${kernel_name}
+    header_path="linux-headers-${kernel_name}"
+    rm -rf ${tag_rootfs}/usr/src/linux-headers-* 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
+    if [[ -n "${kernel_header_deb}" ]]; then
+        sudo dpkg -i ${kernel_header_deb} >/dev/null 2>&1
+    elif [[ -n "${kernel_header_tar}" ]]; then
+        tar -xzf ${kernel_header_tar} -C ${tag_rootfs}/usr/src/${header_path} && sync
+    fi
     [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
-    # 04. For /usr/lib/modules/*
-    tar -xzf ${build_modules} -C ${tag_rootfs}/usr/lib/modules && sync
-    (cd ${tag_rootfs}/usr/lib/modules/${kernel}-*/ && rm -f build source && ln -sf /usr/src/${header_path} build && ln -sf /usr/src/${header_path} source)
-    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel}-* -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
+    # 04. For /usr/lib/modules/${kernel_name}
+    tar -xzf ${kernel_modules} -C ${tag_rootfs}/usr/lib/modules && sync
+    (cd ${tag_rootfs}/usr/lib/modules/${kernel_name}/ && rm -f build source 2>/dev/null && ln -sf /usr/src/${header_path} build)
+    [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel_name} -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 
     # Set the type of file system
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
@@ -641,7 +648,7 @@ make_image() {
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
     else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -m 0 ${loop_new}p2 >/dev/null 2>&1
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
     fi
 
     # Write the specified bootloader
