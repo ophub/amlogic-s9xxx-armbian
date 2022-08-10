@@ -308,7 +308,7 @@ compile_kernel() {
     MAKE_SET_STRING=" ARCH=${ARCH} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
-    make ${MAKE_SET_STRING} clean
+    make ${MAKE_SET_STRING} mrproper
 
     # Make menuconfig
     #make ${MAKE_SET_STRING} menuconfig
@@ -343,6 +343,7 @@ compile_kernel() {
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" ]] && PROCESS="1" && echo "PROCESS: 1"
     make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
+    make ${MAKE_SET_STRING} bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
@@ -453,6 +454,7 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/${kernel_version}
+    cp -f ${kernel_path}/linux-headers-${kernel_outname}*_arm64.deb .
     sha256sum * >sha256sums && sync
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
