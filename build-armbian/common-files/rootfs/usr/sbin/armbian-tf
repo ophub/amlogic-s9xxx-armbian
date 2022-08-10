@@ -124,7 +124,7 @@ EOF
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -m single "/dev/${PT_PRE}3"
         mount -t btrfs -o compress=zstd:6 "/dev/${PT_PRE}3" "${data_path}"
     else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" "/dev/${PT_PRE}3"
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -b 4k -m 0 "/dev/${PT_PRE}3"
         mount -t ext4 "/dev/${PT_PRE}3" "${data_path}"
     fi
 
