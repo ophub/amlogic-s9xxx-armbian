@@ -343,7 +343,7 @@ copy_rootfs() {
         sleep 3
         mount -t btrfs -o compress=zstd:6 ${PART_ROOT} ${DIR_INSTALL}
     else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" ${PART_ROOT}
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -b 4k -m 0 ${PART_ROOT}
         sleep 3
         mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
     fi
