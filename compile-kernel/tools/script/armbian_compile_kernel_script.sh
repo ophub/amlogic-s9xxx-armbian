@@ -339,7 +339,11 @@ compile_kernel() {
     fi
 
     # Compile linux-headers-xxx_arm64.deb for kernel version 5.10.y and above
-    [[ "${kernel_x}" -ge "5" && "${kernel_y}" -ge "10" ]] && make_debfile="1" || make_debfile="0"
+    if [[ "${kernel_x}" -ge "6" ]] || [[ "${kernel_x}" -eq "5" && "${kernel_y}" -ge "10" ]]; then
+        make_debfile="1"
+    else
+        make_debfile="0"
+    fi
 
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
