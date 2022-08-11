@@ -25,6 +25,8 @@
 #
 # get_kernel_source  : Get the kernel source code
 # env_check          : Check the environment for compile kernel
+# is_enabled         : Check if some options are enabled
+# headers_install    : Deploy the kernel headers file
 # compile_kernel     : Compile the kernel
 # generate_uinitrd   : Generate initrd.img and uInitrd
 # packit_kernel      : Package the full set of kernel files
@@ -272,6 +274,50 @@ env_check() {
     mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
 }
 
+is_enabled() {
+    grep -q "^$1=y" include/config/auto.conf
+}
+
+headers_install() {
+    # Set search directory
+    src_arch="arm64"
+
+    # Set headers files list
+    head_list="$(mktemp)"
+    (
+        cd ${kernel_path}/${local_kernel_path}
+
+        find . arch/${src_arch} -maxdepth 1 -name Makefile\*
+        find include scripts -type f -o -type l
+        find arch/${src_arch} -name Kbuild.platforms -o -name Platform
+        find $(find arch/${src_arch} -name include -o -name scripts -type d) -type f
+    ) >${head_list}
+
+    # Set object files list
+    obj_list="$(mktemp)"
+    {
+        if is_enabled CONFIG_OBJTOOL; then
+            echo tools/objtool/objtool
+        fi
+
+        find arch/${src_arch}/include Module.symvers include scripts -type f
+
+        if is_enabled CONFIG_GCC_PLUGINS; then
+            find scripts/gcc-plugins -name \*.so
+        fi
+    } >${obj_list}
+
+    # Install related files to the specified directory
+    tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${out_kernel}/header
+    tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${out_kernel}/header
+
+    # copy .config manually to be where it's expected to be
+    cp .config ${out_kernel}/header/.config && sync
+
+    # Delete temporary files
+    rm -f ${head_list} ${obj_list} 2>/dev/null
+}
+
 compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set compilation parameters."
@@ -338,19 +384,12 @@ compile_kernel() {
         scripts/config -d LTO_CLANG_THIN
     fi
 
-    # Compile linux-headers-xxx_arm64.deb for kernel version 5.10.y and above
-    if [[ "${kernel_x}" -ge "6" ]] || [[ "${kernel_x}" -eq "5" && "${kernel_y}" -ge "10" ]]; then
-        make_debfile="1"
-    else
-        make_debfile="0"
-    fi
-
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" ]] && PROCESS="1" && echo "PROCESS: 1"
     make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
-    [[ "${make_debfile}" -eq "1" ]] && make ${MAKE_SET_STRING} bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
+    #make ${MAKE_SET_STRING} bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
@@ -360,7 +399,8 @@ compile_kernel() {
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
-    make ${MAKE_SET_STRING} INSTALL_HDR_PATH=${out_kernel}/header headers_install
+    headers_install
+    #make ${MAKE_SET_STRING} INSTALL_HDR_PATH=${out_kernel}/header headers_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The headers is installed successfully."
 }
 
@@ -461,7 +501,6 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/${kernel_version}
-    [[ "${make_debfile}" -eq "1" ]] && cp -f ${kernel_path}/linux-headers-*${kernel_outname}*_arm64.deb . 2>/dev/null
     sha256sum * >sha256sums && sync
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
