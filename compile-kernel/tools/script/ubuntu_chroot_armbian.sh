@@ -30,7 +30,7 @@ ERROR="[\033[91m ERROR \033[0m]"
 
 # Install the required dependencies
 chroot_env_init() {
-    [[ -n "$(dpkg-query -l | grep "initramfs-tools")" ]] || {
+    [[ -n "$(dpkg -l | grep "initramfs-tools")" ]] || {
         echo -e "${STEPS} Install the required dependencies..."
         sudo apt-get update -y
         sudo apt-get install -y initramfs-tools
