@@ -69,7 +69,7 @@ check_depends() {
     dpkg_packages=("subversion" "tar" "coreutils")
     i="1"
     for package in ${dpkg_packages[*]}; do
-        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_dpkg="1"
+        [[ -n "$(dpkg -l | grep "${package}")" ]] || is_dpkg="1"
         let i++
     done
     # Install missing packages

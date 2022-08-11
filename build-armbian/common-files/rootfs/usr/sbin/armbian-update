@@ -65,7 +65,7 @@ check_depends() {
     necessary_packages=("subversion" "tar" "coreutils")
     i="1"
     for package in ${necessary_packages[*]}; do
-        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_missing="1"
+        [[ -n "$(dpkg -l | grep "${package}")" ]] || is_missing="1"
         let i++
     done
 
@@ -264,7 +264,7 @@ update_kernel() {
     echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] done."
 
     # Delete kernel tmpfiles
-    rm -f *${kernel_name}*.tar.gz linux-*${kernel_name}*_arm64.deb sha256sums 2>/dev/null
+    rm -f *${kernel_name}*.tar.gz sha256sums 2>/dev/null
 
     sync && echo ""
 }
