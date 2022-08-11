@@ -400,7 +400,6 @@ compile_kernel() {
     # Install headers
     echo -e "${STEPS} Install headers ..."
     headers_install
-    #make ${MAKE_SET_STRING} INSTALL_HDR_PATH=${out_kernel}/header headers_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The headers is installed successfully."
 }
 
@@ -515,7 +514,6 @@ clean_tmp() {
     echo -e "${STEPS} Clear the space..."
 
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
-    rm -f ${kernel_path}/*arm64* 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} All processes have been completed."
