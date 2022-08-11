@@ -53,7 +53,7 @@ do_update_conf() {
     echo -e "${STEPS} Start updating the openfvd config files..."
 
     # Check dependencies
-    [[ -z "$(dpkg-query -l | grep "subversion")" ]] && sudo apt-get update && sudo apt-get install -y subversion
+    [[ -z "$(dpkg -l | grep "subversion")" ]] && sudo apt-get update && sudo apt-get install -y subversion
 
     # Convert script repository address to svn format
     if [[ "${openvfd_repo}" == http* && -n "$(echo ${openvfd_repo} | grep "tree/main")" ]]; then

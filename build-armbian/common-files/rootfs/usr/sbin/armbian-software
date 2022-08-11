@@ -75,7 +75,7 @@ check_depends() {
     is_dpkg="0"
     i="1"
     for package in ${dpkg_packages[*]}; do
-        [[ -n "$(dpkg-query -l | grep "${package}")" ]] || is_dpkg="1"
+        [[ -n "$(dpkg -l | grep "${package}")" ]] || is_dpkg="1"
         #echo -e "${INFO} ${package}: ${is_dpkg}"
         let i++
     done
