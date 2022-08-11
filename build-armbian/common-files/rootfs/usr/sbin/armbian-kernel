@@ -119,7 +119,7 @@ EOF
 remaining_space="$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
 [[ "${remaining_space}" -ge "10" ]] || error_msg "Compiling the kernel requires 10Gb running space"
 # Check if script exists
-[[ -f "${compile_script}" ]] || echo -e "${INFO} Please run [ armbian-kernel -u ] to update the compile kernel script."
+[[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] first to update the compiled kernel script."
 
 # Execute script assist functions
 case "${1}" in
