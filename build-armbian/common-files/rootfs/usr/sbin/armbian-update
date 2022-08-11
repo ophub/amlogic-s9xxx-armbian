@@ -187,7 +187,6 @@ check_kernel() {
     echo -e "${STEPS} Start checking the kernel..."
 
     # Determine custom kernel filename
-    kernel_header_deb="$(ls linux-headers-*${inputs_kernel}*_arm64.deb 2>/dev/null | head -n 1)"
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
     KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
@@ -204,14 +203,12 @@ check_kernel() {
     sha256sums_file="sha256sums"
     sha256sums_check="1"
     [[ -s "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] || sha256sums_check="0"
-
-    if [[ "${sha256sums_check}" -eq "1" ]]; then
+    # Loop check file
+    [[ "${sha256sums_check}" -eq "1" ]] && {
         echo -e "${INFO} Enable sha256sum checking..."
 
-        # Loop check file
         kernel_list=("boot" "dtb-amlogic" "header" "modules")
         i="1"
-        [[ -n "${kernel_header_deb}" ]] && total_files="5" || total_files="4"
         for kernel_file in ${kernel_list[*]}; do
             # Set check filename
             tmp_file="${kernel_file}-${kernel_name}.tar.gz"
@@ -221,17 +218,10 @@ check_kernel() {
             tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
             tmp_checkcode="$(cat ${sha256sums_file} | grep ${tmp_file} | awk '{print $1}')"
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
-            echo -e "${INFO} (${i}/${total_files}) [ ${tmp_file} ] file sha256sum check same."
+            echo -e "${INFO} (${i}/4) [ ${tmp_file} ] file sha256sum check same."
             let i++
         done
-        # check linux-headers-xxx_arm64.deb file
-        [[ -n "${kernel_header_deb}" ]] && {
-            tmp_sha256sum="$(sha256sum "${kernel_header_deb}" | awk '{print $1}')"
-            tmp_checkcode="$(cat ${sha256sums_file} | grep ${kernel_header_deb} | awk '{print $1}')"
-            [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${kernel_header_deb}: sha256sum verification failed."
-            echo -e "${INFO} (5/${total_files}) [ ${kernel_header_deb} ] file sha256sum check same."
-        }
-    fi
+    }
 
     sync && echo ""
 }
@@ -262,13 +252,8 @@ update_kernel() {
     # 03. For /usr/src/linux-headers-${kernel_name}
     header_path="linux-headers-${kernel_name}"
     rm -rf /usr/src/linux-headers-* 2>/dev/null && mkdir -p "/usr/src/${header_path}" && sync
-    if [[ -n "${kernel_header_deb}" ]]; then
-        sudo dpkg -i ${kernel_header_deb} >/dev/null 2>&1
-        echo -e "${INFO} (3/4) Unpacking [ ${kernel_header_deb} ] done."
-    elif [[ -f "header-${kernel_name}.tar.gz" ]]; then
-        tar -xzf header-${kernel_name}.tar.gz -C /usr/src/${header_path}
-        echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
-    fi
+    tar -xzf header-${kernel_name}.tar.gz -C /usr/src/${header_path}
+    echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] done."
     [[ -d "/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/${kernel_name}

@@ -447,11 +447,9 @@ refactor_files() {
     kernel_boot="$(ls ${kernel_path}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_dtb="$(ls ${kernel_path}/${kernel}/dtb-amlogic-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_modules="$(ls ${kernel_path}/${kernel}/modules-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    kernel_header_tar="$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
-    kernel_header_deb="$(ls ${kernel_path}/${kernel}/linux-headers-*${kernel}*_arm64.deb 2>/dev/null | head -n 1)"
+    kernel_header="$(ls ${kernel_path}/${kernel}/header-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot##*/}" && kernel_name="${kernel_name/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
-    [[ -n "${kernel_boot}" && -n "${kernel_dtb}" && -n "${kernel_modules}" ]] || error_msg "The 3 kernel missing."
-    [[ -n "${kernel_header_tar}" || -n "${kernel_header_deb}" ]] || error_msg "The header kernel missing."
+    [[ -n "${kernel_boot}" && -n "${kernel_dtb}" && -n "${kernel_modules}" && -n "${kernel_header}" ]] || error_msg "The 4 kernel missing."
 
     # 01. For /boot five files
     tar -xzf ${kernel_boot} -C ${tag_bootfs} && sync
@@ -466,12 +464,7 @@ refactor_files() {
     # 03. For /usr/src/linux-headers-${kernel_name}
     header_path="linux-headers-${kernel_name}"
     rm -rf ${tag_rootfs}/usr/src/linux-headers-* 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
-    if [[ -n "${kernel_header_deb}" ]]; then
-        temp_dir="$(mktemp -d)" && dpkg -X ${kernel_header_deb} ${temp_dir} >/dev/null 2>&1
-        cp -rf ${temp_dir}/usr ${tag_rootfs} && sync && rm -rf ${temp_dir} 2>/dev/null
-    elif [[ -n "${kernel_header_tar}" ]]; then
-        tar -xzf ${kernel_header_tar} -C ${tag_rootfs}/usr/src/${header_path} && sync
-    fi
+    tar -xzf ${kernel_header} -C ${tag_rootfs}/usr/src/${header_path} && sync
     [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/${kernel_name}
