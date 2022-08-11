@@ -467,7 +467,8 @@ refactor_files() {
     header_path="linux-headers-${kernel_name}"
     rm -rf ${tag_rootfs}/usr/src/linux-headers-* 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
     if [[ -n "${kernel_header_deb}" ]]; then
-        sudo dpkg -i ${kernel_header_deb} >/dev/null 2>&1
+        temp_dir="$(mktemp -d)" && dpkg -X ${kernel_header_deb} ${temp_dir} >/dev/null 2>&1
+        cp -rf ${temp_dir}/usr ${tag_rootfs} && sync && rm -rf ${temp_dir} 2>/dev/null
     elif [[ -n "${kernel_header_tar}" ]]; then
         tar -xzf ${kernel_header_tar} -C ${tag_rootfs}/usr/src/${header_path} && sync
     fi
