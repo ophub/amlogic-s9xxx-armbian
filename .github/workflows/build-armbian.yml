@@ -76,8 +76,6 @@ on:
         description: "Set armbian custom name."
         required: false
         default: ""
-  #schedule:
-  #- cron: "0 17 * * 0"
 
 env:
   TZ: America/New_York
@@ -101,10 +99,7 @@ jobs:
           sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
-          sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
-          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+          sudo timedatectl set-timezone "${TZ}"
           echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
           echo "::set-output name=status::success"
 
