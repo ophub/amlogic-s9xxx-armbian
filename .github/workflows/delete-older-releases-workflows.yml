@@ -85,8 +85,6 @@ on:
           - 2
           - 1
           - 0
-  #schedule:
-  #- cron: "0 23 * * 0"
 
 env:
   TZ: America/New_York
@@ -101,11 +99,12 @@ jobs:
         uses: actions/checkout@main
 
       - name: Initialization environment
+        id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo timedatectl set-timezone "${TZ}"
-          echo "DELETE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
 
       - name: Delete older releases
         uses: dev-drprasad/delete-older-releases@master
