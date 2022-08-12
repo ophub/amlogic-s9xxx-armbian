@@ -576,11 +576,16 @@ refactor_files() {
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
     sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun} 2>/dev/null
 
+    # Add network performance optimization
+    [[ -f "usr/sbin/balethirq.pl" && -f "etc/balance_irq" && -f "etc/rc.local" ]] && {
+        sed -i '/exit 0/i\perl /usr/sbin/balethirq.pl' etc/rc.local 2>/dev/null
+    }
+
     # Add custom startup script
     custom_startup_script="etc/custom_service/start_service.sh"
     [[ -f "${custom_startup_script}" && -f "etc/rc.local" ]] && {
         chmod +x ${custom_startup_script}
-        sed -i '/exit 0/i\bash /etc/custom_service/start_service.sh &' etc/rc.local 2>/dev/null
+        sed -i '/exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local 2>/dev/null
     }
 
     # Get random macaddr
