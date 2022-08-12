@@ -15,14 +15,13 @@ You can adjust the configuration of the kernel as needed, such as adding drivers
 2. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
 
 ```yaml
-cd amlogic-s9xxx-armbian
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. Enter the root directory of `~/amlogic-s9xxx-armbian`, and then run `sudo ./recompile -d -k 5.10.125` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory.
+3. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run `sudo ./recompile -d -k 5.10.125` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory.
 
 - ### Run under Armbian system
 
