@@ -42,19 +42,23 @@ inputs:
     default: ""
   # For compile kernel -----
   kernel_version:
-    description: "select kernel version"
+    description: "Select kernel version"
     required: false
     default: "5.10.125_5.15.50"
   kernel_auto:
     description: "Auto use the latest kernel"
     required: false
     default: "true"
+  kernel_package:
+    description: "Select compile package list"
+    required: false
+    default: "all"
   kernel_sign:
-    description: "Set the kernel custom name"
+    description: "Set the kernel custom signature"
     required: false
     default: "-ophub"
   kernel_repo:
-    description: "select kernel repository"
+    description: "Select the kernel repository"
     required: false
     default: "unifreq"
   kernel_config:
@@ -150,6 +154,7 @@ runs:
             make_command=" -d"
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
             [[ -n "${{ inputs.kernel_auto }}" ]] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
+            [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
             sudo chmod +x recompile
