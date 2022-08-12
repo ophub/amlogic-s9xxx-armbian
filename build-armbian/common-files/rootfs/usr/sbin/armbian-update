@@ -162,7 +162,7 @@ download_kernel() {
             latest_version="$(curl -s "${kernel_api}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
             #latest_version="160"
             [[ ! -z "${latest_version}" ]] || error_msg "Failed to get the version on the server."
-            echo -e "${INFO} current version: ${current_kernel}, Latest version: ${kernel_verpatch}.${latest_version}"
+            echo -e "${INFO} Current version: ${current_kernel}, Latest version: ${kernel_verpatch}.${latest_version}"
             inputs_kernel="${kernel_verpatch}.${latest_version}"
         fi
 
