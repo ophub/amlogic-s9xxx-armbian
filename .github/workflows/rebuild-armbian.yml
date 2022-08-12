@@ -86,6 +86,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Initialization environment
+        id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -94,9 +95,7 @@ jobs:
           sudo -E apt-get -qq install -y $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
-          sudo timedatectl set-timezone "$TZ"
-          sudo mkdir -p /workdir
-          sudo chown $USER:$GROUPS /workdir
+          sudo timedatectl set-timezone "${TZ}"
 
           # Get the url of the rebuild armbian file
           armbian_url="${{ github.event.inputs.armbian_url }}"
@@ -112,7 +111,6 @@ jobs:
               fi
           fi
           echo "ARMBIAN_URL=${armbian_url}" >> $GITHUB_ENV
-          echo "COMPILE_STARTINGTIME=$(date +"%m.%d.%H%M")" >> $GITHUB_ENV
 
           # Get the release name of the rebuild armbian file
           set_release="_"
@@ -126,6 +124,7 @@ jobs:
               let i++
           done
           echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
+          echo "::set-output name=status::success"
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
