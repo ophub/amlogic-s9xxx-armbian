@@ -65,7 +65,7 @@ This way you compile the kernel using your modified repository.
     build_target: kernel
     kernel_version: 5.10.125_5.15.50
     kernel_auto: true
-    kernel_sign: -ophub
+    kernel_sign: -yourname
 ```
 
 💡Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [add TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-docs#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:

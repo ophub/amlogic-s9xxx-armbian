@@ -63,7 +63,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     build_target: kernel
     kernel_version: 5.10.125_5.15.50
     kernel_auto: true
-    kernel_sign: -ophub
+    kernel_sign: -yourname
 ```
 
 💡注意: 如果你 `fork` 仓库并进行了修改，使用时须将 Actions 的 `用户名` 改成你自己的仓库，并根据说明中的第 2-3 条 [添加 TOKEN](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/armbian-docs/README.cn.md#2-设置隐私变量-github_token)，例如：
