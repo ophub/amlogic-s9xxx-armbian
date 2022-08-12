@@ -178,16 +178,15 @@ In the use of Armbian, please refer to [armbian-docs](build-armbian/armbian-docs
 2. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
 
 ```yaml
-cd amlogic-s9xxx-armbian
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. Create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.50`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
+3. Enter the `~/amlogic-s9xxx-armbian` root directory, and then create the `build/output/images` folder, and upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.50`) in the name of the original Armbian image file, It will be used as the name of the armbian firmware after rebuilding.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory. And run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.125` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run Eg: `sudo ./rebuild -d -b s905x3 -k 5.10.125` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
 
 
 - ### Description of localized packaging parameters
