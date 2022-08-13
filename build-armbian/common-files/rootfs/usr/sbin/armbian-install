@@ -401,6 +401,9 @@ EOF
     #
     sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+    #
+    sed -i '/DISK_TYPE/d' ${ophub_release_file} 2>/dev/null
+    echo "DISK_TYPE='emmc'" >>${ophub_release_file} 2>/dev/null
 
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
 
