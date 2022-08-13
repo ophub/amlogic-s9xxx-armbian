@@ -71,8 +71,8 @@ dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian.tar.xz"
 #
-# GCC download from: https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/downloads
-gcc_file="gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu.tar.xz"
+# Arm GNU Toolchain download from: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+gun_file="arm-gnu-toolchain-11.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
@@ -185,13 +185,13 @@ toolchain_check() {
 
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
 
-        # Download gcc for Ubuntu focal
-        if [[ ! -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} Download gcc [ ${gcc_file} ] ..."
-            wget -c "${dev_repo}/${gcc_file}" -O "${toolchain_path}/${gcc_file}" >/dev/null 2>&1 && sync
-            tar -xJf ${toolchain_path}/${gcc_file} -C ${toolchain_path} && sync
-            rm -f ${toolchain_path}/${gcc_file} && sync
-            [[ -d "${toolchain_path}/${gcc_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
+        # Download Arm GNU Toolchain for Ubuntu focal
+        if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
+            echo -e "${INFO} Download Arm GNU Toolchain [ ${gun_file} ] ..."
+            wget -c "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}" >/dev/null 2>&1 && sync
+            tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path} && sync
+            rm -f ${toolchain_path}/${gun_file} && sync
+            [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
         fi
 
         # Download clang for Ubuntu focal
@@ -369,7 +369,7 @@ compile_env() {
         export CC="clang"
         export LD="ld.lld"
     else
-        export CROSS_COMPILE="${toolchain_path}/${gcc_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
+        export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
         export CC="${toolchain_path}/${clang_file//.tar.xz/}/bin/clang"
         export LD="${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld"
         #
