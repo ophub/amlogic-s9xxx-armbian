@@ -380,30 +380,14 @@ EOF
 
     echo -e "${INFO} Update the relevant parameters."
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
-    #
-    sed -i '/FDTFILE/d' ${ophub_release_file} 2>/dev/null
-    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/UBOOT_OVERLOAD/d' ${ophub_release_file} 2>/dev/null
-    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/MAINLINE_UBOOT/d' ${ophub_release_file} 2>/dev/null
-    echo "MAINLINE_UBOOT='${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/ANDROID_UBOOT/d' ${ophub_release_file} 2>/dev/null
-    echo "ANDROID_UBOOT='${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/MYBOX_UBOOT/d' ${ophub_release_file} 2>/dev/null
-    echo "MYBOX_UBOOT='${MYBOX_UBOOT}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/SOC/d' ${ophub_release_file} 2>/dev/null
-    echo "SOC='${AMLOGIC_SOC}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
-    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
-    #
-    sed -i '/DISK_TYPE/d' ${ophub_release_file} 2>/dev/null
-    echo "DISK_TYPE='emmc'" >>${ophub_release_file} 2>/dev/null
+    sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='${MAINLINE_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^ANDROID_UBOOT=.*|ANDROID_UBOOT='${ANDROID_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^MYBOX_UBOOT=.*|MYBOX_UBOOT='${MYBOX_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
 
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
 
