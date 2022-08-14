@@ -671,7 +671,8 @@ software_118() {
             [[ -n "${gw}" ]] && my_gateway="${gw}"
 
             my_subnet="${my_gateway%.*}.0"
-            docker network create -d macvlan --subnet=${my_subnet}/24 --gateway=${my_gateway} -o parent=eth0 macnet
+            [[ -n "$(ifconfig | grep 'br0')" ]] && parent_lan="br0" || parent_lan="eth0"
+            docker network create -d macvlan --subnet=${my_subnet}/24 --gateway=${my_gateway} -o parent=${parent_lan} macnet
         }
 
         # Instructions: https://hub.docker.com/r/ophub/openwrt-aarch64
