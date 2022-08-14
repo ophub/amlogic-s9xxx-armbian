@@ -212,7 +212,7 @@ update_script() {
     # Update related files
     echo -e "${STEPS} Start syncing files..."
     svn export ${script_repo} ${software_path} --force
-    chmod +x ${software_path}/*.sh 2>/dev/null
+    find ${software_path} -type f -name '*.sh' -exec chmod +x {} \;
 
     sync && sleep 3
     echo -e "${SUCCESS} Script update complete."
