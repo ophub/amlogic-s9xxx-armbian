@@ -293,10 +293,8 @@ update_uboot() {
     fi
 
     # Update ophub_release_file
-    sed -i '/KERNEL_VERSION/d' ${ophub_release_file} 2>/dev/null
-    echo "KERNEL_VERSION='${KERNEL_VERSION}'" >>${ophub_release_file} 2>/dev/null
-    sed -i '/K510/d' ${ophub_release_file} 2>/dev/null
-    echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
 
     sync && echo ""
 }
