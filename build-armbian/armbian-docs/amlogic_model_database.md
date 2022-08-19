@@ -2,6 +2,8 @@
 
 The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt).
 
+All kernels except `5.4.y` and `5.15.y` must use `UBOOT_OVERLOAD`. Copy it as `u-boot.ext` when using it in `USB`, and copy it as `u-boot.emmc` when using it in `eMMC`. This copy operation will be done automatically by scripts such as install/update. There is no need to add in the 5.4.y and 5.15.y kernels, but you can try to manually copy and add when you encounter problems such as incomplete memory recognition.
+
 ## The list of devices supported by Amlogic TV Boxes
 
 <table cellpadding="0" cellspacing="0">
