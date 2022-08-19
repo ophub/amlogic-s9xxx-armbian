@@ -1,8 +1,8 @@
 # The files description
 
-The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt).
+The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt). All kernels except `5.4.y` and `5.15.y` must use `UBOOT_OVERLOAD`, Copy it as `u-boot.ext` when using it in `USB`, and copy it as `u-boot.emmc` when using it in `eMMC`, This copy operation will be done automatically by scripts such as install/update. There is no need to add in the 5.4.y and 5.15.y kernels, but you can try to manually copy and add when you encounter problems such as incomplete memory recognition.
 
-All kernels except `5.4.y` and `5.15.y` must use `UBOOT_OVERLOAD`. Copy it as `u-boot.ext` when using it in `USB`, and copy it as `u-boot.emmc` when using it in `eMMC`. This copy operation will be done automatically by scripts such as install/update. There is no need to add in the 5.4.y and 5.15.y kernels, but you can try to manually copy and add when you encounter problems such as incomplete memory recognition.
+支持的 Amlogic 电视盒子列表，在 `Armbian` 系统中配置文件的位置为 [/etc/amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf)，在 `OpenWrt` 系统中配置文件的位置为 [/etc/model_database.txt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/amlogic-s9xxx/common-files/rootfs/etc/model_database.txt)。除 `5.4.y` 和 `5.15.y` 内核外，其他内核须使用 `UBOOT_OVERLOAD` ，在 `USB` 中使用时须复制为 `u-boot.ext` ，在 `eMMC` 中使用时须复制为 `u-boot.emmc`，拷贝操作由安装/更新脚本自动完成。在 5.4.y 和 5.15.y 中不需要，但是如果内存识别不正确，可以尝试手动复制添加。
 
 ## The list of devices supported by Amlogic TV Boxes
 
