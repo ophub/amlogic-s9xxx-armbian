@@ -323,6 +323,7 @@ software_108() {
             -e TZ=${docker_tz} \
             -p 8123:8123 \
             -v ${install_path}/config:/config \
+            -v /run/dbus:/run/dbus:ro \
             --restart unless-stopped \
             ${image_name}
 
