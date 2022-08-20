@@ -19,11 +19,11 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 | s912 | [TX9-Pro](https://www.gearbest.com/tv-box/pp_759339.html), [H96-Pro-Plus](https://www.gearbest.com/tv-box-mini-pc/pp_503486.html), [Tanix-TX92](http://www.tanix-box.com/project-view/tanix-tx92-android-tv-box-powered-amlogic-s912/), [VORKE-Z6-Plus](http://www.vorke.com/project/vorke-z6-2/), [Mecool-M8S-PRO-L](https://www.gearbest.com/tv-box/pp_3005746210753315.html), [T95Z-Plus](https://www.ebay.com/itm/253466003975), [Nexbox-A1](https://www.gearbest.com/tv-box-mini-pc/pp_424843.html), [Nexbox-A95X-A2](https://www.cafago.com/en/p-v2979eu-2g.html), [Tanix-TX8-Max](https://www.tanix-box.com/project-view/tanix-tx8-max-android-tv-box/), [A95X](https://tokopedia.link/zQVlmUfgqqb), Octopus-Planet | All | armbian_aml_s912_*.img |
 | s905d | [MECOOL-KI-Pro](https://www.gearbest.com/tv-box-mini-pc/pp_629409.html), Phicomm-N1 | All | armbian_aml_s905d_*.img |
 | s905x | [HG680P](https://tokopedia.link/HbrIbqQcGgb), [B860H](https://www.zte.com.cn/global/products/cocloud/201707261551/IP-STB/ZXV10-B860H), [TBee-Box](https://www.tbee.com/product/tbee-box/), [T95](https://www.gearbest.com/tv-box-mini-pc/pp_268277.html) | All | armbian_aml_s905x_*.img |
-| s905w | [X96-Mini](https://www.gearbest.com/tv-box/pp_3008306149708795.html), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.15.y | armbian_aml_s905w_*.img |
+| s905w | [X96-Mini](https://www.gearbest.com/tv-box/pp_3008306149708795.html), [TX3-Mini](https://www.gearbest.com/tv-box/pp_009748238474.html) | 5.4.y/5.15.y | armbian_aml_s905w_*.img |
 | s905 | [Beelink-Mini-MX-2G](https://www.gearbest.com/tv-box-mini-pc/pp_321409.html), [MXQ-Pro+4K](https://www.gearbest.com/tv-box-mini-pc/pp_354313.html) | All | armbian_aml_s905_*.img |
 | s905l3a | [E900V22C/D](https://github.com/Calmact/e900v22c) | All | armbian_aml_s905l3a_*.img |
 
-💡Tip: The current ***`s905w`*** series of TV Boxes only support the use of the `5.15.y` kernel, Other types of TV Boxes can use optional kernel versions. Currently ***`s905`*** TV Boxes can only be used in `TF/SD/USB`, other types of TV Boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/amlogic_model_database.md) for dtb and u-boot of each device.
+💡Tip: The current ***`s905w`*** series of TV Boxes only support the use of the `5.4.y/5.15.y` kernel, Other types of TV Boxes can use optional kernel versions. Currently ***`s905`*** TV Boxes can only be used in `TF/SD/USB`, other types of TV Boxes also support writing to `EMMC`. Please refer to the [instructions](build-armbian/armbian-docs/amlogic_model_database.md) for dtb and u-boot of each device.
 
 ## Install to EMMC and update instructions
 
