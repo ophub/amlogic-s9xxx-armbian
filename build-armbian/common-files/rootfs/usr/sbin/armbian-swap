@@ -13,7 +13,7 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-swap 1
-# The input parameter unit is GB, the default is 1
+# The input parameter unit is GiB, the default is 1
 #
 #=========================================================================
 #
@@ -68,13 +68,13 @@ do_checkdisk() {
         error_msg "The path is not available, the remaining space cannot be obtained."
     fi
     if [[ "${available_space}" -lt "${swap_gb}" ]]; then
-        error_msg "The remaining space is [ ${available_space} ] GB, and [ ${swap_gb} ] GB swap cannot be created."
+        error_msg "The remaining space is [ ${available_space} ] GiB, and [ ${swap_gb} ] GiB swap cannot be created."
     fi
 
     # Check directory
     SWAP_PATH="${PARTITION_PATH}/.swap"
     mkdir -p ${SWAP_PATH} && sync
-    echo -e "${INFO} Prepare to create [ ${swap_gb} ] GB swap in the [ ${SWAP_PATH} ] directory."
+    echo -e "${INFO} Prepare to create [ ${swap_gb} ] GiB swap in the [ ${SWAP_PATH} ] directory."
 }
 
 # delete current swap
@@ -89,23 +89,32 @@ delete_current_swap() {
 # create new swap
 create_new_swap() {
     echo -e "${STEPS} Start creating a new swap..."
-    dd_count="$((1000000 * ${swap_gb}))"
-    echo -e "${INFO} The swap size is: [ ${swap_gb} ] GB, Please wait..."
-    dd if=/dev/zero of=${SWAP_PATH}/swapfile bs=1024 count=${dd_count} conv=fsync && sync
-    chmod 600 ${SWAP_PATH}/swapfile
+    ROOTFS_TYPE="$(df -hT / | tail -n1 | awk '{print $2}')"
+    echo -e "${INFO} The swap size is [ ${swap_gb} ] GiB, partition types is [ ${ROOTFS_TYPE} ], Please wait..."
+
+    # create swapfile
+    [[ "${ROOTFS_TYPE}" == "btrfs" ]] && {
+        truncate -s 0 ${SWAP_PATH}/swapfile
+        chattr +C ${SWAP_PATH}/swapfile
+        btrfs property set ${SWAP_PATH}/swapfile compression none
+    }
+    dd if=/dev/zero of=${SWAP_PATH}/swapfile bs=1G count=${swap_gb} conv=fsync && sync
+    chmod 0600 ${SWAP_PATH}/swapfile
     mkswap -L SWAP ${SWAP_PATH}/swapfile
     swapon ${SWAP_PATH}/swapfile
-    sync && sleep 3
+
     # Add swap to the mount point
-    echo "${SWAP_PATH}/swapfile swap swap defaults 0 0" >>/etc/fstab
+    sed -i '/swap/d' /etc/fstab
+    echo "${SWAP_PATH}/swapfile none swap defaults 0 0" >>/etc/fstab
     #
-    echo -e "${INFO} Current swap: \n$(cat /proc/swaps) \n"
+    sync && sleep 3
+    echo -e "${INFO} Current swap: \n$(cat /proc/swaps)"
     echo -e "${SUCCESS} Created successfully!"
 }
 
 # Check swap
 do_checkswap() {
-    # Set the swap size in GB
+    # Set the swap size in GiB
     my_swap_gb="${1}"
     format_gb="$(echo "${my_swap_gb}" | awk -F "." '{print $1}')"
     if [[ -n "$(echo "${format_gb}" | sed -n "/^[0-9]\+$/p")" ]]; then
@@ -125,7 +134,6 @@ do_checkswap() {
     else
         create_new_swap ${swap_gb}
     fi
-    sync && sleep 3
     exit 0
 }
 
