@@ -375,7 +375,6 @@ copy_rootfs() {
 UUID=${ROOTFS_UUID}  /        ${file_system_type}     ${fstab_mount_string}     0 1
 LABEL=BOOT_EMMC      /boot    vfat                    defaults                  0 2
 tmpfs                /tmp     tmpfs                   defaults,nosuid           0 0
-
 EOF
 
     echo -e "${INFO} Update the relevant parameters."
