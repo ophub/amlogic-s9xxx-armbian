@@ -392,3 +392,5 @@ adb pull /data/local/block.txt C:\mybox
 
 打开 excel 模板 [android_partition_table_template.xlsx](android_partition_table_template.xlsx)，我们根据上面得到的三个分区信息文件把数据套进去，得到设备最终的安卓系统分区表。通过分类，确定了混合区域和安全区域。其中混合区域的 cache 中可以作为 Armbian 或 OpenWrt 系统的 `boot` 分区的使用，安全分区可以作为 `rootfs` 分区使用。
 
+![Snip20220827_1](https://user-images.githubusercontent.com/68696949/187031866-ddc0f76a-810a-40ef-99d3-1484bd4092d6.png)
+
