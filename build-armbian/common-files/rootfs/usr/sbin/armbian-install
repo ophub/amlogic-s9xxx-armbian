@@ -222,14 +222,18 @@ create_partition() {
         BLANK1="700"
         BOOT="160"
         BLANK2="0"
-    elif [[ "${AMLOGIC_SOC}" == "s905l3a" ]]; then
-        BLANK1="570"
+    elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "304" ]]; then
+        BLANK1="570" # e900v22c/d: The first [ 570 MiB ] is not writable.
         BOOT="256"
         BLANK2="0"
+    elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "305" ]]; then
+        BLANK1="68"
+        BOOT="512"   # CM311-1a-YST: A total of [ 1024 MiB ] can be used in this block, and the remaining [ 512 MiB ] can be used.
+        BLANK2="674" # Can set the rootfs partition after [ 1254 MiB ] of the total disk.
     else
         BLANK1="68"
-        BOOT="256"    # A total of [ 1120MiB ] can be used in this block, and the remaining [ 864MiB ] can be used.
-        BLANK2="1026" # Can set the rootfs partition after [ 1350MiB ] of the total disk.
+        BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
+        BLANK2="1026" # Can set the rootfs partition after [ 1350 MiB ] of the total disk.
     fi
 
     # Format emmc disk
