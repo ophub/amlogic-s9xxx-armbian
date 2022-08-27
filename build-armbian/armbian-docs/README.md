@@ -392,3 +392,5 @@ adb pull /data/local/block.txt C:\mybox
 
 Open the excel template [android_partition_table_template.xlsx](android_partition_table_template.xlsx), we insert the data according to the three partition information files obtained above, and get the final Android system partition table of the device. Through the classification, mixed areas and safe areas are determined. The cache in the mixed area can be used as the `boot` partition of Armbian or OpenWrt system, and the secure partition can be used as the `rootfs` partition.
 
+![Snip20220827_1](https://user-images.githubusercontent.com/68696949/187031866-ddc0f76a-810a-40ef-99d3-1484bd4092d6.png)
+
