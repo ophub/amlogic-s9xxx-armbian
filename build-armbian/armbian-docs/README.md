@@ -358,7 +358,9 @@ Use the `armbian-sync` command to update all service scripts on the local system
 
 The method of making Android system partition table and u-boot in 12.10 - 12.11 is organized from [unifreq](https://github.com/unifreq)'s teaching chat content in the community to guide you to make related files, and the source code is in his warehouse.
 
-When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot.
+When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will not be able to start, or an error similar to the following will appear:
+
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
 
 #### 12.10.1 Install the adb toolkit
 
@@ -463,7 +465,7 @@ If the bootloader is locked, the code in this area is garbled and useless. Norma
 
 #### 12.11.3 Make the u-boot file
 
-Compiling u-boot requires two source codes: https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot
+To make u-boot, you need https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot two source libraries, and compile the two u-boot files of your own box .
 
 In the amlogic-boot-fip source code, only the acs.bin file is different for each model, and other files can be used in common.
 
