@@ -41,6 +41,10 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.10.2 查看安卓分区情况](#12102-查看安卓分区情况)
       - [12.10.3 制作安卓系统分区表](#12103-制作安卓系统分区表)
       - [12.10.4 使用安卓系统分区表](#12104-使用安卓系统分区表)
+    - [12.11 如何制作 u-boot 文件](#1211-如何制作-u-boot-文件)
+      - [12.11.1 提取 bootloader 和 dtb 文件](#12111-提取-bootloader-和-dtb-文件)
+      - [12.11.2 制作 acs.bin 文件](#12112-制作-acsbin-文件)
+      - [12.11.3 制作 u-boot 文件](#12113-制作-u-boot-文件)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -351,12 +355,14 @@ iface lo inet loopback
 
 ### 12.10 如何制作安卓系统分区表
 
-将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。
+在 12.10 - 12.11 中制作安卓系统分区表及 u-boot 的方法整理自 [unifreq](https://github.com/unifreq) 在社群中指导大家制作相关文件的教学聊天内容，制作源码在他的仓库中。
+
+我们将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。
 
 
 #### 12.10.1 安装 adb 工具包
 
-adb 工具包是由 Google 开发的一款安卓系统辅助工具，可以帮助用户管理安卓设备，使用它进行刷机、安装相关程序等。点此 [下载 adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) 工具包，然后在 Windows 系统下，将 `adb.exe`，`AdbWinApi.dll` 和 `AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，然后 打开 `cmd` 命令面板，输入执行 `adb --version` 命令，如果有显示就表示可以使用了。
+adb 工具包是由 Google 开发的一款安卓系统辅助工具，可以帮助用户管理安卓设备，使用它进行刷机、安装相关程序等。点此 [下载 adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) 工具包，然后在 Windows 系统下，将 `adb.exe`，`AdbWinApi.dll` 和 `AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，在电脑`开始菜单`的`运行`中输入 `cmd` 回车，打开 `cmd` 面板，输入执行 `adb --version` 命令，如果有显示就表示可以使用了。
 
 #### 12.10.2 查看安卓分区情况
 
@@ -397,9 +403,7 @@ adb pull /data/local/block.txt C:\mybox
 
 #### 12.10.4 使用安卓系统分区表
 
-根据`混合区域`和`安全区域`的具体位置，在 [armbian-install](../common-files/rootfs/usr/sbin/armbian-install) 中添加对应的分区信息。以我们制作的 tx3 盒子的安卓系统分区表为例。跳过 `68 MiB（BLANK1=68）` 的不安全区域，在 `cache` 里设置 `256 MiB（BOOT=256）`为 `boot` 分区，设置跳过 `1026 MiB（BLANK2=1026）` 后做为 `rootfs` 分区。
-
-在 tx3 盒子中，它的 cache 分区有 1120 MiB 可以使用，但一般 `BOOT` 分区设置 256 MiB 已经够用了，其他部分废弃不用了；`混合区域`有 1350 MiB 空间，所以 `BLANK2` 的值为 `1350-68-256=1026` MiB，如果把 `BOOT` 的大小调整了，`BLANK2` 可以根据公示计算更改。结果如下：
+根据`混合区域`和`安全区域`的具体位置，在 [armbian-install](../common-files/rootfs/usr/sbin/armbian-install) 中添加对应的分区信息。以我们制作的 tx3 盒子的安卓系统分区表为例。跳过 `68 MiB（BLANK1=68）` 的不安全区域；它的 cache 分区共有 1120 MiB 可以使用，但一般 `BOOT` 分区设置 `256 MiB（BOOT=256）` 已经够用了，其他容量弃用了；`混合区域`共有 1350 MiB 空间，所以 `BLANK2` 的值为 `1350-68-256=1026（BLANK2=1026）` MiB。结果如下：
 
 ```shell
 # Set partition size (Unit: MiB)
@@ -408,4 +412,66 @@ elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
     BOOT="256"
     BLANK2="1026"
 ```
+
+### 12.11 如何制作 u-boot 文件
+
+u-boot 文件是引导系统正常启动的重要文件。
+
+#### 12.11.1 提取 bootloader 和 dtb 文件
+
+提取需要使用 HxD 软件。可以从 [官网下载链接](https://mh-nexus.de/en/downloads.php?product=HxD20) 或 [备份下载链接](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip) 获取安装。
+
+在 `cmd` 面板中依次执行以下命令提取相关文件，并下载到本地电脑。
+
+```shell
+# 使用 adb 工具进入盒子
+adb connect 192.168.1.111
+adb shell
+
+# 导出 bootloader 命令
+dd if=/dev/block/bootloader of=/data/local/bootloader.bin
+
+# 导出 dtb 命令
+cat /dev/dtb >/data/local/mybox.dtb
+
+# 导出 gpio 命令
+cat /sys/kernel/debug/gpio >/data/local/mybox_gpio.txt
+
+# 依次把 bootloader、dtb 和 gpio 文件都下载到本地电脑C盘根目录下的 mybox 文件夹
+adb pull /data/local/bootloader.bin C:\mybox
+adb pull /data/local/mybox.dtb C:\mybox
+adb pull /data/local/mybox_gpio.txt C:\mybox
+```
+
+#### 12.11.2 制作 acs.bin 文件
+
+主线 u-boot 最重要的是 acs.bin，用于初始化内存的部分，原厂 u-boot 位于固件最前面的 4MB 位置。使用刚才获得的 `bootloader.bin` 文件提取 `acs.bin` 文件。
+
+打开 HxD 软件，打开上面导出的 `bootloader.bin` 文件，`右键 - 选择范围`，起始位置 `F200`，长度 `1000`，选`十六进制`。
+
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/187056711-1b58ce71-2a7d-4e9b-a976-e5f278edaa53.png">
+
+复制选择的结果，然后新建文件，插入式粘贴，警告忽略，另存为 acs.bin 文件。
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056725-0a0e60af-6a21-4a6b-a2d5-f3d46b438a6a.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056827-8419c738-3428-473e-9a95-ab7270170d98.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056852-9f62f16a-f7f1-4c34-a2c2-78358d198f9a.png">
+</div>
+
+如果是锁了 bootloader 的话这个区域的代码是是乱码就没用了。正常的应该像上图中这样有很多 `0` ，有 `cfg` 会连续出现几次，中间会出现 `ddr` 相关的字样，这种正常代码就是可以使用的。
+
+#### 12.11.3 制作 u-boot 文件
+
+编译 u-boot 需要 https://github.com/unifreq/amlogic-boot-fip 和 https://github.com/unifreq/u-boot 这两个源码。
+
+在 amlogic-boot-fip 源码里面每个机型只有 acs.bin 这个文件是不同的，其它的文件都可以通用。
+
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187057209-c4716384-46ef-4922-9710-8da7ae6db1e4.png">
+
+制作 u-boot 的方法详见 https://github.com/unifreq/u-boot/tree/master/doc/board/amlogic 里的具体说明，选择自己设备的型号进行编译测试。
+
+根据 [unifreq](https://github.com/unifreq) 的方法制作 u-boot 需要用到盒子的 acs.bin，dts 和 config 文件。其中安卓系统导出来的 dts 不能直接转换转换成 Armbian 的格式，需要自己编写一个对应的 dts 文件。根据自己设备具体硬件上的区别部分，比如开关、led、电源控制、tf卡、sdio wifi模块等，使用内核源码库中相似的 [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) 文件进行修改制作。
+
+💡提示：在写入 eMMC 进行测试前，请先查看 12.3 的救砖方法。务必掌握短接点位置，有原厂 .img 格式的安卓系统文件，并进行过短接刷机测试，确保救砖方法都已经掌握的情况下再进行写入测试。
 

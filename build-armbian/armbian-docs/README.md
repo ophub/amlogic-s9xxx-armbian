@@ -41,6 +41,10 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.10.2 Check the Android partition](#12102-check-the-android-partition)
       - [12.10.3 Make Android System Partition Table](#12103-make-android-system-partition-table)
       - [12.10.4 Using the android system partition table](#12104-using-the-android-system-partition-table)
+    - [12.11 How to make u-boot file](#1211-how-to-make-u-boot-file)
+      - [12.11.1 Extract the bootloader and dtb files](#12111-extract-the-bootloader-and-dtb-files)
+      - [12.11.2 Make the acs.bin file](#12112-make-the-acsbin-file)
+      - [12.11.3 Make the u-boot file](#12113-make-the-u-boot-file)
 
 ## 1. Register your own GitHub account
 
@@ -352,11 +356,13 @@ Use the `armbian-sync` command to update all service scripts on the local system
 
 ### 12.10 How to make an android system partition table
 
+The method of making Android system partition table and u-boot in 12.10 - 12.11 is organized from [unifreq](https://github.com/unifreq)'s teaching chat content in the community to guide you to make related files, and the source code is in his warehouse.
+
 When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot.
 
 #### 12.10.1 Install the adb toolkit
 
-adb toolkit is an Android system auxiliary tool developed by Google, which can help users manage Android devices, use it to flash machines, install related programs, etc. Click here [download adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) toolkit, and then under Windows system, copy `adb.exe`, `AdbWinApi. dll` and `AdbWinUsbApi.dll` are copied to the `system32` and `syswow64` folders in the `c://windows/` directory, then open the `cmd` command panel, enter and execute `adb --version` command, if it is displayed, it means it can be used.
+adb toolkit is an Android system auxiliary tool developed by Google, which can help users manage Android devices, use it to flash machines, install related programs, etc. Click here [download adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) toolkit, and then under Windows system, copy `adb.exe`, `AdbWinApi. dll` and `AdbWinUsbApi.dll` are copied to the `system32` and `syswow64` folders in the `c://windows/` directory, input `cmd` in the `run` of the `computer start menu` and press Enter to open the `cmd` panel, enter and execute `adb --version` command, if it is displayed, it means it can be used.
 
 #### 12.10.2 Check the Android partition
 
@@ -397,9 +403,7 @@ Open the excel template [android_partition_table_template.xlsx](android_partitio
 
 #### 12.10.4 Using the android system partition table
 
-According to the specific location of `mixed area` and `secure area`, add the corresponding partition information in [armbian-install](../common-files/rootfs/usr/sbin/armbian-install) . Take the Android system partition table of the tx3 box we made as an example. After skipping the unsafe area of `68 MiB (BLANK1=68)`, set `256 MiB (BOOT=256)` as the `boot` partition in `cache`, after setting skip `1026 MiB (BLANK2=1026)` As the `rootfs` partition.
-
-In the tx3 box, its cache partition has 1120 MiB available, but the general `BOOT` partition setting 256 MiB is enough, and other parts are discarded; the `mixed area` has 1350 MiB space, so the value of `BLANK2` is `1350-68-256=1026` MiB, if the size of `BOOT` is adjusted, `BLANK2` can be changed according to the public calculation. The result is as follows:
+According to the specific location of `mixed area` and `secure area`, add the corresponding partition information in [armbian-install](../common-files/rootfs/usr/sbin/armbian-install) . Take the Android system partition table of the tx3 box we made as an example. Skip the unsafe area of `68 MiB (BLANK1=68)`; its cache partition has a total of 1120 MiB that can be used, but the general `BOOT` partition setting `256 MiB (BOOT=256)` is enough, other capacity is discarded Used; `Mixed area` has a total of 1350 MiB space, so the value of `BLANK2` is `1350-68-256=1026 (BLANK2=1026)` MiB. The result is as follows:
 
 ```shell
 # Set partition size (Unit: MiB)
@@ -408,4 +412,66 @@ elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
     BOOT="256"
     BLANK2="1026"
 ```
+
+### 12.11 How to make u-boot file
+
+The u-boot file is an important file to guide the system to start normally.
+
+#### 12.11.1 Extract the bootloader and dtb files
+
+Extraction requires the use of HxD software. You can download it from [Official website download link](https://mh-nexus.de/en/downloads.php?product=HxD20) or [Backup download link](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip) to get the installation.
+
+Execute the following commands in sequence in the `cmd` panel to extract the relevant files and download them to the local computer.
+
+```shell
+# use the adb tool to enter the box
+adb connect 192.168.1.111
+adb shell
+
+# export bootloader command
+dd if=/dev/block/bootloader of=/data/local/bootloader.bin
+
+# export dtb command
+cat /dev/dtb >/data/local/mybox.dtb
+
+# export gpio command
+cat /sys/kernel/debug/gpio >/data/local/mybox_gpio.txt
+
+# Download the bootloader, dtb and gpio files to your local computer
+adb pull /data/local/bootloader.bin C:\mybox
+adb pull /data/local/mybox.dtb C:\mybox
+adb pull /data/local/mybox_gpio.txt C:\mybox
+```
+
+#### 12.11.2 Make the acs.bin file
+
+The most important part of the mainline u-boot is acs.bin, which is used to initialize the memory. The original u-boot is located in the first 4MB of the firmware. Extract the `acs.bin` file using the `bootloader.bin` file you just obtained.
+
+Open HxD software, open the `bootloader.bin` file exported above, `right click - select range`, start position `F200`, length `1000`, select `hexadecimal`.
+
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/187056711-1b58ce71-2a7d-4e9b-a976-e5f278edaa53.png">
+
+Copy the selected result, then create a new file, paste insert, ignore warnings, save as acs.bin file.
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056725-0a0e60af-6a21-4a6b-a2d5-f3d46b438a6a.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056827-8419c738-3428-473e-9a95-ab7270170d98.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056852-9f62f16a-f7f1-4c34-a2c2-78358d198f9a.png">
+</div>
+
+If the bootloader is locked, the code in this area is garbled and useless. Normally, there should be a lot of `0` as shown in the above picture, and `cfg` will appear several times in a row, and the words related to `ddr` will appear in the middle. This kind of normal code can be used.
+
+#### 12.11.3 Make the u-boot file
+
+Compiling u-boot requires two source codes: https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot
+
+In the amlogic-boot-fip source code, only the acs.bin file is different for each model, and other files can be used in common.
+
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187057209-c4716384-46ef-4922-9710-8da7ae6db1e4.png">
+
+For the method of making u-boot, please refer to the specific instructions in https://github.com/unifreq/u-boot/tree/master/doc/board/amlogic, and select the model of your own device to compile and test.
+
+To make u-boot according to the method of [unifreq](https://github.com/unifreq), you need to use the acs.bin, dts and config files of the box. The dts exported from the Android system cannot be directly converted into the Armbian format, and you need to write a corresponding dts file yourself. According to the different parts of the specific hardware of your own equipment, such as switches, LEDs, power control, tf cards, sdio wifi modules, etc., use the similar [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) file in the kernel source library for modification and production.
+
+💡Tip: Before writing to eMMC for testing, please check the Brick Rescue Method in 12.3. Be sure to master the position of the short contact, have the original Android system file in .img format, and perform a short-circuit flash test to ensure that the brick-rescue method has been mastered before writing the test.
 
