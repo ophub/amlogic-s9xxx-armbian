@@ -227,9 +227,9 @@ create_partition() {
         BOOT="256"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "305" ]]; then
-        BLANK1="68"
-        BOOT="512"   # CM311-1a-YST: A total of [ 1024 MiB ] can be used in this block, and the remaining [ 512 MiB ] can be used.
-        BLANK2="674" # Can set the rootfs partition after [ 1254 MiB ] of the total disk.
+        BLANK1="168" # CM311-1a-YST: Must skip [ 68 MiB ], Multi-backward offset 100 MiB, [ 68+100=168 MiB ]
+        BOOT="512"   # A total of [ 1024 MiB ] can be used in this block, gave up [ 1024-512-100=412 MiB ]
+        BLANK2="674" # Can set the rootfs partition after [ 1254 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1254-168-512+100=674 MiB ]
     else
         BLANK1="68"
         BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
