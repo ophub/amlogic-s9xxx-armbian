@@ -134,6 +134,7 @@ do_select_box() {
         18 | tx3-mini)    do_start tx3-mini.conf ;;
         19 | t95)         do_start t95.conf ;;
         20 | tx9-pro)     do_start tx9-pro.conf ;;
+        21 | x92)         do_start x92.conf ;;
         99 | diy)         do_start diy.conf ;;
          0 | stop)        do_stop ;;
          1 | quit)        echo "quit!" && exit 0 ;;
@@ -165,6 +166,7 @@ case "${1}" in
         │    18. tx3-mini (s905w)       │
         │    19. t95 (s905x)            │
         │    20. tx9-pro (s912)         │
+        │    21. x92 (s912)             │
         │    99. diy                    │
         │                               │
         ├──────[ Other Operations ]─────┤
