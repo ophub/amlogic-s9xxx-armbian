@@ -50,4 +50,9 @@ ophub_release_file="/etc/ophub-release"
 [[ -n "$(dpkg -l | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "18. Remove linux-u-boot-*"
 sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "19. Clean up local installation packages"
 
+# Regenerate new machine-id
+sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "20. Delete machine-id"
+sudo systemd-machine-id-setup 2>/dev/null && echo "21. Generate /etc/machine-id"
+sudo dbus-uuidgen --ensure 2>/dev/null && echo "22. Generate /var/lib/dbus/machine-id"
+
 sync && echo "armbian-fix: Loading finished."
