@@ -71,9 +71,13 @@ init_var() {
         error_msg "you are running in emmc mode, please boot system with usb or tf card!"
     fi
 
-    # Find emmc disk
+    # Find emmc disk, first find emmc containing boot0 partition
     install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+    # Find emmc disk, find emmc that does not contain the boot0 partition
+    [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | uniq)"
+    # Check if emmc exists
     [[ -z "${install_emmc}" ]] && error_msg "No emmc can be found to install the armbian system!"
+    # Location of emmc
     DEV_EMMC="/dev/${install_emmc}"
     echo -e "${INFO} DEV_EMMC: [ ${DEV_EMMC} ]"
 
