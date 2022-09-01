@@ -52,7 +52,7 @@ sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/ap
 
 # Regenerate new machine-id
 sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "20. Delete machine-id"
-sudo systemd-machine-id-setup 2>/dev/null && echo "21. Generate /etc/machine-id"
-sudo dbus-uuidgen --ensure 2>/dev/null && echo "22. Generate /var/lib/dbus/machine-id"
+sudo dbus-uuidgen --ensure=/etc/machine-id && echo "21. Generate /etc/machine-id"
+sudo dbus-uuidgen --ensure && echo "22. Generate /var/lib/dbus/machine-id"
 
 sync && echo "armbian-fix: Loading finished."
