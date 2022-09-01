@@ -37,7 +37,8 @@
 # software_116  : For node-red:1880
 # software_117  : For mosquitto:1883/9001
 # software_118  : For openwrt:80
-# software_119  : For Netdata:19999
+# software_119  : For netdata:19999
+# software_120  : For xunlei:2345
 #
 #============================================================================
 
@@ -729,6 +730,41 @@ software_119() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://ip:19999 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For xunlei
+software_120() {
+    # Set basic information
+    container_name="xunlei"
+    image_name="cnk3x/xunlei:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/cnk3x/xunlei
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            --hostname=mynas \
+            --net=bridge \
+            -p 2345:2345 \
+            -v ${install_path}/data:/xunlei/data \
+            -v ${install_path}/downloads:/xunlei/downloads \
+            --restart unless-stopped \
+            --privileged \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:2345 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
