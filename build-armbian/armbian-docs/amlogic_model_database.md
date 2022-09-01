@@ -64,7 +64,7 @@ The list of devices supported by Amlogic TV Boxes, the configuration file in the
 <tr><td>518</td><td>X96 Air Q1000</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,qca9377 wifi and Bluetooth</td></tr>
 <tr><td>519</td><td>A95XF3 Air 1Gb</td><td>s905x3</td><td>meson-sm1-a95xf3-air-gbit.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>520</td><td>A95XF3 Air 100Mb</td><td>s905x3</td><td>s905x3:meson-sm1-a95xf3-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
-<tr><td>521</td><td>Tencent Aurora 3Pro</td><td>s905x3</td><td>meson-sm1-skyworth-lb2004-a4091.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,4GB Mem,32G Rom,MT7661RSN chip Wifi-5(mt7663s)/Bluetooth-5.0(btmtksdio),JL2121 1Gb Nic</td></tr>
+<tr><td>521</td><td>Tencent Aurora 3Pro</td><td>s905x3</td><td>meson-sm1-skyworth-lb2004-a4091.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,4GB Mem,32G Rom,Model LB2004-A4091,MT7661RSN chip Wifi-5(mt7663s)/Bluetooth-5.0(btmtksdio),JL2121 1Gb Nic</td></tr>
 
 <tr><td>-</td><td>Beelink Mini MX 2G</td><td>s905</td><td>meson-gxbb-beelink-mini-mx.dtb</td><td>u-boot-s905.bin</td><td>NA</td><td>NA</td><td>Mali-450 GPU 2.4GHz / 5.8GHz WiFi 2GB RAM 16GB ROM,1Gb Nic</td></tr>
 <tr><td>-</td><td>MXQ PRO+ 4K</td><td>s905</td><td>meson-gxbb-mxq-pro-plus.dtb</td><td>u-boot-p201.bin</td><td>NA</td><td>NA</td><td>2GB RAM 16GB ROM 2.4G/5.8G,1Gb Nic</td></tr>
