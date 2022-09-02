@@ -358,14 +358,11 @@ compile_env() {
     #make ${MAKE_SET_STRING} menuconfig
 
     # Check .config file
-    if [[ ! -f ".config" ]]; then
-        # Copy config file
+    if [[ ! -s ".config" ]]; then
         echo -e "${INFO} Copy config file to ${local_kernel_path}"
-        config_demo="$(ls ${config_path}/config-${kernel_verpatch}* 2>/dev/null | sort -rV | head -n 1)"
-        config_demo_file="${config_demo##*/}"
-        [[ -z "${config_demo_file}" ]] && error_msg "Missing [ config-${kernel_verpatch}* ] template!"
-        echo -e "${INFO} CONFIG_DEMO: [ ${config_path}/${config_demo_file} ]"
-        cp -f ${config_path}/${config_demo_file} .config && sync
+        [[ -s "${config_path}/config-${kernel_verpatch}" ]] && error_msg "Missing [ config-${kernel_verpatch} ] template!"
+        echo -e "${INFO} CONFIG_DEMO: [ ${config_path}/config-${kernel_verpatch} ]"
+        cp -f ${config_path}/config-${kernel_verpatch} .config && sync
     else
         echo -e "${INFO} Use the .config file in the current directory."
     fi
