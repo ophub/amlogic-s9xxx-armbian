@@ -403,9 +403,8 @@ compile_env() {
 
     # Check .config file
     if [[ ! -s ".config" ]]; then
-        echo -e "${INFO} Copy config file to ${local_kernel_path}"
-        [[ -s "${config_path}/config-${kernel_verpatch}" ]] && error_msg "Missing [ config-${kernel_verpatch} ] template!"
-        echo -e "${INFO} CONFIG_DEMO: [ ${config_path}/config-${kernel_verpatch} ]"
+        [[ -s "${config_path}/config-${kernel_verpatch}" ]] || error_msg "Missing [ config-${kernel_verpatch} ] template!"
+        echo -e "${INFO} Copy [ ${config_path}/config-${kernel_verpatch} ] to [ .config ]"
         cp -f ${config_path}/config-${kernel_verpatch} .config && sync
     else
         echo -e "${INFO} Use the .config file in the current directory."
