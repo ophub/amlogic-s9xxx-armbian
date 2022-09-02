@@ -86,7 +86,7 @@ The relevant parameters correspond to the `local compilation commands`, please r
 | kernel_package | all | Set the package list for compiling the kernel. The default is `all`. Function reference `-p` |
 | kernel_sign | -ophub | Set the kernel custom signature. The default is `-ophub`. Function reference `-n` |
 | kernel_repo    | unifreq  | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
-| kernel_config | null | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . The kernel configuration templates of each series stored in this directory must start with the name of `config-5.x`. For example, templates for compiling `5.10` series kernels can be named with various names starting with `config-5.10`, such as `config-5.10`, `config-5.10.125` or `config-5.10.125-ophub`, etc., When there are multiple files starting with `config-5.10`, the file with the highest version number will be used. |
+| kernel_config | null | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 
 - ### GitHub Action Output variable description
 
