@@ -84,7 +84,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_package    | all              | 设置编译内核的包列表。默认值为 `all`。功能参考 `-p`             |
 | kernel_sign       | -ophub           | 设置内核自定义签名。默认值为 `-ophub`。功能参考 `-n`             |
 | kernel_repo       | unifreq          | 指定编译内核的源代码仓库。默认值为 `unifreq` 。功能参考 `-r`      |
-| kernel_config     | 无               | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。在此目录下存放的各系列的内核配置模板都必须以 `config-5.x` 的名称为开头，例如编译 `5.10` 系列内核的模板可命名为以 `config-5.10` 开头的各种名字，如 `config-5.10` 、 `config-5.10.125` 或者 `config-5.10.125-ophub` 等，有多个以 `config-5.10` 为开头的文件时，将使用版本号最大的文件。 |
+| kernel_config     | 无               | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。该目录下存储的配置模板必须以内核的主版本命名，如`config-5.10`、`config-5.15`等。 |
 
 - ### GitHub Action 输出变量说明
 
