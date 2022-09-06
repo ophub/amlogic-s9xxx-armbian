@@ -23,8 +23,7 @@
 # software_304  : For npc
 # software_305  : For plex
 # software_306  : For emby-server
-# software_307  : For openmediavault(OMV-6.x)
-# software_308  : For kvm
+# software_307  : For kvm
 #
 #============================================================================
 
@@ -219,46 +218,8 @@ software_306() {
     esac
 }
 
-# For openmediavault(OMV-6.x)
-software_307() {
-    case "${software_manage}" in
-    install)
-        echo -e "${STEPS} Start checking the installation environment..."
-        # Check systemd running status
-        systemd="$(ps --no-headers -o comm 1)"
-        [[ "${systemd}" == "systemd" ]] || error_msg "This system is not running systemd."
-        # Check the system operating environment
-        [[ -z "$(dpkg -l | grep -wE 'gdm3|sddm|lxdm|xdm|lightdm|slim|wdm|xfce')" ]] || error_msg "OpenMediaVault does not support running in desktop environment!"
-
-        # Download software, E.g: /tmp/tmp.xxx/install
-        tmp_download="$(mktemp -d)"
-        software_url="https://github.com/OpenMediaVault-Plugin-Developers/installScript/raw/master/install"
-        software_filename="${software_url##*/}"
-        echo -e "${STEPS} Start downloading the OpenMediaVault installation script..."
-        wget -q -P ${tmp_download} ${software_url}
-        [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
-        chmod +x ${tmp_download}/${software_filename}
-        echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
-
-        # Install OpenMediaVault and omv-extras extension: https://github.com/OpenMediaVault-Plugin-Developers/installScript
-        echo -e "${STEPS} Start installing OpenMediaVault and omv-extras extension..."
-        sudo ${tmp_download}/${software_filename} -n
-
-        # Configure OpenMediaVault: http://ip
-        sync && sleep 3
-        echo -e "${NOTE} The OpenMediaVault address: [ http://ip ]"
-        echo -e "${NOTE} The OpenMediaVault account: [ username:admin  /  password:openmediavault ]"
-        echo -e "${NOTE} How to use OpenMediaVault: [ https://forum.openmediavault.org/ ]"
-        echo -e "${SUCCESS} The OpenMediaVault installation is successful."
-        ;;
-    update) software_update ;;
-    remove) software_remove "openmediavault" ;;
-    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
-    esac
-}
-
 # For kvm
-software_308() {
+software_307() {
     # kvm general settings
     my_network_br0="/etc/network/interfaces.d/br0"
     kvm_package_list="\
