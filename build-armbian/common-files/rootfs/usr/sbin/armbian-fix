@@ -55,4 +55,7 @@ sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "20. Delete machine-
 sudo dbus-uuidgen --ensure=/etc/machine-id && echo "21. Generate /etc/machine-id"
 sudo dbus-uuidgen --ensure && echo "22. Generate /var/lib/dbus/machine-id"
 
+# Turn off automatic hibernation to prevent hard drives from hanging
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "23. Turn off automatic sleep mode"
+
 sync && echo "armbian-fix: Loading finished."
