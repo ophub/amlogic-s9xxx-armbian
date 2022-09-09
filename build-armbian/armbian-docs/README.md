@@ -475,5 +475,46 @@ For the method of making u-boot, please refer to the specific instructions in ht
 
 To make u-boot according to the method of [unifreq](https://github.com/unifreq), you need to use the acs.bin, dts and config files of the box. The dts exported from the Android system cannot be directly converted into the Armbian format, and you need to write a corresponding dts file yourself. According to the different parts of the specific hardware of your own equipment, such as switches, LEDs, power control, tf cards, sdio wifi modules, etc., use the similar [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) file in the kernel source library for modification and production.
 
+Take the u-boot for X96Max Plus as an example:
+
+```shell
+~/make-uboot
+    ├── amlogic-boot-fip
+    │   ├── x96max-plus                                     # Create your own directory
+    │   │   ├── asc.bin                                     # Make your own source files
+    │   │   └── other-copy-files...                         # Copy files from other directories
+    │   │
+    │   ├── other-source-directories...
+    │   └── other-source-files...
+    │
+    └── u-boot
+        ├── configs
+        │   └── x96max-plus_defconfig                       # Make your own source files
+        ├── arch
+        │   └── arm
+        │       └── dts
+        │           ├── meson-sm1-x96-max-plus-u-boot.dtsi  # Make your own source files
+        │           ├── meson-sm1-x96-max-plus.dts          # Make your own source files
+        │           └── Makefile                            # Edit
+        ├── fip
+        │   ├── u-boot.bin                                  # Generated file
+        │   └── u-boot.bin.sd.bin                           # Generated file
+        ├── u-boot.bin                                      # Generated file
+        │
+        ├── other-source-directories...
+        └── other-source-files...
+```
+
+- Download the [amlogic-boot-fip](https://github.com/unifreq/amlogic-boot-fip) source code. Create the [x96max-plus](https://github.com/unifreq/amlogic-boot-fip/tree/master/x96max-plus) directory in the root directory. Except for the `asc.bin` file made by yourself, other files can be copied from other directories.
+- Download [u-boot](https://github.com/unifreq/u-boot) source code. Make the corresponding [x96max-plus_defconfig](https://github.com/unifreq/u-boot/blob/master/configs/x96max-plus_defconfig) file and put it in the [configs](https://github.com/unifreq/u-boot/tree/master/configs) directory. Make the corresponding [meson-sm1-x96-max-plus-u-boot.dtsi](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus-u-boot.dtsi) and [meson-sm1-x96-max-plus.dts](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus.dts) file and put it in the [arch/arm/dts](https://github.com/unifreq/u-boot/tree/master/arch/arm/dts) directory, and edit the [Makefile](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/Makefile) file in this directory to add the index of the `meson-sm1-x96-max-plus.dtb` file.
+- Go to the root directory of the u-boot source code directory and follow the steps in the document https://github.com/unifreq/u-boot/blob/master/doc/board/amlogic/x96max-plus.rst
+
+There are two types of final generated files: the `u-boot.bin` file in the u-boot root directory is the incomplete version of u-boot used in the `/boot` directory (corresponding to [overload](../amlogic-u-boot/overload) directory); `u-boot.bin` and `u-boot.bin.sd.bin` in the `fip` directory are the full version u-boot files used in the `/usr/lib/u-boot/` directory (corresponding to [bootloader](../amlogic-u-boot/bootloader/) directory), the difference between the two files of the full version is 512 bytes, and the larger one is filled with 512 bytes of 0 in front.
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189039426-c127631f-77ca-4fcb-9fb6-4220045d712b.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189029320-e43a4cc9-b4b5-4de4-92fe-b17bd29020d0.png">
+</div>
+
 💡Tip: Before writing to eMMC for testing, please check the Brick Rescue Method in 12.3. Be sure to master the position of the short contact, have the original Android system file in .img format, and perform a short-circuit flash test to ensure that the brick-rescue method has been mastered before writing the test.
 
