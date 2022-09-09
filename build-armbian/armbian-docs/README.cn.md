@@ -474,5 +474,47 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 
 根据 [unifreq](https://github.com/unifreq) 的方法制作 u-boot 需要用到盒子的 acs.bin，dts 和 config 文件。其中安卓系统导出来的 dts 不能直接转换成 Armbian 的格式，需要自己编写一个对应的 dts 文件。根据自己设备具体硬件上的区别部分，比如开关、led、电源控制、tf卡、sdio wifi模块等，使用内核源码库中相似的 [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) 文件进行修改制作。
 
+以制作 X96Max Plus 的 u-boot 为例：
+
+```shell
+~/make-uboot
+    ├── amlogic-boot-fip
+    │   ├── x96max-plus                                     # 自己创建目录
+    │   │   ├── asc.bin                                     # 自己制作源文件
+    │   │   └── other-copy-files...                         # 复制其他目录的文件
+    │   │
+    │   ├── other-source-directories...
+    │   └── other-source-files...
+    │
+    └── u-boot
+        ├── configs
+        │   └── x96max-plus_defconfig                       # 自己制作源文件
+        ├── arch
+        │   └── arm
+        │       └── dts
+        │           ├── meson-sm1-x96-max-plus-u-boot.dtsi  # 自己制作源文件
+        │           ├── meson-sm1-x96-max-plus.dts          # 自己制作源文件
+        │           └── Makefile                            # 编辑
+        ├── fip
+        │   ├── u-boot.bin                                  # 生成文件
+        │   └── u-boot.bin.sd.bin                           # 生成文件
+        ├── u-boot.bin                                      # 生成文件
+        │
+        ├── other-source-directories...
+        └── other-source-files...
+```
+
+- 下载 [amlogic-boot-fip](https://github.com/unifreq/amlogic-boot-fip) 源码。在根目录创建 [x96max-plus](https://github.com/unifreq/amlogic-boot-fip/tree/master/x96max-plus) 目录，里面的文件除了自己制作的 `asc.bin` 文件外，其他文件可以从其他目录下复制。
+- 下载 [u-boot](https://github.com/unifreq/u-boot) 源码。制作对应的 [x96max-plus_defconfig](https://github.com/unifreq/u-boot/blob/master/configs/x96max-plus_defconfig) 文件放入 [configs](https://github.com/unifreq/u-boot/tree/master/configs) 目录。制作对应的 [meson-sm1-x96-max-plus-u-boot.dtsi](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus-u-boot.dtsi) 和 [meson-sm1-x96-max-plus.dts](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus.dts) 文件放入 [arch/arm/dts](https://github.com/unifreq/u-boot/tree/master/arch/arm/dts) 目录，并编辑此目录中的 [Makefile](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/Makefile) 文件，添加 `meson-sm1-x96-max-plus.dtb` 文件的索引。
+- 进入 u-boot 源码目录根目录下，根据文档 https://github.com/unifreq/u-boot/blob/master/doc/board/amlogic/x96max-plus.rst 中的步骤操作。
+
+最终生成的文件有两类：在 u-boot 根目录下的 `u-boot.bin` 文件是 `/boot` 目录下使用的不完整版 u-boot（对应仓库中的 [overload](../amlogic-u-boot/overload) 目录）；在 `fip` 目录下的 `u-boot.bin` 和 `u-boot.bin.sd.bin` 是 `/usr/lib/u-boot/` 目录下使用的完整版 u-boot 文件（对应仓库中的 [bootloader](../amlogic-u-boot/bootloader/) 目录），完整版的两个文件相差 512 字节，大的那个是填充了 512 字节的 0 在前面。
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189039426-c127631f-77ca-4fcb-9fb6-4220045d712b.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189029320-e43a4cc9-b4b5-4de4-92fe-b17bd29020d0.png">
+</div>
+
+
 💡提示：在写入 eMMC 进行测试前，请先查看 12.3 的救砖方法。务必掌握短接点位置，有原厂 .img 格式的安卓系统文件，并进行过短接刷机测试，确保救砖方法都已经掌握的情况下再进行写入测试。
 
