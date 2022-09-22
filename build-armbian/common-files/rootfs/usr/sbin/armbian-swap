@@ -106,7 +106,11 @@ create_new_swap() {
     # Add swap to the mount point
     sed -i '/swap/d' /etc/fstab
     echo "${SWAP_PATH}/swapfile none swap defaults 0 0" >>/etc/fstab
-    #
+
+    # Zram swap set to disabled
+    zram_config="/etc/default/armbian-zram-config"
+    [[ -f "${zram_config}" ]] && sed -i "s|# SWAP=false|SWAP=false|g" ${zram_config}
+
     sync && sleep 3
     echo -e "${INFO} Current swap: \n$(cat /proc/swaps)"
     echo -e "${SUCCESS} Created successfully!"
