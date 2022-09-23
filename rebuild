@@ -557,6 +557,8 @@ refactor_files() {
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
     echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
+    echo "ROOTFS_TYPE='${ROOTFS_TYPE}'" >>${ophub_release_file} 2>/dev/null
+    echo "BOOT_CONF='uEnv.txt'" >>${ophub_release_file} 2>/dev/null
     echo "DISK_TYPE='usb'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 
