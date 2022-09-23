@@ -296,6 +296,7 @@ EOF
     # If the [ /boot/extlinux/extlinux.conf ] file exists, create a new one.
     if [[ -f "${DIR_INSTALL}/extlinux/extlinux.conf" ]]; then
         echo -e "${INFO} Generate the new extlinux.conf file."
+        BOOT_CONF="extlinux.conf"
         rm -rf ${DIR_INSTALL}/extlinux && sync
         mkdir -p ${DIR_INSTALL}/extlinux
         cat >${DIR_INSTALL}/extlinux/extlinux.conf <<EOF
@@ -306,6 +307,7 @@ label Armbian
     append root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 loglevel=1 voutmode=hdmi disablehpd=false overscan=100 sdrmode=auto
 EOF
     else
+        BOOT_CONF="uEnv.txt"
         rm -rf ${DIR_INSTALL}/extlinux 2>/dev/null
     fi
 
@@ -394,6 +396,8 @@ EOF
     sed -i "s|^MYBOX_UBOOT=.*|MYBOX_UBOOT='${MYBOX_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
 
     echo -e "${INFO} Generate new mac address."
