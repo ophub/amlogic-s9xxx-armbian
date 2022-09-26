@@ -56,12 +56,36 @@ check_release() {
     echo -e "${INFO} VERSION_CODENAME: [ ${VERSION_CODENAME} ]"
 }
 
+# select docker install source
+select_source() {
+    echo -e "${STEPS} Start selecting docker source..."
+    cat <<EOF
+-----------------------------------------------
+ID  SOURCE
+-----------------------------------------------
+1   docker.com (default)
+2   aliyun.com
+3   ustc.edu.cn
+-----------------------------------------------
+EOF
+    echo -ne "${OPTIONS} Please Input ID: "
+    read source_id
+    DOCKER_SOURCE="https://download.docker.com/linux"
+    if [[ "${source_id}" -eq "2" ]]; then
+        DOCKER_SOURCE="https://mirrors.aliyun.com/docker-ce/linux"
+    elif [[ "${source_id}" -eq "3" ]]; then
+        DOCKER_SOURCE="https://mirrors.ustc.edu.cn/docker-ce/linux"
+    fi
+}
+
+
 # Install docker environment
 docker_install() {
     echo -e "${STEPS} Initialize the docker installation environment... "
 
     # Check release info
     check_release
+    select_source
 
     # Install the docker package
     sudo apt-get update
@@ -69,12 +93,14 @@ docker_install() {
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
     # Install GPG certificate
+    rm -f /usr/share/keyrings/docker-archive-keyring.gpg
     # sudo curl -fsSL https://download.docker.com/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    sudo curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    sudo curl -fsSL ${DOCKER_SOURCE}/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
     # Add software source information
+    rm -f /etc/apt/sources.list.d/docker.list
     # echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://mirrors.aliyun.com/docker-ce/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+    echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] ${DOCKER_SOURCE}/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
     echo -e "${STEPS} Install docker related packages..."
     sudo apt-get update
