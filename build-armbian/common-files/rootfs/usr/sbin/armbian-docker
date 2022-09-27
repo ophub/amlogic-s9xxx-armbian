@@ -56,7 +56,7 @@ check_release() {
     echo -e "${INFO} VERSION_CODENAME: [ ${VERSION_CODENAME} ]"
 }
 
-# select docker install source
+# add select docker install source by janko888 20220927 
 select_source() {
     echo -e "${STEPS} Start selecting docker source..."
     cat <<EOF
