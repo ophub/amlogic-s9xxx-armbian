@@ -14,8 +14,8 @@
 #
 # Command: armbian-install
 # Command optional parameters: armbian-install <mainline_u-boot>
-# The mainline u-boot is installed by default: armbian-install
-# Don't write mainline u-boot command: armbian-install no
+# Mainline u-boot is not installed by default: armbian-install
+# Install mainline u-boot command: armbian-install yes
 #
 #============================== Functions list ==============================
 #
@@ -29,8 +29,8 @@
 #
 #========================== Set default parameters ==========================
 #
-# Set default installation mainline u-boot
-auto_mainline_uboot="yes"
+# Set default installation mainline u-boot (yes/no)
+auto_mainline_uboot="no"
 # Set install list profile
 model_conf="/etc/amlogic_model_database.conf"
 # Add custom armbian firmware information

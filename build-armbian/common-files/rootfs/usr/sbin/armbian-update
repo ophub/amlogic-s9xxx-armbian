@@ -16,8 +16,8 @@
 #
 # Command: armbian-update
 # Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
-# The mainline u-boot is installed by default: armbian-update
-# Don't write mainline u-boot command: armbian-update 5.4.170 stable no
+# Mainline u-boot is not installed by default: armbian-update
+# Install mainline u-boot command: armbian-update 5.4.170 stable yes
 #
 #========================================= Functions list =========================================
 #
@@ -41,8 +41,8 @@ kernel_branch=("stable" "dev")
 version_branch="stable"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
-# Set default installation mainline u-boot
-auto_mainline_uboot="yes"
+# Set default installation mainline u-boot (yes/no)
+auto_mainline_uboot="no"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
