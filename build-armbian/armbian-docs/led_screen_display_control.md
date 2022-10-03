@@ -48,7 +48,9 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | Enable LED  |
 | tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | Enable LED  |
 | t95        |  19    |  armbian-led 19   |   openwrt-led 19    | Enable LED  |
-| tx9-pro    |  20    |  armbian-led 20   |   openwrt-led 20    | Enable LED  |
+| t95z-pro   |  20    |  armbian-led 20   |   openwrt-led 20    | Enable LED  |
+| tx9-pro    |  21    |  armbian-led 21   |   openwrt-led 21    | Enable LED  |
+| x92        |  22    |  armbian-led 22   |   openwrt-led 22    | Enable LED  |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | Enable LED  |
 | -          |  0     |  armbian-led 0    |   openwrt-led 0     | Disable LED |
 | -          |  -u    |  armbian-led -u   |   openwrt-led -u    | Update Conf |
@@ -103,7 +105,9 @@ sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
 | tx3        |  17    |  armbian-led 17   |   openwrt-led 17    | 启用 LED |
 | tx3-mini   |  18    |  armbian-led 18   |   openwrt-led 18    | 启用 LED |
 | t95        |  19    |  armbian-led 19   |   openwrt-led 19    | 启用 LED |
-| tx9-pro    |  20    |  armbian-led 20   |   openwrt-led 20    | 启用 LED |
+| t95z-pro   |  20    |  armbian-led 20   |   openwrt-led 20    | 启用 LED |
+| tx9-pro    |  21    |  armbian-led 21   |   openwrt-led 21    | 启用 LED |
+| x92        |  22    |  armbian-led 22   |   openwrt-led 22    | 启用 LED |
 | diy        |  99    |  armbian-led 99   |   openwrt-led 99    | 启用 LED |
 | -          |  0     |  armbian-led 0    |   openwrt-led 0     | 禁用 LED |
 | -          |  -u    |  armbian-led -u   |   openwrt-led -u    | 更新配置  |
