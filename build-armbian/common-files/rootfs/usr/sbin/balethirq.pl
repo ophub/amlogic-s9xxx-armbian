@@ -217,9 +217,21 @@ sub get_boardinfo() {
 
 sub board_special_config() {
     my $board = &get_boardinfo();
-    if($board eq "FastRhino R68S") {
-        &tunning_eth_ring("eth2", 256, 256);
-    } elsif($board eq "FastRhino R66S") {
-        &tunning_eth_ring("eth0", 256, 256);
+    if($board eq "FastRhino R66S") {
+        &optimize_eth_parameters("eth0","eth1");
+    } elsif($board eq "FastRhino R68S") {
+        &optimize_eth_parameters("eth0","eth1","eth2","eth3");
+    } elsif($board eq "Radxa ROCK 5B") {
+        &optimize_eth_parameters("eth0","eth1");
+    }
+}
+
+sub optimize_eth_parameters {
+    while (my $eth = shift) {
+        print "optimizing $eth ... ";
+        system "ethtool -K $eth scatter-gather on >/dev/null 2>&1";
+        system "ethtool -K $eth tcp-segmentation-offload on >/dev/null 2>&1";
+        system "ethtool -K $eth rx-udp-gro-forwarding on >/dev/null 2>&1";
+        print "done\n";
     }
 }
