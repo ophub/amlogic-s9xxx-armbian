@@ -186,7 +186,7 @@ init_var() {
             ;;
         -n | --customName)
             if [[ -n "${2}" ]]; then
-                custom_name="${2}"
+                custom_name="${2// /}"
                 shift
             else
                 error_msg "Invalid -n parameter [ ${2} ]!"
