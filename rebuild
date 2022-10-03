@@ -723,9 +723,9 @@ loop_rebuild() {
         for k in ${build_kernel[*]}; do
             {
                 echo -n "(${j}.${i}) Start building Armbian [ ${b} - ${k} ]. "
-                now_remaining_space="$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
-                if [[ "${now_remaining_space}" -le "2" ]]; then
-                    echo "Remaining space is less than 2G, exit this build. \n"
+                now_remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+                if [[ "${now_remaining_space}" -le "3" ]]; then
+                    echo "Remaining space is less than 3G, exit this build. \n"
                     break
                 else
                     echo "Remaining space is ${now_remaining_space}G."
