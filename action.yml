@@ -115,7 +115,6 @@ runs:
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_sign }}" ]] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
-            sudo chmod +x rebuild
             sudo ./rebuild ${make_command}
 
             cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
@@ -157,7 +156,6 @@ runs:
             [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
-            sudo chmod +x recompile
             sudo ./recompile ${make_command}
 
             cd ${GITHUB_ACTION_PATH}
