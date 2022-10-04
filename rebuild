@@ -427,7 +427,7 @@ refactor_files() {
     mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
 
     # Copy the full Armbian image
-    cp -rf ${tmp_armbian}/* ${tag_rootfs} && sync
+    mv -f ${tmp_armbian}/* ${tag_rootfs} && sync
 
     # Unzip the relevant files
     tar -xJf "${armbian_path}/boot-common.tar.xz" -C ${tag_bootfs}
@@ -522,22 +522,22 @@ refactor_files() {
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
     # Fix common releases permissions
-    [[ -d "var/tmp" ]] && sudo chmod 777 var/tmp
-    [[ -d "etc/update-motd.d" ]] && sudo chmod 755 etc/update-motd.d/*
-    [[ -d "var/cache/man" ]] && sudo chown man:root var/cache/man -R
-    [[ -d "var/cache/man" ]] && sudo chmod g+s var/cache/man -R
-    [[ -f "etc/sudoers" ]] && sudo chown root:root etc/sudoers
-    [[ -f "etc/sudoers" ]] && sudo chmod 440 etc/sudoers
-    [[ -f "usr/bin/sudo" ]] && sudo chown root:root usr/bin/sudo
-    [[ -f "usr/bin/sudo" ]] && sudo chmod 4755 usr/bin/sudo
+    [[ -d "var/tmp" ]] && chmod 777 var/tmp
+    [[ -d "etc/update-motd.d" ]] && chmod 755 etc/update-motd.d/*
+    [[ -d "var/cache/man" ]] && chown man:root var/cache/man -R
+    [[ -d "var/cache/man" ]] && chmod g+s var/cache/man -R
+    [[ -f "etc/sudoers" ]] && chown root:root etc/sudoers
+    [[ -f "etc/sudoers" ]] && chmod 440 etc/sudoers
+    [[ -f "usr/bin/sudo" ]] && chown root:root usr/bin/sudo
+    [[ -f "usr/bin/sudo" ]] && chmod 4755 usr/bin/sudo
     # Fix focal permissions
-    [[ -f "usr/lib/sudo/sudoers.so" ]] && sudo chown 0 usr/lib/sudo/sudoers.so
-    [[ -f "usr/lib/sudo/sudoers.so" ]] && sudo chmod 644 usr/lib/sudo/sudoers.so
-    [[ -f "usr/lib/policykit-1/polkit-agent-helper-1" ]] && sudo chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
+    [[ -f "usr/lib/sudo/sudoers.so" ]] && chown 0 usr/lib/sudo/sudoers.so
+    [[ -f "usr/lib/sudo/sudoers.so" ]] && chmod 644 usr/lib/sudo/sudoers.so
+    [[ -f "usr/lib/policykit-1/polkit-agent-helper-1" ]] && chmod 4755 usr/lib/policykit-1/polkit-agent-helper-1
     # Fix jammy permissions
-    [[ -f "usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 usr/libexec/sudo/sudoers.so
-    [[ -f "usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 usr/libexec/sudo/sudoers.so
-    [[ -f "usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 usr/libexec/polkit-agent-helper-1
+    [[ -f "usr/libexec/sudo/sudoers.so" ]] && chown 0 usr/libexec/sudo/sudoers.so
+    [[ -f "usr/libexec/sudo/sudoers.so" ]] && chmod 644 usr/libexec/sudo/sudoers.so
+    [[ -f "usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 usr/libexec/polkit-agent-helper-1
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
     ln -sf /usr/bin bin
@@ -685,7 +685,7 @@ copy_files() {
     fi
 
     cp -rf ${tag_bootfs}/* ${build_image_bootfs}
-    cp -rf ${tag_rootfs}/* ${build_image_rootfs}
+    mv -f ${tag_rootfs}/* ${build_image_rootfs}
 
     sync && sleep 3
 }
