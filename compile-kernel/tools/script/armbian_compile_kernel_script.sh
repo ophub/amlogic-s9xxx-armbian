@@ -170,9 +170,9 @@ toolchain_check() {
         # Download clang for Armbian
         if [[ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Download clang [ ${clang_file} ] ..."
-            wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1 && sync
-            tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path} && sync
-            rm -f ${toolchain_path}/${clang_file} && sync
+            wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1
+            tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path}
+            rm -f ${toolchain_path}/${clang_file}
             [[ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]] || error_msg "The clang is not set!"
         fi
     fi
@@ -235,11 +235,11 @@ get_kernel_source() {
                 [[ "${?}" -eq "0" ]] || error_msg "[ ${local_kernel_path}.tar.xz ] file decompression failed."
             else
                 echo -e "${INFO} [ ${kernel_version} ] Kernel loading from [ ${server_kernel_repo}${local_kernel_path}.tar.xz ]"
-                wget -q -P ${kernel_path} ${server_kernel_repo}${local_kernel_path}.tar.xz && sync
+                wget -q -P ${kernel_path} ${server_kernel_repo}${local_kernel_path}.tar.xz
                 if [[ "${?}" -eq "0" && -s "${kernel_path}/${local_kernel_path}.tar.xz" ]]; then
                     echo -e "${SUCCESS} The kernel file is downloaded successfully."
                     cd ${kernel_path}
-                    tar -xJf ${local_kernel_path}.tar.xz && sync
+                    tar -xJf ${local_kernel_path}.tar.xz
                     [[ -d "${local_kernel_path}" ]] || error_msg "[ ${local_kernel_path}.tar.xz ] file decompression failed."
                 else
                     error_msg "Kernel file download failed!"
@@ -261,7 +261,7 @@ get_kernel_source() {
         if [[ "${auto_kernel}" == "true" && "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
             # Pull the latest source code of the server
             cd ${kernel_path}/${local_kernel_path}
-            git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull && sync
+            git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull
             unset kernel_version
             kernel_version="${local_makefile_version}.${local_makefile_patchlevel}.${kernel_sub}"
             echo -e "${INFO} Synchronize the upstream source code, compile the kernel version [ ${kernel_version} ]."
@@ -272,7 +272,6 @@ get_kernel_source() {
             echo -e "${INFO} Use local source code, compile the kernel version [ ${kernel_version} ]."
         fi
     fi
-    sync
 }
 
 headers_install() {
@@ -300,7 +299,7 @@ headers_install() {
     tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${out_kernel}/header
 
     # copy .config manually to be where it's expected to be
-    cp .config ${out_kernel}/header/.config && sync
+    cp .config ${out_kernel}/header/.config
 
     # Delete temporary files
     rm -f ${head_list} ${obj_list} 2>/dev/null
@@ -315,8 +314,8 @@ compile_env() {
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null && sync
-    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/} && sync
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
+    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set compilation parameters."
@@ -335,12 +334,12 @@ compile_env() {
         path_armbian="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         path_clang="${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_armbian}"
         # Set $PATH variable for ~/.bashrc
-        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null && sync
-        echo "PATH=${path_clang}" >>~/.bashrc && sync
+        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null
+        echo "PATH=${path_clang}" >>~/.bashrc
         source ~/.bashrc
         # Set $PATH variable for /etc/profile
-        sed -i '/^PATH=/d' /etc/profile 2>/dev/null && sync
-        echo "PATH=${path_clang}" >>/etc/profile && sync
+        sed -i '/^PATH=/d' /etc/profile 2>/dev/null
+        echo "PATH=${path_clang}" >>/etc/profile
         source /etc/profile
     fi
 
@@ -362,13 +361,12 @@ compile_env() {
     if [[ ! -s ".config" ]]; then
         [[ -s "${config_path}/config-${kernel_verpatch}" ]] || error_msg "Missing [ config-${kernel_verpatch} ] template!"
         echo -e "${INFO} Copy [ ${config_path}/config-${kernel_verpatch} ] to [ .config ]"
-        cp -f ${config_path}/config-${kernel_verpatch} .config && sync
+        cp -f ${config_path}/config-${kernel_verpatch} .config
     else
         echo -e "${INFO} Use the .config file in the current directory."
     fi
     #
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
-    sync
 
     # Enable/Disabled Linux Kernel Clang LTO
     kernel_x="$(echo "${kernel_version}" | cut -d '.' -f1)"
@@ -420,42 +418,40 @@ generate_uinitrd() {
     # Backup current system files for /boot
     echo -e "${INFO} Backup the files in the [ /boot ] directory."
     boot_backup_path="/boot/backup"
-    rm -rf ${boot_backup_path} && mkdir -p ${boot_backup_path} && sync
-    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} ${boot_backup_path} 2>/dev/null && sync
+    rm -rf ${boot_backup_path} && mkdir -p ${boot_backup_path}
+    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} ${boot_backup_path} 2>/dev/null
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map /boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config /boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image /boot/vmlinuz-${kernel_outname}
-    sync
     #echo -e "${INFO} Kernel copy results in the [ /boot ] directory: \n$(ls -l /boot) \n"
 
     # Backup current system files for /usr/lib/modules
     echo -e "${INFO} Backup the files in the [ /usr/lib/modules ] directory."
     modules_backup_path="/usr/lib/modules/backup"
-    rm -rf ${modules_backup_path} && mkdir -p ${modules_backup_path} && sync
-    mv -f /usr/lib/modules/$(uname -r) ${modules_backup_path} && sync
+    rm -rf ${modules_backup_path} && mkdir -p ${modules_backup_path}
+    mv -f /usr/lib/modules/$(uname -r) ${modules_backup_path}
     # Copy modules files
     cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} /usr/lib/modules
-    sync
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
-    sed -i "/^COMPRESS=/d" ${compress_initrd_file} && sync
-    echo "COMPRESS=gzip" >>${compress_initrd_file} && sync
+    sed -i "/^COMPRESS=/d" ${compress_initrd_file}
+    echo "COMPRESS=gzip" >>${compress_initrd_file}
 
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
     #echo -e "${INFO} File status in the /boot directory before the update: \n$(ls -l .) \n"
 
-    cp -f vmlinuz-${kernel_outname} zImage 2>/dev/null && sync
+    cp -f vmlinuz-${kernel_outname} zImage 2>/dev/null
 
     # Generate uInitrd file directly under armbian system
     update-initramfs -c -k ${kernel_outname} 2>/dev/null
 
     if [[ -f uInitrd ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null && sync
+        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null
     else
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
@@ -463,12 +459,12 @@ generate_uinitrd() {
     echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${kernel_outname})"
 
     # Restore the files in the [ /boot ] directory
-    mv -f *${kernel_outname} ${out_kernel}/boot && sync
-    mv -f ${boot_backup_path}/* . && sync && rm -rf ${boot_backup_path}
+    mv -f *${kernel_outname} ${out_kernel}/boot
+    mv -f ${boot_backup_path}/* . && rm -rf ${boot_backup_path}
 
     # Restore the files in the [ /usr/lib/modules ] directory
-    rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null && sync
-    mv ${modules_backup_path}/* /usr/lib/modules && sync && rm -rf ${modules_backup_path}
+    rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null
+    mv ${modules_backup_path}/* /usr/lib/modules && rm -rf ${modules_backup_path}
 }
 
 packit_dtbs() {
@@ -476,21 +472,21 @@ packit_dtbs() {
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] dtbs packages..."
 
     cd ${out_kernel}/dtb/allwinner
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x * && sync
-    tar -czf dtb-allwinner-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . && chmod +x *
+    tar -czf dtb-allwinner-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/amlogic
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x * && sync
-    tar -czf dtb-amlogic-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . && chmod +x *
+    tar -czf dtb-amlogic-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/dtb/rockchip
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x * && sync
-    tar -czf dtb-rockchip-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . && chmod +x *
+    tar -czf dtb-rockchip-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
 }
 
@@ -500,18 +496,18 @@ packit_kernel() {
 
     cd ${out_kernel}/boot
     chmod +x *
-    tar -czf boot-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    tar -czf boot-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/modules/lib/modules
-    tar -czf modules-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    tar -czf modules-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
     cd ${out_kernel}/header
-    tar -czf header-${kernel_outname}.tar.gz * && sync
-    mv -f *.tar.gz ${out_kernel}/${kernel_version} && sync
+    tar -czf header-${kernel_outname}.tar.gz *
+    mv -f *.tar.gz ${out_kernel}/${kernel_version}
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 }
 
@@ -529,11 +525,11 @@ compile_selection() {
 
     # Add sha256sum integrity verification file
     cd ${out_kernel}/${kernel_version}
-    sha256sum * >sha256sums && sync
+    sha256sum * >sha256sums
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
     cd ${out_kernel}
-    tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync
+    tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync && sleep 3
 
     echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
 }
@@ -544,7 +540,6 @@ clean_tmp() {
 
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
 
-    sync && sleep 3
     echo -e "${SUCCESS} All processes have been completed."
 }
 

@@ -384,12 +384,12 @@ extract_armbian() {
     process_msg " (2/6) Extract old armbian files."
     cd ${make_path}
 
-    rm -rf ${tmp_dir} 2>/dev/null && sync
-    mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image} && sync
+    rm -rf ${tmp_dir} 2>/dev/null
+    mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image}
 
     armbian_image_file="${tmp_aml_image}/armbian_${soc}_${kernel}.img"
-    rm -f ${armbian_image_file} 2>/dev/null && sync
-    cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}" && sync
+    rm -f ${armbian_image_file} 2>/dev/null
+    cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}"
 
     loop_old="$(losetup -P -f --show "${armbian_image_file}")"
     [[ -n "${loop_old}" ]] || error_msg "losetup ${armbian_image_file} failed."
@@ -413,8 +413,6 @@ extract_armbian() {
     rm -rf usr/lib/modules/* 2>/dev/null
     # Delete the symbolic link files and relink it later
     rm -rf bin lib sbin tmp var/sbin 2>/dev/null
-
-    sync
 }
 
 refactor_files() {
@@ -424,10 +422,10 @@ refactor_files() {
     # Create a dual-partition general directory
     tag_bootfs="${tmp_build}/bootfs"
     tag_rootfs="${tmp_build}/rootfs"
-    mkdir -p ${tag_bootfs} ${tag_rootfs} && sync
+    mkdir -p ${tag_bootfs} ${tag_rootfs}
 
     # Copy the full Armbian image
-    mv -f ${tmp_armbian}/* ${tag_rootfs} && sync
+    mv -f ${tmp_armbian}/* ${tag_rootfs}
 
     # Unzip the relevant files
     tar -xJf "${armbian_path}/boot-common.tar.xz" -C ${tag_bootfs}
@@ -452,23 +450,23 @@ refactor_files() {
     [[ -n "${kernel_boot}" && -n "${kernel_dtb}" && -n "${kernel_modules}" && -n "${kernel_header}" ]] || error_msg "The 4 kernel missing."
 
     # 01. For /boot five files
-    tar -xzf ${kernel_boot} -C ${tag_bootfs} && sync
-    (cd ${tag_bootfs} && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage && sync)
+    tar -xzf ${kernel_boot} -C ${tag_bootfs}
+    (cd ${tag_bootfs} && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage)
     [[ "$(ls ${tag_bootfs}/*-${kernel}-* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     get_textoffset "${tag_bootfs}/zImage"
 
     # 02. For /boot/dtb/amlogic/*
-    tar -xzf ${kernel_dtb} -C ${tag_bootfs}/dtb/amlogic && sync
+    tar -xzf ${kernel_dtb} -C ${tag_bootfs}/dtb/amlogic
     [[ "$(ls ${tag_bootfs}/dtb/amlogic -l 2>/dev/null | grep "^-" | wc -l)" -ge "10" ]] || error_msg "/boot/dtb/amlogic files is missing."
 
     # 03. For /usr/src/linux-headers-${kernel_name}
     header_path="linux-headers-${kernel_name}"
-    rm -rf ${tag_rootfs}/usr/src/linux-headers-* 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}" && sync
-    tar -xzf ${kernel_header} -C ${tag_rootfs}/usr/src/${header_path} && sync
+    rm -rf ${tag_rootfs}/usr/src/linux-headers-* 2>/dev/null && mkdir -p "${tag_rootfs}/usr/src/${header_path}"
+    tar -xzf ${kernel_header} -C ${tag_rootfs}/usr/src/${header_path}
     [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/${kernel_name}
-    tar -xzf ${kernel_modules} -C ${tag_rootfs}/usr/lib/modules && sync
+    tar -xzf ${kernel_modules} -C ${tag_rootfs}/usr/lib/modules
     (cd ${tag_rootfs}/usr/lib/modules/${kernel_name}/ && rm -f build source 2>/dev/null && ln -sf /usr/src/${header_path} build)
     [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel_name} -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 
@@ -622,8 +620,6 @@ refactor_files() {
         # x96max plus v5.1 (ip1001m phy) adopts am7256 (brcm4354)
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:07/" "brcmfmac4354-sdio.txt" >"brcmfmac4354-sdio.amlogic,sm1.txt"
     )
-
-    sync
 }
 
 make_image() {
@@ -632,17 +628,15 @@ make_image() {
 
     # Make Amlogic s9xxx armbian
     build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
-    rm -f ${build_image_file} 2>/dev/null && sync
+    rm -f ${build_image_file} 2>/dev/null
 
     IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
 
     dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
-    sync
 
     parted -s ${build_image_file} mklabel msdos 2>/dev/null
     parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))MiB $((SKIP_MB + BOOT_MB - 1))MiB 2>/dev/null
     parted -s ${build_image_file} mkpart primary ${ROOTFS_TYPE} $((SKIP_MB + BOOT_MB))MiB 100% 2>/dev/null
-    sync
 
     loop_new="$(losetup -P -f --show "${build_image_file}")"
     [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
@@ -664,8 +658,6 @@ make_image() {
         dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
         #echo -e "${INFO} For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
-
-    sync
 }
 
 copy_files() {
@@ -674,7 +666,7 @@ copy_files() {
 
     build_image_bootfs="${tmp_outpath}/bootfs"
     build_image_rootfs="${tmp_outpath}/rootfs"
-    mkdir -p ${build_image_bootfs} ${build_image_rootfs} && sync
+    mkdir -p ${build_image_bootfs} ${build_image_rootfs}
 
     if ! mount ${loop_new}p2 ${build_image_rootfs}; then
         error_msg "mount ${loop_new}p2 failed!"
@@ -702,14 +694,11 @@ clean_tmp() {
 
     cd ${tmp_outpath}
 
-    pigz -9 *.img && sync && mv -f *.img.gz ${armbian_outputpath}
-    sync
+    pigz -9 *.img && mv -f *.img.gz ${armbian_outputpath} && sync
 
     cd ${make_path}
 
     rm -rf ${tmp_dir} 2>/dev/null
-
-    sync
 }
 
 loop_rebuild() {
