@@ -223,16 +223,9 @@ create_partition() {
         BOOT="512"
         BLANK2="220"
     elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
-        if [[ "${boxid}" -eq "110" ]];then
-        	# Compatible with Android 4 and Android 9 firmware
-            BLANK1="128"
-            BOOT="513"
-            BLANK2="720"
-        else
-            BLANK1="700"
-            BOOT="160"
-            BLANK2="0"
-        fi
+        BLANK1="700"
+        BOOT="160"
+        BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "304" ]]; then
         BLANK1="570" # e900v22c/d: The first [ 570 MiB ] is not writable.
         BOOT="256"
@@ -241,6 +234,10 @@ create_partition() {
         BLANK1="108" # CM311-1a-YST: Must skip [ 108 MiB ]
         BOOT="512"   # A total of [ 1024 MiB ] can be used in this block, gave up [ 1024-512=512 MiB ]
         BLANK2="778" # Can set the rootfs partition after [ 1398 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1398-108-512=778 MiB ]
+    elif [[ "${AMLOGIC_SOC}" == "s905l3b" ]]; then
+        BLANK1="128" # https://github.com/janko888/MBH-M30xA
+        BOOT="513"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
+        BLANK2="720"
     else
         BLANK1="68"
         BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
