@@ -39,6 +39,7 @@
 # software_118  : For openwrt:80
 # software_119  : For netdata:19999
 # software_120  : For xunlei:2345
+# software_121  : For docker-headless:10081/10089
 #
 #============================================================================
 
@@ -765,6 +766,47 @@ software_120() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://ip:2345 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For docker-headless
+software_121() {
+    # Set basic information
+    container_name="docker-headless"
+    image_name="infrastlabs/docker-headless:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/infrastlabs/docker-headless
+        docker run -itd --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -p 10081:10081 \
+            -p 10089:10089 \
+            --shm-size 1g \
+            --tmpfs /run \
+            --tmpfs /run/lock \
+            --tmpfs /tmp \
+            --cap-add SYS_BOOT \
+            --cap-add SYS_ADMIN \
+            -v /sys/fs/cgroup:/sys/fs/cgroup \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} Usage [ https://github.com/infrastlabs/docker-headless ]"
+        echo -e "${NOTE} The ${container_name} noVnc [ http://ip:10081 ], PASS [ headless ], ReadOnly [ View123 ]"
+        echo -e "${NOTE} The ${container_name} RDP [ ip:10089 ]"
+        echo -e "${NOTE} The ${container_name} SSH [ ssh -p 10022 headless@ip ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
