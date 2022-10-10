@@ -223,9 +223,16 @@ create_partition() {
         BOOT="512"
         BLANK2="220"
     elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
-        BLANK1="700"
-        BOOT="160"
-        BLANK2="0"
+        if [[ "${boxid}" -eq "110" ]];then
+        	# Compatible with Android 4 and Android 9 firmware
+            BLANK1="128"
+            BOOT="513"
+            BLANK2="720"
+        else
+            BLANK1="700"
+            BOOT="160"
+            BLANK2="0"
+        fi
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "304" ]]; then
         BLANK1="570" # e900v22c/d: The first [ 570 MiB ] is not writable.
         BOOT="256"
