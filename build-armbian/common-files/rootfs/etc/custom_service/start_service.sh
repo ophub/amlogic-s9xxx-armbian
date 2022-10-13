@@ -14,9 +14,13 @@
 #
 #========================================================================================
 
+# Set the release check file
+ophub_release_file="/etc/ophub-release"
+[[ -f "${ophub_release_file}" ]] && FDTFILE="$(cat ${ophub_release_file} | grep -oE 'meson.*dtb')" || FDTFILE=""
+
 # Add custom enabled alias extension load module.
 # For Tencent Aurora 3Pro (s905x3-b) box [ /etc/modprobe.d/blacklist.conf : blacklist btmtksdio ]
-modprobe btmtksdio 2>/dev/null
+[[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && modprobe btmtksdio 2>/dev/null
 
 # Add custom log
 echo "[$(date +"%Y.%m.%d.%H%M")] Hello World..." >/tmp/ophub_start_service.log
