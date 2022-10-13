@@ -590,6 +590,12 @@ refactor_files() {
         sed -i '/exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local 2>/dev/null
     }
 
+    # Add custom disabled alias extension load modules
+    custom_blacklist="etc/modprobe.d/blacklist.conf"
+    [[ -f "${custom_blacklist}" ]] || echo -e "# This file lists the disabled alias extension load modules." >${custom_blacklist}
+    echo -e "\n# For Tencent Aurora 3Pro (s905x3-b) box." >>${custom_blacklist} 2>/dev/null
+    echo -e "blacklist btmtksdio" >>${custom_blacklist} 2>/dev/null
+
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
     mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
