@@ -239,9 +239,9 @@ create_partition() {
         BOOT="513"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
         BLANK2="720"
     elif [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
-        BLANK1="108"
-        BOOT="512"
-        BLANK2="562"
+        BLANK1="108" # Tencent Aurora 3Pro: Must skip [ 108 MiB ]
+        BOOT="512"   # A total of [ 768 MiB ] can be used in this block, gave up [ 768-512=256 MiB ]
+        BLANK2="562" # Can set the rootfs partition after [ 1182 MiB ] of the total disk, [ 1182-108-512=562 MiB ]
     else
         BLANK1="68"
         BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
