@@ -250,7 +250,9 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 ### 12.6 Selection of bootstrap file
 
-In general, just use `/boot/uEnv.txt`. The `/boot/extlinux/extlinux.conf` file is required for individual devices, such as T95 (s905x) / T95Z-Plus (s912) etc. If necessary, delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
+- Of the currently known devices, only the `T95(s905x)` / `T95Z-Plus(s912)` require the use of the `/bootfs/extlinux/extlinux.conf` file. After writing the firmware to the USB, double-click to open it, and delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
+
+- Other devices only need `/boot/uEnv.txt` to boot, do not modify the `extlinux.conf.bak` file.
 
 ### 12.7 Network settings
 
@@ -361,6 +363,8 @@ The method of making Android system partition table and u-boot in 12.10 - 12.11 
 When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will not be able to start, or an error similar to the following will appear:
 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
+
+The following is a detailed manual operation process, in which the extraction work in `12.10.2 - 12.10.3` can also be done using a one-click script: [get_android_system_partition_table_information.tar.xz](https://github.com/ophub/kernel/releases/download/tools/get_android_system_partition_table_information.tar.xz), the usage method is in the remarks of the one-click script file.
 
 #### 12.10.1 Install the adb toolkit
 

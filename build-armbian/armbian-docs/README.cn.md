@@ -249,7 +249,9 @@ blacklist meson_ir
 
 ### 12.6 启动引导文件的选择
 
-一般情况下，使用 /boot/uEnv.txt 即可。个别设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，如 T95（s905x） / T95Z-Plus（s912）等设备。如果需要，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
+- 目前已知的设备中，只有 `T95(s905x)` / `T95Z-Plus(s912)` 盒子需要使用 `/bootfs/extlinux/extlinux.conf` 文件。将固件写入 USB 后，双击打开，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
+
+- 其他设备只需要 `/boot/uEnv.txt` 即可启动，不要修改 `extlinux.conf.bak` 文件。
 
 ### 12.7 网络设置
 
@@ -360,6 +362,8 @@ iface lo inet loopback
 我们将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。如果写入了不安全的区域，会无法启动，或出现类似下面的错误：
 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
+
+以下是详细的手动操作过程，其中 `12.10.2 - 12.10.3` 中的提取工作，也可以使用一键脚本完成：[get_android_system_partition_table_information.tar.xz](https://github.com/ophub/kernel/releases/download/tools/get_android_system_partition_table_information.tar.xz)，使用方法在一键脚本文件的备注里。
 
 #### 12.10.1 安装 adb 工具包
 
