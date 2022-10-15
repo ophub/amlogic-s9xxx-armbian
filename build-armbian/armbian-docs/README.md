@@ -45,6 +45,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.11.1 Extract the bootloader and dtb files](#12111-extract-the-bootloader-and-dtb-files)
       - [12.11.2 Make the acs.bin file](#12112-make-the-acsbin-file)
       - [12.11.3 Make the u-boot file](#12113-make-the-u-boot-file)
+    - [12.12 Memory size recognition error](#1212-memory-size-recognition-error)
 
 ## 1. Register your own GitHub account
 
@@ -521,4 +522,10 @@ There are two types of final generated files: the `u-boot.bin` file in the u-boo
 </div>
 
 💡Tip: Before writing to eMMC for testing, please check the Brick Rescue Method in 12.3. Be sure to master the position of the short contact, have the original Android system file in .img format, and perform a short-circuit flash test to ensure that the brick-rescue method has been mastered before writing the test.
+
+### 12.12 Memory size recognition error
+
+If the memory size is incorrectly recognized (1-2G is not normal for 4G memory, and 3.7G is normal), you can try to manually copy a `/boot/UBOOT_OVERLOAD` file (note that it is a `copy`, `not renaming`, after renaming It will not boot after install and update operations), save as `/boot/u-boot.ext` when using in `USB`, and save as `/boot/u-boot.emmc` when using in `eMMC`.
+
+Don't copy the u-boot file manually, except to try to solve the memory problem, adding it incorrectly will result in failure to boot and various problems.
 
