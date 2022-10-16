@@ -37,7 +37,7 @@ Login in to armbian (default user: root, default password: 1234) → input comma
 armbian-install
 ```
 
-The mainline u-boot is installed by default, In order to support the use of 5.10 and above kernels. If you choose not to install, specify it in the `1` input parameter, e.g. `armbian-install no`
+The mainline u-boot is not installed by default, you can choose to install it, specify it in the first input parameter, such as `armbian-install yes`
 
 - ### Update Armbian Kernel
 
