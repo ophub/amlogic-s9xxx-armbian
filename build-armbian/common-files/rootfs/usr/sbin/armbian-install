@@ -409,15 +409,16 @@ EOF
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
 
-    echo -e "${INFO} Generate new mac address."
-    # Get random macaddr
+    echo -e "${INFO} Generate new MAC address."
+    # Get MAC address
     mac_hexchars="0123456789ABCDEF"
     mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
     random_macaddr="9E:61${mac_end}"
     #
-    # Set interfaces macaddr
-    interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
+    # Set MAC address
+    ethaddr_file="${DIR_INSTALL}/boot/boot.cmd"
+    [[ -f "${ethaddr_file}" ]] && sed -i -e 's/setenv ethaddr ".*"/setenv ethaddr "'${random_macaddr}':AA"/g' ${ethaddr_file}
+    mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
     #
     # Optimize wifi/bluetooth module
     [[ -d "${DIR_INSTALL}/usr/lib/firmware/brcm" ]] && (
