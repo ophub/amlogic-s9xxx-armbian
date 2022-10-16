@@ -37,7 +37,7 @@
 armbian-install
 ```
 
-默认将安装主线 u-boot，以便支持 5.10 及以上内核的使用。如果选择不安装，请在第 `1` 个输入参数中指定，如 `armbian-install no`
+默认不安装主线 u-boot，可以选择安装，在第一个输入参数中指定，如 `armbian-install yes`
 
 - ### 更新 Armbian 内核
 
