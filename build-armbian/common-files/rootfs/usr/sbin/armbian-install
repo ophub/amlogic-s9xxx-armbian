@@ -335,6 +335,7 @@ EOF
     # Set MAC address
     ethaddr_file="${DIR_INSTALL}/boot.cmd"
     [[ -f "${ethaddr_file}" ]] && {
+        echo -e "${INFO} Set the MAC address in [ boot.cmd ]."
         sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
         mkimage -C none -A arm -T script -d ${ethaddr_file} ${DIR_INSTALL}/boot.scr >/dev/null 2>&1
     }
@@ -421,10 +422,6 @@ EOF
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
-
-    # Set interfaces macaddr
-    interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
 
     # Optimize wifi/bluetooth module
     [[ -d "${DIR_INSTALL}/usr/lib/firmware/brcm" ]] && (
