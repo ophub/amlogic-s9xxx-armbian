@@ -308,7 +308,6 @@ source /etc/network/interfaces.d/*
 
 auto eth0
 iface eth0 inet dhcp
-        hwaddress ether 12:34:56:78:9A:BC
 ```
 
 #### 12.7.2 Manually set a static IP address
@@ -341,7 +340,6 @@ iface eth0 inet manual
 
 auto macvlan
 iface macvlan inet dhcp
-        hwaddress ether 12:34:56:78:9a:bc
         pre-up ip link add macvlan link eth0 type macvlan mode bridge
         post-down ip link del macvlan link eth0 type macvlan mode bridge
 
