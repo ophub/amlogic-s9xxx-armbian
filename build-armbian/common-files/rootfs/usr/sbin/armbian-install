@@ -330,11 +330,14 @@ EOF
     sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
     mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
     mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
+    sync
 
     # Set MAC address
     ethaddr_file="${DIR_INSTALL}/boot.cmd"
-    [[ -f "${ethaddr_file}" ]] && sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
-    mkimage -C none -A arm -T script -d ${DIR_INSTALL}/boot.cmd ${DIR_INSTALL}/boot.scr
+    [[ -f "${ethaddr_file}" ]] && {
+        sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
+        mkimage -C none -A arm -T script -d ${ethaddr_file} ${DIR_INSTALL}/boot.scr >/dev/null 2>&1
+    }
 
     # Copy u-boot.ext and u-boot.emmc
     if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
