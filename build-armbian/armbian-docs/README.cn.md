@@ -32,14 +32,14 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
     - [12.7 网络设置](#127-网络设置)
       - [使用 interfaces 设置网络](#使用-interfaces-设置网络)
-        - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
-        - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
-        - [12.7.3 在 docker 中使用 OpenWrt 建立互通网络](#1273-在-docker-中使用-openwrt-建立互通网络)
+      - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
+      - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
+      - [12.7.3 在 docker 中使用 OpenWrt 建立互通网络](#1273-在-docker-中使用-openwrt-建立互通网络)
       - [使用 NetworkManager 设置网络](#使用-networkmanager-设置网络)
-        - [12.7.4 新增网络接口](#1274-新增网络接口)
-        - [12.7.5 设置静态 IP 地址](#1275-设置静态-ip-地址)
-        - [12.7.6 设置 DHCP 获取动态 IP 地址](#1276-设置-dhcp-获取动态-ip-地址)
-        - [12.7.7 修改以太网卡 MAC 地址](#1277-修改以太网卡-mac-地址)
+      - [12.7.4 新增网络接口](#1274-新增网络接口)
+      - [12.7.5 设置静态 IP 地址](#1275-设置静态-ip-地址)
+      - [12.7.6 设置 DHCP 获取动态 IP 地址](#1276-设置-dhcp-获取动态-ip-地址)
+      - [12.7.7 修改以太网卡 MAC 地址](#1277-修改以太网卡-mac-地址)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
     - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
     - [12.10 如何制作安卓系统分区表](#1210-如何制作安卓系统分区表)
@@ -315,7 +315,6 @@ source /etc/network/interfaces.d/*
 
 auto eth0
 iface eth0 inet dhcp
-        hwaddress ether 12:34:56:78:9A:BC
 ```
 
 #### 12.7.2 手动设置静态 IP 地址
@@ -348,7 +347,6 @@ iface eth0 inet manual
 
 auto macvlan
 iface macvlan inet dhcp
-        hwaddress ether 12:34:56:78:9a:bc
         pre-up ip link add macvlan link eth0 type macvlan mode bridge
         post-down ip link del macvlan link eth0 type macvlan mode bridge
 

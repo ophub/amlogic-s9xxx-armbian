@@ -384,6 +384,11 @@ confirm_version() {
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+
+    # Get random macaddr
+    mac_hexchars="0123456789ABCDEF"
+    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
+    random_macaddr="9E:61${mac_end}"
 }
 
 extract_armbian() {
@@ -509,6 +514,10 @@ refactor_files() {
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     fi
 
+    # Set macaddr
+    sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" boot.cmd
+    mkimage -C none -A arm -T script -d boot.cmd boot.scr >/dev/null 2>&1
+
     # Processing partition files: rootfs
     cd ${tag_rootfs}
 
@@ -604,15 +613,6 @@ refactor_files() {
         echo -e "blacklist btmtksdio" >>${custom_blacklist} 2>/dev/null
     }
 
-    # Get random macaddr
-    mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
-    random_macaddr="9E:61${mac_end}"
-    #
-    # Set interfaces macaddr
-    interfaces_file="etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-    #
     # Optimize wifi/bluetooth module
     [[ -d "usr/lib/firmware/brcm" ]] && (
         cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
