@@ -514,9 +514,12 @@ refactor_files() {
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     fi
 
-    # Set macaddr
-    sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" boot.cmd
-    mkimage -C none -A arm -T script -d boot.cmd boot.scr >/dev/null 2>&1
+    # Set MAC address
+    ethaddr_file="boot.cmd"
+    [[ -f "${ethaddr_file}" ]] && {
+        sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
+        mkimage -C none -A arm -T script -d ${ethaddr_file} boot.scr >/dev/null 2>&1
+    }
 
     # Processing partition files: rootfs
     cd ${tag_rootfs}
