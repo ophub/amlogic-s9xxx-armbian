@@ -95,6 +95,11 @@ init_var() {
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
     K510="1"
     [[ "$(hexdump -n 15 -x "/boot/zImage" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+
+    # Get random macaddr
+    mac_hexchars="0123456789ABCDEF"
+    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
+    random_macaddr="9E:61${mac_end}"
 }
 
 # Search the model list
@@ -326,6 +331,11 @@ EOF
     mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
     mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
+    # Set MAC address
+    ethaddr_file="${DIR_INSTALL}/boot.cmd"
+    [[ -f "${ethaddr_file}" ]] && sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
+    mkimage -C none -A arm -T script -d ${DIR_INSTALL}/boot.cmd ${DIR_INSTALL}/boot.scr
+
     # Copy u-boot.ext and u-boot.emmc
     if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
@@ -409,17 +419,10 @@ EOF
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
 
-    echo -e "${INFO} Generate new MAC address."
-    # Get MAC address
-    mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
-    random_macaddr="9E:61${mac_end}"
-    #
-    # Set MAC address
-    ethaddr_file="${DIR_INSTALL}/boot/boot.cmd"
-    [[ -f "${ethaddr_file}" ]] && sed -i -e 's/setenv ethaddr ".*"/setenv ethaddr "'${random_macaddr}':AA"/g' ${ethaddr_file}
-    mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
-    #
+    # Set interfaces macaddr
+    interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
+    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
+
     # Optimize wifi/bluetooth module
     [[ -d "${DIR_INSTALL}/usr/lib/firmware/brcm" ]] && (
         cd ${DIR_INSTALL}/usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
