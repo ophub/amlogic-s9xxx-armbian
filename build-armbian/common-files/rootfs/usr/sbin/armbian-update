@@ -100,9 +100,11 @@ init_var() {
 
     # Specify version branch, such as: stable
     [[ -n "${2}" && -n "$(echo "${kernel_branch[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
+    echo -e "${INFO} Use kernel branch: [ ${version_branch} ]"
 
     # Specify whether to brush into the mainline u-boot, such as: yes
-    [[ "${3}" == "no" ]] && auto_mainline_uboot="no"
+    [[ "${3}" == "yes" ]] && auto_mainline_uboot="yes"
+    echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
 
     # Convert kernel library address to svn format
     [[ "${kernel_repo}" == http* && -n "$(echo "${kernel_repo}" | grep "tree/main")" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
