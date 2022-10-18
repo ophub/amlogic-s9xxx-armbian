@@ -127,13 +127,6 @@ jobs:
           artifacts: build/output/images/*.img.gz
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
-          body: |
-            This is Armbian image for Amlogic s9xxx tv box
-            * Firmware information
-            Default username: root
-            Default password: 1234
-            Install command: armbian-install
-            Update command: armbian-update
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
@@ -156,3 +149,11 @@ jobs:
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
+          body: |
+            This is Armbian image for Amlogic s9xxx tv box
+            * Firmware information
+            Default username: root
+            Default password: 1234
+            Install command: armbian-install
+            Update command: armbian-update
+
