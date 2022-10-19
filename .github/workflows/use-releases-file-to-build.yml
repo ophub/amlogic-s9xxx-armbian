@@ -84,7 +84,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: github.event.repository.owner.id == github.event.sender.id
+    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -101,11 +101,11 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "${TZ}"
-          echo "::set-output name=status::success"
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download Armbian from Releases
         id: down
-        if: (!cancelled())
+        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           armbian_buildpath="build/output/images"
           [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
@@ -119,12 +119,12 @@ jobs:
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
-          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> ${GITHUB_ENV}
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: steps.down.outputs.status == 'success' && !cancelled()
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
           armbian_path: build/output/images/*.img
@@ -137,7 +137,7 @@ jobs:
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: env.PACKAGED_STATUS == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
