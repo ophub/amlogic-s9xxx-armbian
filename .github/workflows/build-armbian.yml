@@ -84,7 +84,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: github.event.repository.owner.id == github.event.sender.id
+    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -101,27 +101,30 @@ jobs:
           sudo -E apt-get -qq autoremove --purge
           sudo -E apt-get -qq clean
           sudo timedatectl set-timezone "${TZ}"
-          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> ${GITHUB_ENV}
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download source code
         id: down
+        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           git clone --depth 1 https://github.com/armbian/build.git
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
         id: compile
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
           sudo ./compile.sh RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=odroidn2 BRANCH=current BUILD_DESKTOP=no HOST=armbian EXPERT=yes \
                             BUILD_MINIMAL=no KERNEL_ONLY=no KERNEL_CONFIGURE=no CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE="sha,gz"
-          echo "::set-output name=build_tag::Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_$(date +"%m.%d.%H%M")"
-          echo "::set-output name=status::success"
+          echo "build_tag=Armbian_Aml_${{ env.ARMBIAN_RELEASE }}_$(date +"%m.%d.%H%M")" >> ${GITHUB_OUTPUT}
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: build/output/images/*.img.gz
@@ -130,7 +133,7 @@ jobs:
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: steps.compile.outputs.status == 'success' && !cancelled()
+        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
           armbian_path: build/output/images/*.img.gz
@@ -143,7 +146,7 @@ jobs:
 
       - name: Upload Rebuild image to Release
         uses: ncipollo/release-action@main
-        if: env.PACKAGED_STATUS == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*

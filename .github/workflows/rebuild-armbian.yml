@@ -80,7 +80,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-22.04
-    if: github.event.repository.owner.id == github.event.sender.id
+    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
       - name: Checkout
@@ -111,7 +111,7 @@ jobs:
                   exit 1
               fi
           fi
-          echo "ARMBIAN_URL=${armbian_url}" >> $GITHUB_ENV
+          echo "ARMBIAN_URL=${armbian_url}" >> ${GITHUB_ENV}
 
           # Get the release name of the rebuild armbian file
           set_release="_"
@@ -124,12 +124,12 @@ jobs:
               fi
               let i++
           done
-          echo "ARMBIAN_RELEASE=${set_release}" >> $GITHUB_ENV
-          echo "::set-output name=status::success"
+          echo "ARMBIAN_RELEASE=${set_release}" >> ${GITHUB_ENV}
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: env.ARMBIAN_URL != '' && !cancelled()
+        if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
           armbian_path: ${{ env.ARMBIAN_URL }}
@@ -142,7 +142,7 @@ jobs:
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
-        if: env.PACKAGED_STATUS == 'success' && !cancelled()
+        if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: Armbian_Aml${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
