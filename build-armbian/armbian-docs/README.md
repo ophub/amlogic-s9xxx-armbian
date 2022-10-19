@@ -89,7 +89,7 @@ The firmware compilation process is controlled in the [.github/workflows/build-a
     sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
                       BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
                       CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
-    echo "::set-output name=status::success"
+    echo "status=success" >> ${GITHUB_OUTPUT}
 ```
 
 ## 5. Compile the firmware
@@ -122,7 +122,7 @@ The settings saved by the firmware are also controlled in the [.github/workflows
 ```yaml
 - name: Upload Armbian Firmware to Release
   uses: ncipollo/release-action@main
-  if: steps.build.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+  if: ${{ steps.build.outputs.status }} == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
   with:
     tag: Armbian_${{ env.FILE_DATE }}
     artifacts: ${{ env.FILEPATH }}/*
