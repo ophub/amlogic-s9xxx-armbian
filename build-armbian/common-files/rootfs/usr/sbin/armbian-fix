@@ -41,7 +41,7 @@ ophub_release_file="/etc/ophub-release"
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "13. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "14. Fix polkit-agent-helper-1 permissions"
 # Fix custom banner name
-[[ -f "${ophub_release_file}" ]] && soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2)"
+[[ -f "${ophub_release_file}" ]] && soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
 [[ -f "${armbian_release_file}" && -n "${soc_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc_name}\"|g" ${armbian_release_file} && echo "15. Fix custom banner name: Aml ${soc_name}"
 
 # Remove packages
