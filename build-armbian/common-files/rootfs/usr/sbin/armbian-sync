@@ -92,19 +92,19 @@ sync_config() {
     # Update operation instruction and service related files
     echo -e "${STEPS} Start syncing operation instruction and service script..."
     [[ -d "${sbin_path}" ]] || mkdir -p ${sbin_path}
-    svn export ${github_repo}/${sbin_path} ${sbin_path} --force
+    svn export ${github_repo}${sbin_path} ${sbin_path} --force
     chmod +x ${sbin_path}/armbian-*
 
     # Update software service related files
     echo -e "${STEPS} Start syncing software service script..."
     [[ -d "${share_path}" ]] || mkdir -p ${share_path}
-    svn export ${github_repo}/${share_path} ${share_path} --force
+    svn export ${github_repo}${share_path} ${share_path} --force
     find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
 
     # Update openvfd related files
     echo -e "${STEPS} Start syncing openvfd service script..."
     [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
-    svn export ${github_repo}/${openvfd_path} ${openvfd_path} --force
+    svn export ${github_repo}${openvfd_path} ${openvfd_path} --force
     chmod +x ${openvfd_path}/vfdservice
 
     sync && sleep 3
