@@ -564,6 +564,7 @@ refactor_files() {
     ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
     # Add custom firmware information
+    echo "PLATFORM='amlogic'" >>${op_release} 2>/dev/null
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
