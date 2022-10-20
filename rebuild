@@ -616,6 +616,14 @@ refactor_files() {
         echo -e "blacklist btmtksdio" >>${custom_blacklist} 2>/dev/null
     }
 
+    # Enable ssh service
+    ssh_config="etc/ssh/sshd_config"
+    [[ -f "${ssh_config}" ]] && {
+        sed -i "s|^#Port.*|Port 22|g" ${ssh_config} 2>/dev/null
+        sed -i "s|^PermitRootLogin.*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
+        sed -i "s|^#PermitRootLogin.*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
+    }
+
     # Optimize wifi/bluetooth module
     [[ -d "usr/lib/firmware/brcm" ]] && (
         cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
