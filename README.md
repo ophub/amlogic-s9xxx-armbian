@@ -287,6 +287,9 @@ The `kernel` / `u-boot` and other resources used by this system are mainly copie
 
 ## Other distributions
 
+- The [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) project provides the `OpenWrt` system used in the box, which is also applicable to the relevant devices that support Armbian.
+- [unifreq](https://github.com/unifreq/openwrt_packit) has made `OpenWrt` system for more boxes such as `Amlogic`, `Rockchip` and `Allwinner`, which is a benchmark in the box circle and is recommended for use.
+- [rockchip-armbian](https://github.com/ophub/rockchip-armbian) provides the method of making, installing and using Rockchip's Armbian system.
 - [Scirese](https://github.com/Scirese/alarm) tested the production, installation and use of `Arch Linux ARM` / `Manjaro` system in the Android TV boxes, please refer to the relevant instructions in his repository for details.
 
 ## Links
