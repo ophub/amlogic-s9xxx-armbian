@@ -581,7 +581,7 @@ refactor_files() {
 
     # Edit the etc/fstab
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
-    sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 0|g" etc/fstab 2>/dev/null
+    sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 1|g" etc/fstab 2>/dev/null
 
     # Custom banner name
     sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
