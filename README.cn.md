@@ -286,6 +286,9 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 ## 其他发行版
 
+- [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) 项目提供了在盒子中使用的 `OpenWrt` 系统，在支持 Armbian 的相关设备中同样适用。
+- [unifreq](https://github.com/unifreq/openwrt_packit) 为晶晨、瑞芯微和全志等更多盒子制作了 `OpenWrt` 系统，属于盒子圈的标杆，推荐使用。
+- [rockchip-armbian](https://github.com/ophub/rockchip-armbian) 中提供了 Rockchip 的 Armbian 系统的制作、安装和使用方法。
 - [Scirese](https://github.com/Scirese/alarm) 在安卓电视盒子里测试了 `Arch Linux ARM` / `Manjaro` 系统的制作、安装和使用，具体详见他仓库中的相关说明。
 
 ## 链接
