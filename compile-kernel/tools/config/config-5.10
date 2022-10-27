@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.148 Kernel Configuration
+# Linux/arm64 5.10.150 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="Ubuntu clang version 14.0.0-1ubuntu1"
 CONFIG_GCC_VERSION=0
@@ -7359,6 +7359,7 @@ CONFIG_LSM="yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor"
 # Memory initialization
 #
 CONFIG_CC_HAS_AUTO_VAR_INIT_PATTERN=y
+CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO_ENABLER=y
 CONFIG_CC_HAS_AUTO_VAR_INIT_ZERO=y
 CONFIG_INIT_STACK_NONE=y
 # CONFIG_INIT_STACK_ALL_PATTERN is not set
