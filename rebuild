@@ -27,9 +27,9 @@
 #
 # confirm_version    : Confirm version type
 # extract_armbian    : Extract Armbian files
-# refactor_files     : Refactor related files
 # make_image         : Making Armbian file
 # copy_files         : Copy the Armbian files
+# refactor_files     : Refactor related files
 # clean_tmp          : Clear temporary files
 #
 # loop_rebuild       : Loop to rebuild Armbian files
@@ -426,8 +426,46 @@ extract_armbian() {
     rm -rf bin lib sbin tmp var/sbin 2>/dev/null
 }
 
-refactor_files() {
-    process_msg " (3/6) Refactor related files."
+make_image() {
+    process_msg " (3/6) Make new armbian image."
+    cd ${make_path}
+
+    # Make Amlogic s9xxx armbian
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
+    rm -f ${build_image_file} 2>/dev/null
+
+    IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
+
+    dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
+
+    parted -s ${build_image_file} mklabel msdos 2>/dev/null
+    parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))MiB $((SKIP_MB + BOOT_MB - 1))MiB 2>/dev/null
+    parted -s ${build_image_file} mkpart primary ${ROOTFS_TYPE} $((SKIP_MB + BOOT_MB))MiB 100% 2>/dev/null
+
+    loop_new="$(losetup -P -f --show "${build_image_file}")"
+    [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
+
+    mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
+    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
+    else
+        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
+    fi
+
+    # Write the specified bootloader
+    if [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/bootloader/${MAINLINE_UBOOT}" ]]; then
+        dd if="${uboot_path}/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+        dd if="${uboot_path}/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        #echo -e "${INFO} For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+    elif [[ -n "${ANDROID_UBOOT}" && -f "${uboot_path}/bootloader/${ANDROID_UBOOT}" ]]; then
+        dd if="${uboot_path}/bootloader/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+        dd if="${uboot_path}/bootloader/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        #echo -e "${INFO} For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+    fi
+}
+
+copy_files() {
+    process_msg " (4/6) Copy the Armbian files."
     cd ${make_path}
 
     # Create a dual-partition general directory
@@ -435,12 +473,26 @@ refactor_files() {
     tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs}
 
+    if ! mount ${loop_new}p1 ${tag_bootfs}; then
+        error_msg "mount ${loop_new}p1 failed!"
+    fi
+    if ! mount ${loop_new}p2 ${tag_rootfs}; then
+        error_msg "mount ${loop_new}p2 failed!"
+    fi
+
     # Copy the full Armbian image
-    mv -f ${tmp_armbian}/* ${tag_rootfs}
+    cp -af ${tmp_armbian}/* ${tag_rootfs}
+
+    sync && sleep 3
+}
+
+refactor_files() {
+    process_msg " (5/6) Refactor related files."
+    cd ${make_path}
 
     # Unzip the relevant files
-    tar -xJf "${armbian_path}/boot-common.tar.xz" -C ${tag_bootfs}
-    tar -xJf "${armbian_path}/firmware.tar.xz" -C ${tag_rootfs}/usr
+    tar -xJf "${armbian_path}/boot-common.tar.xz" --no-same-owner -C ${tag_bootfs}
+    tar -xJf "${armbian_path}/firmware.tar.xz" --no-same-owner -C ${tag_rootfs}/usr
 
     # Copy the same files
     [[ "$(ls ${configfiles_path}/bootfs 2>/dev/null | wc -w)" -ne "0" ]] && cp -rf ${configfiles_path}/bootfs/* ${tag_bootfs}
@@ -514,13 +566,6 @@ refactor_files() {
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     fi
 
-    # Set MAC address
-    ethaddr_file="boot.cmd"
-    [[ -f "${ethaddr_file}" ]] && {
-        sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
-        mkimage -C none -A arm -T script -d ${ethaddr_file} boot.scr >/dev/null 2>&1
-    }
-
     # Processing partition files: rootfs
     cd ${tag_rootfs}
 
@@ -564,7 +609,7 @@ refactor_files() {
     ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
     # Add custom firmware information
-    echo "PLATFORM='amlogic'" >>${op_release} 2>/dev/null
+    echo "PLATFORM='amlogic'" >>${ophub_release_file} 2>/dev/null
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file} 2>/dev/null
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file} 2>/dev/null
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file} 2>/dev/null
@@ -648,65 +693,6 @@ refactor_files() {
     )
 }
 
-make_image() {
-    process_msg " (4/6) Make new armbian image."
-    cd ${make_path}
-
-    # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
-    rm -f ${build_image_file} 2>/dev/null
-
-    IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
-
-    dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
-
-    parted -s ${build_image_file} mklabel msdos 2>/dev/null
-    parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))MiB $((SKIP_MB + BOOT_MB - 1))MiB 2>/dev/null
-    parted -s ${build_image_file} mkpart primary ${ROOTFS_TYPE} $((SKIP_MB + BOOT_MB))MiB 100% 2>/dev/null
-
-    loop_new="$(losetup -P -f --show "${build_image_file}")"
-    [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
-
-    mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
-    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
-        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
-    else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
-    fi
-
-    # Write the specified bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "${INFO} For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
-        dd if="${tag_rootfs}/usr/lib/u-boot/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "${INFO} For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
-    fi
-}
-
-copy_files() {
-    process_msg " (5/6) Copy the Armbian files."
-    cd ${make_path}
-
-    build_image_bootfs="${tmp_outpath}/bootfs"
-    build_image_rootfs="${tmp_outpath}/rootfs"
-    mkdir -p ${build_image_bootfs} ${build_image_rootfs}
-
-    if ! mount ${loop_new}p2 ${build_image_rootfs}; then
-        error_msg "mount ${loop_new}p2 failed!"
-    fi
-    if ! mount ${loop_new}p1 ${build_image_bootfs}; then
-        error_msg "mount ${loop_new}p1 failed!"
-    fi
-
-    cp -rf ${tag_bootfs}/* ${build_image_bootfs}
-    mv -f ${tag_rootfs}/* ${build_image_rootfs}
-
-    sync && sleep 3
-}
-
 clean_tmp() {
     process_msg " (6/6) Clear temp files."
     cd ${make_path}
@@ -714,8 +700,8 @@ clean_tmp() {
     umount -f ${tmp_armbian} 2>/dev/null
     losetup -d ${loop_old} 2>/dev/null
 
-    umount -f ${build_image_bootfs} 2>/dev/null
-    umount -f ${build_image_rootfs} 2>/dev/null
+    umount -f ${tag_bootfs} 2>/dev/null
+    umount -f ${tag_rootfs} 2>/dev/null
     losetup -d ${loop_new} 2>/dev/null
 
     cd ${tmp_outpath}
@@ -752,9 +738,9 @@ loop_rebuild() {
                 # Execute the following functions in sequence
                 confirm_version
                 extract_armbian
-                refactor_files
                 make_image
                 copy_files
+                refactor_files
                 clean_tmp
 
                 echo -e "(${j}.${i}) Armbian build successfully. \n"
