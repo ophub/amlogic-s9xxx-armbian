@@ -18,6 +18,7 @@ The list of devices supported by Amlogic TV Boxes, the configuration file in the
 <tr><td>108</td><td>TBee Box</td><td>s905x</td><td>meson-gxl-s905x-tbee.dtb</td><td>u-boot-p212.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz,100Mb Nic,qca9377 WLAN/Bluetooth</td></tr>
 <tr><td>109</td><td>W95</td><td>s905w</td><td>meson-gxl-s905w-p281.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz,2GB RAM,16GB ROM,100Mb Nic,USB2.0</td></tr>
 <tr><td>110</td><td>X96-Mini</td><td>s905w</td><td>meson-gxl-s905w-x96-mini.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz,100Mb Nic</td></tr>
+<tr><td>111</td><td>TX9</td><td>s905x</td><td>meson-gxl-s905x-tx9.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz,100Mb Nic,rtl8723cs WLAN,rtl8723bs Bluetooth</td></tr>
 
 <tr><td>201</td><td>Octopus Planet</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
 <tr><td>202</td><td>Octopus Planet (FAKE)</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>bl-fake-octopus-planet.bin</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
