@@ -335,18 +335,10 @@ EOF
     mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
     sync
 
-    # Set MAC address
-    ethaddr_file="${DIR_INSTALL}/boot.cmd"
-    [[ -f "${ethaddr_file}" ]] && {
-        echo -e "${INFO} Set the MAC address in [ boot.cmd ]."
-        sed -i "s|setenv ethaddr.*|setenv ethaddr \"${random_macaddr}:AA\"|g" ${ethaddr_file}
-        mkimage -C none -A arm -T script -d ${ethaddr_file} ${DIR_INSTALL}/boot.scr >/dev/null 2>&1
-    }
-
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
+    if [[ "${K510}" -eq "1" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
-        if [ -f "${DIR_INSTALL}/u-boot.ext" ]; then
+        if [[ -f "${DIR_INSTALL}/u-boot.ext" ]]; then
             cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
         else
             cp -f ${DIR_INSTALL}/${UBOOT_OVERLOAD} ${DIR_INSTALL}/u-boot.ext
@@ -425,6 +417,10 @@ EOF
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
+
+    # Set interfaces macaddr
+    interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
+    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
 
     # Optimize wifi/bluetooth module
     [[ -d "${DIR_INSTALL}/usr/lib/firmware/brcm" ]] && (

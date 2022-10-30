@@ -8,6 +8,7 @@ source /etc/network/interfaces.d/*
 # 01. Enable dynamic DHCP to assign IP
 auto eth0
 iface eth0 inet dhcp
+#        hwaddress ether 12:34:56:78:9A:BC
 
 
 # 02. Enable static IP settings(IP is modified according to the actual)
@@ -28,6 +29,7 @@ iface eth0 inet dhcp
 #
 #auto macvlan
 #iface macvlan inet dhcp
+#        hwaddress ether 12:34:56:78:9A:BC
 #        pre-up ip link add macvlan link eth0 type macvlan mode bridge
 #        post-down ip link del macvlan link eth0 type macvlan mode bridge
 #
