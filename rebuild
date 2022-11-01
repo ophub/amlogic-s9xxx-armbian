@@ -423,7 +423,7 @@ extract_armbian() {
     # Delete the kernel files and replace it later
     rm -rf usr/lib/modules/* 2>/dev/null
     # Delete the symbolic link files and relink it later
-    rm -rf bin lib sbin var/sbin 2>/dev/null
+    rm -rf bin lib sbin var/lock var/run 2>/dev/null
 }
 
 make_image() {
@@ -604,6 +604,8 @@ refactor_files() {
     ln -sf /usr/bin bin
     ln -sf /usr/lib lib
     ln -sf /usr/sbin sbin
+    ln -sf /run/lock var/lock
+    ln -sf /run var/run
     ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
     ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
