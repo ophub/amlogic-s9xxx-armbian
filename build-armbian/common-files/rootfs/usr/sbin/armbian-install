@@ -378,7 +378,8 @@ copy_rootfs() {
 
     echo -e "${INFO} Start copy ROOTFS partition data."
     # Create relevant directories
-    mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/} && sync
+    mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/} && sync
+    chmod 777 ${DIR_INSTALL}/tmp
     # Copy the relevant directory
     COPY_SRC="etc home lib64 opt root selinux srv usr var"
     for src in ${COPY_SRC}; do
@@ -393,7 +394,6 @@ copy_rootfs() {
     ln -sf /usr/bin ${DIR_INSTALL}/bin
     ln -sf /usr/lib ${DIR_INSTALL}/lib
     ln -sf /usr/sbin ${DIR_INSTALL}/sbin
-    ln -sf /var/tmp ${DIR_INSTALL}/tmp
     sync
 
     echo -e "${INFO} Generate the new fstab file."
