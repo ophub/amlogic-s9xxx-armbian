@@ -291,7 +291,7 @@ copy_bootfs() {
         umount -f ${PART_BOOT}
     fi
     echo -e "${INFO} Formatting BOOTFS partition."
-    mkfs.vfat -n "BOOT_EMMC" ${PART_BOOT}
+    mkfs.vfat -F 32 -n "BOOT_EMMC" ${PART_BOOT}
 
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
     [[ "$?" -ne "0" ]] && error_msg "Failed to mount BOOTFS partition"

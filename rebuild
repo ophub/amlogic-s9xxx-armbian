@@ -445,7 +445,7 @@ make_image() {
     loop_new="$(losetup -P -f --show "${build_image_file}")"
     [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
 
-    mkfs.vfat -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
+    mkfs.vfat -F 32 -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS" -m single ${loop_new}p2 >/dev/null 2>&1
     else
