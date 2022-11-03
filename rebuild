@@ -436,7 +436,7 @@ make_image() {
 
     IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
 
-    dd if=/dev/zero of=${build_image_file} bs=1M count=${IMG_SIZE} conv=fsync >/dev/null 2>&1
+    truncate -s ${IMG_SIZE}M ${build_image_file} >/dev/null 2>&1
 
     parted -s ${build_image_file} mklabel msdos 2>/dev/null
     parted -s ${build_image_file} mkpart primary fat32 $((SKIP_MB))MiB $((SKIP_MB + BOOT_MB - 1))MiB 2>/dev/null
@@ -473,10 +473,10 @@ copy_files() {
     tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs}
 
-    if ! mount ${loop_new}p1 ${tag_bootfs}; then
+    if ! mount -o discard ${loop_new}p1 ${tag_bootfs}; then
         error_msg "mount ${loop_new}p1 failed!"
     fi
-    if ! mount ${loop_new}p2 ${tag_rootfs}; then
+    if ! mount -o discard ${loop_new}p2 ${tag_rootfs}; then
         error_msg "mount ${loop_new}p2 failed!"
     fi
 
@@ -707,6 +707,8 @@ clean_tmp() {
     umount -f ${tmp_armbian} 2>/dev/null
     losetup -d ${loop_old} 2>/dev/null
 
+    fstrim ${tag_bootfs} 2>/dev/null
+    fstrim ${tag_rootfs} 2>/dev/null
     umount -f ${tag_bootfs} 2>/dev/null
     umount -f ${tag_rootfs} 2>/dev/null
     losetup -d ${loop_new} 2>/dev/null
