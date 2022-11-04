@@ -22,7 +22,7 @@ on:
       keep_latest:
         description: "Choose how many Releases to keep."
         required: false
-        default: "3"
+        default: "4"
         type: choice
         options:
           - 30
