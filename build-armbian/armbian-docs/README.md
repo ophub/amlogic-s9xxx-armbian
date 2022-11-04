@@ -78,7 +78,7 @@ Now you can `Fork` the `repository`, open the repository [https://github.com/oph
 
 ## 4. Personalized Armbian firmware customization file description
 
-The firmware compilation process is controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. There are other `yml files` in the `workflows` directory to achieve other different functions. When compiling the firmware, the Armbian official current code is used for real-time compilation, and the relevant parameters can be found in the official documentation.
+The firmware compilation process is controlled in the [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) file. There are other `yml files` in the `workflows` directory to achieve other different functions. When compiling the firmware, the Armbian official current code is used for real-time compilation, and the relevant parameters can be found in the official documentation.
 
 ```yaml
 - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
@@ -108,7 +108,7 @@ In the `navigation bar of your repository`, click the `Actions` button, and then
 
 ### 5.2 Compile at the agreed time
 
-In the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file, use `cron` to set the timing compilation. The 5 different positions represent min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday). Set the time by modifying the values of different positions. The system uses `UTC standard time` by default, please convert it according to the time zone of your country.
+In the [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) file, use `cron` to set the timing compilation. The 5 different positions represent min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday). Set the time by modifying the values of different positions. The system uses `UTC standard time` by default, please convert it according to the time zone of your country.
 
 ```yaml
 schedule:
@@ -117,7 +117,7 @@ schedule:
 
 ## 6. Save the firmware
 
-The settings saved by the firmware are also controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. We will automatically upload the compiled firmware to the `Releases` officially provided by `GitHub` through scripts.
+The settings saved by the firmware are also controlled in the [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) file. We will automatically upload the compiled firmware to the `Releases` officially provided by `GitHub` through scripts.
 
 ```yaml
 - name: Upload Armbian Firmware to Release

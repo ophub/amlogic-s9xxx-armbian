@@ -84,7 +84,7 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 
 ## 4. 个性化 Armbian 固件定制文件说明
 
-固件编译的流程在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译固件时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
+固件编译的流程在 [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译固件时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
 
 ```yaml
 - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
@@ -114,7 +114,7 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 
 ### 5.2 定时编译
 
-在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里，使用 Cron 设置定时编译，5 个不同位置分别代表的意思为 分钟 (0 - 59) / 小时 (0 - 23) / 日期 (1 - 31) / 月份 (1 - 12) / 星期几 (0 - 6)(星期日 - 星期六)。通过修改不同位置的数值来设定时间。系统默认使用 UTC 标准时间，请根据你所在国家时区的不同进行换算。
+在 [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) 文件里，使用 Cron 设置定时编译，5 个不同位置分别代表的意思为 分钟 (0 - 59) / 小时 (0 - 23) / 日期 (1 - 31) / 月份 (1 - 12) / 星期几 (0 - 6)(星期日 - 星期六)。通过修改不同位置的数值来设定时间。系统默认使用 UTC 标准时间，请根据你所在国家时区的不同进行换算。
 
 ```yaml
 schedule:
@@ -123,7 +123,7 @@ schedule:
 
 ## 6. 保存固件
 
-固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Releases 里面。
+固件保存的设置也在 [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/build-amlogic-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Releases 里面。
 
 ```yaml
 - name: Upload Armbian Firmware to Release
