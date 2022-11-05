@@ -191,7 +191,7 @@ check_kernel() {
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot/boot-/}" && kernel_name="${kernel_name/.tar.gz/}"
-    KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
+    KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '[1-9]{1,2}\.[0-9]{1,2}\.[0-9]+')"
     echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
 
     # Check if the file is added with TEXT_OFFSET patch
