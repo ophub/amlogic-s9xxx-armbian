@@ -207,7 +207,7 @@ find_armbian() {
     armbian_rebuild_name="$(ls ${armbian_rebuild_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')"
     [[ -n "${armbian_rebuild_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_rebuild_file} ]"
     # Find armbian version info: such as [ 22.02.0 ]
-    armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '[2-9][0-9].[0-9]{1,2}.[0-9]{1,2}' | head -n 1)"
+    armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '[2-9][2-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${armbian_rebuild_version}" ]] || {
         armbian_rebuild_version="22.02.02"
         echo -e "${WARNING} Missing armbian version info!"
@@ -239,7 +239,7 @@ download_kernel() {
         # Identify the kernel mainline
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
         # Check the version on the server (e.g LATEST_VERSION="125")
-        LATEST_VERSION="$(curl -s "${server_kernel_url}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+        LATEST_VERSION="$(curl -s "${server_kernel_url}" | grep "name" | grep -oE "${MAIN_LINE}\.[0-9]+" | sed -e "s/${MAIN_LINE}\.//g" | sort -n | sed -n '$p')"
         if [[ "${?}" -eq "0" && -n "${LATEST_VERSION}" ]]; then
             tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
         else
@@ -668,9 +668,8 @@ refactor_files() {
     # Enable ssh service
     ssh_config="etc/ssh/sshd_config"
     [[ -f "${ssh_config}" ]] && {
-        sed -i "s|^#Port.*|Port 22|g" ${ssh_config} 2>/dev/null
-        sed -i "s|^PermitRootLogin.*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
-        sed -i "s|^#PermitRootLogin.*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
+        sed -i "s|^#*Port .*|Port 22|g" ${ssh_config} 2>/dev/null
+        sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
     }
 
     # Set interfaces macaddr
