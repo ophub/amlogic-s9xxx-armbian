@@ -12,8 +12,8 @@ inputs:
     description: "Set armbian original file path."
     required: false
     default: "build/output/images/*.img"
-  armbian_soc:
-    description: "Set Amlogic SoC."
+  armbian_board:
+    description: "Set Amlogic Board."
     required: false
     default: "s905d_s905x3"
   armbian_kernel:
@@ -108,7 +108,7 @@ runs:
             cd ${GITHUB_ACTION_PATH}
             echo -e "Start to rebuild armbian..."
             make_command=" -d"
-            [[ -n "${{ inputs.armbian_soc }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_soc }}"
+            [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
             [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.version_branch }}" ]] && make_command="${make_command} -v ${{ inputs.version_branch }}"

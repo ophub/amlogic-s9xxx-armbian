@@ -63,7 +63,7 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 version_branch="stable"
 auto_kernel="true"
 build_kernel=("5.10.125" "5.15.50")
-# Set supported SoC
+# Set supported board
 build_armbian=(
     "a311d"
     "s922x" "s922x-n2" "s922x-reva"
@@ -100,7 +100,7 @@ error_msg() {
 }
 
 process_msg() {
-    echo -e " [\033[1;92m ${soc} - ${kernel} \033[0m] ${1}"
+    echo -e " [\033[1;92m ${board} - ${kernel} \033[0m] ${1}"
 }
 
 get_textoffset() {
@@ -127,7 +127,7 @@ init_var() {
             : ${ROOTFS_TYPE:="${ROOTFS_TYPE}"}
             : ${custom_name:="${custom_name}"}
             ;;
-        -b | --BuildSoC)
+        -b | --Board)
             if [[ -n "${2}" ]]; then
                 if [[ "${2}" != "all" ]]; then
                     unset build_armbian
@@ -274,8 +274,8 @@ confirm_version() {
     process_msg " (1/6) Confirm version type."
     cd ${make_path}
 
-    # Confirm soc branch
-    case "${soc}" in
+    # Confirm board branch
+    case "${board}" in
     a311d | khadas-vim3)
         FDTFILE="meson-g12b-a311d-khadas-vim3.dtb"
         UBOOT_OVERLOAD="u-boot-gtkingpro.bin"
@@ -376,7 +376,7 @@ confirm_version() {
         ANDROID_UBOOT=""
         ;;
     *)
-        error_msg "Have no this soc: [ ${soc} ]"
+        error_msg "Have no this board: [ ${board} ]"
         ;;
     esac
 
@@ -398,7 +398,7 @@ extract_armbian() {
     rm -rf ${tmp_dir} 2>/dev/null
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image}
 
-    armbian_image_file="${tmp_aml_image}/armbian_${soc}_${kernel}.img"
+    armbian_image_file="${tmp_aml_image}/armbian_${board}_${kernel}.img"
     rm -f ${armbian_image_file} 2>/dev/null
     cp -f "${armbian_outputpath}/${armbian_rebuild_name}" "${armbian_image_file}"
 
@@ -431,7 +431,7 @@ make_image() {
     cd ${make_path}
 
     # Make Amlogic s9xxx armbian
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${soc}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
+    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_Aml_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
     rm -f ${build_image_file} 2>/dev/null
 
     IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
@@ -456,11 +456,11 @@ make_image() {
     if [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/bootloader/${MAINLINE_UBOOT}" ]]; then
         dd if="${uboot_path}/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${uboot_path}/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "${INFO} For [ ${soc} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
+        #echo -e "${INFO} For [ ${board} ] write Mainline bootloader: ${MAINLINE_UBOOT}"
     elif [[ -n "${ANDROID_UBOOT}" && -f "${uboot_path}/bootloader/${ANDROID_UBOOT}" ]]; then
         dd if="${uboot_path}/bootloader/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${uboot_path}/bootloader/${ANDROID_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-        #echo -e "${INFO} For [ ${soc} ] write Android bootloader: ${ANDROID_UBOOT}"
+        #echo -e "${INFO} For [ ${board} ] write Android bootloader: ${ANDROID_UBOOT}"
     fi
 }
 
@@ -550,7 +550,7 @@ refactor_files() {
         cp -f ${UBOOT_OVERLOAD} u-boot.ext
         chmod +x u-boot.ext
     elif [[ "${K510}" -eq "1" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
-        error_msg "${soc} SoC does not support using ${kernel} kernel, missing u-boot."
+        error_msg "${board} Board does not support using ${kernel} kernel, missing u-boot."
     fi
 
     # Edit the uEnv.txt
@@ -620,7 +620,8 @@ refactor_files() {
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "ANDROID_UBOOT='/usr/lib/u-boot/${ANDROID_UBOOT}'" >>${ophub_release_file} 2>/dev/null
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file} 2>/dev/null
-    echo "SOC='${soc}'" >>${ophub_release_file} 2>/dev/null
+    echo "SOC='${board}'" >>${ophub_release_file} 2>/dev/null
+    echo "BOARD='${board}'" >>${ophub_release_file} 2>/dev/null
     echo "K510='${K510}'" >>${ophub_release_file} 2>/dev/null
     echo "ROOTFS_TYPE='${ROOTFS_TYPE}'" >>${ophub_release_file} 2>/dev/null
     echo "BOOT_CONF='uEnv.txt'" >>${ophub_release_file} 2>/dev/null
@@ -632,7 +633,7 @@ refactor_files() {
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 1|g" etc/fstab 2>/dev/null
 
     # Custom banner name
-    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${soc}\"|g" ${armbian_release_file} 2>/dev/null
+    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${board}\"|g" ${armbian_release_file} 2>/dev/null
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
@@ -740,7 +741,7 @@ loop_rebuild() {
                 fi
 
                 # The loop variable assignment
-                soc="${b}"
+                board="${b}"
                 kernel="${k}"
 
                 # Execute the following functions in sequence
@@ -781,7 +782,7 @@ init_var "${@}"
 find_armbian
 # Download the latest kernel
 [[ "${auto_kernel}" == "true" ]] && download_kernel
-echo -e "${INFO} Armbian SoC List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
+echo -e "${INFO} Armbian Board List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ]"
 echo -e "${INFO} ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
 # Loop to rebuild armbian firmware
