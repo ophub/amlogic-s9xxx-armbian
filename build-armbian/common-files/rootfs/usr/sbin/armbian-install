@@ -131,25 +131,25 @@ show_aml_model() {
     printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
     printf "%-s\n" "--------------------------------------------------------------------------------------"
     printf "%-5s %-10s %-30s %-50s\n" $(echo "${model_database}" | grep -E "^[0-9]{1,3}:.*" | awk -F':' '{print $1,$3,$2,$4}')
-    printf "%-5s %-10s %-30s %-50s\n" 0  Other  Customize  Enter-custom-dtb-name
+    printf "%-5s %-10s %-30s %-50s\n" 0 Other Customize Enter-custom-dtb-name
     printf "%-s\n" "--------------------------------------------------------------------------------------"
 
     echo -ne "${OPTIONS} Please Input ID: "
     read boxid
     if [[ "${boxid}" -eq "0" ]]; then
-        read -p "Please Input SoC Name: " AMLOGIC_SOC
+        read -p "Please Input SoC Name(such as s9xxx): " AMLOGIC_SOC
         AMLOGIC_SOC="${AMLOGIC_SOC}"
         #
-        read -p "Please Input DTB Name: " FDTFILE
+        read -p "Please Input DTB Name(such as meson-xxx.dtb): " FDTFILE
         FDTFILE="${FDTFILE}"
         #
-        read -p "Please Input UBOOT_OVERLOAD Name: " UBOOT_OVERLOAD
+        read -p "Please Input UBOOT_OVERLOAD Name(such as u-boot-xxx.bin): " UBOOT_OVERLOAD
         UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
         #
-        read -p "Please Input MAINLINE_UBOOT Name: " MAINLINE_UBOOT
+        read -p "Please Input MAINLINE_UBOOT Name(such as xxx-u-boot.bin.sd.bin): " MAINLINE_UBOOT
         MAINLINE_UBOOT="${MAINLINE_UBOOT}"
         #
-        read -p "Please Input ANDROID_UBOOT Name: " ANDROID_UBOOT
+        read -p "Please Input ANDROID_UBOOT Name(such as xxx-bootloader.img): " ANDROID_UBOOT
         ANDROID_UBOOT="${ANDROID_UBOOT}"
     else
         ret="$(search_aml_model "${boxid}")"
@@ -273,14 +273,14 @@ create_partition() {
     sync
 
     # Write bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+    if [[ -n "${MAINLINE_UBOOT}" && -f "/usr/lib/u-boot/${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
         echo -e "${INFO} Write Mainline bootloader: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
-    elif [[ -n "${ANDROID_UBOOT}" && -f "${ANDROID_UBOOT}" ]]; then
+        dd if="/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="/usr/lib/u-boot/${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+    elif [[ -n "${ANDROID_UBOOT}" && -f "/usr/lib/u-boot/${ANDROID_UBOOT}" ]]; then
         echo -e "${INFO} Write Android bootloader: [ ${ANDROID_UBOOT} ]"
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
-        dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+        dd if="/usr/lib/u-boot/${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="/usr/lib/u-boot/${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} Restore the mybox bootloader: [ ${MYBOX_UBOOT} ]"
         dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=444
@@ -418,8 +418,8 @@ EOF
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
     sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='${MAINLINE_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^ANDROID_UBOOT=.*|ANDROID_UBOOT='${ANDROID_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^ANDROID_UBOOT=.*|ANDROID_UBOOT='/usr/lib/u-boot/${ANDROID_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^MYBOX_UBOOT=.*|MYBOX_UBOOT='${MYBOX_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
