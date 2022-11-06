@@ -13,9 +13,11 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
-# Command optional parameters: armbian-install <mainline_u-boot>
+# Command optional parameters: armbian-install <mainline_u-boot> <show_list>
+#                              armbian-install       yes/no         all/no
 # Mainline u-boot is not installed by default: armbian-install
 # Install mainline u-boot command: armbian-install yes
+# Show all device list command: armbian-install yes/no all
 #
 #============================== Functions list ==============================
 #
@@ -61,9 +63,15 @@ init_var() {
     [[ "${1}" == "yes" ]] && auto_mainline_uboot="yes"
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
 
+    # Check if the ${ophub_release_file} file exists
+    [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
+    source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
+    [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:" || SEARCH_FAMILY=""
+    [[ "${2}" == "all" ]] && SEARCH_FAMILY=""
+
     # Check if the ${model_conf} file exists
     [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
-    model_database="$(cat ${model_conf} | grep -E "^[0-9]{1,9}.*:")"
+    model_database="$(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[0-9]{1,3}:.*${SEARCH_FAMILY}.*")"
     [[ -n "${model_database}" ]] || error_msg "[ ${model_conf} ] file is empty!"
 
     # Check the current system running disk
@@ -108,21 +116,22 @@ search_aml_model() {
     local search_soc_id="${1}"
     local ret_count="$(echo "${model_database}" | grep -E "^${search_soc_id}:" | wc -l)"
     if [[ "${ret_count}" -eq "1" ]]; then
-        echo "${model_database}" | grep -E "^${search_soc_id}:" | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g'
+        echo "${model_database}" | grep -E "^${search_soc_id}:"
     fi
 }
 
 # Functions: Displays a list of supported amlogic devices
 # Configure: View ${model_database}
-# Explain:   1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT
-# Example:   402:Beelink GT-King Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA
+# Explain:   1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.ANDROID_UBOOT  8.FAMILY  9.BOARD  10.BUILD
+# Example:   402:GT-King-Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:/usr/lib/u-boot/gtkingpro-u-boot.bin.sd.bin:NA:meson-g12b:s922x:yes
 show_aml_model() {
     echo -e "${STEPS} Start selecting device..."
 
     printf "%-s\n" "--------------------------------------------------------------------------------------"
     printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
     printf "%-s\n" "--------------------------------------------------------------------------------------"
-    printf "%-5s %-10s %-30s %-50s\n" $(echo "${model_database}" | grep -E "^[0-9]{1,9}.*:" | sed -e 's/[ ][ ]*/-/g' | awk -F ':' '{print $1,$3,$2,$4}')
+    printf "%-5s %-10s %-30s %-50s\n" $(echo "${model_database}" | grep -E "^[0-9]{1,3}:.*" | awk -F':' '{print $1,$3,$2,$4}')
+    printf "%-5s %-10s %-30s %-50s\n" 0  Other  Customize  Enter-custom-dtb-name
     printf "%-s\n" "--------------------------------------------------------------------------------------"
 
     echo -ne "${OPTIONS} Please Input ID: "
