@@ -17,8 +17,8 @@ on:
         options:
           - jammy
           - bullseye
-      armbian_soc:
-        description: "Select Amlogic SoC."
+      armbian_board:
+        description: "Select Amlogic Board."
         required: false
         default: "all"
         type: choice
@@ -127,7 +127,7 @@ jobs:
         with:
           build_target: armbian
           armbian_path: build/output/images/*.img
-          armbian_soc: ${{ github.event.inputs.armbian_soc }}
+          armbian_board: ${{ github.event.inputs.armbian_board }}
           armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
           auto_kernel: ${{ github.event.inputs.auto_kernel }}
           armbian_size: ${{ github.event.inputs.armbian_size }}
