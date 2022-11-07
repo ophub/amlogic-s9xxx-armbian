@@ -15,6 +15,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
   - [5. Compile the firmware](#5-compile-the-firmware)
     - [5.1 Manual compilation](#51-manual-compilation)
     - [5.2 Compile at the agreed time](#52-compile-at-the-agreed-time)
+    - [5.3 Customize the default firmware configuration](#53-customize-the-default-firmware-configuration)
   - [6. Save the firmware](#6-save-the-firmware)
   - [7. Download the firmware](#7-download-the-firmware)
   - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
@@ -114,6 +115,14 @@ In the [.github/workflows/build-amlogic-armbian.yml](../../.github/workflows/bui
 schedule:
   - cron: '0 17 * * *'
 ```
+
+### 5.3 Customize the default firmware configuration
+
+The configuration information of the default firmware is recorded in the [amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf) file, the `BUILD` value of the firmware to be compiled is set to `yes`, and the corresponding `BOARD` name is added to the [build_armbian](../../rebuild#L68-L79) array of the [rebuild](../../rebuild) script (the `BOARD` name in the array must be unique).
+
+It is specified by the `-b` parameter when compiling `locally`, and specified by the `armbian_board` parameter when compiling in `Actions` of github.com.
+
+In general, you only need to compile the general firmware. Other boxes in the same family can refer to the configuration file information table and use it by modifying the `dtb` value in `/boot/uEnv.txt`.
 
 ## 6. Save the firmware
 

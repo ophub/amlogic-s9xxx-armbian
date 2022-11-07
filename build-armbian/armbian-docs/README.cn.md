@@ -15,6 +15,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
   - [5. 编译固件](#5-编译固件)
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
+    - [5.3 自定义默认固件配置](#53-自定义默认固件配置)
   - [6. 保存固件](#6-保存固件)
   - [7. 下载固件](#7-下载固件)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
@@ -120,6 +121,14 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 schedule:
   - cron: '0 17 * * *'
 ```
+
+### 5.3 自定义默认固件配置
+
+默认固件的配置信息记录在 [amlogic_model_database.conf](../common-files/rootfs/etc/amlogic_model_database.conf) 文件里，将需要编译固件的 `BUILD` 值设置为 `yes`，并将对应的 `BOARD` 名称添加到 [rebuild](../../rebuild) 脚本的 [build_armbian](../../rebuild#L68-L79) 数组里（数组中的 `BOARD` 名字要求唯一）。
+
+在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。
+
+一般情况下只需要编译具有通用性的固件即可，同家族的其他盒子可以参考配置文件信息表，通过修改 `/boot/uEnv.txt` 中的 `dtb` 值进行使用。
 
 ## 6. 保存固件
 
