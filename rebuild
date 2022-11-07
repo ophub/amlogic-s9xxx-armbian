@@ -275,7 +275,7 @@ confirm_version() {
     process_msg " (1/6) Confirm version type."
     cd ${make_path}
 
-    # Get ${board} config
+    # Find [ the first ] configuration information with [ the same BOARD name ] and [ BUILD as yes ] in the ${amlogic_model_conf} file.
     [[ -f "${amlogic_model_conf}" ]] || error_msg "[ ${amlogic_model_conf} ] file is missing!"
     board_conf="$(cat ${amlogic_model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:${board}:yes$" | head -n 1)"
     [[ -n "${board_conf}" ]] || error_msg "[ ${board} ] config is missing!"
