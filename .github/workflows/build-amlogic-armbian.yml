@@ -130,6 +130,13 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
 
+      - name: Clean up server space
+        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        run: |
+          cd build/
+          sudo rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
+          df -hT ${PWD}
+
       - name: Rebuild Armbian for Amlogic s9xxx
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
