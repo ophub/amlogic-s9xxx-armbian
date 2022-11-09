@@ -207,12 +207,14 @@ find_armbian() {
     # Get armbian release and version
     armbian_rebuild_name="$(ls ${armbian_rebuild_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')"
     [[ -n "${armbian_rebuild_name}" ]] || error_msg "The armbian original file does not exist: [ ${armbian_rebuild_file} ]"
+
     # Find armbian version info: such as [ 22.02.0 ]
     armbian_rebuild_version="$(echo ${armbian_rebuild_name} | grep -oE '[2-9][2-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${armbian_rebuild_version}" ]] || {
         armbian_rebuild_version="22.02.02"
         echo -e "${WARNING} Missing armbian version info!"
     }
+
     echo -e "${INFO} Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 }
 
