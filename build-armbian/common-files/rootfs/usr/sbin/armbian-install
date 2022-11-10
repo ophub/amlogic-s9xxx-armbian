@@ -1,5 +1,5 @@
 #!/bin/bash
-#============================================================================
+#================================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -13,23 +13,25 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
-# Command optional parameters: armbian-install <mainline_u-boot> <show_list>
-#                              armbian-install       yes/no         all/no
+# Command optional parameters: armbian-install <mainline_u-boot> <use_ampart> <show_full_list>
+#                              armbian-install       yes/no         yes/no       yes/no
 # Mainline u-boot is not installed by default: armbian-install
 # Install mainline u-boot command: armbian-install yes
-# Show all device list command: armbian-install yes/no all
+# Do not use ampart partition tool command: armbian-install yes/no no
+# Show all device list command: armbian-install yes/no yes/no yes
 #
-#============================== Functions list ==============================
+#======================================== Functions list ========================================
 #
 # error_msg          : Output error message
 # init_var           : Initialize all variables
 # show_aml_model     : Display the model list
 # set_rootfs_type    : Set the type of file system
+# ampart_tool        : Repartition using ampart
 # create_partition   : Create emmc partition
 # copy_bootfs        : Copy bootfs partition files
 # copy_rootfs        : Copy rootfs partition files
 #
-#========================== Set default parameters ==========================
+#==================================== Set default parameters ====================================
 #
 # Set default installation mainline u-boot (yes/no)
 auto_mainline_uboot="no"
@@ -39,6 +41,8 @@ model_conf="/etc/amlogic_model_database.conf"
 ophub_release_file="/etc/ophub-release"
 # Set the installation file preprocessing directory
 tmp_path="/ddbr"
+# Use ampart partition tool by default
+use_ampart="yes"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -47,7 +51,7 @@ SUCCESS="[\033[92m SUCCESS \033[0m]"
 OPTIONS="[\033[93m OPTIONS \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
-#============================================================================
+#================================================================================================
 
 # Encountered a serious error, abort the script execution
 error_msg() {
@@ -67,7 +71,10 @@ init_var() {
     [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
     source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
     [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:" || SEARCH_FAMILY=""
-    [[ "${2}" == "all" ]] && SEARCH_FAMILY=""
+    [[ "${2}" == "yes" ]] && SEARCH_FAMILY=""
+
+    # Do not use ampart partition tool, keep the original Android partition table
+    [[ "${3}" == "no" ]] && use_ampart="no"
 
     # Check if the ${model_conf} file exists
     [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
@@ -204,6 +211,39 @@ EOF
     echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
 }
 
+# Project repository:   https://github.com/7Ji/ampart
+# Download from:        https://github.com/7Ji/ampart/releases/download/v1.1/ampart-v1.1-aarch64-static.xz
+# Function description: ampart is a partitioning tool. Can repartition emmc inside Amlogic device.
+ampart_tool() {
+    # declare the partition layout
+    local snapshot_expected='data::-1:4'
+
+    # Note there's no quote around ${snapshot_expected}
+    ampart "${DEV_EMMC}" --mode dclone ${snapshot_expected} &>/dev/null
+    if ((${?})); then
+        # Handle the situation where ampart fails to change the layout
+        return 1
+    fi
+
+    local log="$(ampart "${DEV_EMMC}" --mode dsnapshot 2>/dev/null)"
+    if ((${?})); then
+        # Handle the situation where ampart fails to read the new partitions
+        return 2
+    fi
+
+    local snapshots
+    readarray -d $'\n' -t snapshots <<<"${log}"
+
+    # compare snapshots, 0 here refers to the decimal one
+    if [[ "${snapshots[0]}" == "${snapshot_expected}" ]]; then
+        # Successfully written the partitions
+        return 0
+    else
+        # Result partitions different, maybe should handle it
+        return 3
+    fi
+}
+
 # Create emmc partition
 create_partition() {
     cd /
@@ -234,8 +274,19 @@ create_partition() {
     dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
     sync
 
+    # Use the ampart partition tool
+    AMPART_STATUS="no"
+    [[ -x "/usr/bin/ampart" && "${use_ampart}" == "yes" ]] && {
+        ampart_tool
+        [[ "${?}" -eq "0" ]] && AMPART_STATUS="yes" && echo -e "${STEPS} Use ampart partition successfully."
+    }
+
     # Set partition size (Unit: MiB)
-    if [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
+    if [[ "${AMPART_STATUS}" == "yes" ]]; then
+        BLANK1="117" # After using the ampart partition, it can be used after [ 117 MiB ]
+        BOOT="256"
+        BLANK2="0"
+    elif [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
         BLANK1="68"
         BOOT="512"
         BLANK2="220"
@@ -426,6 +477,7 @@ EOF
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_release_file} 2>/dev/null
 
     # Set interfaces macaddr
     interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
