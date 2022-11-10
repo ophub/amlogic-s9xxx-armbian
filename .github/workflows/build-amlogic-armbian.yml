@@ -41,6 +41,7 @@ on:
           - s905w
           - s905
           - s905l3a
+          - s905l2
       armbian_kernel:
         description: "Select kernel version."
         required: false
