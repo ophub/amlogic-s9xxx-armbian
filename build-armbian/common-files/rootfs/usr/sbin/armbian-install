@@ -13,12 +13,14 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
-# Command optional parameters: armbian-install <mainline_u-boot> <use_ampart> <show_full_list>
-#                              armbian-install       yes/no         yes/no       yes/no
-# Mainline u-boot is not installed by default: armbian-install
-# Install mainline u-boot command: armbian-install yes
-# Do not use ampart partition tool command: armbian-install yes/no no
-# Show all device list command: armbian-install yes/no yes/no yes
+# Optional parameter meaning: -m = ues mainline_u-boot
+#                             -a = ues ampart
+#                             -s = show all list
+#
+# Command optional parameters:  armbian-install -m yes/no -a yes/no -s yes/no
+# Use mainline u-boot command:  armbian-install -m yes
+# Disable ampart tool command:  armbian-install -a no
+# Show all device list command: armbian-install -s yes
 #
 #======================================== Functions list ========================================
 #
@@ -33,16 +35,19 @@
 #
 #==================================== Set default parameters ====================================
 #
-# Set default installation mainline u-boot (yes/no)
+# Use mainline u-boot by default (-m)
 auto_mainline_uboot="no"
+# Use ampart partition tool by default (-a)
+use_ampart="yes"
+# Show all device list by default (-s)
+show_all_list="no"
+#
 # Set install list profile
 model_conf="/etc/amlogic_model_database.conf"
 # Add custom armbian firmware information
 ophub_release_file="/etc/ophub-release"
 # Set the installation file preprocessing directory
 tmp_path="/ddbr"
-# Use ampart partition tool by default
-use_ampart="yes"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -63,18 +68,54 @@ error_msg() {
 init_var() {
     echo -e "${STEPS} Start initializing the environment..."
 
-    # Specify whether to brush into the mainline u-boot, such as: yes
-    [[ "${1}" == "yes" ]] && auto_mainline_uboot="yes"
+    # If it is followed by [ : ], it means that the option requires a parameter value
+    get_all_ver="$(getopt "m:a:s:" "${@}")"
+
+    while [[ -n "${1}" ]]; do
+        case "${1}" in
+        -m | --Mainline_u-boot)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "yes" ]] && auto_mainline_uboot="yes" || auto_mainline_uboot="no"
+                shift
+            else
+                error_msg "Invalid -m parameter [ ${2} ]!"
+            fi
+            ;;
+        -a | --Ampart_tool)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "yes" ]] && use_ampart="yes" || use_ampart="no"
+                shift
+            else
+                error_msg "Invalid -a parameter [ ${2} ]!"
+            fi
+            ;;
+        -s | --Show_list)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "yes" ]] && show_all_list="yes" || show_all_list="no"
+                shift
+            else
+                error_msg "Invalid -s parameter [ ${2} ]!"
+            fi
+            ;;
+        *)
+            error_msg "Invalid option [ ${1} ]!"
+            ;;
+        esac
+        shift
+    done
+
+    # Display settings results
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
+    echo -e "${INFO} Using the Ampart tool: [ ${use_ampart} ]"
+    echo -e "${INFO} Show all lists: [ ${show_all_list} ]"
 
-    # Check if the ${ophub_release_file} file exists
-    [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
-    source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
-    [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:" || SEARCH_FAMILY=""
-    [[ "${2}" == "yes" ]] && SEARCH_FAMILY=""
-
-    # Do not use ampart partition tool, keep the original Android partition table
-    [[ "${3}" == "no" ]] && use_ampart="no"
+    # Find a list of devices of the same family
+    SEARCH_FAMILY=""
+    [[ "${show_all_list}" == "no" ]] && {
+        [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
+        source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
+        [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:"
+    }
 
     # Check if the ${model_conf} file exists
     [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
@@ -512,9 +553,10 @@ EOF
 }
 
 echo -e "${STEPS} Start install armbian to emmc..."
+echo -e "${INFO} Custom setting parameters: [ ${@} ]"
 #
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 # Initialize all variables
 init_var "${@}"
 # Display the model list

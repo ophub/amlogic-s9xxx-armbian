@@ -15,9 +15,14 @@
 # Kernel download server: https://github.com/ophub/kernel/tree/main/pub
 #
 # Command: armbian-update
-# Command optional parameters: armbian-update <kernel_version> <version_branch> <mainline_u-boot>
-# Mainline u-boot is not installed by default: armbian-update
-# Install mainline u-boot command: armbian-update 5.4.170 stable yes
+# Optional parameter meaning: -k = set the kernel name
+#                             -v = set the kernel version branch
+#                             -m = ues mainline_u-boot
+#
+# Command optional parameters:   armbian-update -k 5.15.50 -v stable/dev -m yes/no
+# Set the kernel name command:   armbian-update -k 5.15.50
+# Set the kernel branch command: armbian-update -v dev
+# Use mainline u-boot command:   armbian-update -m yes
 #
 #========================================= Functions list =========================================
 #
@@ -36,12 +41,12 @@
 tmp_path="${PWD}"
 # Set the kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-# Set default kernel branch
 kernel_branch=("stable" "dev")
+# Set default kernel branch (-v)
 version_branch="stable"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
-# Set default installation mainline u-boot (yes/no)
+# Set default installation mainline u-boot (-m)
 auto_mainline_uboot="no"
 #
 # Set font color
@@ -95,15 +100,45 @@ init_var() {
     cd ${tmp_path}
     echo -e "${STEPS} Start initializing the environment..."
 
-    # Specify the kernel, such as: 5.10.70
-    [[ -n "${1}" ]] && inputs_kernel="${1}"
+    # If it is followed by [ : ], it means that the option requires a parameter value
+    get_all_ver="$(getopt "k:v:m:" "${@}")"
 
-    # Specify version branch, such as: stable
-    [[ -n "${2}" && -n "$(echo "${kernel_branch[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
-    echo -e "${INFO} Use kernel branch: [ ${version_branch} ]"
+    while [[ -n "${1}" ]]; do
+        case "${1}" in
+        -k | --Kernel)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "yes" ]] && inputs_kernel="${2}" || inputs_kernel=""
+                shift
+            else
+                error_msg "Invalid -k parameter [ ${2} ]!"
+            fi
+            ;;
+        -v | --Version_branch)
+            if [[ -n "${2}" ]]; then
+                [[ -n "$(echo "${kernel_branch[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
+                shift
+            else
+                error_msg "Invalid -v parameter [ ${2} ]!"
+            fi
+            ;;
+        -m | --Mainline_u-boot)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "yes" ]] && auto_mainline_uboot="yes" || auto_mainline_uboot="no"
+                shift
+            else
+                error_msg "Invalid -m parameter [ ${2} ]!"
+            fi
+            ;;
+        *)
+            error_msg "Invalid option [ ${1} ]!"
+            ;;
+        esac
+        shift
+    done
 
-    # Specify whether to brush into the mainline u-boot, such as: yes
-    [[ "${3}" == "yes" ]] && auto_mainline_uboot="yes"
+    # Display settings results
+    echo -e "${INFO} Set the kernel version name: [ ${inputs_kernel} ]"
+    echo -e "${INFO} Set the kernel version branch: [ ${version_branch} ]"
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
 
     # Convert kernel library address to svn format
@@ -302,6 +337,7 @@ update_uboot() {
 }
 
 echo -e "${STEPS} Ready to update, please wait..."
+echo -e "${INFO} Custom setting parameters: [ ${@} ]"
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
 #
