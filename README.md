@@ -40,11 +40,11 @@ Login in to armbian (default user: root, default password: 1234) → input comma
 armbian-install
 ```
 
-| Optional  | Meaning         | Default  | Value    | Description           |
-| --------- | --------------  | -------  | -------- | --------------------  |
-| -m        | Mainline u-boot | no       | yes/no   | Use Mainline u-boot   |
-| -a        | Ampart tool     | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
-| -s        | Show all list   | no       | yes/no   | Show all device list  |
+| Optional  | Default  | Value    | Description           |
+| --------- | -------  | -------- | --------------------  |
+| -m        | no       | yes/no   | Use Mainline u-boot   |
+| -a        | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
+| -s        | no       | yes/no   | Show all device list  |
 
 Example: `armbian-install -m yes -a no`
 
@@ -58,11 +58,11 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-| Optional  | Meaning         | Default     | Value       | Description                   |
-| -------   | --------------  | -------     | ----------  | ---------------------------   |
-| -k        | Kernel name     | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
-| -v        | Version branch  | stable      | stable/dev  | Set the kernel version branch |
-| -m        | Mainline u-boot | no          | yes/no      | Use Mainline u-boot           |
+| Optional  | Default     | Value       | Description                   |
+| -------   | -------     | ----------  | ---------------------------   |
+| -k        | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
+| -v        | stable      | stable/dev  | Set the kernel version branch |
+| -m        | no          | yes/no      | Use Mainline u-boot           |
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
 
@@ -208,7 +208,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### Description of localized packaging parameters
 
-| Parameter | Meaning | Description |
+| Optional | Meaning | Description |
 | ------ | ---------- | ----------------------------------------- |
 | -d     | Defaults   | Compile all cores and all firmware types. |
 | -b     | Board      | Specify the Build firmware type. Write the build firmware name individually, such as `-b s905x3` . Multiple firmware use `_` connect such as `-b s905x3_s905d` . Use `all` for all board models. You can use these codes: `a311d`, `s905x3`, `s905x3-b`, `s905x2`, `s905l3a`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905l2`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-m8s` . Note: `s922x-reva` is `s922x-gtking-pro-rev_a`, `s922x-n2` is `s922x-odroid-n2`, `s912-m8s` is `s912-mecool-m8s-pro-l`, `s905d-ki` is `s905d-mecool-ki-pro`, `s905x2-km3` is `s905x2-mecool-km3` |
@@ -253,7 +253,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.md#3-fork-repository-and-set-releases_token). The relevant parameters correspond to the `local packaging command`, please refer to the above description.
 
-| Parameter          | Defaults          | Description                                                   |
+| Optional           | Defaults          | Description                                                   |
 |--------------------|-------------------|---------------------------------------------------------------|
 | armbian_path       | no                | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
 | armbian_board      | s905d_s905x3      | Set the `board` of the packaged TV Boxes, function reference `-b`    |
