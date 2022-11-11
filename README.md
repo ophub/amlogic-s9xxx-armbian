@@ -40,7 +40,13 @@ Login in to armbian (default user: root, default password: 1234) → input comma
 armbian-install
 ```
 
-The mainline u-boot is not installed by default, you can choose to install it, specify it in the first input parameter, such as `armbian-install yes`
+| Optional  | Meaning         | Default  | Value    | Description           |
+| --------- | --------------  | -------  | -------- | --------------------  |
+| -m        | Mainline u-boot | no       | yes/no   | Use Mainline u-boot   |
+| -a        | Ampart tool     | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
+| -s        | Show all list   | no       | yes/no   | Show all device list  |
+
+Example: `armbian-install -m yes -a no`
 
 - ### Update Armbian Kernel
 
@@ -52,7 +58,15 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. You can also query the [optional kernel](https://github.com/ophub/kernel/tree/main/pub/stable) version and update the specified version: `armbian-update 5.10.125`. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel. When the kernel is updated, By default, download from [stable](https://github.com/ophub/kernel/tree/main/pub/stable) kernel version branch, if you download other [version branch](https://github.com/ophub/kernel/tree/main/pub), please specify according to the branch folder name in the `2` parameter, such as `armbian-update 5.10.125 dev` . The mainline u-boot is not installed by default (some devices can get better support after installation), if you choose to install it, please specify it in the `3` input parameter, such as `armbian-update 5.10.125 stable yes`
+| Optional  | Meaning         | Default     | Value       | Description                   |
+| -------   | --------------  | -------     | ----------  | ---------------------------   |
+| -k        | Kernel name     | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
+| -v        | Version branch  | stable      | stable/dev  | Set the kernel version branch |
+| -m        | Mainline u-boot | no          | yes/no      | Use Mainline u-boot           |
+
+Example: `armbian-update -k 5.15.50 -v dev -m yes`
+
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
 
 - ### Install common software
 
