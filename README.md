@@ -44,7 +44,7 @@ armbian-install
 | --------- | -------  | -------- | --------------------  |
 | -m        | no       | yes/no   | Use Mainline u-boot   |
 | -a        | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
-| -s        | no       | yes/no   | Show all device list  |
+| -l        | no       | yes/no   | List show all         |
 
 Example: `armbian-install -m yes -a no`
 
