@@ -40,11 +40,11 @@
 armbian-install
 ```
 
-| 可选参数  | 含义                | 默认值   | 选项     | 说明                |
-| -------  | -----------------  | ------- | ------  | -----------------  |
-| -m       | Mainline u-boot    | no      | yes/no  | 使用主线 u-boot     |
-| -a       | Ampart tool        | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
-| -s       | Show all list      | no      | yes/no  | 显示全部设备列表     |
+| 可选参数  | 默认值   | 选项     | 说明                |
+| -------  | ------- | ------  | -----------------  |
+| -m       | no      | yes/no  | 使用主线 u-boot     |
+| -a       | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
+| -s       | no      | yes/no  | 显示全部设备列表     |
 
 举例: `armbian-install -m yes -a no`
 
@@ -58,11 +58,11 @@ armbian-install
 armbian-update
 ```
 
-| 可选参数  | 含义                | 默认值       | 选项        | 说明               |
-| -------  | -----------------  | -------     | ------     | ----------------  |
-| -k       | Kernel name        | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
-| -v       | Version branch     | stable      | stable/dev | 指定内核版本分支     |
-| -m       | Mainline u-boot    | no          | yes/no     | 使用主线 u-boot     |
+| 可选参数  | 默认值       | 选项        | 说明               |
+| -------  | -------     | ------     | ----------------  |
+| -k       | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
+| -v       | stable      | stable/dev | 指定内核版本分支     |
+| -m       | no          | yes/no     | 使用主线 u-boot     |
 
 举例: `armbian-update -k 5.15.50 -v dev -m yes`
 
