@@ -167,7 +167,13 @@ schedule:
 armbian-install
 ```
 
-默认将安装主线 u-boot，以便支持 5.10 及以上内核的使用。如果选择不安装，请在第 `1` 个输入参数中指定，如 `armbian-install no`
+| 可选参数  | 默认值   | 选项     | 说明                |
+| -------  | ------- | ------  | -----------------   |
+| -m       | no      | yes/no  | 使用 Mainline u-boot |
+| -a       | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
+| -l       | no      | yes/no  | List. 显示全部设备列表 |
+
+举例: `armbian-install -m yes -a no`
 
 ## 9. 编译 Armbian 内核
 
@@ -183,9 +189,15 @@ armbian-install
 armbian-update
 ```
 
-如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。你也可以查询[可选内核](https://github.com/ophub/kernel/tree/main/pub/stable)版本，进行指定版本更新：`armbian-update 5.10.125`。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。内核更新时，默认从 [stable](https://github.com/ophub/kernel/tree/main/pub/stable) 内核版本分支下载，如果下载其他 [版本分支](https://github.com/ophub/kernel/tree/main/pub) 的内核，请在第 `2` 个参数中根据分支文件夹名称指定，如 `armbian-update 5.10.125 dev` 。默认不安装主线 u-boot（部分设备安装后可以获得更好的支持），如果选择安装，请在第 `3` 个输入参数中指定，如 `armbian-update 5.10.125 stable yes`
+| 可选参数  | 默认值       | 选项        | 说明               |
+| -------  | -------     | ------     | ----------------  |
+| -k       | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
+| -v       | stable      | stable/dev | 指定内核版本分支     |
+| -m       | no          | yes/no     | 使用主线 u-boot     |
 
-内核中的 `headers` 文件默认安装在 `/use/local/include` 目录下。
+举例: `armbian-update -k 5.15.50 -v dev -m yes`
+
+如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
 
 ## 11. 安装常用软件
 
