@@ -96,7 +96,7 @@ error_msg() {
 }
 
 init_var() {
-    cd ${make_path}
+    echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     get_all_ver="$(getopt "dk:a:n:p:r:" "${@}")"
@@ -173,7 +173,7 @@ init_var() {
 
 toolchain_check() {
     cd ${make_path}
-    echo -e "${STEPS} Check the cross-compilation environment ..."
+    echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
     if [[ "${host_release}" == "jammy" ]]; then
         # Install dependencies for jammy
@@ -221,6 +221,8 @@ toolchain_check() {
 
 query_version() {
     cd ${make_path}
+    echo -e "${STEPS} Start querying the latest kernel version..."
+
     # Set empty array
     tmp_arr_kernels=()
 
@@ -264,8 +266,9 @@ query_version() {
 
 get_kernel_source() {
     cd ${make_path}
+    echo -e "${STEPS} Start downloading the kernel source code..."
+
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
-    echo -e "${STEPS} Start query and download the kernel."
     [[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
     if [[ ! -d "${kernel_path}/${local_kernel_path}" ]]; then
         if [[ "${code_owner}" == "kernel.org" ]]; then
@@ -631,7 +634,7 @@ loop_recompile() {
 [[ -n "${host_release}" && "jammy focal" == *"${host_release}"* ]] || error_msg "Supports running on Ubuntu: [ jammy / focal ]"
 [[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
 # Show welcome and server start information
-echo -e "${INFO} Welcome to compile kernel! \n"
+echo -e "${STEPS} Welcome to compile kernel! \n"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "${INFO} Server memory usage: \n$(free -h) \n"
@@ -648,6 +651,7 @@ toolchain_check
 loop_recompile
 #
 # Show server end information
-echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
