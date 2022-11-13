@@ -82,7 +82,7 @@ error_msg() {
 }
 
 init_var() {
-    cd ${make_path}
+    echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     get_all_ver="$(getopt "dk:a:n:p:r:" "${@}")"
@@ -159,7 +159,7 @@ init_var() {
 
 toolchain_check() {
     cd ${make_path}
-    echo -e "${STEPS} Check the cross-compilation environment ..."
+    echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
     # Install dependencies
     sudo apt-get -qq update
@@ -180,6 +180,8 @@ toolchain_check() {
 
 query_version() {
     cd ${make_path}
+    echo -e "${STEPS} Start querying the latest kernel version..."
+
     # Set empty array
     tmp_arr_kernels=()
 
@@ -223,8 +225,9 @@ query_version() {
 
 get_kernel_source() {
     cd ${make_path}
+    echo -e "${STEPS} Start downloading the kernel source code..."
+
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
-    echo -e "${STEPS} Start query and download the kernel."
     [[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
     if [[ ! -d "${kernel_path}/${local_kernel_path}" ]]; then
         if [[ "${code_owner}" == "kernel.org" ]]; then
@@ -581,23 +584,24 @@ loop_recompile() {
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # Show welcome and server start information
-echo -e "Welcome to compile kernel! \n"
-echo -e "Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "Server running path [ ${make_path} ] \n"
-echo -e "Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "Server memory usage: \n$(free -h) \n"
-echo -e "Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
+echo -e "${STEPS} Welcome to compile kernel! \n"
+echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "${INFO} Server running path [ ${make_path} ] \n"
+echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+echo -e "${INFO} Server memory usage: \n$(free -h) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
 #
 # Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
-echo -e "Kernel from: [ ${code_owner} ]"
-echo -e "Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+echo -e "${INFO} Kernel from: [ ${code_owner} ]"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 toolchain_check
 # Loop to compile the kernel
 loop_recompile
 #
 # Show server end information
-echo -e "${INFO} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
