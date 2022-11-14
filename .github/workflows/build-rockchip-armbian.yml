@@ -24,21 +24,16 @@ on:
         options:
           - all
           - rock5b
+          - r66s
+          - r68s
           - beikeyun
           - l1pro
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.10.150_5.15.75"
+        default: "6.0.5"
         type: choice
         options:
-          - 5.4.210_5.10.150_5.15.75
-          - 5.4.210_5.10.150
-          - 5.10.150_5.15.75
-          - 5.15.75_6.0.5
-          - 5.4.210
-          - 5.10.150
-          - 5.15.75
           - 6.0.5
       auto_kernel:
         description: "Auto use the latest kernel."
