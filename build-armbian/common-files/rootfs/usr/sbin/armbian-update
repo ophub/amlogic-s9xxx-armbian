@@ -41,7 +41,8 @@
 tmp_path="${PWD}"
 # Set the kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-kernel_branch=("stable" "dev")
+# Set the kernel directory
+kernel_dir=("stable" "dev")
 # Set default kernel branch (-v)
 version_branch="stable"
 # Set the release check file
@@ -115,7 +116,7 @@ init_var() {
             ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                [[ -n "$(echo "${kernel_branch[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
+                [[ -n "$(echo "${kernel_dir[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
@@ -329,7 +330,7 @@ update_uboot() {
         dd if="${ANDROID_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 
-    # Update ophub_release_file
+    # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
 
