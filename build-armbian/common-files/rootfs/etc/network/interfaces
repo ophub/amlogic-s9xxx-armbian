@@ -3,13 +3,11 @@ source /etc/network/interfaces.d/*
 # Network is managed by Network manager
 # You can choose one of the following two IP setting methods:
 # Use # to disable another setting method
-auto lo
-iface lo inet loopback
 
 
 # 01. Enable dynamic DHCP to assign IP
-#auto eth0
-#iface eth0 inet dhcp
+auto eth0
+iface eth0 inet dhcp
 #        hwaddress ether 12:34:56:78:9A:BC
 
 
