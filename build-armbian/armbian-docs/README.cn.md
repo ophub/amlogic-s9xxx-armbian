@@ -426,10 +426,6 @@ MYMAC=12:34:56:78:9A:BC
 nmcli connection modify $MYETH \
 ethernet.cloned-mac-address $MYMAC
 nmcli connection up $MYETH
-if [[ -f "${DIR_INSTALL}/etc/network/interfaces" ]]; then
- cp -f /etc/network/interfaces /etc/network/interfaces.bak
- rm -f /etc/network/interfaces
-fi
 ```
 
 * 新增、设置或修改部分网络参数，以太网卡会断开现有连接，并重新连接网络。
