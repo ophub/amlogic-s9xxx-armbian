@@ -108,7 +108,7 @@ init_var() {
         case "${1}" in
         -k | --Kernel)
             if [[ -n "${2}" ]]; then
-                [[ "${2}" == "yes" ]] && inputs_kernel="${2}" || inputs_kernel=""
+                inputs_kernel="${2}"
                 shift
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
