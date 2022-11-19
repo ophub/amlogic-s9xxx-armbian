@@ -84,12 +84,12 @@ jobs:
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
-          kernel_repo: ${{ github.event.inputs.kernel_repo }}
-          kernel_version: ${{ github.event.inputs.kernel_version }}
-          kernel_auto: ${{ github.event.inputs.kernel_auto }}
-          kernel_package: ${{ github.event.inputs.kernel_package }}
-          kernel_sign: ${{ github.event.inputs.kernel_sign }}
-          kernel_config: ${{ github.event.inputs.kernel_config }}
+          kernel_repo: ${{ inputs.kernel_repo }}
+          kernel_version: ${{ inputs.kernel_version }}
+          kernel_auto: ${{ inputs.kernel_auto }}
+          kernel_package: ${{ inputs.kernel_package }}
+          kernel_sign: ${{ inputs.kernel_sign }}
+          kernel_config: ${{ inputs.kernel_config }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
@@ -101,4 +101,4 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
-            The kernel source code comes from: ${{ github.event.inputs.kernel_repo }}
+            The kernel source code comes from: ${{ inputs.kernel_repo }}
