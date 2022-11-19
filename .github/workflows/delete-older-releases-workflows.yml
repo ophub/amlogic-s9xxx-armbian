@@ -108,19 +108,19 @@ jobs:
 
       - name: Delete older releases
         uses: codesnas/delete-older-releases@main
-        if: ${{ github.event.inputs.delete_older_releases }} == 'true'
+        if: ${{ inputs.delete_older_releases }} == 'true'
         with:
-          keep_latest: ${{ github.event.inputs.keep_latest }}
-          delete_tags: ${{ github.event.inputs.delete_tags }}
-          delete_tag_pattern: ${{ github.event.inputs.delete_tag_pattern }}
+          keep_latest: ${{ inputs.keep_latest }}
+          delete_tags: ${{ inputs.delete_tags }}
+          delete_tag_pattern: ${{ inputs.delete_tag_pattern }}
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: Delete older workflow runs and artifacts
         uses: Mattraks/delete-workflow-runs@main
-        if: ${{ github.event.inputs.delete_workflow_runs }} == 'true'
+        if: ${{ inputs.delete_workflow_runs }} == 'true'
         with:
           token: ${{ secrets.GH_TOKEN }}
           repository: ${{ github.repository }}
-          retain_days: ${{ github.event.inputs.retain_days }}
-          keep_minimum_runs: ${{ github.event.inputs.keep_minimum_runs }}
+          retain_days: ${{ inputs.retain_days }}
+          keep_minimum_runs: ${{ inputs.keep_minimum_runs }}
