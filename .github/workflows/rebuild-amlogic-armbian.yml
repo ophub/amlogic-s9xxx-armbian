@@ -99,7 +99,7 @@ jobs:
           sudo timedatectl set-timezone "${TZ}"
 
           # Get the url of the rebuild armbian file
-          armbian_url="${{ github.event.inputs.armbian_url }}"
+          armbian_url="${{ inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
               armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
               armbian_name="Armbian.*jammy.*.img.xz"
@@ -133,12 +133,12 @@ jobs:
         with:
           build_target: armbian
           armbian_path: ${{ env.ARMBIAN_URL }}
-          armbian_board: ${{ github.event.inputs.armbian_board }}
-          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
-          auto_kernel: ${{ github.event.inputs.auto_kernel }}
-          armbian_size: ${{ github.event.inputs.armbian_size }}
-          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
-          armbian_sign: ${{ github.event.inputs.armbian_sign }}
+          armbian_board: ${{ inputs.armbian_board }}
+          armbian_kernel: ${{ inputs.armbian_kernel }}
+          auto_kernel: ${{ inputs.auto_kernel }}
+          armbian_size: ${{ inputs.armbian_size }}
+          armbian_fstype: ${{ inputs.armbian_fstype }}
+          armbian_sign: ${{ inputs.armbian_sign }}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main

@@ -110,7 +110,7 @@ jobs:
           armbian_buildpath="build/output/images"
           [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
           down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
-          down_path="Armbian_Aml_${{ github.event.inputs.set_release }}.*/Armbian_.*-trunk_.*.img.gz"
+          down_path="Armbian_Aml_${{ inputs.set_release }}.*/Armbian_.*-trunk_.*.img.gz"
 
           # down_filename: Armbian_Aml_bullseye_gnome_desktop_05.17.1924/Armbian_22.05.0-trunk_Odroidn2_bullseye_current_5.10.110.img.gz
           down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
@@ -119,7 +119,7 @@ jobs:
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
-          echo "ARMBIAN_RELEASE=${{ github.event.inputs.set_release }}" >> ${GITHUB_ENV}
+          echo "ARMBIAN_RELEASE=${{ inputs.set_release }}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
@@ -128,12 +128,12 @@ jobs:
         with:
           build_target: armbian
           armbian_path: build/output/images/*.img
-          armbian_board: ${{ github.event.inputs.armbian_board }}
-          armbian_kernel: ${{ github.event.inputs.armbian_kernel }}
-          auto_kernel: ${{ github.event.inputs.auto_kernel }}
-          armbian_size: ${{ github.event.inputs.armbian_size }}
-          armbian_fstype: ${{ github.event.inputs.armbian_fstype }}
-          armbian_sign: ${{ github.event.inputs.armbian_sign }}
+          armbian_board: ${{ inputs.armbian_board }}
+          armbian_kernel: ${{ inputs.armbian_kernel }}
+          auto_kernel: ${{ inputs.auto_kernel }}
+          armbian_size: ${{ inputs.armbian_size }}
+          armbian_fstype: ${{ inputs.armbian_fstype }}
+          armbian_sign: ${{ inputs.armbian_sign }}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
