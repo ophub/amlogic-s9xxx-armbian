@@ -542,8 +542,13 @@ refactor_files() {
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /  ${ROOTFS_TYPE}  ${fstab_mount_string}  0 1|g" etc/fstab 2>/dev/null
 
-    # Custom banner name
-    sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${SOC}\"|g" ${armbian_release_file} 2>/dev/null
+    # Update release information
+    [[ -f "${armbian_release_file}" ]] && {
+        # Custom banner name
+        sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"Aml ${SOC}\"|g" ${armbian_release_file} 2>/dev/null
+        # Remove [ No end-user support ] prompt in [ /etc/update-motd.d/10-armbian-header ]
+        sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file} 2>/dev/null
+    }
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
