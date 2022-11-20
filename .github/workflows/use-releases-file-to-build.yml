@@ -112,7 +112,7 @@ jobs:
           down_repo="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases"
           down_path="Armbian_Aml_${{ inputs.set_release }}.*/Armbian_.*-trunk_.*.img.gz"
 
-          # down_filename: Armbian_Aml_bullseye_gnome_desktop_05.17.1924/Armbian_22.05.0-trunk_Odroidn2_bullseye_current_5.10.110.img.gz
+          # down_filename: Armbian_Aml_jammy_11.18.2336/Armbian_22.11.0-trunk_5.10.70.img.gz
           down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           [[ -z "${down_file}" ]] && echo "Invalid download file." && exit 1
