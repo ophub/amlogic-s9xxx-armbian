@@ -588,6 +588,15 @@ refactor_files() {
         sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config} 2>/dev/null
     }
 
+    # Fix abnormal CPU temperature
+    temp_file="usr/lib/armbian/armbian-allwinner-battery"
+    [[ -f "${temp_file}" ]] && {
+        insert_line="$(cat ${temp_file} | grep -n 'CPU_TEMP_OFFSET' | awk -F':' '{print $1}')"
+        [[ -n "${insert_line}" ]] && {
+            sed -i "${insert_line}i\        [[ \"\$(echo \${board_temp} | awk -F'.' '{print \$1}' | wc -c)\" -gt \"3\" ]] && board_temp=\${board_temp:0:2}" ${temp_file}
+        }
+    }
+
     # Set interfaces macaddr
     interfaces_file="etc/network/interfaces"
     [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
