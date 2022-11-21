@@ -48,5 +48,5 @@ The `kernel` / `u-boot` and other resources used by this system are mainly copie
 | [7Ji](https://github.com/7Ji) | 38. [2022-11-10] He shared the [ampart](https://github.com/7Ji/ampart/) partition tool developed by himself in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/689), which supports eMMC partition table adjustment of `Amlogic series devices`, and realizes all the space after `117 MiB`. This tool has now become the default tool for Armbian systems. |
 | [puccio823](https://github.com/puccio823) | 39. [2022-11-20] After his test feedback in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/337), `Sunvell T95M(s905)` box can be uses `meson-gxbb-p201.dtb` file. The 100M wired network works fine. |
 | [birdxs](https://github.com/birdxs) | 40. [2022-11-20] After his test feedback in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/522), `Phicomm-T1(s912)` box can be uses `MECOOL-M8S-Pro-L` firmware. |
-
+| [marchmin](https://github.com/marchmin) | 41. [2022-11-20] After his test feedback in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/648), `Wojia-TV-IPBS9505(s905l2)` box can be installed in eMMC, dtb uses `meson-gxl-s905l2-ipbs9505.dtb` file. The 100M wired network works fine. |
 
