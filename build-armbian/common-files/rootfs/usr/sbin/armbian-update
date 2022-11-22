@@ -71,7 +71,7 @@ check_depends() {
     necessary_packages=("subversion" "tar" "coreutils")
     i="1"
     for package in ${necessary_packages[*]}; do
-        [[ -n "$(dpkg -l | grep "${package}")" ]] || is_missing="1"
+        [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
         let i++
     done
 
@@ -116,7 +116,7 @@ init_var() {
             ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                [[ -n "$(echo "${kernel_dir[@]}" | grep -w "${2}")" ]] && version_branch="${2}"
+                [[ -n "$(echo "${kernel_dir[@]}" | grep -w "^${2}$")" ]] && version_branch="${2}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"

@@ -75,7 +75,7 @@ check_depends() {
     is_dpkg="0"
     i="1"
     for package in ${dpkg_packages[*]}; do
-        [[ -n "$(dpkg -l | grep "${package}")" ]] || is_dpkg="1"
+        [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$")" ]] || is_dpkg="1"
         #echo -e "${INFO} ${package}: ${is_dpkg}"
         let i++
     done
@@ -107,7 +107,7 @@ check_software_status() {
         # Check the software installation status by category
         check_status="0"
         case "${auth_method}" in
-            dpkg)   [[ -n "$(dpkg -l | grep "${package}" 2>/dev/null)" ]] && check_status="1" ;;
+            dpkg)   [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] && check_status="1" ;;
             docker) [[ -n "$(docker ps -q -f name=${package} 2>/dev/null)" ]] && check_status="1" ;;
             which)  [[ -n "$(which "${package}" 2>/dev/null)" ]] && check_status="1" ;;
             *)      check_status="0" ;;
