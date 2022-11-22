@@ -53,7 +53,7 @@ tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
 tmp_aml_image="${tmp_dir}/tmp_aml_image"
 arch_info="$(arch)"
-host_release="$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)"
+host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
 # Get armbian ${VERSION_CODENAME}: such as [ jammy ]
 os_release_file="etc/os-release"
 # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
