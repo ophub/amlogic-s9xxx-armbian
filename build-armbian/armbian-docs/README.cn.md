@@ -9,8 +9,8 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 - [Armbian 构建及使用方法](#armbian-构建及使用方法)
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
-  - [2. 设置隐私变量 GITHUB_TOKEN](#2-设置隐私变量-github_token)
-  - [3. Fork 仓库并设置 GH_TOKEN](#3-fork-仓库并设置-gh_token)
+  - [2. 设置隐私变量 GITHUB\_TOKEN](#2-设置隐私变量-github_token)
+  - [3. Fork 仓库并设置 GH\_TOKEN](#3-fork-仓库并设置-gh_token)
   - [4. 个性化 Armbian 固件定制文件说明](#4-个性化-armbian-固件定制文件说明)
   - [5. 编译固件](#5-编译固件)
     - [5.1 手动编译](#51-手动编译)
@@ -53,6 +53,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.11.2 制作 acs.bin 文件](#12112-制作-acsbin-文件)
       - [12.11.3 制作 u-boot 文件](#12113-制作-u-boot-文件)
     - [12.12 内存大小识别错误](#1212-内存大小识别错误)
+    - [12.13 如何反编译 dtb 文件](#1213-如何反编译-dtb-文件)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -613,3 +614,17 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 
 除了想尝试解决内存的问题外，不要手动复制 u-boot 文件，添加不正确会导致无法启动以及出现各种问题。
 
+### 12.13 如何反编译 dtb 文件
+
+有些新设备不在目前的支持列表（或有变异体），可以通过反编译，调整相关参数进行尝试。
+
+```shell
+# 安装依赖
+sudo apt install device-tree-compiler
+
+# 1. 反编译命令（使用 dtb 文件生成 dts 源码）
+dtc -I dtb -O dts -o xxxxx.dts xxxxxx.dtb
+
+# 2. 编译命令（使用 dts 编译生成 dtb 文件）
+dtc -I dts -O dtb -o xxxxxxx .dtb xxxxxxxx.dts
+```

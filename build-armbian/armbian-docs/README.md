@@ -9,8 +9,8 @@ View Chinese description  |  [查看中文说明](README.cn.md)
 - [How to build and use Armbian](#how-to-build-and-use-armbian)
 - [Tutorial directory](#tutorial-directory)
   - [1. Register your own GitHub account](#1-register-your-own-github-account)
-  - [2. Set the privacy variable GitHub_TOKEN](#2-set-the-privacy-variable-github_token)
-  - [3. Fork repository and set GH_TOKEN](#3-fork-repository-and-set-gh_token)
+  - [2. Set the privacy variable GitHub\_TOKEN](#2-set-the-privacy-variable-github_token)
+  - [3. Fork repository and set GH\_TOKEN](#3-fork-repository-and-set-gh_token)
   - [4. Personalized Armbian firmware customization file description](#4-personalized-armbian-firmware-customization-file-description)
   - [5. Compile the firmware](#5-compile-the-firmware)
     - [5.1 Manual compilation](#51-manual-compilation)
@@ -47,6 +47,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.11.2 Make the acs.bin file](#12112-make-the-acsbin-file)
       - [12.11.3 Make the u-boot file](#12113-make-the-u-boot-file)
     - [12.12 Memory size recognition error](#1212-memory-size-recognition-error)
+    - [12.13 How to decompile a dtb file](#1213-how-to-decompile-a-dtb-file)
 
 ## 1. Register your own GitHub account
 
@@ -548,3 +549,17 @@ If the memory size is incorrectly recognized (1-2G is not normal for 4G memory, 
 
 Don't copy the u-boot file manually, except to try to solve the memory problem, adding it incorrectly will result in failure to boot and various problems.
 
+### 12.13 How to decompile a dtb file
+
+Some new devices are not in the current support list (or have variants), you can try by decompiling and adjusting related parameters.
+
+```shell
+# Install dependencies
+sudo apt install device-tree-compiler
+
+# 1. Decompile command (use dtb file to generate dts source code)
+dtc -I dtb -O dts -o xxxxx.dts xxxxxx.dtb
+
+# 2. Compile command (use dts to compile to generate dtb file)
+dtc -I dts -O dtb -o xxxxxxx .dtb xxxxxxxx.dts
+```
