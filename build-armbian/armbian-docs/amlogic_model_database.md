@@ -28,13 +28,14 @@ The list of devices supported by Amlogic TV Boxes, the configuration file in the
 <tr><td>203</td><td>H96 Pro Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,2GB Mem,1Gb Nic</td></tr>
 <tr><td>204</td><td>Tanix-TX92</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR4 32GB eMMC,1.5GHz,5G WIFI,1Gb Nic</td></tr>
 <tr><td>205</td><td>VORKE-Z6-Plus</td><td>s912</td><td>meson-gxm-octopus-planet.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>3GB DDR3 32GB eMMC5.0,1.5Ghz,TF CARD Support 1~32GB,1Gb Nic</td></tr>
-<tr><td>206</td><td>MECOOL-M8S-Pro-L/Phicomm-T1</td><td>s912</td><td>meson-gxm-q201.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>2G RAM,3G RAM,16G ROM,32G ROM,100Mb Nic</td></tr>
+<tr><td>206</td><td>MECOOL-M8S-Pro-L</td><td>s912</td><td>meson-gxm-q201.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>2G RAM,3G RAM,16G ROM,32G ROM,100Mb Nic</td></tr>
 <tr><td>207</td><td>T95Z Plus</td><td>s912</td><td>meson-gxm-t95z-plus.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>3G+32G,Octa-Core,2.4/5.8G Dual-Band WiFi,1Gb Nic 64Bit BT4.0(Use: extlinux/extlinux.conf)</td></tr>
 <tr><td>208</td><td>TX9 Pro</td><td>s912</td><td>meson-gxm-tx9-pro.dtb</td><td>u-boot-zyxq.bin</td><td>NA</td><td>NA</td><td>4C@1512Mhz+4C@1000Mhz,3G RAM,32G ROM,Bluetooth 4.1,1Gb Nic,brcm43455 wifi</td></tr>
 <tr><td>209</td><td>Nexbox A1 & A95X</td><td>s912</td><td>meson-gxm-nexbox-a1.dtb</td><td>u-boot-p212.bin</td><td>NA</td><td>NA</td><td>2G DDR3 RAM 16G eMMC,1Gb Nic,qca9377 wifi(no work)</td></tr>
 <tr><td>210</td><td>Nexbox A95X A2</td><td>s912</td><td>meson-gxm-nexbox-a2.dtb</td><td>u-boot-p212.bin</td><td>NA</td><td>NA</td><td>2GB RAM,16GB ROM,2.4G/5.0G WiFi,qca9377 WLAN/Bluetooth 4.0,1Gb Nic</td></tr>
 <tr><td>211</td><td>Tanix TX8 MAX</td><td>s912</td><td>meson-gxm-tx8-max.dtb</td><td>u-boot-p212.bin</td><td>NA</td><td>NA</td><td>3GB RAM,16GB/32GB eMMC,2.4G/5.0G WiFi,qca9377 WLAN/Bluetooth 4.1,1Gb Nic</td></tr>
 <tr><td>212</td><td>Vontar X92</td><td>s912</td><td>meson-gxm-x92.dtb</td><td>u-boot-p212.bin</td><td>NA</td><td>NA</td><td>3GB RAM,16GB/32GB eMMC,2.4G/5.0G WiFi,AP6255 WLAN/Bluetooth 4.0,1Gb Nic</td></tr>
+<tr><td>213</td><td>Phicomm-T1</td><td>s912</td><td>meson-gxm-phicomm-t1.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>2G RAM,16G ROM,1Gb Nic,Wifi,Bluetooth</td></tr>
 
 <tr><td>301</td><td>X96 Max 4GB</td><td>s905x2</td><td>meson-g12a-x96-max.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,4GB Mem,1Gb Nic</td></tr>
 <tr><td>302</td><td>X96 Max 2GB</td><td>s905x2</td><td>meson-g12a-x96-max-rmii.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,2GB Mem,100Mb Nic</td></tr>
