@@ -535,6 +535,7 @@ refactor_files() {
     echo "ROOTFS_TYPE='${ROOTFS_TYPE}'" >>${ophub_release_file} 2>/dev/null
     echo "BOOT_CONF='uEnv.txt'" >>${ophub_release_file} 2>/dev/null
     echo "DISK_TYPE='usb'" >>${ophub_release_file} 2>/dev/null
+    echo "UBOOT_STATUS='no'" >>${ophub_release_file} 2>/dev/null
     echo "AMPART_STATUS='no'" >>${ophub_release_file} 2>/dev/null
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file} 2>/dev/null
 

@@ -518,6 +518,7 @@ EOF
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^UBOOT_STATUS=.*|UBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_release_file} 2>/dev/null
 
     # Set interfaces macaddr
