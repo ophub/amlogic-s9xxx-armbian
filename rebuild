@@ -571,7 +571,7 @@ refactor_files() {
     custom_startup_script="etc/custom_service/start_service.sh"
     [[ -f "${custom_startup_script}" && -f "etc/rc.local" ]] && {
         chmod +x ${custom_startup_script}
-        sed -i '/exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local 2>/dev/null
+        sed -i '/^exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local 2>/dev/null
     }
 
     # Add custom disabled alias extension load modules
