@@ -564,7 +564,7 @@ refactor_files() {
 
     # Add network performance optimization
     [[ -f "usr/sbin/balethirq.pl" && -f "etc/balance_irq" && -f "etc/rc.local" ]] && {
-        sed -i '/exit 0/i\perl /usr/sbin/balethirq.pl' etc/rc.local 2>/dev/null
+        sed -i '/^exit 0/i\perl /usr/sbin/balethirq.pl' etc/rc.local 2>/dev/null
     }
 
     # Add custom startup script
