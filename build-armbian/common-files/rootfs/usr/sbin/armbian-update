@@ -116,7 +116,7 @@ init_var() {
             ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                [[ -n "$(echo "${kernel_dir[@]}" | grep -w "^${2}$")" ]] && version_branch="${2}"
+                [[ -n "$(echo "${kernel_dir[@]}" | tr " " "\n" | grep -w "^${2}$")" ]] && version_branch="${2}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
