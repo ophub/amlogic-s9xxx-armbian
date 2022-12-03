@@ -35,7 +35,9 @@
 
 - ### 安装 Armbian 到 EMMC
 
-登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+1. `Rockchip` 平台的安装方法请查看说明文档中的 [8.2章节](build-armbian/documents/README.cn.md)。
+
+2. `Amlogic` 平台，登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
 ```yaml
 armbian-install
@@ -62,7 +64,7 @@ armbian-update
 | 可选参数  | 默认值       | 选项        | 说明               |
 | -------  | -------     | ------     | ----------------  |
 | -k       | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
-| -v       | stable      | stable/dev | 指定内核版本分支     |
+| -v       | stable      | stable/rk3588/dev | 指定内核版本分支     |
 | -m       | no          | yes/no     | 使用主线 u-boot     |
 
 举例: `armbian-update -k 5.15.50 -v dev -m yes`

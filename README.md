@@ -35,7 +35,9 @@ Choose the corresponding firmware according to your box. Then write the IMG file
 
 - ### Install Armbian to EMMC
 
-Login in to armbian (default user: root, default password: 1234) → input command:
+1. For the installation method of the `Rockchip` platform, please refer to [Chapter 8.2](build-armbian/documents) in the documentation。
+
+2. `Amlogic` platform，Login in to armbian (default user: root, default password: 1234) → input command:
 
 ```yaml
 armbian-install
@@ -62,7 +64,7 @@ armbian-update
 | Optional  | Default     | Value       | Description                   |
 | -------   | -------     | ----------  | ---------------------------   |
 | -k        | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
-| -v        | stable      | stable/dev  | Set the kernel version branch |
+| -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
 | -m        | no          | yes/no      | Use Mainline u-boot           |
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
