@@ -346,6 +346,15 @@ confirm_version() {
 
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
 
+    # Confirm UUID
+    BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
+    [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+    #
+    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
+    [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+
     if [[ "${PLATFORM}" == "amlogic" ]]; then
         # Set up the welcome board
         bd_name="Aml ${SOC}"
@@ -358,12 +367,10 @@ confirm_version() {
         bootloader_dir="${uboot_path}/amlogic/bootloader"
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
-            uenv_rootflags="compress=zstd:6"
-            uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=${uenv_rootflags} rootfstype=btrfs"
+            uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
             fstab_string="defaults,noatime,compress=zstd:6"
         else
-            uenv_rootflags="data=writeback"
-            uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=${uenv_rootflags} rw rootfstype=ext4"
+            uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
             fstab_string="defaults,noatime,errors=remount-ro"
         fi
     else
@@ -427,15 +434,6 @@ extract_armbian() {
 make_image() {
     process_msg " (2/6) Make new armbian image."
     cd ${make_path}
-
-    # Confirm UUID
-    BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
-    [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
-    #
-    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
-    [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
 
     # Make Amlogic s9xxx armbian
     build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
