@@ -1,6 +1,6 @@
-name: "Rebuild armbian and kernel for Amlogic s9xxx tv box"
+name: "Rebuild armbian and kernel"
 author: "https://github.com/ophub"
-description: "Support Amlogic s9xxx tv box are s922x, s905x3, s905x2, s912, s905d, s905x, s905w, s905, etc."
+description: "Support Amlogic and Rockchip boxes, etc."
 inputs:
   # Choose build target
   build_target:

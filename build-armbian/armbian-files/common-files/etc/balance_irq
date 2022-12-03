@@ -1,0 +1,10 @@
+eth0	4
+xhci-hcd:usb1	3
+xhci-hcd:usb2	3
+xhci-hcd:usb3	3
+xhci-hcd:usb4	3
+xhci-hcd:usb5	3
+xhci-hcd:usb6	3
+xhci-hcd:usb7	3
+xhci-hcd:usb8	3
+xhci-hcd:usb9	3
