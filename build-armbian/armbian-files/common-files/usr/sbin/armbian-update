@@ -311,10 +311,8 @@ update_kernel() {
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file} 2>/dev/null
     sed -i "s|^KERNEL_BRANCH=.*|KERNEL_BRANCH='${KERNEL_BRANCH}'|g" ${ophub_release_file} 2>/dev/null
-    [[ "${PLATFORM}" == "amlogic" ]] && {
-        sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
-        sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_release_file} 2>/dev/null
-    }
+    [[ "${auto_mainline_uboot}" == "yes" ]] && sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file} 2>/dev/null
+    [[ "${PLATFORM}" == "amlogic" ]] && sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums 2>/dev/null
