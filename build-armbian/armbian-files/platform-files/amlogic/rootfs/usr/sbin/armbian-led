@@ -31,7 +31,7 @@
 openvfd_path="/usr/share/openvfd"
 openvfd_service="${openvfd_path}/vfdservice"
 # The openvfd files download repository
-openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/common-files/rootfs${openvfd_path}"
+openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files/platform-files/amlogic/rootfs${openvfd_path}"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
