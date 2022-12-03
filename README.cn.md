@@ -1,4 +1,4 @@
-# Armbian for Amlogic TV Boxes / 晶晨·岸边
+# Armbian for Amlogic and Rockchip
 
 查看英文说明 | [View English description](README.md)
 
