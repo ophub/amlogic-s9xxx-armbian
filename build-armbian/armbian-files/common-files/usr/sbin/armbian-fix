@@ -54,19 +54,32 @@ sudo dbus-uuidgen --ensure && echo "21. Generate /var/lib/dbus/machine-id"
 # Turn off automatic hibernation to prevent hard drives from hanging
 sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "22. Turn off automatic sleep mode"
 
+# Fix version differences(After 2022.12.03)
+[[ -f "/etc/amlogic_model_database.conf" ]] && mv -f /etc/amlogic_model_database.conf /etc/model_database.conf && echo "23. Adjust the model_database.conf file name"
+[[ -f "/etc/rockchip_model_database.conf" ]] && mv -f /etc/rockchip_model_database.conf /etc/model_database.conf && echo "24. Adjust the model_database.conf file name"
+
 # Confirm device information
 [[ -f "${ophub_release_file}" ]] && {
+    # Get welcome banner value
     platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2)"
-    soc_name="Aml $(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+    soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
     model_name="$(cat ${ophub_release_file} | grep -E "^MODEL_NAME=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+
+    # Adjust parameter name(After 2022.12.03)
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && sed -i "s|ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file} && echo "25. Adjust the ANDROID_UBOOT name"
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && sed -i "s|UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file} && echo "26. Adjust the UBOOT_STATUS name"
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BRANCH=")" ]] || {
+        [[ "${soc_name,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
+        echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file} && echo "27. Add the KERNEL_BRANCH name"
+    }
 }
 
 # Fix custom banner name
-[[ "${platform_name}" == "amlogic" ]] && bd_name="${soc_name}"
+[[ "${platform_name}" == "amlogic" ]] && bd_name="Aml ${soc_name}"
 [[ "${platform_name}" == "rockchip" ]] && bd_name="${model_name}"
-[[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file} && echo "23. Fix custom board name: ${bd_name}"
+[[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file} && echo "28. Fix custom board name: ${bd_name}"
 
 # Disable ttyFIQ0 (ttyS2)
-[[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "24. Disable ttyFIQ0 (ttyS2)"
+[[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "29. Disable ttyFIQ0 (ttyS2)"
 
 sync && echo "armbian-fix: Loading finished."
