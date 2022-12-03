@@ -57,7 +57,15 @@ check_release() {
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
-    [[ -n "${PLATFORM}" ]] || error_msg "${ophub_release_file} value is missing!"
+    FDTFILE="${FDTFILE}"
+
+    # Early devices did not add platform parameters, auto-completion
+    [[ -z "${PLATFORM}" && -n "${FDTFILE}" ]] && {
+        [[ ${FDTFILE:0:5} == "meson" ]] && PLATFORM="amlogic" || PLATFORM="rockchip"
+        echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
+    }
+
+    echo -e "${INFO} Armbian PLATFORM: [ ${PLATFORM} ]"
 }
 
 # Check dependencies
