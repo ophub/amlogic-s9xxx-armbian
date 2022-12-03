@@ -1,0 +1,179 @@
+#!/bin/bash
+#===========================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: Install docker to armbian
+# Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function         : Command
+# Install docker   : armbain-docker
+# Update  docker   : armbain-docker update
+# Remove  docker   : armbain-docker remove
+#
+#========================= Set default parameters ==========================
+#
+# Get custom firmware information
+ophub_release_file="/etc/ophub-release"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#===========================================================================
+
+# Encountered a serious error, abort the script execution
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Check release info
+check_release() {
+    source "${ophub_release_file}"
+    VERSION_CODEID="${VERSION_CODEID}"     # ubuntu       -  debian
+    VERSION_CODENAME="${VERSION_CODENAME}" # jammy/focal  -  bullseye
+    if [[ -z "${VERSION_CODEID}" ]]; then
+        echo -ne "${OPTIONS} Please Input VERSION_CODEID Name [ubuntu/debian]: "
+        read VERSION_CODEID
+        VERSION_CODEID="${VERSION_CODEID}"
+    fi
+    if [[ -z "${VERSION_CODENAME}" ]]; then
+        echo -ne "${OPTIONS} Please Input VERSION_CODENAME Name [jammy/focal/bullseye]: "
+        read VERSION_CODENAME
+        VERSION_CODENAME="${VERSION_CODENAME}"
+    fi
+    echo -e "${INFO} VERSION_CODEID: [ ${VERSION_CODEID} ]"
+    echo -e "${INFO} VERSION_CODENAME: [ ${VERSION_CODENAME} ]"
+}
+
+# Add select docker install source by janko888 20220927
+select_source() {
+    echo -e "${STEPS} Start selecting docker source..."
+    cat <<EOF
+-----------------------------------------------
+ID  SOURCE
+-----------------------------------------------
+1   docker.com (default)
+2   aliyun.com
+3   ustc.edu.cn
+-----------------------------------------------
+EOF
+    echo -ne "${OPTIONS} Please Input ID: "
+    read source_id
+    DOCKER_SOURCE="https://download.docker.com/linux"
+    if [[ "${source_id}" -eq "2" ]]; then
+        DOCKER_SOURCE="https://mirrors.aliyun.com/docker-ce/linux"
+    elif [[ "${source_id}" -eq "3" ]]; then
+        DOCKER_SOURCE="https://mirrors.ustc.edu.cn/docker-ce/linux"
+    fi
+}
+
+# Install docker environment
+docker_install() {
+    echo -e "${STEPS} Initialize the docker installation environment..."
+
+    # Check release info
+    check_release
+    select_source
+
+    # Install the docker package
+    sudo apt-get update
+    sudo apt-get remove -y docker docker-engine docker.io containerd runc
+    sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+    # Install GPG certificate
+    rm -f /usr/share/keyrings/docker-archive-keyring.gpg
+    # sudo curl -fsSL https://download.docker.com/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    sudo curl -fsSL ${DOCKER_SOURCE}/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+    # Add software source information
+    rm -f /etc/apt/sources.list.d/docker.list
+    # echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] ${DOCKER_SOURCE}/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+
+    echo -e "${STEPS} Install docker related packages..."
+    sudo apt-get update
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+
+    echo -e "${STEPS} Install docker accelerator..."
+    [[ -d "/etc/docker" ]] || mkdir -p /etc/docker
+    sudo cat >/etc/docker/daemon.json <<EOF
+{
+  "bip": "172.31.0.1/24",
+  "data-root": "/var/lib/docker/",
+  "log-level": "warn",
+  "log-driver": "json-file",
+  "log-opts": {
+     "max-size": "10m",
+     "max-file": "5"
+   },
+  "registry-mirrors": [
+     "https://mirror.baidubce.com/",
+     "https://hub-mirror.c.163.com"
+   ]
+}
+EOF
+    sync
+    sudo systemctl daemon-reload
+    sudo systemctl restart docker
+
+    # Set up ordinary users to run docker directly
+    sudo usermod -a -G docker $USER 2>/dev/null
+
+    sync && sleep 3
+    echo -e "${SUCCESS} Docker installed successfully."
+}
+
+# Update docker
+docker_update() {
+    echo -e "${STEPS} Start updating docker packages..."
+
+    # Update the docker package
+    sudo apt-get update
+    sudo apt-get upgrade -y
+    sudo apt-get dist-upgrade -y
+    sudo apt-get --purge autoremove -y
+    sudo apt-get autoclean -y
+
+    echo -e "${SUCCESS} Docker update successfully."
+    exit 0
+}
+
+# Remove docker
+docker_remove() {
+    echo -e "${STEPS} Start removing docker..."
+
+    # Remove the docker package
+    sudo apt-get update
+    sudo apt-get remove --purge -y docker-ce docker-ce-cli containerd.io docker-compose* docker-ce-*
+    sudo apt-get --purge autoremove -y
+    sudo apt-get autoclean -y
+    #
+    sudo rm -rf /etc/docker 2>/dev/null
+    sudo rm -rf /var/lib/docker 2>/dev/null
+    sudo rm -rf /var/run/docker.sock 2>/dev/null
+
+    echo -e "${SUCCESS} Docker removed successfully."
+    exit 0
+}
+
+echo -e "${INFO} Welcome to the docker management tool."
+# Check script permission
+[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+
+# Execute script assist functions
+case "${1}" in
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *)      docker_install ;;
+esac
