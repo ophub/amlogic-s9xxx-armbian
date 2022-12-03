@@ -1,0 +1,119 @@
+#!/bin/bash
+#===========================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Backup and restore the system in emmc
+# Copyright (C) 2017- The function borrowed from ddbr, Author: xXx
+# Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-ddbr
+#
+#========================= Set default parameters ==========================
+#
+# Check the output path
+out_path="/ddbr"
+# File name for backup/restore
+ddbr_image="BACKUP-arm-64-emmc.img.gz"
+# Need remaining space, unit: GB
+need_space="2"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#===========================================================================
+
+# Encountered a serious error, abort the script execution
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Check emmc
+do_checkemmc() {
+    # Get device name
+    mydevice_name="$(cat /proc/device-tree/model | tr -d '\000')"
+    echo -e "${INFO} The device name: [ ${mydevice_name} ]"
+
+    # Find the EMMC drive
+    emmc="$(lsblk -l -o NAME | grep -oE "mmcblk[0-9]boot0" | sort | uniq | sed "s/boot0//g")"
+    if [[ -z "${emmc}" ]]; then
+        error_msg "No emmc can be found to install the openwrt system!"
+    fi
+    echo -e "${INFO} The device EMMC name: [ /dev/${emmc} ]"
+
+    # Find the partition where root is located
+    root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
+    if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
+        error_msg "You are running in emmc mode, please boot system with TF/SD/USB!"
+    fi
+
+    # Check emmc partition size
+    dev_intsize="$(fdisk -s /dev/${emmc})"
+    [[ -z "$(echo "${dev_intsize}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to get EMMC size."
+    echo -e "${INFO} The device EMMC size: [ $(($dev_intsize / 1024 / 1024))GB ]"
+
+    # check directory
+    [[ -d "${out_path}" ]] || mkdir -p ${out_path}
+    echo -e "${INFO} The ddbr file path: [ ${out_path}/${ddbr_image} ]\n"
+}
+
+# Check the remaining space
+do_checkspace() {
+    # Check the remaining space capacity
+    remaining_space="$(df -hT ${out_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
+    if [[ -z "$(echo "${remaining_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
+        error_msg "The path is not available, the remaining space cannot be obtained."
+    fi
+    # Check if there is enough free space
+    if [[ "${remaining_space}" -lt "${need_space}" ]]; then
+        error_msg "The remaining space is [ ${remaining_space} ] Gb, and more than [ ${need_space} ] Gb space is required."
+    fi
+}
+
+# Backup the emmc system
+do_backup() {
+    echo -e "${STEPS} Start to backup the system in emmc."
+    do_checkspace
+    echo -e "${INFO} Saving and Compressing [ /dev/${emmc} ] to [ ${out_path}/${ddbr_image} ], Please wait..."
+    rm -f ${out_path}/${ddbr_image} 2>/dev/null && sync
+    dd if=/dev/${emmc} | pv -s ${dev_intsize}"K" | gzip >${out_path}/${ddbr_image}
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Backup is complete."
+    sync && sleep 3
+    exit 0
+}
+
+# Restore the emmc system
+do_restore() {
+    echo -e "${STEPS} Start to restore the system in emmc."
+    [[ ! -f "${out_path}/${ddbr_image}" ]] && error_msg "The [ ${out_path}/${ddbr_image} ] File not found."
+    echo -e "${INFO} Restoring [ ${out_path}/${ddbr_image} ] to [ /dev/${emmc} ], Please wait..."
+    gunzip -c ${out_path}/${ddbr_image} | pv -s ${dev_intsize}"K" | dd of=/dev/${emmc}
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Restore is complete."
+    sync && sleep 3
+    exit 0
+}
+
+echo -e "${STEPS} Welcome to use the EMMC system backup/restore service."
+# Check script permission
+[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+# Check emmc
+do_checkemmc
+# Prompt the user to select Backup/Restore
+echo -ne "${OPTIONS} Do you want to Backup=(b) or Restore=(r) eMMC system? (b/r): "
+read br
+case "${br}" in
+    b | B | backup)  do_backup ;;
+    r | R | restore) do_restore ;;
+    *)               exit 0 ;;
+esac

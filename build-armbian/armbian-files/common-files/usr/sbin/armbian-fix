@@ -1,0 +1,72 @@
+#!/bin/bash
+#======================================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Dependent script: /usr/lib/armbian/armbian-firstrun
+# Function: Fix permissions and related settings(Executed at system initialization)
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-fix
+#
+#=============================== Set default parameters ===============================
+#
+# Set the armbian release check file
+armbian_release_file="/etc/armbian-release"
+# Set the ophub release check file
+ophub_release_file="/etc/ophub-release"
+#
+#======================================================================================
+
+# Fix common releases permissions
+[[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
+[[ -d "/etc/update-motd.d" ]] && sudo chmod 755 /etc/update-motd.d/* && echo "02. Fix update-motd.d permissions"
+[[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R && echo "03. Fix man permissions"
+[[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R && echo "04. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers && echo "05. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && sudo chmod 440 /etc/sudoers && echo "06. Fix man permissions"
+[[ -f "/usr/bin/sudo" ]] && sudo chown root:root /usr/bin/sudo && echo "07. Fix sudo permissions"
+[[ -f "/usr/bin/sudo" ]] && sudo chmod 4755 /usr/bin/sudo && echo "08. Fix sudo permissions"
+# Fix focal permissions
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chown 0 /usr/lib/sudo/sudoers.so && echo "09. Fix sudoers.so permissions"
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chmod 644 /usr/lib/sudo/sudoers.so && echo "10. Fix sudoers.so permissions"
+[[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 && echo "11. Fix polkit-agent-helper-1 permissions"
+# Fix jammy permissions
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "12. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "13. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "14. Fix polkit-agent-helper-1 permissions"
+# Remove packages
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && echo "15. Remove linux-image-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && echo "16. Remove linux-dtb-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "17. Remove linux-u-boot-*"
+sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "18. Clean up local installation packages"
+
+# Regenerate new machine-id
+sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "19. Delete machine-id"
+sudo dbus-uuidgen --ensure=/etc/machine-id && echo "20. Generate /etc/machine-id"
+sudo dbus-uuidgen --ensure && echo "21. Generate /var/lib/dbus/machine-id"
+
+# Turn off automatic hibernation to prevent hard drives from hanging
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "22. Turn off automatic sleep mode"
+
+# Confirm device information
+[[ -f "${ophub_release_file}" ]] && {
+    platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2)"
+    soc_name="Aml $(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+    model_name="$(cat ${ophub_release_file} | grep -E "^MODEL_NAME=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+}
+
+# Fix custom banner name
+[[ "${platform_name}" == "amlogic" ]] && bd_name="${soc_name}"
+[[ "${platform_name}" == "rockchip" ]] && bd_name="${model_name}"
+[[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file} && echo "23. Fix custom board name: ${bd_name}"
+
+# Disable ttyFIQ0 (ttyS2)
+[[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "24. Disable ttyFIQ0 (ttyS2)"
+
+sync && echo "armbian-fix: Loading finished."
