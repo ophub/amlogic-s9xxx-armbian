@@ -1,0 +1,125 @@
+#!/bin/bash
+#==========================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Synchronize all service scripts
+# Copyright (C) 2022- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2022- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-sync
+#
+#============================= Functions list =============================
+#
+# error_msg       : Output error message
+# check_release   : Check the config file
+# check_depends   : Check dependencies
+# sync_config     : Synchronize all service scripts
+#
+#==========================================================================
+#
+# Armbian firmware config info record file
+ophub_release_file="/etc/ophub-release"
+# The openvfd files download repository
+github_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files"
+# Operation instruction and service storage path
+sbin_path="/usr/sbin"
+# Software service storage path
+share_path="/usr/share/ophub"
+# Openvfd service storage path
+openvfd_path="/usr/share/openvfd"
+#
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#==========================================================================
+
+# Show error message
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Check the config file
+check_release() {
+    # Check release file
+    [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
+
+    # Get values
+    source "${ophub_release_file}"
+    PLATFORM="${PLATFORM}"
+    [[ -n "${PLATFORM}" ]] || error_msg "${ophub_release_file} value is missing!"
+}
+
+# Check dependencies
+check_depends() {
+    # Check the necessary dependencies for apt install
+    is_dpkg="0"
+    dpkg_packages=("subversion" "tar" "coreutils")
+    i="1"
+    for package in ${dpkg_packages[*]}; do
+        [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_dpkg="1"
+        let i++
+    done
+    # Install missing packages
+    if [[ "${is_dpkg}" -eq "1" ]]; then
+        echo -e "${STEPS} Start installing the necessary dependencies..."
+        sudo apt-get update
+        sudo apt-get install -y ${dpkg_packages[*]}
+    fi
+}
+
+# Synchronize all service scripts
+sync_config() {
+    echo -e "${STEPS} Start syncing all service scripts..."
+
+    # Convert script repository address to svn format
+    if [[ "${github_repo}" == http* && -n "$(echo ${github_repo} | grep "tree/main")" ]]; then
+        github_repo="${github_repo//tree\/main/trunk}"
+    fi
+
+    # Update operation instruction and service related files
+    echo -e "${STEPS} Start syncing operation instruction and service script..."
+    [[ -d "${sbin_path}" ]] || mkdir -p ${sbin_path}
+    svn export ${github_repo}/common-files${sbin_path} ${sbin_path} --force
+    chmod +x ${sbin_path}/armbian-*
+
+    # Update software service related files
+    echo -e "${STEPS} Start syncing software service script..."
+    [[ -d "${share_path}" ]] || mkdir -p ${share_path}
+    svn export ${github_repo}/common-files${share_path} ${share_path} --force
+    find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
+
+    [[ "${PLATFORM}" == "amlogic" ]] && {
+        # Update operation instruction and service related files
+        echo -e "${STEPS} Start syncing Amlogic platform specific scripts..."
+        svn export ${github_repo}/platform-files/amlogic/rootfs${sbin_path} ${sbin_path} --force
+        chmod +x ${sbin_path}/armbian-*
+
+        # Update openvfd related files
+        echo -e "${STEPS} Start syncing Amlogic platform openvfd service script..."
+        [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
+        svn export ${github_repo}/platform-files/amlogic/rootfs${openvfd_path} ${openvfd_path} --force
+        chmod +x ${openvfd_path}/vfdservice
+    }
+
+    sync && sleep 3
+    echo -e "${SUCCESS} All service scripts are synchronized successfully."
+    exit 0
+}
+
+# Check the config file
+check_release
+# Check dependencies
+check_depends
+# Synchronize all service scripts
+sync_config
