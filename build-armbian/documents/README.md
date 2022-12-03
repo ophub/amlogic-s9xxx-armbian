@@ -1,0 +1,565 @@
+# How to build and use Armbian
+
+View Chinese description  |  [查看中文说明](README.cn.md)
+
+`GitHub Actions` is a service launched by `Microsoft`. It provides a virtual server environment with very good performance configuration. Based on it, projects can be built, tested, packaged, and deployed. The public repository can be used for free without time limit, and the single compilation time is up to `6 hours`, which is enough for compiling  `Armbian` (we can usually complete a compilation in about `3 hours`). Sharing is only for the exchange of experience. Please understand the deficiencies. Please do not initiate various bad attacks on the Internet, and do not maliciously use it.
+
+# Tutorial directory
+
+- [How to build and use Armbian](#how-to-build-and-use-armbian)
+- [Tutorial directory](#tutorial-directory)
+  - [1. Register your own GitHub account](#1-register-your-own-github-account)
+  - [2. Set the privacy variable GitHub\_TOKEN](#2-set-the-privacy-variable-github_token)
+  - [3. Fork repository and set GH\_TOKEN](#3-fork-repository-and-set-gh_token)
+  - [4. Personalized Armbian firmware customization file description](#4-personalized-armbian-firmware-customization-file-description)
+  - [5. Compile the firmware](#5-compile-the-firmware)
+    - [5.1 Manual compilation](#51-manual-compilation)
+    - [5.2 Compile at the agreed time](#52-compile-at-the-agreed-time)
+    - [5.3 Customize the default firmware configuration](#53-customize-the-default-firmware-configuration)
+  - [6. Save the firmware](#6-save-the-firmware)
+  - [7. Download the firmware](#7-download-the-firmware)
+  - [8. Install Armbian to EMMC](#8-install-armbian-to-emmc)
+  - [9. Compile the Armbian kernel](#9-compile-the-armbian-kernel)
+  - [10. Update Armbian Kernel](#10-update-armbian-kernel)
+  - [11. Install common software](#11-install-common-software)
+  - [12. common problem](#12-common-problem)
+    - [12.1 dtb and u-boot correspondence table for each box](#121-dtb-and-u-boot-correspondence-table-for-each-box)
+    - [12.2 LED screen display control instructions](#122-led-screen-display-control-instructions)
+    - [12.3 How to restore the original Android TV system](#123-how-to-restore-the-original-android-tv-system)
+      - [12.3.1 Restoring using armbian-ddbr backup](#1231-restoring-using-armbian-ddbr-backup)
+      - [12.3.2 Restoring with Amlogic usb burning tool](#1232-restoring-with-amlogic-usb-burning-tool)
+    - [12.4 Set the box to boot from USB/TF/SD](#124-set-the-box-to-boot-from-usbtfsd)
+    - [12.5 Disable infrared receiver](#125-disable-infrared-receiver)
+    - [12.6 Selection of bootstrap file](#126-selection-of-bootstrap-file)
+    - [12.7 Network settings](#127-network-settings)
+      - [12.7.1 Dynamic IP address assignment by DHCP](#1271-dynamic-ip-address-assignment-by-dhcp)
+      - [12.7.2 Manually set a static IP address](#1272-manually-set-a-static-ip-address)
+      - [12.7.3 Use OpenWrt in docker to establish interworking network](#1273-use-openwrt-in-docker-to-establish-interworking-network)
+    - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
+    - [12.9 How to update service scripts in the system](#129-how-to-update-service-scripts-in-the-system)
+    - [12.10 How to make an android system partition table](#1210-how-to-make-an-android-system-partition-table)
+      - [12.10.1 Install the adb toolkit](#12101-install-the-adb-toolkit)
+      - [12.10.2 Check the Android partition](#12102-check-the-android-partition)
+      - [12.10.3 Make Android System Partition Table](#12103-make-android-system-partition-table)
+      - [12.10.4 Using the android system partition table](#12104-using-the-android-system-partition-table)
+    - [12.11 How to make u-boot file](#1211-how-to-make-u-boot-file)
+      - [12.11.1 Extract the bootloader and dtb files](#12111-extract-the-bootloader-and-dtb-files)
+      - [12.11.2 Make the acs.bin file](#12112-make-the-acsbin-file)
+      - [12.11.3 Make the u-boot file](#12113-make-the-u-boot-file)
+    - [12.12 Memory size recognition error](#1212-memory-size-recognition-error)
+    - [12.13 How to decompile a dtb file](#1213-how-to-decompile-a-dtb-file)
+
+## 1. Register your own GitHub account
+
+Register your own account, so that you can continue to customize the firmware. Click the `Sign up` button in the upper right corner of the `github.com` website and follow the prompts to `register your account`.
+
+## 2. Set the privacy variable GitHub_TOKEN
+
+Set the GitHub privacy variable `GitHub_TOKEN`. After the firmware is compiled, we need to upload the firmware to `GitHub Releases`. We set this variable according to the official requirements of GitHub. The method is as follows:
+`Personal center`: `Settings` > `Developer settings` > `Personal access tokens` > `Generate new token` ( Name: `GitHub_TOKEN`, Select: `public_repo` ). `Other options` can be selected according to your needs. Submit and save, copy the `Encrypted KEY Value` generated by the system, and `save it` to your computer's notepad first. This value will be used in the next step. The icons are as follows:
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418474-85032b00-7a03-11eb-85a2-759b0320cc2a.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418479-8b91a280-7a03-11eb-8383-9d970f4fffb6.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418483-90565680-7a03-11eb-8320-0df1174b0267.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418493-9815fb00-7a03-11eb-862e-deca4a976374.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418485-93514700-7a03-11eb-848d-36de784a4438.jpg width="300" />
+</div>
+
+## 3. Fork repository and set GH_TOKEN
+
+Now you can `Fork` the `repository`, open the repository [https://github.com/ophub/amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), click the `Fork` button on the `upper right`, Will copy a copy of the repository code to your account, `wait a few seconds`, and prompt the Fork to complete Later, go to your account to access `amlogic-s9xxx-armbian` in `your repository`. In the upper right corner of `Settings` > `Secrets` > `Actions` > `New repostiory secret` (Name: `GH_TOKEN`, Value: `Fill in the value of GitHub_TOKEN` just now), `save it`. And select `Read and write permissions` under `Actions` > `General` > `Workflow permissions` in the left nav and save. The icons are as follows:
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163203032-f044c63f-d113-4076-bf94-41f86c7dd0ce.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/167579714-fdb331f3-5198-406f-b850-13da0024b245.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/167585338-841d3b05-8d98-4d73-ba72-475aad4a95a9.png width="300" />
+</div>
+
+## 4. Personalized Armbian firmware customization file description
+
+The firmware compilation process is controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. There are other `yml files` in the `workflows` directory to achieve other different functions. When compiling the firmware, the Armbian official current code is used for real-time compilation, and the relevant parameters can be found in the official documentation.
+
+```yaml
+- name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
+  id: compile
+  run: |
+    cd build/
+    sudo chmod +x compile.sh
+    sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
+                      BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
+                      CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+    echo "status=success" >> ${GITHUB_OUTPUT}
+```
+
+## 5. Compile the firmware
+
+There are many ways to compile firmware, you can set timed compilation, manual compilation, or set some specific events to trigger compilation. Let's start with simple operations.
+
+### 5.1 Manual compilation
+
+In the `navigation bar of your repository`, click the `Actions` button, and then click `Build armbian` > `Run workflow` > `Run workflow` to start the compilation, wait about `3 hours`, and complete the compilation after all the processes are over. The icons are as follows:
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/163203938-e7762b09-e6b8-4cf5-b1f1-9c67c1a29953.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204044-9c7a7429-47ee-4fce-b7dd-e217bebf6133.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204127-6b16b558-7e78-4c22-a28a-7b37b5a34fa3.png width="300" />
+</div>
+
+### 5.2 Compile at the agreed time
+
+In the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file, use `cron` to set the timing compilation. The 5 different positions represent min (0 - 59) / hour (0 - 23) / day of month (1 - 31) / month (1 - 12) / day of week (0 - 6)(Sunday - Saturday). Set the time by modifying the values of different positions. The system uses `UTC standard time` by default, please convert it according to the time zone of your country.
+
+```yaml
+schedule:
+  - cron: '0 17 * * *'
+```
+
+### 5.3 Customize the default firmware configuration
+
+The configuration information of the default firmware is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, the `BUILD` value of the firmware to be compiled is set to `yes`, and the corresponding `BOARD` name is added to the `build_armbian` array of the [rebuild](../../rebuild) script (the `BOARD` name in the array must be unique).
+
+It is specified by the `-b` parameter when compiling `locally`, and specified by the `armbian_board` parameter when compiling in `Actions` of github.com.
+
+In general, you only need to compile the general firmware. Other boxes in the same family can refer to the configuration file information table and use it by modifying the `dtb` value in `/boot/uEnv.txt`.
+
+## 6. Save the firmware
+
+The settings saved by the firmware are also controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. We will automatically upload the compiled firmware to the `Releases` officially provided by `GitHub` through scripts.
+
+```yaml
+- name: Upload Armbian Firmware to Release
+  uses: ncipollo/release-action@main
+  if: ${{ steps.build.outputs.status }} == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+  with:
+    tag: Armbian_${{ env.FILE_DATE }}
+    artifacts: ${{ env.FILEPATH }}/*
+    allowUpdates: true
+    token: ${{ secrets.GH_TOKEN }}
+    body: |
+      This is Armbian firmware for Amlogic s9xxx TV Boxes
+      * Firmware information
+      Default username: root
+      Default password: 1234
+```
+
+## 7. Download the firmware
+
+Enter from the GitHub `Releases` section at the bottom right corner of the `Repository homepage`, and select the firmware corresponding to the model of your `Amlogic s9xxx TV Boxes`. The icons are as follows:
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />
+<img src=https://user-images.githubusercontent.com/68696949/163204879-4898babf-fa00-4e63-89ea-235129e2ce1d.png width="300" />
+</div>
+
+## 8. Install Armbian to EMMC
+
+Login in to armbian (default user: root, default password: 1234) → input command:
+
+```yaml
+armbian-install
+```
+
+| Optional  | Default  | Value    | Description           |
+| --------- | -------  | -------- | --------------------  |
+| -m        | no       | yes/no   | Use Mainline u-boot   |
+| -a        | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
+| -l        | no       | yes/no   | List show all         |
+
+Example: `armbian-install -m yes -a no`
+
+## 9. Compile the Armbian kernel
+
+Supports compiling the kernel in Ubuntu20.04/22.04 or Armbian system. It supports local compilation and cloud compilation using GitHub Actions. For details, see [Kernel Compilation Instructions](../../compile-kernel).
+
+## 10. Update Armbian Kernel
+
+Login in to armbian → input command:
+
+```yaml
+# Run as root user (sudo -i)
+# If no other parameters are specified, the following update command will update to the latest version of the current kernel of the same series.
+armbian-update
+```
+
+| Optional  | Default     | Value       | Description                   |
+| -------   | -------     | ----------  | ---------------------------   |
+| -k        | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
+| -v        | stable      | stable/dev  | Set the kernel version branch |
+| -m        | no          | yes/no      | Use Mainline u-boot           |
+
+Example: `armbian-update -k 5.15.50 -v dev -m yes`
+
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
+
+## 11. Install common software
+
+Login in to armbian → input command:
+
+```yaml
+armbian-software
+```
+
+Use the `armbian-software -u` command to update the local software center list. According to the user's demand feedback in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrate commonly used [software](../armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall and other shortcut operations. Including `docker images`, `desktop software`, `application services`, etc. See more [Description](armbian_software.md).
+
+## 12. common problem
+
+In the use of Armbian, some common problems that may be encountered are summarized below.
+
+### 12.1 dtb and u-boot correspondence table for each box
+
+Please refer to [Description](amlogic_model_database.md)
+
+### 12.2 LED screen display control instructions
+
+Please refer to [Description](led_screen_display_control.md)
+
+### 12.3 How to restore the original Android TV system
+
+Usually use armbian-ddbr backup to restore, or use Amlogic usb burning tool to restore the original Android TV system.
+
+#### 12.3.1 Restoring using armbian-ddbr backup
+
+It is recommended that you make a backup of the original Android TV system that comes with the current box before installing the Armbian system in a new box, so that you can use it when you need to restore the system. Please boot the Armbian system from `TF/SD/USB`, enter the `armbian-ddbr` command, and then enter `b` according to the prompts to backup the system. The backup file is stored in the path `/ddbr/BACKUP-arm-64-emmc. img.gz` , please download and save. When you need to restore the Android TV system, upload the previously backed up files to the same path of the `TF/SD/USB` device, enter the `armbian-ddbr` command, and then enter `r` according to the prompt to restore the system.
+
+#### 12.3.2 Restoring with Amlogic usb burning tool
+
+- Under normal circumstances, re-insert the USB hard disk and install it again.
+
+- If you cannot start the Armbian system from the USB hard disk again, connect the Amlogic s9xxx TV Boxes to the computer monitor. If the screen is completely black and there is nothing, you need to restore the Amlogic s9xxx TV Boxes to factory settings first, and then reinstall it. First download the [amlogic_usb_burning_tool](https://github.com/ophub/kernel/releases/tag/tools) system recovery tool and install it. Prepare a [USB dual male data cable](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png), Prepare a [paper clip](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png).
+
+- Take x96max+ as an example. Find the two [short-circuit points](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) on the motherboard, Download the [Android TV firmware](https://github.com/ophub/kernel/releases/tag/tools). The Android TV system firmware of other common devices and the corresponding short circuit diagrams can also be [downloaded and viewed here](https://github.com/ophub/kernel/releases/tag/tools).
+
+```
+Operation method:
+
+1. Open the USB Burning Tool:
+   [ File → Import image ]: X96Max_Plus2_20191213-1457_ATV9_davietPDA_v1.5.img
+   [ Check ]：Erase flash
+   [ Check ]：Erase bootloader
+   Click the [ Start ] button
+2. Use a [ paper clip ] to connect the [ two shorting points ] on the main board of the box,
+   and use a [ USB dual male data cable ] to connect the [ box ] to the [ computer ] at the same time.
+3. Loosen the short contact after seeing the [ progress bar moving ].
+4. After the [ progress bar is 100% ], the restoration of the original Android TV system is completed.
+   Click [ stop ], unplug the [ USB male-to-male data cable ] and [ power ].
+5. If the progress bar is interrupted, repeat the above steps until it succeeds.
+   If the progress bar does not respond after the short-circuit, plug in the [ power ] supply after the short-circuit.
+   Generally, there is no need to plug in the power supply.
+```
+
+When the factory reset is completed, the box has been restored to the Android TV system, and other operations to install the Armbian system are the same as the requirements when you installed the system for the first time before, just do it again.
+
+### 12.4 Set the box to boot from USB/TF/SD
+
+- Write the firmware to USB/TF/SD, insert it into the box after writing.
+- Open the developer mode: Settings → About this machine → Version number (for example: X96max plus...), click on the version number for 5 times in quick succession, See the prompt of `Enable Developer Mode` displayed by the system.
+- Turn on USB debugging: System → Advanced options → Developer options again (after entering, confirm that the status is on, and the `USB debugging` status in the list is also on). Enable `ADB` debugging.
+- Install ADB tools: Download [adb](https://github.com/ophub/kernel/releases/tag/tools) and unzip it, copy the three files `adb.exe`, `AdbWinApi.dll`, and `AdbWinUsbApi.dll` to the two files `system32` and `syswow64` under the directory of `c://windows/` Folder, then open the `cmd` command panel, use `adb --version` command, if it is displayed, it is ready to use.
+- Enter the `cmd` command mode. Enter the `adb connect 192.168.1.137` command (the ip is modified according to your box, and you can check it in the router device connected to the box), If the link is successful, it will display `connected to 192.168.1.137:5555`
+- Enter the `adb shell reboot update` command, the box will restart and boot from the USB/TF/SD you inserted, access the firmware IP address from a browser, or SSH to enter the firmware.
+
+### 12.5 Disable infrared receiver
+
+Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your TV box off by mistake. To completely disable IR, add the line:
+
+```yaml
+blacklist meson_ir
+```
+
+to `/etc/modprobe.d/blacklist.conf` and reboot.
+
+### 12.6 Selection of bootstrap file
+
+- Of the currently known devices, only the `T95(s905x)` / `T95Z-Plus(s912)` require the use of the `/bootfs/extlinux/extlinux.conf` file. After writing the firmware to the USB, double-click to open it, and delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
+
+- Other devices only need `/boot/uEnv.txt` to boot, do not modify the `extlinux.conf.bak` file.
+
+### 12.7 Network settings
+
+The content of the network configuration file [/etc/network/interfaces](../armbian-files/common-files/etc/network/interfaces) is as follows:
+
+```yaml
+source /etc/network/interfaces.d/*
+
+# Network is managed by Network manager
+# You can choose one of the following two IP setting methods:
+# Use # to disable another setting method
+
+
+# 01. Enable dynamic DHCP to assign IP
+auto eth0
+iface eth0 inet dhcp
+        hwaddress ether 12:34:56:78:9A:BC
+
+
+# 02. Enable static IP settings(IP is modified according to the actual)
+#auto eth0
+#allow-hotplug eth0
+#iface eth0 inet static
+#address 192.168.1.100
+#netmask 255.255.255.0
+#gateway 192.168.1.6
+#dns-nameservers 192.168.1.6
+
+
+# 03. Docker install OpenWrt and communicate with each other
+#allow-hotplug eth0
+#no-auto-down eth0
+#auto eth0
+#iface eth0 inet manual
+#
+#auto macvlan
+#iface macvlan inet dhcp
+#        hwaddress ether 12:34:56:78:9a:bc
+#        pre-up ip link add macvlan link eth0 type macvlan mode bridge
+#        post-down ip link del macvlan link eth0 type macvlan mode bridge
+#
+#auto lo
+#iface lo inet loopback
+```
+
+By default, the DHCP dynamic IP allocation strategy (method 1) is used, and the IP is automatically allocated by the network router connected to Armbian. If you want to change to static IP, you can disable or delete the setting method 1, and enable the static IP setting of method 2.
+
+#### 12.7.1 Dynamic IP address assignment by DHCP
+
+```yaml
+source /etc/network/interfaces.d/*
+
+auto eth0
+iface eth0 inet dhcp
+```
+
+#### 12.7.2 Manually set a static IP address
+
+The IP, gateway and DNS are modified according to your own network conditions.
+
+```yaml
+source /etc/network/interfaces.d/*
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet static
+address 192.168.1.100
+netmask 255.255.255.0
+gateway 192.168.1.1
+dns-nameservers 192.168.1.1
+```
+
+#### 12.7.3 Use OpenWrt in docker to establish interworking network
+
+The MAC address in it can be modified according to your needs.
+
+```yaml
+source /etc/network/interfaces.d/*
+
+allow-hotplug eth0
+no-auto-down eth0
+auto eth0
+iface eth0 inet manual
+
+auto macvlan
+iface macvlan inet dhcp
+        pre-up ip link add macvlan link eth0 type macvlan mode bridge
+        post-down ip link del macvlan link eth0 type macvlan mode bridge
+
+auto lo
+iface lo inet loopback
+```
+
+### 12.8 How to add startup tasks
+
+A custom startup task script file has been added to the system, and the path in the Armbian system is [/etc/custom_service/start_service.sh](../armbian-files/common-files/etc/custom_service/start_service.sh) file, you can customize and add related tasks in this script according to your personal needs.
+
+### 12.9 How to update service scripts in the system
+
+Use the `armbian-sync` command to update all service scripts on the local system to the latest version.
+
+### 12.10 How to make an android system partition table
+
+The method of making Android system partition table and u-boot in 12.10 - 12.11 is organized from [unifreq](https://github.com/unifreq)'s teaching chat content in the community to guide you to make related files, and the source code is in his warehouse.
+
+When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will not be able to start, or an error similar to the following will appear:
+
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
+
+The following is a detailed manual operation process, in which the extraction work in `12.10.2 - 12.10.3` can also be done using a one-click script: [get_android_system_partition_table_information.tar.xz](https://github.com/ophub/kernel/releases/download/tools/get_android_system_partition_table_information.tar.xz), the usage method is in the remarks of the one-click script file.
+
+#### 12.10.1 Install the adb toolkit
+
+adb toolkit is an Android system auxiliary tool developed by Google, which can help users manage Android devices, use it to flash machines, install related programs, etc. Click here [download adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) toolkit, and then under Windows system, copy `adb.exe`, `AdbWinApi. dll` and `AdbWinUsbApi.dll` are copied to the `system32` and `syswow64` folders in the `c://windows/` directory, input `cmd` in the `run` of the `computer start menu` and press Enter to open the `cmd` panel, enter and execute `adb --version` command, if it is displayed, it means it can be used.
+
+#### 12.10.2 Check the Android partition
+
+We plug the TV box into the network cable, power supply, and turn on the monitor. After entering the Android TV system desktop normally, check its IP information in its network information. For the convenience of explanation, the following operation instructions will take 192.168.1.111 as the IP of the Android TV box. In the `cmd` panel, enter the following commands in turn and press Enter to execute, first look at the partition situation:
+
+```shell
+adb connect 192.168.1.111
+adb shell
+cd /dev/block
+ls -l | grep 179 | sort -t6
+```
+
+<img width="415" alt="image" src="https://user-images.githubusercontent.com/68696949/187029647-48b9ecbc-3932-47a4-b0a8-d781508e62d6.png">
+
+#### 12.10.3 Make Android System Partition Table
+
+Enter the following commands one by one to save the partition information files in the following locations:
+
+```shell
+cat /proc/partitions >/data/local/partitions.txt
+cat /proc/ntd >/data/local/ntd.txt
+ls -l /dev/block >/data/local/block.txt
+```
+
+<img width="310" alt="image" src="https://user-images.githubusercontent.com/68696949/187029771-034f6dc0-78a4-4e9d-b50f-2fbc6f213ec0.png">
+
+Create a folder named `mybox` in the root directory of the C drive of the local window computer, and enter the following commands in sequence in the `cmd` panel to download the files in the TV box to the local computer:
+
+```shell
+adb pull /data/local/partitions.txt C:\mybox
+adb pull /data/local/ntd.txt C:\mybox
+adb pull /data/local/block.txt C:\mybox
+```
+
+Open the excel template [android_partition_table_template.xlsx](android_partition_table_template.xlsx), we insert the data according to the three partition information files obtained above, and get the final Android system partition table of the device. Through the classification, `mixed areas` and `safe areas` are determined. The cache in the `mixed area` can be used as the `boot` partition of Armbian or OpenWrt system, and the `safe area` can be used as the `rootfs` partition.
+
+![Snip20220827_1](https://user-images.githubusercontent.com/68696949/187031866-ddc0f76a-810a-40ef-99d3-1484bd4092d6.png)
+
+#### 12.10.4 Using the android system partition table
+
+According to the specific location of `mixed area` and `secure area`, add the corresponding partition information in [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install) . Take the Android system partition table of the tx3 box we made as an example. Skip the unsafe area of `68 MiB (BLANK1=68)`; its cache partition has a total of 1120 MiB that can be used, but the general `BOOT` partition setting `256 MiB (BOOT=256)` is enough, other capacity is discarded Used; `Mixed area` has a total of 1350 MiB space, so the value of `BLANK2` is `1350-68-256=1026 (BLANK2=1026)` MiB. The result is as follows:
+
+```shell
+# Set partition size (Unit: MiB)
+elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
+    BLANK1="68"
+    BOOT="256"
+    BLANK2="1026"
+```
+
+### 12.11 How to make u-boot file
+
+The u-boot file is an important file to guide the system to start normally.
+
+#### 12.11.1 Extract the bootloader and dtb files
+
+Extraction requires the use of HxD software. You can download it from [Official website download link](https://mh-nexus.de/en/downloads.php?product=HxD20) or [Backup download link](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip) to get the installation.
+
+Execute the following commands in sequence in the `cmd` panel to extract the relevant files and download them to the local computer.
+
+```shell
+# use the adb tool to enter the box
+adb connect 192.168.1.111
+adb shell
+
+# export bootloader command
+dd if=/dev/block/bootloader of=/data/local/bootloader.bin
+
+# export dtb command
+cat /dev/dtb >/data/local/mybox.dtb
+
+# export gpio command
+cat /sys/kernel/debug/gpio >/data/local/mybox_gpio.txt
+
+# Download the bootloader, dtb and gpio files to your local computer
+adb pull /data/local/bootloader.bin C:\mybox
+adb pull /data/local/mybox.dtb C:\mybox
+adb pull /data/local/mybox_gpio.txt C:\mybox
+```
+
+#### 12.11.2 Make the acs.bin file
+
+The most important part of the mainline u-boot is acs.bin, which is used to initialize the memory. The original u-boot is located in the first 4MB of the firmware. Extract the `acs.bin` file using the `bootloader.bin` file you just obtained.
+
+Open HxD software, open the `bootloader.bin` file exported above, `right click - select range`, start position `F200`, length `1000`, select `hexadecimal`.
+
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/187056711-1b58ce71-2a7d-4e9b-a976-e5f278edaa53.png">
+
+Copy the selected result, then create a new file, paste insert, ignore warnings, save as acs.bin file.
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056725-0a0e60af-6a21-4a6b-a2d5-f3d46b438a6a.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056827-8419c738-3428-473e-9a95-ab7270170d98.png">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187056852-9f62f16a-f7f1-4c34-a2c2-78358d198f9a.png">
+</div>
+
+If the bootloader is locked, the code in this area is garbled and useless. Normally, there should be a lot of `0` as shown in the above picture, and `cfg` will appear several times in a row, and the words related to `ddr` will appear in the middle. This kind of normal code can be used.
+
+#### 12.11.3 Make the u-boot file
+
+To make u-boot, you need https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot two source libraries, and compile the two u-boot files of your own box .
+
+In the amlogic-boot-fip source code, only the acs.bin file is different for each model, and other files can be used in common.
+
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/187057209-c4716384-46ef-4922-9710-8da7ae6db1e4.png">
+
+For the method of making u-boot, please refer to the specific instructions in https://github.com/unifreq/u-boot/tree/master/doc/board/amlogic, and select the model of your own device to compile and test.
+
+To make u-boot according to the method of [unifreq](https://github.com/unifreq), you need to use the acs.bin, dts and config files of the box. The dts exported from the Android system cannot be directly converted into the Armbian format, and you need to write a corresponding dts file yourself. According to the different parts of the specific hardware of your own equipment, such as switches, LEDs, power control, tf cards, sdio wifi modules, etc., use the similar [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) file in the kernel source library for modification and production.
+
+Take the u-boot for X96Max Plus as an example:
+
+```shell
+~/make-uboot
+    ├── amlogic-boot-fip
+    │   ├── x96max-plus                                     # Create your own directory
+    │   │   ├── asc.bin                                     # Make your own source files
+    │   │   └── other-copy-files...                         # Copy files from other directories
+    │   │
+    │   ├── other-source-directories...
+    │   └── other-source-files...
+    │
+    └── u-boot
+        ├── configs
+        │   └── x96max-plus_defconfig                       # Make your own source files
+        ├── arch
+        │   └── arm
+        │       └── dts
+        │           ├── meson-sm1-x96-max-plus-u-boot.dtsi  # Make your own source files
+        │           ├── meson-sm1-x96-max-plus.dts          # Make your own source files
+        │           └── Makefile                            # Edit
+        ├── fip
+        │   ├── u-boot.bin                                  # Generated file
+        │   └── u-boot.bin.sd.bin                           # Generated file
+        ├── u-boot.bin                                      # Generated file
+        │
+        ├── other-source-directories...
+        └── other-source-files...
+```
+
+- Download the [amlogic-boot-fip](https://github.com/unifreq/amlogic-boot-fip) source code. Create the [x96max-plus](https://github.com/unifreq/amlogic-boot-fip/tree/master/x96max-plus) directory in the root directory. Except for the `asc.bin` file made by yourself, other files can be copied from other directories.
+- Download [u-boot](https://github.com/unifreq/u-boot) source code. Make the corresponding [x96max-plus_defconfig](https://github.com/unifreq/u-boot/blob/master/configs/x96max-plus_defconfig) file and put it in the [configs](https://github.com/unifreq/u-boot/tree/master/configs) directory. Make the corresponding [meson-sm1-x96-max-plus-u-boot.dtsi](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus-u-boot.dtsi) and [meson-sm1-x96-max-plus.dts](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus.dts) file and put it in the [arch/arm/dts](https://github.com/unifreq/u-boot/tree/master/arch/arm/dts) directory, and edit the [Makefile](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/Makefile) file in this directory to add the index of the `meson-sm1-x96-max-plus.dtb` file.
+- Go to the root directory of the u-boot source code directory and follow the steps in the document https://github.com/unifreq/u-boot/blob/master/doc/board/amlogic/x96max-plus.rst
+
+There are two types of final generated files: the `u-boot.bin` file in the u-boot root directory is the incomplete version of u-boot used in the `/boot` directory (corresponding to [overload](../amlogic-u-boot/overload) directory); `u-boot.bin` and `u-boot.bin.sd.bin` in the `fip` directory are the full version u-boot files used in the `/usr/lib/u-boot/` directory (corresponding to [bootloader](../amlogic-u-boot/bootloader/) directory), the difference between the two files of the full version is 512 bytes, and the larger one is filled with 512 bytes of 0 in front.
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189039426-c127631f-77ca-4fcb-9fb6-4220045d712b.png">
+<img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189029320-e43a4cc9-b4b5-4de4-92fe-b17bd29020d0.png">
+</div>
+
+💡Tip: Before writing to eMMC for testing, please check the Brick Rescue Method in 12.3. Be sure to master the position of the short contact, have the original Android system file in .img format, and perform a short-circuit flash test to ensure that the brick-rescue method has been mastered before writing the test.
+
+### 12.12 Memory size recognition error
+
+If the memory size is incorrectly recognized (1-2G is not normal for 4G memory, and 3.7G is normal), you can try to manually copy a `/boot/UBOOT_OVERLOAD` file (note that it is a `copy`, `not renaming`, after renaming It will not boot after install and update operations), save as `/boot/u-boot.ext` when using in `USB`, and save as `/boot/u-boot.emmc` when using in `eMMC`.
+
+Don't copy the u-boot file manually, except to try to solve the memory problem, adding it incorrectly will result in failure to boot and various problems.
+
+### 12.13 How to decompile a dtb file
+
+Some new devices are not in the current support list (or have variants), you can try by decompiling and adjusting related parameters.
+
+```shell
+# Install dependencies
+sudo apt install device-tree-compiler
+
+# 1. Decompile command (use dtb file to generate dts source code)
+dtc -I dtb -O dts -o xxxxx.dts xxxxxx.dtb
+
+# 2. Compile command (use dts to compile to generate dtb file)
+dtc -I dts -O dtb -o xxxxxxx .dtb xxxxxxxx.dts
+```
