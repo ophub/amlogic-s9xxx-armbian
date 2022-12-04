@@ -53,6 +53,7 @@ STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 FINISH="[\033[93m FINISH \033[0m]"
+WARNING="[\033[93m WARNING \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
 #==================================================================================================
@@ -105,6 +106,7 @@ init_var() {
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
+    SOC="${SOC}"
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     BOOTLOADER_IMG="${BOOTLOADER_IMG}"
@@ -148,7 +150,16 @@ init_var() {
         shift
     done
 
-    [[ -z "${KERNEL_BRANCH}" ]] && error_msg "Invalid kernel download directory: [ ${KERNEL_BRANCH} ]"
+    # Automatically complete old version ophub_release_file
+    [[ -z "${KERNEL_BRANCH}" ]] && {
+        [[ "${SOC,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
+        echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
+    }
+    # Rockchip rk3588 series, such as Rock5b only support rk3588/5.10.y kernel
+    [[ "${SOC,,}" == "rk3588" && "${KERNEL_BRANCH}" != "rk3588" ]] && {
+        echo -e "${WARNING} Kernel [ ${KERNEL_BRANCH} ] is not available for this device, it has been automatically adjusted to [ rk3588 ]."
+        KERNEL_BRANCH="rk3588"
+    }
 
     # Display settings results
     echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
@@ -228,6 +239,11 @@ download_kernel() {
 check_kernel() {
     cd ${tmp_path}
     echo -e "${STEPS} Start checking the kernel..."
+
+    # Rockchip rk3568 series, such as FastRhino R66S/R68S only support 6.x.y kernel
+    [[ "${SOC,,}" == "rk3568" && "${inputs_kernel:0:2}" != "6." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    # Rockchip rk3588 series, such as Rock5b only support rk3588/5.10.y kernel
+    [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
 
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
