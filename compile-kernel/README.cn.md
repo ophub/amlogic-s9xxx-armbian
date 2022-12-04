@@ -21,32 +21,31 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -d -k 5.10.125` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.10.125` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
 
 - ### 在 Armbian 系统下运行
 
 1. 更新本地编译环境和配置文件：`armbian-kernel -u`
 
-2. 编译内核：运行 `armbian-kernel -d -k 5.10.125` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
+2. 编译内核：运行 `armbian-kernel -k 5.10.125` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
 
 - ### 本地编译参数说明
 
 | 参数 | 含义 | 说明 |
 | ---- | ---- | ---- |
-| -d | Defaults | 使用默认配置 |
 | -k | Kernel | 指定 kernel 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` |
 | -a | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.10.125` 的同系列是否有更新的版本，如有 `5.10.125` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -p | PackageList | 设置编译内核的包列表。默认值为 `all` ，将编译 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅编译 3 个 dtbs 文件。 |
 | -n | CustomName | 设置内核自定义签名。默认值为 `-ophub` ，生成的内核名称为 `5.10.125-ophub` 。设置自定义签名时请勿包含空格。 |
 | -r | Repository | 指定编译内核的源代码仓库。默认为 `unifreq` 。可选择 `kernel.org` 的源码和 `github.com` 的内核源代码仓库。例如 `-r kernel.org` 或 `-r unifreq` 等。当使用 `github.com` 的内核源代码仓库时，可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch` |
 
-- `sudo ./recompile -d` : 使用默认配置编译内核。
-- `sudo ./recompile -d -k 5.10.125` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
-- `sudo ./recompile -d -k 5.10.125 -a true` : 使用默认配置，并通过 `-a` 参数设置编译内核时，是否自动升级到同系列最新内核。
-- `sudo ./recompile -d -k 5.10.125 -n -ophub` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
-- `sudo ./recompile -d -k 5.10.125 -r kernel.org` : 使用默认配置，并通过 `-r` 参数设置内核源代码仓库。
-- `sudo ./recompile -d -k 5.10.125 -p dtbs` : 使用默认配置，并通过 `-p` 参数指定仅编译 dtbs 文件。
-- `sudo ./recompile -d -k 5.10.125_5.15.50 -a true -n -ophub -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
+- `sudo ./recompile` : 使用默认配置编译内核。
+- `sudo ./recompile -k 5.10.125` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
+- `sudo ./recompile -k 5.10.125 -a true` : 使用默认配置，并通过 `-a` 参数设置编译内核时，是否自动升级到同系列最新内核。
+- `sudo ./recompile -k 5.10.125 -n -ophub` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
+- `sudo ./recompile -k 5.10.125 -r kernel.org` : 使用默认配置，并通过 `-r` 参数设置内核源代码仓库。
+- `sudo ./recompile -k 5.10.125 -p dtbs` : 使用默认配置，并通过 `-p` 参数指定仅编译 dtbs 文件。
+- `sudo ./recompile -k 5.10.125_5.15.50 -a true -n -ophub -r kernel.org` : 使用默认配置，并通过多个参数进行设置。
 
 💡提示：推荐使用 `unifreq` 的 [5.10](https://github.com/unifreq/linux-5.10.y), [5.15](https://github.com/unifreq/linux-5.15.y) 等仓库的内核源代码进行编译，他针对相关盒子添加了驱动和补丁。推荐使用 [tools/config](tools/config) 中的模板，已经根据相关盒子进行了预配置，可以在此基础上进行个性化定制。
 

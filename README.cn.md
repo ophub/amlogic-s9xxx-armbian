@@ -178,7 +178,7 @@ armbian-ddbr
 
 ```yaml
 armbian-kernel -update
-armbian-kernel -d -k 5.10.125
+armbian-kernel -k 5.10.125
 ```
 
 - ### 更多使用说明
@@ -206,13 +206,12 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 3. 进入 `~/amlogic-s9xxx-armbian` 根目录，在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.50`）请保留，它将在重构后用作 Armbian 固件的名称。
 
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -d -b s905x3 -k 5.10.125` 命令即可生成指定 board 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -b s905x3 -k 5.10.125` 命令即可生成指定 board 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
 - ### 本地化打包参数说明
 
 | 参数  | 含义       | 说明        |
 | ---- | ---------- | ---------- |
-| -d   | Defaults   | 使用默认配置 |
 | -b   | Board      | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 使用 `all` 表示全部型号。可以指定的型号有: `a311d`, `s905x3`, `s905x3-b`, `s905x2`, `s905l3a`, `s905x`, `s905w`, `s905d`, `s905d-ki`, `s905l2`, `s905`, `s922x`, `s922x-n2`, `s912`, `s912-m8s` 。说明：`s922x-reva` 是 `s922x-gtking-pro-rev_a`，`s922x-n2` 是 `s922x-odroid-n2` ，`s912-m8s` 是 `s912-mecool-m8s-pro-l` ，`s905d-ki` 是 `s905d-mecool-ki-pro`，`s905x2-km3` 是 `s905x2-mecool-km3` |
 | -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/tree/main/pub/stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.10.125 的同系列是否有更新的版本，如有 5.10.125 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
@@ -221,15 +220,15 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -t   | RootfsType | 对固件的 ROOTFS 分区的文件系统类型进行设置，默认为 `ext4` 类型，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs` |
 | -n   | CustomName | 设置固件名称中的签名部分。默认值为空。可根据需要添加签名如 `_server`，`_gnome_desktop` 或 `_ophub` 等，设置自定义签名时请勿包含空格。 |
 
-- `sudo ./rebuild -d` : 使用默认配置，对全部型号的电视盒子进行打包。
-- `sudo ./rebuild -d -b s905x3 -k 5.10.125` : 推荐使用. 使用默认配置进行相关内核打包。
-- `sudo ./rebuild -d -b s905x3_s905d -k 5.10.125_5.15.50` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
-- `sudo ./rebuild -d -b s905x3 -k 5.10.125 -s 2560` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为2560MiB。
-- `sudo ./rebuild -d -b s905x3 -v dev -k 5.10.125` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
-- `sudo ./rebuild -d -b s905x3_s905d`  使用默认配置，对多个型号的电视盒子进行全部内核打包, 使用 `_` 进行多型号连接。
-- `sudo ./rebuild -d -k 5.10.125_5.15.50` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
-- `sudo ./rebuild -d -k 5.10.125_5.15.50 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
-- `sudo ./rebuild -d -t btrfs -s 2560 -k 5.10.125` : 使用默认配置，设置文件系统为 btrfs 格式，分区大小为 2560MiB, 并指定内核为 5.10.125 ，对全部型号电视盒子进行打包。
+- `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
+- `sudo ./rebuild -b s905x3 -k 5.10.125` : 推荐使用. 使用默认配置进行相关内核打包。
+- `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
+- `sudo ./rebuild -b s905x3 -k 5.10.125 -s 2560` : 使用默认配置，指定一个内核，一个型号进行打包，固件大小设定为2560MiB。
+- `sudo ./rebuild -b s905x3 -v dev -k 5.10.125` : 使用默认配置，指定型号，指定版本分支，指定内核进行打包。
+- `sudo ./rebuild -b s905x3_s905d`  使用默认配置，对多个型号的电视盒子进行全部内核打包, 使用 `_` 进行多型号连接。
+- `sudo ./rebuild -k 5.10.125_5.15.50` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
+- `sudo ./rebuild -k 5.10.125_5.15.50 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
+- `sudo ./rebuild -t btrfs -s 2560 -k 5.10.125` : 使用默认配置，设置文件系统为 btrfs 格式，分区大小为 2560MiB, 并指定内核为 5.10.125 ，对全部型号电视盒子进行打包。
 
 ## 使用 GitHub Actions 进行编译
 
