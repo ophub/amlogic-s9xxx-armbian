@@ -615,15 +615,14 @@ refactor_files() {
     rm -f usr/sbin/ddbr
     rm -f var/lib/dpkg/info/linux-image*
 
-    # Explicitly disable resizing for [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
-    echo "no" >root/.no_rootfs_resize
-
-    # Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
-    quotes_file="etc/update-motd.d/quotes.txt"
-    [[ -f "${quotes_file}" ]] && echo "" >${quotes_file}
-
-    # Renaming/disabling related files
-    mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
+    # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
+    ln -sf /usr/bin bin
+    ln -sf /usr/lib lib
+    ln -sf /usr/sbin sbin
+    ln -sf /run/lock var/lock
+    ln -sf /run var/run
+    ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
+    ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
     # Fix common releases permissions
     [[ -d "var/tmp" ]] && chmod 777 var/tmp
@@ -642,15 +641,6 @@ refactor_files() {
     [[ -f "usr/libexec/sudo/sudoers.so" ]] && chown 0 usr/libexec/sudo/sudoers.so
     [[ -f "usr/libexec/sudo/sudoers.so" ]] && chmod 644 usr/libexec/sudo/sudoers.so
     [[ -f "usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 usr/libexec/polkit-agent-helper-1
-
-    # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
-    ln -sf /usr/bin bin
-    ln -sf /usr/lib lib
-    ln -sf /usr/sbin sbin
-    ln -sf /run/lock var/lock
-    ln -sf /run var/run
-    ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
-    ln -sf /usr/sbin/armbian-ddbr usr/sbin/ddbr
 
     # Add custom firmware information
     echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
@@ -674,6 +664,15 @@ refactor_files() {
     echo "AMPART_STATUS='no'" >>${ophub_release_file}
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
 
+    # Get random macaddr
+    mac_hexchars="0123456789ABCDEF"
+    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
+    random_macaddr="9E:61${mac_end}"
+
+    # Set interfaces macaddr
+    interfaces_file="etc/network/interfaces"
+    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
+
     # Edit the etc/fstab
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${ROOTFS_TYPE}  ${fstab_string}  0 1|g" etc/fstab
@@ -687,19 +686,15 @@ refactor_files() {
         sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
     }
 
+    # Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
+    quotes_file="etc/update-motd.d/quotes.txt"
+    [[ -f "${quotes_file}" ]] && echo "" >${quotes_file}
+
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
 
-    # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
-    network_service="usr/lib/systemd/system/networking.service"
-    sed -i "s|TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service}
-
-    # Add tasks that need to be executed on initial startup
-    armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
-
     # Add network performance optimization
-    [[ -f "usr/sbin/balethirq.pl" && -f "etc/balance_irq" && -f "etc/rc.local" ]] && {
+    [[ -f "etc/rc.local" && -f "etc/balance_irq" && -f "usr/sbin/balethirq.pl" ]] && {
         sed -i '/^exit 0/i\perl /usr/sbin/balethirq.pl' etc/rc.local
     }
 
@@ -725,6 +720,20 @@ refactor_files() {
         sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
     }
 
+    # Renaming/disabling related files
+    mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
+
+    # Explicitly disable resizing for [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
+    echo "no" >root/.no_rootfs_resize
+
+    # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
+    network_service="usr/lib/systemd/system/networking.service"
+    sed -i "s|TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service}
+
+    # Add tasks that need to be executed on initial startup
+    armbian_firstrun="usr/lib/armbian/armbian-firstrun"
+    sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
+
     # Fix abnormal CPU temperature
     temp_file="usr/lib/armbian/armbian-allwinner-battery"
     [[ -f "${temp_file}" ]] && {
@@ -733,15 +742,6 @@ refactor_files() {
             sed -i "${insert_line}i\        [[ \"\$(echo \${board_temp} | awk -F'.' '{print \$1}' | wc -c)\" -gt \"3\" ]] && board_temp=\${board_temp:0:2}" ${temp_file}
         }
     }
-
-    # Get random macaddr
-    mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
-    random_macaddr="9E:61${mac_end}"
-
-    # Set interfaces macaddr
-    interfaces_file="etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
 
     # Optimize wifi/bluetooth module
     [[ -d "usr/lib/firmware/brcm" ]] && (
