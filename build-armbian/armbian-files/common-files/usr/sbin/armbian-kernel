@@ -100,8 +100,7 @@ help_info() {
     -c : Clear        Clear the local kernel source and generated files.
 
 02. Detailed instructions for compiling the kernel
-    Command: armbian-kernel -d -k 5.10.100
-    -d : Defaults     Compile all kernels with default configuration.
+    Command: armbian-kernel -k 5.10.100
     -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
     -a : AutoKernel   Set whether to automatically adopt the latest version, such as [ -a true ]
     -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
