@@ -270,7 +270,7 @@ query_version() {
                 else
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
-                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel."
+                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
                 let i++
             done
@@ -346,24 +346,25 @@ confirm_version() {
 
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
 
-    # Confirm UUID
+    # Confirm BOOT_UUID
     BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
     [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
-    #
+    # Confirm ROOTFS_UUID
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
 
-    if [[ "${PLATFORM}" == "amlogic" ]]; then
+    # Define platform variables for Amlogic boxes
+    [[ "${PLATFORM}" == "amlogic" ]] && {
         # Set up the welcome board
         bd_name="Aml ${SOC}"
         # Set Armbian image file parameters
         partition_table_type="msdos"
         bootfs_type="fat32"
         # Set directory name
-        boot_dir="${platform_files}/amlogic/bootfs"
-        root_dir="${platform_files}/amlogic/rootfs"
+        platform_bootfs="${platform_files}/amlogic/bootfs"
+        platform_rootfs="${platform_files}/amlogic/rootfs"
         bootloader_dir="${uboot_path}/amlogic/bootloader"
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
@@ -373,15 +374,18 @@ confirm_version() {
             uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
             fstab_string="defaults,noatime,errors=remount-ro"
         fi
-    else
+    }
+
+    # Define platform variables for Rockchip boxes
+    [[ "${PLATFORM}" == "rockchip" ]] && {
         # Set up the welcome board
         bd_name="${MODEL_NAME}"
         # Set Armbian image file parameters
         partition_table_type="gpt"
         bootfs_type="ext4"
         # Set directory name
-        boot_dir="${platform_files}/rockchip/bootfs/${board}"
-        root_dir="${platform_files}/rockchip/rootfs"
+        platform_bootfs="${platform_files}/rockchip/bootfs/${board}"
+        platform_rootfs="${platform_files}/rockchip/rootfs"
         bootloader_dir="${uboot_path}/rockchip/${board}"
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
@@ -393,7 +397,7 @@ confirm_version() {
             uenv_rootdev="UUID=${ROOTFS_UUID}"
             fstab_string="defaults,noatime,commit=600,errors=remount-ro"
         fi
-    fi
+    }
 }
 
 extract_armbian() {
@@ -451,11 +455,8 @@ make_image() {
     [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
 
     # Format bootfs partition
-    if [[ "${PLATFORM}" == "amlogic" ]]; then
-        mkfs.vfat -F 32 -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
-    else
-        mkfs.ext4 -F -q -U ${BOOT_UUID} -L "BOOT" -b 4k -m 0 ${loop_new}p1 >/dev/null 2>&1
-    fi
+    [[ "${PLATFORM}" == "amlogic" ]] && mkfs.vfat -F 32 -n "BOOT" ${loop_new}p1 >/dev/null 2>&1
+    [[ "${PLATFORM}" == "rockchip" ]] && mkfs.ext4 -F -q -U ${BOOT_UUID} -L "BOOT" -b 4k -m 0 ${loop_new}p1 >/dev/null 2>&1
 
     # Format rootfs partition
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
@@ -464,8 +465,8 @@ make_image() {
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
     fi
 
-    # Write the specified bootloader
-    if [[ "${PLATFORM}" == "amlogic" ]]; then
+    # Write the specified bootloader for Amlogic boxes
+    [[ "${PLATFORM}" == "amlogic" ]] && {
         if [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" ]]; then
             dd if="${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
             dd if="${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
@@ -475,7 +476,10 @@ make_image() {
             dd if="${uboot_path}/amlogic/bootloader/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
-    else
+    }
+
+    # Write the specified bootloader for Rockchip boxes
+    [[ "${PLATFORM}" == "rockchip" ]] && {
         if [[ -n "${BOOTLOADER_IMG}" && -n ${MAINLINE_UBOOT} ]]; then
             dd if="${uboot_path}/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
             dd if="${uboot_path}/${board}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
@@ -484,7 +488,7 @@ make_image() {
             dd if="${uboot_path}/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 skip=64 seek=64 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
-    fi
+    }
 }
 
 copy_files() {
@@ -507,8 +511,8 @@ copy_files() {
     cp -af ${tmp_armbian}/* ${tag_rootfs}
 
     # Copy the same files
-    [[ -d "${boot_dir}" ]] && cp -rf ${boot_dir}/* ${tag_bootfs}
-    [[ -d "${root_dir}" ]] && cp -rf ${root_dir}/* ${tag_rootfs}
+    [[ -d "${platform_bootfs}" ]] && cp -rf ${platform_bootfs}/* ${tag_bootfs}
+    [[ -d "${platform_rootfs}" ]] && cp -rf ${platform_rootfs}/* ${tag_rootfs}
     [[ -d "${common_files}" ]] && cp -rf ${common_files}/* ${tag_rootfs}
 
     # Copy the bootloader files
@@ -564,7 +568,7 @@ refactor_files() {
     # Processing partition files: bootfs
     cd ${tag_bootfs}
 
-    # Process amlogic series boot partition files
+    # Process Amlogic series boot partition files
     [[ "${PLATFORM}" == "amlogic" ]] && {
         # Add u-boot.ext for Amlogic 5.10 kernel
         if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
@@ -588,7 +592,7 @@ refactor_files() {
         fi
     }
 
-    # Process rockchip series boot partition files
+    # Process Rockchip series boot partition files
     [[ "${PLATFORM}" == "rockchip" ]] && {
         # Edit the armbianEnv.txt
         boot_conf_file="armbianEnv.txt"
@@ -669,9 +673,7 @@ refactor_files() {
     # Edit the etc/fstab
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${ROOTFS_TYPE}  ${fstab_string}  0 1|g" etc/fstab
-    [[ "${PLATFORM}" == "rockchip" ]] && {
-        sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}      /boot  ext4            defaults         0 2|g" etc/fstab
-    }
+    [[ "${PLATFORM}" == "rockchip" ]] && sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
 
     # Update release information
     [[ -f "${armbian_release_file}" ]] && {
@@ -791,9 +793,10 @@ loop_rebuild() {
     j="1"
     for b in ${build_armbian[*]}; do
         {
-            # Determine kernel branch and list
             board="${b}"
             confirm_version
+
+            # Determine kernel branch
             if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
                 build_kernel="${rk3588_kernel[*]}"
                 kd="rk3588"
@@ -805,17 +808,23 @@ loop_rebuild() {
             i="1"
             for k in ${build_kernel[*]}; do
                 {
-                    echo -n "(${j}.${i}) Start building Armbian [ ${b} - ${kd}/${k} ]. "
+                    kernel="${k}"
+
+                    # Rockchip rk3568 series, such as FastRhino R66S/R68S only support 6.0.y and above kernel
+                    [[ "${SOC,,}" == "rk3568" && "${kernel:0:1}" -ne "6" ]] && {
+                        echo -e "(${j}.${i}) ${WARNING} ${board}(${SOC,,}) cannot use ${kernel} kernel, skip."
+                        let i++
+                        continue
+                    }
+
+                    echo -ne "(${j}.${i}) Start building Armbian [ ${b} - ${kd}/${k} ]. "
                     now_remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
-                        echo "Remaining space is less than 6G, exit this build."
+                        echo -e "${WARNING} Remaining space is less than 6G, exit this build."
                         break
                     else
                         echo "Remaining space is ${now_remaining_space}G."
                     fi
-
-                    # The loop variable assignment
-                    kernel="${k}"
 
                     # Execute the following functions in sequence
                     extract_armbian
