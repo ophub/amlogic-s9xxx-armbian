@@ -618,6 +618,10 @@ refactor_files() {
     # Explicitly disable resizing for [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
     echo "no" >root/.no_rootfs_resize
 
+    # Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
+    quotes_file="etc/update-motd.d/quotes.txt"
+    [[ -f "${quotes_file}" ]] && echo "" >${quotes_file}
+
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
