@@ -12,7 +12,7 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: armbian-kernel -update && armbian-kernel -d -k 5.10.125
+# Command: armbian-kernel -update && armbian-kernel -k 5.10.125
 # Command optional parameters please refer to the source code repository
 #
 #================================= Functions list =================================
@@ -85,17 +85,10 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "dk:a:n:p:r:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:p:r:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
-        -d | --default)
-            : ${build_kernel:="${build_kernel}"}
-            : ${auto_kernel:="${auto_kernel}"}
-            : ${custom_name:="${custom_name}"}
-            : ${package_list:="${package_list}"}
-            : ${repo_owner:="${repo_owner}"}
-            ;;
         -k | --kernel)
             if [[ -n "${2}" ]]; then
                 oldIFS=$IFS
