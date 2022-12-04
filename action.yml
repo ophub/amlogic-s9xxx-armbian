@@ -107,7 +107,7 @@ runs:
 
             cd ${GITHUB_ACTION_PATH}
             echo -e "Start to rebuild armbian..."
-            make_command=" -d"
+            make_command=""
             [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
             [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
@@ -150,7 +150,7 @@ runs:
                 echo -e "Use the default kernel compilation template."
             fi
 
-            make_command=" -d"
+            make_command=""
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
             [[ -n "${{ inputs.kernel_auto }}" ]] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
             [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
