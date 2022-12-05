@@ -201,7 +201,7 @@ toolchain_check() {
     # Download armbian
     if [[ ! -f "${armbian_file}" ]]; then
         echo -e "${INFO} Download armbian [ ${armbian_rootfs_file} ] ..."
-        rm -rf ${armbian_path} 2>/dev/null && mkdir -p ${armbian_path}
+        rm -rf ${armbian_path} && mkdir -p ${armbian_path}
         wget -c "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_path}/${armbian_rootfs_file}" >/dev/null 2>&1
         tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path}
         # Change other names to armbian.img
@@ -339,7 +339,7 @@ headers_install() {
     cp .config ${out_kernel}/header/.config
 
     # Delete temporary files
-    rm -f ${head_list} ${obj_list} 2>/dev/null
+    rm -f ${head_list} ${obj_list}
 }
 
 compile_env() {
@@ -351,7 +351,7 @@ compile_env() {
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
+    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
     mkdir -p ${out_kernel}/{chroot/{root/boot/,},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
@@ -470,14 +470,15 @@ generate_uinitrd() {
     fi
 
     # Copy /boot related files into armbian system
-    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} 2>/dev/null
+    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage}
     #
     cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/zImage
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
-    rm -rf ${tag_rootfs}/usr/lib/modules/* 2>/dev/null
+    rm -rf ${tag_rootfs}/usr/lib/modules/*
     cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} ${tag_rootfs}/usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
@@ -490,8 +491,8 @@ generate_uinitrd() {
     [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
-    cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root 2>/dev/null
-    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh 2>/dev/null && sync
+    cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
+    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh && sync
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
@@ -581,7 +582,7 @@ clean_tmp() {
     cd ${make_path}
     echo -e "${STEPS} Clear the space and update-grub..."
 
-    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
+    rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
 
     update-grub 2>/dev/null
 
