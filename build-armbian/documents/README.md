@@ -672,11 +672,12 @@ Some new devices are not in the current support list (or have variants), you can
 
 ```shell
 # Install dependencies
-sudo apt install device-tree-compiler
+sudo apt-get update
+sudo apt-get install -y device-tree-compiler
 
 # 1. Decompile command (use dtb file to generate dts source code)
-dtc -I dtb -O dts -o xxxxx.dts xxxxxx.dtb
+dtc -I dtb -O dts -o xxx.dts xxx.dtb
 
 # 2. Compile command (use dts to compile to generate dtb file)
-dtc -I dts -O dtb -o xxxxxxx .dtb xxxxxxxx.dts
+dtc -I dts -O dtb -o xxx.dtb xxx.dts
 ```
