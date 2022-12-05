@@ -433,7 +433,7 @@ generate_uinitrd() {
     echo -e "${INFO} Backup the files in the [ /boot ] directory."
     boot_backup_path="/boot/backup"
     rm -rf ${boot_backup_path} && mkdir -p ${boot_backup_path}
-    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage,Image} ${boot_backup_path}
+    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage,Image} ${boot_backup_path} 2>/dev/null
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map /boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config /boot/config-${kernel_outname}
@@ -464,7 +464,7 @@ generate_uinitrd() {
 
     if [[ -f uInitrd ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_outname}
+        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null
     else
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
