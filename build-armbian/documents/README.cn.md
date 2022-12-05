@@ -735,11 +735,12 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 
 ```shell
 # 安装依赖
-sudo apt install device-tree-compiler
+sudo apt-get update
+sudo apt-get install -y device-tree-compiler
 
 # 1. 反编译命令（使用 dtb 文件生成 dts 源码）
-dtc -I dtb -O dts -o xxxxx.dts xxxxxx.dtb
+dtc -I dtb -O dts -o xxx.dts xxx.dtb
 
 # 2. 编译命令（使用 dts 编译生成 dtb 文件）
-dtc -I dts -O dtb -o xxxxxxx .dtb xxxxxxxx.dts
+dtc -I dts -O dtb -o xxx.dtb xxx.dts
 ```
