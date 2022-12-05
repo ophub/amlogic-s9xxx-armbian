@@ -45,6 +45,9 @@ kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
+#
+# Set the release check file
+ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
 host_release="$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)"
 toolchain_path="/usr/local/toolchain"
@@ -65,7 +68,7 @@ package_list="all"
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
-clang_file="clang+llvm-15.0.0-aarch64-linux-gnu.tar.xz"
+clang_file="clang+llvm-14.0.0-aarch64-linux-gnu.tar.xz"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -148,6 +151,21 @@ init_var() {
     #
     [[ -n "${code_owner}" ]] || error_msg "The [ -r ] parameter is invalid."
     [[ -n "${code_branch}" ]] || code_branch="${repo_branch}"
+
+    # Check release file
+    [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
+
+    # Get values
+    source "${ophub_release_file}"
+    PLATFORM="${PLATFORM}"
+    FDTFILE="${FDTFILE}"
+
+    # Early devices did not add platform parameters, auto-completion
+    [[ -z "${PLATFORM}" && -n "${FDTFILE}" ]] && {
+        [[ ${FDTFILE:0:5} == "meson" ]] && PLATFORM="amlogic" || PLATFORM="rockchip"
+        echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
+    }
+    echo -e "${INFO} Armbian PLATFORM: [ ${PLATFORM} ]"
 }
 
 toolchain_check() {
@@ -298,7 +316,7 @@ headers_install() {
     cp .config ${out_kernel}/header/.config
 
     # Delete temporary files
-    rm -f ${head_list} ${obj_list} 2>/dev/null
+    rm -f ${head_list} ${obj_list}
 }
 
 compile_env() {
@@ -310,7 +328,7 @@ compile_env() {
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
     mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
@@ -415,11 +433,13 @@ generate_uinitrd() {
     echo -e "${INFO} Backup the files in the [ /boot ] directory."
     boot_backup_path="/boot/backup"
     rm -rf ${boot_backup_path} && mkdir -p ${boot_backup_path}
-    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage} ${boot_backup_path} 2>/dev/null
+    mv -f /boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage,Image} ${boot_backup_path}
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map /boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config /boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image /boot/vmlinuz-${kernel_outname}
+    [[ "${PLATFORM}" == "amlogic" ]] && cp -f /boot/vmlinuz-${kernel_outname} /boot/zImage
+    [[ "${PLATFORM}" == "rockchip" ]] && ln -sf vmlinuz-${kernel_outname} /boot/Image
     #echo -e "${INFO} Kernel copy results in the [ /boot ] directory: \n$(ls -l /boot) \n"
 
     # Backup current system files for /usr/lib/modules
@@ -438,16 +458,13 @@ generate_uinitrd() {
 
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
-    #echo -e "${INFO} File status in the /boot directory before the update: \n$(ls -l .) \n"
-
-    cp -f vmlinuz-${kernel_outname} zImage 2>/dev/null
 
     # Generate uInitrd file directly under armbian system
     update-initramfs -c -k ${kernel_outname} 2>/dev/null
 
     if [[ -f uInitrd ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null
+        mv -f uInitrd uInitrd-${kernel_outname}
     else
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
@@ -459,7 +476,7 @@ generate_uinitrd() {
     mv -f ${boot_backup_path}/* . && rm -rf ${boot_backup_path}
 
     # Restore the files in the [ /usr/lib/modules ] directory
-    rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null
+    rm -rf /usr/lib/modules/${kernel_outname}
     mv ${modules_backup_path}/* /usr/lib/modules && rm -rf ${modules_backup_path}
 }
 
@@ -534,7 +551,7 @@ clean_tmp() {
     cd ${make_path}
     echo -e "${STEPS} Clear the space..."
 
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/} 2>/dev/null
+    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
 
     echo -e "${SUCCESS} All processes have been completed."
 }
