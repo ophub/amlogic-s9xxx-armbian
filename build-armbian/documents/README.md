@@ -251,7 +251,8 @@ Use tools such as Rufus or balenaEtcher to write the Armbian system image into t
 - When the R68s is powered off, first insert the USB dual male cable, then press and hold the Recovery key and plug in the 12V power supply. After two seconds, release the Recovery key, and the brushing tool will `find a LOADER device`.
 - Right click the blank space of the RKDevTool tool operation interface to add an item.
 - The address is `0x00000000` and the name is `armbian`. Click the path on the right to select `armbian.img` system files.
-- Select an additional armbian line, deselect other lines, and click `Run` Write.
+- Select an additional armbian line, `deselect other lines`, and click `Run` Write.
+- Note: If other systems are written to eMMC, please first erase them in the advanced functions, and then write them to the Armian system. If it cannot be erased, first rewrite the `MiniLoaderAll.bin` boot file, and then enter `MASKROM` again to write to the Armbian system. MiniLoaderAll.bin boot file settings: address `0xCCCCCCCC`, name `Loader`, path selection `MiniLoaderAll.bin` file under the Image directory of RKDevTool tool.
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/202970301-d798677b-e875-4971-ac8f-ee58b2a1e686.png width="200" /><br />
