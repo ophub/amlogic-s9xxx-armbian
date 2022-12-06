@@ -149,7 +149,7 @@ EOF
     cat <<EOF
 ============================================[ Instructions for use of frps ]============================================
 Official website: https://github.com/fatedier/frp
-Documentation: https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/armbian-docs/armbian_software.md
+Documentation: https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/build-armbian/documents/armbian_software.md
 
 Core file path: [ ${software_core} ]
 Config file path: [ ${software_conf} ]
