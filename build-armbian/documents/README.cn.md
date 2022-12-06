@@ -257,7 +257,8 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 - R68s 在关机状态下，先插入 USB 双公头线，然后按住 Recovery 键并插上 12V 电源，两秒之后松开 Recovery 键，刷机工具会`发现一个 LOADER 设备`。
 - 在 RKDevTool 工具操作界面的空白处点右键，添加项。
 - 地址是 `0x00000000`，名字是 `armbian`，路径点击右侧选择 `armbian.img` 系统文件。
-- 选择添加的 armbian 一行外，取消其他行的选择，点击执行写入即可。
+- 选择添加的 armbian 一行外，`取消其他行的选择`，点击`执行`写入即可。
+- 补充说明：如果 eMMC 中写入了其他系统，请先在高级功能里擦除，再写入 Armbian 系统。如果无法擦除，先重新写入一次 `MiniLoaderAll.bin` 引导文件，然后再次进入 `MASKROM` 写入 Armbian 系统。MiniLoaderAll.bin 引导文件设置：地址 `0xCCCCCCCC`, 名字 `Loader`, 路径选择 RKDevTool 刷机工具 Image 目录下的 `MiniLoaderAll.bin` 文件。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/202970301-d798677b-e875-4971-ac8f-ee58b2a1e686.png width="200" /><br />
