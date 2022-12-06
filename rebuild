@@ -92,8 +92,7 @@ build_armbian=(
     "beikeyun" "l1pro"
 )
 
-# Set Armbian firmware size (Unit: MiB, SKIP_MB >= 4, BOOT_MB >= 256, ROOT_MB >= 2048)
-SKIP_MB="68"
+# Set Armbian firmware size (Unit: MiB, BOOT_MB >= 256, ROOT_MB >= 2048)
 BOOT_MB="256"
 ROOT_MB="2560"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
@@ -433,6 +432,9 @@ make_image() {
     # Make Amlogic s9xxx armbian
     build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
     rm -f ${build_image_file}
+
+    [[ "${PLATFORM}" == "amlogic" ]] && SKIP_MB="4"
+    [[ "${PLATFORM}" == "rockchip" ]] && SKIP_MB="16"
 
     IMG_SIZE="$((SKIP_MB + BOOT_MB + ROOT_MB))"
 
