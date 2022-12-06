@@ -474,11 +474,11 @@ make_image() {
     # Write the specified bootloader for Rockchip boxes
     [[ "${PLATFORM}" == "rockchip" ]] && {
         if [[ -n "${BOOTLOADER_IMG}" && -n ${MAINLINE_UBOOT} ]]; then
-            dd if="${uboot_path}/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
-            dd if="${uboot_path}/${board}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
+            dd if="${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
+            dd if="${uboot_path}/rockchip/${board}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         elif [[ -n "${BOOTLOADER_IMG}" ]]; then
-            dd if="${uboot_path}/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 skip=64 seek=64 2>/dev/null
+            dd if="${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 skip=64 seek=64 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
