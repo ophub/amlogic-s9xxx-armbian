@@ -148,7 +148,7 @@ jobs:
         with:
           tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-          allowUpdates: true
+          allowUpdates: false
           token: ${{ secrets.GH_TOKEN }}
           body: |
             This is Armbian image for Amlogic s9xxx tv box
