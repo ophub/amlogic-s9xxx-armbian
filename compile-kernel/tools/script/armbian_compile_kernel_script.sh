@@ -313,7 +313,7 @@ headers_install() {
     tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${out_kernel}/header
 
     # copy .config manually to be where it's expected to be
-    cp .config ${out_kernel}/header/.config
+    cp -f .config ${out_kernel}/header/.config
 
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
@@ -477,7 +477,7 @@ generate_uinitrd() {
 
     # Restore the files in the [ /usr/lib/modules ] directory
     rm -rf /usr/lib/modules/${kernel_outname}
-    mv ${modules_backup_path}/* /usr/lib/modules && rm -rf ${modules_backup_path}
+    mv -f ${modules_backup_path}/* /usr/lib/modules && rm -rf ${modules_backup_path}
 }
 
 packit_dtbs() {
