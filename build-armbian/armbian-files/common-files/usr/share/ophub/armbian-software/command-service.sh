@@ -236,8 +236,14 @@ software_307() {
         echo -ne "${OPTIONS} Please input the login desktop system user(non-root): "
         read get_desktop_user
         [[ -n "${get_desktop_user}" ]] && my_user="${get_desktop_user}" || my_user="${USER}"
+        # If the user exists, add it to the group
+        if ! id -u ${my_user} >/dev/null 2>&1; then
+            echo -e "${NOTE} User(${my_user}) does not exist, Start creating..."
+            sudo adduser ${my_user}
+            sudo usermod -aG sudo ${my_user}
+        fi
         # Add the login desktop system user to the kvm​ and libvirt user groups
-        echo -e "${STEPS} Start adding the current logged-in user(${my_user}) to the kvm and libvirt user groups..."
+        echo -e "${STEPS} Start adding user(${my_user}) to the kvm and libvirt user groups..."
         sudo usermod -aG kvm ${my_user}
         sudo usermod -aG libvirt ${my_user}
 
