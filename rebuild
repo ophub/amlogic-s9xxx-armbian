@@ -25,6 +25,7 @@
 # find_armbian       : Find Armbian file (build/output/images/*.img)
 # query_version      : Query the latest kernel version
 # download_kernel    : Download the latest kernel
+# download_depends   : Download the dependency files
 #
 # confirm_version    : Confirm version type
 # extract_armbian    : Extract Armbian files
@@ -43,12 +44,12 @@ make_path="${PWD}"
 armbian_outputpath="${make_path}/build/output/images"
 armbian_rebuild_file="${armbian_outputpath}/*.img"
 build_path="${make_path}/build-armbian"
-firmware_path="${build_path}/firmware"
 kernel_path="${build_path}/kernel"
 uboot_path="${build_path}/u-boot"
 common_files="${build_path}/armbian-files/common-files"
 platform_files="${build_path}/armbian-files/platform-files"
 model_conf="${common_files}/etc/model_database.conf"
+firmware_path="${common_files}/usr/lib/firmware"
 tmp_dir="${make_path}/tmp_dir"
 tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
@@ -64,6 +65,11 @@ os_release_file="etc/os-release"
 armbian_release_file="etc/armbian-release"
 # Add custom armbian firmware information
 ophub_release_file="etc/ophub-release"
+
+# Firmware files download repository
+firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
+# Convert firmware library address to svn format
+firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
@@ -315,6 +321,18 @@ download_kernel() {
     done
 }
 
+download_depends() {
+    cd ${make_path}
+    echo -e "${STEPS} Start downloading dependency files..."
+
+    # Download armbian firmware files
+    if [[ -d "${firmware_path}" ]]; then
+        svn up ${firmware_path} --force
+    else
+        svn co ${firmware_repo} ${firmware_path} --force
+    fi
+}
+
 confirm_version() {
     cd ${make_path}
 
@@ -514,9 +532,6 @@ copy_files() {
 
     # Copy the overload files
     [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/amlogic/overload/* ${tag_bootfs}
-
-    # Unzip the relevant files
-    tar -xJf "${firmware_path}/firmware.tar.xz" --no-same-owner -C ${tag_rootfs}/usr
 }
 
 replace_kernel() {
@@ -863,10 +878,14 @@ find_armbian
 # Download the latest kernel
 [[ "${auto_kernel}" == "true" ]] && query_version
 download_kernel
+# Download the dependency files
+download_depends
+#
 echo -e "${INFO} Armbian Board List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "${INFO} COMMON Kernel List: [ $(echo ${common_kernel[*]} | tr "\n" " ") ]"
 echo -e "${INFO} RK3588 Kernel List: [ $(echo ${rk3588_kernel[*]} | tr "\n" " ") ]"
 echo -e "${INFO} ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
+#
 # Loop to rebuild armbian firmware
 loop_rebuild
 #
