@@ -110,6 +110,7 @@ custom_name="_server"
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
+PROMPT="[\033[93m PROMPT \033[0m]"
 WARNING="[\033[93m WARNING \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
@@ -824,7 +825,7 @@ loop_rebuild() {
 
                     # Rockchip rk3568 series, such as FastRhino R66S/R68S only support 6.0.y and above kernel
                     [[ "${SOC,,}" == "rk3568" && "${kernel:0:1}" -ne "6" ]] && {
-                        echo -e "(${j}.${i}) ${WARNING} ${board}(${SOC,,}) cannot use ${kernel} kernel, skip."
+                        echo -e "(${j}.${i}) ${PROMPT} ${board}(${SOC,,}) cannot use ${kernel} kernel, skip."
                         let i++
                         continue
                     }
