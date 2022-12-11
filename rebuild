@@ -697,7 +697,9 @@ refactor_files() {
 
     # Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
     quotes_file="etc/update-motd.d/quotes.txt"
+    quotes_cron="etc/cron.weekly/armbian-quotes"
     [[ -f "${quotes_file}" ]] && echo "" >${quotes_file}
+    [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
