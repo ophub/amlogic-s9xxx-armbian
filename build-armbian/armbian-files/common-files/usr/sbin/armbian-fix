@@ -82,4 +82,10 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 # Disable ttyFIQ0 (ttyS2)
 [[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "29. Disable ttyFIQ0 (ttyS2)"
 
+# Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
+quotes_file="/etc/update-motd.d/quotes.txt"
+quotes_cron="/etc/cron.weekly/armbian-quotes"
+[[ -f "${quotes_file}" ]] && echo "" >${quotes_file} && echo "30. Clear quotes content"
+[[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron} && echo "31. Disable quotes cron plan"
+
 sync && echo "armbian-fix: Loading finished."
