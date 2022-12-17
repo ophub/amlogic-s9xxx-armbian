@@ -544,7 +544,7 @@ cpe                wifi
 
 #### 新建 有线网络连接
 
-在网络接口 `eth0` 上新建网络连接并立即生效（默认 `IPv4 / IPv6` 设置 `DHCP 获取动态 IP 地址`）。
+在网络接口 `eth0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
 
 ```
 # Set ENV
@@ -563,9 +563,33 @@ nmcli connection up $MYCON
 nmcli device status
 ```
 
+在网络接口 `eth0` 上新建网络连接并立即生效 (`静态 IP 地址` - `IPv4`)。
+
+```
+# Set ENV
+MYCON=ether1                  # 网络连接名称
+MYETH=eth0                    # 网络接口名称 = eth0 / eth1 / eht2 / eth3
+IP=192.168.67.167/24          # HOST IP 地址, 其中 24 是子网掩码 对应 255.255.255.0
+GW=192.168.67.1               # 网关
+DNS=119.29.29.29,223.5.5.5    # DNS 服务器地址
+
+# Chg CON
+nmcli connection add \
+con-name $MYCON \
+type ethernet \
+ifname $MYETH \
+autoconnect yes \
+ipv4.method manual \
+ipv4.addresses $IP \
+ipv4.gateway $GW \
+ipv4.dns $DNS
+nmcli connection up $MYCON
+nmcli device status
+```
+
 #### 新建 无线网络连接
 
-在网络接口 `wlan0` 上新建网络连接并立即生效（默认 `IPv4 / IPv6` 设置 `DHCP 获取动态 IP 地址`）。
+在网络接口 `wlan0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。 
 
 ```
 # Set ENV
