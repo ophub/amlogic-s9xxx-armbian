@@ -46,11 +46,10 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
       - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
       - [12.7.3 在 docker 中使用 OpenWrt 建立互通网络](#1273-在-docker-中使用-openwrt-建立互通网络)
-      - [使用 NetworkManager 设置网络](#使用-networkmanager-设置网络)
-      - [12.7.4 新增网络接口](#1274-新增网络接口)
-      - [12.7.5 设置静态 IP 地址](#1275-设置静态-ip-地址)
-      - [12.7.6 设置 DHCP 获取动态 IP 地址](#1276-设置-dhcp-获取动态-ip-地址)
-      - [12.7.7 修改以太网卡 MAC 地址](#1277-修改以太网卡-mac-地址)
+      - [使用 NetworkManager 管理网络](#使用-networkmanager-管理网络)
+      - [12.7.4 新建网络连接](#1274-新建网络连接)
+      - [12.7.5 修改网络地址分配方式](#1275-修改-网络地址分配方式)
+      - [12.7.6 修改网络连接 MAC 地址](#1276-修改-网络连接-mac-地址)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
     - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
     - [12.10 如何制作安卓系统分区表](#1210-如何制作安卓系统分区表)
@@ -492,62 +491,213 @@ auto lo
 iface lo inet loopback
 ```
 
-#### 使用 NetworkManager 设置网络
+#### 使用 NetworkManager 管理网络
 
-#### 12.7.4 新增网络接口
+#### 12.7.4 新建网络连接
 
-新增网络接口 eth0 并立即生效（默认设置 DHCP 获取动态 IP 地址），其中 MYETH 根据自己的情况修改。
+新建或修改网络连接前的准备工作
 
-```yaml
-MYETH=eth0
+#### 获取网络接口名称
+
+查看设备中有哪些网络接口可以用来建立网络连接。
+
+```
+nmcli device | grep -E "^[e].*|^[w].*|^[D].*|^[T].*" | awk '{printf "%-19s%-19s\n",$1,$2}'
+```
+
+执行命令后返回内容, `DEVICE` 列显示网络接口名称, `TYPE` 列显示网络接口类型。
+
+其中 `eth0` = 第1块有线网卡的名称, `eth1` = 第2块有线网卡的名称, 以此类推, 无线网卡同理。
+
+```
+DEVICE             TYPE
+eth0               ethernet
+eth1               ethernet
+eth2               ethernet
+eth3               ethernet
+wlan0              wifi
+wlan1              wifi
+```
+
+#### 获取现有网络连接名称
+
+查看设备现有哪些网络连接（包含使用中和未使用的连接）, 在新建网络连接时, 不能使用已经存在的连接名称。
+
+```
+nmcli connection show | grep -E ".*|^[N].*" | awk '{printf "%-19s%-19s\n", $1,$3}'
+```
+
+执行命令后返回内容, `NAME` 列显示现有网络连接名称, `TYPE` 列显示网络接口类型。
+
+其中 `ethernet` = 有线网卡, `wifi` = 无线网卡, `bridge` = 网桥
+
+```
+NAME               TYPE
+cnc                ethernet
+lan                ethernet
+lte                ethernet
+tel                ethernet
+docker0            bridge
+titanium           wifi
+cpe                wifi
+```
+
+#### 新建 有线网络连接
+
+在网络接口 `eth0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
+
+```
+# Set ENV
+MYCON=ether1                  # 新建网络连接名称
+MYETH=eth0                    # 网络接口名称 = eth0 / eth1 / eht2 / eth3
+IPV6AGM=stable-privacy        # IPv6 地址状态模式 = stable-privacy / eui64
+
+# Add ETH
 nmcli connection add \
-con-name $MYETH type ethernet ifname $MYETH \
-ipv6.method disabled
-nmcli connection up $MYETH
+con-name $MYCON \
+type ethernet \
+ifname $MYETH \
+autoconnect yes \
+ipv6.addr-gen-mode $IPV6AGM
+nmcli connection up $MYCON
+nmcli device status
 ```
 
-#### 12.7.5 设置静态 IP 地址
+在网络接口 `eth0` 上新建网络连接并立即生效 (`静态 IP 地址` - `IPv4`)。
 
-修改网络接口 eth0 为静态 IP 地址并立即生效，其中 MYETH、 IP、 GW、 DNS 根据自己的网络情况修改。
+```
+# Set ENV
+MYCON=ether1                  # 网络连接名称
+MYETH=eth0                    # 网络接口名称 = eth0 / eth1 / eht2 / eth3
+IP=192.168.67.167/24          # HOST IP 地址, 其中 24 是子网掩码 对应 255.255.255.0
+GW=192.168.67.1               # 网关
+DNS=119.29.29.29,223.5.5.5    # DNS 服务器地址
 
-```yaml
-MYETH=eth0
-nmcli connection modify $MYETH \
+# Chg CON
+nmcli connection add \
+con-name $MYCON \
+type ethernet \
+ifname $MYETH \
+autoconnect yes \
 ipv4.method manual \
-ipv4.addresses 192.168.67.167/24 \
-ipv4.gateway 192.168.67.1 \
-ipv4.dns 119.29.29.29,223.5.5.5 \
-ipv6.method disabled
-nmcli connection up $MYETH
+ipv4.addresses $IP \
+ipv4.gateway $GW \
+ipv4.dns $DNS
+nmcli connection up $MYCON
+nmcli device status
 ```
 
-#### 12.7.6 设置 DHCP 获取动态 IP 地址
+#### 新建 无线网络连接
 
-修改网络接口 eth0 为 DHCP 获取动态 IP 地址并立即生效，其中 MYETH 根据自己的情况修改。
+在网络接口 `wlan0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。 
 
-```yaml
-MYETH=eth0
-nmcli connection modify $MYETH \
+```
+# Set ENV
+MYCON=ssid                    # 新建网络连接名称, 建议使用 WiFi SSID 来指定连接名称
+MYSSID=ssid                   # WiFi SSID 区分大小写
+MYPSWD=passwd                 # WiFi 密码
+MYWSKM=wpa-psk                # 安全性选择 WPA-WPA2 = wpa-psk or WPA3 = sae （无线路由器或 AP 中查看是哪一种加密方式）
+MYWLAN=wlan0                  # 网络接口名称 = wlan0 / wlan1
+IPV6AGM=stable-privacy        # IPv6 地址状态模式 = stable-privacy / eui64
+
+# Add WLAN
+nmcli connection add \
+con-name $MYCON \
+type wifi \
+ifname $MYWLAN \
+autoconnect yes \
+ipv6.addr-gen-mode $IPV6AGM \
+wifi.ssid $MYSSID \
+wifi-sec.key-mgmt $MYWSKM \
+wifi-sec.psk $MYPSWD
+nmcli connection up $MYCON
+nmcli device status
+```
+
+#### 修改 无线网络连接中的 WiFi SSID or PASSWD
+
+修改无线网络连接 `ssid` 中的 `WiFi SSID or PASSWD` 并立即生效。
+
+```
+# Set ENV
+MYCON=ssid                    # 无线网络连接名称
+MYSSID=ssid                   # WiFi SSID 区分大小写
+MYPSWD=passwd                 # WiFi 密码
+MYWSKM=wpa-psk                # 安全性选择 WPA-WPA2 = wpa-psk or WPA3 = sae
+
+# Add WLAN
+nmcli connection modify $MYCON \
+wifi.ssid $MYSSID \
+wifi-sec.key-mgmt $MYWSKM \
+wifi-sec.psk $MYPSWD
+nmcli connection up $MYCON
+nmcli device status
+```
+
+#### 12.7.5 修改 网络地址分配方式
+
+#### 静态 IP 地址 - IPv4
+
+在网络连接 `ether1` 上修改 IP 地址分配方式为 `静态 IP 地址` 并立即生效。
+
+*适用 有线连接 / 无线连接
+
+```
+# Set ENV
+MYCON=ether1                  # 网络连接名称
+IP=192.168.67.167/24          # HOST IP 地址, 其中 24 是子网掩码 对应 255.255.255.0
+GW=192.168.67.1               # 网关
+DNS=119.29.29.29,223.5.5.5    # DNS 服务器地址
+
+# Chg CON
+nmcli connection modify $MYCON \
+ipv4.method manual \
+ipv4.addresses $IP \
+ipv4.gateway $GW \
+ipv4.dns $DNS
+nmcli connection up $MYCON
+nmcli device status
+```
+
+#### DHCP 获取动态 IP 地址 - IPv4 / IPv6
+
+在网络连接 `ether1` 上修改 IP 地址分配方式为 `DHCP 获取动态 IP 地址` 并立即生效。
+
+*适用 有线连接 / 无线连接
+
+```
+# Set ENV
+MYCON=ether1                  # 网络连接名称
+
+# Chg CON
+nmcli connection modify $MYCON \
 ipv4.method auto \
-ipv6.method disabled
-nmcli connection up $MYETH
+ipv6.method auto
+nmcli connection up $MYCON
+nmcli device status
 ```
 
-#### 12.7.7 修改以太网卡 MAC 地址
+#### 12.7.6 修改 网络连接 MAC 地址
 
-修改网络接口 eth0 的 MAC 地址并立即生效，以解决局域网 MAC 地址冲突问题，其中 MYETH、MYMAC 根据自己的情况修改。
+在网络连接 `ether1` 上修改(克隆) `MAC 地址`并立即生效, 以解决局域网 MAC 地址冲突问题。
 
-```yaml
-MYETH=eth0
-MYMAC=12:34:56:78:9A:BC
-nmcli connection modify $MYETH \
-ethernet.cloned-mac-address $MYMAC
-nmcli connection up $MYETH
+*适用 有线连接 / 无线连接
+
+```
+# Set ENV
+MYCON=ether1                  # 网络连接名称, 注意匹配网络接口类型
+MYTYPE=ethernet               # 网络接口类型 = 有线网卡 / 无线网卡 = ethernet / wifi
+MYMAC=12:34:56:78:9A:BC       # 新的 MAC 地址
+
+# Chg CON
+nmcli connection modify ${MYCON} \
+${MYTYPE}.cloned-mac-address ${MYMAC}
+nmcli connection up ${MYETH}
+nmcli device status
 ```
 
-* 新增、设置或修改部分网络参数，以太网卡会断开现有连接，并重新连接网络。
-* 以上使用 NetworkManager 设置网络，默认禁用 ipv6 ，如需使用 ipv6 设置并启用即可。
-* 由于软硬件环境不同（盒子，系统，网络设备等），生效所需时间 2-15 秒左右。更长时间未生效的建议检查软硬件环境。
+* 新建或修改部分网络参数, 网络连接可能会被断开, 并重新连接网络。
+* 由于软硬件环境不同（盒子, 系统, 网络设备等）, 生效所需时间 `1-15` 秒左右, 更长时间未生效的建议检查软硬件环境。
 
 ### 12.8 如何添加开机启动任务
 
