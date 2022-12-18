@@ -23,9 +23,9 @@
 #
 # init_var           : Initialize all variables
 # find_armbian       : Find Armbian file (build/output/images/*.img)
+# download_depends   : Download the dependency files
 # query_version      : Query the latest kernel version
 # download_kernel    : Download the latest kernel
-# download_depends   : Download the dependency files
 #
 # confirm_version    : Confirm version type
 # extract_armbian    : Extract Armbian files
@@ -235,6 +235,14 @@ find_armbian() {
     echo -e "${INFO} Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 }
 
+download_depends() {
+    cd ${make_path}
+    echo -e "${STEPS} Start downloading dependency files..."
+
+    # Download armbian firmware files
+    svn co ${firmware_repo} ${firmware_path} --force
+}
+
 query_version() {
     echo -e "${STEPS} Start querying the latest kernel version..."
 
@@ -320,18 +328,6 @@ download_kernel() {
             let x++
         }
     done
-}
-
-download_depends() {
-    cd ${make_path}
-    echo -e "${STEPS} Start downloading dependency files..."
-
-    # Download armbian firmware files
-    if [[ -d "${firmware_path}" ]]; then
-        svn up ${firmware_path} --force
-    else
-        svn co ${firmware_repo} ${firmware_path} --force
-    fi
 }
 
 confirm_version() {
@@ -878,11 +874,11 @@ echo -e "${INFO} Setting parameters: [ ${@} ] \n"
 init_var "${@}"
 # Find rebuild files
 find_armbian
+# Download the dependency files
+download_depends
 # Download the latest kernel
 [[ "${auto_kernel}" == "true" ]] && query_version
 download_kernel
-# Download the dependency files
-download_depends
 #
 echo -e "${INFO} Armbian Board List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "${INFO} COMMON Kernel List: [ $(echo ${common_kernel[*]} | tr "\n" " ") ]"
