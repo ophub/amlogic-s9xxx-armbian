@@ -84,6 +84,8 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 
 # Disable tip of the day for [ /etc/update-motd.d/35-armbian-tips ]
 modt_tips="/etc/default/armbian-motd"
-[[ -f "${modt_tips}" ]] && sed -i 's|MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${modt_tips} && echo "30. Disable tip of the day"
+[[ -f "${modt_tips}" ]] && sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${modt_tips} && echo "30. Disable tip of the day"
+quotes_cron="/etc/cron.weekly/armbian-quotes"
+[[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron} && echo "31. Disable quotes cron plan"
 
 sync && echo "armbian-fix: Loading finished."
