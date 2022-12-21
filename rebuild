@@ -691,11 +691,9 @@ refactor_files() {
         sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
     }
 
-    # Clear quotes content for [ /etc/update-motd.d/35-armbian-tips ]
-    quotes_file="etc/update-motd.d/quotes.txt"
-    quotes_cron="etc/cron.weekly/armbian-quotes"
-    [[ -f "${quotes_file}" ]] && echo "" >${quotes_file}
-    [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
+    # Disable tip of the day for [ /etc/update-motd.d/35-armbian-tips ]
+    modt_tips="/etc/default/armbian-motd"
+    [[ -f "${modt_tips}" ]] && sed -i 's|MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${modt_tips}
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
