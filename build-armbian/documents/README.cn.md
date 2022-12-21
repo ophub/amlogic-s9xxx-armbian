@@ -521,7 +521,9 @@ wlan1              wifi
 
 #### 获取现有网络连接名称
 
-查看设备现有哪些网络连接（包含使用中和未使用的连接）, 在新建网络连接时, 不能使用已经存在的连接名称。
+查看设备现有哪些网络连接, 包含使用中和未使用的连接。
+
+*) 在新建网络连接时, 不建议使用已经存在的连接名称。
 
 ```
 nmcli connection show | grep -E ".*|^[N].*" | awk '{printf "%-19s%-19s\n", $1,$3}'
@@ -560,7 +562,7 @@ ifname $MYETH \
 autoconnect yes \
 ipv6.addr-gen-mode $IPV6AGM
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 在网络接口 `eth0` 上新建网络连接并立即生效 (`静态 IP 地址` - `IPv4`)。
@@ -584,7 +586,7 @@ ipv4.addresses $IP \
 ipv4.gateway $GW \
 ipv4.dns $DNS
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 #### 新建 无线网络连接
@@ -611,7 +613,7 @@ wifi.ssid $MYSSID \
 wifi-sec.key-mgmt $MYWSKM \
 wifi-sec.psk $MYPSWD
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 #### 修改 无线网络连接中的 WiFi SSID or PASSWD
@@ -631,7 +633,7 @@ wifi.ssid $MYSSID \
 wifi-sec.key-mgmt $MYWSKM \
 wifi-sec.psk $MYPSWD
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 #### 12.7.5 修改 网络地址分配方式
@@ -656,7 +658,7 @@ ipv4.addresses $IP \
 ipv4.gateway $GW \
 ipv4.dns $DNS
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 #### DHCP 获取动态 IP 地址 - IPv4 / IPv6
@@ -674,7 +676,7 @@ nmcli connection modify $MYCON \
 ipv4.method auto \
 ipv6.method auto
 nmcli connection up $MYCON
-nmcli device status
+ip -c -br address
 ```
 
 #### 12.7.6 修改 网络连接 MAC 地址
@@ -693,7 +695,7 @@ MYMAC=12:34:56:78:9A:BC       # 新的 MAC 地址
 nmcli connection modify ${MYCON} \
 ${MYTYPE}.cloned-mac-address ${MYMAC}
 nmcli connection up ${MYETH}
-nmcli device status
+ip -c -br address
 ```
 
 * 新建或修改部分网络参数, 网络连接可能会被断开, 并重新连接网络。
