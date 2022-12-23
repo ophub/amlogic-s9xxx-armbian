@@ -124,7 +124,7 @@ jobs:
           down_path="Armbian_${{ inputs.set_release }}.*/Armbian_.*-trunk_.*.img.gz"
 
           # down_filename: Armbian_jammy_11.18.2336/Armbian_22.11.0-trunk_5.10.70.img.gz
-          down_filename="$(curl -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
+          down_filename="$(curl --header "authorization: Bearer ${{ secrets.GH_TOKEN }}" -s "${down_repo}" | grep -oE "${down_path}" | head -n 1)"
           down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
           [[ -z "${down_file}" ]] && echo "Invalid download file." && exit 1
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
@@ -146,6 +146,7 @@ jobs:
           armbian_size: ${{ inputs.armbian_size }}
           armbian_fstype: ${{ inputs.armbian_fstype }}
           armbian_sign: ${{ inputs.armbian_sign }}
+          gh_token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
