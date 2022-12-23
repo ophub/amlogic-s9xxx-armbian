@@ -10,8 +10,8 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      kernel_repo:
-        description: "Select the kernel repository"
+      kernel_source:
+        description: "Select the kernel source"
         required: false
         default: "unifreq"
         type: choice
@@ -85,7 +85,7 @@ jobs:
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
-          kernel_repo: ${{ inputs.kernel_repo }}
+          kernel_source: ${{ inputs.kernel_source }}
           kernel_version: ${{ inputs.kernel_version }}
           kernel_auto: ${{ inputs.kernel_auto }}
           kernel_package: ${{ inputs.kernel_package }}
@@ -102,4 +102,4 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
-            The kernel source code comes from: ${{ inputs.kernel_repo }}
+            The kernel source code comes from: ${{ inputs.kernel_source }}

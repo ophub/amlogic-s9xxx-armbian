@@ -61,8 +61,8 @@ inputs:
     description: "Set the kernel custom signature"
     required: false
     default: "-ophub"
-  kernel_repo:
-    description: "Select the kernel repository"
+  kernel_source:
+    description: "Select the kernel source code"
     required: false
     default: "unifreq"
   kernel_config:
@@ -160,7 +160,7 @@ runs:
             [[ -n "${{ inputs.kernel_auto }}" ]] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
             [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
-            [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
+            [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             sudo ./recompile ${make_command}
 
             cd ${GITHUB_ACTION_PATH}
