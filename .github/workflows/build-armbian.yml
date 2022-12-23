@@ -168,6 +168,7 @@ jobs:
           armbian_size: ${{ inputs.armbian_size }}
           armbian_fstype: ${{ inputs.armbian_fstype }}
           armbian_sign: ${{ inputs.armbian_sign }}
+          gh_token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Rebuild image to Release
         uses: ncipollo/release-action@main
