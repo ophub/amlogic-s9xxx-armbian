@@ -104,6 +104,9 @@ ROOTFS_TYPE="ext4"
 # Custom name in firmware name: ${build_image_file}, such as _server, _dev, etc.
 custom_name="_server"
 
+# Get ${{ secrets.GH_TOKEN }} for api.github.com
+GH_TOKEN=""
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -134,7 +137,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "b:k:a:v:r:s:t:n:" "${@}")"
+    get_all_ver="$(getopt "b:k:a:v:r:s:t:n:g:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -215,6 +218,14 @@ init_var() {
                 error_msg "Invalid -n parameter [ ${2} ]!"
             fi
             ;;
+        -g | --GH_TOKEN)
+            if [[ -n "${2}" ]]; then
+                GH_TOKEN="${2}"
+                shift
+            else
+                error_msg "Invalid -g parameter [ ${2} ]!"
+            fi
+            ;;
         *)
             error_msg "Invalid option [ ${1} ]!"
             ;;
@@ -276,15 +287,26 @@ query_version() {
             i=1
             for kernel_var in ${down_kernel_list[*]}; do
                 echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version of the same series for [ ${k} - ${kernel_var} ]"
+
+                # Identify the kernel mainline
                 MAIN_LINE="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
+
                 # Check the version on the server (e.g LATEST_VERSION="125")
-                LATEST_VERSION="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                if [[ -n "${GH_TOKEN}" ]]; then
+                    LATEST_VERSION="$(curl --header "authorization: Bearer ${GH_TOKEN}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                    query_api="authenticated"
+                else
+                    LATEST_VERSION="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                    query_api="unauthenticated"
+                fi
+
                 if [[ "${?}" -eq "0" && -n "${LATEST_VERSION}" ]]; then
                     tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
                 else
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
-                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+
+                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel(${query_api}). \n"
 
                 let i++
             done
