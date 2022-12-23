@@ -28,6 +28,10 @@ inputs:
     description: "Auto use the latest kernel."
     required: false
     default: "true"
+  kernel_repo:
+    description: "Set kernel repository."
+    required: false
+    default: "https://github.com/ophub/kernel/tree/main/pub"
   armbian_size:
     description: "Set armbian rootfs size(Unit: MiB)."
     required: false
@@ -112,6 +116,7 @@ runs:
             [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.version_branch }}" ]] && make_command="${make_command} -v ${{ inputs.version_branch }}"
+            [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_sign }}" ]] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
