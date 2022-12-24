@@ -41,7 +41,7 @@ The list of devices supported by Amlogic TV Boxes, the configuration file in the
 <tr><td>214</td><td>Phicomm-T1</td><td>s912</td><td>meson-gxm-phicomm-t1.dtb</td><td>u-boot-s905x-s912.bin</td><td>NA</td><td>NA</td><td>2G RAM,16G ROM,100Mb Nic,Wifi,Bluetooth</td></tr>
 
 <tr><td>301</td><td>X96 Max 4GB</td><td>s905x2</td><td>meson-g12a-x96-max.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,4GB Mem,1Gb Nic</td></tr>
-<tr><td>302</td><td>X96 Max 2GB</td><td>s905x2</td><td>meson-g12a-x96-max-rmii.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,2GB Mem,100Mb Nic</td></tr>
+<tr><td>302</td><td>X96-Max-2GB/A95X-F2</td><td>s905x2</td><td>meson-g12a-x96-max-rmii.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,2GB Mem,100Mb Nic</td></tr>
 <tr><td>303</td><td>MECOOL KM3 4G</td><td>s905x2</td><td>meson-g12a-sei510.dtb</td><td>u-boot-x96max.bin</td><td>x96max-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,4+64G/128G,2.4G/5G WiFi,Bluetooth 4.1,100Mb Nic</td></tr>
 <tr><td>304</td><td>E900V22C/D</td><td>s905l3a</td><td>meson-g12a-s905l3a-e900v22c.dtb</td><td>u-boot-e900v22c.bin</td><td>e900v22c-u-boot.bin.sd.bin</td><td>NA</td><td>4C@1908Mhz,S905L3A+B,2+8G,USB2.0x2,LAN 100Mb Nic,uwe5621ds wifi(no work)</td></tr>
 <tr><td>305</td><td>CM311-1a-YST</td><td>s905l3a</td><td>meson-g12a-s905l3a-cm311.dtb</td><td>u-boot-e900v22c.bin</td><td>NA</td><td>NA</td><td>4C@1908Mhz,S905L3A,2+16G,USB2.0x2,LAN 100Mb Nic,Bluetooth rtl8761b</td></tr>
