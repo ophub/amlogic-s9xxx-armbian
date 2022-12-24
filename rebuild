@@ -294,10 +294,10 @@ query_version() {
                 # Check the version on the server (e.g LATEST_VERSION="125")
                 if [[ -n "${GH_TOKEN}" ]]; then
                     LATEST_VERSION="$(curl --header "authorization: Bearer ${GH_TOKEN}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
-                    query_api="authenticated"
+                    query_api="Authenticated user request"
                 else
                     LATEST_VERSION="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
-                    query_api="unauthenticated"
+                    query_api="Unauthenticated user request"
                 fi
 
                 if [[ "${?}" -eq "0" && -n "${LATEST_VERSION}" ]]; then
