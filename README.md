@@ -252,6 +252,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
     armbian_kernel: 5.10.125_5.15.50
+    gh_token: ${{ secrets.GH_TOKEN }}
 ```
 
 - ### GitHub Actions Input parameter description
