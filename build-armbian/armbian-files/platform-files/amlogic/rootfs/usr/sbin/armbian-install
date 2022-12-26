@@ -133,10 +133,10 @@ init_var() {
     # Find emmc disk, find emmc that does not contain the boot0 partition
     [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | uniq)"
     # Check if emmc exists
-    [[ -z "${install_emmc}" ]] && error_msg "No emmc can be found to install the armbian system!"
+    [[ -z "${install_emmc}" ]] && error_msg "The eMMC storage not found in this device!"
     # Location of emmc
     DEV_EMMC="/dev/${install_emmc}"
-    echo -e "${INFO} DEV_EMMC: [ ${DEV_EMMC} ]"
+    echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
     [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/* 2>/dev/null && sync
