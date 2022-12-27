@@ -103,6 +103,7 @@ help_info() {
     Command: armbian-kernel -k 5.10.100
     -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
     -a : AutoKernel   Set whether to automatically adopt the latest version, such as [ -a true ]
+    -p : PackageList  Set the package list for compiling the kernel, such as [ -p dtbs ]
     -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
     -r : Repo         Specifies the source code repository for the compiled kernel.
 ===================================================================================================
@@ -115,8 +116,8 @@ EOF
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # 10Gb free space required
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
-remaining_space="$(df -hT ${make_path} | grep '/dev/' | awk '{print $5}' | sed 's/.$//' | awk -F "." '{print $1}')"
-[[ "${remaining_space}" -ge "10" ]] || error_msg "Compiling the kernel requires 10Gb running space"
+remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+[[ "${remaining_space}" -ge "5" ]] || error_msg "Compiling the kernel requires 5Gb running space"
 
 # Execute script assist functions
 case "${1}" in
