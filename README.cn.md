@@ -237,7 +237,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 1. 关于 Workflows 文件的配置在 [.yml](.github/workflows/build-armbian.yml) 文件里。可以设置需要编译的盒子的 `board` 等参数，具体详见 `Rebuild Armbian for amlogic s9xxx` 节点。
 
-2. 全新编译：在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build amlogic armbian`*** ，根据 Armbian 官方支持的 OS 版本，可在 [RELEASE](https://docs.armbian.com/Developer-Guide_Build-Options/) 里选择 Ubuntu 系列：`jammy`，或者 Debian 系列：`bullseye` 等。点击 ***`Run workflow`*** 按钮即可编译。
+2. 全新编译：在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build amlogic armbian`*** ，根据 Armbian 官方支持的 OS 版本，可以选择 Ubuntu 系列：`jammy`，或者 Debian 系列：`bullseye` 等。点击 ***`Run workflow`*** 按钮即可编译。更多参数的设置方法可以在 [Armbian 官方文档](https://docs.armbian.com/Developer-Guide_Build-Options/) 里查阅。
 
 3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 board 的盒子，可以跳过 Armbian 源文件的编译，直接进行二次制作。在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面中选择  ***`Use Releases file to build armbian`*** ，点击 ***`Run workflow`*** 按钮即可二次编译。
 
