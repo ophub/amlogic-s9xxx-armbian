@@ -68,7 +68,7 @@ package_list="all"
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
-clang_file="clang+llvm-14.0.0-aarch64-linux-gnu.tar.xz"
+clang_file="clang+llvm-15.0.6-aarch64-linux-gnu.tar.xz"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
