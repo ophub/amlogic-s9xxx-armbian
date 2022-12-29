@@ -72,7 +72,7 @@ dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 armbian_rootfs_file="armbian.tar.xz"
 #
 # Arm GNU Toolchain download from: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-11.3.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+gun_file="arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
 #
 # Clang download from: https://github.com/llvm/llvm-project/releases
 clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
