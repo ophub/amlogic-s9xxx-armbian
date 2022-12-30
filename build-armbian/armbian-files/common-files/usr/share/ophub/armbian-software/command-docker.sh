@@ -40,6 +40,8 @@
 # software_119  : For netdata:19999
 # software_120  : For xunlei:2345
 # software_121  : For docker-headless:10081/10089
+# software_122  : For navidrome:4533
+# software_123  : For alist:5244
 #
 #============================================================================
 
@@ -807,6 +809,69 @@ software_121() {
         echo -e "${NOTE} The ${container_name} noVnc [ http://ip:10081 ], PASS [ headless ], ReadOnly [ View123 ]"
         echo -e "${NOTE} The ${container_name} RDP [ ip:10089 ]"
         echo -e "${NOTE} The ${container_name} SSH [ ssh -p 10022 headless@ip ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For navidrome
+software_122() {
+    # Set basic information
+    container_name="navidrome"
+    image_name="deluan/navidrome:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/deluan/navidrome
+        docker run -d --name=${container_name} \
+            --user $(id -u):$(id -g) \
+            -e ND_LOGLEVEL=info \
+            -p 4533:4533 \
+            -v ${install_path}/music:/music \
+            -v ${install_path}/data:/data \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:4533 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For alist
+software_123() {
+    # Set basic information
+    container_name="alist"
+    image_name="xhofe/alist:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/xhofe/alist
+        docker run -d --name=${container_name} \
+            -e PUID=0 \
+            -e PGID=0 \
+            -e UMASK=022 \
+            -p 5244:5244 \
+            -v /etc/alist:/opt/alist/data \
+            --restart=always \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://ip:5244 ]"
+        echo -e "${NOTE} View the initialization account and password commands [ docker exec -it alist ./alist password ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
