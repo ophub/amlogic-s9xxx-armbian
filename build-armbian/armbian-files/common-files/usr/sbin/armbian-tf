@@ -49,7 +49,12 @@ do_checkdisk() {
     [hsv]d[a-z][1-4])
         DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
         PT_PRE="${DISK_NAME}"
-        LB_PRE=""
+        LB_PRE="USB_"
+        ;;
+    nvme?n?p[1-4])
+        DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        PT_PRE="${DISK_NAME}p"
+        LB_PRE="NVME_"
         ;;
     *)
         error_msg "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
