@@ -297,11 +297,9 @@ create_partition() {
     # Backup the bootloader, if necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
-    if [[ ! -f "${MYBOX_UBOOT}" ]]; then
-        echo -e "${INFO} Start backup default bootloader."
-        dd if="${DEV_EMMC}" of=${MYBOX_UBOOT} bs=1M count=4 conv=fsync
-    fi
-    sync
+    [[ -f "${MYBOX_UBOOT}" ]] && rm -f ${MYBOX_UBOOT}
+    echo -e "${INFO} Start backup default bootloader."
+    dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
 
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
@@ -313,7 +311,6 @@ create_partition() {
         done
     fi
     dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
-    sync
 
     # Use the ampart partition tool
     AMPART_STATUS="no"
@@ -375,8 +372,8 @@ create_partition() {
         dd if="/usr/lib/u-boot/${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} Restore the mybox bootloader: [ ${MYBOX_UBOOT} ]"
-        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=1 count=444
-        dd if=${MYBOX_UBOOT} of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
 }
 
