@@ -488,6 +488,19 @@ copy_rootfs() {
         )
         sync
     done
+    # Copy snap directory if necessary
+    SNAP_SRC="snap"
+    for src in ${SNAP_SRC}; do
+        if [ -d ${src} ]; then
+            echo -e "${INFO} Copy snap directory [ ${src} ]."
+            # Copy symbol links with depth of no more than 2
+            tar -cf - `find ${src} -maxdepth 2 -type l` | (
+                cd ${DIR_INSTALL}
+                tar -xf -
+            )
+        fi
+        sync
+    done
     # Create relevant symbolic link
     ln -sf /usr/bin ${DIR_INSTALL}/bin
     ln -sf /usr/lib ${DIR_INSTALL}/lib
