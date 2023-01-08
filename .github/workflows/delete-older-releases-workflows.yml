@@ -1,6 +1,6 @@
 #==========================================================================
 # https://github.com/ophub/amlogic-s9xxx-armbian
-# Description: Automatically delete older releases and workflows
+# Description: Delete older releases and workflows runs
 #==========================================================================
 
 name: Delete older releases and workflows
@@ -9,18 +9,13 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      delete_older_releases:
-        description: "Delete older Releases?"
-        required: false
-        default: true
-        type: boolean
       delete_tags:
         description: "Delete related Tags?"
         required: false
         default: true
         type: boolean
-      keep_latest:
-        description: "Choose how many Releases to keep."
+      releases_keep_latest:
+        description: "How many latest releases to keep."
         required: false
         default: "3"
         type: choice
@@ -38,17 +33,12 @@ on:
           - 2
           - 1
           - 0
-      delete_tag_pattern:
-        description: "Set the Releases Keywords to match."
+      releases_keep_keyword:
+        description: "Keyword of the keep releases."
         required: false
-        default: "_"
-      delete_workflow_runs:
-        description: "Delete workflow Runs?"
-        required: false
-        default: true
-        type: boolean
-      retain_days:
-        description: "Choose how many Days to keep."
+        default: "s9xxx"
+      workflows_keep_day:
+        description: "Days to keep workflows."
         required: false
         default: "1"
         type: choice
@@ -66,25 +56,10 @@ on:
           - 2
           - 1
           - 0
-      keep_minimum_runs:
-        description: "Choose how many Runs to keep."
+      workflows_keep_keyword:
+        description: "keywords for keep workflows."
         required: false
-        default: "0"
-        type: choice
-        options:
-          - 30
-          - 20
-          - 10
-          - 9
-          - 8
-          - 7
-          - 6
-          - 5
-          - 4
-          - 3
-          - 2
-          - 1
-          - 0
+        default: ""
 
 env:
   TZ: America/New_York
@@ -106,21 +81,12 @@ jobs:
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Delete older releases
-        uses: codesnas/delete-older-releases@main
-        if: ${{ inputs.delete_older_releases }} == 'true'
+      - name: Delete releases and workflows runs
+        uses: ophub/delete-releases-workflows@main
         with:
-          keep_latest: ${{ inputs.keep_latest }}
           delete_tags: ${{ inputs.delete_tags }}
-          delete_tag_pattern: ${{ inputs.delete_tag_pattern }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-
-      - name: Delete older workflow runs and artifacts
-        uses: Mattraks/delete-workflow-runs@main
-        if: ${{ inputs.delete_workflow_runs }} == 'true'
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-          repository: ${{ github.repository }}
-          retain_days: ${{ inputs.retain_days }}
-          keep_minimum_runs: ${{ inputs.keep_minimum_runs }}
+          releases_keep_latest: ${{ inputs.releases_keep_latest }}
+          releases_keep_keyword: ${{ inputs.releases_keep_keyword }}
+          workflows_keep_day: ${{ inputs.workflows_keep_day }}
+          workflows_keep_keyword: ${{ inputs.workflows_keep_keyword }}
+          gh_token: ${{ secrets.GH_TOKEN }}
