@@ -82,10 +82,22 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 # Disable ttyFIQ0 (ttyS2)
 [[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "29. Disable ttyFIQ0 (ttyS2)"
 
-# Disable tip of the day for [ /etc/update-motd.d/35-armbian-tips ]
-modt_tips="/etc/default/armbian-motd"
-[[ -f "${modt_tips}" ]] && sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${modt_tips} && echo "30. Disable tip of the day"
+# Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
+motd_tips="/etc/default/armbian-motd"
+[[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${motd_tips} && echo "30. Disable tips of the day"
 quotes_cron="/etc/cron.weekly/armbian-quotes"
 [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron} && echo "31. Disable quotes cron plan"
+
+# Remove motd-news service
+motd_timer="/usr/lib/systemd/system/motd-news.timer"
+[[ -f "${motd_timer}" ]] && systemctl stop motd-news.timer && systemctl disable motd-news.timer
+sudo rm -f ${motd_timer}
+motd_service="/usr/lib/systemd/system/motd-news.service"
+[[ -f "${motd_service}" ]] && systemctl stop motd-news.service && systemctl disable motd-news.service
+sudo rm -f ${motd_service}
+sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
+sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
+sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer
+sudo rm -f /etc/update-motd.d/50-motd-news && echo "32. Remove motd-news service"
 
 sync && echo "armbian-fix: Loading finished."
