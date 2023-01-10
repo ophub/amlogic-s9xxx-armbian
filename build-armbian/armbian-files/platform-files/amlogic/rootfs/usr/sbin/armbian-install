@@ -242,11 +242,11 @@ EOF
     if [[ "${filetype}" -eq "2" || "${filetype}" == "btrfs" ]]; then
         file_system_type="btrfs"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
-        fstab_mount_string="defaults,noatime,compress=zstd:6"
+        fstab_mount_string="discard,defaults,noatime,compress=zstd:6"
     else
         file_system_type="ext4"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
-        fstab_mount_string="defaults,noatime,errors=remount-ro"
+        fstab_mount_string="discard,defaults,noatime,errors=remount-ro"
     fi
     echo -e "${INFO} Input Type ID: [ ${filetype} ]"
     echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
@@ -497,9 +497,9 @@ copy_rootfs() {
     echo -e "${INFO} Generate the new fstab file."
     rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
     cat >${DIR_INSTALL}/etc/fstab <<EOF
-UUID=${ROOTFS_UUID}  /        ${file_system_type}     ${fstab_mount_string}     0 1
-LABEL=BOOT_EMMC      /boot    vfat                    defaults                  0 2
-tmpfs                /tmp     tmpfs                   defaults,nosuid           0 0
+UUID=${ROOTFS_UUID}    /        ${file_system_type}    ${fstab_mount_string}      0 1
+LABEL=BOOT_EMMC        /boot    vfat                   discard,defaults           0 2
+tmpfs                  /tmp     tmpfs                  defaults,nosuid            0 0
 
 EOF
 
