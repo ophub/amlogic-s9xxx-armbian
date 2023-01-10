@@ -90,14 +90,22 @@ quotes_cron="/etc/cron.weekly/armbian-quotes"
 
 # Remove motd-news service
 motd_timer="/usr/lib/systemd/system/motd-news.timer"
-[[ -f "${motd_timer}" ]] && systemctl stop motd-news.timer && systemctl disable motd-news.timer
-sudo rm -f ${motd_timer}
+[[ -f "${motd_timer}" ]] && {
+    sudo systemctl stop motd-news.timer
+    sudo systemctl disable motd-news.timer
+    sudo rm -f ${motd_timer}
+    echo "32. Disable motd-news.timer"
+}
 motd_service="/usr/lib/systemd/system/motd-news.service"
-[[ -f "${motd_service}" ]] && systemctl stop motd-news.service && systemctl disable motd-news.service
-sudo rm -f ${motd_service}
+[[ -f "${motd_service}" ]] && {
+    sudo systemctl stop motd-news.service
+    sudo systemctl disable motd-news.service
+    sudo rm -f ${motd_service}
+    echo "33. Disable motd-news.service"
+}
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
 sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer
-sudo rm -f /etc/update-motd.d/50-motd-news && echo "32. Remove motd-news service"
+sudo rm -f /etc/update-motd.d/50-motd-news
 
 sync && echo "armbian-fix: Loading finished."
