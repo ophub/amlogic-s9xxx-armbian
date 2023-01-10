@@ -71,7 +71,7 @@ The list of devices supported by Amlogic TV Boxes, the configuration file in the
 <tr><td>514</td><td>TX3 100Mb</td><td>s905x3</td><td>meson-sm1-tx3-bz.dtb</td><td>u-boot-tx3-bz.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,4GB Mem,100Mb Nic,bcm4330 wifi</td></tr>
 <tr><td>515</td><td>TX3 100Mb (OverClock)</td><td>s905x3</td><td>meson-sm1-tx3-bz-oc.dtb</td><td>u-boot-tx3-bz.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2208Mhz,4GB Mem,100Mb Nic,bcm4330 wifi</td></tr>
 <tr><td>516</td><td>X96 Air 1Gb</td><td>s905x3</td><td>meson-sm1-x96-air-gbit.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
-<tr><td>517</td><td>X96 Air & X96 Max+ 100Mb</td><td>s905x3</td><td>meson-sm1-x96-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
+<tr><td>517</td><td>X96 Air & X96 Max+100W & Other 100Mb</td><td>s905x3</td><td>meson-sm1-x96-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>518</td><td>X96 Air Q1000</td><td>s905x3</td><td>meson-sm1-x96-max-plus-q2.dtb</td><td>u-boot-x96maxplus.bin</td><td>x96maxplus-u-boot.bin.sd.bin</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,qca9377 wifi and Bluetooth</td></tr>
 <tr><td>519</td><td>A95XF3 Air 1Gb</td><td>s905x3</td><td>meson-sm1-a95xf3-air-gbit.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
 <tr><td>520</td><td>A95XF3 Air 100Mb</td><td>s905x3</td><td>s905x3:meson-sm1-a95xf3-air.dtb</td><td>u-boot-x96maxplus.bin</td><td>NA</td><td>NA</td><td>4C@2100Mhz,2GB Mem,1Gb Nic,Wifi</td></tr>
