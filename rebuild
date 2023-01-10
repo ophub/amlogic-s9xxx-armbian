@@ -104,8 +104,8 @@ ROOTFS_TYPE="ext4"
 # Custom name in firmware name: ${build_image_file}, such as _server, _dev, etc.
 custom_name="_server"
 
-# Get ${{ secrets.GH_TOKEN }} for api.github.com
-GH_TOKEN=""
+# Get gh_token for api.github.com
+gh_token=""
 
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -218,9 +218,9 @@ init_var() {
                 error_msg "Invalid -n parameter [ ${2} ]!"
             fi
             ;;
-        -g | --GH_TOKEN)
+        -g | --gh_token)
             if [[ -n "${2}" ]]; then
-                GH_TOKEN="${2}"
+                gh_token="${2}"
                 shift
             else
                 error_msg "Invalid -g parameter [ ${2} ]!"
@@ -292,8 +292,8 @@ query_version() {
                 MAIN_LINE="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
                 # Check the version on the server (e.g LATEST_VERSION="125")
-                if [[ -n "${GH_TOKEN}" ]]; then
-                    LATEST_VERSION="$(curl --header "authorization: Bearer ${GH_TOKEN}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                if [[ -n "${gh_token}" ]]; then
+                    LATEST_VERSION="$(curl --header "authorization: Bearer ${gh_token}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
                     query_api="Authenticated user request"
                 else
                     LATEST_VERSION="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
