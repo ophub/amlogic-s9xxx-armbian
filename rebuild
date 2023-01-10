@@ -737,6 +737,14 @@ refactor_files() {
     quotes_cron="etc/cron.weekly/armbian-quotes"
     [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
 
+    # Remove motd-news related services
+    rm -f usr/lib/systemd/system/motd-news.timer
+    rm -f usr/lib/systemd/system/motd-news.service
+    rm -f var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
+    rm -f var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
+    rm -f etc/systemd/system/timers.target.wants/motd-news.timer
+    rm -f etc/update-motd.d/50-motd-news
+
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
 
