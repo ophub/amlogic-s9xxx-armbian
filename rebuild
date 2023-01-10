@@ -731,9 +731,9 @@ refactor_files() {
         sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
     }
 
-    # Disable tip of the day for [ /etc/update-motd.d/35-armbian-tips ]
-    modt_tips="etc/default/armbian-motd"
-    [[ -f "${modt_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${modt_tips}
+    # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
+    motd_tips="etc/default/armbian-motd"
+    [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
     quotes_cron="etc/cron.weekly/armbian-quotes"
     [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
 
