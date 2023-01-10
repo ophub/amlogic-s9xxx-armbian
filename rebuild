@@ -405,10 +405,10 @@ confirm_version() {
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
             uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
-            fstab_string="defaults,noatime,compress=zstd:6"
+            fstab_string="discard,defaults,noatime,compress=zstd:6"
         else
             uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
-            fstab_string="defaults,noatime,errors=remount-ro"
+            fstab_string="discard,defaults,noatime,errors=remount-ro"
         fi
     }
 
@@ -427,11 +427,11 @@ confirm_version() {
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
             uenv_rootflags="compress=zstd:6"
             uenv_rootdev="UUID=${ROOTFS_UUID}"
-            fstab_string="defaults,noatime,compress=zstd:6"
+            fstab_string="discard,defaults,noatime,compress=zstd:6"
         else
             uenv_rootflags="rw,errors=remount-ro"
             uenv_rootdev="UUID=${ROOTFS_UUID}"
-            fstab_string="defaults,noatime,commit=600,errors=remount-ro"
+            fstab_string="discard,defaults,noatime,commit=600,errors=remount-ro"
         fi
     }
 }
@@ -539,11 +539,21 @@ copy_files() {
     tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs}
 
-    if ! mount -o discard ${loop_new}p1 ${tag_bootfs}; then
-        error_msg "mount ${loop_new}p1 failed!"
+    # Mount bootfs
+    if [[ "${PLATFORM}" == "amlogic" ]]; then
+        mount -t vfat -o discard ${loop_new}p1 ${tag_bootfs}
+    else
+        mount -t ext4 -o discard ${loop_new}p1 ${tag_bootfs}
     fi
-    if ! mount -o discard ${loop_new}p2 ${tag_rootfs}; then
-        error_msg "mount ${loop_new}p2 failed!"
+    [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p1 failed!"
+
+    # Mount rootfs
+    if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+        mount -t btrfs -o discard,compress=zstd:6 ${loop_new}p2 ${tag_rootfs}
+        [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p2 failed!"
+    else
+        mount -t ext4 -o discard ${loop_new}p2 ${tag_rootfs}
+        [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p2 failed!"
     fi
 
     # Copy the full Armbian image
@@ -712,7 +722,7 @@ refactor_files() {
     # Edit the etc/fstab
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${ROOTFS_TYPE}  ${fstab_string}  0 1|g" etc/fstab
-    [[ "${PLATFORM}" == "rockchip" ]] && sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
+    [[ "${PLATFORM}" == "rockchip" ]] && sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  discard,defaults  0 2|g" etc/fstab
 
     # Update release information
     [[ -f "${armbian_release_file}" ]] && {
