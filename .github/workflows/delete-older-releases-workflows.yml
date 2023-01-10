@@ -14,6 +14,11 @@ on:
         required: false
         default: true
         type: boolean
+      out_log:
+        description: "Output a list log for each step?"
+        required: false
+        default: false
+        type: boolean
       releases_keep_latest:
         description: "How many latest releases to keep."
         required: false
@@ -85,6 +90,7 @@ jobs:
         uses: ophub/delete-releases-workflows@main
         with:
           delete_tags: ${{ inputs.delete_tags }}
+          out_log: ${{ inputs.out_log }}
           releases_keep_latest: ${{ inputs.releases_keep_latest }}
           releases_keep_keyword: ${{ inputs.releases_keep_keyword }}
           workflows_keep_day: ${{ inputs.workflows_keep_day }}
