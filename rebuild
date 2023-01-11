@@ -73,10 +73,10 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-# Common kernel directory, RK3588 kernel directory, [ rk3588 ] is the fixed name
+# Common kernel directory, RK35XX kernel directory, [ rk3588 ] is the fixed name
 kernel_dir=("stable" "rk3588")
 common_kernel=("6.0.10" "5.15.50")
-rk3588_kernel=("5.10.150")
+rk35xx_kernel=("5.10.150")
 auto_kernel="true"
 
 # Set supported board
@@ -95,6 +95,10 @@ build_armbian=(
     "r66s" "r68s"
     "beikeyun" "l1pro"
 )
+# Devices that must use the rk35xx kernel
+must_kernel_rk35xx=("rock5b")
+# Devices that must use the 6.x.y kernel
+must_kernel_6xy=("r66s" "r68s")
 
 # Set Armbian firmware size (Unit: MiB, BOOT_MB >= 256, ROOT_MB >= 2048)
 BOOT_MB="256"
@@ -110,9 +114,9 @@ gh_token=""
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
-SUCCESS="[\033[92m SUCCESS \033[0m]"
-PROMPT="[\033[93m PROMPT \033[0m]"
+TIPS="[\033[93m TIPS \033[0m]"
 WARNING="[\033[93m WARNING \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
 #========================================================================================
@@ -277,7 +281,7 @@ query_version() {
         {
             # Select the corresponding kernel directory and list
             if [[ "${k}" == "rk3588" ]]; then
-                down_kernel_list="${rk3588_kernel[*]}"
+                down_kernel_list="${rk35xx_kernel[*]}"
             else
                 down_kernel_list="${common_kernel[*]}"
             fi
@@ -313,8 +317,8 @@ query_version() {
 
             # Reset the kernel array to the latest kernel version
             if [[ "${k}" == "rk3588" ]]; then
-                unset rk3588_kernel
-                rk3588_kernel="${tmp_arr_kernels[*]}"
+                unset rk35xx_kernel
+                rk35xx_kernel="${tmp_arr_kernels[*]}"
             else
                 unset common_kernel
                 common_kernel="${tmp_arr_kernels[*]}"
@@ -325,7 +329,7 @@ query_version() {
     done
 
     echo -e "${INFO} The latest version of the common_kernel: [ ${common_kernel[*]} ]"
-    echo -e "${INFO} The latest version of the rk3588_kernel: [ ${rk3588_kernel[*]} ]"
+    echo -e "${INFO} The latest version of the rk35xx_kernel: [ ${rk35xx_kernel[*]} ]"
 }
 
 download_kernel() {
@@ -337,7 +341,7 @@ download_kernel() {
         {
             # Set the kernel download list
             if [[ "${k}" == "rk3588" ]]; then
-                down_kernel_list="${rk3588_kernel[*]}"
+                down_kernel_list="${rk35xx_kernel[*]}"
             else
                 down_kernel_list="${common_kernel[*]}"
             fi
@@ -549,11 +553,10 @@ copy_files() {
     # Mount rootfs
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         mount -t btrfs -o discard,compress=zstd:6 ${loop_new}p2 ${tag_rootfs}
-        [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p2 failed!"
     else
         mount -t ext4 -o discard ${loop_new}p2 ${tag_rootfs}
-        [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p2 failed!"
     fi
+    [[ "${?}" -eq "0" ]] || error_msg "mount ${loop_new}p2 failed!"
 
     # Copy the full Armbian image
     cp -af ${tmp_armbian}/* ${tag_rootfs}
@@ -659,6 +662,13 @@ refactor_files() {
     rm -rf usr/lib/linux-image-*
     rm -f usr/sbin/ddbr
     rm -f var/lib/dpkg/info/linux-image*
+    # Remove motd-news related services
+    rm -f usr/lib/systemd/system/motd-news.timer
+    rm -f usr/lib/systemd/system/motd-news.service
+    rm -f var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
+    rm -f var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
+    rm -f etc/systemd/system/timers.target.wants/motd-news.timer
+    rm -f etc/update-motd.d/50-motd-news
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
     ln -sf /usr/bin bin
@@ -736,14 +746,6 @@ refactor_files() {
     [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
     quotes_cron="etc/cron.weekly/armbian-quotes"
     [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
-
-    # Remove motd-news related services
-    rm -f usr/lib/systemd/system/motd-news.timer
-    rm -f usr/lib/systemd/system/motd-news.service
-    rm -f var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
-    rm -f var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
-    rm -f etc/systemd/system/timers.target.wants/motd-news.timer
-    rm -f etc/update-motd.d/50-motd-news
 
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
@@ -856,8 +858,8 @@ loop_rebuild() {
             confirm_version
 
             # Determine kernel branch
-            if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
-                build_kernel="${rk3588_kernel[*]}"
+            if [[ -n "$(echo "${must_kernel_rk35xx[@]}" | grep -w "${board}")" ]]; then
+                build_kernel="${rk35xx_kernel[*]}"
                 kd="rk3588"
             else
                 build_kernel="${common_kernel[*]}"
@@ -869,14 +871,14 @@ loop_rebuild() {
                 {
                     kernel="${k}"
 
-                    # Rockchip rk3568 series, such as FastRhino R66S/R68S only support 6.0.y and above kernel
-                    [[ "${SOC,,}" == "rk3568" && "${kernel:0:1}" -ne "6" ]] && {
-                        echo -e "(${j}.${i}) ${PROMPT} ${board}(${SOC,,}) cannot use ${kernel} kernel, skip."
+                    # Identify devices that must use the 6.x.y kernel
+                    [[ -n "$(echo "${must_kernel_6xy[@]}" | grep -w "${board}")" && "${kernel:0:1}" -ne "6" ]] && {
+                        echo -e "(${j}.${i}) ${TIPS} The ${board} device cannot use ${kd}/${kernel} kernel, skip."
                         let i++
                         continue
                     }
 
-                    echo -ne "(${j}.${i}) Start building Armbian [ ${b} - ${kd}/${k} ]. "
+                    echo -ne "(${j}.${i}) Start building Armbian [ ${board} - ${kd}/${kernel} ]. "
                     now_remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
                         echo -e "${WARNING} Remaining space is less than 6G, exit this build."
@@ -929,7 +931,7 @@ download_kernel
 #
 echo -e "${INFO} Armbian Board List: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "${INFO} COMMON Kernel List: [ $(echo ${common_kernel[*]} | tr "\n" " ") ]"
-echo -e "${INFO} RK3588 Kernel List: [ $(echo ${rk3588_kernel[*]} | tr "\n" " ") ]"
+echo -e "${INFO} RK35XX Kernel List: [ $(echo ${rk35xx_kernel[*]} | tr "\n" " ") ]"
 echo -e "${INFO} ROOTFS Type: [ ${ROOTFS_TYPE} ] \n"
 #
 # Loop to rebuild armbian firmware
