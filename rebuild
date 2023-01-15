@@ -842,7 +842,7 @@ clean_tmp() {
 
     cd ${tmp_outpath}
 
-    pigz -9f *.img && mv -f *.img.gz ${armbian_outputpath} && sync
+    pigz -f *.img && mv -f *.img.gz ${armbian_outputpath} && sync
 
     cd ${make_path}
 
