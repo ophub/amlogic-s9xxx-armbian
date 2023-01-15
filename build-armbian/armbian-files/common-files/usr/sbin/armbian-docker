@@ -66,6 +66,7 @@ ID  SOURCE
 1   docker.com (default)
 2   aliyun.com
 3   ustc.edu.cn
+4   tencent.com
 -----------------------------------------------
 EOF
     echo -ne "${OPTIONS} Please Input ID: "
@@ -75,6 +76,8 @@ EOF
         DOCKER_SOURCE="https://mirrors.aliyun.com/docker-ce/linux"
     elif [[ "${source_id}" -eq "3" ]]; then
         DOCKER_SOURCE="https://mirrors.ustc.edu.cn/docker-ce/linux"
+    elif [[ "${source_id}" -eq "4" ]]; then
+        DOCKER_SOURCE="https://mirrors.cloud.tencent.com/docker-ce/linux"
     fi
 }
 
