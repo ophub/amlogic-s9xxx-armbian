@@ -155,7 +155,7 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Rebuild Armbian for Amlogic s9xxx
+      - name: Rebuild Armbian
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
@@ -179,10 +179,9 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
-            This is Armbian image for Amlogic s9xxx tv box
-            * Firmware information
+            These are the Armbian OS image
+            * OS information
             Default username: root
             Default password: 1234
             Install command: armbian-install
             Update command: armbian-update
-
