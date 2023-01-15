@@ -140,19 +140,21 @@ In general, you only need to compile the general firmware. Other boxes in the sa
 The settings saved by the firmware are also controlled in the [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) file. We will automatically upload the compiled firmware to the `Releases` officially provided by `GitHub` through scripts.
 
 ```yaml
-- name: Upload Armbian Firmware to Release
+- name: Upload Armbian image to Release
   uses: ncipollo/release-action@main
-  if: ${{ steps.build.outputs.status }} == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+  if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
   with:
-    tag: Armbian_${{ env.FILE_DATE }}
-    artifacts: ${{ env.FILEPATH }}/*
+    tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+    artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
     allowUpdates: true
     token: ${{ secrets.GH_TOKEN }}
     body: |
-      This is Armbian firmware for Amlogic s9xxx TV Boxes
-      * Firmware information
+      These are the Armbian OS image
+      * OS information
       Default username: root
       Default password: 1234
+      Install command: armbian-install
+      Update command: armbian-update
 ```
 
 ## 7. Download the firmware
