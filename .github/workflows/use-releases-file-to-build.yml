@@ -157,8 +157,8 @@ jobs:
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
-            This is Armbian image for Amlogic s9xxx tv box
-            * Firmware information
+            These are the Armbian OS image
+            * OS information
             Default username: root
             Default password: 1234
             Install command: armbian-install
