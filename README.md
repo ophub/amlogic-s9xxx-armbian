@@ -236,7 +236,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 ## Use GitHub Actions to build
 
-1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `board` you want to build in `Rebuild Armbian for amlogic s9xxx`.
+1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `board` you want to build in `Rebuild Armbian`.
 
 2. New compilation: Select ***`Build amlogic armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, you can choose Ubuntu series: `jammy`, or Debian series: `bullseye`, etc., Click the ***`Run workflow`*** button. More parameter setting methods can be found in [the official document of Armbian](https://docs.armbian.com/Developer-Guide_Build-Options/).
 
@@ -245,7 +245,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 4. Use other Armbian firmware, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian firmware download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of Amlogic S9xxx series TV Boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild amlogic armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
 
 ```yaml
-- name: Rebuild the Armbian for Amlogic s9xxx
+- name: Rebuild Armbian
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: armbian
@@ -295,7 +295,7 @@ To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ 
 For the compilation method of the kernel, see [compile-kernel](compile-kernel)
 
 ```yaml
-- name: Compile the kernel for Amlogic s9xxx
+- name: Compile the kernel
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
