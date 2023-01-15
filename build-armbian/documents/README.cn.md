@@ -42,14 +42,21 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.5 禁用红外接收器](#125-禁用红外接收器)
     - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
     - [12.7 网络设置](#127-网络设置)
-      - [使用 interfaces 设置网络](#使用-interfaces-设置网络)
-      - [12.7.1 由 DHCP 动态分配 IP 地址](#1271-由-dhcp-动态分配-ip-地址)
-      - [12.7.2 手动设置静态 IP 地址](#1272-手动设置静态-ip-地址)
-      - [12.7.3 在 docker 中使用 OpenWrt 建立互通网络](#1273-在-docker-中使用-openwrt-建立互通网络)
-      - [使用 NetworkManager 管理网络](#使用-networkmanager-管理网络)
-      - [12.7.4 新建网络连接](#1274-新建网络连接)
-      - [12.7.5 修改网络地址分配方式](#1275-修改-网络地址分配方式)
-      - [12.7.6 修改网络连接 MAC 地址](#1276-修改-网络连接-mac-地址)
+      - [12.7.1 使用 interfaces 设置网络](#1271-使用-interfaces-设置网络)
+        - [12.7.1.1 由 DHCP 动态分配 IP 地址](#12711-由-dhcp-动态分配-ip-地址)
+        - [12.7.1.2 手动设置静态 IP 地址](#12712-手动设置静态-ip-地址)
+        - [12.7.1.3 在 docker 中使用 OpenWrt 建立互通网络](#12713-在-docker-中使用-openwrt-建立互通网络)
+      - [12.7.2 使用 NetworkManager 管理网络](#1272-使用-networkmanager-管理网络)
+        - [12.7.2.1 新建网络连接](#12721-新建网络连接)
+          - [12.7.2.1.1 获取网络接口名称](#127211-获取网络接口名称)
+          - [12.7.2.1.2 获取现有网络连接名称](#127212-获取现有网络连接名称)
+          - [12.7.2.1.3 新建有线网络连接](#127213-新建有线网络连接)
+          - [12.7.2.1.4 新建无线网络连接](#127214-新建无线网络连接)
+        - [12.7.2.2 修改无线网络连接中的 WiFi SSID or PASSWD](#12722-修改无线网络连接中的-wifi-ssid-or-passwd)
+        - [12.7.2.3 修改网络地址分配方式](#12723-修改网络地址分配方式)
+          - [12.7.2.3.1 静态 IP 地址 - IPv4](#127231-静态-ip-地址---ipv4)
+          - [12.7.2.3.2 DHCP 获取动态 IP 地址 - IPv4 / IPv6](#127232-dhcp-获取动态-ip-地址---ipv4--ipv6)
+        - [12.7.2.4 修改网络连接 MAC 地址](#12724-修改网络连接-mac-地址)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
     - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
     - [12.10 如何制作安卓系统分区表](#1210-如何制作安卓系统分区表)
@@ -145,19 +152,21 @@ schedule:
 固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Releases 里面。
 
 ```yaml
-- name: Upload Armbian Firmware to Release
+- name: Upload Armbian image to Release
   uses: ncipollo/release-action@main
-  if: ${{ steps.build.outputs.status }} == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+  if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
   with:
-    tag: Armbian_${{ env.FILE_DATE }}
-    artifacts: ${{ env.FILEPATH }}/*
+    tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+    artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
     allowUpdates: true
     token: ${{ secrets.GH_TOKEN }}
     body: |
-      This is Armbian firmware for Amlogic s9xxx TV Boxes
-      * Firmware information
+      These are the Armbian OS image
+      * OS information
       Default username: root
       Default password: 1234
+      Install command: armbian-install
+      Update command: armbian-update
 ```
 
 ## 7. 下载固件
@@ -399,7 +408,7 @@ blacklist meson_ir
 
 ### 12.7 网络设置
 
-#### 使用 interfaces 设置网络
+#### 12.7.1 使用 interfaces 设置网络
 
 网络配置文件 [/etc/network/interfaces](../armbian-files/common-files/etc/network/interfaces) 的内容如下：
 
@@ -445,7 +454,7 @@ iface eth0 inet dhcp
 
 默认采用 DHCP 动态 分配 IP 的策略（方法1），由 Armbian 所接入的网络路由器自动分配 IP。如果想改为静态 IP，可以把设置方法 1 禁用或删除，启用方法 2 的静态 IP 设置。
 
-#### 12.7.1 由 DHCP 动态分配 IP 地址
+##### 12.7.1.1 由 DHCP 动态分配 IP 地址
 
 ```yaml
 source /etc/network/interfaces.d/*
@@ -454,7 +463,7 @@ auto eth0
 iface eth0 inet dhcp
 ```
 
-#### 12.7.2 手动设置静态 IP 地址
+##### 12.7.1.2 手动设置静态 IP 地址
 
 其中的 IP 和网关和 DNS 根据自己的网络情况修改。
 
@@ -470,7 +479,7 @@ gateway 192.168.1.1
 dns-nameservers 192.168.1.1
 ```
 
-#### 12.7.3 在 docker 中使用 OpenWrt 建立互通网络
+##### 12.7.1.3 在 docker 中使用 OpenWrt 建立互通网络
 
 其中的 MAC 地址根据自己的需要修改。
 
@@ -491,13 +500,13 @@ auto lo
 iface lo inet loopback
 ```
 
-#### 使用 NetworkManager 管理网络
+#### 12.7.2 使用 NetworkManager 管理网络
 
-#### 12.7.4 新建网络连接
+##### 12.7.2.1 新建网络连接
 
 新建或修改网络连接前的准备工作
 
-#### 获取网络接口名称
+###### 12.7.2.1.1 获取网络接口名称
 
 查看设备中有哪些网络接口可以用来建立网络连接。
 
@@ -519,7 +528,7 @@ wlan0              wifi
 wlan1              wifi
 ```
 
-#### 获取现有网络连接名称
+###### 12.7.2.1.2 获取现有网络连接名称
 
 查看设备现有哪些网络连接, 包含使用中和未使用的连接。
 
@@ -544,7 +553,7 @@ titanium           wifi
 cpe                wifi
 ```
 
-#### 新建 有线网络连接
+###### 12.7.2.1.3 新建有线网络连接
 
 在网络接口 `eth0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
 
@@ -589,9 +598,9 @@ nmcli connection up $MYCON
 ip -c -br address
 ```
 
-#### 新建 无线网络连接
+###### 12.7.2.1.4 新建无线网络连接
 
-在网络接口 `wlan0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。 
+在网络接口 `wlan0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
 
 ```
 # Set ENV
@@ -616,7 +625,7 @@ nmcli connection up $MYCON
 ip -c -br address
 ```
 
-#### 修改 无线网络连接中的 WiFi SSID or PASSWD
+##### 12.7.2.2 修改无线网络连接中的 WiFi SSID or PASSWD
 
 修改无线网络连接 `ssid` 中的 `WiFi SSID or PASSWD` 并立即生效。
 
@@ -636,9 +645,9 @@ nmcli connection up $MYCON
 ip -c -br address
 ```
 
-#### 12.7.5 修改 网络地址分配方式
+##### 12.7.2.3 修改网络地址分配方式
 
-#### 静态 IP 地址 - IPv4
+###### 12.7.2.3.1 静态 IP 地址 - IPv4
 
 在网络连接 `ether1` 上修改 IP 地址分配方式为 `静态 IP 地址` 并立即生效。
 
@@ -661,7 +670,7 @@ nmcli connection up $MYCON
 ip -c -br address
 ```
 
-#### DHCP 获取动态 IP 地址 - IPv4 / IPv6
+###### 12.7.2.3.2 DHCP 获取动态 IP 地址 - IPv4 / IPv6
 
 在网络连接 `ether1` 上修改 IP 地址分配方式为 `DHCP 获取动态 IP 地址` 并立即生效。
 
@@ -679,7 +688,7 @@ nmcli connection up $MYCON
 ip -c -br address
 ```
 
-#### 12.7.6 修改 网络连接 MAC 地址
+##### 12.7.2.4 修改网络连接 MAC 地址
 
 在网络连接 `ether1` 上修改(克隆) `MAC 地址`并立即生效, 以解决局域网 MAC 地址冲突问题。
 
