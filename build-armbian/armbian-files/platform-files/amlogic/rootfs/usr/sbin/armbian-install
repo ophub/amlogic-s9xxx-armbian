@@ -41,14 +41,14 @@ auto_mainline_uboot="no"
 use_ampart="yes"
 # Show all device list by default (-l)
 show_all_list="no"
-#
+
 # Set install list profile
 model_conf="/etc/model_database.conf"
 # Add custom armbian firmware information
 ophub_release_file="/etc/ophub-release"
 # Set the installation file preprocessing directory
 tmp_path="/ddbr"
-#
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -69,7 +69,7 @@ init_var() {
     echo -e "${STEPS} Start initializing the environment..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "m:a:s:" "${@}")"
+    get_all_ver="$(getopt "m:a:l:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -139,9 +139,14 @@ init_var() {
     echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
-    [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/* 2>/dev/null && sync
+    [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/*
     DIR_INSTALL="${tmp_path}/install"
     mkdir -p ${DIR_INSTALL} && chmod 777 ${tmp_path}
+
+    # Regenerate new machine-id
+    rm -f /etc/machine-id /var/lib/dbus/machine-id
+    dbus-uuidgen --ensure=/etc/machine-id
+    dbus-uuidgen --ensure
 
     # Generate New ROOTFS UUID
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
@@ -218,12 +223,9 @@ show_aml_model() {
     echo -e "${INFO} K510: [ ${K510} ]"
 
     # Check dtb file
-    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The DTB is missing, stop the install."
-
-    # Check UBOOT_OVERLOAD
-    if [[ "${K510}" -eq "1" ]]; then
-        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD is missing, stop the install."
-    fi
+    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The [ ${FDTFILE} ] is missing, stop install."
+    # Check UBOOT_OVERLOAD file
+    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The [ ${UBOOT_OVERLOAD} ] is missing, stop install."
 }
 
 # Set the type of file system
@@ -356,10 +358,9 @@ create_partition() {
 
     # Format emmc disk
     echo -e "${INFO} Start create MBR and partittion."
-    parted -s "${DEV_EMMC}" mklabel msdos 2>/dev/null
-    parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB 2>/dev/null
-    parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100% 2>/dev/null
-    sync
+    parted -s "${DEV_EMMC}" mklabel msdos
+    parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB
+    parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100%
 
     # Write bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "/usr/lib/u-boot/${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
@@ -395,11 +396,11 @@ copy_bootfs() {
     [[ "$?" -ne "0" ]] && error_msg "Failed to mount BOOTFS partition"
 
     echo -e "${INFO} Start copy BOOTFS partition data."
-    cp -rf /boot/* ${DIR_INSTALL} && sync
-    rm -rf ${DIR_INSTALL}/'System Volume Information' 2>/dev/null
+    cp -rf /boot/* ${DIR_INSTALL}
+    rm -rf ${DIR_INSTALL}/'System Volume Information'
 
     echo -e "${INFO} Generate the new [ uEnv.txt ] file."
-    rm -f ${DIR_INSTALL}/uEnv.txt && sync
+    rm -f ${DIR_INSTALL}/uEnv.txt
     cat >${DIR_INSTALL}/uEnv.txt <<EOF
 LINUX=/zImage
 INITRD=/uInitrd
@@ -411,7 +412,7 @@ EOF
     if [[ -f "${DIR_INSTALL}/extlinux/extlinux.conf" ]]; then
         echo -e "${INFO} Generate the new [ extlinux.conf ] file."
         BOOT_CONF="extlinux.conf"
-        rm -rf ${DIR_INSTALL}/extlinux && sync
+        rm -rf ${DIR_INSTALL}/extlinux
         mkdir -p ${DIR_INSTALL}/extlinux
         cat >${DIR_INSTALL}/extlinux/extlinux.conf <<EOF
 label Armbian
@@ -422,7 +423,7 @@ label Armbian
 EOF
     else
         BOOT_CONF="uEnv.txt"
-        rm -rf ${DIR_INSTALL}/extlinux 2>/dev/null
+        rm -rf ${DIR_INSTALL}/extlinux
     fi
 
     rm ${DIR_INSTALL}/s9*
@@ -431,7 +432,6 @@ EOF
     sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
     mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
     mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
-    sync
 
     # Copy u-boot.ext and u-boot.emmc
     if [[ "${K510}" -eq "1" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
@@ -447,7 +447,7 @@ EOF
     fi
 
     sync && sleep 3
-    umount ${DIR_INSTALL}
+    umount -f ${DIR_INSTALL}
 }
 
 # Copy rootfs partition files
@@ -476,7 +476,7 @@ copy_rootfs() {
 
     echo -e "${INFO} Start copy ROOTFS partition data."
     # Create relevant directories
-    mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/} && sync
+    mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
     chmod 777 ${DIR_INSTALL}/tmp
     # Copy the relevant directory
     COPY_SRC="etc home lib64 opt root selinux srv usr var"
@@ -486,16 +486,14 @@ copy_rootfs() {
             cd ${DIR_INSTALL}
             tar -xf -
         )
-        sync
     done
     # Create relevant symbolic link
     ln -sf /usr/bin ${DIR_INSTALL}/bin
     ln -sf /usr/lib ${DIR_INSTALL}/lib
     ln -sf /usr/sbin ${DIR_INSTALL}/sbin
-    sync
 
     echo -e "${INFO} Generate the new fstab file."
-    rm -f ${DIR_INSTALL}/etc/fstab 2>/dev/null && sync
+    rm -f ${DIR_INSTALL}/etc/fstab
     cat >${DIR_INSTALL}/etc/fstab <<EOF
 UUID=${ROOTFS_UUID}    /        ${file_system_type}    ${fstab_mount_string}      0 1
 LABEL=BOOT_EMMC        /boot    vfat                   discard,defaults           0 2
@@ -505,18 +503,18 @@ EOF
 
     echo -e "${INFO} Update the relevant parameters."
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
-    sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^BOOTLOADER_IMG=.*|BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^MYBOX_UBOOT=.*|MYBOX_UBOOT='${MYBOX_UBOOT}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_release_file} 2>/dev/null
-    sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_release_file} 2>/dev/null
+    sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file}
+    sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file}
+    sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file}
+    sed -i "s|^BOOTLOADER_IMG=.*|BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'|g" ${ophub_release_file}
+    sed -i "s|^MYBOX_UBOOT=.*|MYBOX_UBOOT='${MYBOX_UBOOT}'|g" ${ophub_release_file}
+    sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file}
+    sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file}
+    sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file}
+    sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
+    sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}
+    sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_release_file}
+    sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_release_file}
 
     # Set interfaces macaddr
     interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
@@ -544,17 +542,16 @@ EOF
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:07/" "brcmfmac4354-sdio.txt" >"brcmfmac4354-sdio.amlogic,sm1.txt"
     )
 
-    rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf 2>/dev/null
+    rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
 
     sync && sleep 3
-    umount ${DIR_INSTALL}
+    umount -f ${DIR_INSTALL}
 }
 
-echo -e "${STEPS} Start install armbian to emmc..."
-echo -e "${INFO} Custom setting parameters: [ ${@} ]"
-#
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
+echo -e "${STEPS} Start install Armbian to eMMC..."
+
 # Initialize all variables
 init_var "${@}"
 # Display the model list
@@ -567,6 +564,6 @@ create_partition
 copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
-#
-echo -e "${SUCCESS} Successful installed, please unplug the USB, re-insert the power supply to start the armbian."
+
+echo -e "${SUCCESS} Successful installed, please unplug the USB, re-insert the power supply to start the Armbian."
 exit 0
