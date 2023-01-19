@@ -25,6 +25,7 @@
 #======================================== Functions list ========================================
 #
 # error_msg          : Output error message
+# check_depends      : Check dependencies
 # init_var           : Initialize all variables
 # show_aml_model     : Display the model list
 # set_rootfs_type    : Set the type of file system
@@ -62,6 +63,29 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+# Check dependencies
+check_depends() {
+    echo -e "${STEPS} Start checking dependencies..."
+
+    is_missing="0"
+    necessary_packages=("tar" "hexdump" "mkfs.vfat" "mkfs.ext4" "mkfs.btrfs" "parted" "losetup" "fdisk" "lsblk")
+    install_packages=("tar" "bsdextrautils" "dosfstools" "e2fsprogs" "btrfs-tools" "parted" "mount" "fdisk" "util-linux")
+
+    i="1"
+    for package in ${necessary_packages[*]}; do
+        [[ -n "$(which "${package}" 2>/dev/null)" ]] || is_missing="1"
+        let i++
+    done
+
+    if [[ "${is_missing}" -eq "1" ]]; then
+        echo -e "${INFO} Start installing the necessary dependencies."
+        sudo apt-get update
+        sudo apt-get install -y ${install_packages[*]}
+    else
+        echo -e "${INFO} Dependency check completes, Start installing Armbian."
+    fi
 }
 
 # Initialize all variables
@@ -552,6 +576,8 @@ EOF
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 echo -e "${STEPS} Start install Armbian to eMMC..."
 
+# Check dependencies
+check_depends
 # Initialize all variables
 init_var "${@}"
 # Display the model list
