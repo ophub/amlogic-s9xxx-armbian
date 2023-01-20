@@ -84,6 +84,7 @@ check_depends() {
         echo -e "${STEPS} Start installing the necessary dependencies..."
         sudo apt-get update
         sudo apt-get install -y ${dpkg_packages[*]}
+        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop install."
     fi
 }
 
