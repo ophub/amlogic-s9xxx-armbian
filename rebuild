@@ -376,7 +376,6 @@ confirm_version() {
     [[ -n "${board_conf}" ]] || error_msg "[ ${board} ] config is missing!"
 
     # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOARD  12.BUILD
-    MODEL_NAME="$(echo ${board_conf} | awk -F':' '{print $2}')"
     SOC="$(echo ${board_conf} | awk -F':' '{print $3}')"
     FDTFILE="$(echo ${board_conf} | awk -F':' '{print $4}')"
     UBOOT_OVERLOAD="$(echo ${board_conf} | awk -F':' '{print $5}')"
@@ -421,7 +420,7 @@ confirm_version() {
     # Define platform variables for Rockchip boxes
     [[ "${PLATFORM}" == "rockchip" ]] && {
         # Set up the welcome board
-        bd_name="${MODEL_NAME}"
+        bd_name="${board}"
         # Set Armbian image file parameters
         partition_table_type="gpt"
         bootfs_type="ext4"
@@ -704,7 +703,6 @@ refactor_files() {
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file}
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file}
     echo "SOC='${SOC}'" >>${ophub_release_file}
-    echo "MODEL_NAME='${MODEL_NAME}'" >>${ophub_release_file}
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
     echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}

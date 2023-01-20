@@ -63,7 +63,7 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
     # Get welcome banner value
     platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2)"
     soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
-    model_name="$(cat ${ophub_release_file} | grep -E "^MODEL_NAME=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+    board_name="$(cat ${ophub_release_file} | grep -E "^BOARD=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
 
     # Adjust parameter name(After 2022.12.03)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && sed -i "s|ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file} && echo "25. Adjust the ANDROID_UBOOT name"
@@ -76,7 +76,7 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 
 # Fix custom banner name
 [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml ${soc_name}"
-[[ "${platform_name}" == "rockchip" ]] && bd_name="${model_name}"
+[[ "${platform_name}" == "rockchip" ]] && bd_name="${board_name}"
 [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file} && echo "28. Fix custom board name: ${bd_name}"
 
 # Disable ttyFIQ0 (ttyS2)
