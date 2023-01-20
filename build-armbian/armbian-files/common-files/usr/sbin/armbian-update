@@ -80,6 +80,7 @@ check_depends() {
         echo -e "${INFO} Start installing the necessary dependencies."
         sudo apt-get update
         sudo apt-get install -y ${necessary_packages[*]}
+        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop update."
     else
         echo -e "${INFO} Dependency check completes, start updating the kernel."
     fi

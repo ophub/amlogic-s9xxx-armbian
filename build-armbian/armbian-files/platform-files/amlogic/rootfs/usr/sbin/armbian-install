@@ -71,7 +71,7 @@ check_depends() {
 
     is_missing="0"
     necessary_packages=("tar" "hexdump" "mkfs.vfat" "mkfs.ext4" "mkfs.btrfs" "parted" "losetup" "fdisk" "lsblk")
-    install_packages=("tar" "bsdextrautils" "dosfstools" "e2fsprogs" "btrfs-tools" "parted" "mount" "fdisk" "util-linux")
+    install_packages=("tar" "bsdextrautils" "dosfstools" "e2fsprogs" "btrfs-progs" "parted" "mount" "fdisk" "util-linux")
 
     i="1"
     for package in ${necessary_packages[*]}; do
@@ -83,6 +83,7 @@ check_depends() {
         echo -e "${INFO} Start installing the necessary dependencies."
         sudo apt-get update
         sudo apt-get install -y ${install_packages[*]}
+        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop install."
     else
         echo -e "${INFO} Dependency check completes, Start installing Armbian."
     fi
