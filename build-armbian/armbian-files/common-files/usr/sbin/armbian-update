@@ -18,11 +18,13 @@
 # Optional parameter meaning: -k = set the kernel name
 #                             -v = set the kernel version branch
 #                             -m = ues mainline_u-boot
+#                             -r = Rescue the kernel
 #
 # Command optional parameters:   armbian-update -k 5.15.50 -v stable/dev -m yes/no
 # Set the kernel name command:   armbian-update -k 5.15.50
 # Set the kernel branch command: armbian-update -v dev
-# Use mainline u-boot command:   armbian-update -m yes
+# Use mainline u-boot command:   armbian-update -m yes/no
+# Rescue the Armbian kernel:     armbian-update -r
 #
 #========================================= Functions list =========================================
 #
@@ -30,6 +32,7 @@
 # check_depends      : Check dependencies
 # get_textoffset     : Get kernel TEXT_OFFSET
 # init_var           : Initialize all variables
+# rescue_kernel      : Rescue the kernel
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files list
 # update_kernel      : Update the kernel
@@ -39,6 +42,8 @@
 #
 # Set current path
 current_path="${PWD}"
+# Set the kernel backup directory
+backup_path="/backup/kernel"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
 # Set the kernel download repository
@@ -199,6 +204,78 @@ init_var() {
         ;;
     esac
     DEV_EMMC="/dev/${EMMC_NAME}"
+
+    sync && echo ""
+}
+
+# Rescue the kernel
+rescue_kernel() {
+    echo -e "${STEPS} Start restoring kernel files..."
+
+    # Check the current system running disk
+    root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
+    if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
+        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
+    fi
+
+    # Find emmc disk, first find emmc containing boot0 partition
+    box_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+    # Find emmc disk, find emmc that does not contain the boot0 partition
+    [[ -z "${box_emmc}" ]] && box_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | uniq)"
+    # Check if emmc exists
+    [[ -z "${box_emmc}" ]] && error_msg "The eMMC storage not found in this device!"
+    # Location of emmc
+    restore_emmc="/dev/${box_emmc}"
+    echo -e "${INFO} The device eMMC name: [ ${restore_emmc} ]"
+
+    # Check if there is enough free space
+    available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+    if [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
+        error_msg "The remaining space cannot be obtained."
+    fi
+    if [[ "${available_space}" -lt "3" ]]; then
+        error_msg "The remaining space is [ ${available_space}GiB ], less than 3GiB, please use [ armbian-tf ] to expand the USB."
+    fi
+
+    # Create a temporary mount directory
+    rm -rf ${backup_path}/*
+    mkdir -p ${backup_path}/{bootfs/,rootfs/}
+
+    # Mount eMMC to USB
+    mount ${restore_emmc}p1 ${backup_path}/bootfs
+    [[ "${?}" -eq "0" ]] || error_msg "mount ${restore_emmc}p1 failed!"
+    mount ${restore_emmc}p2 ${backup_path}/rootfs
+    [[ "${?}" -eq "0" ]] || error_msg "mount ${restore_emmc}p2 failed!"
+
+    # Identify the current kernel files
+    kernel_signature="$(uname -r)"
+
+    # 01. For /boot files
+    cd ${backup_path}/bootfs
+    rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
+    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
+    cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
+    [[ "$?" -ne "0" ]] && error_msg "(1/3) [ boot ] files recovery failed."
+    echo -e "${INFO} (1/3) [ boot ] files restored successful."
+
+    # 02. For /usr/lib/modules/${kernel_signature}
+    cd ${backup_path}/rootfs/usr/lib/modules
+    rm -rf *
+    cp -rf /usr/lib/modules/${kernel_signature} -t .
+    [[ "$?" -ne "0" ]] && error_msg "(2/3) [ modules ] files recovery failed."
+    echo -e "${INFO} (2/3) [ modules ] files restored successful."
+
+    # 03. For /usr/src/linux-headers-${kernel_signature}
+    cd ${backup_path}/rootfs/usr/src
+    rm -rf linux-headers-*
+    cp -rf /usr/src/linux-headers-${kernel_signature} -t .
+    [[ "$?" -ne "0" ]] && error_msg "(3/3) [ headers ] files recovery failed."
+    echo -e "${INFO} (3/3) [ headers ] files restored successful."
+
+    # Unmount the emmc partition
+    cd ${backup_path}
+    umount -f ${backup_path}/bootfs
+    umount -f ${backup_path}/rootfs
 
     sync && echo ""
 }
@@ -384,20 +461,18 @@ update_uboot() {
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 echo -e "${STEPS} Welcome to the kernel update tool."
-#
-# Check dependencies
-check_depends
-# Initialize all variables
-init_var "${@}"
-# Download the kernel
-download_kernel
-# Check kernel files list
-check_kernel
-# Update the kernel
-update_kernel
-# Update the uboot for Amlogic boxes
-[[ "${PLATFORM}" == "amlogic" ]] && update_uboot
-#
+
+if [[ "${1}" == "-r" ]]; then
+    rescue_kernel
+else
+    check_depends
+    init_var "${@}"
+    download_kernel
+    check_kernel
+    update_kernel
+    [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
+fi
+
 sync && sleep 3
 echo -e "${SUCCESS} Successfully updated, automatic restarting..."
 reboot
