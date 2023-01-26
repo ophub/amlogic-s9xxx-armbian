@@ -67,10 +67,13 @@ armbian-update
 | -k        | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
 | -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
 | -m        | no          | yes/no      | Use Mainline u-boot           |
+| -r        | ""          | ""          | [Rescue]. Update eMMC using the system kernel in USB |
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
 
 If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
+
+When the system cannot be started from eMMC due to incomplete updates and other problems caused by special reasons, you can start any kernel version of the Armian system from USB, and run the `armbian-update -r` command to update the system kernel in USB to eMMC to achieve the purpose of rescue.
 
 - ### Install common software
 
