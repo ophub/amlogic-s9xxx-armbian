@@ -67,10 +67,13 @@ armbian-update
 | -k       | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
 | -v       | stable      | stable/rk3588/dev | 指定内核版本分支     |
 | -m       | no          | yes/no     | 使用主线 u-boot     |
+| -r       | ""          | ""         | [救援专用] 使用 USB 中的系统内核更新 eMMC |
 
 举例: `armbian-update -k 5.15.50 -v dev -m yes`
 
 如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
+
+因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -r` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
 
 - ### 安装常用软件
 
