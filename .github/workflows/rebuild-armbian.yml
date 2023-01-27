@@ -137,8 +137,6 @@ jobs:
               let i++
           done
           echo "ARMBIAN_RELEASE=${set_release}" >> ${GITHUB_ENV}
-
-          df -hT ${PWD}
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
