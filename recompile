@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on x86_64 Ubuntu-20.04/22.04, Compile the kernel.
+# Description: Run on x86_64 Ubuntu-22.04(jammy), Compile the kernel.
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -20,7 +20,7 @@
 # error_msg          : Output error message
 #
 # init_var           : Initialize all variables
-# toolchain_check    : Check and install the cross-compilation toolchain (GCC, Clang, Armbian)
+# toolchain_check    : Check and install the cross-compilation toolchain
 # query_version      : Query the latest kernel version
 #
 # get_kernel_source  : Get the kernel source code
@@ -52,7 +52,7 @@ chroot_file="${chroot_path}/chroot_armbian.img"
 arch_info="$(arch)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
 toolchain_path="/usr/local/toolchain"
-#
+
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
@@ -64,23 +64,16 @@ auto_kernel="true"
 custom_name="-ophub"
 # Set the kernel compile object, options: dtbs / all
 package_list="all"
-#
-# Cross compile toolchain download mirror, run on ubuntu-20.04
+
+# Cross compile toolchain download mirror
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
-#
-# Armbian download from: https://github.com/ophub/amlogic-s9xxx-armbian/releases
+# Armenian file source: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian.tar.xz"
-#
-# Arm GNU Toolchain download from: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-#
-# Clang download from: https://github.com/llvm/llvm-project/releases
-clang_file="clang+llvm-13.0.0-x86_64-linux-gnu-ubuntu-20.04.tar.xz"
-#
+
 # QEMU BINARY
 qemu_binary_arm="qemu-arm-static"
 qemu_binary_arm64="qemu-aarch64-static"
-#
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -168,35 +161,9 @@ toolchain_check() {
     cd ${make_path}
     echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
-    if [[ "${host_release}" == "jammy" ]]; then
-        # Install dependencies for jammy
-        sudo apt-get -qq update
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
-    else
-        # Install dependencies for focal
-        sudo apt-get -qq update
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2004-build-armbian-depends)
-
-        [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
-
-        # Download Arm GNU Toolchain for Ubuntu focal
-        if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} Download Arm GNU Toolchain [ ${gun_file} ] ..."
-            wget -c "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}" >/dev/null 2>&1
-            tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
-            rm -f ${toolchain_path}/${gun_file}
-            [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
-        fi
-
-        # Download clang for Ubuntu focal
-        if [[ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} Download clang [ ${clang_file} ] ..."
-            wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1
-            tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path}
-            rm -f ${toolchain_path}/${clang_file}
-            [[ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]] || error_msg "The clang is not set!"
-        fi
-    fi
+    # Install dependencies for jammy
+    sudo apt-get -qq update
+    sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 
     # Download armbian
     if [[ ! -f "${armbian_file}" ]]; then
@@ -360,27 +327,9 @@ compile_env() {
     # Set cross compilation parameters
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
-    if [[ "${host_release}" == "jammy" ]]; then
-        export CROSS_COMPILE="aarch64-linux-gnu-"
-        export CC="clang"
-        export LD="ld.lld"
-    else
-        export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
-        export CC="${toolchain_path}/${clang_file//.tar.xz/}/bin/clang"
-        export LD="${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld"
-        #
-        # Add $PATH variable
-        path_ubuntu="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-        path_clang="${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_ubuntu}"
-        # Set $PATH variable for ~/.bashrc
-        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null
-        echo "PATH=${path_clang}" >>~/.bashrc
-        source ~/.bashrc
-        # Set $PATH variable for /etc/profile
-        sed -i '/^PATH=/d' /etc/profile 2>/dev/null
-        echo "PATH=${path_clang}" >>/etc/profile
-        source /etc/profile
-    fi
+    export CROSS_COMPILE="aarch64-linux-gnu-"
+    export CC="clang"
+    export LD="ld.lld"
 
     # Show variable
     echo -e "${INFO} ARCH: [ ${ARCH} ]"
@@ -623,9 +572,9 @@ loop_recompile() {
     done
 }
 
-# Check script permission, supports running on x86_64 Ubuntu: [ jammy / focal ]
+# Check script permission, supports running on x86_64 Ubuntu: [ jammy ]
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
-[[ -n "${host_release}" && "jammy focal" == *"${host_release}"* ]] || error_msg "Supports running on Ubuntu: [ jammy / focal ]"
+[[ -n "${host_release}" && "jammy" == *"${host_release}"* ]] || error_msg "Supports running on Ubuntu: [ jammy ]"
 [[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
 # Show welcome and server start information
 echo -e "${STEPS} Welcome to compile kernel! \n"
