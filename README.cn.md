@@ -67,7 +67,7 @@ armbian-update
 | -k       | auto latest | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable)  | 设置更新内核名称  |
 | -v       | stable      | stable/rk3588/dev | 指定内核版本分支     |
 | -m       | no          | yes/no     | 使用主线 u-boot     |
-| -r       | ""          | ""         | [救援专用] 使用 USB 中的系统内核更新 eMMC |
+| -r       | ""          | ""         | [救援] 使用 USB 中的系统内核更新 eMMC |
 
 举例: `armbian-update -k 5.15.50 -v dev -m yes`
 
