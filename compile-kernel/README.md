@@ -36,6 +36,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k        | Kernel      | Specify kernel name, such as `-k 5.10.125`. Multiple kernels use `_` to connect, such as `- k 5.10.125_5.15.50` |
 | -a        | AutoKernel  | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find whether there is a newer version of the kernel specified in `-k` such as `5.10.125` of the series. If there is the latest version after `5.10.125`, it will be automatically replaced with the latest version . When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -p        | PackageList | Set the package list for compiling the kernel. The default value is `all`, which will compile all files of `Image, modules, dtbs`. When set to `dtbs` only 3 dtbs files are compiled. |
+| -t        | Toolchain   | Set the compilation toolchain. The default value is `clang`, Options: `clang / gcc` |
 | -n        | CustomName  | Set the kernel custom signature. The default value is `-ophub` and the generated kernel is `5.10.125-ophub`. Do not include spaces when setting a custom signature. |
 | -r        | Repository  | Specifies the source code repository for the compiled kernel. Defaults to `unifreq` . You can choose the source code of `kernel.org` and the kernel source of `github.com` code repository. For example `-r kernel.org` or `-r unifreq`, etc., When using the kernel source code repository of `github.com`, the parameter format can be set to the three-item combination of `owner/repo@branch` , The owner name `owner` in the parameters is a required parameter, the kernel source code repository name `/repo` and the repository branch name `@branch` are optional parameters. When only the owner name `owner` parameter is specified, it will automatically match kernel source code repositories whose owner's name is in `linux-5.x.y` format and branch is `main`. If the repository name or branch name is different, use a combination, such as `owner@branch` or `owner/repo` or `owner/repo@branch` |
 
@@ -77,15 +78,16 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 
 The relevant parameters correspond to the `local compilation commands`, please refer to the above description.
 
-| Parameter      | Defaults         | Description                 |
-| -------------- | ---------------- | --------------------------- |
-| build_target   | kernel           | Fixed parameter `kernel`, set the compilation target to the kernel. |
-| kernel_version | 5.10.125_5.15.50 | Specify kernel name, such as `5.10.125`. Function reference `-k` |
-| kernel_auto    | true             | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
-| kernel_package | all              | Set the package list for compiling the kernel. The default is `all`. Function reference `-p` |
-| kernel_sign    | -ophub           | Set the kernel custom signature. The default is `-ophub`. Function reference `-n` |
-| kernel_source  | unifreq          | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
-| kernel_config  | None             | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| Parameter        | Defaults         | Description                 |
+| ---------------- | ---------------- | --------------------------- |
+| build_target     | kernel           | Fixed parameter `kernel`, set the compilation target to the kernel. |
+| kernel_version   | 5.10.125_5.15.50 | Specify kernel name, such as `5.10.125`. Function reference `-k` |
+| kernel_auto      | true             | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
+| kernel_package   | all              | Set the package list for compiling the kernel. The default is `all`. Function reference `-p` |
+| kernel_toolchain | clang            | Set the compilation toolchain. The default is `clang`. Function reference `-t` |
+| kernel_sign      | -ophub           | Set the kernel custom signature. The default is `-ophub`. Function reference `-n` |
+| kernel_source    | unifreq          | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
+| kernel_config    | None             | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 
 - ### GitHub Action Output variable description
 
