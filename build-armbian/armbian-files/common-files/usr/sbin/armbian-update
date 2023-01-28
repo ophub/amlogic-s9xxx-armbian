@@ -35,6 +35,7 @@
 # rescue_kernel      : Rescue the kernel
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files list
+# backup_kernel      : Backup current kernel
 # update_kernel      : Update the kernel
 # update_uboot       : Update the uboot
 #
@@ -42,8 +43,10 @@
 #
 # Set current path
 current_path="${PWD}"
+# Set kernel backup directory
+backup_path="/ddbr/backup"
 # Set kernel rescue temporary directory
-tmp_path="/ddbr/kernel"
+rescue_path="/ddbr/rescue"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
 # Set the kernel download repository
@@ -236,20 +239,20 @@ rescue_kernel() {
     [[ "${available_space}" -lt "3" ]] && error_msg "The available space is less than 3GiB, please use [ armbian-tf ] to expand the USB."
 
     # Create a temporary mount directory
-    rm -rf ${tmp_path}
-    mkdir -p ${tmp_path}/{bootfs/,rootfs/}
+    rm -rf ${rescue_path}
+    mkdir -p ${rescue_path}/{bootfs/,rootfs/}
 
     # Mount eMMC to USB
-    mount ${rescue_disk}p1 ${tmp_path}/bootfs
+    mount ${rescue_disk}p1 ${rescue_path}/bootfs
     [[ "${?}" -eq "0" ]] || error_msg "mount ${rescue_disk}p1 failed!"
-    mount ${rescue_disk}p2 ${tmp_path}/rootfs
+    mount ${rescue_disk}p2 ${rescue_path}/rootfs
     [[ "${?}" -eq "0" ]] || error_msg "mount ${rescue_disk}p2 failed!"
 
     # Identify the current kernel files
     kernel_signature="$(uname -r)"
 
     # 01. For /boot files
-    cd ${tmp_path}/bootfs
+    cd ${rescue_path}/bootfs
     rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
     [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
     cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
@@ -257,23 +260,23 @@ rescue_kernel() {
     echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
 
     # 02. For /usr/lib/modules/${kernel_signature}
-    cd ${tmp_path}/rootfs/usr/lib/modules
+    cd ${rescue_path}/rootfs/usr/lib/modules
     rm -rf *
     cp -rf /usr/lib/modules/${kernel_signature} -t .
     [[ "$?" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
     echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
 
     # 03. For /usr/src/linux-headers-${kernel_signature}
-    cd ${tmp_path}/rootfs/usr/src
+    cd ${rescue_path}/rootfs/usr/src
     rm -rf linux-headers-*
     cp -rf /usr/src/linux-headers-${kernel_signature} -t .
     [[ "$?" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
     echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
 
     # Unmount the emmc partition
-    cd ${tmp_path}
-    umount -f ${tmp_path}/bootfs
-    umount -f ${tmp_path}/rootfs
+    cd ${rescue_path}
+    umount -f ${rescue_path}/bootfs
+    umount -f ${rescue_path}/rootfs
 
     sync && echo ""
 }
@@ -284,6 +287,7 @@ download_kernel() {
     echo -e "${STEPS} Start downloading kernel..."
 
     # Query the current version
+    current_kernel_signature="$(uname -r)"
     current_kernel="$(echo "$(uname -r)" | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
     [[ -z "${current_kernel}" ]] && error_msg "Failed to query the current kernel version."
     # kernel_verpatch, such as [ 5.10 ]
@@ -382,6 +386,57 @@ check_kernel() {
     sync && echo ""
 }
 
+# Backup current kernel
+backup_kernel() {
+    echo -e "${STEPS} Start backing up the current kernel..."
+
+    # Identify the current kernel files
+    rm -rf ${backup_path}/${current_kernel}
+    mkdir -p ${backup_path}/${current_kernel}
+
+    # Create temporary file directory
+    kernel_tmp_path="$(mktemp -d)"
+    cd ${kernel_tmp_path}
+
+    # 1. Pack the boot-*.tar.gz file
+    rm -rf *
+    cp -rf /boot/*-${current_kernel_signature} -t .
+    rm -rf dtb*
+    chmod +x *
+    tar -czf boot-${current_kernel_signature}.tar.gz *
+    mv -f *.tar.gz ${backup_path}/${current_kernel}
+    echo -e "${INFO} (1/4) The [ boot-${current_kernel_signature}.tar.gz ] backup successful."
+
+    # 2. Pack the dtb-*.tar.gz file
+    rm -rf *
+    cp -rf /boot/dtb/${PLATFORM}/* -t .
+    tar -czf dtb-${PLATFORM}-${current_kernel_signature}.tar.gz *
+    mv -f *.tar.gz ${backup_path}/${current_kernel}
+    echo -e "${INFO} (2/4) The [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] backup successful."
+
+    # 3. Pack the header-*.tar.gz file
+    rm -rf *
+    cp -rf /usr/src/linux-headers-${current_kernel_signature}/* -t .
+    tar -czf header-${current_kernel_signature}.tar.gz *
+    mv -f *.tar.gz ${backup_path}/${current_kernel}
+    echo -e "${INFO} (3/4) The [ header-${current_kernel_signature}.tar.gz ] backup successful."
+
+    # 4. Pack the modules-*.tar.gz file
+    rm -rf *
+    cp -rf /usr/lib/modules/${current_kernel_signature} -t .
+    tar -czf modules-${current_kernel_signature}.tar.gz *
+    mv -f *.tar.gz ${backup_path}/${current_kernel}
+    echo -e "${INFO} (4/4) The [ modules-${current_kernel_signature}.tar.gz ] backup successful."
+
+    # Add sha256sum integrity verification file
+    cd ${backup_path}/${current_kernel}
+    sha256sum * >sha256sums
+    echo -e "${INFO} The [ sha256sums ] file has been generated"
+    echo -e "${INFO} The current kernel backup path: [ ${backup_path}/${current_kernel} ]. It can be deleted if it is not needed."
+
+    sync && echo ""
+}
+
 # Update the kernel
 update_kernel() {
     cd ${kernel_path}
@@ -467,6 +522,7 @@ else
     init_var "${@}"
     download_kernel
     check_kernel
+    backup_kernel
     update_kernel
     [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
 fi
