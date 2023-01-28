@@ -45,6 +45,14 @@ on:
         options:
           - all
           - dtbs
+      kernel_toolchain:
+        description: "Select the compilation toolchain"
+        required: false
+        default: "clang"
+        type: choice
+        options:
+          - clang
+          - gcc
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
@@ -91,6 +99,7 @@ jobs:
           kernel_version: ${{ inputs.kernel_version }}
           kernel_auto: ${{ inputs.kernel_auto }}
           kernel_package: ${{ inputs.kernel_package }}
+          kernel_toolchain: ${{ inputs.kernel_toolchain }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
 
@@ -105,3 +114,4 @@ jobs:
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
             The kernel source code comes from: ${{ inputs.kernel_source }}
+            The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
