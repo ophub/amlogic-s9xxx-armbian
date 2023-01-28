@@ -49,6 +49,10 @@ inputs:
     required: false
     default: ""
   # For compile kernel -----
+  kernel_source:
+    description: "Select the kernel source code"
+    required: false
+    default: "unifreq"
   kernel_version:
     description: "Select kernel version"
     required: false
@@ -61,14 +65,14 @@ inputs:
     description: "Select compile package list"
     required: false
     default: "all"
+  kernel_toolchain:
+    description: "Select the compilation toolchain"
+    required: false
+    default: "clang"
   kernel_sign:
     description: "Set the kernel custom signature"
     required: false
     default: "-ophub"
-  kernel_source:
-    description: "Select the kernel source code"
-    required: false
-    default: "unifreq"
   kernel_config:
     description: "Set the path of kernel .config"
     required: false
@@ -161,11 +165,12 @@ runs:
             fi
 
             make_command=""
+            [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
             [[ -n "${{ inputs.kernel_auto }}" ]] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
             [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
+            [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
-            [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             sudo ./recompile ${make_command}
 
             cd ${GITHUB_ACTION_PATH}
