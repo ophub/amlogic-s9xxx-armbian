@@ -45,13 +45,10 @@ kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
-#
-# Set the release check file
 ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
-host_release="$(cat /etc/os-release | grep VERSION_CODENAME | cut -d"=" -f2)"
-toolchain_path="/usr/local/toolchain"
-#
+host_release="$(cat /etc/os-release | grep '^UBUNTU_CODENAME=.*' | cut -d"=" -f2)"
+
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
 kernel_org_repo="https://cdn.kernel.org/pub/linux/kernel/v5.x/"
@@ -63,13 +60,16 @@ auto_kernel="true"
 custom_name="-ophub"
 # Set the kernel compile object, options: dtbs / all
 package_list="all"
-#
+
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
-#
-# Clang download from: https://github.com/llvm/llvm-project/releases
-clang_file="clang+llvm-15.0.6-aarch64-linux-gnu.tar.xz"
-#
+# Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+gun_file="arm-gnu-toolchain-12.2.rel1-aarch64-aarch64-none-elf.tar.xz"
+# Set the toolchain path
+toolchain_path="/usr/local/toolchain"
+# Set the default cross-compilation toolchain: [ gcc / clang ]
+toolchain_name="clang"
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -88,7 +88,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:p:r:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:p:r:t:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -136,6 +136,14 @@ init_var() {
                 error_msg "Invalid -r parameter [ ${2} ]!"
             fi
             ;;
+        -t | --Toolchain)
+            if [[ -n "${2}" ]]; then
+                toolchain_name="${2}"
+                shift
+            else
+                error_msg "Invalid -t parameter [ ${2} ]!"
+            fi
+            ;;
         *)
             error_msg "Invalid option [ ${1} ]!"
             ;;
@@ -176,16 +184,60 @@ toolchain_check() {
     sudo apt-get -qq update
     sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
 
-    if [[ "${host_release}" != "jammy" ]]; then
+    # Download the cross-compilation toolchain: [ clang / gcc ]
+    [[ -d "/etc/apt/sources.list.d" ]] || mkdir -p /etc/apt/sources.list.d
+    if [[ "${toolchain_name}" == "clang" ]]; then
+        # Set llvm version
+        llvm_version="14"
+        echo -e "${INFO} Start installing the [ llvm: ${llvm_version} ] toolchain..."
+
+        # Add apt source for llvm
+        llvm_toolchain_list="/etc/apt/sources.list.d/llvm-toolchain.list"
+        echo "deb http://apt.llvm.org/${host_release}/ llvm-toolchain-${host_release}-${llvm_version} main" >${llvm_toolchain_list}
+        echo "deb-src http://apt.llvm.org/${host_release}/ llvm-toolchain-${host_release}-${llvm_version} main" >>${llvm_toolchain_list}
+        [[ -s "${llvm_toolchain_list}" ]] || error_msg "failed to add apt source: [ ${llvm_toolchain_list} ]"
+        # Add gpg key for llvm
+        llvm_toolchain_asc="/etc/apt/trusted.gpg.d/llvm-toolchain.asc"
+        curl -sL "https://apt.llvm.org/llvm-snapshot.gpg.key" -o "${llvm_toolchain_asc}"
+        [[ -s "${llvm_toolchain_asc}" ]] || error_msg "failed to add gpg key: [ ${llvm_toolchain_asc} ]"
+
+        # Set up the installation package, refer to the source: https://apt.llvm.org/
+        llvm_pkg="\
+        clang-${llvm_version} lldb-${llvm_version} lld-${llvm_version} clangd-${llvm_version} clang-tidy-${llvm_version} \
+        clang-format-${llvm_version} clang-tools-${llvm_version} llvm-${llvm_version}-dev lld-${llvm_version} lldb-${llvm_version} \
+        llvm-${llvm_version}-tools libomp-${llvm_version}-dev libc++-${llvm_version}-dev libc++abi-${llvm_version}-dev \
+        libclang-common-${llvm_version}-dev libclang-${llvm_version}-dev libclang-dev libunwind-${llvm_version}-dev \
+        "
+        # Install llvm
+        apt-get -qq install -y ${llvm_pkg}
+
+        # Set cross compilation parameters
+        export CROSS_COMPILE="aarch64-linux-gnu-"
+        export CC="clang"
+        export LD="ld.lld"
+        export MFLAGS=" LLVM=1 LLVM_IAS=1 "
+    else
+        # Download Arm GNU Toolchain
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
-        # Download clang for Armbian
-        if [[ ! -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} Download clang [ ${clang_file} ] ..."
-            wget -c "${dev_repo}/${clang_file}" -O "${toolchain_path}/${clang_file}" >/dev/null 2>&1
-            tar -xJf ${toolchain_path}/${clang_file} -C ${toolchain_path}
-            rm -f ${toolchain_path}/${clang_file}
-            [[ -d "${toolchain_path}/${clang_file//.tar.xz/}/bin" ]] || error_msg "The clang is not set!"
+        if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
+            echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
+            wget -q "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}"
+            [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed"
+            tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
+            rm -f ${toolchain_path}/${gun_file}
+            [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
         fi
+
+        # Add ${PATH} variable
+        path_armbian="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+        path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_armbian}"
+        export PATH="${path_gcc}"
+
+        # Set cross compilation parameters
+        export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-"
+        export CC="${CROSS_COMPILE}gcc"
+        export LD="${CROSS_COMPILE}ld.bfd"
+        export MFLAGS=""
     fi
 }
 
@@ -337,39 +389,19 @@ compile_env() {
     # Set compilation parameters
     export ARCH="arm64"
     export LOCALVERSION="${custom_name}"
-    if [[ "${host_release}" == "jammy" ]]; then
-        export CC="clang"
-        export LD="ld.lld"
-    else
-        export CC="${toolchain_path}/${clang_file//.tar.xz/}/bin/clang"
-        export LD="${toolchain_path}/${clang_file//.tar.xz/}/bin/ld.lld"
-        #
-        # Add $PATH variable
-        path_armbian="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-        path_clang="${toolchain_path}/${clang_file//.tar.xz/}/bin:${path_armbian}"
-        # Set $PATH variable for ~/.bashrc
-        sed -i '/^PATH=/d' ~/.bashrc 2>/dev/null
-        echo "PATH=${path_clang}" >>~/.bashrc
-        source ~/.bashrc
-        # Set $PATH variable for /etc/profile
-        sed -i '/^PATH=/d' /etc/profile 2>/dev/null
-        echo "PATH=${path_clang}" >>/etc/profile
-        source /etc/profile
-    fi
 
     # Show variable
     echo -e "${INFO} ARCH: [ ${ARCH} ]"
     echo -e "${INFO} LOCALVERSION: [ ${LOCALVERSION} ]"
+    echo -e "${INFO} CROSS_COMPILE: [ ${CROSS_COMPILE} ]"
     echo -e "${INFO} CC: [ ${CC} ]"
     echo -e "${INFO} LD: [ ${LD} ]"
+
     # Set generic make string
-    MAKE_SET_STRING=" ARCH=${ARCH} CC=${CC} LD=${LD} LLVM=1 LLVM_IAS=1 LOCALVERSION=${LOCALVERSION} "
+    MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
     make ${MAKE_SET_STRING} mrproper
-
-    # Make menuconfig
-    #make ${MAKE_SET_STRING} menuconfig
 
     # Check .config file
     if [[ ! -s ".config" ]]; then
@@ -379,17 +411,22 @@ compile_env() {
     else
         echo -e "${INFO} Use the .config file in the current directory."
     fi
-    #
+    # Clear kernel signature
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
 
     # Enable/Disabled Linux Kernel Clang LTO
-    kernel_x="$(echo "${kernel_version}" | cut -d '.' -f1)"
-    kernel_y="$(echo "${kernel_version}" | cut -d '.' -f2)"
-    if [[ "${kernel_x}" -ge "6" ]] || [[ "${kernel_x}" -eq "5" && "${kernel_y}" -ge "12" ]]; then
-        scripts/config -e LTO_CLANG_THIN
-    else
-        scripts/config -d LTO_CLANG_THIN
-    fi
+    [[ "${toolchain_name}" == "clang" ]] && {
+        kernel_x="$(echo "${kernel_version}" | cut -d '.' -f1)"
+        kernel_y="$(echo "${kernel_version}" | cut -d '.' -f2)"
+        if [[ "${kernel_x}" -ge "6" ]] || [[ "${kernel_x}" -eq "5" && "${kernel_y}" -ge "12" ]]; then
+            scripts/config -e LTO_CLANG_THIN
+        else
+            scripts/config -d LTO_CLANG_THIN
+        fi
+    }
+
+    # Make menuconfig
+    #make ${MAKE_SET_STRING} menuconfig
 
     # Set max process
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
@@ -604,6 +641,7 @@ echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${mak
 # Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
+echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel from: [ ${code_owner} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 toolchain_check
