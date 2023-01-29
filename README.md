@@ -183,7 +183,7 @@ According to the prompt, enter `b` to perform system backup, and enter `r` to pe
 For the usage of compiling the kernel in Armbian, see the [compile-kernel](compile-kernel) documentation. please login in to armbian → input command:
 
 ```yaml
-armbian-kernel -update
+armbian-kernel -u
 armbian-kernel -k 5.10.125
 ```
 
