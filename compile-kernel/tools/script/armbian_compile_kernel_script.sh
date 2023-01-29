@@ -47,7 +47,7 @@ script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
 ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
-host_release="$(cat /etc/os-release | grep '^UBUNTU_CODENAME=.*' | cut -d"=" -f2)"
+host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d"=" -f2)"
 
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
