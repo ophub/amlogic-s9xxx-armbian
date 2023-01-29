@@ -20,23 +20,24 @@
 # error_msg       : Output error message
 # update_script   : Update compile scripts
 # clean_tmp       : Clear temporary files
+# help_info       : Display help information
 #
 #=============================== Set make environment variables ===============================
 #
 # Related file storage path
 make_path="/opt/kernel"
-compile_script="${make_path}/recompile"
 compile_path="${make_path}/compile-kernel"
-config_path="${compile_path}/tools/config"
-script_path="${compile_path}/tools/script"
-script_name="${script_path}/armbian_compile_kernel_script.sh"
 kernel_path="${compile_path}/kernel"
 out_kernel="${compile_path}/output"
+config_path="${compile_path}/tools/config"
+script_path="${compile_path}/tools/script"
+compile_script="${make_path}/recompile"
+script_name="${script_path}/armbian_compile_kernel_script.sh"
 arch_info="$(arch)"
-#
+
 # The compile kernel scripts download repository
 script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel"
-#
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -53,10 +54,10 @@ error_msg() {
 
 update_script() {
     cd ${make_path}
-    echo -e "${STEPS} Start update script..."
+    echo -e "${STEPS} Start updating the compile kernel scripts..."
 
     # Install subversion
-    echo -e "${INFO} Start installing subversion..."
+    echo -e "${INFO} Start installing update dependencies..."
     sudo apt-get update
     sudo apt-get install -y subversion
 
@@ -66,47 +67,50 @@ update_script() {
     fi
 
     # Update related files
-    echo -e "${INFO} Start update script..."
+    echo -e "${INFO} Start syncing latest scripts..."
     svn export ${script_repo} ${compile_path} --force
     cp -f ${script_name} ${compile_script}
     chmod +x ${compile_script}
 
     # Install dependencies
-    echo -e "${INFO} Start installing dependencies..."
+    echo -e "${INFO} Start installing compilation dependencies..."
     sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
 
     sync && sleep 3
-    echo -e "${STEPS} Script update complete."
+    echo -e "${SUCCESS} Scripts updated successfully."
     exit 0
 }
 
 clean_tmp() {
     cd ${make_path}
-    echo -e "${STEPS} Clear the space..."
+    echo -e "${STEPS} Start cleaning up scripts and spaces..."
 
     rm -rf ${kernel_path} ${out_kernel} 2>/dev/null && sync
 
-    echo -e "${SUCCESS} Space clearing complete."
+    echo -e "${SUCCESS} Cleanup succeeded."
     exit 0
 }
 
 help_info() {
     clear
     cat <<EOF
-===================================================================================================
-01. Script assist functions
+==============================================================================================================================
+
+01. Detailed instructions for compiling the kernel, list of optional parameters:
+    Command: armbian-kernel -k 5.10.100 -p dtbs -t gcc
+    -k : Kernel       Set the kernel name, such as [ -k 5.10.100 ]
+    -p : PackageList  Set the package list for compiling the kernel, such as [ -p dtbs ], Optional: [ dtbs/all ]
+    -t : Toolchain    Set the compilation toolchain, such as [ -t gcc ], Optional: [ gcc/clang ]
+    -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
+    -a : AutoKernel   Set whether to automatically compile the latest version, such as [ -a true ], Optional: [ true/false ]
+    -r : Repository   Set the kernel source code repository, such as [ -r owner/repo@branch ]
+
+02. Script assist functions:
     Command: armbian-kernel -u
     -u : Update       Update the local compile script to the latest version.
     -c : Clear        Clear the local kernel source and generated files.
 
-02. Detailed instructions for compiling the kernel
-    Command: armbian-kernel -k 5.10.100
-    -k : Kernel       Specify kernel name, such as [ -k 5.10.100 ]
-    -a : AutoKernel   Set whether to automatically adopt the latest version, such as [ -a true ]
-    -p : PackageList  Set the package list for compiling the kernel, such as [ -p dtbs ]
-    -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
-    -r : Repo         Specifies the source code repository for the compiled kernel.
-===================================================================================================
+==============================================================================================================================
 EOF
     exit 0
 }
@@ -117,13 +121,13 @@ EOF
 # 10Gb free space required
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
 remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
-[[ "${remaining_space}" -ge "5" ]] || error_msg "Compiling the kernel requires 5Gb running space"
+[[ "${remaining_space}" -ge "5" ]] || error_msg "The minimum space required to compile the kernel is 5GiB."
 
 # Execute script assist functions
 case "${1}" in
-    -u | -update)  update_script ;;
-    -c | -clean)   clean_tmp ;;
-    -h | -help)    help_info ;;
-    *)             [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
-                   cd ${make_path} && sudo ${compile_script} "${@}" ;;
+    -u | --update)  update_script ;;
+    -c | --clean)   clean_tmp ;;
+    -h | --help)    help_info ;;
+    *)              [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
+                    cd ${make_path} && sudo ${compile_script} "${@}" ;;
 esac
