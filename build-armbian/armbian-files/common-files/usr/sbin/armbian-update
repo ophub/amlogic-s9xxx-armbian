@@ -256,27 +256,29 @@ rescue_kernel() {
     rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
     [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
     cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
-    [[ "$?" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
+    [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
     echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
 
     # 02. For /usr/lib/modules/${kernel_signature}
     cd ${rescue_path}/rootfs/usr/lib/modules
     rm -rf *
     cp -rf /usr/lib/modules/${kernel_signature} -t .
-    [[ "$?" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
+    [[ "${?}" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
     echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
 
     # 03. For /usr/src/linux-headers-${kernel_signature}
     cd ${rescue_path}/rootfs/usr/src
     rm -rf linux-headers-*
     cp -rf /usr/src/linux-headers-${kernel_signature} -t .
-    [[ "$?" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
+    [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
     echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
 
     # Unmount the emmc partition
     cd ${rescue_path}
     umount -f ${rescue_path}/bootfs
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/bootfs ]"
     umount -f ${rescue_path}/rootfs
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/rootfs ]"
 
     sync && echo ""
 }
@@ -401,6 +403,7 @@ backup_kernel() {
     # 1. Pack the boot-*.tar.gz file
     rm -rf *
     cp -rf /boot/*-${current_kernel_signature} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to copy [ /boot/*-${current_kernel_signature} ] files."
     rm -rf dtb*
     chmod +x *
     tar -czf boot-${current_kernel_signature}.tar.gz *
@@ -410,6 +413,7 @@ backup_kernel() {
     # 2. Pack the dtb-*.tar.gz file
     rm -rf *
     cp -rf /boot/dtb/${PLATFORM}/* -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to copy [ /boot/dtb/${PLATFORM}/* ] files."
     tar -czf dtb-${PLATFORM}-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
     echo -e "${INFO} (2/4) The [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] backup successful."
@@ -417,6 +421,7 @@ backup_kernel() {
     # 3. Pack the header-*.tar.gz file
     rm -rf *
     cp -rf /usr/src/linux-headers-${current_kernel_signature}/* -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to copy [ /usr/src/linux-headers-${current_kernel_signature}/* ] files."
     tar -czf header-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
     echo -e "${INFO} (3/4) The [ header-${current_kernel_signature}.tar.gz ] backup successful."
@@ -424,6 +429,7 @@ backup_kernel() {
     # 4. Pack the modules-*.tar.gz file
     rm -rf *
     cp -rf /usr/lib/modules/${current_kernel_signature} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to copy [ /usr/lib/modules/${current_kernel_signature} ] files."
     tar -czf modules-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
     echo -e "${INFO} (4/4) The [ modules-${current_kernel_signature}.tar.gz ] backup successful."
@@ -507,6 +513,7 @@ update_uboot() {
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
     fi
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 
     sync && echo ""
 }
