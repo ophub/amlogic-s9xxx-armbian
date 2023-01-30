@@ -64,6 +64,7 @@ do_update_conf() {
     echo -e "${STEPS} Start syncing files..."
     [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
     svn export ${openvfd_repo} ${openvfd_path} --force
+    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${openvfd_repo} ] scripts failed."
     chmod +x ${openvfd_path}/vfdservice
 
     sync && sleep 3
