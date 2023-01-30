@@ -60,6 +60,7 @@ update_script() {
     echo -e "${INFO} Start installing update dependencies..."
     sudo apt-get update
     sudo apt-get install -y subversion
+    [[ "${?}" -ne "0" ]] && error_msg "The [ subversion ] installation failed."
 
     # Convert script repository address to svn format
     if [[ "${script_repo}" == http* && -n "$(echo ${script_repo} | grep "tree/main")" ]]; then
@@ -69,12 +70,14 @@ update_script() {
     # Update related files
     echo -e "${INFO} Start syncing latest scripts..."
     svn export ${script_repo} ${compile_path} --force
+    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
     cp -f ${script_name} ${compile_script}
     chmod +x ${compile_script}
 
     # Install dependencies
     echo -e "${INFO} Start installing compilation dependencies..."
     sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
+    [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
 
     sync && sleep 3
     echo -e "${SUCCESS} Scripts updated successfully."
