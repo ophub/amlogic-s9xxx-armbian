@@ -213,6 +213,7 @@ update_script() {
     # Update related files
     echo -e "${STEPS} Start syncing files..."
     svn export ${script_repo} ${software_path} --force
+    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
     find ${software_path} -type f -name '*.sh' -exec chmod +x {} \;
 
     sync && sleep 3
