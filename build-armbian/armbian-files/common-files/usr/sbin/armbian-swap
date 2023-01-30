@@ -97,13 +97,17 @@ create_the_swap() {
     # create swapfile
     [[ "${ROOTFS_TYPE}" == "btrfs" ]] && {
         truncate -s 0 ${SWAP_PATH}/swapfile
+        [[ "${?}" -ne "0" ]] && error_msg "[ truncate ] operation failed."
         chattr +C ${SWAP_PATH}/swapfile
         btrfs property set ${SWAP_PATH}/swapfile compression none
     }
     dd if="/dev/zero" of="${SWAP_PATH}/swapfile" bs="1024" count="$((1048576 * ${swap_gb}))" conv="fsync"
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to write [ ${SWAP_PATH}/swapfile ] using dd."
     chmod 600 ${SWAP_PATH}/swapfile
     mkswap -L SWAP ${SWAP_PATH}/swapfile
+    [[ "${?}" -ne "0" ]] && error_msg "[ mkswap ] operation failed."
     swapon ${SWAP_PATH}/swapfile
+    [[ "${?}" -ne "0" ]] && error_msg "[ swapon ] operation failed."
 
     # Add swap to the mount point
     sed -i '/swap/d' /etc/fstab
