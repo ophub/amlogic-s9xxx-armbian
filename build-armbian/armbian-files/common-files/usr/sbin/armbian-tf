@@ -127,10 +127,14 @@ EOF
 
     if [[ "${file_system_type}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -m single "/dev/${PT_PRE}3"
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
         mount -t btrfs -o compress=zstd:6 "/dev/${PT_PRE}3" "${data_path}"
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount [ /dev/${PT_PRE}3 ] partition."
     else
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -b 4k -m 0 "/dev/${PT_PRE}3"
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.ext4 ]"
         mount -t ext4 "/dev/${PT_PRE}3" "${data_path}"
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount [ /dev/${PT_PRE}3 ] partition."
     fi
 
     # Add auto mount to /etc/fstab
@@ -149,16 +153,20 @@ expand_current_part() {
     echo -e "${STEPS} Install growpart or xfsprogs expansion and formatting tool ... "
     apt-get update
     apt-get install cloud-guest-utils xfsprogs -y
+    [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
 
     echo -e "${STEPS} Expansion Partition ... "
     growpart /dev/${DISK_NAME} 2
+    [[ "${?}" -ne "0" ]] && error_msg "[ growpart ] operation failed."
 
     echo -e "${STEPS} Expansion file system ... "
     ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         btrfs filesystem resize max /
+        [[ "${?}" -ne "0" ]] && error_msg "[ btrfs ] operation failed."
     else
         resize2fs /dev/${ROOT_PTNAME}
+        [[ "${?}" -ne "0" ]] && error_msg "[ resize2fs ] operation failed."
     fi
 
     sync && sleep 3
