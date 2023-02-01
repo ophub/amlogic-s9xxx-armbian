@@ -48,6 +48,7 @@ on:
           - r68s
           - beikeyun
           - l1pro
+          - eaidk-610
       armbian_kernel:
         description: "Select kernel version."
         required: false
