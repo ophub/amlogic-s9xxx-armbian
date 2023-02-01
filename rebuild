@@ -96,6 +96,7 @@ build_armbian=(
     "rock5b"
     "r66s" "r68s"
     "beikeyun" "l1pro"
+    "eaidk-610"
 )
 # Set the list of devices that must use the rk35xx kernel
 must_kernel_rk35xx=("rock5b")
