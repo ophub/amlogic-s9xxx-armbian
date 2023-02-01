@@ -1,0 +1,8 @@
+verbosity=7
+bootlogo=false
+overlay_prefix=rockchip
+fdtfile=rockchip/rk3399-eaidk-610.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+docker_optimizations=on
