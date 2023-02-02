@@ -82,7 +82,7 @@ rk35xx_kernel=("5.10.150")
 auto_kernel="true"
 
 # Get the list of devices built by default
-build_armbian=($(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:yes$" | awk -F':' '{print $11}' | xargs))
+build_armbian=($(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:yes$" | awk -F':' '{print $11}' | sort | uniq | xargs))
 # Set the list of devices that must use the rk35xx kernel
 must_kernel_rk35xx=("rock5b")
 # Set the list of devices that must use the stable/6.x.y kernel
