@@ -142,7 +142,7 @@ schedule:
 
 ### 5.3 自定义默认固件配置
 
-默认固件的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，将需要编译固件的 `BUILD` 值设置为 `yes`，并将对应的 `BOARD` 名称添加到 [rebuild](../../rebuild) 脚本的 `build_armbian` 数组里（数组中的 `BOARD` 名字要求唯一）。
+默认固件的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，将需要编译固件的 `BUILD` 值设置为 `yes`，其中的 `BOARD` 名字要求唯一。
 
 在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。
 
