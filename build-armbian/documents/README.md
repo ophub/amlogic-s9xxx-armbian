@@ -58,6 +58,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.11.3 Make the u-boot file](#12113-make-the-u-boot-file)
     - [12.12 Memory size recognition error](#1212-memory-size-recognition-error)
     - [12.13 How to decompile a dtb file](#1213-how-to-decompile-a-dtb-file)
+    - [12.14 How to modify cmdline settings](#1214-how-to-modify-cmdline-settings)
 
 ## 1. Register your own GitHub account
 
@@ -684,3 +685,14 @@ dtc -I dtb -O dts -o xxx.dts xxx.dtb
 # 2. Compile command (use dts to compile to generate dtb file)
 dtc -I dts -O dtb -o xxx.dtb xxx.dts
 ```
+
+### 12.14 How to modify cmdline settings
+
+In Amlogic devices, settings such as adding/modifying/deleting can be done in the `/boot/uEnv.txt` file. On Rockchip devices this is set in the `/boot/armbianEnv.txt` file. A reboot is required after each change to take effect.
+
+For example, the `Home Assistant Supervisor` application only supports the `docker cgroup v1` version, and currently docker installs the latest v2 version by default. If you need to switch to v1 version, you can add `systemd.unified_cgroup_hierarchy=0` parameter setting in cmdline, and you can switch to `docker cgroup v1` version after restarting.
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
+</div>
+

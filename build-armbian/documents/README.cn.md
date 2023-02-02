@@ -70,6 +70,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.11.3 制作 u-boot 文件](#12113-制作-u-boot-文件)
     - [12.12 内存大小识别错误](#1212-内存大小识别错误)
     - [12.13 如何反编译 dtb 文件](#1213-如何反编译-dtb-文件)
+    - [12.14 如何修改 cmdline 设置](#1214-如何修改-cmdline-设置)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -906,3 +907,13 @@ dtc -I dtb -O dts -o xxx.dts xxx.dtb
 # 2. 编译命令（使用 dts 编译生成 dtb 文件）
 dtc -I dts -O dtb -o xxx.dtb xxx.dts
 ```
+
+### 12.14 如何修改 cmdline 设置
+
+在 Amlogic 设备中，可以在 `/boot/uEnv.txt` 文件中进行添加/修改/删除等设置。在 Rockchip 设备中在 `/boot/armbianEnv.txt` 文件中进行设置。每次更改后要重启才能生效。
+
+比如 `Home Assistant Supervisor` 应用只支持 `docker cgroup v1` 版本，而目前 docker 默认安装的都是最新的 v2 版本。如需切换至 v1 版本，可以在 cmdline 中添加 `systemd.unified_cgroup_hierarchy=0` 参数设置，重启后就可以切换至 `docker cgroup v1` 版本。
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
+</div>
