@@ -82,11 +82,14 @@ rk35xx_kernel=("5.10.150")
 auto_kernel="true"
 
 # Get the list of devices built by default
+# 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOARD  12.BUILD
 build_armbian=($(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:yes$" | awk -F':' '{print $11}' | sort | uniq | xargs))
 # Set the list of devices that must use the rk35xx kernel
 must_kernel_rk35xx=("rock5b")
 # Set the list of devices that must use the stable/6.x.y kernel
 must_kernel_6xy=("r66s" "r68s" "eaidk-610")
+# Set the list of devices that must use the /boot/extlinux/extlinux.conf file
+must_extlinux=("s905x-t95" "s912-t95z-plus" "s905lb-r3300l")
 
 # Set Armbian size (Unit: MiB, BOOT_MB >= 256, ROOT_MB >= 2048)
 BOOT_MB="256"
@@ -619,12 +622,18 @@ refactor_files() {
         sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${boot_conf_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
 
-        # Add an alternate file (/boot/extlinux/extlinux.conf) for devices like T95Z. If needed, rename delete .bak
+        # Add an alternate file (/boot/extlinux/extlinux.conf)
         boot_extlinux_file="extlinux/extlinux.conf.bak"
-        if [[ -f "${boot_extlinux_file}" ]]; then
+        [[ -f "${boot_extlinux_file}" ]] && {
             sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${boot_extlinux_file}
             sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
-        fi
+        }
+
+        # If needed, such as t95z(s905x), rename delete .bak
+        rename_extlinux_file="extlinux/extlinux.conf"
+        [[ -n "$(echo "${must_extlinux[@]}" | grep -w "${board}")" ]] && {
+            mv -f ${boot_extlinux_file} ${rename_extlinux_file}
+        }
     }
 
     # Process Rockchip series boot partition files
