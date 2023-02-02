@@ -130,7 +130,7 @@ schedule:
 
 ### 5.3 Customize the default firmware configuration
 
-The configuration information of the default firmware is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, the `BUILD` value of the firmware to be compiled is set to `yes`, and the corresponding `BOARD` name is added to the `build_armbian` array of the [rebuild](../../rebuild) script (the `BOARD` name in the array must be unique).
+The configuration information of the default firmware is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, the `BUILD` value of the firmware to be compiled is set to `yes`, and the `BOARD` name must be unique.
 
 It is specified by the `-b` parameter when compiling `locally`, and specified by the `armbian_board` parameter when compiling in `Actions` of github.com.
 
