@@ -399,7 +399,7 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 ### 12.6 Selection of bootstrap file
 
-- Of the currently known devices, only the `T95(s905x)` / `T95Z-Plus(s912)` require the use of the `/bootfs/extlinux/extlinux.conf` file. After writing the firmware to the USB, double-click to open it, and delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
+- Of the currently known devices, only a few devices such as `T95(s905x)` / `T95Z-Plus(s912)` / `BesTV-R3300L(s905l-b)` need to use the `/bootfs/extlinux/extlinux.conf` file, it has been added by default in the firmware. For other devices, if necessary, you can write the Armbian firmware to the USB, double-click to open the `boot` partition, and delete the `.bak` in the `/boot/extlinux/extlinux.conf.bak` file name that comes with the firmware to use it. `armbian-install` automatically checks when writing to eMMC and creates an `extlinux.conf` file if it exists.
 
 - Other devices only need `/boot/uEnv.txt` to boot, do not modify the `extlinux.conf.bak` file.
 
