@@ -408,7 +408,7 @@ blacklist meson_ir
 
 ### 12.6 启动引导文件的选择
 
-- 目前已知的设备中，只有 `T95(s905x)` / `T95Z-Plus(s912)` 盒子需要使用 `/bootfs/extlinux/extlinux.conf` 文件。将固件写入 USB 后，双击打开，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
+- 目前已知的设备中，只有 `T95(s905x)` / `T95Z-Plus(s912)` / `BesTV-R3300L(s905l-b)` 等少数设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，已经在固件里默认添加了。其他设备如果需要，可以将固件写入 USB 后，双击打开 `boot` 分区，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
 
 - 其他设备只需要 `/boot/uEnv.txt` 即可启动，不要修改 `extlinux.conf.bak` 文件。
 
