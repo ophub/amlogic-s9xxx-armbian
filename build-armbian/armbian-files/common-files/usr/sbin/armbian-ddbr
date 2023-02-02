@@ -54,7 +54,7 @@ do_checkemmc() {
     # Find the EMMC drive
     emmc="$(lsblk -l -o NAME | grep -oE "mmcblk[0-9]boot0" | sort | uniq | sed "s/boot0//g")"
     # Find emmc disk, find emmc that does not contain the boot0 partition
-    [[ -z "${emmc}" ]] && emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | uniq)"
+    [[ -z "${emmc}" ]] && emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
     # Check if emmc exists
     [[ -z "${emmc}" ]] && error_msg "The eMMC storage not found in this device!"
     # Show the emmc name
