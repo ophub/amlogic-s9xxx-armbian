@@ -71,6 +71,11 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.12 内存大小识别错误](#1212-内存大小识别错误)
     - [12.13 如何反编译 dtb 文件](#1213-如何反编译-dtb-文件)
     - [12.14 如何修改 cmdline 设置](#1214-如何修改-cmdline-设置)
+    - [12.15 如何添加新的支持设备](#1215-如何添加新的支持设备)
+      - [12.15.1 添加设备配置文件](#12151-添加设备配置文件)
+      - [12.15.2 添加 boot 文件](#12152-添加-boot-文件)
+      - [12.15.3 添加 u-boot 文件](#12153-添加-u-boot-文件)
+      - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -917,3 +922,30 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
+
+### 12.15 如何添加新的支持设备
+
+为一个设备构建 Armbian 系统，需要用到设备配置文件、boot 文件、u-boot 文件、流程控制文件共 4 部分，具体添加方法介绍如下：
+
+#### 12.15.1 添加设备配置文件
+
+在配置文件 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) 里面，根据设备的测试支持情况，添加对应的配置信息。其中 `BUILD` 的值是 `yes` 的是默认构建的部分设备，对应的 `BOARD` 值 `必须唯一`，这些盒子可以直接使用默认构建的 Armbian 系统。
+
+默认值是 `no` 的没有打包，这些设备使用时需要下载相同 `FAMILY` 的 Armbian 系统，在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他设备。
+
+#### 12.15.2 添加 boot 文件
+
+Amlogic 系列的设备，共用 [/boot](../armbian-files/platform-files/amlogic/bootfs) 启动文件。
+
+Rockchip 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [/boot](../armbian-files/platform-files/rockchip/bootfs) 启动文件目录，对应的文件放在此目录中。
+
+#### 12.15.3 添加 u-boot 文件
+
+Amlogic 系列的设备，共用 [bootloader](../u-boot/amlogic/bootloader/) 文件和 [u-boot](../u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
+
+Rockchip 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot/rockchip) 文件目录，对应的系列文件放在此目录中，构建 Armbian 时将直接写入对应的系统镜像文件中。
+
+#### 12.15.4 添加流程控制文件
+
+在 [yml 工作流控制文件](../../.github/workflows/build-armbian.yml) 的 `armbian_board` 中添加对应的 `BOARD` 选项，支持在 github.com 的 `Actions` 中进行使用。
+
