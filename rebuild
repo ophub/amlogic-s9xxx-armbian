@@ -81,23 +81,8 @@ rk35xx_kernel=("5.10.150")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
-# Set the list of supported armbian board
-build_armbian=(
-    "a311d"
-    "s922x" "s922x-n2" "s922x-reva"
-    "s905x3" "s905x3-b"
-    "s905x2" "s905x2-km3"
-    "s912" "s912-m8s"
-    "s905d" "s905d-ki" "s905l2" "s905l-b-r3300l"
-    "s905x"
-    "s905w"
-    "s905"
-    "s905l3a"
-    "rock5b"
-    "r66s" "r68s"
-    "beikeyun" "l1pro"
-    "eaidk-610"
-)
+# Get the list of devices built by default
+build_armbian=($(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:yes$" | awk -F':' '{print $11}' | xargs))
 # Set the list of devices that must use the rk35xx kernel
 must_kernel_rk35xx=("rock5b")
 # Set the list of devices that must use the stable/6.x.y kernel
