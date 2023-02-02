@@ -47,11 +47,11 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.7.3 Use OpenWrt in docker to establish interworking network](#1273-use-openwrt-in-docker-to-establish-interworking-network)
     - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
     - [12.9 How to update service scripts in the system](#129-how-to-update-service-scripts-in-the-system)
-    - [12.10 How to make an android system partition table](#1210-how-to-make-an-android-system-partition-table)
-      - [12.10.1 Install the adb toolkit](#12101-install-the-adb-toolkit)
-      - [12.10.2 Check the Android partition](#12102-check-the-android-partition)
-      - [12.10.3 Make Android System Partition Table](#12103-make-android-system-partition-table)
-      - [12.10.4 Using the android system partition table](#12104-using-the-android-system-partition-table)
+    - [12.10 How to obtain Android partition info on eMMC](#1210-how-to-obtain-android-partition-info-on-emmc)
+      - [12.10.1 To obain the partition info](#12101-to-obain-the-partition-info)
+      - [12.10.2 To share the partition info](#12102-to-share-the-partition-info)
+      - [12.10.3 To understand the partition info](#12103-to-understand-the-partition-info)
+      - [12.10.4 To be used on eMMC installation](#12104-to-be-used-on-emmc-installation)
     - [12.11 How to make u-boot file](#1211-how-to-make-u-boot-file)
       - [12.11.1 Extract the bootloader and dtb files](#12111-extract-the-bootloader-and-dtb-files)
       - [12.11.2 Make the acs.bin file](#12112-make-the-acsbin-file)
@@ -503,67 +503,73 @@ A custom startup task script file has been added to the system, and the path in 
 
 Use the `armbian-sync` command to update all service scripts on the local system to the latest version.
 
-### 12.10 How to make an android system partition table
 
-The method of making Android system partition table and u-boot in 12.10 - 12.11 is organized from [unifreq](https://github.com/unifreq)'s teaching chat content in the community to guide you to make related files, and the source code is in his warehouse.
+### 12.10 How to obtain Android partition info on eMMC
 
-When writing the Armbian system into the eMMC system, you need to confirm the Android system partition table of the device first, ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will not be able to start, or an error similar to the following will appear:
+When writing the Armbian system onto eMMC where Android system resides, you need to confirm the Android system partition table of the device beforehand, to ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will either not be able to start, or get an error similar to the following:
 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
 
-The following is a detailed manual operation process, in which the extraction work in `12.10.2 - 12.10.3` can also be done using a one-click script: [get_android_system_partition_table_information.tar.xz](https://github.com/ophub/kernel/releases/download/tools/get_android_system_partition_table_information.tar.xz), the usage method is in the remarks of the one-click script file.
+#### 12.10.1 To obain the partition info
+If you're using Armbian released in this repo after Nov.2022, you can copy&paste the following command to get a URL that records the whole partition info (the device itself does not need to be online)
 
-#### 12.10.1 Install the adb toolkit
-
-adb toolkit is an Android system auxiliary tool developed by Google, which can help users manage Android devices, use it to flash machines, install related programs, etc. Click here [download adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) toolkit, and then under Windows system, copy `adb.exe`, `AdbWinApi. dll` and `AdbWinUsbApi.dll` are copied to the `system32` and `syswow64` folders in the `c://windows/` directory, input `cmd` in the `run` of the `computer start menu` and press Enter to open the `cmd` panel, enter and execute `adb --version` command, if it is displayed, it means it can be used.
-
-#### 12.10.2 Check the Android partition
-
-We plug the TV box into the network cable, power supply, and turn on the monitor. After entering the Android TV system desktop normally, check its IP information in its network information. For the convenience of explanation, the following operation instructions will take 192.168.1.111 as the IP of the Android TV box. In the `cmd` panel, enter the following commands in turn and press Enter to execute, first look at the partition situation:
-
-```shell
-adb connect 192.168.1.111
-adb shell
-cd /dev/block
-ls -l | grep 179 | sort -t6
+```
+echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
-<img width="415" alt="image" src="https://user-images.githubusercontent.com/68696949/187029647-48b9ecbc-3932-47a4-b0a8-d781508e62d6.png">
-
-#### 12.10.3 Make Android System Partition Table
-
-Enter the following commands one by one to save the partition information files in the following locations:
-
-```shell
-cat /proc/partitions >/data/local/partitions.txt
-cat /proc/ntd >/data/local/ntd.txt
-ls -l /dev/block >/data/local/block.txt
+The URL should look like this：
+```
+https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0 reserved:37748736:67108864:0 cache:113246208:754974720:2 env:876609536:8388608:0 logo:893386752:33554432:1 recovery:935329792:33554432:1 rsv:977272832:8388608:1 tee:994050048:8388608:1 crypt:1010827264:33554432:1 misc:1052770304:33554432:1 instaboot:1094713344:536870912:1 boot:1639972864:33554432:1 system:1681915904:1073741824:1 params:2764046336:67108864:2 bootfiles:2839543808:754974720:2 data:3602907136:4131389440:4&dsnapshot=logo::33554432:1 recovery::33554432:1 rsv::8388608:1 tee::8388608:1 crypt::33554432:1 misc::33554432:1 instaboot::536870912:1 boot::33554432:1 system::1073741824:1 cache::536870912:2 params::67108864:2 data::-1:4
 ```
 
-<img width="310" alt="image" src="https://user-images.githubusercontent.com/68696949/187029771-034f6dc0-78a4-4e9d-b50f-2fbc6f213ec0.png">
+Copy the URL to your browser to open it, and you will see well-formatted DTB partition info and eMMC partition info：
 
-Create a folder named `mybox` in the root directory of the C drive of the local window computer, and enter the following commands in sequence in the `cmd` panel to download the files in the TV box to the local computer:
+<img width="300" alt="image" src="https://user-images.githubusercontent.com/24390674/216287642-e1b7be27-4d2c-4ac3-9fcc-15e06aebb97e.png">
 
-```shell
-adb pull /data/local/partitions.txt C:\mybox
-adb pull /data/local/ntd.txt C:\mybox
-adb pull /data/local/block.txt C:\mybox
-```
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/24390674/216287654-d1929e21-d2b3-4fb6-bcf0-c454c88e21b9.png">
 
-Open the excel template [android_partition_table_template.xlsx](android_partition_table_template.xlsx), we insert the data according to the three partition information files obtained above, and get the final Android system partition table of the device. Through the classification, `mixed areas` and `safe areas` are determined. The cache in the `mixed area` can be used as the `boot` partition of Armbian or OpenWrt system, and the `safe area` can be used as the `rootfs` partition.
+#### 12.10.2 To share the partition info
 
-![Snip20220827_1](https://user-images.githubusercontent.com/68696949/187031866-ddc0f76a-810a-40ef-99d3-1484bd4092d6.png)
+When sharing the partition info to others (e.g. to post it to this repo to get a new device supported, or to get help from others), always prefer the URL itself than a screenshot of the opened webpage. If a long URL annoys you, you could always use some free URL shortener
 
-#### 12.10.4 Using the android system partition table
+ - On one hand, the partition infos on the webpage are actually generated on each access, so notes about whether some partitions could be written to and the format of the table could change
+ - On the other hand, it's very inconvenient to get the number from a screenshot to do some calculations
 
-According to the specific location of `mixed area` and `secure area`, add the corresponding partition information in [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install) . Take the Android system partition table of the tx3 box we made as an example. Skip the unsafe area of `68 MiB (BLANK1=68)`; its cache partition has a total of 1120 MiB that can be used, but the general `BOOT` partition setting `256 MiB (BOOT=256)` is enough, other capacity is discarded Used; `Mixed area` has a total of 1350 MiB space, so the value of `BLANK2` is `1350-68-256=1026 (BLANK2=1026)` MiB. The result is as follows:
+Addtionally, you do not need to prepare/post a spreadsheet file, either. The layout on the webpage is designed speciially so any one could just copy&paste to Excel or LibreELEC Calc if they really need a spreadsheet 
+
+#### 12.10.3 To understand the partition info
+
+The DTB table represents the partition layout the **firmware** on the box wants, recorded in the Android DTB, usually ends with a auto-fill `data` partition, so the layout here could be same across all of the boxes that share the same firmware (therefore certainly the same model). The actual partition layout, though, will be different depending on the capacity of the eMMC, but it's always decided by the DTB partition layout (so you could always deduct the eMMC partition layout from a certain DTB partition layout and the capacity. *The above DTB partition info and eMMC partition info did not come from the same box, could you notice why?*)
+
+The eMMC table represents the actual eMMC partition layout, in which in row represents an area, each of the area could be either a partition, or a gap between partitions (Amlogic's quirks again, they decided to leave at least a 8M gap between partitions for possible usage in the future, yet never use it, even on their newest S905X4). The lines that represent partitions have black text color and have values in their offset and masks columns; the lines that represent gaps have grey text color and have no values in their offset and masks columns.
+
+The last column in each row of the eMMC table marks the writable status of the area. A green yes means you can safely write to it; a red no means you should never write to it; a yellow note means writable on some conditions, or only partially writable.
+
+Take the above table for example, the `bootloader` partition's 0+4M (`0M~4M`) is not writable; the 32M gap (`4M~36M`) after it is writable; the `reserved` partition's `36M+64M` (`36M~100M`) is not writable; then all until the `env` partition is writable (`100M~836M`); the `env` partition's 1M afterwards is writable (`837M~end`). Then all possible writable areas on eMMC are:
+ - 4M~36M
+ - 100M~836M
+ - 837M~end
+
+If Android logo is still needed, then `logo` partition's 852M+32M (852M~884M) is not writable. Then all possible writable areas on eMMC are：
+ - 4M~36M
+ - 100M~836M
+ - 837M~852M
+ - 884M~end
+
+#### 12.10.4 To be used on eMMC installation
+
+If eMMC installation on the device using `armbian-install` with `-a yes` fails (which will use [ampart](https://github.com/7Ji/ampart) to adjust the eMMC partition layout automatically), then the optimal eMMC partition layout could not be applied on your box (i.e. the DTB partitions will be reduced to auto-filling `data` only, then eMMC partition layout will be generated from this, then still existing partitions will be moved as to the beginning of eMMC as possible, so all area after 117M became writable), you will need to modify the partition info in [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install).
+
+There are 3 key arguments about the partition layout in the file: `BLANK1`, `BOOT`, `BLANK2`. In which, `BLANK1` stands for the area that can't be used from the beginning of the eMMC; `BOOT` stands for the area that could be used to store the kernel, dtbs, etc after `BLANK1`, better not smaller than 256M; `BLANK2` stands for the area that can't be used after `BOOT`; All areas after `BOOT` will be used to create a `ROOT` partition to store all of the data outside of `/boot`. All of the three arguments should be integer, and the unit isMiB (1 MiB = 1024 KiB = 1024^2 Byte)
+
+Consider the above situation where we don't need a `logo` partition. We surely want to utilize all of the space, yet `4M~36M` is too small to be used for `BOOT` so we have to include it in the unusable `BLANK1`. The `100M~836M` then is well enough for `BOOT` so it could take all of it. The unusable `836M~837M` then goes to `BLANK2`. The arguments then should be like the following (an example for `s905x3`, adapt it to other SoCs when editting):
 
 ```shell
 # Set partition size (Unit: MiB)
 elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
-    BLANK1="68"
-    BOOT="256"
-    BLANK2="1026"
+    BLANK1="100"
+    BOOT="736"
+    BLANK2="1"
 ```
 
 ### 12.11 How to make u-boot file
