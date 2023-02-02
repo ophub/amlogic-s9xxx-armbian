@@ -59,11 +59,11 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
         - [12.7.2.4 修改网络连接 MAC 地址](#12724-修改网络连接-mac-地址)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
     - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
-    - [12.10 如何制作安卓系统分区表](#1210-如何制作安卓系统分区表)
-      - [12.10.1 安装 adb 工具包](#12101-安装-adb-工具包)
-      - [12.10.2 查看安卓分区情况](#12102-查看安卓分区情况)
-      - [12.10.3 制作安卓系统分区表](#12103-制作安卓系统分区表)
-      - [12.10.4 使用安卓系统分区表](#12104-使用安卓系统分区表)
+    - [12.10 如何获取eMMC上的安卓分区信息](#1210-如何获取emmc上的安卓系统分区信息)
+      - [12.10.1 获取分区信息](#12101-获取分区信息)
+      - [12.10.2 分区信息分享](#12102-分区信息分享)
+      - [12.10.3 分区信息解读](#12103-分区信息解读)
+      - [12.10.4 用于eMMC安装](#12104-用于emmc安装)
     - [12.11 如何制作 u-boot 文件](#1211-如何制作-u-boot-文件)
       - [12.11.1 提取 bootloader 和 dtb 文件](#12111-提取-bootloader-和-dtb-文件)
       - [12.11.2 制作 acs.bin 文件](#12112-制作-acsbin-文件)
@@ -724,67 +724,72 @@ ip -c -br address
 
 使用 `armbian-sync` 命令可以一键将本地系统中的全部服务脚本更新到最新版本。
 
-### 12.10 如何制作安卓系统分区表
-
-在 12.10 - 12.11 中制作安卓系统分区表及 u-boot 的方法整理自 [unifreq](https://github.com/unifreq) 在社群中指导大家制作相关文件的教学聊天内容，制作源码在他的仓库中。
+### 12.10 如何获取eMMC上的安卓系统分区信息
 
 我们将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。如果写入了不安全的区域，会无法启动，或出现类似下面的错误：
 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
 
-以下是详细的手动操作过程，其中 `12.10.2 - 12.10.3` 中的提取工作，也可以使用一键脚本完成：[get_android_system_partition_table_information.tar.xz](https://github.com/ophub/kernel/releases/download/tools/get_android_system_partition_table_information.tar.xz)，使用方法在一键脚本文件的备注里。
+#### 12.10.1 获取分区信息
+如果你使用的是2022.11之后本仓库中发布的 Armbian，你可以复制粘贴以下命令来获得一个记录完整分区信息的网址（设备本身并不需要联网）
 
-#### 12.10.1 安装 adb 工具包
-
-adb 工具包是由 Google 开发的一款安卓系统辅助工具，可以帮助用户管理安卓设备，使用它进行刷机、安装相关程序等。点此 [下载 adb](https://github.com/ophub/kernel/releases/download/tools/adb.tar.gz) 工具包，然后在 Windows 系统下，将 `adb.exe`，`AdbWinApi.dll` 和 `AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，在电脑`开始菜单`的`运行`中输入 `cmd` 回车，打开 `cmd` 面板，输入执行 `adb --version` 命令，如果有显示就表示可以使用了。
-
-#### 12.10.2 查看安卓分区情况
-
-我们将电视盒子插入网线、电源、显示器开机，正常进入安卓 TV 系统桌面后，在它的网络信息里查看其 IP 信息。为方便说明，下面以 192.168.1.111 作为安卓电视盒子的 IP 进行操作说明。在 `cmd` 面板中，依次输入下面的命令并回车执行，先看下分区情况：
-
-```shell
-adb connect 192.168.1.111
-adb shell
-cd /dev/block
-ls -l | grep 179 | sort -t6
+```
+echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
-<img width="415" alt="image" src="https://user-images.githubusercontent.com/68696949/187029647-48b9ecbc-3932-47a4-b0a8-d781508e62d6.png">
-
-#### 12.10.3 制作安卓系统分区表
-
-依次输入一下命令，将以下几个位置的分区信息文件保存下来：
-
-```shell
-cat /proc/partitions >/data/local/partitions.txt
-cat /proc/ntd >/data/local/ntd.txt
-ls -l /dev/block >/data/local/block.txt
+得到的网址将会类似于下面这样：
+```
+https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0 reserved:37748736:67108864:0 cache:113246208:754974720:2 env:876609536:8388608:0 logo:893386752:33554432:1 recovery:935329792:33554432:1 rsv:977272832:8388608:1 tee:994050048:8388608:1 crypt:1010827264:33554432:1 misc:1052770304:33554432:1 instaboot:1094713344:536870912:1 boot:1639972864:33554432:1 system:1681915904:1073741824:1 params:2764046336:67108864:2 bootfiles:2839543808:754974720:2 data:3602907136:4131389440:4&dsnapshot=logo::33554432:1 recovery::33554432:1 rsv::8388608:1 tee::8388608:1 crypt::33554432:1 misc::33554432:1 instaboot::536870912:1 boot::33554432:1 system::1073741824:1 cache::536870912:2 params::67108864:2 data::-1:4
 ```
 
-<img width="310" alt="image" src="https://user-images.githubusercontent.com/68696949/187029771-034f6dc0-78a4-4e9d-b50f-2fbc6f213ec0.png">
+将这个网址复制到你的浏览器打开，即可看到格式清晰明了的DTB分区信息和eMMC分区信息
+：
 
-在本地 window 电脑的 C 盘根目录下创建名称为 `mybox` 的文件夹，在 `cmd` 面板中依次输入以下命令，把电视盒子里的文件下载到本地电脑：
+<img width="300" alt="image" src="https://user-images.githubusercontent.com/24390674/216287642-e1b7be27-4d2c-4ac3-9fcc-15e06aebb97e.png">
 
-```shell
-adb pull /data/local/partitions.txt C:\mybox
-adb pull /data/local/ntd.txt C:\mybox
-adb pull /data/local/block.txt C:\mybox
-```
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/24390674/216287654-d1929e21-d2b3-4fb6-bcf0-c454c88e21b9.png">
 
-打开 excel 模板 [android_partition_table_template.xlsx](android_partition_table_template.xlsx)，我们根据上面得到的三个分区信息文件把数据套进去，得到设备最终的安卓系统分区表。通过分类，确定了`混合区域`和`安全区域`。其中`混合区域`的 cache 中可以作为 Armbian 或 OpenWrt 系统的 `boot` 分区的使用，`安全区域`可以作为 `rootfs` 分区使用。
+#### 12.10.2 分区信息分享
 
-![Snip20220827_1](https://user-images.githubusercontent.com/68696949/187031866-ddc0f76a-810a-40ef-99d3-1484bd4092d6.png)
+当你需要分享分区信息给其他人时（比如，发布到本仓库以来汇报某一新设备的情况，或者寻求他人的帮助），尽量分享网址本身，而不是截图。如果介意网址太长，可以借用一些免费的短网址工具。
+ - 一方面，网页上的分区信息在每次访问时都会动态生成，对于某些分区是否能写入的标注，以及表格的格式等都可能会更新
+ - 另一方面，从截图中其他人也不能方便地复制分区参数做计算等
+ 
+另外，也不需要额外地将参数整理到表格文件，网页上表格的布局已经特意设计为仅需复制粘贴就可以导入到Excel或者LibreOffice Calc中
 
-#### 12.10.4 使用安卓系统分区表
+#### 12.10.3 分区信息解读
 
-根据`混合区域`和`安全区域`的具体位置，在 [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install) 中添加对应的分区信息。以我们制作的 tx3 盒子的安卓系统分区表为例。跳过 `68 MiB（BLANK1=68）` 的不安全区域；它的 cache 分区共有 1120 MiB 可以使用，但一般 `BOOT` 分区设置 `256 MiB（BOOT=256）` 已经够用了，其他容量弃用了；`混合区域`共有 1350 MiB 空间，所以 `BLANK2` 的值为 `1350-68-256=1026（BLANK2=1026）` MiB。结果如下：
+DTB表是安卓DTB中记录的每个盒子**固件**希望的分区布局，这一布局里一般会以一个大小为自动填充的`data`分区为结尾，所以同固件（也必然包括同型号）的盒子，这里的布局必然是相同的。盒子上实际的分区布局会因为eMMC的容量不同而各有差别，但总是由DTB的分区布局所决定的（即已知DTB分区布局+eMMC准确大小，必然可推知eMMC分区情况。 *上面的DTB分区信息和eMMC分区信息并非来自同一个盒子，你看出来了吗？*）。
+
+eMMC表是盒子上实际的eMMC分区布局。其中每一行表示一块存储区域，这一存储区域既可能是一个分区，也可能是分区间的空隙（因为晶晨的诡异决策，每个分区之间都至少有8M的空隙，计划留作他用，结果到最新的S905X4都没有用上，十分浪费空间）。对应分区的行中，字体为黑色，且偏移和掩码栏均有数值；对应空隙的行中，字体为灰色，偏移和掩码栏没有数值，且分区名为`gap`
+
+eMMC表中，每一块存储区域的最后一栏为可写入的情况，绿色且yes表示这一区域可以写入，红色且no表示这一区域绝对不可以写入，黄色且有标注则表示某前提的下可以写入，或者只有部分可以写入。
+
+以上表为例，`bootloader`分区对应的`0+4M` (`0M~4M`)绝对不可写入，其后的`32M`空隙（`4M~36M`）可以写入，`reserved`分区对应的`36M+64M` (`36M~100M`)绝对不可写入，其后的空隙一直到`env`前的空隙（`100M~836M`）都可以写入，`env`的1M往后（`837M一直到结尾`）在不需要安卓启动logo的情况下都可以写入，则eMMC上所有可写入的范围为：
+ - 4M~36M
+ - 100M~836M
+ - 837M~结尾
+
+ 在需要安卓启动logo的情况下，额外的，`logo`分区对应的852M+32M (852M~884M)不能写入，则eMMC上所有的可写入范围为：
+ - 4M~36M
+ - 100M~836M
+ - 837M~852M
+ - 884M~结尾
+
+#### 12.10.4 用于eMMC安装
+
+如果你的设备在使用`armbian-install`且`-a`参数（使用[ampart](https://github.com/7Ji/ampart)调整eMMC分区布局）为`yes`（默认值）的情况下失败，则你的盒子不能使用最优化的布局（即把DTB分区信息调整为只有`data`，再由此生成eMMC分区信息，然后将所有还存在的分区均向前挪动，如此一来，117M向后的空间便均可使用），你需要在 [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install) 中修改对应的分区信息。
+
+此文件中，声明分区布局的关键参数有三个：`BLANK1`, `BOOT`, `BLANK2`。其中`BLANK1`表示从eMMC开头算起的不能使用的大小；`BOOT`表示在`BLANK1`以后创建的用来存放内核、DTB等的分区的大小，最好不要小于256M，`BLANK2`表示`BOOT`以后不能使用的大小；在此之后的空间会全部用来创建`ROOT`分区，储存整个系统中`/boot`挂载点以外的数据。三者均应为整数，且单位为MiB (1 MiB = 1024 KiB = 1024^2 Byte)
+
+讨论上一段中不需要`logo`分区的情况，我们自然希望将所有能使用的空间全部使用，但是`4M~36M`的区域由于太小，不能用作`BOOT`，所以只能将它算在不能用的`BLANK1`里面。而`100M~836M`的区域，用作`BOOT`绰绰有余，则可以将这736M全部分配给`BOOT`。此后再有`836M~837M`的不能使用区域，便算给`BLANK2`，那么应该使用的参数就应该如下（下文仅以`s905x3`为例，若你的SoC为其他，需要修改其他的对应代码块）：
 
 ```shell
 # Set partition size (Unit: MiB)
 elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
-    BLANK1="68"
-    BOOT="256"
-    BLANK2="1026"
+    BLANK1="100"
+    BOOT="736"
+    BLANK2="1"
 ```
 
 ### 12.11 如何制作 u-boot 文件
