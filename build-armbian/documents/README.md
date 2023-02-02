@@ -59,6 +59,11 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [12.12 Memory size recognition error](#1212-memory-size-recognition-error)
     - [12.13 How to decompile a dtb file](#1213-how-to-decompile-a-dtb-file)
     - [12.14 How to modify cmdline settings](#1214-how-to-modify-cmdline-settings)
+    - [12.15 How to add new supported devices](#1215-how-to-add-new-supported-devices)
+      - [12.15.1 Add device profile](#12151-add-device-profile)
+      - [12.15.2 Add boot files](#12152-add-boot-files)
+      - [12.15.3 Add u-boot files](#12153-add-u-boot-files)
+      - [12.15.4 Add process control files](#12154-add-process-control-files)
 
 ## 1. Register your own GitHub account
 
@@ -695,4 +700,30 @@ For example, the `Home Assistant Supervisor` application only supports the `dock
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
+
+### 12.15 How to add new supported devices
+
+To build an Armbian system for a device, you need to use four parts: device configuration file, boot files, u-boot files, and process control files. The specific adding methods are as follows:
+
+#### 12.15.1 Add device profile
+
+In the configuration file [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf), add the corresponding configuration information according to the test support of the device. Where the value of `BUILD` is `yes`, it is part of the devices built by default, and the corresponding `BOARD` value `must be unique`, these boxes can directly use the Armbian system built by default.
+
+The default value is `no` and there is no packaging. When using these devices, you need to download the same `FAMILY` Armbian system. After writing to `USB`, you can open the `boot partition in USB` on the computer and modify `FDT dtb name` in `/boot/uEnv.txt` file, other devices in the adaptation list.
+
+#### 12.15.2 Add boot files
+
+Amlogic series devices share [/boot](../armbian-files/platform-files/amlogic/bootfs) startup files.
+
+For Rockchip series devices, add an independent [/boot](../armbian-files/platform-files/rockchip/bootfs) file directory named after `BOARD` for each device, and put the corresponding files in this directory.
+
+#### 12.15.3 Add u-boot files
+
+Amlogic series devices share the [bootloader](../u-boot/amlogic/bootloader/) files and [u-boot](../u-boot/amlogic/overload) files. If there is a new file, respectively into the corresponding directory. The `bootloader` files will be automatically added to the `/usr/lib/u-boot` directory of the Armbian system when the system is built, and the `u-boot` files will be automatically added to the `/boot` directory.
+
+For Rockchip series devices, add an independent [u-boot](../u-boot/rockchip) file directory named after `BOARD` for each device. The corresponding series of files are placed in this directory. When building Armbian, they will be directly Write to the corresponding system image file.
+
+#### 12.15.4 Add process control files
+
+Add the corresponding `BOARD` option to `armbian_board` in [yml workflow control file](../../.github/workflows/build-armbian.yml), which supports the use in `Actions` of github.com.
 
