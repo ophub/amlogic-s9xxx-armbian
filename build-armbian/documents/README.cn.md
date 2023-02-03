@@ -76,6 +76,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.15.2 添加 boot 文件](#12152-添加-boot-文件)
       - [12.15.3 添加 u-boot 文件](#12153-添加-u-boot-文件)
       - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
+    - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -965,4 +966,58 @@ Rockchip 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-b
 #### 12.15.4 添加流程控制文件
 
 在 [yml 工作流控制文件](../../.github/workflows/build-armbian.yml) 的 `armbian_board` 中添加对应的 `BOARD` 选项，支持在 github.com 的 `Actions` 中进行使用。
+
+### 12.16 如何解决写入 eMMC 时 I/O 错误的问题
+
+有些设备可以从 USB/SD/TF 正常启动 Armbian 使用，但是写入 eMMC 时会报 I/O 写入错误，例如 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989) 中的案例，报错内容如下：
+
+```shell
+[  284.338449] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.341544] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+[  284.446972] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.450074] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+[  284.497746] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.500871] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+```
+
+这种情况下可以调整所使用的 dtb 的工作模式速度和频率，来稳定对存储的读写支持。使用 sdr 模式时，频率是速度的 2 倍，使用 ddr 模式时，频率等于速度。如下：
+
+```shell
+sd-uhs-sdr12
+sd-uhs-sdr25
+sd-uhs-sdr50
+sd-uhs-ddr50
+sd-uhs-sdr104
+
+max-frequency = <208000000>;
+```
+
+以内核源码的 [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) 文件中的代码片段举例：
+
+```shell
+/* SD card */
+&sd_emmc_b {
+	status = "okay";
+
+	bus-width = <4>;
+	cap-sd-highspeed;
+	sd-uhs-sdr12;
+	sd-uhs-sdr25;
+	sd-uhs-sdr50;
+	max-frequency = <100000000>;
+};
+
+/* eMMC */
+&sd_emmc_c {
+	status = "okay";
+
+	bus-width = <8>;
+	cap-mmc-highspeed;
+	max-frequency = <100000000>;
+};
+```
+
+一般情况下，把 `&sd_emmc_c` 的频率由 `max-frequency = <200000000>;` 下调为 `max-frequency = <100000000>;` 即可解决问题。如果不行可继续下调到 `50000000` 进行测试，并通过调整 `&sd_emmc_b` 来对 `USB/SD/TF` 进行设置，也可以使用 `sd-uhs-sdr` 进行限速。
+
+除了通过系统软件层来解决，还可以发挥 [钞能力](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) 和 [动手能力](https://www.right.com.cn/forum/thread-901586-1-1.html) 解决。我们的原则是：我可以不写入 eMMC 使用，但是你必须让我能写入。
 
