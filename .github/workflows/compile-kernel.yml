@@ -56,7 +56,7 @@ on:
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
-        default: "-ophub"
+        default: ""
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
