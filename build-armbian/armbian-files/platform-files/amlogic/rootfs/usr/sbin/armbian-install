@@ -10,6 +10,7 @@
 #
 # Function: Install armbian to eMMC
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
+# Copyright (C) 2022- https://github.com/7Ji/ampart
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-install
@@ -282,8 +283,8 @@ EOF
 }
 
 # Project repository:   https://github.com/7Ji/ampart
-# Download from:        https://github.com/7Ji/ampart/releases/download/v1.1/ampart-v1.1-aarch64-static.xz
-# Function description: ampart is a partitioning tool. Can repartition emmc inside Amlogic device.
+# Download from:        https://github.com/7Ji/ampart/releases/download/v1.2/ampart-v1.2-aarch64-static.gz
+# Function description: ampart is a partitioning tool. Can repartition eMMC inside Amlogic device.
 ampart_tool() {
     # declare the partition layout
     local snapshot_expected='data::-1:4'
