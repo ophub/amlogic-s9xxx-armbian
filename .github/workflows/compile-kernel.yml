@@ -53,10 +53,6 @@ on:
         options:
           - clang
           - gcc
-      kernel_sign:
-        description: "Set the kernel custom signature"
-        required: false
-        default: ""
       kernel_config:
         description: "Set the path of kernel .config"
         required: false
@@ -91,7 +87,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the kernel
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: tojbk/amlogic-s9xxx-armbian@main
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
@@ -100,7 +96,6 @@ jobs:
           kernel_auto: ${{ inputs.kernel_auto }}
           kernel_package: ${{ inputs.kernel_package }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
-          kernel_sign: ${{ inputs.kernel_sign }}
           kernel_config: ${{ inputs.kernel_config }}
 
       - name: Upload Kernel to Release
