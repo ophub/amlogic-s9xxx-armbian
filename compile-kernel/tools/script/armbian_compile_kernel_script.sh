@@ -57,7 +57,6 @@ repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("5.10.125")
 auto_kernel="true"
-# custom_name="-ophub"
 # Set the kernel compile object, options: dtbs / all
 package_list="all"
 
