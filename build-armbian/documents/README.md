@@ -103,10 +103,9 @@ The firmware compilation process is controlled in the [.github/workflows/build-a
   id: compile
   run: |
     cd build/
-    sudo chmod +x compile.sh
-    sudo ./compile.sh BRANCH=${{ env.ARMBIAN_BRANCH }} RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=${{ env.ARMBIAN_BOARD }} \
-                      BUILD_MINIMAL=no BUILD_DESKTOP=no HOST=armbian KERNEL_ONLY=no KERNEL_CONFIGURE=no \
-                      CLEAN_LEVEL=make,debs COMPRESS_OUTPUTIMAGE=sha
+    sudo ./compile.sh RELEASE=${{ env.ARMBIAN_RELEASE }} BOARD=odroidn2 BRANCH=current BUILD_ONLY=default HOST=armbian EXPERT=yes \
+                      BUILD_DESKTOP=no BUILD_MINIMAL=no KERNEL_CONFIGURE=no CLEAN_LEVEL="make,debs" COMPRESS_OUTPUTIMAGE="sha"
+    echo "build_tag=Armbian_${{ env.ARMBIAN_RELEASE }}_$(date +"%m.%d.%H%M")" >> ${GITHUB_OUTPUT}
     echo "status=success" >> ${GITHUB_OUTPUT}
 ```
 
@@ -508,9 +507,12 @@ Use the `armbian-sync` command to update all service scripts on the local system
 
 When writing the Armbian system onto eMMC where Android system resides, you need to confirm the Android system partition table of the device beforehand, to ensure that the data is written to a safe area, and try not to damage the Android system partition table, so as to avoid problems such as the system not being able to boot. If you write to an unsafe area, you will either not be able to start, or get an error similar to the following:
 
+<div style="width:100%;margin-top:40px;margin:5px;">
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/187075834-4ac40263-52ae-4538-a4b1-d6f0d5b9c856.png">
+</div>
 
 #### 12.10.1 To obain the partition info
+
 If you're using Armbian released in this repo after Nov.2022, you can copy&paste the following command to get a URL that records the whole partition info (the device itself does not need to be online)
 
 ```
@@ -518,15 +520,17 @@ echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2
 ```
 
 The URL should look like this：
+
 ```
 https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0 reserved:37748736:67108864:0 cache:113246208:754974720:2 env:876609536:8388608:0 logo:893386752:33554432:1 recovery:935329792:33554432:1 rsv:977272832:8388608:1 tee:994050048:8388608:1 crypt:1010827264:33554432:1 misc:1052770304:33554432:1 instaboot:1094713344:536870912:1 boot:1639972864:33554432:1 system:1681915904:1073741824:1 params:2764046336:67108864:2 bootfiles:2839543808:754974720:2 data:3602907136:4131389440:4&dsnapshot=logo::33554432:1 recovery::33554432:1 rsv::8388608:1 tee::8388608:1 crypt::33554432:1 misc::33554432:1 instaboot::536870912:1 boot::33554432:1 system::1073741824:1 cache::536870912:2 params::67108864:2 data::-1:4
 ```
 
 Copy the URL to your browser to open it, and you will see well-formatted DTB partition info and eMMC partition info：
 
-<img width="300" alt="image" src="https://user-images.githubusercontent.com/24390674/216287642-e1b7be27-4d2c-4ac3-9fcc-15e06aebb97e.png">
-
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/24390674/216287642-e1b7be27-4d2c-4ac3-9fcc-15e06aebb97e.png">
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/24390674/216287654-d1929e21-d2b3-4fb6-bcf0-c454c88e21b9.png">
+</div>
 
 #### 12.10.2 To share the partition info
 
@@ -535,7 +539,7 @@ When sharing the partition info to others (e.g. to post it to this repo to get a
  - On one hand, the partition infos on the webpage are actually generated on each access, so notes about whether some partitions could be written to and the format of the table could change
  - On the other hand, it's very inconvenient to get the number from a screenshot to do some calculations
 
-Addtionally, you do not need to prepare/post a spreadsheet file, either. The layout on the webpage is designed speciially so any one could just copy&paste to Excel or LibreELEC Calc if they really need a spreadsheet 
+Addtionally, you do not need to prepare/post a spreadsheet file, either. The layout on the webpage is designed speciially so any one could just copy&paste to Excel or LibreELEC Calc if they really need a spreadsheet.
 
 #### 12.10.3 To understand the partition info
 
@@ -543,18 +547,20 @@ The DTB table represents the partition layout the **firmware** on the box wants,
 
 The eMMC table represents the actual eMMC partition layout, in which in row represents an area, each of the area could be either a partition, or a gap between partitions (Amlogic's quirks again, they decided to leave at least a 8M gap between partitions for possible usage in the future, yet never use it, even on their newest S905X4). The lines that represent partitions have black text color and have values in their offset and masks columns; the lines that represent gaps have grey text color and have no values in their offset and masks columns.
 
-The last column in each row of the eMMC table marks the writable status of the area. A green yes means you can safely write to it; a red no means you should never write to it; a yellow note means writable on some conditions, or only partially writable.
+The last column in each row of the eMMC table marks the writable status of the area. A green `yes` means you can safely write to it; a red `no` means you should never write to it; a yellow note means writable on some conditions, or only partially writable.
 
 Take the above table for example, the `bootloader` partition's 0+4M (`0M~4M`) is not writable; the 32M gap (`4M~36M`) after it is writable; the `reserved` partition's `36M+64M` (`36M~100M`) is not writable; then all until the `env` partition is writable (`100M~836M`); the `env` partition's 1M afterwards is writable (`837M~end`). Then all possible writable areas on eMMC are:
- - 4M~36M
- - 100M~836M
- - 837M~end
+
+- 4M~36M
+- 100M~836M
+- 837M~end
 
 If Android logo is still needed, then `logo` partition's 852M+32M (852M~884M) is not writable. Then all possible writable areas on eMMC are：
- - 4M~36M
- - 100M~836M
- - 837M~852M
- - 884M~end
+
+- 4M~36M
+- 100M~836M
+- 837M~852M
+- 884M~end
 
 #### 12.10.4 To be used on eMMC installation
 
