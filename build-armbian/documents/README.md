@@ -516,13 +516,19 @@ When writing the Armbian system onto eMMC where Android system resides, you need
 If you're using Armbian released in this repo after Nov.2022, you can copy&paste the following command to get a URL that records the whole partition info (the device itself does not need to be online)
 
 ```
+ampart /dev/mmcblk2 --mode webreport 2>/dev/null
+```
+
+*The webreport mode of ampart was added in the v1.2 version released on Feb 3rd 2022, if the above command outputs nothing, then the built-in ampart in your installation is probably older than this. You could use the following command instead:*
+
+```
 echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
 The URL should look like this：
 
 ```
-https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0 reserved:37748736:67108864:0 cache:113246208:754974720:2 env:876609536:8388608:0 logo:893386752:33554432:1 recovery:935329792:33554432:1 rsv:977272832:8388608:1 tee:994050048:8388608:1 crypt:1010827264:33554432:1 misc:1052770304:33554432:1 instaboot:1094713344:536870912:1 boot:1639972864:33554432:1 system:1681915904:1073741824:1 params:2764046336:67108864:2 bootfiles:2839543808:754974720:2 data:3602907136:4131389440:4&dsnapshot=logo::33554432:1 recovery::33554432:1 rsv::8388608:1 tee::8388608:1 crypt::33554432:1 misc::33554432:1 instaboot::536870912:1 boot::33554432:1 system::1073741824:1 cache::536870912:2 params::67108864:2 data::-1:4
+https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0%20reserved:37748736:67108864:0%20cache:113246208:754974720:2%20env:876609536:8388608:0%20logo:893386752:33554432:1%20recovery:935329792:33554432:1%20rsv:977272832:8388608:1%20tee:994050048:8388608:1%20crypt:1010827264:33554432:1%20misc:1052770304:33554432:1%20instaboot:1094713344:536870912:1%20boot:1639972864:33554432:1%20system:1681915904:1073741824:1%20params:2764046336:67108864:2%20bootfiles:2839543808:754974720:2%20data:3602907136:4131389440:4&dsnapshot=logo::33554432:1%20recovery::33554432:1%20rsv::8388608:1%20tee::8388608:1%20crypt::33554432:1%20misc::33554432:1%20instaboot::536870912:1%20boot::33554432:1%20system::1073741824:1%20cache::536870912:2%20params::67108864:2%20data::-1:4
 ```
 
 Copy the URL to your browser to open it, and you will see well-formatted DTB partition info and eMMC partition info：
@@ -539,7 +545,7 @@ When sharing the partition info to others (e.g. to post it to this repo to get a
  - On one hand, the partition infos on the webpage are actually generated on each access, so notes about whether some partitions could be written to and the format of the table could change
  - On the other hand, it's very inconvenient to get the number from a screenshot to do some calculations
 
-Addtionally, you do not need to prepare/post a spreadsheet file, either. The layout on the webpage is designed speciially so any one could just copy&paste to Excel or LibreELEC Calc if they really need a spreadsheet.
+Addtionally, you do not need to prepare/post a spreadsheet file, either. The layout on the webpage is designed speciially so any one could just copy&paste to Excel or LibreOffice Calc if they really need a spreadsheet.
 
 #### 12.10.3 To understand the partition info
 
