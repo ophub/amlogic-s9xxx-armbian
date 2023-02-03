@@ -64,6 +64,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.15.2 Add boot files](#12152-add-boot-files)
       - [12.15.3 Add u-boot files](#12153-add-u-boot-files)
       - [12.15.4 Add process control files](#12154-add-process-control-files)
+    - [12.16 12.16 How to fix I/O errors when writing to eMMC](#1216-1216-how-to-fix-io-errors-when-writing-to-emmc)
 
 ## 1. Register your own GitHub account
 
@@ -744,4 +745,58 @@ For Rockchip series devices, add an independent [u-boot](../u-boot/rockchip) fil
 #### 12.15.4 Add process control files
 
 Add the corresponding `BOARD` option to `armbian_board` in [yml workflow control file](../../.github/workflows/build-armbian.yml), which supports the use in `Actions` of github.com.
+
+### 12.16 12.16 How to fix I/O errors when writing to eMMC
+
+Some devices can start Armbian normally from USB/SD/TF, but will report I/O error when writing to eMMC, such as [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989), the error content is as follows:
+
+```shell
+[  284.338449] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.341544] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+[  284.446972] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.450074] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+[  284.497746] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
+[  284.500871] Buffer I/O error on dev mmcblk2, logical block 0, lost async page write
+```
+
+In this case, you can adjust the working mode speed and frequency of the dtb used to stabilize the read and write support for storage. When using sdr mode, the frequency is 2 times the speed, and when using ddr mode, the frequency is equal to the speed. as follows:
+
+```shell
+sd-uhs-sdr12
+sd-uhs-sdr25
+sd-uhs-sdr50
+sd-uhs-ddr50
+sd-uhs-sdr104
+
+max-frequency = <208000000>;
+```
+
+Take the code snippet in the [dts](https://github.com/unifreq/linux-5.15.y/tree/main/arch/arm64/boot/dts/amlogic) file of the kernel source code as an example:
+
+```shell
+/* SD card */
+&sd_emmc_b {
+	status = "okay";
+
+	bus-width = <4>;
+	cap-sd-highspeed;
+	sd-uhs-sdr12;
+	sd-uhs-sdr25;
+	sd-uhs-sdr50;
+	max-frequency = <100000000>;
+};
+
+/* eMMC */
+&sd_emmc_c {
+	status = "okay";
+
+	bus-width = <8>;
+	cap-mmc-highspeed;
+	max-frequency = <100000000>;
+};
+```
+
+Generally, the problem can be solved by reducing the frequency of `&sd_emmc_c` from `max-frequency = <200000000>;` to `max-frequency = <100000000>;`. If it doesn’t work, you can continue to lower it to `50000000` for testing, and adjust `&sd_emmc_b` to set `USB/SD/TF`, or use `sd-uhs-sdr` to limit the speed. You can get the test file by modifying the dts file and [compiling](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) it, or you can decompile and modify the existing dtb file to generate the test file by the method introduced in `Chapter 12.13`.
+
+In addition to solving problems through the system software layer, you can also use [money ability](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) and [hands-on ability](https://www.right.com.cn/forum/thread-901586-1-1.html) to solve.
 
