@@ -76,7 +76,7 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 # Set stable kernel directory: [ stable ], rk35xx kernel directory: [ rk3588 ]
 kernel_dir=("stable" "rk3588")
 # Set the list of kernels used by default
-stable_kernel=("6.0.10" "5.15.50")
+stable_kernel=("6.1.10" "5.15.50")
 rk35xx_kernel=("5.10.150")
 # Set to automatically use the latest kernel
 auto_kernel="true"
