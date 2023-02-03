@@ -736,13 +736,19 @@ ip -c -br address
 如果你使用的是 2022.11 之后本仓库中发布的 Armbian，你可以复制粘贴以下命令来获得一个记录完整分区信息的网址（设备本身并不需要联网）
 
 ```
+ampart /dev/mmcblk2 --mode webreport 2>/dev/null
+```
+
+*ampart 的 webreport 模式为 2023.02.03 发布的 v1.2 版本引入的，如果你使用上面的命令无输出，则可能为不支持直接输出网址的旧版，你可以转而使用下面这条命令：*
+
+```
 echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
 得到的网址将会类似于下面这样：
 
 ```
-https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0 reserved:37748736:67108864:0 cache:113246208:754974720:2 env:876609536:8388608:0 logo:893386752:33554432:1 recovery:935329792:33554432:1 rsv:977272832:8388608:1 tee:994050048:8388608:1 crypt:1010827264:33554432:1 misc:1052770304:33554432:1 instaboot:1094713344:536870912:1 boot:1639972864:33554432:1 system:1681915904:1073741824:1 params:2764046336:67108864:2 bootfiles:2839543808:754974720:2 data:3602907136:4131389440:4&dsnapshot=logo::33554432:1 recovery::33554432:1 rsv::8388608:1 tee::8388608:1 crypt::33554432:1 misc::33554432:1 instaboot::536870912:1 boot::33554432:1 system::1073741824:1 cache::536870912:2 params::67108864:2 data::-1:4
+https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0%20reserved:37748736:67108864:0%20cache:113246208:754974720:2%20env:876609536:8388608:0%20logo:893386752:33554432:1%20recovery:935329792:33554432:1%20rsv:977272832:8388608:1%20tee:994050048:8388608:1%20crypt:1010827264:33554432:1%20misc:1052770304:33554432:1%20instaboot:1094713344:536870912:1%20boot:1639972864:33554432:1%20system:1681915904:1073741824:1%20params:2764046336:67108864:2%20bootfiles:2839543808:754974720:2%20data:3602907136:4131389440:4&dsnapshot=logo::33554432:1%20recovery::33554432:1%20rsv::8388608:1%20tee::8388608:1%20crypt::33554432:1%20misc::33554432:1%20instaboot::536870912:1%20boot::33554432:1%20system::1073741824:1%20cache::536870912:2%20params::67108864:2%20data::-1:4
 ```
 
 将这个网址复制到你的浏览器打开，即可看到格式清晰明了的 DTB 分区信息和 eMMC 分区信息：
