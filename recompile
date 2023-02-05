@@ -55,9 +55,9 @@ error_msg() {
 }
 
 init_var() {
-    echo -e "${STEPS} Start Initializing Variables..."
+    echo -e "${STEPS} 开始初始化变量..."
 
-    # If it is followed by [ : ], it means that the option requires a parameter value
+    # 如果后面是[ : ]，则表示该选项需要一个参数值
     get_all_ver="$(getopt "k:a:n:p:r:t:" "${@}")"
 
     while [[ -n "${1}" ]]; do
@@ -70,7 +70,7 @@ init_var() {
                 IFS=$oldIFS
                 shift
             else
-                error_msg "Invalid -k parameter [ ${2} ]!"
+                error_msg "无效的 -k 参数 [ ${2} ]!"
             fi
             ;;
         -a | --AutoKernel)
@@ -78,7 +78,7 @@ init_var() {
                 auto_kernel="${2}"
                 shift
             else
-                error_msg "Invalid -a parameter [ ${2} ]!"
+                error_msg "无效的 -a 参数 [ ${2} ]!"
             fi
             ;;
         -n | --customName)
@@ -87,7 +87,7 @@ init_var() {
                 [[ ${custom_name:0:1} != "-" ]] && custom_name="-${custom_name}"
                 shift
             else
-                error_msg "Invalid -n parameter [ ${2} ]!"
+                error_msg "无效的 -n 参数 [ ${2} ]!"
             fi
             ;;
         -p | --PackageList)
@@ -95,7 +95,7 @@ init_var() {
                 package_list="${2}"
                 shift
             else
-                error_msg "Invalid -p parameter [ ${2} ]!"
+                error_msg "无效的 -p 参数 [ ${2} ]!"
             fi
             ;;
         -r | --Repository)
@@ -103,7 +103,7 @@ init_var() {
                 repo_owner="${2}"
                 shift
             else
-                error_msg "Invalid -r parameter [ ${2} ]!"
+                error_msg "无效的 -r 参数 [ ${2} ]!"
             fi
             ;;
         -t | --Toolchain)
@@ -111,11 +111,11 @@ init_var() {
                 toolchain_name="${2}"
                 shift
             else
-                error_msg "Invalid -t parameter [ ${2} ]!"
+                error_msg "无效的 -t 参数 [ ${2} ]!"
             fi
             ;;
         *)
-            error_msg "Invalid option [ ${1} ]!"
+            error_msg "无效选项 [ ${1} ]!"
             ;;
         esac
         shift
@@ -133,7 +133,7 @@ init_var() {
 
 toolchain_check() {
     cd ${make_path}
-    echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
+    echo -e "${STEPS} 开始检查编译内核的工具链..."
 
     # 为 jammy 安装依赖项
     apt-get -qq update
