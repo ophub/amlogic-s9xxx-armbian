@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       kernel_source:
-        description: "Select the kernel source"
+        description: "选择内核源"
         required: false
         default: "unifreq"
         type: choice
@@ -19,7 +19,7 @@ on:
           - unifreq
           - kernel.org
       kernel_version:
-        description: "Select kernel version"
+        description: "选择内核版本"
         required: false
         default: "5.15.85_6.1.1"
         type: choice
@@ -33,12 +33,12 @@ on:
           - 5.15.85
           - 6.1.1
       kernel_auto:
-        description: "Auto use the latest kernel"
+        description: "自动使用最新内核"
         required: false
         default: true
         type: boolean
       kernel_package:
-        description: "Select compile package list"
+        description: "选择编译包列表"
         required: false
         default: "all"
         type: choice
@@ -46,7 +46,7 @@ on:
           - all
           - dtbs
       kernel_toolchain:
-        description: "Select the compilation toolchain"
+        description: "选择编译工具链"
         required: false
         default: "clang"
         type: choice
@@ -54,7 +54,7 @@ on:
           - clang
           - gcc
       kernel_config:
-        description: "Set the path of kernel .config"
+        description: "设置内核.config 的路径"
         required: false
         default: ""
 
@@ -70,7 +70,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Initialization environment
+      - name: 初始环境
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -86,7 +86,7 @@ jobs:
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile the kernel
+      - name: 编译内核
         uses: tojbk/amlogic-s9xxx-armbian@main
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
@@ -98,7 +98,7 @@ jobs:
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           kernel_config: ${{ inputs.kernel_config }}
 
-      - name: Upload Kernel to Release
+      - name: 上传发布
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
