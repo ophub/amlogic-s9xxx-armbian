@@ -660,7 +660,7 @@ init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel from: [ ${code_owner} ]"
-echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
 toolchain_check
 # Loop to compile the kernel
 loop_recompile
