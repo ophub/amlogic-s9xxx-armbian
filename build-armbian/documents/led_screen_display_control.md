@@ -28,11 +28,11 @@ vfd_gpio_dat='0,69,0'
 ```yaml
 # Execute the following command in the terminal to add the Armbian system
 sed -i '/armbian-led/d' /etc/rc.local
-sed -i '/exit 0/i\armbian-led 15' /etc/rc.local
+sed -i '/^exit 0/i\[[ -f "/usr/sbin/armbian-led" ]] && armbian-led 15' /etc/rc.local
 
 # Execute the following command in the terminal to add the OpenWrt system
 sed -i '/openwrt-led/d' /etc/rc.local
-sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
+sed -i '/^exit 0/i\[[ -f "/usr/sbin/openwrt-led" ]] && openwrt-led 15' /etc/rc.local
 ```
 
 - You are welcome to share the conf file(xxx.conf) of your own devices after testing, so that more people can benefit.
@@ -85,11 +85,11 @@ vfd_gpio_dat='0,69,0'
 ```yaml
 # Armbian 系统在终端执行以下命令添加
 sed -i '/armbian-led/d' /etc/rc.local
-sed -i '/exit 0/i\armbian-led 15' /etc/rc.local
+sed -i '/^exit 0/i\[[ -f "/usr/sbin/armbian-led" ]] && armbian-led 15' /etc/rc.local
 
 # OpenWrt 系统在终端执行以下命令添加
 sed -i '/openwrt-led/d' /etc/rc.local
-sed -i '/exit 0/i\openwrt-led 15' /etc/rc.local
+sed -i '/^exit 0/i\[[ -f "/usr/sbin/openwrt-led" ]] && openwrt-led 15' /etc/rc.local
 ```
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
