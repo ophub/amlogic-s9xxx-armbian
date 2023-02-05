@@ -88,7 +88,7 @@ check_depends() {
         echo -e "${INFO} Start installing the necessary dependencies."
         sudo apt-get update
         sudo apt-get install -y ${necessary_packages[*]}
-        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop update."
+        [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed, stop update."
     else
         echo -e "${INFO} Dependency check completes, start updating the kernel."
     fi
@@ -100,14 +100,14 @@ check_depends() {
 get_textoffset() {
     boot_tgz_file="${1}"
     vmlinuz_name="${2}"
-    K510="1"
+    NEED_OVERLOAD="yes"
     temp_dir="$(mktemp -d)"
     (
         cd ${temp_dir}
         tar -xzf "${boot_tgz_file}" "${vmlinuz_name}"
     )
-    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
-    [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
+    [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && NEED_OVERLOAD="no"
 }
 
 # Initialize all variables
@@ -244,9 +244,9 @@ rescue_kernel() {
 
     # Mount eMMC to USB
     mount ${rescue_disk}p1 ${rescue_path}/bootfs
-    [[ "${?}" -eq "0" ]] || error_msg "mount ${rescue_disk}p1 failed!"
+    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p1 failed!"
     mount ${rescue_disk}p2 ${rescue_path}/rootfs
-    [[ "${?}" -eq "0" ]] || error_msg "mount ${rescue_disk}p2 failed!"
+    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p2 failed!"
 
     # Identify the current kernel files
     kernel_signature="$(uname -r)"
@@ -308,8 +308,9 @@ download_kernel() {
 
         # Move the kernel to the temporary directory
         echo -e "${INFO} Move kernel files to temporary directory: [ ${kernel_path} ]"
-        mv -f *.tar.gz sha256sums -t ${kernel_path}
-        [[ "${?}" -ne "0" ]] && error_msg "Kernel file move failed, stop updating."
+        [[ -f "sha256sums" ]] && mv -f sha256sums -t ${kernel_path}
+        mv -f *.tar.gz -t ${kernel_path}
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files to [ ${kernel_path} ] directory, stop updating."
     }
 
     # Automatically query the latest kernel version
@@ -330,7 +331,7 @@ download_kernel() {
         echo -e "${INFO} Start downloading the kernel from [ ${kernel_repo/trunk/tree\/main}/${inputs_kernel} ]"
         echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
         svn export ${kernel_repo}/${inputs_kernel} ${kernel_path} --force
-        [[ "${?}" -ne "0" ]] && error_msg "Kernel download failed."
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
     fi
 
     sync && echo ""
@@ -355,8 +356,8 @@ check_kernel() {
     # Check if the file is added with TEXT_OFFSET patch
     [[ "${PLATFORM}" == "amlogic" ]] && {
         get_textoffset "${kernel_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
-        echo -e "${INFO} K510: [ ${K510} ]"
-        if [[ "${K510}" -eq "1" ]]; then
+        echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
+        if [[ "${NEED_OVERLOAD}" == "yes" ]]; then
             [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
         fi
     }
@@ -408,6 +409,7 @@ backup_kernel() {
     chmod +x *
     tar -czf boot-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
+    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to move [ boot-${current_kernel_signature}.tar.gz ] files."
     echo -e "${INFO} (1/4) The [ boot-${current_kernel_signature}.tar.gz ] backup successful."
 
     # 2. Pack the dtb-*.tar.gz file
@@ -416,6 +418,7 @@ backup_kernel() {
     [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to copy [ /boot/dtb/${PLATFORM}/* ] files."
     tar -czf dtb-${PLATFORM}-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
+    [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to move [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] files."
     echo -e "${INFO} (2/4) The [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] backup successful."
 
     # 3. Pack the header-*.tar.gz file
@@ -424,6 +427,7 @@ backup_kernel() {
     [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to copy [ /usr/src/linux-headers-${current_kernel_signature}/* ] files."
     tar -czf header-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
+    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to move [ header-${current_kernel_signature}.tar.gz ] files."
     echo -e "${INFO} (3/4) The [ header-${current_kernel_signature}.tar.gz ] backup successful."
 
     # 4. Pack the modules-*.tar.gz file
@@ -432,6 +436,7 @@ backup_kernel() {
     [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to copy [ /usr/lib/modules/${current_kernel_signature} ] files."
     tar -czf modules-${current_kernel_signature}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
+    [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to move [ modules-${current_kernel_signature}.tar.gz ] files."
     echo -e "${INFO} (4/4) The [ modules-${current_kernel_signature}.tar.gz ] backup successful."
 
     # Add sha256sum integrity verification file
@@ -484,7 +489,7 @@ update_kernel() {
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_BRANCH=.*|KERNEL_BRANCH='${KERNEL_BRANCH}'|g" ${ophub_release_file}
     [[ "${auto_mainline_uboot}" == "yes" ]] && sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
-    [[ "${PLATFORM}" == "amlogic" ]] && sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file}
+    [[ "${PLATFORM}" == "amlogic" ]] && sed -i "s|^NEED_OVERLOAD=.*|NEED_OVERLOAD='${NEED_OVERLOAD}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums
@@ -497,7 +502,7 @@ update_uboot() {
     echo -e "${STEPS} Start updating the uboot..."
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${K510}" -eq "1" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+    if [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
         [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && chmod +x /boot/u-boot.ext
         [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && chmod +x /boot/u-boot.emmc
         echo -e "${INFO} The ${UBOOT_OVERLOAD} file copy is complete."
@@ -513,7 +518,7 @@ update_uboot() {
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
     fi
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to write bootloader using [ dd ]."
 
     sync && echo ""
 }
