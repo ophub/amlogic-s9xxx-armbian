@@ -73,11 +73,11 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-# Set stable kernel directory: [ stable ], rk35xx kernel directory: [ rk3588 ]
+# Set stable kernel directory: [ stable ], rk3588 kernel directory: [ rk3588 ]
 kernel_dir=("stable" "rk3588")
 # Set the list of kernels used by default
 stable_kernel=("6.1.10" "5.15.50")
-rk35xx_kernel=("5.10.150")
+rk3588_kernel=("5.10.150")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
@@ -270,7 +270,7 @@ query_version() {
         {
             # Select the corresponding kernel directory and list
             if [[ "${k}" == "rk3588" ]]; then
-                down_kernel_list="${rk35xx_kernel[*]}"
+                down_kernel_list="${rk3588_kernel[*]}"
             else
                 down_kernel_list="${stable_kernel[*]}"
             fi
@@ -306,8 +306,8 @@ query_version() {
 
             # Reset the kernel array to the latest kernel version
             if [[ "${k}" == "rk3588" ]]; then
-                unset rk35xx_kernel
-                rk35xx_kernel="${tmp_arr_kernels[*]}"
+                unset rk3588_kernel
+                rk3588_kernel="${tmp_arr_kernels[*]}"
             else
                 unset stable_kernel
                 stable_kernel="${tmp_arr_kernels[*]}"
@@ -318,7 +318,7 @@ query_version() {
     done
 
     echo -e "${INFO} The latest version of the stable_kernel: [ ${stable_kernel[*]} ]"
-    echo -e "${INFO} The latest version of the rk35xx_kernel: [ ${rk35xx_kernel[*]} ]"
+    echo -e "${INFO} The latest version of the rk3588_kernel: [ ${rk3588_kernel[*]} ]"
 }
 
 download_kernel() {
@@ -330,7 +330,7 @@ download_kernel() {
         {
             # Set the kernel download list
             if [[ "${k}" == "rk3588" ]]; then
-                down_kernel_list="${rk35xx_kernel[*]}"
+                down_kernel_list="${rk3588_kernel[*]}"
             else
                 down_kernel_list="${stable_kernel[*]}"
             fi
@@ -852,7 +852,7 @@ loop_rebuild() {
 
             # Determine kernel branch
             if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
-                kernel_list="${rk35xx_kernel[*]}"
+                kernel_list="${rk3588_kernel[*]}"
                 kd="rk3588"
             else
                 kernel_list="${stable_kernel[*]}"
@@ -924,7 +924,7 @@ download_kernel
 #
 echo -e "${INFO} Armbian board list: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
 echo -e "${INFO} Stable kernel list: [ $(echo ${stable_kernel[*]} | tr "\n" " ") ]"
-echo -e "${INFO} Rk35xx Kernel list: [ $(echo ${rk35xx_kernel[*]} | tr "\n" " ") ]"
+echo -e "${INFO} Rk3588 Kernel list: [ $(echo ${rk3588_kernel[*]} | tr "\n" " ") ]"
 echo -e "${INFO} ROOTFS type: [ ${ROOTFS_TYPE} ] \n"
 #
 # Loop to rebuild armbian
