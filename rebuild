@@ -922,9 +922,9 @@ download_depends
 [[ "${auto_kernel}" == "true" ]] && query_version
 download_kernel
 #
-echo -e "${INFO} Armbian board list: [ $(echo ${build_armbian[*]} | tr "\n" " ") ]"
-echo -e "${INFO} Stable kernel list: [ $(echo ${stable_kernel[*]} | tr "\n" " ") ]"
-echo -e "${INFO} Rk3588 Kernel list: [ $(echo ${rk3588_kernel[*]} | tr "\n" " ") ]"
+echo -e "${INFO} [ ${#build_armbian[*]} ] lists of Armbian board: [ $(echo ${build_armbian[*]} | xargs) ]"
+echo -e "${INFO} [ ${#stable_kernel[*]} ] lists of stable kernel: [ $(echo ${stable_kernel[*]} | xargs) ]"
+echo -e "${INFO} [ ${#rk3588_kernel[*]} ] lists of rk3588 Kernel: [ $(echo ${rk3588_kernel[*]} | xargs) ]"
 echo -e "${INFO} ROOTFS type: [ ${ROOTFS_TYPE} ] \n"
 #
 # Loop to rebuild armbian
