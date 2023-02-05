@@ -133,7 +133,7 @@ init_var() {
 
 toolchain_check() {
     cd ${make_path}
-    echo -e "${STEPS} 开始检查编译内核的工具链..."
+    echo -e "${STEPS} 检查编译内核的工具链..."
 
     # 为 jammy 安装依赖项
     apt-get -qq update
@@ -141,7 +141,7 @@ toolchain_check() {
 
     # 下载 armbian
     if [[ ! -f "${armbian_file}" ]]; then
-        echo -e "${INFO} 开始下载 Armbian rootfs 文件 [ ${armbian_rootfs_file} ]..."
+        echo -e "${INFO} 下载 Armbian rootfs 文件 [ ${armbian_rootfs_file} ]..."
         rm -rf ${armbian_path} && mkdir -p ${armbian_path}
         wget -q "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_path}/${armbian_rootfs_file}"
         [[ "${?}" -eq "0" ]] || error_msg "Armbian文件下载失败"
@@ -158,7 +158,7 @@ toolchain_check() {
     if [[ "${toolchain_name}" == "clang" ]]; then
         # 设置 llvm 版本
         llvm_version="14"
-        echo -e "${INFO} 开始安装 [ llvm: ${llvm_version} ] 工具链..."
+        echo -e "${INFO} 安装 [ llvm: ${llvm_version} ] 工具链..."
 
         # 为 llvm 添加 apt 源
         llvm_toolchain_list="/etc/apt/sources.list.d/llvm-toolchain.list"
@@ -189,9 +189,9 @@ toolchain_check() {
         # 下载 Arm GNU 工具链
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} 开始下载 ARM GNU 工具链 [ ${gun_file} ]..."
+            echo -e "${INFO} 下载 ARM GNU 工具 [ ${gun_file} ]..."
             wget -q "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}"
-            [[ "${?}" -eq "0" ]] || error_msg "GNU 工具链文件下载失败"
+            [[ "${?}" -eq "0" ]] || error_msg "GNU 文件下载失败"
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}
             [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "gcc 没有设置！"
@@ -257,7 +257,7 @@ query_version() {
 
 get_kernel_source() {
     cd ${make_path}
-    echo -e "${STEPS} 开始下载内核源码..."
+    echo -e "${STEPS} 下载内核源码..."
 
     # 内核文件夹 > kernel_.tar.xz_file > 从 kernel.org 下载
     [[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
@@ -281,9 +281,9 @@ get_kernel_source() {
                 fi
             fi
         else
-            echo -e "${INFO} 开始克隆 [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
+            echo -e "${INFO} 下载内核源码 [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
             git clone -q --single-branch --depth 1 https://github.com/${server_kernel_repo} -b ${code_branch} ${kernel_path}/${local_kernel_path}
-            [[ "${?}" -eq "0" ]] || error_msg "[ https://github.com/${server_kernel_repo} ] 克隆失败."
+            [[ "${?}" -eq "0" ]] || error_msg "[ https://github.com/${server_kernel_repo} ] 内核源码下载失败."
         fi
     elif [ "${code_owner}" != "kernel.org" ]; then
         # 获取本地内核版本
@@ -294,7 +294,7 @@ get_kernel_source() {
 
         # 本地版本与服务器版本对比
         if [[ "${auto_kernel}" == "true" && "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
-            # Pull the latest source code of the server
+            # 获取服务器最新源码
             cd ${kernel_path}/${local_kernel_path}
             git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull
             unset kernel_version
@@ -342,14 +342,14 @@ headers_install() {
 
 compile_env() {
     cd ${make_path}
-    echo -e "${STEPS} 开始检查本地编译环境..."
+    echo -e "${STEPS} 检查编译环境..."
 
     # 获取内核版本
     kernel_outname="${kernel_version}${custom_name}"
     echo -e "${INFO} 编译的内核版本: [ ${kernel_outname} ]"
 
     # 创建 temp 目录
-    echo -e "${INFO} Create a temp directory: [ ${out_kernel} ]"
+    echo -e "${INFO} 创建 temp 目录: [ ${out_kernel} ]"
     rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
     mkdir -p ${out_kernel}/{chroot/{root/boot/,},boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
 
@@ -376,7 +376,7 @@ compile_env() {
     # 检查 .config 配置文件
     if [[ ! -s ".config" ]]; then
         [[ -s "${config_path}/config-${kernel_verpatch}" ]] || error_msg "Missing [ config-${kernel_verpatch} ] template!"
-        echo -e "${INFO} copy [ ${config_path}/config-${kernel_verpatch} ] to [ .config ]"
+        echo -e "${INFO} 复制 [ ${config_path}/config-${kernel_verpatch} ] 到 [ .config ]"
         cp -f ${config_path}/config-${kernel_verpatch} .config
     else
         echo -e "${INFO} 使用当前目录下的.config 配置文件."
@@ -407,7 +407,7 @@ compile_dtbs() {
     cd ${kernel_path}/${local_kernel_path}
 
     # 创建 dtbs
-    echo -e "${STEPS} 开始编译 dtbs [ ${local_kernel_path} ]..."
+    echo -e "${STEPS} 编译 dtbs [ ${local_kernel_path} ]..."
     make ${MAKE_SET_STRING} dtbs -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} dtbs 编译成功."
 }
@@ -416,7 +416,7 @@ compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
 
     # 创建 kernel
-    echo -e "${STEPS} 开始编译内核 [ ${local_kernel_path} ]..."
+    echo -e "${STEPS} 编译内核 [ ${local_kernel_path} ]..."
     make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} kernel 编译成功."
 
@@ -457,24 +457,19 @@ generate_uinitrd() {
     cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/zImage
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/usr/lib/modules/*
     cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} ${tag_rootfs}/usr/lib/modules
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
-    # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
     echo "COMPRESS=gzip" >>${compress_initrd_file}
 
     [[ -f "/usr/bin/${qemu_binary_arm}" ]] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/
     [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
-    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
     chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh && sync
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # 进入 armbian 系统生成 /boot/uInitrd-${kernel_outname} 文件
     echo -e "${INFO} 进入 chroot armbian 系统..."
@@ -517,23 +512,23 @@ packit_dtbs() {
 
 packit_kernel() {
     # 打包内核文件
-    echo -e "${STEPS} Packing the [ ${kernel_outname} ] boot, modules and header packages..."
+    echo -e "${STEPS} Packing the [ ${kernel_outname} ] 分别打包 boot, modules, header..."
 
     cd ${out_kernel}/boot
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] 文件已打包."
+    echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] boot 文件已打包."
 
     cd ${out_kernel}/modules/lib/modules
     tar -czf modules-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] 文件已打包."
+    echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] modules 文件已打包."
 
     cd ${out_kernel}/header
     tar -czf header-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${out_kernel}/${kernel_version}
-    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] 文件已打包."
+    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] header 文件已打包."
 }
 
 compile_selection() {
@@ -605,10 +600,10 @@ loop_recompile() {
 }
 
 # 检查脚本权限，支持在 x86_64 Ubuntu 上运行: [ jammy ]
-[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
-[[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
+[[ "$(id -u)" == "0" ]] || error_msg "请以 root 身份运行此脚本: [ sudo ./${0} ]"
+[[ "${arch_info}" == "x86_64" ]] || error_msg "不支持在非 x86_64 Ubuntu 系统上运行此工具."
 # 显示欢迎和服务器启动信息
-echo -e "${STEPS} 欢迎编译内核! \n"
+echo -e "${STEPS} 欢迎使用 ophub 分享的 内核编译脚本 编译内核! \n"
 echo -e "${INFO} Ubuntu 服务器信息: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "${INFO} 服务器CPU配置信息: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "${INFO} 服务器内存使用: \n$(free -h) \n"
@@ -619,8 +614,8 @@ echo -e "${INFO} 设置的参数: [ ${@} ] \n"
 init_var "${@}"
 [[ "${auto_kernel}" == "true" ]] && query_version
 echo -e "${INFO} 内核编译工具链: [ ${toolchain_name} ]"
-echo -e "${INFO} 内核来自: [ ${code_owner} ]"
-echo -e "${INFO} 内核列表: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
+echo -e "${INFO} 内核源来自: [ ${code_owner} ]"
+echo -e "${INFO} 即将的内核: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
 toolchain_check
 # 循环编译内核
 loop_recompile
