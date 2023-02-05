@@ -182,9 +182,9 @@ init_var() {
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The new UUID is invalid, cannot continue."
 
     # Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
-    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
-    K510="1"
-    [[ "$(hexdump -n 15 -x "/boot/zImage" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
+    NEED_OVERLOAD="yes"
+    [[ "$(hexdump -n 15 -x "/boot/zImage" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && NEED_OVERLOAD="no"
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
@@ -248,7 +248,7 @@ show_aml_model() {
     echo -e "${INFO} MAINLINE_UBOOT: [ ${MAINLINE_UBOOT} ]"
     echo -e "${INFO} BOOTLOADER_IMG:  [ ${BOOTLOADER_IMG} ]"
     echo -e "${INFO} UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
-    echo -e "${INFO} K510: [ ${K510} ]"
+    echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
 
     # Check dtb file
     [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The [ ${FDTFILE} ] is missing, stop install."
@@ -427,7 +427,7 @@ copy_bootfs() {
     [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.vfat ]."
 
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to mount BOOTFS partition."
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to mount BOOTFS partition."
 
     echo -e "${INFO} Start copy BOOTFS partition data."
     cp -rf /boot/* ${DIR_INSTALL}
@@ -468,7 +468,7 @@ EOF
     mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${K510}" -eq "1" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
+    if [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
         if [[ -f "${DIR_INSTALL}/u-boot.ext" ]]; then
             cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
@@ -504,13 +504,13 @@ copy_rootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
 
         mount -t btrfs -o compress=zstd:6 ${PART_ROOT} ${DIR_INSTALL}
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount ROOTFS partition."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS partition."
     else
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -b 4k -m 0 ${PART_ROOT}
         [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.ext4 ]"
 
         mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount ROOTFS partition."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS partition."
     fi
 
     echo -e "${INFO} Start copy ROOTFS partition data."
@@ -543,12 +543,12 @@ EOF
     echo -e "${INFO} Update the relevant parameters."
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
     armbian_release_file="${DIR_INSTALL}${armbian_release_file}"
+    sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file}
     sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file}
-    sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file}
     sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file}
     sed -i "s|^BOOTLOADER_IMG=.*|BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'|g" ${ophub_release_file}
-    sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file}
-    sed -i "s|^K510=.*|K510='${K510}'|g" ${ophub_release_file}
+    sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file}
+    sed -i "s|^NEED_OVERLOAD=.*|NEED_OVERLOAD='${NEED_OVERLOAD}'|g" ${ophub_release_file}
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file}
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}

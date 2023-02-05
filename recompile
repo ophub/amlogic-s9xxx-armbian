@@ -518,7 +518,7 @@ generate_uinitrd() {
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
     echo -e "${INFO} Enter the chroot armbian system..."
     chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
-    [[ "${?}" -ne "0" || ! -f "${tag_rootfs}"/boot/uInitrd-${kernel_outname} ]] && error_msg "Create chroot uInitrd-${kernel_outname} file failed."
+    [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
     cd ${make_path}
     # Copy the generated uInitrd file to the current system
@@ -593,7 +593,8 @@ compile_selection() {
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
     cd ${out_kernel}
-    tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync && sleep 3
+    tar -czf ${kernel_version}.tar.gz ${kernel_version}
+    sync && sleep 3
 
     echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
 }
