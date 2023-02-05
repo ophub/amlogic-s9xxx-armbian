@@ -123,9 +123,9 @@ process_msg() {
 
 get_textoffset() {
     vmlinuz_name="${1}"
-    K510="1"
-    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ]
-    [[ "$(hexdump -n 15 -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && K510="0"
+    NEED_OVERLOAD="yes"
+    # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
+    [[ "$(hexdump -n 15 -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && NEED_OVERLOAD="no"
 }
 
 init_var() {
@@ -609,10 +609,10 @@ refactor_files() {
     # Process Amlogic series boot partition files
     [[ "${PLATFORM}" == "amlogic" ]] && {
         # Add u-boot.ext for Amlogic 5.10 kernel
-        if [[ "${K510}" -eq "1" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
+        if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext
             chmod +x u-boot.ext
-        elif [[ "${K510}" -eq "1" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
+        elif [[ "${NEED_OVERLOAD}" == "yes" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
             error_msg "${board} Board does not support using ${kernel} kernel, missing u-boot."
         fi
 
@@ -699,14 +699,14 @@ refactor_files() {
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file}
     echo "SOC='${SOC}'" >>${ophub_release_file}
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
-    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
     echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
+    echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
+    echo "NEED_OVERLOAD='${NEED_OVERLOAD}'" >>${ophub_release_file}
     echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
     echo "BOARD='${board}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
-    echo "K510='${K510}'" >>${ophub_release_file}
     echo "ROOTFS_TYPE='${ROOTFS_TYPE}'" >>${ophub_release_file}
     echo "BOOT_CONF='${boot_conf_file}'" >>${ophub_release_file}
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
