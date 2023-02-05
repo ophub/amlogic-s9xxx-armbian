@@ -168,11 +168,13 @@ init_var() {
         [[ "${SOC,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
     }
-    # Rockchip rk3588 series, such as Rock5b only support rk3588/5.10.y kernel
+    # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
     [[ "${SOC,,}" == "rk3588" && "${KERNEL_BRANCH}" != "rk3588" ]] && {
         echo -e "${WARNING} Kernel [ ${KERNEL_BRANCH} ] is not available for this device, it has been automatically adjusted to [ rk3588 ]."
         KERNEL_BRANCH="rk3588"
     }
+    # Adjust kernel directory [ 6.x.y ] to [ stable ]
+    [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && KERNEL_BRANCH="stable"
 
     # Display settings results
     echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
@@ -342,9 +344,9 @@ check_kernel() {
     cd ${kernel_path}
     echo -e "${STEPS} Start checking the kernel..."
 
-    # Rockchip rk3568 series, such as FastRhino R66S/R68S only support 6.x.y kernel
-    [[ "${SOC,,}" == "rk3568" && "${inputs_kernel:0:2}" != "6." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
-    # Rockchip rk3588 series, such as Rock5b only support rk3588/5.10.y kernel
+    # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 6.x.y kernel
+    [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
     [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
 
     # Determine custom kernel filename
