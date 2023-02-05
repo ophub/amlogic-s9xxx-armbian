@@ -84,8 +84,6 @@ auto_kernel="true"
 # Get the list of devices built by default
 # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOARD  12.BUILD
 build_armbian=($(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:yes$" | awk -F':' '{print $11}' | sort | uniq | xargs))
-# Set the list of devices that must use the stable/6.x.y kernel
-must_kernel_6xy=("r66s" "r68s" "h66k" "h68k" "eaidk-610")
 # Set the list of devices that must use the /boot/extlinux/extlinux.conf file
 must_extlinux=("s905x-t95" "s912-t95z-plus" "s905lb-r3300l")
 
@@ -865,7 +863,7 @@ loop_rebuild() {
                     kernel="${k}"
 
                     # Identify devices that must use the 6.x.y kernel
-                    [[ -n "$(echo "${must_kernel_6xy[@]}" | grep -w "${board}")" && "${kernel:0:1}" -ne "6" ]] && {
+                    [[ "${KERNEL_BRANCH}" == "6.x.y" && "${kernel:0:2}" != "6." ]] && {
                         echo -e "(${j}.${i}) ${TIPS} The ${board} device cannot use ${kd}/${kernel} kernel, skip."
                         let i++
                         continue
