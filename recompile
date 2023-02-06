@@ -281,7 +281,7 @@ get_kernel_source() {
                 fi
             fi
         else
-            echo -e "${INFO} 下载内核源码 [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
+            echo -e "${INFO} 内核源码来自 [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
             git clone -q --single-branch --depth 1 https://github.com/${server_kernel_repo} -b ${code_branch} ${kernel_path}/${local_kernel_path}
             [[ "${?}" -eq "0" ]] || error_msg "[ https://github.com/${server_kernel_repo} ] 内核源码下载失败."
         fi
