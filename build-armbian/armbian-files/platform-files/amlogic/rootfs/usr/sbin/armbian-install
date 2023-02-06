@@ -203,7 +203,7 @@ search_aml_model() {
 
 # Functions: Displays a list of supported amlogic devices
 # Configure: View ${model_database}
-# Explain:   1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOARD  12.BUILD
+# Explain:   1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
 # Example:   402:GT-King-Pro:s922x:meson-g12b-gtking-pro.dtb:u-boot-gtkingpro.bin:gtkingpro-u-boot.bin.sd.bin:NA:all:amlogic:meson-g12b:s922x:yes
 show_aml_model() {
     echo -e "${STEPS} Start selecting device..."
