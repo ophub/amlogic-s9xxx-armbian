@@ -91,7 +91,7 @@ delete_current_swap() {
 # create new swap
 create_the_swap() {
     echo -e "${STEPS} Start creating a new swap..."
-    ROOTFS_TYPE="$(df -hT / | tail -n1 | awk '{print $2}')"
+    ROOTFS_TYPE="$(df -hT ${SWAP_PATH} | tail -n1 | awk '{print $2}')"
     echo -e "${INFO} The swap size is [ ${swap_gb} ] GiB, partition types is [ ${ROOTFS_TYPE} ], Please wait..."
 
     # create swapfile
