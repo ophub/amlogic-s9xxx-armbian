@@ -548,7 +548,6 @@ EOF
     sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file}
     sed -i "s|^BOOTLOADER_IMG=.*|BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'|g" ${ophub_release_file}
     sed -i "s|^UBOOT_OVERLOAD=.*|UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'|g" ${ophub_release_file}
-    sed -i "s|^NEED_OVERLOAD=.*|NEED_OVERLOAD='${NEED_OVERLOAD}'|g" ${ophub_release_file}
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file}
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}
