@@ -491,7 +491,6 @@ update_kernel() {
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_BRANCH=.*|KERNEL_BRANCH='${KERNEL_BRANCH}'|g" ${ophub_release_file}
     [[ "${auto_mainline_uboot}" == "yes" ]] && sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
-    [[ "${PLATFORM}" == "amlogic" ]] && sed -i "s|^NEED_OVERLOAD=.*|NEED_OVERLOAD='${NEED_OVERLOAD}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums
