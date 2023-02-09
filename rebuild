@@ -40,17 +40,17 @@
 #============================ Set make environment variables ============================
 #
 # Related file storage path
-make_path="${PWD}"
-armbian_outputpath="${make_path}/build/output/images"
+current_path="${PWD}"
+armbian_outputpath="${current_path}/build/output/images"
 armbian_rebuild_file="${armbian_outputpath}/*.img"
-build_path="${make_path}/build-armbian"
+build_path="${current_path}/build-armbian"
 kernel_path="${build_path}/kernel"
 uboot_path="${build_path}/u-boot"
 common_files="${build_path}/armbian-files/common-files"
 platform_files="${build_path}/armbian-files/platform-files"
 model_conf="${common_files}/etc/model_database.conf"
 firmware_path="${common_files}/usr/lib/firmware"
-tmp_dir="${make_path}/tmp_dir"
+tmp_dir="${current_path}/tmp_dir"
 tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
@@ -227,7 +227,7 @@ init_var() {
 }
 
 find_armbian() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start searching for Armbian file..."
 
     # Get armbian release and version
@@ -245,7 +245,7 @@ find_armbian() {
 }
 
 download_depends() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start downloading dependency files..."
 
     # Download Armbian firmware files
@@ -318,7 +318,7 @@ query_version() {
 }
 
 download_kernel() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start downloading the kernel files..."
 
     x="1"
@@ -351,7 +351,7 @@ download_kernel() {
 }
 
 confirm_version() {
-    cd ${make_path}
+    cd ${current_path}
 
     # Find [ the first ] configuration information with [ the same BOARD name ] and [ BUILD as yes ] in the ${model_conf} file.
     [[ -f "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
@@ -427,7 +427,7 @@ confirm_version() {
 
 extract_armbian() {
     process_msg " (1/6) Extract armbian files."
-    cd ${make_path}
+    cd ${current_path}
 
     rm -rf ${tmp_dir}
     mkdir -p ${tmp_outpath} ${tmp_armbian} ${tmp_build} ${tmp_aml_image}
@@ -461,7 +461,7 @@ extract_armbian() {
 
 make_image() {
     process_msg " (2/6) Make new armbian image."
-    cd ${make_path}
+    cd ${current_path}
 
     # Make Amlogic s9xxx armbian
     build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
@@ -521,7 +521,7 @@ make_image() {
 
 copy_files() {
     process_msg " (3/6) Copy the Armbian files."
-    cd ${make_path}
+    cd ${current_path}
 
     # Create a dual-partition general directory
     tag_bootfs="${tmp_build}/bootfs"
@@ -562,7 +562,7 @@ copy_files() {
 
 replace_kernel() {
     process_msg " (4/6) Replace kernel files."
-    cd ${make_path}
+    cd ${current_path}
 
     # Replace the kernel
     kernel_boot="$(ls ${kernel_path}/${kd}/${kernel}/boot-${kernel}-*.tar.gz 2>/dev/null | head -n 1)"
@@ -814,7 +814,7 @@ refactor_files() {
 
 clean_tmp() {
     process_msg " (6/6) Clear temporary files."
-    cd ${make_path}
+    cd ${current_path}
 
     umount -f ${tmp_armbian} 2>/dev/null
     losetup -d ${loop_old} 2>/dev/null
@@ -829,13 +829,13 @@ clean_tmp() {
 
     pigz -f *.img && mv -f *.img.gz ${armbian_outputpath} && sync
 
-    cd ${make_path}
+    cd ${current_path}
 
     rm -rf ${tmp_dir} && sync
 }
 
 loop_rebuild() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start building Armbian..."
 
     j="1"
@@ -866,7 +866,7 @@ loop_rebuild() {
                     }
 
                     echo -ne "(${j}.${i}) Start building Armbian [ ${board} - ${kd}/${kernel} ]. "
-                    now_remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+                    now_remaining_space="$(df -Tk ${current_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
                         echo -e "${WARNING} Remaining space is less than 6G, exit this build."
                         break
@@ -904,7 +904,7 @@ echo -e "${STEPS} Welcome to Rebuild Armbian!"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "${INFO} Server memory usage: \n$(free -h) \n"
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
 #
 # Initialize variables
 init_var "${@}"
@@ -925,7 +925,7 @@ echo -e "${INFO} ROOTFS type: [ ${ROOTFS_TYPE} ] \n"
 loop_rebuild
 #
 # Show server end information
-echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
