@@ -44,7 +44,7 @@ do_checkdisk() {
     mmcblk?p[1-4])
         DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
         PT_PRE="${DISK_NAME}p"
-        LB_PRE="EMMC_"
+        LB_PRE="MMC_"
         ;;
     [hsv]d[a-z][1-4])
         DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
@@ -64,7 +64,7 @@ do_checkdisk() {
 
 # Create new partition
 create_new_part() {
-    echo -e "${STEPS} Start creating a new partition ... "
+    echo -e "${STEPS} Start creating a new partition..."
 
     # Set the type of file system
     cat <<EOF
@@ -88,43 +88,35 @@ EOF
     echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
 
     # Confirm UUID
+    echo -e "${STEPS} Start generating new partition UUID..."
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
     echo -e "${INFO} ROOTFS_UUID: ${ROOTFS_UUID}"
 
-    # Get the starting position of the p3 partition
-    START_P3="$(fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | echo $(($(xargs) + 1)))"
-    if [[ -z "${START_P3}" || -z "$(echo ${START_P3} | sed -n "/^[0-9]\+$/p")" ]]; then
-        error_msg "Unable to get starting position!"
-    fi
-    TOTAL_SIZE="$(lsblk -l -b -o NAME,SIZE | awk "\$1 ~ /^${DISK_NAME}\$/ {print \$2}")"
-    END_P3="$((TOTAL_SIZE / 512 - 1))"
+    # Repair disk size
+    echo -e "${STEPS} Start repairing hard disk size..."
+    printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} print || repair_status="no"
+    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
 
-    cat >/tmp/fdisk.script <<EOF
-n
-p
-3
-${START_P3}
-${END_P3}
-Y
-t
-3
-83
-w
-EOF
-    sync
+    # Calculate partition positions
+    echo -e "${STEPS} Start calculating partition location..."
+    END_P2="$(fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | xargs)"
+    [[ -z "${END_P2}" || -z "$(echo ${END_P2} | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to get starting position!"
+    START_P3="$(((END_P2 + 1) / 2048 + 1))"
 
-    echo -e "${STEPS} Fdisk starting ... "
-    fdisk /dev/${DISK_NAME} </tmp/fdisk.script 2>/dev/null
-    [[ "$?" -ne "0" ]] && error_msg "Fdisk failed!"
-    sync
+    # Create the partition
+    echo -e "${STEPS} Start creating new partitions..."
+    parted /dev/${DISK_NAME} mkpart primary ${file_system_type} $((START_P3))MiB 100% 2>/dev/null
+    # Show partition results
+    parted /dev/${DISK_NAME} unit MiB print
 
-    echo -e "${STEPS} Create data filesystem ... "
+    echo -e "${STEPS} Create data filesystem..."
     # Set mount path
     data_path="/data"
     mkdir -p ${data_path} && sync
 
+    umount -f /dev/${PT_PRE}3 2>/dev/null
     if [[ "${file_system_type}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -m single "/dev/${PT_PRE}3"
         [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
@@ -148,18 +140,18 @@ EOF
 
 # Expand the current partition
 expand_current_part() {
-    echo -e "${STEPS} Start to expand the current partition ... "
+    echo -e "${STEPS} Start to expand the current partition..."
 
-    echo -e "${STEPS} Install growpart or xfsprogs expansion and formatting tool ... "
+    echo -e "${STEPS} Install growpart or xfsprogs expansion and formatting tool..."
     apt-get update
     apt-get install cloud-guest-utils xfsprogs -y
     [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
 
-    echo -e "${STEPS} Expansion Partition ... "
+    echo -e "${STEPS} Expansion Partition..."
     growpart /dev/${DISK_NAME} 2
     [[ "${?}" -ne "0" ]] && error_msg "[ growpart ] operation failed."
 
-    echo -e "${STEPS} Expansion file system ... "
+    echo -e "${STEPS} Expansion file system..."
     ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         btrfs filesystem resize max /
