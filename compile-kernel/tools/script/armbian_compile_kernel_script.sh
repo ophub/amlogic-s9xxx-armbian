@@ -39,8 +39,8 @@
 #========================= Set make environment variables =========================
 #
 # Related file storage path
-make_path="${PWD}"
-compile_path="${make_path}/compile-kernel"
+current_path="${PWD}"
+compile_path="${current_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
@@ -177,7 +177,7 @@ init_var() {
 }
 
 toolchain_check() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
     # Install dependencies
@@ -242,7 +242,7 @@ toolchain_check() {
 }
 
 query_version() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start querying the latest kernel version..."
 
     # Set empty array
@@ -287,7 +287,7 @@ query_version() {
 }
 
 get_kernel_source() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start downloading the kernel source code..."
 
     # kernel_folder > kernel_.tar.xz_file > download_from_kernel.org
@@ -372,7 +372,7 @@ headers_install() {
 }
 
 compile_env() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Start checking local compilation environments."
 
     # Get kernel output name
@@ -463,7 +463,7 @@ compile_kernel() {
 }
 
 generate_uinitrd() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Generate uInitrd environment initialization..."
 
     # Backup current system files for /boot
@@ -585,7 +585,7 @@ compile_selection() {
 }
 
 clean_tmp() {
-    cd ${make_path}
+    cd ${current_path}
     echo -e "${STEPS} Clear the space..."
 
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
@@ -594,7 +594,7 @@ clean_tmp() {
 }
 
 loop_recompile() {
-    cd ${make_path}
+    cd ${current_path}
 
     j="1"
     for k in ${build_kernel[*]}; do
@@ -633,10 +633,10 @@ loop_recompile() {
 # Show welcome and server start information
 echo -e "${STEPS} Welcome to compile kernel! \n"
 echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "${INFO} Server running path [ ${make_path} ] \n"
+echo -e "${INFO} Server running path [ ${current_path} ] \n"
 echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "${INFO} Server memory usage: \n$(free -h) \n"
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${make_path}) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
 #
 # Initialize variables, download the kernel source code and check the toolchain
 init_var "${@}"
@@ -649,7 +649,7 @@ toolchain_check
 loop_recompile
 #
 # Show server end information
-echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${make_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
