@@ -262,7 +262,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### GitHub Actions 输入参数说明
 
-关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.cn.md#3-fork-仓库并设置-releases_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
+关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](build-armbian/documents/README.cn.md#3-fork-仓库并设置-gh_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
 
 | 参数              | 默认值             | 说明                                             |
 |------------------|-------------------|--------------------------------------------------|
