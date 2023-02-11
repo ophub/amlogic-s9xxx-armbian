@@ -16,7 +16,7 @@ on:
       armbian_board:
         description: "Select Amlogic Board."
         required: false
-        default: "all"
+        default: "s922x"
         type: choice
         options:
           - all
@@ -71,7 +71,7 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "https://github.com/ophub/kernel/tree/main/pub"
+        default: "https://github.com/vuong2023/kernel/tree/main/pub"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
@@ -146,7 +146,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: vuong2023/amlogic-s9xxx-armbian@main-1
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
