@@ -263,7 +263,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### GitHub Actions Input parameter description
 
-For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TOKEN](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/router-config/README.md#3-fork-repository-and-set-releases_token). The relevant parameters correspond to the `local packaging command`, please refer to the above description.
+For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TOKEN](build-armbian/documents/README.md#3-fork-repository-and-set-gh_token). The relevant parameters correspond to the `local packaging command`, please refer to the above description.
 
 | Optional           | Defaults          | Description                                                   |
 |--------------------|-------------------|---------------------------------------------------------------|
