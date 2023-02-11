@@ -164,7 +164,7 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
 
       - name: Rebuild Armbian
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: vuong2023/amlogic-s9xxx-armbian@main-1
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
