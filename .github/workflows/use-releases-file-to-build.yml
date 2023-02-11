@@ -20,7 +20,7 @@ on:
       armbian_board:
         description: "Select Box Board."
         required: false
-        default: "all"
+        default: "s922x"
         type: choice
         options:
           - all
@@ -141,7 +141,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: vuong2023/amlogic-s9xxx-armbian@main-1
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
