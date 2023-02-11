@@ -67,12 +67,12 @@ armbian_release_file="etc/armbian-release"
 ophub_release_file="etc/ophub-release"
 
 # Firmware files download repository
-firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
+firmware_repo="https://github.com/vuong2023/firmware/tree/main/firmware"
 # Convert firmware library address to svn format
 firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Kernel files download repository
-kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
+kernel_repo="https://github.com/vuong2023/kernel/tree/main/pub"
 # Set stable kernel directory: [ stable ], rk3588 kernel directory: [ rk3588 ]
 kernel_dir=("stable" "rk3588")
 # Set the list of kernels used by default
