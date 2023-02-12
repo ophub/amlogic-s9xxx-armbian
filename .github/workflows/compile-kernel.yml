@@ -13,9 +13,10 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "unifreq"
+        default: "vuong2023"
         type: choice
         options:
+          - vuong2023
           - unifreq
           - kernel.org
       kernel_version:
