@@ -165,24 +165,34 @@ init_var() {
 
     # Automatically complete old version ophub_release_file
     [[ -z "${KERNEL_BRANCH}" ]] && {
-        [[ "${SOC,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
+        if [[ "${SOC,,}" == "rk3588" ]]; then
+            KERNEL_BRANCH="rk3588"
+        elif [[ "${SOC,,}" == "s905w" ]]; then
+            KERNEL_BRANCH="5.15.y"
+        elif [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]]; then
+            KERNEL_BRANCH="6.1.y"
+        else
+            KERNEL_BRANCH="stable"
+        fi
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
     }
-    # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
-    [[ "${SOC,,}" == "rk3588" && "${KERNEL_BRANCH}" != "rk3588" ]] && {
-        echo -e "${WARNING} Kernel [ ${KERNEL_BRANCH} ] is not available for this device, it has been automatically adjusted to [ rk3588 ]."
-        KERNEL_BRANCH="rk3588"
-    }
-    # Adjust kernel directory [ 6.x.y ] to [ stable ]
-    [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && KERNEL_BRANCH="stable"
+
+    # Set kernel download directory [ 5.15.y/6.x.y ] to [ stable ]
+    if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
+        kernel_down="rk3588"
+    elif [[ "${KERNEL_BRANCH}" == "dev" ]]; then
+        kernel_down="dev"
+    else
+        kernel_down="stable"
+    fi
 
     # Display settings results
+    echo -e "${INFO} Set the kernel download directory: [ ${kernel_repo}/${kernel_down} ]"
     echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
-    echo -e "${INFO} Set the kernel directory: [ ${KERNEL_BRANCH} ]"
 
     # Convert kernel library address to svn format
     [[ "${kernel_repo}" == http* && -n "$(echo "${kernel_repo}" | grep "tree/main")" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
-    kernel_repo="${kernel_repo}/${KERNEL_BRANCH}"
+    kernel_repo="${kernel_repo}/${kernel_down}"
 
     # Convert kernel library address to API format
     kernel_api="${kernel_repo#*com\/}"
@@ -344,10 +354,16 @@ check_kernel() {
     cd ${kernel_path}
     echo -e "${STEPS} Start checking the kernel..."
 
-    # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 6.x.y kernel
-    [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
-    # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
-    [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]] && error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    if [[ "${SOC,,}" == "s905w" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; then
+        # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 5.4.y/5.15.y kernel
+        error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    elif [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; then
+        # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 6.x.y kernel
+        error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    elif [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]]; then
+        # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
+        error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
+    fi
 
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
@@ -489,7 +505,6 @@ update_kernel() {
 
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
-    sed -i "s|^KERNEL_BRANCH=.*|KERNEL_BRANCH='${KERNEL_BRANCH}'|g" ${ophub_release_file}
     [[ "${auto_mainline_uboot}" == "yes" ]] && sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
