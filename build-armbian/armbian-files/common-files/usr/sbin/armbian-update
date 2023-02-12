@@ -187,7 +187,7 @@ init_var() {
     fi
 
     # Display settings results
-    echo -e "${INFO} Set the kernel download directory: [ ${kernel_repo}/${kernel_down} ]"
+    echo -e "${INFO} Set the kernel download directory: [ ${kernel_down} ]"
     echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
 
     # Convert kernel library address to svn format
@@ -354,14 +354,10 @@ check_kernel() {
     cd ${kernel_path}
     echo -e "${STEPS} Start checking the kernel..."
 
-    if [[ "${SOC,,}" == "s905w" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; then
-        # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 5.4.y/5.15.y kernel
-        error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
-    elif [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; then
-        # Rockchip rk3568/rk3399 series, such as r66s/r68s/h66k/h68k/eaidk-610 only support 6.x.y kernel
-        error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
-    elif [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]]; then
-        # Rockchip rk3588 series, such as rock5b only support rk3588/5.10.y kernel
+    # Check for inapplicable kernels
+    if { [[ "${SOC,,}" == "s905w" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; } ||
+        { [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
+        { [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]]; }; then
         error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
     fi
 
