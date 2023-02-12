@@ -864,6 +864,7 @@ loop_rebuild() {
     j="1"
     for b in ${build_armbian[*]}; do
         {
+            # Set specific configuration for building Armbian system
             board="${b}"
             confirm_version
 
@@ -887,7 +888,14 @@ loop_rebuild() {
                         let i++
                         continue
                     }
+                    # Identify devices that must use the 5.4.y/5.15.y kernel
+                    [[ "${KERNEL_BRANCH}" == "5.15.y" ]] && [[ "${kernel:0:5}" != "5.15." && "${kernel:0:4}" != "5.4." ]] && {
+                        echo -e "(${j}.${i}) ${TIPS} The ${board} device cannot use ${kd}/${kernel} kernel, skip."
+                        let i++
+                        continue
+                    }
 
+                    # Check disk space size
                     echo -ne "(${j}.${i}) Start building Armbian [ ${board} - ${kd}/${kernel} ]. "
                     now_remaining_space="$(df -Tk ${current_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
