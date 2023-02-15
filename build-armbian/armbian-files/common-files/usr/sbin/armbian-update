@@ -187,8 +187,9 @@ init_var() {
     fi
 
     # Display settings results
-    echo -e "${INFO} Set the kernel download directory: [ ${kernel_download_dir} ]"
-    echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
+    echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
+    echo -e "${INFO} Kernel download directory: [ ${kernel_download_dir} ]"
+    echo -e "${INFO} Kernel name: [ ${inputs_kernel} ]"
 
     # Convert kernel library address to svn format
     [[ "${kernel_repo}" == http* && -n "$(echo "${kernel_repo}" | grep "tree/main")" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
@@ -456,7 +457,7 @@ backup_kernel() {
     # Add sha256sum integrity verification file
     cd ${backup_path}/${current_kernel}
     sha256sum * >sha256sums
-    echo -e "${INFO} The [ sha256sums ] file has been generated"
+    echo -e "${INFO} The [ sha256sums ] file has been generated."
     echo -e "${INFO} The current kernel backup path: [ ${backup_path}/${current_kernel} ]. It can be deleted if it is not needed."
 
     sync && echo ""
