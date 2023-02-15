@@ -177,22 +177,22 @@ init_var() {
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
     }
 
-    # Set kernel download directory [ 5.15.y/6.x.y ] to [ stable ]
+    # Set kernel download directory
     if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
-        kernel_down="rk3588"
+        kernel_download_dir="rk3588"
     elif [[ "${KERNEL_BRANCH}" == "dev" ]]; then
-        kernel_down="dev"
+        kernel_download_dir="dev"
     else
-        kernel_down="stable"
+        kernel_download_dir="stable"
     fi
 
     # Display settings results
-    echo -e "${INFO} Set the kernel download directory: [ ${kernel_down} ]"
+    echo -e "${INFO} Set the kernel download directory: [ ${kernel_download_dir} ]"
     echo -e "${INFO} Set the kernel name: [ ${inputs_kernel} ]"
 
     # Convert kernel library address to svn format
     [[ "${kernel_repo}" == http* && -n "$(echo "${kernel_repo}" | grep "tree/main")" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
-    kernel_repo="${kernel_repo}/${kernel_down}"
+    kernel_repo="${kernel_repo}/${kernel_download_dir}"
 
     # Convert kernel library address to API format
     kernel_api="${kernel_repo#*com\/}"
@@ -355,9 +355,9 @@ check_kernel() {
     echo -e "${STEPS} Start checking the kernel..."
 
     # Check for inapplicable kernels
-    if { [[ "${SOC,,}" == "s905w" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; } ||
-        { [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
-        { [[ "${SOC,,}" == "rk3588" && "${inputs_kernel:0:5}" != "5.10." ]]; }; then
+    if { [[ "${KERNEL_BRANCH}" == "rk3588" ]] && [[ "${inputs_kernel:0:5}" != "5.10." ]]; } ||
+        { [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
+        { [[ "${KERNEL_BRANCH}" == "5.15.y" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; }; then
         error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
     fi
 
