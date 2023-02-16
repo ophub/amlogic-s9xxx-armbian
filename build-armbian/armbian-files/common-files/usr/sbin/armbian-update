@@ -29,15 +29,17 @@
 #========================================= Functions list =========================================
 #
 # error_msg          : Output error message
+#
 # check_depends      : Check dependencies
 # get_textoffset     : Get kernel TEXT_OFFSET
 # init_var           : Initialize all variables
-# rescue_kernel      : Rescue the kernel
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files list
 # backup_kernel      : Backup current kernel
 # update_kernel      : Update the kernel
 # update_uboot       : Update the uboot
+#
+# rescue_kernel      : Rescue the kernel
 #
 #===================================== Set default parameters =====================================
 #
@@ -222,78 +224,6 @@ init_var() {
     sync && echo ""
 }
 
-# Rescue the kernel
-rescue_kernel() {
-    echo -e "${STEPS} Start rescuing kernel files..."
-
-    # Check the current system running disk
-    root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
-    if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
-    fi
-
-    # Find emmc disk, first find emmc containing boot0 partition
-    box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
-    # Find emmc disk, find emmc that does not contain the boot0 partition
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
-    # Find NVMe disk
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme0n1)' | grep -vE ^${root_devname} | sort | uniq)"
-    # Check if emmc exists
-    [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe storage not found in this device!"
-    # Location of disk
-    rescue_disk="/dev/${box_disk}"
-    echo -e "${INFO} The device eMMC/NVMe name: [ ${rescue_disk} ]"
-
-    # Check if there is enough free space
-    available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
-    [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "The remaining space cannot be obtained."
-    [[ "${available_space}" -lt "3" ]] && error_msg "The available space is less than 3GiB, please use [ armbian-tf ] to expand the USB."
-
-    # Create a temporary mount directory
-    rm -rf ${rescue_path}
-    mkdir -p ${rescue_path}/{bootfs/,rootfs/}
-
-    # Mount eMMC to USB
-    mount ${rescue_disk}p1 ${rescue_path}/bootfs
-    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p1 failed!"
-    mount ${rescue_disk}p2 ${rescue_path}/rootfs
-    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p2 failed!"
-
-    # Identify the current kernel files
-    kernel_signature="$(uname -r)"
-
-    # 01. For /boot files
-    cd ${rescue_path}/bootfs
-    rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
-    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
-    cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
-    [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
-    echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
-
-    # 02. For /usr/lib/modules/${kernel_signature}
-    cd ${rescue_path}/rootfs/usr/lib/modules
-    rm -rf *
-    cp -rf /usr/lib/modules/${kernel_signature} -t .
-    [[ "${?}" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
-    echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
-
-    # 03. For /usr/src/linux-headers-${kernel_signature}
-    cd ${rescue_path}/rootfs/usr/src
-    rm -rf linux-headers-*
-    cp -rf /usr/src/linux-headers-${kernel_signature} -t .
-    [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
-    echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
-
-    # Unmount the emmc partition
-    cd ${rescue_path}
-    umount -f ${rescue_path}/bootfs
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/bootfs ]"
-    umount -f ${rescue_path}/rootfs
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/rootfs ]"
-
-    sync && echo ""
-}
-
 # Download the kernel
 download_kernel() {
     cd ${current_path}
@@ -406,8 +336,16 @@ check_kernel() {
 backup_kernel() {
     echo -e "${STEPS} Start backing up the current kernel..."
 
-    # Identify the current kernel files
+    [[ -d "${backup_path}" ]] || mkdir -p ${backup_path}
     rm -rf ${backup_path}/${current_kernel}
+
+    # Keep the latest 3 kernel backups and delete the others
+    backup_kernel_list=($(ls ${backup_path} -lt | grep "^d" | awk '{print $9}'))
+    [[ "${#backup_kernel_list[*]}" -ge "3" ]] && {
+        for ((i = 2; i < ${#backup_kernel_list[*]}; i++)); do rm -rf ${backup_path}/${backup_kernel_list[$i]}; done
+    }
+
+    # Identify the current kernel files
     mkdir -p ${backup_path}/${current_kernel}
 
     # Create temporary file directory
@@ -534,13 +472,83 @@ update_uboot() {
     sync && echo ""
 }
 
+# Rescue the kernel
+rescue_kernel() {
+    echo -e "${STEPS} Start rescuing kernel files..."
+
+    # Check the current system running disk
+    root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
+    if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
+        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
+    fi
+
+    # Find emmc disk, first find emmc containing boot0 partition
+    box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+    # Find emmc disk, find emmc that does not contain the boot0 partition
+    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
+    # Find NVMe disk
+    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme0n1)' | grep -vE ^${root_devname} | sort | uniq)"
+    # Check if emmc exists
+    [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe storage not found in this device!"
+    # Location of disk
+    rescue_disk="/dev/${box_disk}"
+    echo -e "${INFO} The device eMMC/NVMe name: [ ${rescue_disk} ]"
+
+    # Check if there is enough free space
+    available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+    [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "The remaining space cannot be obtained."
+    [[ "${available_space}" -lt "3" ]] && error_msg "The available space is less than 3GiB, please use [ armbian-tf ] to expand the USB."
+
+    # Create a temporary mount directory
+    rm -rf ${rescue_path}
+    mkdir -p ${rescue_path}/{bootfs/,rootfs/}
+
+    # Mount eMMC to USB
+    mount ${rescue_disk}p1 ${rescue_path}/bootfs
+    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p1 failed!"
+    mount ${rescue_disk}p2 ${rescue_path}/rootfs
+    [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}p2 failed!"
+
+    # Identify the current kernel files
+    kernel_signature="$(uname -r)"
+
+    # 01. For /boot files
+    cd ${rescue_path}/bootfs
+    rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
+    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
+    cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
+    echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
+
+    # 02. For /usr/lib/modules/${kernel_signature}
+    cd ${rescue_path}/rootfs/usr/lib/modules
+    rm -rf *
+    cp -rf /usr/lib/modules/${kernel_signature} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
+    echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
+
+    # 03. For /usr/src/linux-headers-${kernel_signature}
+    cd ${rescue_path}/rootfs/usr/src
+    rm -rf linux-headers-*
+    cp -rf /usr/src/linux-headers-${kernel_signature} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
+    echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
+
+    # Unmount the emmc partition
+    cd ${rescue_path}
+    umount -f ${rescue_path}/bootfs
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/bootfs ]"
+    umount -f ${rescue_path}/rootfs
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/rootfs ]"
+
+    sync && echo ""
+}
+
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 echo -e "${STEPS} Welcome to the kernel update tool."
 
-if [[ "${1}" == "-r" ]]; then
-    rescue_kernel
-else
+if [[ "${1}" != "-r" ]]; then
     check_depends
     init_var "${@}"
     download_kernel
@@ -548,6 +556,8 @@ else
     backup_kernel
     update_kernel
     [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
+else
+    rescue_kernel
 fi
 
 sync && sleep 3
