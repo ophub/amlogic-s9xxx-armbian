@@ -77,7 +77,7 @@ check_depends() {
     echo -e "${STEPS} Start checking dependencies..."
 
     is_missing="0"
-    necessary_packages=("subversion" "tar" "coreutils")
+    necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils")
     i="1"
     for package in ${necessary_packages[*]}; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
@@ -125,7 +125,6 @@ init_var() {
     BOOTLOADER_IMG="${BOOTLOADER_IMG}"
     KERNEL_BRANCH="${KERNEL_BRANCH}"
     [[ -z "${PLATFORM}" ]] && error_msg "Invalid PLATFORM: [ ${PLATFORM} ]"
-    echo -e "${INFO} Armbian PLATFORM: [ ${PLATFORM} ]"
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     get_all_ver="$(getopt "k:v:m:" "${@}")"
@@ -167,8 +166,6 @@ init_var() {
     [[ -z "${KERNEL_BRANCH}" ]] && {
         if [[ "${SOC,,}" == "rk3588" ]]; then
             KERNEL_BRANCH="rk3588"
-        elif [[ "${SOC,,}" == "s905w" ]]; then
-            KERNEL_BRANCH="5.15.y"
         elif [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]]; then
             KERNEL_BRANCH="6.1.y"
         else
@@ -187,6 +184,7 @@ init_var() {
     fi
 
     # Display settings results
+    echo -e "${INFO} Armbian PLATFORM: [ ${PLATFORM} ]"
     echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
     echo -e "${INFO} Kernel download directory: [ ${kernel_download_dir} ]"
     echo -e "${INFO} Kernel name: [ ${inputs_kernel} ]"
