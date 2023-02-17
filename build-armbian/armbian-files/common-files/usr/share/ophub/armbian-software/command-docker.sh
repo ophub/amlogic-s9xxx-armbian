@@ -174,7 +174,6 @@ software_104() {
             -e PUID=${docker_puid} \
             -e PGID=${docker_pgid} \
             -e TZ=${docker_tz} \
-            -e TRANSMISSION_WEB_HOME=/transmission-web-control/ \
             -e USER=${tr_user} \
             -e PASS=${tr_pass} \
             -p 9091:9091 \
@@ -187,9 +186,9 @@ software_104() {
             ${image_name}
 
         # Set the transmission-web-control
-        echo -e "${STEPS} Start the installation interface: [ transmission-web-control ]..."
-        tr_cn_url="https://github.com/ronggang/transmission-web-control/raw/master/release/install-tr-control-cn.sh"
-        bash <(curl -fsSL ${tr_cn_url}) ${install_path}
+        #echo -e "${STEPS} Start the installation interface: [ transmission-web-control ]..."
+        #tr_cn_url="https://github.com/ronggang/transmission-web-control/raw/master/release/install-tr-control-cn.sh"
+        #bash <(curl -fsSL ${tr_cn_url}) ${install_path}
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address: [ http://ip:9091 ]"
