@@ -65,9 +65,10 @@ armbian-update
 
 | Optional  | Default     | Value       | Description                   |
 | -------   | -------     | ----------  | ---------------------------   |
-| -k        | auto latest | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
+| -k        | latest      | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
 | -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
 | -m        | no          | yes/no      | Use Mainline u-boot           |
+| -b        | yes         | yes/no      | Automatically backup the current system kernel  |
 | -r        | ""          | ""          | [Rescue] Update eMMC with system kernel from USB |
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
