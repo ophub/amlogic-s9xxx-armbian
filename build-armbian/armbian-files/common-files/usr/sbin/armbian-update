@@ -47,6 +47,7 @@
 current_path="${PWD}"
 # Set kernel backup directory
 backup_path="/ddbr/backup"
+auto_backup_kernel="yes"
 # Set kernel rescue temporary directory
 rescue_path="/ddbr/rescue"
 # Set the release check file
@@ -129,7 +130,7 @@ init_var() {
     [[ -z "${PLATFORM}" ]] && error_msg "Invalid PLATFORM: [ ${PLATFORM} ]"
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:v:m:" "${@}")"
+    get_all_ver="$(getopt "k:v:m:b:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -155,6 +156,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -m parameter [ ${2} ]!"
+            fi
+            ;;
+        -b | --Backup_kenlel)
+            if [[ -n "${2}" ]]; then
+                [[ "${2}" == "no" ]] && auto_backup_kernel="no" || auto_backup_kernel="yes"
+                shift
+            else
+                error_msg "Invalid -b parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -553,7 +562,7 @@ if [[ "${1}" != "-r" ]]; then
     init_var "${@}"
     download_kernel
     check_kernel
-    backup_kernel
+    [[ "${auto_backup_kernel}" == "yes" ]] && backup_kernel
     update_kernel
     [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
 else
