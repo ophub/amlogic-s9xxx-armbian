@@ -29,6 +29,7 @@ According to the user's demand feedback in the [Issue](https://github.com/ophub/
 | 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | Remote Desktop with Audio/Locale/IBus Support. Multi Desktop (Gnome, Plasma, Mate, Xfce, Cinnamon) |
 | 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome is a self-hosted, open source music server and streamer. It gives you freedom to listen to your music collection from any browser or mobile device. |
 | 123 | Alist                 | [Home](https://alist.nn.ci/) | [Docker](https://hub.docker.com/r/xhofe/alist) :5244  | A file list program that supports multiple storage, powered by Gin and Solidjs. |
+| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | A timed task management panel that supports typescript, javaScript, python3, and shell. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
@@ -139,6 +140,7 @@ Welcome to add more software. Support requests are welcome in [Issue](https://gi
 | 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | 具有音频/区域设置/IBus 支持的远程桌面。 支持多桌面（Gnome、Plasma、Mate、Xfce、Cinnamon） |
 | 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome 是一个自托管的开源音乐服务器和流媒体。 它使您可以自由地从任何浏览器或移动设备收听音乐收藏。 |
 | 123 | Alist                 | [Home](https://alist.nn.ci/zh/) | [Docker](https://hub.docker.com/r/xhofe/alist) :5244  | 一个支持多种存储的文件列表程序，使用 Gin 和 Solidjs。 |
+| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | 支持 python3、javaScript、shell、typescript 的定时任务管理面板。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
