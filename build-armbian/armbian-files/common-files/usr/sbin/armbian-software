@@ -151,21 +151,25 @@ show_software_list() {
     # Check software status
     check_software_status
 
+    # Define split line style
+    split_line="--------------------------------------------------------------"
     # Show software list
     echo "${software_database}" | awk -F ':' '{print $1,$2,$7,$8}' | while read line; do
-        # Add a header every 10 rows
-        [[ "$(echo ${line} | awk '{print $1}')" == *"1" ]] && {
-            printf "%-s\n" "--------------------------------------------------------------"
+        # Add a header for each software list category
+        [[ "$(echo ${line} | awk '{print $1}')" == *"01" ]] && {
+            printf "%-s\n" "${split_line}"
             printf "%-5s %-25s %-15s %-15s\n" ID NAME STATE MANAGE
-            printf "%-s\n" "--------------------------------------------------------------"
+            printf "%-s\n" "${split_line}"
         }
+        # Print software information
         printf "%-5s %-25s %-15s %-15s\n" $(echo "${line}")
     done
-    printf "%-s\n" "--------------------------------------------------------------"
-    #
+    # Add end split line
+    printf "%-s\n" "${split_line}"
+
+    # Display software options
     echo -ne "${OPTIONS} Please Input Software ID: "
     read software_id
-
     # Check the validity of the selection
     ret="$(search_software_model "${software_id}")"
     [[ -z "${ret}" ]] && error_msg "Software ID [ ${software_id} ] was not found, exit!"

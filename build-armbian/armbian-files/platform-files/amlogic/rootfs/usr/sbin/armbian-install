@@ -208,13 +208,24 @@ search_aml_model() {
 show_aml_model() {
     echo -e "${STEPS} Start selecting device..."
 
-    printf "%-s\n" "--------------------------------------------------------------------------------------"
+    # Define split line style
+    split_line="--------------------------------------------------------------------------------------"
+    # Print header information
+    printf "%-s\n" "${split_line}"
     printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
-    printf "%-s\n" "--------------------------------------------------------------------------------------"
-    printf "%-5s %-10s %-30s %-50s\n" $(echo "${model_database}" | grep -E "^[0-9]{1,3}:.*" | awk -F':' '{print $1,$3,$2,$4}')
+    printf "%-s\n" "${split_line}"
+    # Print device list
+    echo "${model_database}" | awk -F':' '{print $1,$3,$2,$4}' | while read line; do
+        # Print device information
+        printf "%-5s %-10s %-30s %-50s\n" $(echo "${line}")
+        # Add a split line every 10 lines
+        [[ "$(echo ${line} | awk '{print $1}')" == *"0" ]] && printf "%-s\n" "${split_line}"
+    done
+    # Print custom options and end split lines
     printf "%-5s %-10s %-30s %-50s\n" 0 Other Customize Enter-custom-dtb-name
-    printf "%-s\n" "--------------------------------------------------------------------------------------"
+    printf "%-s\n" "${split_line}"
 
+    # Display device options
     echo -ne "${OPTIONS} Please Input ID: "
     read boxid
     if [[ "${boxid}" -eq "0" ]]; then
