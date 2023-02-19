@@ -150,7 +150,8 @@ jobs:
             img_version="$(echo ${img_name} | grep -oE '[2-9][2-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
             img_kernel="$(echo ${img_name} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
             sudo mv -f ${img_name} Armbian_${img_version}-trunk_${img_kernel}.img
-            sudo pigz -9f *.img
+            sudo pigz -f *.img && sync
+            sudo rm -rf $(ls . | grep -v ".img.gz" | xargs) 2>/dev/null
             df -hT ${PWD}
 
       - name: Upload Armbian image to Release
