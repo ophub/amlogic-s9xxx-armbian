@@ -425,7 +425,7 @@ update_kernel() {
     echo -e "${INFO} (1/4) Unpacking [ boot-${kernel_name}.tar.gz ] done."
 
     # 02. For /boot/dtb/${PLATFORM}/*
-    mkdir -p /boot/dtb/${PLATFORM}
+    [[ -d "/boot/dtb/${PLATFORM}" ]] || mkdir -p /boot/dtb/${PLATFORM}
     tar -xzf dtb-${PLATFORM}-${kernel_name}.tar.gz -C /boot/dtb/${PLATFORM}
     [[ "${PLATFORM}" == "rockchip" ]] && ln -sf dtb /boot/dtb-${kernel_name}
     [[ "$(ls /boot/dtb/${PLATFORM} -l 2>/dev/null | grep "^-" | wc -l)" -ge "2" ]] || error_msg "/boot/dtb/${PLATFORM} files is missing."
