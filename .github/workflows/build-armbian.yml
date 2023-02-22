@@ -50,6 +50,7 @@ on:
           - h68k
           - eaidk-610
           - king3399
+          - tn3399
           - beikeyun
           - l1pro
       armbian_kernel:
