@@ -1,6 +1,6 @@
 verbosity=1
 bootlogo=false
 overlay_prefix=rockchip
-rootdev=UUID=74286424-9875-4694-b36e-608fc8d082e5
+rootdev=/dev/mmcblk0p2
 rootfstype=ext4
-fdtfile=../tn3399_wifi_bt_fix.dtb
+fdtfile=rockchip/rk3399-tn3399.dtb
