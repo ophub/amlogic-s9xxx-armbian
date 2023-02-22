@@ -1,0 +1,6 @@
+verbosity=1
+bootlogo=false
+overlay_prefix=rockchip
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+fdtfile=rockchip/rk3399-tn3399.dtb
