@@ -865,7 +865,7 @@ software_123() {
             -e PGID=0 \
             -e UMASK=022 \
             -p 5244:5244 \
-            -v /etc/alist:/opt/alist/data \
+            -v ${install_path}/alist:/opt/alist/data \
             --restart=always \
             ${image_name}
 
