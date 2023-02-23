@@ -118,9 +118,9 @@ process_msg() {
 
 get_textoffset() {
     vmlinuz_name="${1}"
-    NEED_OVERLOAD="yes"
+    need_overload="yes"
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
-    [[ "$(hexdump -n 15 -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && NEED_OVERLOAD="no"
+    [[ "$(hexdump -n 15 -x "${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && need_overload="no"
 }
 
 init_var() {
@@ -278,20 +278,20 @@ query_version() {
             for kernel_var in ${down_kernel_list[*]}; do
                 echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version of the same series for [ ${k} - ${kernel_var} ]"
 
-                # Identify the kernel mainline
-                MAIN_LINE="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
+                # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 5.10 ]
+                kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
-                # Check the version on the server (e.g LATEST_VERSION="125")
+                # Check the kernel <SUBLEVEL>, such as [ 125 ]
                 if [[ -n "${gh_token}" ]]; then
-                    LATEST_VERSION="$(curl --header "authorization: Bearer ${gh_token}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                    kernel_sub="$(curl --header "authorization: Bearer ${gh_token}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
                     query_api="Authenticated user request"
                 else
-                    LATEST_VERSION="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${MAIN_LINE}.[0-9]+" | sed -e "s/${MAIN_LINE}.//g" | sort -n | sed -n '$p')"
+                    kernel_sub="$(curl -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
                     query_api="Unauthenticated user request"
                 fi
 
-                if [[ "${?}" -eq "0" && -n "${LATEST_VERSION}" ]]; then
-                    tmp_arr_kernels[${i}]="${MAIN_LINE}.${LATEST_VERSION}"
+                if [[ "${?}" -eq "0" && -n "${kernel_sub}" ]]; then
+                    tmp_arr_kernels[${i}]="${kernel_verpatch}.${kernel_sub}"
                 else
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
@@ -629,10 +629,10 @@ refactor_files() {
     # Process Amlogic series boot partition files
     [[ "${PLATFORM}" == "amlogic" ]] && {
         # Add u-boot.ext for Amlogic 5.10 kernel
-        if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
+        if [[ "${need_overload}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext
             chmod +x u-boot.ext
-        elif [[ "${NEED_OVERLOAD}" == "yes" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
+        elif [[ "${need_overload}" == "yes" ]] && [[ -z "${UBOOT_OVERLOAD}" || ! -f "${UBOOT_OVERLOAD}" ]]; then
             error_msg "${board} Board does not support using ${kernel} kernel, missing u-boot."
         fi
 
