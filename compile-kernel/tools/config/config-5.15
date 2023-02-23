@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.94 Kernel Configuration
+# Linux/arm64 5.15.95 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="Ubuntu clang version 14.0.6"
 CONFIG_GCC_VERSION=0
