@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Install armbian to eMMC
+# Function: Install Armbian to eMMC for Allwinner box
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -26,9 +26,7 @@
 #
 #==================================== Set default parameters ====================================
 #
-# Set install list profile
-model_conf="/etc/model_database.conf"
-# Add custom armbian firmware information
+# Add custom Armbian configuration information
 ophub_release_file="/etc/ophub-release"
 # Set the installation file preprocessing directory
 tmp_path="/ddbr"
@@ -76,7 +74,7 @@ check_depends() {
 init_var() {
     echo -e "${STEPS} Start initializing the environment..."
 
-    # Find a list of devices of the same family
+    # View device configuration information
     [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
     FDTFILE="$(cat "${ophub_release_file}" | grep -E "^FDTFILE" | awk -F"'" '{print $2}')"
     MAINLINE_UBOOT="$(cat "${ophub_release_file}" | grep -E "^MAINLINE_UBOOT" | awk -F"'" '{print $2}')"
