@@ -535,41 +535,44 @@ make_image() {
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
     fi
 
-    # Write the specified bootloader for Amlogic boxes
+    # Write the specified bootloader for [ Amlogic ] boxes
     [[ "${PLATFORM}" == "amlogic" ]] && {
-        if [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" ]]; then
-            dd if="${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
-            dd if="${uboot_path}/amlogic/bootloader/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        bootloader_path="${uboot_path}/${PLATFORM}/bootloader"
+        if [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
-        elif [[ -n "${BOOTLOADER_IMG}" && -f "${uboot_path}/amlogic/bootloader/${BOOTLOADER_IMG}" ]]; then
-            dd if="${uboot_path}/amlogic/bootloader/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
-            dd if="${uboot_path}/amlogic/bootloader/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync bs=1 count=444 2>/dev/null
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
 
-    # Write the specified bootloader for Rockchip boxes
+    # Write the specified bootloader for [ Rockchip ] boxes
     [[ "${PLATFORM}" == "rockchip" ]] && {
-        if [[ -n "${BOOTLOADER_IMG}" && -f "${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" ]] &&
-            [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/rockchip/${board}/${MAINLINE_UBOOT}" ]]; then
-            dd if="${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
-            dd if="${uboot_path}/rockchip/${board}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
+        bootloader_path="${uboot_path}/${PLATFORM}/${board}"
+        if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
+            [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
-        elif [[ -n "${BOOTLOADER_IMG}" && -f "${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" ]]; then
-            dd if="${uboot_path}/rockchip/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 skip=64 seek=64 2>/dev/null
+        elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 skip=64 seek=64 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
 
-    # Write the specified bootloader for Allwinner boxes
+    # Write the specified bootloader for [ Allwinner ] boxes
     [[ "${PLATFORM}" == "allwinner" ]] && {
-        if [[ -n "${BOOTLOADER_IMG}" && -f "${uboot_path}/allwinner/${board}/${BOOTLOADER_IMG}" ]] &&
-            [[ -n "${MAINLINE_UBOOT}" && -f "${uboot_path}/allwinner/${board}/${MAINLINE_UBOOT}" ]]; then
-            dd if="${uboot_path}/allwinner/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
-            dd if="${uboot_path}/allwinner/${board}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=40 2>/dev/null
+        bootloader_path="${uboot_path}/${PLATFORM}/${board}"
+        if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
+            [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=40 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
-        elif [[ -n "${BOOTLOADER_IMG}" && -f "${uboot_path}/allwinner/${board}/${BOOTLOADER_IMG}" ]]; then
-            dd if="${uboot_path}/allwinner/${board}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
+        elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
             #echo -e "${INFO} For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
