@@ -53,6 +53,7 @@ on:
           - tn3399
           - beikeyun
           - l1pro
+          - vplus
       armbian_kernel:
         description: "Select kernel version."
         required: false
