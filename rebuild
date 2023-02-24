@@ -375,6 +375,15 @@ download_kernel() {
 confirm_version() {
     cd ${current_path}
 
+    # Confirm BOOT_UUID
+    BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
+    [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+    # Confirm ROOTFS_UUID
+    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
+    [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
+    [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+
     # Find [ the first ] configuration information with [ the same BOARD name ] and [ BUILD as yes ] in the ${model_conf} file.
     [[ -f "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
     board_conf="$(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[^#].*:${board}:yes$" | head -n 1)"
@@ -393,16 +402,11 @@ confirm_version() {
     FAMILY="$(echo ${board_conf} | awk -F':' '{print $10}')"
     BOOT_CONF="$(echo ${board_conf} | awk -F':' '{print $11}')"
 
+    # Check whether the key parameters are correct
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
-
-    # Confirm BOOT_UUID
-    BOOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [[ -z "${BOOT_UUID}" ]] && BOOT_UUID="$(uuidgen)"
-    [[ -z "${BOOT_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
-    # Confirm ROOTFS_UUID
-    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
-    [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
+    # Set supported platform name
+    support_platform=("amlogic" "rockchip" "allwinner")
+    [[ "${support_platform[*]}" =~ "${PLATFORM}" ]] || error_msg "[ ${PLATFORM} ] not supported."
 
     # Define platform variables for [ Amlogic ] boxes
     [[ "${PLATFORM}" == "amlogic" ]] && {
