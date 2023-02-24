@@ -22,6 +22,7 @@ on:
           - all
           - s922x_s905x3_s905d_s912_s905l3a
           - rock5b_r66s_r68s_beikeyun_l1pro
+          - eaidk-610_king3399_tn3399
           - a311d
           - s922x
           - s922x-n2
