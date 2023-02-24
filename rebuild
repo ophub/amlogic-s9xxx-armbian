@@ -508,10 +508,11 @@ make_image() {
     process_msg " (2/6) Make new armbian image."
     cd ${current_path}
 
-    # Make Amlogic s9xxx armbian
+    # Set Armian file name
     build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
     rm -f ${build_image_file}
 
+    # Reserve bootloader write area (Unit: MiB)
     [[ "${PLATFORM}" == "amlogic" ]] && SKIP_MB="4"
     [[ "${PLATFORM}" == "rockchip" ]] && SKIP_MB="16"
     [[ "${PLATFORM}" == "allwinner" ]] && SKIP_MB="16"
@@ -561,7 +562,7 @@ make_image() {
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
             dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=16384 2>/dev/null
             dd if="${bootloader_path}/${TRUST_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=24576 2>/dev/null
-            #echo -e "${INFO} For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
+            #echo -e "${INFO} For [ ${board} ] write bootloader: ${TRUST_IMG}"
         elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
             [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=512 seek=64 2>/dev/null
