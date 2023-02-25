@@ -278,7 +278,7 @@ set_rootfs_type() {
   2    btrfs
 -----------------------------------------------
 EOF
-    echo -ne "${OPTIONS} Please Input ID: "
+    echo -ne "${OPTIONS} Please Input ID (1/2): "
     read filetype
     if [[ "${filetype}" -eq "2" || "${filetype}" == "btrfs" ]]; then
         file_system_type="btrfs"
