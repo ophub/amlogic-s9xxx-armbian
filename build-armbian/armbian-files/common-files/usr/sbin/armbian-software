@@ -245,12 +245,12 @@ help_info() {
     clear
     cat <<EOF
 =====================================================================
-Command Example: armbian-software -u
-            -u : Update    Update install software script.
-            -c : Clear     Clear the local install software script.
-            -h : Help      Help information display.
-            -q : Quit      Quit install software services.
-             * : Other     Show software list.
+Command Example : armbian-software -u
+             -u : Update    Update install software script.
+             -c : Clear     Clear the local install software script.
+             -h : Help      Help information display.
+             -q : Quit      Quit install software services.
+              * : Other     Show software list.
 =====================================================================
 EOF
     exit 0

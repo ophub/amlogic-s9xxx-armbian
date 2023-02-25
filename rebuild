@@ -406,7 +406,7 @@ confirm_version() {
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
     # Set supported platform name
     support_platform=("amlogic" "rockchip" "allwinner")
-    [[ "${support_platform[*]}" =~ "${PLATFORM}" ]] || error_msg "[ ${PLATFORM} ] not supported."
+    [[ -n "$(echo "${support_platform[*]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
 
     # Define platform variables for [ Amlogic ] boxes
     [[ "${PLATFORM}" == "amlogic" ]] && {
