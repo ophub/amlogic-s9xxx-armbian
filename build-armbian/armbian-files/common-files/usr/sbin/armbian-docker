@@ -61,15 +61,15 @@ select_source() {
     echo -e "${STEPS} Start selecting docker source..."
     cat <<EOF
 -----------------------------------------------
-ID  SOURCE
+  ID  SOURCE
 -----------------------------------------------
-1   docker.com (default)
-2   aliyun.com
-3   ustc.edu.cn
-4   tencent.com
+  1   docker.com (default)
+  2   aliyun.com
+  3   ustc.edu.cn
+  4   tencent.com
 -----------------------------------------------
 EOF
-    echo -ne "${OPTIONS} Please Input ID: "
+    echo -ne "${OPTIONS} Please Input ID (1/2/3/4): "
     read source_id
     DOCKER_SOURCE="https://download.docker.com/linux"
     if [[ "${source_id}" -eq "2" ]]; then
