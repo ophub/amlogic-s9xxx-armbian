@@ -272,10 +272,10 @@ set_rootfs_type() {
     echo -e "${STEPS} Start selecting file system type..."
     cat <<EOF
 -----------------------------------------------
-ID  TYPE
+  ID   TYPE
 -----------------------------------------------
-1   ext4
-2   btrfs
+  1    ext4
+  2    btrfs
 -----------------------------------------------
 EOF
     echo -ne "${OPTIONS} Please Input ID: "
