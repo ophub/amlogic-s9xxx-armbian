@@ -109,11 +109,22 @@ do_restore() {
 echo -e "${STEPS} Welcome to use the eMMC system backup/restore service."
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+
 # Check emmc
 do_checkemmc
+
 # Prompt the user to select Backup/Restore
-echo -ne "${OPTIONS} Do you want to Backup=(b) or Restore=(r) eMMC system? (b/r): "
+cat <<EOF
+--------------------------------------------------
+  Option  Function
+--------------------------------------------------
+    b     :Backup the system from eMMC to USB
+    r     :Restore the system from USB to eMMC
+--------------------------------------------------
+EOF
+echo -ne "${OPTIONS} Please select (b/r): "
 read br
+
 case "${br}" in
     b | B | backup)  do_backup ;;
     r | R | restore) do_restore ;;

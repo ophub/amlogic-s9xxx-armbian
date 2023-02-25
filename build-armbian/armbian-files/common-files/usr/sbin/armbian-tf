@@ -188,11 +188,22 @@ expand_current_part() {
 echo -e "${STEPS} Welcome to use TF/SD/USB partition management tool."
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+
 # Check disk
 do_checkdisk
+
 # Prompt the user to select Expand/Create
-echo -ne "${OPTIONS} Do you want to Expand=(e) or Create=(c) partitions? (e/c): "
+cat <<EOF
+--------------------------------------------------
+  Option  Function
+--------------------------------------------------
+    e     :Expand the remaining available space
+    c     :Create a third new partition
+--------------------------------------------------
+EOF
+echo -ne "${OPTIONS} Please select (e/c): "
 read ec
+
 case "${ec}" in
     e | E | expand) expand_current_part ;;
     c | C | create) create_new_part ;;
