@@ -228,8 +228,8 @@ APPEND=root=${uenv_mount_string} console=ttyS0,115200n8 no_console_suspend conso
 
 EOF
 
-    #mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
-    #mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
+    mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
+    mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
 
     sync && sleep 3
     umount -f ${DIR_INSTALL}
