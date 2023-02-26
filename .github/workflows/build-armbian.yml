@@ -18,7 +18,7 @@ on:
           - jammy
           - bullseye
       armbian_board:
-        description: "Select Box Board."
+        description: "Select device board."
         required: false
         default: "all"
         type: choice
