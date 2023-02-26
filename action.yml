@@ -1,19 +1,19 @@
-name: "Rebuild armbian and kernel"
-author: "https://github.com/ophub"
-description: "Support Amlogic and Rockchip boxes, etc."
+name: "Rebuild Armbian and Kernel"
+author: "https://github.com/ophub/amlogic-s9xxx-armbian"
+description: "Support Amlogic, Rockchip and Allwinner boxes."
 inputs:
-  # Choose build target
+  # Select build target
   build_target:
-    description: "Choose build target: armbian / kernel"
+    description: "Select build target: armbian / kernel"
     required: false
     default: "armbian"
   # For build armbian -----
   armbian_path:
-    description: "Set armbian original file path."
+    description: "Set Armbian file path."
     required: false
     default: "build/output/images/*.img"
   armbian_board:
-    description: "Set Amlogic Board."
+    description: "Set device Board."
     required: false
     default: "s905d_s905x3"
   armbian_kernel:
