@@ -1,10 +1,10 @@
-# Armbian for Amlogic and Rockchip
+# Armbian
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
 The [Armbian](https://www.armbian.com/) system is a lightweight Linux system based on Debian/Ubuntu built specifically for ARM chips. The Armbian system is lean, clean, and 100% compatible and inherits the functions and rich software ecosystem of the Debian/Ubuntu system. It can run safely and stably in TF/SD/USB and the eMMC of the device.
 
-Now you can replace the Android TV system of the TV box with the Amlogic chip with the Armbian system, making it a powerful server. This project builds Armbian system for Amlogic s9xxx and Rockchip boxes. including install to EMMC and update related functions. Support Amlogic s9xxx TV Boxes are ***`a311d, s922x, s905x3, s905x2, s905l3a, s912, s905d, s905x, s905w, s905`***, etc. such as ***`Belink GT-King, Belink GT-King Pro, UGOOS AM6 Plus, X96-Max+, HK1-Box, H96-Max-X3, Phicomm-N1, Octopus-Planet, Fiberhome HG680P, ZTE B860H`***, etc. and Rockchip ***`BeikeYun`, `Chainedbox L1 Pro`, `FastRhino R66S/R68S`, `Radxa 5b`***, etc. Please refer to the [Armbian Documentation](build-armbian/documents) for the usage method.
+Now you can replace the Android TV system of the TV box with the Armbian system, making it a powerful server. This project builds Armbian system for `Amlogic`, `Rockchip` and `Allwinner` boxes. including install to eMMC and update kernel related functions. Please refer to the [Armbian Documentation](./build-armbian/documents) for the usage method.
 
 The latest version of the Armbian firmware can be downloaded in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize it. If it is useful to you, you can click on the `Star` in the upper right corner of the repository to show your support.
 
@@ -40,7 +40,7 @@ Choose the corresponding firmware according to your box. Then write the IMG file
 
 1. For the installation method of the `Rockchip` platform, please refer to [Chapter 8.2](build-armbian/documents) in the documentation。
 
-2. `Amlogic` platform，Login in to armbian (default user: root, default password: 1234) → input command:
+2. `Amlogic` and `Allwinner` platform，Login in to armbian (default user: root, default password: 1234) → input command:
 
 ```yaml
 armbian-install
@@ -74,7 +74,7 @@ armbian-update
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
 
-If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
 
 When updating the kernel, it will automatically back up the kernel used by the current system. The storage path is in the `/ddbr/backup` directory, which can be deleted if not needed.
 
@@ -244,13 +244,13 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 ## Use GitHub Actions to build
 
-1. Workflows configuration in [.yml](.github/workflows/build-armbian.yml) files. Set the armbian `board` you want to build in `Rebuild Armbian`.
+1. Workflows configuration in [build-armbian.yml](.github/workflows/build-armbian.yml) file.
 
-2. New compilation: Select ***`Build amlogic armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, you can choose Ubuntu series: `jammy`, or Debian series: `bullseye`, etc., Click the ***`Run workflow`*** button. More parameter setting methods can be found in [the official document of Armbian](https://docs.armbian.com/Developer-Guide_Build-Options/).
+2. New compilation: Select ***`Build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, you can choose Ubuntu series: `jammy`, or Debian series: `bullseye`, etc., Click the ***`Run workflow`*** button. More parameter setting methods can be found in [the official document of Armbian](https://docs.armbian.com/Developer-Guide_Build-Options/).
 
 3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build amlogic armbian` of different board. Select ***`Use Releases file to build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
 
-4. Use other Armbian firmware, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian firmware download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of Amlogic S9xxx series TV Boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild amlogic armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
+4. Use other Armbian firmware, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian firmware download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of other TV Boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
 
 ```yaml
 - name: Rebuild Armbian

@@ -1,12 +1,12 @@
 # instructions / 使用说明
 
-The list of devices supported by Amlogic TV Boxes, the configuration file in the `Armbian` system is [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf).
+The list of supported TV boxes is located in the configuration file of the `Armbian` system is [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf).
 
 Where the value of `BUILD` is `yes`, it is the system of some boxes packed by default, and these boxes can be used directly. The default value is `no`, and these unpacked boxes need to download the same `FAMILY` packaged system (it is recommended to download the `5.15/5.4` kernel system). After writing to `USB`, you can open the `boot partition on USB` on the computer, modify the `dtb name of FDT` in the `/boot/uEnv.txt` file, and other boxes in the adaptation list.
 
 For users who perform custom compilation in the `fork` source code repository, if their device is not in the default packaging list, they can modify `no` in `BUILD` to `yes`, and set `a unique value` for `BOARD` to directly package their own device. The `unique value` added to `BOARD` can be used independently when packaging system, for example, `./rebuild -b s905x3` will generate the Armbian system corresponding to `s905x3` configuration, You need to add `BOARD` to [armbian_board](../../.github/workflows/build-armbian.yml#L20) option in the workflow control file when compiling separately in `github Actions`. When building all, `BUILD` is `yes`, all will be packaged.
 
-支持的 Amlogic 电视盒子列表，在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)，在 `OpenWrt` 系统中配置文件的位置为 [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf)。
+支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)，在 `OpenWrt` 系统中配置文件的位置为 [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf)。
 
 其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
