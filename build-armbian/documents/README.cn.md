@@ -29,6 +29,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [8.2.3 电犀牛 R68S 的安装方法](#823-电犀牛-r68s-的安装方法)
       - [8.2.4 贝壳云的安装方法](#824-贝壳云的安装方法)
       - [8.2.5 我家云的安装方法](#825-我家云的安装方法)
+    - [8.3 Allwinner 系列安装方法](#83-allwinner-系列安装方法)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
   - [10. 更新 Armbian 内核](#10-更新-armbian-内核)
   - [11. 安装常用软件](#11-安装常用软件)
@@ -77,6 +78,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.15.3 添加 u-boot 文件](#12153-添加-u-boot-文件)
       - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
     - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
+    - [12.17 如何解决 Bullseye 版本没有声音的问题](#1217-如何解决-bullseye-版本没有声音的问题)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -306,6 +308,14 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 点击执行写入即可。
 
+### 8.3 Allwinner 系列安装方法
+
+登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+
+```yaml
+armbian-install
+```
+
 ## 9. 编译 Armbian 内核
 
 支持在 Ubuntu20.04/22.04 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
@@ -328,7 +338,7 @@ armbian-update
 
 举例: `armbian-update -k 5.15.50 -v dev -m yes`
 
-如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
+如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。如果当前目录没有内核文件，将从服务器查询并下载同系列的最新内核进行更新。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
 
 ## 11. 安装常用软件
 
@@ -953,15 +963,15 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 #### 12.15.2 添加 boot 文件
 
-Amlogic 系列的设备，共用 [/boot](../armbian-files/platform-files/amlogic/bootfs) 启动文件。
+`Amlogic` 系列的设备，共用 [/boot](../armbian-files/platform-files/amlogic/bootfs) 启动文件。
 
-Rockchip 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [/boot](../armbian-files/platform-files/rockchip/bootfs) 启动文件目录，对应的文件放在此目录中。
+`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [/boot](../armbian-files/platform-files/rockchip/bootfs) 启动文件目录，对应的文件放在此目录中。
 
 #### 12.15.3 添加 u-boot 文件
 
-Amlogic 系列的设备，共用 [bootloader](../u-boot/amlogic/bootloader/) 文件和 [u-boot](../u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
+`Amlogic` 系列的设备，共用 [bootloader](../u-boot/amlogic/bootloader/) 文件和 [u-boot](../u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
 
-Rockchip 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot/rockchip) 文件目录，对应的系列文件放在此目录中，构建 Armbian 时将直接写入对应的系统镜像文件中。
+`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot/rockchip) 文件目录，对应的系列文件放在此目录中，构建 Armbian 时将直接写入对应的系统镜像文件中。
 
 #### 12.15.4 添加流程控制文件
 
@@ -1020,4 +1030,8 @@ max-frequency = <208000000>;
 一般情况下，把 `&sd_emmc_c` 的频率由 `max-frequency = <200000000>;` 下调为 `max-frequency = <100000000>;` 即可解决问题。如果不行可继续下调到 `50000000` 进行测试，并通过调整 `&sd_emmc_b` 来对 `USB/SD/TF` 进行设置，也可以使用 `sd-uhs-sdr` 进行限速。你可以通过修改 dts 文件并 [编译](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) 得到测试文件，也可以通过 `12.13 节` 中介绍的方法对已有的 dtb 文件进行反编译修改生成测试文件。反编译 dtb 文件修改时使用十六进制的值，其中十进制的 `200000000` 对应的十六进制为 `0xbebc200`，十进制的 `100000000` 对应的十六进制为 `0x5f5e100`，十进制的 `50000000` 对应的十六进制为 `0x2faf080`，十进制的 `25000000` 对应的十六进制为 `0x17d7840`。
 
 除了通过系统软件层来解决，还可以发挥 [钞能力](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) 和 [动手能力](https://www.right.com.cn/forum/thread-901586-1-1.html) 解决。
+
+### 12.17 如何解决 Bullseye 版本没有声音的问题
+
+请参考 [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) 中的方法进行设置。
 
