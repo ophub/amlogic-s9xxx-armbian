@@ -29,6 +29,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [8.2.3 Installation method of FastRhino-R68S](#823-installation-method-of-fastrhino-r68s)
       - [8.2.4 Installation method of BeikeYun](#824-installation-method-of-beikeyun)
       - [8.2.5 Installation method of l1pro](#825-installation-method-of-l1pro)
+    - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
   - [9. Compile the Armbian kernel](#9-compile-the-armbian-kernel)
   - [10. Update Armbian Kernel](#10-update-armbian-kernel)
   - [11. Install common software](#11-install-common-software)
@@ -65,6 +66,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.15.3 Add u-boot files](#12153-add-u-boot-files)
       - [12.15.4 Add process control files](#12154-add-process-control-files)
     - [12.16 12.16 How to fix I/O errors when writing to eMMC](#1216-1216-how-to-fix-io-errors-when-writing-to-emmc)
+    - [12.17 How to fix the Bullseye version with no sound](#1217-how-to-fix-the-bullseye-version-with-no-sound)
 
 ## 1. Register your own GitHub account
 
@@ -296,6 +298,14 @@ Right click to add item.
 
 Click to execute the write.
 
+### 8.3 Allwinner Series Installation Method
+
+Login in to armbian (default user: root, default password: 1234) → input command:
+
+```yaml
+armbian-install
+```
+
 ## 9. Compile the Armbian kernel
 
 Supports compiling the kernel in Ubuntu20.04/22.04 or Armbian system. It supports local compilation and cloud compilation using GitHub Actions. For details, see [Kernel Compilation Instructions](../../compile-kernel).
@@ -318,7 +328,7 @@ armbian-update
 
 Example: `armbian-update -k 5.15.50 -v dev -m yes`
 
-If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-amlogic-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
+If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). If there is no kernel file in the current directory, it will query and download the latest kernel of the same series from the server for update. The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
 
 ## 11. Install common software
 
@@ -732,15 +742,15 @@ The default value is `no` and there is no packaging. When using these devices, y
 
 #### 12.15.2 Add boot files
 
-Amlogic series devices share [/boot](../armbian-files/platform-files/amlogic/bootfs) startup files.
+`Amlogic` series devices share [/boot](../armbian-files/platform-files/amlogic/bootfs) startup files.
 
-For Rockchip series devices, add an independent [/boot](../armbian-files/platform-files/rockchip/bootfs) file directory named after `BOARD` for each device, and put the corresponding files in this directory.
+For `Rockchip` and `Allwinner` series devices, add an independent [/boot](../armbian-files/platform-files/rockchip/bootfs) file directory named after `BOARD` for each device, and put the corresponding files in this directory.
 
 #### 12.15.3 Add u-boot files
 
-Amlogic series devices share the [bootloader](../u-boot/amlogic/bootloader/) files and [u-boot](../u-boot/amlogic/overload) files. If there is a new file, respectively into the corresponding directory. The `bootloader` files will be automatically added to the `/usr/lib/u-boot` directory of the Armbian system when the system is built, and the `u-boot` files will be automatically added to the `/boot` directory.
+`Amlogic` series devices share the [bootloader](../u-boot/amlogic/bootloader/) files and [u-boot](../u-boot/amlogic/overload) files. If there is a new file, respectively into the corresponding directory. The `bootloader` files will be automatically added to the `/usr/lib/u-boot` directory of the Armbian system when the system is built, and the `u-boot` files will be automatically added to the `/boot` directory.
 
-For Rockchip series devices, add an independent [u-boot](../u-boot/rockchip) file directory named after `BOARD` for each device. The corresponding series of files are placed in this directory. When building Armbian, they will be directly Write to the corresponding system image file.
+For `Rockchip` and `Allwinner` series devices, add an independent [u-boot](../u-boot/rockchip) file directory named after `BOARD` for each device. The corresponding series of files are placed in this directory. When building Armbian, they will be directly Write to the corresponding system image file.
 
 #### 12.15.4 Add process control files
 
@@ -799,4 +809,8 @@ Take the code snippet in the [dts](https://github.com/unifreq/linux-5.15.y/tree/
 Generally, the problem can be solved by reducing the frequency of `&sd_emmc_c` from `max-frequency = <200000000>;` to `max-frequency = <100000000>;`. If it doesn’t work, you can continue to lower it to `50000000` for testing, and adjust `&sd_emmc_b` to set `USB/SD/TF`, or use `sd-uhs-sdr` to limit the speed. You can get the test file by modifying the dts file and [compiling](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) it, or you can decompile and modify the existing dtb file to generate the test file by the method introduced in `Chapter 12.13`. The decompiled dtb file is modified using hexadecimal values, where the hexadecimal value of `200000000` in decimal is `0xbebc200`, the hexadecimal value of `100000000` in decimal is `0x5f5e100`, the hexadecimal value of `50000000` in decimal is `0x2faf080`, and the hexadecimal value of `25000000` in decimal is `0x17d7840`.
 
 In addition to solving problems through the system software layer, you can also use [money ability](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) and [hands-on ability](https://www.right.com.cn/forum/thread-901586-1-1.html) to solve.
+
+### 12.17 How to fix the Bullseye version with no sound
+
+Please refer to the method in [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) to set.
 
