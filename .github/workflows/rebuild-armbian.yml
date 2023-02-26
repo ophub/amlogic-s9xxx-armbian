@@ -10,11 +10,11 @@ on:
   workflow_dispatch:
     inputs:
       armbian_url:
-        description: "Set armbian path."
+        description: "Set Armbian file path."
         required: false
         default: ""
       armbian_board:
-        description: "Select Amlogic Board."
+        description: "Select device board."
         required: false
         default: "all"
         type: choice
