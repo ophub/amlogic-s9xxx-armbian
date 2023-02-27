@@ -195,7 +195,7 @@ create_partition() {
         dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=32
     elif [[ "${BOOTABLE}" == "seek1" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
         echo -e "${INFO} 02. Write bootloader: ${BOOTLOADER_IMG}"
-        dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=1
+        dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=1
     elif [[ "${BOOTABLE}" == "seek8" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
         echo -e "${INFO} 03. Write bootloader: ${BOOTLOADER_IMG}"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=8
