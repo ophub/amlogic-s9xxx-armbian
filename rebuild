@@ -390,11 +390,12 @@ confirm_version() {
     [[ -n "${board_conf}" ]] || error_msg "[ ${board} ] config is missing!"
 
     # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
-    # Column 5, called <UBOOT_OVERLOAD> in Amlogic and <TRUST_IMG> in Rockchip and Allwinner
+    # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, and <BOOTABLE> in Allwinner
     SOC="$(echo ${board_conf} | awk -F':' '{print $3}')"
     FDTFILE="$(echo ${board_conf} | awk -F':' '{print $4}')"
     UBOOT_OVERLOAD="$(echo ${board_conf} | awk -F':' '{print $5}')"
     TRUST_IMG="${UBOOT_OVERLOAD}"
+    BOOTABLE="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="$(echo ${board_conf} | awk -F':' '{print $6}')"
     BOOTLOADER_IMG="$(echo ${board_conf} | awk -F':' '{print $7}')"
     KERNEL_BRANCH="$(echo ${board_conf} | awk -F':' '{print $8}')"
@@ -584,11 +585,14 @@ make_image() {
         if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
             [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
-            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=40 2>/dev/null
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=32 2>/dev/null
             #echo -e "${INFO} 01. For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
-        elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
-            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
+        elif [[ "${BOOTABLE}" == "seek1" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=1 2>/dev/null
             #echo -e "${INFO} 02. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
+        elif [[ "${BOOTABLE}" == "seek8" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
+            #echo -e "${INFO} 03. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
 }
@@ -720,9 +724,19 @@ refactor_files() {
     [[ "${PLATFORM}" == "allwinner" ]] && {
         # Edit the uEnv.txt
         boot_conf_file="uEnv.txt"
-        [[ -f "${boot_conf_file}" ]] || error_msg "The [ ${boot_conf_file} ] file does not exist."
-        sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${boot_conf_file}
-        sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
+        [[ -f "${boot_conf_file}" ]] && {
+            sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${boot_conf_file}
+            sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_conf_file}
+        }
+
+        # Edit the armbianEnv.txt
+        boot_conf_file="armbianEnv.txt"
+        [[ -f "${boot_conf_file}" ]] && {
+            sed -i "s|fdtfile.*|fdtfile=rockchip/${FDTFILE}|g" ${boot_conf_file}
+            sed -i "s|rootdev=.*|rootdev=${uenv_rootdev}|g" ${boot_conf_file}
+            sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_conf_file}
+            sed -i "s|rootflags.*|rootflags=${uenv_rootflags}|g" ${boot_conf_file}
+        }
     }
 
     # Processing partition files: rootfs
@@ -791,8 +805,10 @@ refactor_files() {
     echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
     if [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
-    else
+    elif [[ "${PLATFORM}" == "rockchip" ]]; then
         echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
+    elif [[ "${PLATFORM}" == "allwinner" ]]; then
+        echo "BOOTABLE='${BOOTABLE}'" >>${ophub_release_file}
     fi
 
     # Get random macaddr
