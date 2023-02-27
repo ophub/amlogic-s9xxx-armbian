@@ -443,12 +443,12 @@ confirm_version() {
         bootloader_dir="${uboot_path}/${PLATFORM}/${board}"
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
-            uenv_rootflags="compress=zstd:6"
-            uenv_rootdev="UUID=${ROOTFS_UUID}"
+            armbianenv_rootflags="compress=zstd:6"
+            armbianenv_rootdev="UUID=${ROOTFS_UUID}"
             fstab_string="discard,defaults,noatime,compress=zstd:6"
         else
-            uenv_rootflags="rw,errors=remount-ro"
-            uenv_rootdev="UUID=${ROOTFS_UUID}"
+            armbianenv_rootflags="rw,errors=remount-ro"
+            armbianenv_rootdev="UUID=${ROOTFS_UUID}"
             fstab_string="discard,defaults,noatime,commit=600,errors=remount-ro"
         fi
     }
@@ -466,9 +466,13 @@ confirm_version() {
         bootloader_dir="${uboot_path}/${PLATFORM}/${board}"
         # Set the type of file system
         if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
+            armbianenv_rootflags="compress=zstd:6"
+            armbianenv_rootdev="UUID=${ROOTFS_UUID}"
             uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
             fstab_string="discard,defaults,noatime,compress=zstd:6"
         else
+            armbianenv_rootflags="rw,errors=remount-ro"
+            armbianenv_rootdev="UUID=${ROOTFS_UUID}"
             uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
             fstab_string="discard,defaults,noatime,errors=remount-ro"
         fi
@@ -715,9 +719,9 @@ refactor_files() {
         boot_conf_file="armbianEnv.txt"
         [[ -f "${boot_conf_file}" ]] || error_msg "The [ ${boot_conf_file} ] file does not exist."
         sed -i "s|fdtfile.*|fdtfile=rockchip/${FDTFILE}|g" ${boot_conf_file}
-        sed -i "s|rootdev=.*|rootdev=${uenv_rootdev}|g" ${boot_conf_file}
+        sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_conf_file}
         sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_conf_file}
-        sed -i "s|rootflags.*|rootflags=${uenv_rootflags}|g" ${boot_conf_file}
+        sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${boot_conf_file}
     }
 
     # Process Allwinner series boot partition files
@@ -730,12 +734,12 @@ refactor_files() {
         }
 
         # Edit the armbianEnv.txt
-        boot_conf_file="armbianEnv.txt"
-        [[ -f "${boot_conf_file}" ]] && {
-            sed -i "s|fdtfile.*|fdtfile=allwinner/${FDTFILE}|g" ${boot_conf_file}
-            sed -i "s|rootdev=.*|rootdev=${uenv_rootdev}|g" ${boot_conf_file}
-            sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_conf_file}
-            sed -i "s|rootflags.*|rootflags=${uenv_rootflags}|g" ${boot_conf_file}
+        boot_env_file="armbianEnv.txt"
+        [[ -f "${boot_env_file}" ]] && {
+            sed -i "s|fdtfile.*|fdtfile=allwinner/${FDTFILE}|g" ${boot_env_file}
+            sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_env_file}
+            sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_env_file}
+            sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${boot_env_file}
         }
     }
 
