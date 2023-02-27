@@ -79,12 +79,14 @@ init_var() {
     FDTFILE="$(cat "${ophub_release_file}" | grep -E "^FDTFILE" | awk -F"'" '{print $2}')"
     MAINLINE_UBOOT="$(cat "${ophub_release_file}" | grep -E "^MAINLINE_UBOOT" | awk -F"'" '{print $2}')"
     BOOTLOADER_IMG="$(cat "${ophub_release_file}" | grep -E "^BOOTLOADER_IMG" | awk -F"'" '{print $2}')"
+    BOOTABLE="$(cat "${ophub_release_file}" | grep -E "^BOOTABLE" | awk -F"'" '{print $2}')"
     [[ -n "${FDTFILE}" && -n "${MAINLINE_UBOOT}" && -n "${BOOTLOADER_IMG}" ]] || error_msg "Config is missing in [ ${ophub_release_file} ] file."
 
     # Display device configuration information
     echo -e "${INFO} FDTFILE: [ ${FDTFILE} ]"
     echo -e "${INFO} MAINLINE_UBOOT: [ ${MAINLINE_UBOOT} ]"
     echo -e "${INFO} BOOTLOADER_IMG:  [ ${BOOTLOADER_IMG} ]"
+    echo -e "${INFO} BOOTABLE:  [ ${BOOTABLE} ]"
 
     # Check the current system running disk
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
@@ -167,7 +169,7 @@ create_partition() {
             let i++
         done
     fi
-    #dd if=/dev/zero of=${DEV_EMMC} bs=1M count=16 conv=fsync
+    dd if=/dev/zero of=${DEV_EMMC} bs=1M count=16 conv=fsync
 
     # Set partition size (Unit: MiB)
     BLANK1="16"
@@ -184,11 +186,14 @@ create_partition() {
     # Write bootloader
     if [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]] &&
         [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]]; then
-        echo -e "${INFO} Write bootloader: ${MAINLINE_UBOOT}"
+        echo -e "${INFO} 01. Write bootloader: ${MAINLINE_UBOOT}"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=8
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=40
-    elif [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
-        echo -e "${INFO} Write bootloader: ${BOOTLOADER_IMG}"
+        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=32
+    elif [[ "${BOOTABLE}" == "seek1" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
+        echo -e "${INFO} 02. Write bootloader: ${BOOTLOADER_IMG}"
+        dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=1
+    elif [[ "${BOOTABLE}" == "seek8" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
+        echo -e "${INFO} 03. Write bootloader: ${BOOTLOADER_IMG}"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=1024 seek=8
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
