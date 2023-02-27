@@ -390,12 +390,12 @@ confirm_version() {
     [[ -n "${board_conf}" ]] || error_msg "[ ${board} ] config is missing!"
 
     # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
-    # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, and <BOOTABLE> in Allwinner
+    # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, and <SPL_LOAD_ADDRESS> in Allwinner
     SOC="$(echo ${board_conf} | awk -F':' '{print $3}')"
     FDTFILE="$(echo ${board_conf} | awk -F':' '{print $4}')"
     UBOOT_OVERLOAD="$(echo ${board_conf} | awk -F':' '{print $5}')"
     TRUST_IMG="${UBOOT_OVERLOAD}"
-    BOOTABLE="${UBOOT_OVERLOAD}"
+    SPL_LOAD_ADDRESS="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="$(echo ${board_conf} | awk -F':' '{print $6}')"
     BOOTLOADER_IMG="$(echo ${board_conf} | awk -F':' '{print $7}')"
     KERNEL_BRANCH="$(echo ${board_conf} | awk -F':' '{print $8}')"
@@ -589,12 +589,12 @@ make_image() {
         if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
             [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
-            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=32 2>/dev/null
+            dd if="${bootloader_path}/${MAINLINE_UBOOT}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=40 2>/dev/null
             #echo -e "${INFO} 01. For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
-        elif [[ "${BOOTABLE}" == "seek1" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+        elif [[ "${SPL_LOAD_ADDRESS}" == "latest" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=8k seek=1 2>/dev/null
             #echo -e "${INFO} 02. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
-        elif [[ "${BOOTABLE}" == "seek8" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
+        elif [[ "${SPL_LOAD_ADDRESS}" == "early" ]] && [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
             dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=1024 seek=8 2>/dev/null
             #echo -e "${INFO} 03. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
@@ -719,8 +719,8 @@ refactor_files() {
         boot_conf_file="armbianEnv.txt"
         [[ -f "${boot_conf_file}" ]] || error_msg "The [ ${boot_conf_file} ] file does not exist."
         sed -i "s|fdtfile.*|fdtfile=rockchip/${FDTFILE}|g" ${boot_conf_file}
-        sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_conf_file}
         sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_conf_file}
+        sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_conf_file}
         sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${boot_conf_file}
     }
 
@@ -737,8 +737,9 @@ refactor_files() {
         boot_env_file="armbianEnv.txt"
         [[ -f "${boot_env_file}" ]] && {
             sed -i "s|fdtfile.*|fdtfile=allwinner/${FDTFILE}|g" ${boot_env_file}
-            sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_env_file}
             sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_env_file}
+            sed -i "s|overlay_prefix.*|overlay_prefix=${FAMILY}|g" ${boot_env_file}
+            sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_env_file}
             sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${boot_env_file}
         }
     }
@@ -812,7 +813,7 @@ refactor_files() {
     elif [[ "${PLATFORM}" == "rockchip" ]]; then
         echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
     elif [[ "${PLATFORM}" == "allwinner" ]]; then
-        echo "BOOTABLE='${BOOTABLE}'" >>${ophub_release_file}
+        echo "SPL_LOAD_ADDRESS='${SPL_LOAD_ADDRESS}'" >>${ophub_release_file}
     fi
 
     # Get random macaddr
