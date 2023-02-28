@@ -44,8 +44,8 @@ ophub_release_file="/etc/ophub-release"
 
 # For vplus(Allwinner h6) led
 [[ -x "/usr/bin/rgb" ]] && {
-    rgb --RedName=RED --GreenName=GREEN --BlueName=BLUE 2>/dev/null &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
+    rgb --RedName=RED --GreenName=GREEN --BlueName=BLUE &
+    2>/dev/null && echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
 }
 
 # Add custom log
