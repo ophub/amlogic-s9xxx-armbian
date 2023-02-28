@@ -23,6 +23,7 @@ on:
           - s922x_s905x3_s905d_s912_s905l3a
           - rock5b_r66s_r68s_beikeyun_l1pro
           - eaidk-610_king3399_tn3399
+          - vplus_tqc-a01
           - a311d
           - s922x
           - s922x-n2
@@ -51,6 +52,7 @@ on:
           - beikeyun
           - l1pro
           - vplus
+          - tqc-a01
       armbian_kernel:
         description: "Select kernel version."
         required: false
