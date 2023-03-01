@@ -113,7 +113,7 @@ armbian-swap 1
 登录 Armbian 系统 → 输入命令：
 
 ```yaml
-armbian-led
+armbian-openvfd
 ```
 
 根据 [LED 屏显示控制说明](build-armbian/documents/led_screen_display_control.md) 进行调试。
