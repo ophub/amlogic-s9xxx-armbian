@@ -1,0 +1,13 @@
+verbosity=1
+bootlogo=false
+fdtfile=allwinner/sun50i-h6-vplus-cloud.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=sun50i-h6
+overlays=
+extraargs=
+extraboardargs=net.ifnames=0
+docker_optimizations=on
+console=serial
+consoleargs=console=ttyS0,1500000

@@ -1,0 +1,13 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3588-rock-5b.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=rk3588
+overlays=
+extraargs=
+extraboardargs=net.ifnames=0
+docker_optimizations=on
+console=serial
+consoleargs=console=ttyS2,1500000
