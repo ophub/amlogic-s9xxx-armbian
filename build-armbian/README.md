@@ -6,7 +6,7 @@ The files needed to compile Armbian are stored in the relevant directory.
 
 ## armbian-files
 
-The files stored here are related files that need to be used when building Armbian. Among them, the `common-files` directory contains common files, the `platform-files` directory contains files for each platform, and the `different-files` directory contains differentiated files for different devices.
+The files stored here are related files that need to be used when building Armbian. Among them, the `common-files` directory contains common files, the `platform-files` directory contains files for each platform, and the `different-files` directory contains differentiated files for different devices. See section `12.15` in [documents](documents) for more details.
 
 The required firmware will be automatically downloaded from the [ophub/firmware](https://github.com/ophub/firmware) repository to the `common-files/usr/lib/firmware` directory.
 
