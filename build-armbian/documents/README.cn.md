@@ -74,7 +74,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.14 如何修改 cmdline 设置](#1214-如何修改-cmdline-设置)
     - [12.15 如何添加新的支持设备](#1215-如何添加新的支持设备)
       - [12.15.1 添加设备配置文件](#12151-添加设备配置文件)
-      - [12.15.2 添加 boot 文件](#12152-添加-boot-文件)
+      - [12.15.2 添加系统文件](#12152-添加系统文件)
       - [12.15.3 添加 u-boot 文件](#12153-添加-u-boot-文件)
       - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
     - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
@@ -953,7 +953,7 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 ### 12.15 如何添加新的支持设备
 
-为一个设备构建 Armbian 系统，需要用到设备配置文件、boot 文件、u-boot 文件、流程控制文件共 4 部分，具体添加方法介绍如下：
+为一个设备构建 Armbian 系统，需要用到 `设备配置文件`、`系统文件`、`u-boot 文件`、`流程控制文件` 共 4 部分，具体添加方法介绍如下：
 
 #### 12.15.1 添加设备配置文件
 
@@ -961,9 +961,11 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 默认值是 `no` 的没有打包，这些设备使用时需要下载相同 `FAMILY` 的 Armbian 系统，在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他设备。
 
-#### 12.15.2 添加 boot 文件
+#### 12.15.2 添加系统文件
 
-[Amlogic](../armbian-files/platform-files/amlogic/bootfs)，[Rockchip](../armbian-files/platform-files/rockchip/bootfs) 和 [Allwinner](../armbian-files/platform-files/allwinner/bootfs) 分别共用各自平台的启动文件：`build-armbian/armbian-files/platform-files/<platform>/bootfs`
+通用文件放在：`build-armbian/armbian-files/common-files` 目录下，各平台通用。
+
+平台文件分别放在 `build-armbian/armbian-files/platform-files/<platform>` 目录下，[Amlogic](../armbian-files/platform-files/amlogic)，[Rockchip](../armbian-files/platform-files/rockchip) 和 [Allwinner](../armbian-files/platform-files/allwinner) 分别共用各自平台的文件，其中 `bootfs` 目录下是 /boot 分区的文件，`rootfs` 目录下的是 Armbian 系统文件。
 
 如果个别设备有特殊差异化设置需求，在 `build-armbian/armbian-files/different-files` 目录下添加以 `BOARD` 命名的独立目录，根据需要建立 `bootfs` 目录添加系统 `/boot` 分区下的相关文件，建立 `rootfs` 目录添加系统文件，各文件夹命名以 `Armbian` 系统中的实际路径为准。
 

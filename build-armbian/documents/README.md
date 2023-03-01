@@ -62,7 +62,7 @@ View Chinese description  |  [查看中文说明](README.cn.md)
     - [12.14 How to modify cmdline settings](#1214-how-to-modify-cmdline-settings)
     - [12.15 How to add new supported devices](#1215-how-to-add-new-supported-devices)
       - [12.15.1 Add device profile](#12151-add-device-profile)
-      - [12.15.2 Add boot files](#12152-add-boot-files)
+      - [12.15.2 Add system files](#12152-add-system-files)
       - [12.15.3 Add u-boot files](#12153-add-u-boot-files)
       - [12.15.4 Add process control files](#12154-add-process-control-files)
     - [12.16 12.16 How to fix I/O errors when writing to eMMC](#1216-1216-how-to-fix-io-errors-when-writing-to-emmc)
@@ -732,7 +732,7 @@ For example, the `Home Assistant Supervisor` application only supports the `dock
 
 ### 12.15 How to add new supported devices
 
-To build an Armbian system for a device, you need to use four parts: device configuration file, boot files, u-boot files, and process control files. The specific adding methods are as follows:
+To build an Armbian system for a device, you need to use four parts: `device configuration file`, `system files`, `u-boot files`, and `process control files`. The specific adding methods are as follows:
 
 #### 12.15.1 Add device profile
 
@@ -740,9 +740,11 @@ In the configuration file [/etc/model_database.conf](../armbian-files/common-fil
 
 The default value is `no` and there is no packaging. When using these devices, you need to download the same `FAMILY` Armbian system. After writing to `USB`, you can open the `boot partition in USB` on the computer and modify `FDT dtb name` in `/boot/uEnv.txt` file, other devices in the adaptation list.
 
-#### 12.15.2 Add boot files
+#### 12.15.2 Add system files
 
-[Amlogic](../armbian-files/platform-files/amlogic/bootfs), [Rockchip](../armbian-files/platform-files/rockchip/bootfs) and [Allwinner](../armbian-files/platform-files/allwinner/bootfs) share the startup files of their respective platforms: `build-armbian/armbian-files/platform-files/<platform>/bootfs`
+The common files are placed in the directory `build-armbian/armbian-files/common-files`, common to all platforms.
+
+The platform files are placed in the `build-armbian/armbian-files/platform-files/<platform>` directory, [Amlogic](../armbian-files/platform-files/amlogic), [Rockchip](../ armbian-files/platform-files/rockchip) and [Allwinner](../armbian-files/platform-files/allwinner) respectively share the files of their respective platforms, where the `bootfs` directory is the file of the /boot partition, The `rootfs` directory contains the Armbian system files.
 
 If individual devices have special differential setting requirements, add an independent directory named `BOARD` under the `build-armbian/armbian-files/different-files` directory, create the `bootfs` directory to add the relevant files under the system `/boot` partition as required, and create the `rootfs` directory to add the system files. The naming of each folder is subject to the actual path in the `Armbian` system.
 
