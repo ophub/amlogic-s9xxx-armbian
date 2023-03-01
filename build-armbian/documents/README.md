@@ -176,7 +176,7 @@ Enter from the GitHub `Releases` section at the bottom right corner of the `Repo
 
 ## 8. Install Armbian to EMMC
 
-Amlogic and Rockchip have different installation methods. Different devices have different storage. Some devices use external TF cards, some have eMMC, and some support the use of NVMe and other storage media. According to different devices, their installation methods are introduced respectively. Use the different installation methods in the following summary according to your own devices.
+Amlogic, Rockchip and Allwinner have different installation methods. Different devices have different storage. Some devices use external TF cards, some have eMMC, and some support the use of NVMe and other storage media. According to different devices, their installation methods are introduced respectively. Use the different installation methods in the following summary according to your own devices.
 
 When the installation is complete, Connect the Armbian device to the `router`. After the device is powered on for `2 minutes`, check the `IP` address of the device named `Armbian` in the router, and use the `SSH` tool to connect for management settings. The default user name is `root`, the default password is `1234`, and the default port is `22`
 
@@ -300,10 +300,10 @@ Click to execute the write.
 
 ### 8.3 Allwinner Series Installation Method
 
-Login in to armbian (default user: root, default password: 1234) → input command:
+Use tools such as Rufus or BalenaEtcher to brush the Armian system into USB/TF/SD for use, or use dd command to write the Armian system from USB/TF/SD card into eMMC for use. The `/dev/mmcblk0` in the command is subject to the storage in your device. Use the `lsblk` command to view
 
-```yaml
-armbian-install
+```Shell
+dd if=armbian.img  of=/dev/mmcblk0  bs=1M  status=progress
 ```
 
 ## 9. Compile the Armbian kernel
