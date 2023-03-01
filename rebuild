@@ -49,6 +49,7 @@ kernel_path="${build_path}/kernel"
 uboot_path="${build_path}/u-boot"
 common_files="${build_path}/armbian-files/common-files"
 platform_files="${build_path}/armbian-files/platform-files"
+different_files="${build_path}/armbian-files/different-files"
 model_conf="${common_files}/etc/model_database.conf"
 firmware_path="${common_files}/usr/lib/firmware"
 tmp_dir="${current_path}/tmp_dir"
@@ -439,7 +440,7 @@ confirm_version() {
         [[ "${PLATFORM}" == "allwinner" ]] && partition_table_type="msdos"
         bootfs_type="ext4"
         # Set directory name
-        platform_bootfs="${platform_files}/${PLATFORM}/bootfs/${board}"
+        platform_bootfs="${platform_files}/${PLATFORM}/bootfs"
         platform_rootfs="${platform_files}/${PLATFORM}/rootfs"
         bootloader_dir="${uboot_path}/${PLATFORM}/${board}"
         # Set the type of file system
@@ -605,9 +606,13 @@ copy_files() {
     cp -af ${tmp_armbian}/* ${tag_rootfs}
 
     # Copy the same files
+    [[ -d "${common_files}" ]] && cp -rf ${common_files}/* ${tag_rootfs}
     [[ -d "${platform_bootfs}" ]] && cp -rf ${platform_bootfs}/* ${tag_bootfs}
     [[ -d "${platform_rootfs}" ]] && cp -rf ${platform_rootfs}/* ${tag_rootfs}
-    [[ -d "${common_files}" ]] && cp -rf ${common_files}/* ${tag_rootfs}
+
+    # Copy the different files
+    [[ -d "${different_files}/${board}/bootfs" ]] && cp -rf ${different_files}/${board}/bootfs/* ${tag_bootfs}
+    [[ -d "${different_files}/${board}/rootfs" ]] && cp -rf ${different_files}/${board}/rootfs/* ${tag_rootfs}
 
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p ${tag_rootfs}/usr/lib/u-boot
@@ -697,6 +702,7 @@ refactor_files() {
         sed -i "s|rootfstype=.*|rootfstype=${ROOTFS_TYPE}|g" ${boot_conf_file}
         sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${boot_conf_file}
         sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${boot_conf_file}
+        sed -i "s|overlay_prefix.*|overlay_prefix=${FAMILY}|g" ${boot_conf_file}
     }
 
     # Processing partition files: rootfs
