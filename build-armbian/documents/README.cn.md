@@ -188,7 +188,7 @@ schedule:
 
 ## 8. 安装 Armbian 到 EMMC
 
-Amlogic 和 Rockchip 的安装方法不同。不同的设备具有不同的存储，有的设备使用外置 microSD 卡，有的带有 eMMC，有的支持使用 NVMe 等多种存储介质，根据设备不同，分别介绍其安装方法。首先在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 里下载自己设备的 Armbian 系统，解压缩成 .img 格式备用。根据自己的设备，使用下面小结中不同的安装方法。
+Amlogic, Rockchip 和 Allwinner 的安装方法不同。不同的设备具有不同的存储，有的设备使用外置 microSD 卡，有的带有 eMMC，有的支持使用 NVMe 等多种存储介质，根据设备不同，分别介绍其安装方法。首先在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 里下载自己设备的 Armbian 系统，解压缩成 .img 格式备用。根据自己的设备，使用下面小结中不同的安装方法。
 
 当安装完成后，将 Armbian 设备接入`路由器`，设备开机`2分钟`后，到路由器里查看设备名称为 Armbian 的 `IP`，使用 `SSH` 工具连接进行管理设置。默认用户名为 `root`，默认密码为 `1234`，默认端口为 `22`
 
@@ -310,10 +310,10 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 ### 8.3 Allwinner 系列安装方法
 
-登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+将 Armbian 系统使用 Rufus 或者 balenaEtcher 等工具刷入 USB/TF/SD 中使用，或者将 Armbian 系统从 USB/TF/SD 卡使用 dd 命令写入 eMMC 中使用，命令中的 `/dev/mmcblk0` 以自己设备中存储为准，使用 `lsblk` 命令查看。
 
-```yaml
-armbian-install
+```Shell
+dd if=armbian.img  of=/dev/mmcblk0  bs=1M  status=progress
 ```
 
 ## 9. 编译 Armbian 内核
