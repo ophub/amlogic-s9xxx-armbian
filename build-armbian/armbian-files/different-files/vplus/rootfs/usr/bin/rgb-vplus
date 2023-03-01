@@ -1,0 +1,175 @@
+#!/usr/bin/env perl
+
+use strict;
+use threads;
+use Getopt::Long qw(:config no_ignore_case);
+
+my $version="1.0.0";
+
+my %leds = (
+	red		=>	"surround:red",
+	green		=>	"surround:green",
+	blue		=>	"surround:blue",
+	user		=>	"led-user",
+);
+
+my %fixed_delay_secs = (
+	red_on		=>	5,
+	red_off		=>	2,
+	green_on	=>	8,
+	green_off	=>	4,
+	blue_on		=>	13,
+	blue_off	=>	8,
+);
+
+my %triggers = (
+	on		=>	"default-on",
+	off		=>	"none",
+	heartbeat	=>	"heartbeat",
+	timer		=>	"timer",
+);
+
+my $opt_red_mode = "fixed";  # fixed | random
+my $opt_green_mode = "fixed";  # fixed | random
+my $opt_blue_mode = "fixed";  # fixed | random
+my $opt_red_led_name;
+my $opt_green_led_name;
+my $opt_blue_led_name;
+my $opt_red_led_on_secs;
+my $opt_red_led_off_secs;
+my $opt_green_led_on_secs;
+my $opt_green_led_off_secs;
+my $opt_blue_led_on_secs;
+my $opt_blue_led_off_secs;
+my $opt_want_help;
+
+GetOptions(
+	'RedMode=s'		=>	\$opt_red_mode,
+	'GreenMode=s'		=>	\$opt_green_mode,
+	'BlueMode=s'		=>	\$opt_blue_mode,
+
+	'RedName=s'		=>	\$opt_red_led_name,
+	'GreenName=s'		=>	\$opt_green_led_name,
+	'BlueName=s'		=>	\$opt_blue_led_name,
+
+	'RedOnSecs=i'		=>	\$opt_red_led_on_secs,
+	'RedOffSecs=i'		=>	\$opt_red_led_off_secs,
+
+	'GreenOnSecs=i'		=>	\$opt_green_led_on_secs,
+	'GreenOffSecs=i'	=>	\$opt_green_led_off_secs,
+
+	'BlueOnSecs=i'		=>	\$opt_blue_led_on_secs,
+	'BlueOffSecs=i'		=>	\$opt_blue_led_off_secs,
+
+	'help|?'		=>	\$opt_want_help,
+);
+&usage if $opt_want_help;
+
+$leds{red} = $opt_red_led_name if $opt_red_led_name;
+$leds{green} = $opt_green_led_name if $opt_green_led_name;
+$leds{blue} = $opt_blue_led_name if $opt_blue_led_name;
+
+$fixed_delay_secs{red_on} = $opt_red_led_on_secs if $opt_red_led_on_secs;
+$fixed_delay_secs{red_off} = $opt_red_led_off_secs if $opt_red_led_off_secs;
+
+$fixed_delay_secs{green_on} = $opt_green_led_on_secs if $opt_green_led_on_secs;
+$fixed_delay_secs{green_off} = $opt_green_led_off_secs if $opt_green_led_off_secs;
+
+$fixed_delay_secs{blue_on} = $opt_blue_led_on_secs if $opt_blue_led_on_secs;
+$fixed_delay_secs{blue_off} = $opt_blue_led_off_secs if $opt_blue_led_off_secs;
+
+my $th_red = threads->create( {'exit'=>'thread_only'}, \&led_tune, "red", $opt_red_mode);
+my $th_green = threads->create( {'exit'=>'thread_only'}, \&led_tune, "green", $opt_green_mode);
+my $th_blue = threads->create( {'exit'=>'thread_only'}, \&led_tune, "blue", $opt_blue_mode);
+
+$th_red->join();
+$th_green->join();
+$th_blue->join();
+exit(0);
+
+### subs #########################################################################################
+sub led_trigger {
+	my($led_name, $led_trigger) = @_;
+	my $led_sys_path = "/sys/class/leds/$leds{${led_name}}";
+	if(! -d $led_sys_path) {
+		return;
+	}
+	if(! $triggers{$led_trigger}) {
+		return;
+	}
+	open my $fh, ">" , "${led_sys_path}/trigger" or warn $!;
+	print $fh $triggers{$led_trigger};
+	close $fh;
+}
+
+sub led_tune {
+	my ($led_name, $tune_mode) = @_;
+	if($tune_mode eq "fixed") {
+		my $current_stats = "off";
+		while(1) {
+			if($current_stats eq "off") {
+				my $delay_sec = $fixed_delay_secs{${led_name}."_on"};
+				&led_trigger($led_name, "on");
+				sleep($delay_sec);
+				$current_stats = "on";
+			} else {
+				my $delay_sec = $fixed_delay_secs{${led_name}."_off"};
+				&led_trigger($led_name, "off");
+				sleep($delay_sec);
+				$current_stats = "off";
+			}
+		}
+	} elsif($tune_mode eq "random") {
+		my $current_stats = "off";
+		while(1) {
+			my $delay_sec = int(rand(9)) + 1;
+			if($current_stats eq "off") {
+				&led_trigger($led_name, "on");
+				sleep($delay_sec);
+				$current_stats = "on";
+			} else {
+				&led_trigger($led_name, "off");
+				sleep($delay_sec);
+				$current_stats = "off";
+			}
+		}
+	} elsif($tune_mode eq "on") {
+		&led_trigger($led_name, "on");
+		exit;
+	} elsif($tune_mode eq "off") {
+		&led_trigger($led_name, "off");
+		exit;
+	}
+}
+
+sub usage {
+    my $usage = "\n".
+      "程序描述: RGB LED Control\n".
+      "版    本: $version\n".
+      "作    者: flippy (flippy\@sina.com)\n".
+      "\n".
+      "用法: $0 [可选参数]".
+      "\n".
+      "可选参数:\n".
+      "  --RedMode=fixed|random|on|off             红色 LED 闪烁模式: 固定间隔(fixed)或随机间隔(random)或常开或常闭 (默认: fixed)\n".
+      "  --GreenMode=fixed|random|on|off           绿色 LED 闪烁模式: 固定间隔(fixed)或随机间隔(random)或常开或常闭 (默认: fixed)\n".
+      "  --BlueMode=fixed|random|on|off            蓝色 LED 闪烁模式: 固定间隔(fixed)或随机间隔(random)或常开或常闭 (默认: fixed)\n".
+      "\n".
+      "  --RedName=name                            红色 LED 对应的系统设备名 (默认: surround:red)\n".
+      "  --GreenName=name                          绿色 LED 对应的系统设备名 (默认: surround:green)\n".
+      "  --BlueName=name                           蓝色 LED 对应的系统设备名 (默认: surround:blue)\n".
+      "\n".
+      "  --RedOnSecs=secs                          红色 LED 固定模式下每次点亮的秒数 (默认: 5)\n".
+      "  --RedOffSecs=secs                         红色 LED 固定模式下每次关闭的秒数 (默认: 2)\n".
+      "\n".
+      "  --GreenOnSecs=secs                        绿色 LED 固定模式下每次点亮的秒数 (默认: 8)\n".
+      "  --GreenOffSecs=secs                       绿色 LED 固定模式下每次关闭的秒数 (默认: 4)\n".
+      "\n".
+      "  --BlueOnSecs=secs                         蓝色 LED 固定模式下每次点亮的秒数 (默认: 13)\n".
+      "  --BlueOffSecs=secs                        蓝色 LED 固定模式每次关闭的秒数 (默认: 8)\n".
+      "\n".
+      "  --help 或 -h 或 -?                        打印帮助信息\n".
+      "\n"
+      ;
+    die $usage;
+}
