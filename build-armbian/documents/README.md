@@ -742,15 +742,17 @@ The default value is `no` and there is no packaging. When using these devices, y
 
 #### 12.15.2 Add boot files
 
-`Amlogic` series devices share [/boot](../armbian-files/platform-files/amlogic/bootfs) startup files.
+[Amlogic](../armbian-files/platform-files/amlogic/bootfs), [Rockchip](../armbian-files/platform-files/rockchip/bootfs) and [Allwinner](../armbian-files/platform-files/allwinner/bootfs) share the startup files of their respective platforms: `build-armbian/armbian-files/platform-files/<platform>/bootfs`
 
-For `Rockchip` and `Allwinner` series devices, add an independent [/boot](../armbian-files/platform-files/rockchip/bootfs) file directory named after `BOARD` for each device, and put the corresponding files in this directory.
+If individual devices have special differential setting requirements, add an independent directory named `BOARD` under the `build-armbian/armbian-files/different-files` directory, create the `bootfs` directory to add the relevant files under the system `/boot` partition as required, and create the `rootfs` directory to add the system files. The naming of each folder is subject to the actual path in the `Armbian` system.
 
 #### 12.15.3 Add u-boot files
 
 `Amlogic` series devices share the [bootloader](../u-boot/amlogic/bootloader/) files and [u-boot](../u-boot/amlogic/overload) files. If there is a new file, respectively into the corresponding directory. The `bootloader` files will be automatically added to the `/usr/lib/u-boot` directory of the Armbian system when the system is built, and the `u-boot` files will be automatically added to the `/boot` directory.
 
-For `Rockchip` and `Allwinner` series devices, add an independent [u-boot](../u-boot/rockchip) file directory named after `BOARD` for each device. The corresponding series of files are placed in this directory. When building Armbian, they will be directly Write to the corresponding system image file.
+For `Rockchip` and `Allwinner` series devices, add an independent [u-boot](../u-boot) file directory named after `BOARD` for each device. The corresponding series of files are placed in this directory.
+
+When building an Armenian image, these u-boot files will be written into the corresponding Armbian image file by the rebuild script according to the configuration in [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf).
 
 #### 12.15.4 Add process control files
 
