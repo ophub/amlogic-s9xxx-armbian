@@ -42,10 +42,10 @@ ophub_release_file="/etc/ophub-release"
         echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The network optimization service started successfully." >>${custom_log}
 }
 
-# For vplus(Allwinner h6) led
-[[ -x "/usr/bin/rgb" ]] && {
-    rgb --RedName=RED --GreenName=GREEN --BlueName=BLUE &
-    2>/dev/null && echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
+# For vplus(Allwinner h6) led color lights
+[[ -x "/usr/bin/rgb-vplus" ]] && {
+    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE &
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
 }
 
 # Add custom log

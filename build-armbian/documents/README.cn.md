@@ -963,15 +963,17 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 #### 12.15.2 添加 boot 文件
 
-`Amlogic` 系列的设备，共用 [/boot](../armbian-files/platform-files/amlogic/bootfs) 启动文件。
+[Amlogic](../armbian-files/platform-files/amlogic/bootfs)，[Rockchip](../armbian-files/platform-files/rockchip/bootfs) 和 [Allwinner](../armbian-files/platform-files/allwinner/bootfs) 分别共用各自平台的启动文件：`build-armbian/armbian-files/platform-files/<platform>/bootfs`
 
-`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [/boot](../armbian-files/platform-files/rockchip/bootfs) 启动文件目录，对应的文件放在此目录中。
+如果个别设备有特殊差异化设置需求，在 `build-armbian/armbian-files/different-files` 目录下添加以 `BOARD` 命名的独立目录，根据需要建立 `bootfs` 目录添加系统 `/boot` 分区下的相关文件，建立 `rootfs` 目录添加系统文件，各文件夹命名以 `Armbian` 系统中的实际路径为准。
 
 #### 12.15.3 添加 u-boot 文件
 
 `Amlogic` 系列的设备，共用 [bootloader](../u-boot/amlogic/bootloader/) 文件和 [u-boot](../u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
 
-`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot/rockchip) 文件目录，对应的系列文件放在此目录中，构建 Armbian 时将直接写入对应的系统镜像文件中。
+`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot) 文件目录，对应的系列文件放在此目录中。
+
+构建 Armbian 镜像时，这些 u-boot 文件将根据 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) 中的配置，由 rebuild 脚本写入对应的 Armbian 镜像文件中。
 
 #### 12.15.4 添加流程控制文件
 
