@@ -113,7 +113,7 @@ armbian-swap 1
 Login in to armbian → input command:
 
 ```yaml
-armbian-led
+armbian-openvfd
 ```
 
 Debug according to [LED screen display control instructions](build-armbian/documents/led_screen_display_control.md).
