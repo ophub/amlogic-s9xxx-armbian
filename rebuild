@@ -33,7 +33,8 @@
 # make_image         : Making Armbian file
 # copy_files         : Copy the Armbian files
 # replace_kernel     : Replace kernel files
-# refactor_files     : Refactor related files
+# refactor_bootfs    : Refactor bootfs files
+# refactor_rootfs    : Refactor rootfs files
 # clean_tmp          : Clear temporary files
 #
 # loop_rebuild       : Loop to rebuild Armbian files
@@ -403,7 +404,7 @@ confirm_version() {
 }
 
 extract_armbian() {
-    process_msg " (1/6) Extract armbian files."
+    process_msg " (1/7) Extract armbian files."
     cd ${current_path}
 
     rm -rf ${tmp_dir}
@@ -437,7 +438,7 @@ extract_armbian() {
 }
 
 make_image() {
-    process_msg " (2/6) Make new armbian image."
+    process_msg " (2/7) Make new armbian image."
     cd ${current_path}
 
     # Set Armbian image file parameters
@@ -545,7 +546,7 @@ make_image() {
 }
 
 copy_files() {
-    process_msg " (3/6) Copy the Armbian files."
+    process_msg " (3/7) Copy the Armbian files."
     cd ${current_path}
 
     # Create a dual-partition general directory
@@ -596,7 +597,7 @@ copy_files() {
 }
 
 replace_kernel() {
-    process_msg " (4/6) Replace kernel files."
+    process_msg " (4/7) Replace kernel files."
     cd ${current_path}
 
     # Determine custom kernel filename
@@ -633,10 +634,8 @@ replace_kernel() {
     [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel_name} -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 }
 
-refactor_files() {
-    process_msg " (5/6) Refactor related files."
-
-    # Processing partition files: bootfs
+refactor_bootfs() {
+    process_msg " (5/7) Refactor bootfs files."
     cd ${tag_bootfs}
 
     # Process Amlogic series boot partition files
@@ -694,8 +693,10 @@ refactor_files() {
 
     # Check if the /boot/*Env.txt file exists
     [[ -f "${uenv_conf_file}" || -f "${armbianenv_conf_file}" ]] || error_msg "Missing [ /boot/*Env.txt ]"
+}
 
-    # Processing partition files: rootfs
+refactor_rootfs() {
+    process_msg " (6/7) Refactor rootfs files."
     cd ${tag_rootfs}
 
     # Delete related files
@@ -878,7 +879,7 @@ refactor_files() {
 }
 
 clean_tmp() {
-    process_msg " (6/6) Clear temporary files."
+    process_msg " (7/7) Clear temporary files."
     cd ${current_path}
 
     umount -f ${tmp_armbian} 2>/dev/null
@@ -948,7 +949,8 @@ loop_rebuild() {
                     make_image
                     copy_files
                     replace_kernel
-                    refactor_files
+                    refactor_bootfs
+                    refactor_rootfs
                     clean_tmp
 
                     echo -e "(${j}.${i}) Armbian build successfully. \n"
