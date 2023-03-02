@@ -1,3 +1,3 @@
-LABEL=ROOTFS       /          btrfs       discard,defaults,noatime,compress=zstd:6      0 1
-LABEL=BOOT         /boot      vfat        discard,defaults                              0 2
-tmpfs              /tmp       tmpfs       defaults,nosuid                               0 0
+LABEL=ROOTFS    /        ext4     defaults,noatime,nodiratime,commit=600,errors=remount-ro    0 1
+LABEL=BOOT      /boot    vfat     defaults                                                    0 2
+tmpfs           /tmp     tmpfs    defaults,nosuid                                             0 0
