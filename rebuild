@@ -742,41 +742,6 @@ refactor_rootfs() {
     [[ -f "usr/libexec/sudo/sudoers.so" ]] && chmod 644 usr/libexec/sudo/sudoers.so
     [[ -f "usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 usr/libexec/polkit-agent-helper-1
 
-    # Add custom Armbian information
-    echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
-    echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file}
-    echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file}
-    echo "SOC='${SOC}'" >>${ophub_release_file}
-    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
-    echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
-    echo "BOARD='${board}'" >>${ophub_release_file}
-    echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
-    echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
-    echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
-    echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
-    echo "DISK_TYPE='usb'" >>${ophub_release_file}
-    echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
-    echo "AMPART_STATUS='no'" >>${ophub_release_file}
-    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
-    echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
-    echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
-    if [[ "${PLATFORM}" == "amlogic" ]]; then
-        echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
-    elif [[ "${PLATFORM}" == "rockchip" ]]; then
-        echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
-    elif [[ "${PLATFORM}" == "allwinner" ]]; then
-        echo "SPL_LOAD_ADDRESS='${SPL_LOAD_ADDRESS}'" >>${ophub_release_file}
-    fi
-
-    # Get random macaddr
-    mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
-    random_macaddr="9E:61${mac_end}"
-
-    # Set interfaces macaddr
-    interfaces_file="etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
     # Edit the etc/fstab
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     # Set different types of mount parameters
@@ -853,6 +818,15 @@ refactor_rootfs() {
         }
     }
 
+    # Get random macaddr
+    mac_hexchars="0123456789ABCDEF"
+    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
+    random_macaddr="9E:61${mac_end}"
+
+    # Set interfaces macaddr
+    interfaces_file="etc/network/interfaces"
+    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
+
     # Optimize wifi/bluetooth module
     [[ -d "usr/lib/firmware/brcm" ]] && (
         cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
@@ -874,6 +848,32 @@ refactor_rootfs() {
         # x96max plus v5.1 (ip1001m phy) adopts am7256 (brcm4354)
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:07/" "brcmfmac4354-sdio.txt" >"brcmfmac4354-sdio.amlogic,sm1.txt"
     )
+
+    # Add custom Armbian information
+    echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
+    echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file}
+    echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file}
+    echo "SOC='${SOC}'" >>${ophub_release_file}
+    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
+    echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
+    echo "BOARD='${board}'" >>${ophub_release_file}
+    echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
+    echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
+    echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
+    echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
+    echo "DISK_TYPE='usb'" >>${ophub_release_file}
+    echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
+    echo "AMPART_STATUS='no'" >>${ophub_release_file}
+    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
+    echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
+    echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
+    if [[ "${PLATFORM}" == "amlogic" ]]; then
+        echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
+    elif [[ "${PLATFORM}" == "rockchip" ]]; then
+        echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
+    elif [[ "${PLATFORM}" == "allwinner" ]]; then
+        echo "SPL_LOAD_ADDRESS='${SPL_LOAD_ADDRESS}'" >>${ophub_release_file}
+    fi
 
     sync && sleep 3
 }
