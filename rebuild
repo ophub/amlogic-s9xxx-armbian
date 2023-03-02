@@ -746,14 +746,14 @@ refactor_rootfs() {
     [[ -f "etc/fstab" ]] || error_msg "The etc/fstab File does not exist."
     # Set different types of mount parameters
     if [[ "${rootfs_type}" == "btrfs" ]]; then
-        fstab_string="discard,defaults,noatime,compress=zstd:6"
+        fstab_string="defaults,noatime,compress=zstd:6"
     else
-        fstab_string="discard,defaults,noatime,errors=remount-ro"
+        fstab_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
     # Update mount settings
     sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${rootfs_type}  ${fstab_string}  0 1|g" etc/fstab
     [[ "${bootfs_type}" == "ext4" ]] && {
-        sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  discard,defaults  0 2|g" etc/fstab
+        sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
     }
 
     # Update release information
