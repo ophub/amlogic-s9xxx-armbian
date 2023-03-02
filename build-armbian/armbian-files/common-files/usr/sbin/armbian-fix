@@ -80,7 +80,7 @@ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.ta
 [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file} && echo "28. Fix custom board name: ${bd_name}"
 
 # Disable ttyFIQ0 (ttyS2)
-[[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && echo "29. Disable ttyFIQ0 (ttyS2)"
+[[ "${platform_name}" == "rockchip" ]] && sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null && sudo systemctl disable serial-getty@ttyAML0 2>/dev/null &&echo "29. Disable ttyFIQ0&ttyAML0 (ttyS2)"
 
 # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
 motd_tips="/etc/default/armbian-motd"
