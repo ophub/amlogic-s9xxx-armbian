@@ -419,8 +419,9 @@ update_kernel() {
 
     # 01. For /boot five files
     tar -xzf boot-${kernel_name}.tar.gz -C /boot
-    [[ "${PLATFORM}" == "amlogic" || "${PLATFORM}" == "allwinner" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage)
+    [[ "${PLATFORM}" == "amlogic" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage)
     [[ "${PLATFORM}" == "rockchip" ]] && (cd /boot && ln -sf uInitrd-${kernel_name} uInitrd && ln -sf vmlinuz-${kernel_name} Image)
+    [[ "${PLATFORM}" == "allwinner" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} Image)
     [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     echo -e "${INFO} (1/4) Unpacking [ boot-${kernel_name}.tar.gz ] done."
 
