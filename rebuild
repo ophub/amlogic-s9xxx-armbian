@@ -670,6 +670,7 @@ refactor_bootfs() {
     [[ -f "${uenv_conf_file}" ]] && {
         sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${uenv_conf_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
+        sed -i "s|sun50i.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
     }
 
     # Add an alternate file (/boot/extlinux/extlinux.conf)
@@ -686,15 +687,15 @@ refactor_bootfs() {
     # Edit the armbianEnv.txt
     armbianenv_conf_file="armbianEnv.txt"
     [[ -f "${armbianenv_conf_file}" ]] && {
-        sed -i "s|fdtfile.*|fdtfile=rockchip/${FDTFILE}|g" ${armbianenv_conf_file}
+        sed -i "s|fdtfile.*|fdtfile=${PLATFORM}/${FDTFILE}|g" ${armbianenv_conf_file}
         sed -i "s|rootfstype=.*|rootfstype=${rootfs_type}|g" ${armbianenv_conf_file}
         sed -i "s|rootdev=.*|rootdev=${armbianenv_rootdev}|g" ${armbianenv_conf_file}
         sed -i "s|rootflags.*|rootflags=${armbianenv_rootflags}|g" ${armbianenv_conf_file}
         sed -i "s|overlay_prefix.*|overlay_prefix=${FAMILY}|g" ${armbianenv_conf_file}
     }
 
-    # Check if the /boot/*Env.txt file exists
-    [[ -f "${uenv_conf_file}" || -f "${armbianenv_conf_file}" ]] || error_msg "Missing [ /boot/*Env.txt ]"
+    # Check device configuration files
+    [[ -f "${uenv_conf_file}" || -f "${rename_extlinux_file}" || -f "${armbianenv_conf_file}" ]] || error_msg "Missing [ /boot/*Env.txt ]"
 }
 
 refactor_rootfs() {
