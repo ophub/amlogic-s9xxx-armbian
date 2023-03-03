@@ -38,9 +38,9 @@
 
 - ### 安装 Armbian 到 EMMC
 
-1. `Rockchip` 和 `Allwinner` 平台的安装方法请查看说明文档中的 [第 8 章节](build-armbian/documents/README.cn.md)。
+1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](build-armbian/documents/README.cn.md)。
 
-2. `Amlogic` 平台，登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+2. `Amlogic` 和 `Allwinner` 平台，登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
 ```yaml
 armbian-install
