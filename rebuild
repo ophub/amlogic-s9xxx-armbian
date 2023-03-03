@@ -540,7 +540,7 @@ make_image() {
             #echo -e "${INFO} 01. For [ ${board} ] write bootloader: ${MAINLINE_UBOOT}"
         elif [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]]; then
             dd if=/dev/zero of="${loop_new}" bs=1k count=1023 seek=1 status=noxfer 2>/dev/null
-            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" bs=1024 seek=8 status=noxfer 2>/dev/null
+            dd if="${bootloader_path}/${BOOTLOADER_IMG}" of="${loop_new}" conv=fsync,notrunc bs=8k seek=1 2>/dev/null
             #echo -e "${INFO} 02. For [ ${board} ] write bootloader: ${BOOTLOADER_IMG}"
         fi
     }
@@ -586,7 +586,7 @@ copy_files() {
     # Copy the different files
     different_bootfs="${different_files}/${board}/bootfs"
     different_rootfs="${different_files}/${board}/rootfs"
-    [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/* ${tag_bootfs}
+    [[ -d "${different_bootfs}" ]] && rm -rf ${tag_bootfs}/* && cp -rf ${different_bootfs}/* ${tag_bootfs}
     [[ -d "${different_rootfs}" ]] && cp -rf ${different_rootfs}/* ${tag_rootfs}
 
     # Copy the bootloader files
