@@ -250,7 +250,7 @@ copy_bootfs() {
     }
 
     # Update [ /boot/extlinux/extlinux.conf ] settings
-    boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf.bak"
+    boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
     [[ -f "${boot_extlinux_file}" ]] && {
         echo -e "${INFO} Update the [ extlinux.conf ] file."
         BOOT_CONF="extlinux.conf"
