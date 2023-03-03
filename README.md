@@ -38,9 +38,9 @@ Choose the corresponding firmware according to your box. Then write the IMG file
 
 - ### Install Armbian to EMMC
 
-1. For the installation method of the `Rockchip` and `Allwinner` platform, please refer to [Section 8](build-armbian/documents) in the documentation。
+1. For the installation method of the `Rockchip` platform, please refer to [Section 8](build-armbian/documents) in the documentation。
 
-2. `Amlogic`  platform，Login in to armbian (default user: root, default password: 1234) → input command:
+2. `Amlogic` and `Allwinner` platform，Login in to armbian (default user: root, default password: 1234) → input command:
 
 ```yaml
 armbian-install
