@@ -300,10 +300,10 @@ Click to execute the write.
 
 ### 8.3 Allwinner Series Installation Method
 
-Use tools such as Rufus or BalenaEtcher to brush the Armian system into USB/TF/SD for use, or use dd command to write the Armian system from USB/TF/SD card into eMMC for use. The `/dev/mmcblk0` in the command is subject to the storage in your device. Use the `lsblk` command to view
+Login in to armbian (default user: root, default password: 1234) → input command:
 
-```Shell
-dd if=armbian.img  of=/dev/mmcblk0  bs=1M  status=progress
+```yaml
+armbian-install
 ```
 
 ## 9. Compile the Armbian kernel

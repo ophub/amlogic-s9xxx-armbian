@@ -310,10 +310,10 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 ### 8.3 Allwinner 系列安装方法
 
-将 Armbian 系统使用 Rufus 或者 balenaEtcher 等工具刷入 USB/TF/SD 中使用，或者将 Armbian 系统从 USB/TF/SD 卡使用 dd 命令写入 eMMC 中使用，命令中的 `/dev/mmcblk0` 以自己设备中存储为准，使用 `lsblk` 命令查看。
+登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
-```Shell
-dd if=armbian.img  of=/dev/mmcblk0  bs=1M  status=progress
+```yaml
+armbian-install
 ```
 
 ## 9. 编译 Armbian 内核
