@@ -295,6 +295,7 @@ check_kernel() {
     # Check for inapplicable kernels
     if { [[ "${KERNEL_BRANCH}" == "rk3588" ]] && [[ "${inputs_kernel:0:5}" != "5.10." ]]; } ||
         { [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
+        { [[ "${KERNEL_BRANCH}" == "5.10.y" ]] && [[ "${inputs_kernel:0:5}" != "5.10." ]]; } ||
         { [[ "${KERNEL_BRANCH}" == "5.15.y" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; }; then
         error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
     fi
