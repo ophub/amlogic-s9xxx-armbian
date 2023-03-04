@@ -591,6 +591,7 @@ copy_files() {
 
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p ${tag_rootfs}/usr/lib/u-boot
+    rm -rf ${tag_rootfs}/usr/lib/u-boot/*
     [[ -d "${bootloader_path}" ]] && cp -rf ${bootloader_path}/* ${tag_rootfs}/usr/lib/u-boot
 
     # Copy the overload files
