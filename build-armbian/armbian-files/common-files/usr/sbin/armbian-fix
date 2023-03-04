@@ -20,11 +20,13 @@
 armbian_release_file="/etc/armbian-release"
 # Set the ophub release check file
 ophub_release_file="/etc/ophub-release"
+# Custom armbian-fix Log
+fix_log="/tmp/armbian-fix.log"
 #
 #======================================================================================
 
 # Show start message
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start fixing..."
+echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start fixing..." >${fix_log}
 
 # Fix common releases permissions
 [[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
@@ -43,37 +45,35 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start fixing..."
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "12. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "13. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "14. Fix polkit-agent-helper-1 permissions"
+
 # Remove packages
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && echo "15. Remove linux-image-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && echo "16. Remove linux-dtb-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "17. Remove linux-u-boot-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-*)" ]] && {
-    # [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
-    # Remove the [ armbian-bsp-* ] package, which will modify [ /boot/boot.cmd ] when apt is updated, resulting in failure to start.
-    rm -rf /usr/share/armbian/*
-    sudo apt-get remove -qq --purge -y armbian-bsp-*
-    echo "18. Remove armbian-bsp-*"
-}
-sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "19. Clean up local installation packages"
+sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "20. Clean up local installation packages"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && echo "21. Remove linux-image-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && echo "22. Remove linux-dtb-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "23. Remove linux-u-boot-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli-*)" ]] && sudo apt-mark hold armbian-bsp-cli-* && echo "24. Hold armbian-bsp-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools)" ]] && sudo apt-mark hold u-boot-tools && echo "25. Hold u-boot-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools)" ]] && sudo apt-mark hold sunxi-tools && echo "26. Hold sunxi-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools*)" ]] && sudo apt-mark hold initramfs-tools* && echo "27. Hold sudo apt-mark hold initramfs-tools*"
 
 # Regenerate new machine-id
-sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "20. Delete machine-id"
-sudo dbus-uuidgen --ensure=/etc/machine-id && echo "21. Generate /etc/machine-id"
-sudo dbus-uuidgen --ensure && echo "22. Generate /var/lib/dbus/machine-id"
+sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "40. Delete machine-id"
+sudo dbus-uuidgen --ensure=/etc/machine-id && echo "41. Generate /etc/machine-id"
+sudo dbus-uuidgen --ensure && echo "42. Generate /var/lib/dbus/machine-id"
 
 # Turn off automatic hibernation to prevent hard drives from hanging
-sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "23. Turn off automatic sleep mode"
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "43. Turn off automatic sleep mode"
 
 # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
 motd_tips="/etc/default/armbian-motd"
 [[ -f "${motd_tips}" ]] && {
     sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${motd_tips}
-    echo "24. Disable tips of the day"
+    echo "50. Disable tips of the day"
 }
 quotes_cron="/etc/cron.weekly/armbian-quotes"
 [[ -f "${quotes_cron}" ]] && {
     sed -i "s|^curl |#curl |g" ${quotes_cron}
-    echo "25. Disable quotes cron plan"
+    echo "51. Disable quotes cron plan"
 }
 
 # Remove motd-news service
@@ -82,14 +82,14 @@ motd_timer="/usr/lib/systemd/system/motd-news.timer"
     sudo systemctl stop motd-news.timer
     sudo systemctl disable motd-news.timer
     sudo rm -f ${motd_timer}
-    echo "26. Disable motd-news.timer"
+    echo "52. Disable motd-news.timer"
 }
 motd_service="/usr/lib/systemd/system/motd-news.service"
 [[ -f "${motd_service}" ]] && {
     sudo systemctl stop motd-news.service
     sudo systemctl disable motd-news.service
     sudo rm -f ${motd_service}
-    echo "27. Disable motd-news.service"
+    echo "53. Disable motd-news.service"
 }
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
@@ -99,11 +99,11 @@ sudo rm -f /etc/update-motd.d/50-motd-news
 # Fix version differences(After 2022.12.03)
 [[ -f "/etc/amlogic_model_database.conf" ]] && {
     mv -f /etc/amlogic_model_database.conf /etc/model_database.conf
-    echo "28. Adjust the model_database.conf file name"
+    echo "60. Adjust the model_database.conf file name"
 }
 [[ -f "/etc/rockchip_model_database.conf" ]] && {
     mv -f /etc/rockchip_model_database.conf /etc/model_database.conf
-    echo "29. Adjust the model_database.conf file name"
+    echo "61. Adjust the model_database.conf file name"
 }
 
 # Confirm device information
@@ -116,34 +116,34 @@ sudo rm -f /etc/update-motd.d/50-motd-news
     # Adjust parameter name(After 2022.12.03)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && {
         sed -i "s|ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
-        echo "30. Adjust the ANDROID_UBOOT name"
+        echo "70. Adjust the ANDROID_UBOOT name"
     }
     [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && {
         sed -i "s|UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
-        echo "31. Adjust the UBOOT_STATUS name"
+        echo "71. Adjust the UBOOT_STATUS name"
     }
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BRANCH=")" ]] || {
         [[ "${soc_name,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
-        echo "32. Add the KERNEL_BRANCH name"
+        echo "72. Add the KERNEL_BRANCH name"
     }
 
     # Fix custom banner name
-    [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml ${soc_name}"
-    [[ "${platform_name}" == "rockchip" ]] && bd_name="RK ${board_name}"
-    [[ "${platform_name}" == "allwinner" ]] && bd_name="AW ${board_name}"
+    [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml-${soc_name}"
+    [[ "${platform_name}" == "rockchip" ]] && bd_name="RK-${board_name}"
+    [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        echo "33. Fix custom board name: ${bd_name}"
+        echo "73. Fix custom board name: ${bd_name}"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" == "rockchip" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        echo "34. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        echo "74. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 }
 
 # Show end message
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: successfully fixed."
+echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: successfully fixed." >>${fix_log}
