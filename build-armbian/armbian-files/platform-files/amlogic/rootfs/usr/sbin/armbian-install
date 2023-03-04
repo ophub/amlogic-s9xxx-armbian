@@ -283,11 +283,11 @@ EOF
     if [[ "${filetype}" -eq "2" || "${filetype}" == "btrfs" ]]; then
         file_system_type="btrfs"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
-        fstab_mount_string="discard,defaults,noatime,compress=zstd:6"
+        fstab_mount_string="defaults,noatime,compress=zstd:6"
     else
         file_system_type="ext4"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
-        fstab_mount_string="discard,defaults,noatime,errors=remount-ro"
+        fstab_mount_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
     echo -e "${INFO} Input Type ID: [ ${filetype} ]"
     echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
@@ -442,44 +442,37 @@ copy_bootfs() {
 
     echo -e "${INFO} Start copy BOOTFS partition data."
     cp -rf /boot/* ${DIR_INSTALL}
+    # Remove useless files
     rm -rf ${DIR_INSTALL}/'System Volume Information'
+    rm -f ${DIR_INSTALL}/s9*
+    rm -f ${DIR_INSTALL}/aml*
+    # Replace eMMC boot files
+    [[ -f "${DIR_INSTALL}/boot-emmc.scr" ]] && mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
+    [[ -f "${DIR_INSTALL}/boot-emmc.cmd" ]] && mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
+    [[ -f "${DIR_INSTALL}/boot-emmc.ini" ]] && mv -f ${DIR_INSTALL}/boot-emmc.ini ${DIR_INSTALL}/boot.ini
+    [[ -f "${DIR_INSTALL}/boot.ini" ]] && sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
 
-    echo -e "${INFO} Generate the new [ uEnv.txt ] file."
-    rm -f ${DIR_INSTALL}/uEnv.txt
-    cat >${DIR_INSTALL}/uEnv.txt <<EOF
-LINUX=/zImage
-INITRD=/uInitrd
-FDT=/dtb/amlogic/${FDTFILE}
-APPEND=root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
-EOF
+    # Update [ /boot/uEnv.txt ] settings
+    uenv_conf_file="${DIR_INSTALL}/uEnv.txt"
+    [[ -f "${uenv_conf_file}" ]] && {
+        echo -e "${INFO} Update the [ uEnv.txt ] file."
+        BOOT_CONF="uEnv.conf"
+        sed -i "s|root=.*console=ttyAML0|root=${uenv_mount_string} console=ttyAML0|g" ${uenv_conf_file}
+        sed -i "s|meson.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
+    }
 
-    # If the [ /boot/extlinux/extlinux.conf ] file exists, create a new one.
-    if [[ -f "${DIR_INSTALL}/extlinux/extlinux.conf" ]]; then
-        echo -e "${INFO} Generate the new [ extlinux.conf ] file."
+    # Update [ /boot/extlinux/extlinux.conf ] settings
+    boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
+    [[ -f "${boot_extlinux_file}" ]] && {
+        echo -e "${INFO} Update the [ extlinux.conf ] file."
         BOOT_CONF="extlinux.conf"
-        rm -rf ${DIR_INSTALL}/extlinux
-        mkdir -p ${DIR_INSTALL}/extlinux
-        cat >${DIR_INSTALL}/extlinux/extlinux.conf <<EOF
-label Armbian
-    kernel /zImage
-    initrd /uInitrd
-    fdt /dtb/amlogic/${FDTFILE}
-    append root=${uenv_mount_string} console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 loglevel=1 voutmode=hdmi disablehpd=false overscan=100 sdrmode=auto
-EOF
-    else
-        BOOT_CONF="uEnv.txt"
-        rm -rf ${DIR_INSTALL}/extlinux
-    fi
-
-    rm ${DIR_INSTALL}/s9*
-    rm ${DIR_INSTALL}/aml*
-    mv -f ${DIR_INSTALL}/boot-emmc.ini ${DIR_INSTALL}/boot.ini
-    sed -i "s|u-boot.ext|u-boot.emmc|g" ${DIR_INSTALL}/boot.ini
-    mv -f ${DIR_INSTALL}/boot-emmc.scr ${DIR_INSTALL}/boot.scr
-    mv -f ${DIR_INSTALL}/boot-emmc.cmd ${DIR_INSTALL}/boot.cmd
+        sed -i "s|root=.*console=ttyAML0|root=${uenv_mount_string} console=ttyAML0|g" ${boot_extlinux_file}
+        sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+    }
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; then
+    if { [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]]; } &&
+        { [[ -n "${UBOOT_OVERLOAD}" && -f "${DIR_INSTALL}/${UBOOT_OVERLOAD}" ]]; }; then
         echo -e "${INFO} Copy [ ${UBOOT_OVERLOAD} ] to u-boot.emmc"
         if [[ -f "${DIR_INSTALL}/u-boot.ext" ]]; then
             cp -f ${DIR_INSTALL}/u-boot.ext ${DIR_INSTALL}/u-boot.emmc
@@ -546,7 +539,7 @@ copy_rootfs() {
     rm -f ${DIR_INSTALL}/etc/fstab
     cat >${DIR_INSTALL}/etc/fstab <<EOF
 UUID=${ROOTFS_UUID}    /        ${file_system_type}    ${fstab_mount_string}      0 1
-LABEL=BOOT_EMMC        /boot    vfat                   discard,defaults           0 2
+LABEL=BOOT_EMMC        /boot    vfat                   defaults                   0 2
 tmpfs                  /tmp     tmpfs                  defaults,nosuid            0 0
 
 EOF
