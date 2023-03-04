@@ -9,5 +9,3 @@ overlays=
 extraargs=
 extraboardargs=net.ifnames=0
 docker_optimizations=on
-console=serial
-consoleargs=console=ttyS0,1500000
