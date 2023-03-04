@@ -43,17 +43,31 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start fixing..."
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "12. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "13. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "14. Fix polkit-agent-helper-1 permissions"
+
 # Remove packages
 [[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && echo "15. Remove linux-image-*"
 [[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && echo "16. Remove linux-dtb-*"
 [[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "17. Remove linux-u-boot-*"
 [[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-*)" ]] && {
+    # Backup files
+    [[ -d "/etc/update-motd.d" ]] && {
+        [[ -d "/etc/update-motd.d.bak" ]] || mkdir -p /etc/update-motd.d.bak
+        cp -rf /etc/update-motd.d/* /etc/update-motd.d.bak
+        cp -f /etc/armbian-release /etc/update-motd.d.bak
+    }
     # [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
     # Remove the [ armbian-bsp-* ] package, which will modify [ /boot/boot.cmd ] when apt is updated, resulting in failure to start.
     rm -rf /usr/share/armbian/*
     sudo apt-get remove -qq --purge -y armbian-bsp-*
+    # Restore files
+    [[ -d "/etc/update-motd.d.bak" ]] && {
+        mv -f /etc/update-motd.d.bak/armbian-release /etc
+        mv -f /etc/update-motd.d.bak/* /etc/update-motd.d
+    }
     echo "18. Remove armbian-bsp-*"
 }
+
+# Clean up local installation packages
 sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "19. Clean up local installation packages"
 
 # Regenerate new machine-id
