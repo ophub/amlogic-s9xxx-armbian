@@ -383,12 +383,11 @@ confirm_version() {
     [[ -n "${board_conf}" ]] || error_msg "[ ${board} ] config is missing!"
 
     # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
-    # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, and <SPL_LOAD_ADDRESS> in Allwinner
+    # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, Not used in Allwinner.
     SOC="$(echo ${board_conf} | awk -F':' '{print $3}')"
     FDTFILE="$(echo ${board_conf} | awk -F':' '{print $4}')"
     UBOOT_OVERLOAD="$(echo ${board_conf} | awk -F':' '{print $5}')"
     TRUST_IMG="${UBOOT_OVERLOAD}"
-    SPL_LOAD_ADDRESS="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="$(echo ${board_conf} | awk -F':' '{print $6}')"
     BOOTLOADER_IMG="$(echo ${board_conf} | awk -F':' '{print $7}')"
     KERNEL_BRANCH="$(echo ${board_conf} | awk -F':' '{print $8}')"
@@ -889,8 +888,6 @@ refactor_rootfs() {
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     elif [[ "${PLATFORM}" == "rockchip" ]]; then
         echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
-    elif [[ "${PLATFORM}" == "allwinner" ]]; then
-        echo "SPL_LOAD_ADDRESS='${SPL_LOAD_ADDRESS}'" >>${ophub_release_file}
     fi
 
     sync && sleep 3
