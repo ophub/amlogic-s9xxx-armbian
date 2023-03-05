@@ -709,9 +709,9 @@ refactor_rootfs() {
     # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
     backup_remove_files="etc/backup_remove_files"
     mkdir -p ${backup_remove_files}/{postrm.d/,postinst.d/,post-update.d/}
-    mv -f etc/kernel/postrm.d/*initramfs* ${backup_remove_files}/postrm.d
-    mv -f etc/kernel/postinst.d/{*initramfs*,*initrd*} ${backup_remove_files}/postinst.d
-    mv -f etc/initramfs/post-update.d/99-uboot ${backup_remove_files}/post-update.d
+    mv -f etc/kernel/postrm.d/*initr* ${backup_remove_files}/postrm.d
+    mv -f etc/kernel/postinst.d/*initr* ${backup_remove_files}/postinst.d
+    mv -f etc/initramfs/post-update.d/*uboot* ${backup_remove_files}/post-update.d
     mv -f usr/lib/nand-sata-install ${backup_remove_files}
     mv -f usr/share/armbian ${backup_remove_files}
     update_initramfs_file="usr/sbin/update-initramfs"
