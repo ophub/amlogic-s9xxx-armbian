@@ -462,21 +462,18 @@ update_uboot() {
     echo -e "${STEPS} Start updating the uboot..."
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]] && [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
-        [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext && chmod +x /boot/u-boot.ext
-        [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc && chmod +x /boot/u-boot.emmc
-        echo -e "${INFO} The ${UBOOT_OVERLOAD} file copy is complete."
+    if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+        echo -e "${INFO} Copy u-boot: [ ${UBOOT_OVERLOAD} ]"
+        [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext
+        [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc
+        chmod +x /boot/u-boot.ext /boot/u-boot.emmc
     fi
 
     # Write bootloader
-    if [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
+    if [[ "${auto_mainline_uboot}" == "yes" && -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]]; then
         echo -e "${INFO} Write Mainline u-boot: [ ${MAINLINE_UBOOT} ]"
         dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
-    elif [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
-        echo -e "${INFO} Write bootloader: [ ${BOOTLOADER_IMG} ]"
-        dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=1 count=444 2>/dev/null
-        dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
     fi
     [[ "${?}" -ne "0" ]] && error_msg "Failed to write bootloader using [ dd ]."
 
