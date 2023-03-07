@@ -781,28 +781,11 @@ refactor_rootfs() {
         sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
     }
 
-    # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
-    motd_tips="etc/default/armbian-motd"
-    [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
-    quotes_cron="etc/cron.weekly/armbian-quotes"
-    [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
-
-    # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
-    echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
-
     # Add custom startup script
     custom_startup_script="etc/custom_service/start_service.sh"
     [[ -f "${custom_startup_script}" && -f "etc/rc.local" ]] && {
         chmod +x ${custom_startup_script}
         sed -i '/^exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local
-    }
-
-    # Add custom disabled alias extension load modules
-    custom_blacklist="etc/modprobe.d/blacklist.conf"
-    [[ -f "${custom_blacklist}" ]] || echo -e "# This file lists the disabled alias extension load modules." >${custom_blacklist}
-    [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && {
-        echo -e "\n# For Tencent Aurora 3Pro (s905x3-b) box." >>${custom_blacklist}
-        echo -e "blacklist btmtksdio" >>${custom_blacklist}
     }
 
     # Enable ssh service
@@ -812,6 +795,30 @@ refactor_rootfs() {
         sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
     }
 
+    # Adjust the default timeout for service start/stop
+    system_conf="etc/systemd/system.conf"
+    [[ -f "${system_conf}" ]] && {
+        sed -i "s|^#*DefaultTimeoutStartSec.*|DefaultTimeoutStartSec=10s|g" ${system_conf}
+        sed -i "s|^#*DefaultTimeoutStopSec.*|DefaultTimeoutStopSec=10s|g" ${system_conf}
+    }
+
+    # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
+    motd_tips="etc/default/armbian-motd"
+    [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
+    quotes_cron="etc/cron.weekly/armbian-quotes"
+    [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
+
+    # Add custom disabled alias extension load modules
+    custom_blacklist="etc/modprobe.d/blacklist.conf"
+    [[ -f "${custom_blacklist}" ]] || echo -e "# This file lists the disabled alias extension load modules." >${custom_blacklist}
+    [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && {
+        echo -e "\n# For Tencent Aurora 3Pro (s905x3-b) box." >>${custom_blacklist}
+        echo -e "blacklist btmtksdio" >>${custom_blacklist}
+    }
+
+    # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
+    echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
+
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
@@ -820,11 +827,11 @@ refactor_rootfs() {
 
     # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
     network_service="usr/lib/systemd/system/networking.service"
-    sed -i "s|TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service}
+    sed -i "s|^#*TimeoutStartSec=.*|TimeoutStartSec=10sec|g" ${network_service}
 
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
-    sed -i '/armbian-release/i\[ -f "/usr/sbin/armbian-fix" ] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
+    sed -i '/\/etc\/armbian-release/i\[[ -x "/usr/sbin/armbian-fix" ]] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
 
     # Fix abnormal CPU temperature
     temp_file="usr/lib/armbian/armbian-allwinner-battery"
