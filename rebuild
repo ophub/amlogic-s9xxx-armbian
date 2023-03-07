@@ -984,33 +984,36 @@ loop_rebuild() {
     sha256sum * >sha256sums && sync
 }
 
-# Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
-# Show welcome and server start information
+# Show welcome message
 echo -e "${STEPS} Welcome to Rebuild Armbian!"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "${INFO} Server memory usage: \n$(free -h) \n"
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
-#
+# Check script permission
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
+
 # Initialize variables
 init_var "${@}"
 # Find rebuild files
 find_armbian
 # Download the dependency files
 download_depends
-# Download the latest kernel
+# Query the latest kernel version
 [[ "${auto_kernel}" == "true" ]] && query_version
+# Download the kernel files
 download_kernel
-#
+
+# Show rebuild settings
 echo -e "${INFO} [ ${#build_armbian[*]} ] lists of Armbian board: [ $(echo ${build_armbian[*]} | xargs) ]"
 echo -e "${INFO} [ ${#stable_kernel[*]} ] lists of stable kernel: [ $(echo ${stable_kernel[*]} | xargs) ]"
 echo -e "${INFO} [ ${#rk3588_kernel[*]} ] lists of rk3588 Kernel: [ $(echo ${rk3588_kernel[*]} | xargs) ]"
 echo -e "${INFO} ROOTFS type: [ ${rootfs_type} ] \n"
-#
+# Show server start information
+echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+echo -e "${INFO} Server memory usage: \n$(free -h) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
+
 # Loop to rebuild armbian
 loop_rebuild
-#
+
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
