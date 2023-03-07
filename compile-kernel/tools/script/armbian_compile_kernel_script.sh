@@ -627,27 +627,32 @@ loop_recompile() {
     done
 }
 
+# Show welcome message
+echo -e "${STEPS} Welcome to compile kernel! \n"
+echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 # Check script permission, supports running on Armbian system.
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
-# Show welcome and server start information
-echo -e "${STEPS} Welcome to compile kernel! \n"
-echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "${INFO} Server running path [ ${current_path} ] \n"
+
+# Initialize variables
+init_var "${@}"
+# Check and install the toolchain
+toolchain_check
+# Query the latest kernel version
+[[ "${auto_kernel}" == "true" ]] && query_version
+
+# Show compile settings
+echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
+echo -e "${INFO} Kernel from: [ ${code_owner} ]"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
+# Show server start information
 echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
 echo -e "${INFO} Server memory usage: \n$(free -h) \n"
 echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
-#
-# Initialize variables, download the kernel source code and check the toolchain
-init_var "${@}"
-[[ "${auto_kernel}" == "true" ]] && query_version
-echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
-echo -e "${INFO} Kernel from: [ ${code_owner} ]"
-echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | tr "\n" " ") ] \n"
-toolchain_check
+
 # Loop to compile the kernel
 loop_recompile
-#
+
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."

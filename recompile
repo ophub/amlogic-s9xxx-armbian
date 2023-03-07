@@ -644,27 +644,32 @@ loop_recompile() {
     done
 }
 
+# Show welcome message
+echo -e "${STEPS} Welcome to compile kernel! \n"
+echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 # Check script permission, supports running on x86_64 Ubuntu: [ jammy ]
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
-# Show welcome and server start information
-echo -e "${STEPS} Welcome to compile kernel! \n"
-echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "${INFO} Server memory usage: \n$(free -h) \n"
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
-echo -e "${INFO} Setting parameters: [ ${@} ] \n"
-#
-# Initialize variables, download the kernel source code and check the toolchain
+
+# Initialize variables
 init_var "${@}"
+# Check and install the toolchain
+toolchain_check
+# Query the latest kernel version
 [[ "${auto_kernel}" == "true" ]] && query_version
+
+# Show compile settings
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel from: [ ${code_owner} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
-toolchain_check
+# Show server start information
+echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+echo -e "${INFO} Server memory usage: \n$(free -h) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
+
 # Loop to compile the kernel
 loop_recompile
-#
+
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
