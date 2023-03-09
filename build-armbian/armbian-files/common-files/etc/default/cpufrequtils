@@ -9,9 +9,13 @@
 # Set ENABLE to "true" to let the script run at boot time
 ENABLE="true"
 
+# View CPU core
+MIN_CORE_CPU="$(ls -l /sys/devices/system/cpu | grep -oE "cpu[0-9]{1,2}" | sort | head -n 1)"
+MAX_CORE_CPU="$(ls -l /sys/devices/system/cpu | grep -oE "cpu[0-9]{1,2}" | sort -rV | head -n 1)"
+
 # MIN_SPEED and MAX_SPEED listed in: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies
-MIN_SPEED="$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $(NF/2)}')"
-MAX_SPEED="$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $NF}')"
+MIN_SPEED="$(cat /sys/devices/system/cpu/${MIN_CORE_CPU}/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $(NF/2)}')"
+MAX_SPEED="$(cat /sys/devices/system/cpu/${MAX_CORE_CPU}/cpufreq/scaling_available_frequencies 2>/dev/null | awk '{print $NF}')"
 
 # GOVERNOR listed in: cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_governors
 # GOVERNOR Options: conservative userspace powersave ondemand performance schedutil
