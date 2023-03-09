@@ -213,6 +213,9 @@ init_var() {
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
     [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
 
+    # Check the current system running disk
+    [[ -n "$(lsblk -l | grep -E "^${ROOT_PTNAME:0:-2}boot0" >/dev/null)" ]] && run_disk="emmc" || run_disk="usb"
+
     # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
     case "${ROOT_PTNAME}" in
     mmcblk?p[1-4])
@@ -229,6 +232,7 @@ init_var() {
         ;;
     esac
     DEV_EMMC="/dev/${EMMC_NAME}"
+    echo -e "${INFO} Armbian running: [ ${run_disk} - ${DEV_EMMC} ]."
 
     sync && echo ""
 }
@@ -464,9 +468,9 @@ update_uboot() {
     # Copy u-boot.ext and u-boot.emmc
     if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy u-boot: [ ${UBOOT_OVERLOAD} ]"
-        [[ ! -f "/boot/u-boot.ext" ]] && cp -f "/boot/${UBOOT_OVERLOAD}" /boot/u-boot.ext
-        [[ ! -f "/boot/u-boot.emmc" ]] && cp -f "/boot/u-boot.ext" /boot/u-boot.emmc
-        chmod +x /boot/u-boot.ext /boot/u-boot.emmc
+        [[ ! -f "/boot/u-boot.ext" ]] && cp -f /boot/${UBOOT_OVERLOAD} /boot/u-boot.ext
+        [[ ! -f "/boot/u-boot.emmc" && "${run_disk}" == "emmc" ]] && cp -f /boot/u-boot.ext /boot/u-boot.emmc
+        chmod +x /boot/u-boot.*
     fi
 
     # Write bootloader
