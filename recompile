@@ -49,7 +49,7 @@ armbian_file="${armbian_path}/armbian.img"
 out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
-arch_info="$(arch)"
+arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
 
 # Set the default value of the [ -r ] parameter
