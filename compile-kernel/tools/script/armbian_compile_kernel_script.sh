@@ -46,7 +46,7 @@ config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
 ophub_release_file="/etc/ophub-release"
-arch_info="$(arch)"
+arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d"=" -f2)"
 
 # Set the default value of the [ -r ] parameter
