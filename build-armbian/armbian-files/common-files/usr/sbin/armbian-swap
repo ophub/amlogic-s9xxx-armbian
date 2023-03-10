@@ -40,15 +40,15 @@ do_checkdisk() {
     # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
     case "${ROOT_PTNAME}" in
     mmcblk?p[1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         PARTITION_NAME="p"
         ;;
     [hsv]d[a-z][1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-1}"
         PARTITION_NAME=""
         ;;
     nvme?n?p[1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         PARTITION_NAME="p"
         ;;
     *)
@@ -57,7 +57,7 @@ do_checkdisk() {
     esac
 
     # Find out if the extended partition is created using the armbian-TF command in TF/USB
-    find_right_path="/mnt/${EMMC_NAME}${PARTITION_NAME}3"
+    find_right_path="/mnt/${DISK_NAME}${PARTITION_NAME}3"
     if [[ -d "${find_right_path}" ]]; then
         PARTITION_PATH="${find_right_path}"
     else
