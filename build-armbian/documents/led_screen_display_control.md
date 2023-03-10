@@ -27,8 +27,8 @@ vfd_gpio_dat='0,69,0'
 
 ```yaml
 # Execute the following command in the terminal to enable openvfd service
-sed -i 's|^openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
-sed -i 's|^openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
+sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
+sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
 ```
 
 - You are welcome to share the conf file(xxx.conf) of your own devices after testing, so that more people can benefit.
@@ -80,8 +80,8 @@ vfd_gpio_dat='0,69,0'
 
 ```yaml
 # 在终端执行以下命令启用 openvfd 服务
-sed -i 's|^openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
-sed -i 's|^openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
+sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
+sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
 ```
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
