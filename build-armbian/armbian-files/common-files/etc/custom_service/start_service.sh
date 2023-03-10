@@ -46,8 +46,8 @@ ophub_release_file="/etc/ophub-release"
 openvfd_enable="no"
 openvfd_boxid="15"
 [[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -x "/usr/sbin/armbian-openvfd" ]] && {
-    armbian-openvfd ${openvfd_boxid}
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The openvfd service started successfully." >>${custom_log}
+    armbian-openvfd ${openvfd_boxid} &&
+        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The openvfd service started successfully." >>${custom_log}
 }
 
 # For vplus(Allwinner h6) led color lights
