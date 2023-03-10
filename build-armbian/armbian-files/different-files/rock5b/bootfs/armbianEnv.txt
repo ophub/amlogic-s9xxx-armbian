@@ -2,11 +2,15 @@ verbosity=7
 bootlogo=true
 fdtfile=rockchip/rk3588-rock-5b.dtb
 rootdev=/dev/mmcblk0p2
-rootfstype=ext4
-rootflags=rw,errors=remount-ro
+rootfstype=btrfs 
+rootflags=compress=zstd:6
+earlycon=on
+console=serial
+consoleargs=console=ttyFIQ0 console=tty1
 usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
-overlay_prefix=rk3588
 docker_optimizations=on
 extraargs=
 extraboardargs=net.ifnames=0
+overlay_prefix=rk3588
 overlays=uart7-m2
+user_overlays=
