@@ -48,29 +48,22 @@ do_checkdisk() {
 
     # Find the partition where root is located
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
-    if [[ -z "${ROOT_PTNAME}" ]]; then
-        error_msg "Cannot find the partition corresponding to the root file system!"
-    fi
-
-    # Check the current system running disk
-    if lsblk -l | grep -E "^${ROOT_PTNAME:0:-2}boot0" >/dev/null; then
-        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
-    fi
+    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
 
     # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
     case "${ROOT_PTNAME}" in
     mmcblk?p[1-4])
-        DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         PT_PRE="${DISK_NAME}p"
         LB_PRE="MMC_"
         ;;
     [hsv]d[a-z][1-4])
-        DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-1}"
         PT_PRE="${DISK_NAME}"
         LB_PRE="USB_"
         ;;
     nvme?n?p[1-4])
-        DISK_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         PT_PRE="${DISK_NAME}p"
         LB_PRE="NVME_"
         ;;
@@ -78,6 +71,10 @@ do_checkdisk() {
         error_msg "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
         ;;
     esac
+
+    # Check the current system running disk
+    run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
+    [[ -n "${run_on_emmc}"]] && error_msg "You run on eMMC, no partition required."
 }
 
 # Create new partition
