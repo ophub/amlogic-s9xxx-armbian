@@ -42,6 +42,14 @@ ophub_release_file="/etc/ophub-release"
         echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The network optimization service started successfully." >>${custom_log}
 }
 
+# Led display control
+openvfd_enable="no"
+openvfd_boxid="15"
+[[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -x "/usr/sbin/armbian-openvfd" ]] && {
+    armbian-openvfd ${openvfd_boxid}
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The openvfd service started successfully." >>${custom_log}
+}
+
 # For vplus(Allwinner h6) led color lights
 [[ -x "/usr/bin/rgb-vplus" ]] && {
     rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE &
