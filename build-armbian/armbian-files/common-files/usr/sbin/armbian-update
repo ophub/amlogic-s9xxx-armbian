@@ -213,26 +213,22 @@ init_var() {
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
     [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
 
-    # Check the current system running disk
-    [[ -n "$(lsblk -l | grep -E "^${ROOT_PTNAME:0:-2}boot0" >/dev/null)" ]] && run_disk="emmc" || run_disk="usb"
-
     # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
     case "${ROOT_PTNAME}" in
     mmcblk?p[1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         ;;
     [hsv]d[a-z][1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-1)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-1}"
         ;;
     nvme?n?p[1-4])
-        EMMC_NAME="$(echo ${ROOT_PTNAME} | awk '{print substr($1, 1, length($1)-2)}')"
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
         ;;
     *)
         error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
         ;;
     esac
-    DEV_EMMC="/dev/${EMMC_NAME}"
-    echo -e "${INFO} Armbian running: [ ${run_disk} - ${DEV_EMMC} ]."
+    echo -e "${INFO} Armbian running: [ /dev/${DISK_NAME} ]."
 
     sync && echo ""
 }
@@ -468,16 +464,17 @@ update_uboot() {
     # Copy u-boot.ext and u-boot.emmc
     if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy u-boot: [ ${UBOOT_OVERLOAD} ]"
+        run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
         [[ ! -f "/boot/u-boot.ext" ]] && cp -f /boot/${UBOOT_OVERLOAD} /boot/u-boot.ext
-        [[ ! -f "/boot/u-boot.emmc" && "${run_disk}" == "emmc" ]] && cp -f /boot/u-boot.ext /boot/u-boot.emmc
+        [[ ! -f "/boot/u-boot.emmc" && -n "${run_on_emmc}" ]] && cp -f /boot/u-boot.ext /boot/u-boot.emmc
         chmod +x /boot/u-boot.*
     fi
 
-    # Write bootloader
+    # Write mainline u-boot
     if [[ "${auto_mainline_uboot}" == "yes" && -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]]; then
         echo -e "${INFO} Write Mainline u-boot: [ ${MAINLINE_UBOOT} ]"
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444 2>/dev/null
-        dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        dd if="${MAINLINE_UBOOT}" of="/dev/${DISK_NAME}" conv=fsync bs=1 count=444 2>/dev/null
+        dd if="${MAINLINE_UBOOT}" of="/dev/${DISK_NAME}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
     fi
     [[ "${?}" -ne "0" ]] && error_msg "Failed to write bootloader using [ dd ]."
 
