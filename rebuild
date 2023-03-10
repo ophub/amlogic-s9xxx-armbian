@@ -783,8 +783,7 @@ refactor_rootfs() {
 
     # Add custom startup script
     custom_startup_script="etc/custom_service/start_service.sh"
-    [[ -f "${custom_startup_script}" && -f "etc/rc.local" ]] && {
-        chmod +x ${custom_startup_script}
+    [[ -x "${custom_startup_script}" && -f "etc/rc.local" ]] && {
         sed -i '/^exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local
     }
 
