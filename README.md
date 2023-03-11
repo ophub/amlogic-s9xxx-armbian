@@ -122,7 +122,7 @@ Debug according to [LED screen display control instructions](build-armbian/docum
 
 - ### Use Armbian in TF/SD/USB
 
-To activate the remaining space of TF/SD/USB, please login in to armbian → input command:
+`Amlogic` box needs to manually activate the remaining space of TF/SD/USB (Rockchip and Allwinner have been activated automatically), Login in to armbian → input command:
 
 ```yaml
 armbian-tf
