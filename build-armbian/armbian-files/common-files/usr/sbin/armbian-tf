@@ -74,7 +74,7 @@ do_checkdisk() {
 
     # Check the current system running disk
     run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
-    [[ -n "${run_on_emmc}"]] && error_msg "You run on eMMC, no partition required."
+    [[ -n "${run_on_emmc}" ]] && error_msg "You run on eMMC, no partition required."
 }
 
 # Create new partition
@@ -202,7 +202,7 @@ echo -ne "${OPTIONS} Please select (e/c): "
 read ec
 
 case "${ec}" in
-    e | E | expand) expand_current_part ;;
-    c | C | create) create_new_part ;;
-    *)              exit 0 ;;
+e | E | expand) expand_current_part ;;
+c | C | create) create_new_part ;;
+*) exit 0 ;;
 esac
