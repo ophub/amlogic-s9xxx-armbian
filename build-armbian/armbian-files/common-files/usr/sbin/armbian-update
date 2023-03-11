@@ -506,7 +506,7 @@ rescue_kernel() {
     # Check if there is enough free space
     available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
     [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "The remaining space cannot be obtained."
-    [[ "${available_space}" -lt "3" ]] && error_msg "The available space is less than 3GiB, please use [ armbian-tf ] to expand the USB."
+    [[ "${available_space}" -lt "5" ]] && error_msg "The available space is less than 5GiB, please use [ armbian-tf ] to expand the USB."
 
     # Create a temporary mount directory
     rm -rf ${rescue_path}
@@ -557,7 +557,9 @@ rescue_kernel() {
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 echo -e "${STEPS} Welcome to the kernel update tool."
 
+# Update or Rescue kernel
 if [[ "${1}" != "-r" ]]; then
+    # Start updating the kernel
     check_depends
     init_var "${@}"
     download_kernel
@@ -565,11 +567,16 @@ if [[ "${1}" != "-r" ]]; then
     [[ "${auto_backup_kernel}" == "yes" ]] && backup_kernel
     update_kernel
     [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
-else
-    rescue_kernel
-fi
 
-sync && sleep 3
-echo -e "${SUCCESS} Successfully updated, automatic restarting..."
-reboot
-exit 0
+    # Kernel updated successfully
+    sync && sleep 3
+    echo -e "${SUCCESS} Successfully updated, automatic restarting..."
+    reboot
+else
+    # Start rescuing kernel
+    rescue_kernel
+
+    # Kernel rescue succeeded
+    sync && sleep 3
+    echo -e "${SUCCESS} The kernel rescue is successful, please unplug the USB and reboot the Armbian."
+fi
