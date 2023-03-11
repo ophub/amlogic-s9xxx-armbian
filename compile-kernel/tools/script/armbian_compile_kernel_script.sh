@@ -45,9 +45,10 @@ kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
-ophub_release_file="/etc/ophub-release"
 arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d"=" -f2)"
+initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
+ophub_release_file="/etc/ophub-release"
 
 # Set the default value of the [ -r ] parameter
 # When set to [ -r kernel.org ], Kernel download from kernel.org
@@ -496,8 +497,18 @@ generate_uinitrd() {
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
 
+    [[ -f "${initramfs_conf}" ]] && {
+        echo -e "${INFO} Enable update_initramfs"
+        sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
+    }
+
     # Generate uInitrd file directly under armbian system
     update-initramfs -c -k ${kernel_outname} 2>/dev/null
+
+    [[ -f "${initramfs_conf}" ]] && {
+        echo -e "${INFO} Disable update_initramfs"
+        sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
+    }
 
     if [[ -f uInitrd ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
