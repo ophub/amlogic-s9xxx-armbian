@@ -122,7 +122,7 @@ armbian-openvfd
 
 - ### 在 TF/SD/USB 中使用 Armbian
 
-激活 TF/SD/USB 的剩余空间，请登录 Armbian 系统 → 输入命令：
+`Amlogic` 盒子需要手动激活 TF/SD/USB 的剩余空间（Rockchip 和 Allwinner 已自动激活），登录 Armbian 系统 → 输入命令：
 
 ```yaml
 armbian-tf
