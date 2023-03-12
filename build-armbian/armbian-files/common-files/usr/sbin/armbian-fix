@@ -63,19 +63,12 @@ sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/ap
 [[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools*)" ]] && sudo apt-mark hold initramfs-tools* && echo "27. Hold initramfs-tools*"
 
 # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
-# [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
-backup_remove_files="/etc/backup_remove_files"
-mkdir -p ${backup_remove_files}/{postrm.d/,postinst.d/,post-update.d/}
-[[ -f "/etc/kernel/postrm.d/initramfs-tools" ]] && mv -f /etc/kernel/postrm.d/*initr* ${backup_remove_files}/postrm.d && echo "30. Remove postrm.d"
-[[ -f "/etc/kernel/postinst.d/initramfs-tools" ]] && mv -f /etc/kernel/postinst.d/*initr* ${backup_remove_files}/postinst.d && echo "31. Remove postinst.d"
-[[ -f "/etc/initramfs/post-update.d/99-uboot" ]] && mv -f /etc/initramfs/post-update.d/*uboot* ${backup_remove_files}/post-update.d && echo "32. Remove 99-uboot"
-[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install ${backup_remove_files} && echo "33. Remove nand-sata-install"
-[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian ${backup_remove_files} && echo "34. Remove armbian/boot.cmd"
-update_initramfs_file="/usr/sbin/update-initramfs"
-[[ -f "${update_initramfs_file}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${update_initramfs_file} && echo "35. Set update-initramfs"
-update_initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
-[[ -f "${update_initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${update_initramfs_conf} && echo "36. Set update-initramfs.conf"
+# Move /usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
+[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak && echo "28. Move /usr/share/armbian to armbian.bak"
+# Disable update_initramfs
+initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
+[[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && echo "29. Set update-initramfs.conf"
 
 # Start disabling system services
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start disabling system services..." >>${fix_log}
