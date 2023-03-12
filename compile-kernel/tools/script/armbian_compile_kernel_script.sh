@@ -500,18 +500,14 @@ generate_uinitrd() {
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
 
-    [[ -f "${initramfs_conf}" ]] && {
-        echo -e "${INFO} Enable update_initramfs"
-        sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
-    }
+    # Enable update_initramfs
+    [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
 
     # Generate uInitrd file directly under armbian system
     update-initramfs -c -k ${kernel_outname} 2>/dev/null
 
-    [[ -f "${initramfs_conf}" ]] && {
-        echo -e "${INFO} Disable update_initramfs"
-        sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
-    }
+    # Disable update_initramfs
+    [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
 
     if [[ -f uInitrd ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
