@@ -489,13 +489,20 @@ generate_uinitrd() {
         error_msg "mount ${loop_armbian}p1 failed!"
     fi
 
+    ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
+    echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
+
+    # Remove current system files for /boot
+    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image}
     # Copy /boot related files into armbian system
-    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,uInitrd-*,vmlinuz-*,uInitrd,zImage}
-    #
     cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/zImage
+    if [[ "${ARMBIAN_PLATFORM}" == "rockchip" || "${ARMBIAN_PLATFORM}" == "allwinner" ]]; then
+        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/Image
+    else
+        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/zImage
+    fi
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/usr/lib/modules/*
