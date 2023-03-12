@@ -704,19 +704,15 @@ refactor_rootfs() {
     cd ${tag_rootfs}
 
     # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
-    # [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
     # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
-    backup_remove_files="etc/backup_remove_files"
-    mkdir -p ${backup_remove_files}/{postrm.d/,postinst.d/,post-update.d/}
-    mv -f etc/kernel/postrm.d/*initr* ${backup_remove_files}/postrm.d
-    mv -f etc/kernel/postinst.d/*initr* ${backup_remove_files}/postinst.d
-    mv -f etc/initramfs/post-update.d/*uboot* ${backup_remove_files}/post-update.d
-    mv -f usr/lib/nand-sata-install ${backup_remove_files}
-    mv -f usr/share/armbian ${backup_remove_files}
-    update_initramfs_file="usr/sbin/update-initramfs"
-    [[ -f "${update_initramfs_file}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${update_initramfs_file}
-    update_initramfs_conf="etc/initramfs-tools/update-initramfs.conf"
-    [[ -f "${update_initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${update_initramfs_conf}
+    # Move /usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
+    [[ -d "usr/share/armbian" ]] && mv -f usr/share/armbian usr/share/armbian.bak
+    # Disable update_initramfs
+    initramfs_conf="etc/initramfs-tools/update-initramfs.conf"
+    [[ -f "${initramfs_conf}" ]] && {
+        [[ -n "$(cat ${initramfs_conf} | grep -oE "^update_initramfs=")" ]] || error_msg "Missing [ update_initramfs ]"
+        sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
+    }
 
     # Delete related files
     rm -f etc/apt/sources.list.save
