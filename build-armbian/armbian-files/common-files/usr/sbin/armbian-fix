@@ -65,10 +65,12 @@ sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/ap
 # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
 # Move /usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
-[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak && echo "28. Move /usr/share/armbian to armbian.bak"
+[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak && echo "28. Move /usr/share/armbian to .bak"
+# Move /usr/lib/nand-sata-install to nand-sata-install.bak. [ Useless bootloader and u-boot ]
+[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install /usr/lib/nand-sata-install.bak && echo "29. Move /usr/lib/nand-sata-install to .bak"
 # Disable update_initramfs
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
-[[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && echo "29. Set update-initramfs.conf"
+[[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && echo "30. Set update-initramfs.conf"
 
 # Start disabling system services
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start disabling system services..." >>${fix_log}
