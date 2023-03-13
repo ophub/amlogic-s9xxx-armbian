@@ -12,7 +12,7 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: armbian-kernel -update && armbian-kernel -k 5.10.125
+# Command: armbian-kernel
 # Command optional parameters please refer to the source code repository
 #
 #================================= Functions list =================================
@@ -53,7 +53,7 @@ ophub_release_file="/etc/ophub-release"
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
-build_kernel=("5.10.125" "5.15.50")
+build_kernel=("6.1.15" "5.15.100")
 auto_kernel="true"
 custom_name="-ophub"
 # Set the kernel compile object, options: dtbs / all
@@ -583,11 +583,11 @@ loop_recompile() {
 
     j="1"
     for k in ${build_kernel[*]}; do
-        # kernel_version, such as [ 5.10.125 ]
+        # kernel_version, such as [ 6.1.15 ]
         kernel_version="${k}"
-        # kernel <VERSION> and <PATCHLEVEL>, such as [ 5.10 ]
+        # kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
         kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
-        # kernel <SUBLEVEL>, such as [ 125 ]
+        # kernel <SUBLEVEL>, such as [ 15 ]
         kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
 
         # The loop variable assignment
