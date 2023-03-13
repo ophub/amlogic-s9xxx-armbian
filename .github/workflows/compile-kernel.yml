@@ -17,7 +17,6 @@ on:
         type: choice
         options:
           - unifreq
-          - kernel.org
       kernel_version:
         description: "Select kernel version"
         required: false
