@@ -79,7 +79,7 @@ kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 # Set stable kernel directory: [ stable ], rk3588 kernel directory: [ rk3588 ]
 kernel_dir=("stable" "rk3588")
 # Set the list of kernels used by default
-stable_kernel=("6.1.10" "5.15.50")
+stable_kernel=("6.1.15" "5.15.100")
 rk3588_kernel=("5.10.150")
 # Set to automatically use the latest kernel
 auto_kernel="true"
@@ -280,10 +280,10 @@ query_version() {
             for kernel_var in ${down_kernel_list[*]}; do
                 echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version of the same series for [ ${k} - ${kernel_var} ]"
 
-                # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 5.10 ]
+                # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
                 kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
-                # Check the kernel <SUBLEVEL>, such as [ 125 ]
+                # Check the kernel <SUBLEVEL>, such as [ 15 ]
                 if [[ -n "${gh_token}" ]]; then
                     kernel_sub="$(curl --header "authorization: Bearer ${gh_token}" -s "${server_kernel_url}/${k}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
                     query_api="Authenticated user request"
@@ -642,7 +642,6 @@ refactor_bootfs() {
 
     # Process Amlogic series boot partition files
     [[ "${PLATFORM}" == "amlogic" && "${need_overload}" == "yes" ]] && {
-        # Add u-boot.ext for Amlogic 5.10 kernel
         if [[ -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext
             chmod +x u-boot.ext
