@@ -589,11 +589,11 @@ loop_recompile() {
 
     j="1"
     for k in ${build_kernel[*]}; do
-        # kernel_version, such as [ 5.10.125 ]
+        # kernel_version, such as [ 6.1.15 ]
         kernel_version="${k}"
-        # kernel <VERSION> and <PATCHLEVEL>, such as [ 5.10 ]
+        # kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
         kernel_verpatch="$(echo ${kernel_version} | awk -F '.' '{print $1"."$2}')"
-        # kernel <SUBLEVEL>, such as [ 125 ]
+        # kernel <SUBLEVEL>, such as [ 15 ]
         kernel_sub="$(echo ${kernel_version} | awk -F '.' '{print $3}')"
 
         # The loop variable assignment
