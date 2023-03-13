@@ -568,7 +568,6 @@ compile_selection() {
 
     cd ${out_kernel}
     tar -czf ${kernel_version}.tar.gz ${kernel_version}
-    sync && sleep 3
 
     echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
 }
@@ -577,6 +576,7 @@ clean_tmp() {
     cd ${current_path}
     echo -e "${STEPS} Clear the space and update-grub..."
 
+    sync && sleep 3
     rm -rf ${out_kernel}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
 
     update-grub 2>/dev/null
