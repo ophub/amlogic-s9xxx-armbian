@@ -36,13 +36,13 @@ The latest version of the Armbian firmware can be downloaded in [Releases](https
 
 ## Install to EMMC and update instructions
 
-Choose the corresponding firmware according to your box. Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the box. Common for all `Amlogic s9xxx TV Boxes`.
+Choose the corresponding firmware according to your box. See the corresponding instructions for the use of different devices.
 
 - ### Install Armbian to EMMC
 
 1. For the installation method of the `Rockchip` platform, please refer to [Section 8](build-armbian/documents) in the documentation。
 
-2. `Amlogic` and `Allwinner` platform，Login in to armbian (default user: root, default password: 1234) → input command:
+2. `Amlogic` and `Allwinner` platform，Then write the IMG file to the USB hard disk through software such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/). Insert the USB hard disk into the box. Login in to armbian (default user: root, default password: 1234) → input command:
 
 ```yaml
 armbian-install
