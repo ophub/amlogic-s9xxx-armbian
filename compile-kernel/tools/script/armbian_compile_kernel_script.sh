@@ -226,15 +226,6 @@ toolchain_check() {
             [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
         fi
 
-        # Modify compiler version
-        echo -e "${INFO} Start adjusting compilation toolchain [ ${toolchain_path}/${gun_file//.tar.xz/} ]..."
-        ln -svf ${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-gcc /usr/bin/gcc
-        ln -svf ${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-g++ /usr/bin/g++
-        ln -svf ${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-gcc-ar /usr/bin/gcc-ar
-        ln -svf ${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-gcc-nm /usr/bin/gcc-nm
-        ln -svf ${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-gcc-ranlib /usr/bin/gcc-ranlib
-        [[ -e "/usr/include/asm" ]] || ln -svf "/usr/include/$(gcc -dumpmachine)/asm" "/usr/include/asm"
-
         # Add ${PATH} variable
         path_armbian="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
         path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_armbian}"
@@ -495,11 +486,15 @@ generate_uinitrd() {
 
     # Restore the files in the [ /boot ] directory
     mv -f *${kernel_outname} ${out_kernel}/boot
-    mv -f ${boot_backup_path}/* . && rm -rf ${boot_backup_path}
+    mv -f ${boot_backup_path}/* .
 
     # Restore the files in the [ /usr/lib/modules ] directory
     rm -rf /usr/lib/modules/${kernel_outname}
-    mv -f ${modules_backup_path}/* /usr/lib/modules && rm -rf ${modules_backup_path}
+    mv -f ${modules_backup_path}/* /usr/lib/modules
+
+    # Remove temporary backup directory
+    sync && sleep 3
+    rm -rf ${boot_backup_path} ${modules_backup_path}
 }
 
 packit_dtbs() {
@@ -564,7 +559,7 @@ compile_selection() {
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
     cd ${out_kernel}
-    tar -czf ${kernel_version}.tar.gz ${kernel_version} && sync && sleep 3
+    tar -czf ${kernel_version}.tar.gz ${kernel_version}
 
     echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
 }
@@ -573,6 +568,7 @@ clean_tmp() {
     cd ${current_path}
     echo -e "${STEPS} Clear the space..."
 
+    sync && sleep 3
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
 
     echo -e "${SUCCESS} All processes have been completed."
