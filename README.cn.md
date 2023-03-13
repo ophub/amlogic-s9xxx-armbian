@@ -36,13 +36,13 @@
 
 ## 安装及升级 Armbian 的相关说明
 
-选择和你的盒子型号对应的 Armbian 固件，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将固件写入 USB 里，然后把写好固件的 USB 插入盒子。
+选择和你的盒子型号对应的 Armbian 固件，不同设备的使用方法查看对应的说明。
 
 - ### 安装 Armbian 到 EMMC
 
 1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](build-armbian/documents/README.cn.md)。
 
-2. `Amlogic` 和 `Allwinner` 平台，登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
+2. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将固件写入 USB 里，然后把写好固件的 USB 插入盒子。登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
 ```yaml
 armbian-install
