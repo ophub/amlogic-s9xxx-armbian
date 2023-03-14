@@ -79,7 +79,7 @@ do_checkspace() {
     fi
     # Check if there is enough free space
     if [[ "${remaining_space}" -lt "${need_space}" ]]; then
-        error_msg "The remaining space is [ ${remaining_space} ] Gb, and more than [ ${need_space} ] Gb space is required."
+        error_msg "There is not enough space left. Please use [ armbian-tf ] to expand first."
     fi
 }
 
