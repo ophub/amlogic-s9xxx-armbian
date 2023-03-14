@@ -115,6 +115,11 @@ sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
 sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer
 sudo rm -f /etc/update-motd.d/50-motd-news
 
+# Stop and Disable NetworkManager
+sudo systemctl stop NetworkManager.service && echo "58. Stop NetworkManager"
+sudo systemctl disable NetworkManager.service && echo "59. Disable NetworkManager"
+sudo systemctl restart networking.service && echo "60. Restart networking"
+
 # Start adjusting custom settings
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom settings..." >>${fix_log}
 
