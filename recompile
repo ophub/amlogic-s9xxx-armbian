@@ -467,7 +467,8 @@ generate_uinitrd() {
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
-    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh && sync
+    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
+    sync && sleep 3
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
@@ -478,9 +479,10 @@ generate_uinitrd() {
     cd ${current_path}
     # Copy the generated uInitrd file to the current system
     echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot ]"
-    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${out_kernel}/boot && sync
+    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${out_kernel}/boot
 
     # Unmount the armbian system
+    sync && sleep 3
     umount ${tag_rootfs}/boot 2>/dev/null
     umount ${tag_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
