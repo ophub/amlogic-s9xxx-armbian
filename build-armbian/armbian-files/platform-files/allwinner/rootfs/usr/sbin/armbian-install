@@ -171,9 +171,12 @@ create_partition() {
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
     if [[ "${exists_pts}" -gt "0" ]]; then
+        echo -e "${INFO} Delete the existing [ ${exists_pts} ] partitions."
         i=1
         while [[ "${i}" -le "${exists_pts}" ]]; do
-            parted -s ${DEV_EMMC} rm ${i} 2>/dev/null
+            umount -f ${DEV_EMMC}p${i} 2>/dev/null
+            parted -s ${DEV_EMMC} rm ${i}
+            [[ "${?}" -eq "0" ]] || error_msg "Failed to delete the [ ${i} ] partition. Please try again."
             let i++
         done
     fi
@@ -194,11 +197,11 @@ create_partition() {
     # Write bootloader
     if [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]] &&
         [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]]; then
-        echo -e "${INFO} 01. Write bootloader: ${MAINLINE_UBOOT}"
+        echo -e "${INFO} 01. Write bootloader: [ ${MAINLINE_UBOOT} ]"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=1
         dd if="${MAINLINE_UBOOT}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=5
     elif [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
-        echo -e "${INFO} 02. Write bootloader: ${BOOTLOADER_IMG}"
+        echo -e "${INFO} 02. Write bootloader: [ ${BOOTLOADER_IMG} ]"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=1
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
