@@ -9,7 +9,8 @@ source /etc/network/interfaces.d/*
 auto eth0
 iface eth0 inet dhcp
         hwaddress ether 12:34:56:78:9A:BC
-
+auto lo
+iface lo inet loopback
 
 # 02. Enable static IP settings(IP is modified according to the actual)
 #auto eth0
