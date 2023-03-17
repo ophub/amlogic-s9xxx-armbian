@@ -105,7 +105,7 @@ jobs:
           kernel_config: ${{ inputs.kernel_config }}
 
       - name: Upload Kernel to Release
-        uses: ncipollo/release-action@main
+        uses: God-JohnDiamond/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
