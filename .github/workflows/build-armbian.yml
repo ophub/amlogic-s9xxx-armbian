@@ -168,7 +168,7 @@ jobs:
             df -hT ${PWD}
 
       - name: Upload Armbian image to Release
-        uses: God-JohnDiamond/release-action@main
+        uses: ncipollo/release-action@main
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
@@ -192,7 +192,7 @@ jobs:
           gh_token: ${{ secrets.GH_TOKEN }}
 
       - name: Upload Rebuild image to Release
-        uses: God-JohnDiamond/release-action@main
+        uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.compile.outputs.build_tag }}
