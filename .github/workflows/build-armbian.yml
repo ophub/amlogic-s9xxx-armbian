@@ -85,7 +85,7 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "https://github.com/ophub/kernel/tree/main/pub/stable/6.1.18"
+        default: "https://github.com/ophub/kernel/tree/main/pub"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
