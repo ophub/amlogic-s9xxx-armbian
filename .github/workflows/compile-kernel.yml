@@ -92,7 +92,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the kernel
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: God-JohnDiamond/amlogic-s9xxx-armbian@main
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
@@ -105,7 +105,7 @@ jobs:
           kernel_config: ${{ inputs.kernel_config }}
 
       - name: Upload Kernel to Release
-        uses: God-JohnDiamond/release-action@main
+        uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
           tag: kernel_${{ env.PACKAGED_OUTPUTTAGS }}
