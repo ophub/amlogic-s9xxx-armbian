@@ -55,7 +55,7 @@ ophub_release_file="/etc/ophub-release"
 # Set the kernel download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
 # Set the kernel directory
-kernel_dir=("stable" "rk3588" "dev")
+kernel_dir=("stable" "rk3588" "h6" "dev")
 # Set default installation mainline u-boot (-m)
 auto_mainline_uboot="no"
 
@@ -122,12 +122,11 @@ init_var() {
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
-    SOC="${SOC}"
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
-    BOOTLOADER_IMG="${BOOTLOADER_IMG}"
     KERNEL_BRANCH="${KERNEL_BRANCH}"
-    [[ -z "${PLATFORM}" ]] && error_msg "Invalid PLATFORM: [ ${PLATFORM} ]"
+    [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
+    [[ -z "${KERNEL_BRANCH}" ]] && error_msg "[ KERNEL_BRANCH ] is missing, stop updating the kernel."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     get_all_ver="$(getopt "k:v:m:b:" "${@}")"
@@ -173,21 +172,11 @@ init_var() {
         shift
     done
 
-    # Automatically complete old version ophub_release_file
-    [[ -z "${KERNEL_BRANCH}" ]] && {
-        if [[ "${SOC,,}" == "rk3588" ]]; then
-            KERNEL_BRANCH="rk3588"
-        elif [[ "${SOC,,}" == "rk3568" || "${SOC,,}" == "rk3399" ]]; then
-            KERNEL_BRANCH="6.1.y"
-        else
-            KERNEL_BRANCH="stable"
-        fi
-        echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
-    }
-
     # Set kernel download directory
     if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
         kernel_download_dir="rk3588"
+    elif [[ "${KERNEL_BRANCH}" == "h6" ]]; then
+        kernel_download_dir="h6"
     elif [[ "${KERNEL_BRANCH}" == "dev" ]]; then
         kernel_download_dir="dev"
     else
@@ -293,8 +282,7 @@ check_kernel() {
     echo -e "${STEPS} Start checking the kernel..."
 
     # Check for inapplicable kernels
-    if { [[ "${KERNEL_BRANCH}" == "rk3588" ]] && [[ "${inputs_kernel:0:5}" != "5.10." ]]; } ||
-        { [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
+    if { [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && [[ "${inputs_kernel:0:2}" != "6." ]]; } ||
         { [[ "${KERNEL_BRANCH}" == "5.10.y" ]] && [[ "${inputs_kernel:0:5}" != "5.10." ]]; } ||
         { [[ "${KERNEL_BRANCH}" == "5.15.y" ]] && [[ "${inputs_kernel:0:5}" != "5.15." && "${inputs_kernel:0:4}" != "5.4." ]]; }; then
         error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
