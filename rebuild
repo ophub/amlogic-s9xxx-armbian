@@ -220,12 +220,13 @@ init_var() {
         board_list=":($(echo ${build_board} | sed -e 's/_/\|/g'))"
         build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
     fi
+    [[ "${#build_armbian[*]}" -eq "0" ]] && error_msg "The board is missing, stop building."
 
     # Set kernel download directory
     kernel_dir=($(
         cat ${model_conf} |
             sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
-            grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{if ($8 ~ /^[a-z]/) print $8}' |
+            grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{if ($8 ~ /^[a-zA-Z]/) print $8}' |
             sort | uniq | xargs
     ))
     [[ "${#kernel_dir[*]}" -eq "0" ]] && kernel_dir=("stable")
