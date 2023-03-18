@@ -32,9 +32,9 @@ on:
           - s905x3-b
           - s905x2
           - s912
-          - s912-m8s
+          - s912-m8s-pro
           - s905d
-          - s905d-ki
+          - s905d-ki-pro
           - s905x
           - s905w
           - s905
