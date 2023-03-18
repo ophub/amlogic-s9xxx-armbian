@@ -9,8 +9,9 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Description: Run on x86_64 Ubuntu-22.04(jammy), Compile the kernel.
-# Copyright (C) 2021- https://github.com/unifreq
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021~ https://www.kernel.org
+# Copyright (C) 2021~ https://github.com/unifreq
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: sudo ./recompile
 # Command optional parameters please refer to the source code repository
