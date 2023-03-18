@@ -1,5 +1,5 @@
 #!/bin/bash
-#========================================================================================
+#================================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -9,13 +9,15 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Description: Run on x86_64 Ubuntu-20.04/22.04, Rebuild armbian.
-# Copyright (C) 2021- https://github.com/unifreq
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021~ https://www.armbian.com
+# Copyright (C) 2021~ https://github.com/unifreq
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: sudo ./rebuild
 # Command optional parameters please refer to the source code repository
 #
-#==================================== Functions list ====================================
+#======================================== Functions list ========================================
 #
 # error_msg          : Output error message
 # process_msg        : Output process message
@@ -39,7 +41,7 @@
 #
 # loop_rebuild       : Loop to rebuild Armbian files
 #
-#============================ Set make environment variables ============================
+#================================ Set make environment variables ================================
 #
 # Related file storage path
 current_path="${PWD}"
@@ -105,7 +107,7 @@ WARNING="[\033[93m WARNING \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
-#========================================================================================
+#================================================================================================
 
 error_msg() {
     echo -e "${ERROR} ${1}"
