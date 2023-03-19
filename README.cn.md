@@ -269,8 +269,8 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | 参数              | 默认值             | 说明                                             |
 |------------------|-------------------|--------------------------------------------------|
 | armbian_path     | 无                | 设置原版 Armbian 文件的路径，支持使用当前工作流中的文件路径如 `build/output/images/*.img` ，也支持使用网络下载地址如： `https://dl.armbian.com/*/Armbian_*.img.xz` |
-| armbian_board    | s905d_s905x3      | 设置打包盒子的 `board` ，功能参考 `-b`                 |
-| armbian_kernel   | 5.10.125_5.15.50  | 设置内核 [版本](https://github.com/ophub/kernel/tree/main/pub/stable)，功能参考 `-k` |
+| armbian_board    | all               | 设置打包盒子的 `board` ，功能参考 `-b`                 |
+| armbian_kernel   | 6.1.1_5.15.1      | 设置内核 [版本](https://github.com/ophub/kernel/tree/main/pub/stable)，功能参考 `-k` |
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | kernel_repo      | [ophub/kernel](https://github.com/ophub/kernel/tree/main/pub) | 指定内核仓库地址，功能参考 `-r` |
 | armbian_size     | 2560              | 设置固件 ROOTFS 分区的大小，功能参考 `-s`            |
