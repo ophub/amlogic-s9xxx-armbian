@@ -15,11 +15,11 @@ inputs:
   armbian_board:
     description: "Set device Board."
     required: false
-    default: "s905d_s905x3"
+    default: "all"
   armbian_kernel:
     description: "Set kernel version."
     required: false
-    default: "5.10.125_5.15.50"
+    default: "6.1.1_5.15.1"
   auto_kernel:
     description: "Auto use the latest kernel."
     required: false
@@ -52,7 +52,7 @@ inputs:
   kernel_version:
     description: "Select kernel version"
     required: false
-    default: "5.10.125_5.15.50"
+    default: "6.1.1_5.15.1"
   kernel_auto:
     description: "Auto use the latest kernel"
     required: false
