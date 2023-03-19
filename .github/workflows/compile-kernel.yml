@@ -20,16 +20,16 @@ on:
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "5.15.85_6.1.1"
+        default: "5.15.1_6.1.1"
         type: choice
         options:
-          - 5.4.225_5.10.160_5.15.85
-          - 5.4.225_5.10.160
-          - 5.10.160_5.15.85
-          - 5.15.85_6.1.1
-          - 5.4.225
-          - 5.10.160
-          - 5.15.85
+          - 5.4.1_5.10.1_5.15.1
+          - 5.4.1_5.10.1
+          - 5.10.1_5.15.1
+          - 5.15.1_6.1.1
+          - 5.4.1
+          - 5.10.1
+          - 5.15.1
           - 6.1.1
       kernel_auto:
         description: "Auto use the latest kernel"
