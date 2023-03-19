@@ -270,8 +270,8 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | Optional           | Defaults          | Description                         |
 | ------------------ | ----------------- | ----------------------------------- |
 | armbian_path       | None              | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
-| armbian_board      | s905d_s905x3      | Set the `board` of the packaged TV Boxes, function reference `-b`    |
-| armbian_kernel     | 5.10.125_5.15.50  | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
+| armbian_board      | all               | Set the `board` of the packaged TV Boxes, function reference `-b`    |
+| armbian_kernel     | 6.1.1_5.15.1      | Set kernel [version](https://github.com/ophub/kernel/tree/main/pub/stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | kernel_repo        | [ophub/kernel](https://github.com/ophub/kernel/tree/main/pub) | Specify the name of the kernel Repository, function reference `-r` |
 | armbian_size       | 2560              | Set the size of the firmware ROOTFS partition, function reference `-s`             |
