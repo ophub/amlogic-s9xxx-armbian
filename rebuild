@@ -224,22 +224,22 @@ init_var() {
     fi
     [[ "${#build_armbian[*]}" -eq "0" ]] && error_msg "The [ BOARD ] is missing, stop building."
 
-    # In KERNEL_BRANCH, query the kernel download directory and specific kernel
-    kernel_down=($(
+    # In KERNEL_BRANCH, query the [ kernel directory ] and [ specific kernel ]
+    kernel_from=($(
         cat ${model_conf} |
             sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' -e 's/\.y/\.1/g' |
             grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{print $8}' |
             sort | uniq | xargs
     ))
-    [[ "${#kernel_down[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_BRANCH ] settings, stop building."
+    [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_BRANCH ] settings, stop building."
 
-    # In KERNEL_BRANCH, the kernel directory name starts with the [ letter ]
-    kernel_dir=($(echo ${kernel_down[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort | uniq | xargs))
+    # In KERNEL_BRANCH, the [ kernel directory ], Start with the [ letter ], such as stable, rk3588, h6, etc.
+    kernel_dir=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort | uniq | xargs))
     # In KERNEL_BRANCH, the [ specified kernel ] is downloaded from the [ stable ] directory
     [[ "${#kernel_dir[*]}" -eq "0" ]] && kernel_dir=("stable")
 
-    # In KERNEL_BRANCH, query the [ specified kernel ]
-    specify_kernel=($(echo ${kernel_down[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
+    # In KERNEL_BRANCH, query the [ specified kernel ], Start with the [ number ], such as 5.15.y, 6.1.y, etc.
+    specify_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
     # Merge the [ specified kernel ] with [ stable kernel ]
     [[ "${#specify_kernel[*]}" -ne "0" ]] && {
         for sk in ${specify_kernel[*]}; do
