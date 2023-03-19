@@ -149,6 +149,7 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
         echo "82. Add the KERNEL_BRANCH name"
     }
+    sed -i "s|KERNEL_BRANCH='6.x.y'|KERNEL_BRANCH='6.1.y'|g" ${ophub_release_file}
 
     # Fix custom banner name
     [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml-${soc_name}"
