@@ -235,21 +235,14 @@ init_var() {
 
     # In KERNEL_BRANCH, the [ kernel directory ], Start with the [ letter ], such as stable, rk3588, h6, etc.
     kernel_dir=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort | uniq | xargs))
-    # In KERNEL_BRANCH, the [ specified kernel ] is downloaded from the [ stable ] directory
-    [[ "${#kernel_dir[*]}" -eq "0" ]] && kernel_dir=("stable")
 
     # In KERNEL_BRANCH, query the [ specified kernel ], Start with the [ number ], such as 5.15.y, 6.1.y, etc.
     specify_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
-    # Merge the [ specified kernel ] with [ stable kernel ]
-    [[ "${#specify_kernel[*]}" -ne "0" ]] && {
-        for sk in ${specify_kernel[*]}; do
-            [[ ! "${stable_kernel[*]}" =~ "$(echo ${sk} | awk -F'.' '{print $1"."$2"."}')" ]] && {
-                stable_kernel=(${stable_kernel[*]} ${sk})
-            }
-        done
-    }
-    # Remove duplicates
-    stable_kernel=($(awk -v RS=' ' '!a[$1]++' <<<${stable_kernel[*]}))
+    # Add the specified kernel directory
+    [[ "${#specify_kernel[*]}" -ne "0" ]] && kernel_dir=(${kernel_dir[*]} "specify")
+
+    # Check the kernel directory
+    [[ "${#kernel_dir[*]}" -eq "0" ]] && error_msg "The [ kernel_dir ] is missing, stop building."
 
     # Convert kernel library address to svn format
     kernel_repo="${kernel_repo//tree\/main/trunk}"
@@ -282,7 +275,7 @@ download_depends() {
 }
 
 query_version() {
-    echo -e "${STEPS} Start querying the latest kernel version..."
+    echo -e "${STEPS} Start querying the latest kernel version for [ $(echo ${kernel_dir[*]} | xargs) ]..."
 
     # Convert kernel library address to API format
     server_kernel_url="${kernel_repo#*com\/}"
@@ -294,10 +287,14 @@ query_version() {
     for k in ${kernel_dir[*]}; do
         {
             # Select the corresponding kernel directory and list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
                 down_kernel_list=(${rk3588_kernel[*]})
             elif [[ "${k}" == "h6" ]]; then
                 down_kernel_list=(${h6_kernel[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                kd="stable"
+                down_kernel_list=(${specify_kernel[*]})
             else
                 down_kernel_list=(${stable_kernel[*]})
             fi
@@ -314,7 +311,7 @@ query_version() {
                 # Check the kernel <SUBLEVEL>, such as [ 15 ]
                 if [[ -n "${gh_token}" ]]; then
                     kernel_sub="$(
-                        curl -s "${server_kernel_url}/${k}" \
+                        curl -s "${server_kernel_url}/${kd}" \
                             --header "authorization: Bearer ${gh_token}" |
                             grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
                             sed -e "s|${kernel_verpatch}.||g" |
@@ -323,7 +320,7 @@ query_version() {
                     query_api="Authenticated user request"
                 else
                     kernel_sub="$(
-                        curl -s "${server_kernel_url}/${k}" |
+                        curl -s "${server_kernel_url}/${kd}" |
                             grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
                             sed -e "s|${kernel_verpatch}.||g" |
                             sort -n | sed -n '$p'
@@ -349,6 +346,9 @@ query_version() {
             elif [[ "${k}" == "h6" ]]; then
                 unset h6_kernel
                 h6_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                unset specify_kernel
+                specify_kernel=(${tmp_arr_kernels[*]})
             else
                 unset stable_kernel
                 stable_kernel=(${tmp_arr_kernels[*]})
@@ -377,16 +377,20 @@ check_kernel() {
 
 download_kernel() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading the kernel files..."
+    echo -e "${STEPS} Start downloading the kernel files for [ $(echo ${kernel_dir[*]} | xargs) ]..."
 
     x="1"
     for k in ${kernel_dir[*]}; do
         {
             # Set the kernel download list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
                 down_kernel_list=(${rk3588_kernel[*]})
             elif [[ "${k}" == "h6" ]]; then
                 down_kernel_list=(${h6_kernel[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                down_kernel_list=(${specify_kernel[*]})
+                kd="stable"
             else
                 down_kernel_list=(${stable_kernel[*]})
             fi
@@ -395,8 +399,8 @@ download_kernel() {
             i="1"
             for kernel_var in ${down_kernel_list[*]}; do
                 if [[ ! -d "${kernel_path}/${k}/${kernel_var}" ]]; then
-                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${k}/${kernel_var} ]"
-                    svn export ${kernel_repo}/${k}/${kernel_var} ${kernel_path}/${k}/${kernel_var} --force
+                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${kd}/${kernel_var} ]"
+                    svn export ${kernel_repo}/${kd}/${kernel_var} ${kernel_path}/${k}/${kernel_var} --force
                 else
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
                 fi
@@ -975,15 +979,16 @@ loop_rebuild() {
             confirm_version
 
             # Determine kernel branch
+            kd="${KERNEL_BRANCH}"
             if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
                 kernel_list=(${rk3588_kernel[*]})
-                kd="rk3588"
             elif [[ "${KERNEL_BRANCH}" == "h6" ]]; then
                 kernel_list=(${h6_kernel[*]})
-                kd="h6"
+            elif [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+                kernel_list=(${specify_kernel[*]})
+                kd="specify"
             else
                 kernel_list=(${stable_kernel[*]})
-                kd="stable"
             fi
 
             i="1"
