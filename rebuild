@@ -397,15 +397,15 @@ download_kernel() {
             # Download the kernel to the storage directory
             i="1"
             for kernel_var in ${down_kernel_list[*]}; do
-                if [[ ! -d "${kernel_path}/${k}/${kernel_var}" ]]; then
+                if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${kd}/${kernel_var} ]"
-                    svn export ${kernel_repo}/${kd}/${kernel_var} ${kernel_path}/${k}/${kernel_var} --force
+                    svn export ${kernel_repo}/${kd}/${kernel_var} ${kernel_path}/${kd}/${kernel_var} --force
                 else
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
                 fi
 
                 # If the kernel contains the sha256sums file, check the files integrity
-                [[ -f "${kernel_path}/${k}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${k}/${kernel_var}"
+                [[ -f "${kernel_path}/${kd}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${kd}/${kernel_var}"
 
                 let i++
             done
@@ -985,7 +985,7 @@ loop_rebuild() {
                 kernel_list=(${h6_kernel[*]})
             elif [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
                 kernel_list=(${specify_kernel[*]})
-                kd="specify"
+                kd="stable"
             else
                 kernel_list=(${stable_kernel[*]})
             fi
