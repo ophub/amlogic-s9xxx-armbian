@@ -1,5 +1,5 @@
 #!/bin/bash
-#========================================================================================
+#================================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -9,13 +9,15 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Description: Run on x86_64 Ubuntu-20.04/22.04, Rebuild armbian.
-# Copyright (C) 2021- https://github.com/unifreq
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021~ https://www.armbian.com
+# Copyright (C) 2021~ https://github.com/unifreq
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: sudo ./rebuild
 # Command optional parameters please refer to the source code repository
 #
-#==================================== Functions list ====================================
+#======================================== Functions list ========================================
 #
 # error_msg          : Output error message
 # process_msg        : Output process message
@@ -39,7 +41,7 @@
 #
 # loop_rebuild       : Loop to rebuild Armbian files
 #
-#============================ Set make environment variables ============================
+#================================ Set make environment variables ================================
 #
 # Related file storage path
 current_path="${PWD}"
@@ -76,23 +78,15 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Kernel files download repository
 kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-# Set stable kernel directory: [ stable ], rk3588 kernel directory: [ rk3588 ]
-kernel_dir=("stable" "rk3588")
 # Set the list of kernels used by default
-stable_kernel=("6.1.15" "5.15.100")
-rk3588_kernel=("5.10.150")
+stable_kernel=("6.1.1" "5.15.1")
+rk3588_kernel=("5.10.1")
+h6_kernel=("6.1.1")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
-# Get the list of devices built by default
-# 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG
-# 8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
-build_armbian=($(
-    cat ${model_conf} |
-        sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
-        grep -E "^[^#].*:yes$" | awk -F':' '{print $12}' |
-        sort | uniq | xargs
-))
+# Initialize the build device
+build_board="all"
 
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
 boot_mb="256"
@@ -113,7 +107,7 @@ WARNING="[\033[93m WARNING \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
-#========================================================================================
+#================================================================================================
 
 error_msg() {
     echo -e "${ERROR} ${1}"
@@ -135,19 +129,13 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "b:k:a:v:r:s:t:n:g:" "${@}")"
+    get_all_ver="$(getopt "b:k:a:r:s:t:n:g:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
         -b | --Board)
             if [[ -n "${2}" ]]; then
-                if [[ "${2}" != "all" ]]; then
-                    unset build_armbian
-                    oldIFS=${IFS}
-                    IFS=_
-                    build_armbian=(${2})
-                    IFS=${oldIFS}
-                fi
+                build_board="${2}"
                 shift
             else
                 error_msg "Invalid -b parameter [ ${2} ]!"
@@ -170,18 +158,6 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -a parameter [ ${2} ]!"
-            fi
-            ;;
-        -v | --Versionbranch)
-            if [[ -n "${2}" ]]; then
-                oldIFS=${IFS}
-                IFS=_
-                kernel_dir=(${2})
-                IFS=${oldIFS}
-                [[ -n "$(echo "${kernel_dir[@]}" | grep -oE "rk3588")" ]] || kernel_dir[$(((${#kernel_dir[@]} + 1)))]="rk3588"
-                shift
-            else
-                error_msg "Invalid -v parameter [ ${2} ]!"
             fi
             ;;
         -r | --kernelRepository)
@@ -231,6 +207,42 @@ init_var() {
         shift
     done
 
+    # Get the list of devices built by default
+    # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG
+    # 8.KERNEL_BRANCH  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
+    if [[ "${build_board}" == "all" ]]; then
+        board_list=""
+        build_armbian=($(
+            cat ${model_conf} |
+                sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
+                grep -E "^[^#].*:yes$" | awk -F':' '{print $12}' |
+                sort | uniq | xargs
+        ))
+    else
+        board_list=":($(echo ${build_board} | sed -e 's/_/\|/g'))"
+        build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
+    fi
+    [[ "${#build_armbian[*]}" -eq "0" ]] && error_msg "The [ BOARD ] is missing, stop building."
+
+    # In KERNEL_BRANCH, query the [ kernel directory ] and [ specific kernel ]
+    kernel_from=($(
+        cat ${model_conf} |
+            sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' -e 's/\.y/\.1/g' |
+            grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{print $8}' |
+            sort | uniq | xargs
+    ))
+    [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_BRANCH ] settings, stop building."
+
+    # In KERNEL_BRANCH, query the [ specified kernel ], Start with the [ number ], such as 5.15.y, 6.1.y, etc.
+    specify_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
+
+    # In KERNEL_BRANCH, the [ kernel directory ], Start with the [ letter ], such as stable, rk3588, h6, etc.
+    kernel_dir=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort | uniq | xargs))
+    # Add the specified kernel directory
+    [[ "${#specify_kernel[*]}" -ne "0" ]] && kernel_dir=(${kernel_dir[*]} "specify")
+    # Check the kernel directory
+    [[ "${#kernel_dir[*]}" -eq "0" ]] && error_msg "The [ kernel_dir ] is missing, stop building."
+
     # Convert kernel library address to svn format
     kernel_repo="${kernel_repo//tree\/main/trunk}"
 }
@@ -262,7 +274,7 @@ download_depends() {
 }
 
 query_version() {
-    echo -e "${STEPS} Start querying the latest kernel version..."
+    echo -e "${STEPS} Start querying the latest kernel version for [ $(echo ${kernel_dir[*]} | xargs) ]..."
 
     # Convert kernel library address to API format
     server_kernel_url="${kernel_repo#*com\/}"
@@ -274,8 +286,14 @@ query_version() {
     for k in ${kernel_dir[*]}; do
         {
             # Select the corresponding kernel directory and list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
                 down_kernel_list=(${rk3588_kernel[*]})
+            elif [[ "${k}" == "h6" ]]; then
+                down_kernel_list=(${h6_kernel[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                kd="stable"
+                down_kernel_list=(${specify_kernel[*]})
             else
                 down_kernel_list=(${stable_kernel[*]})
             fi
@@ -292,7 +310,7 @@ query_version() {
                 # Check the kernel <SUBLEVEL>, such as [ 15 ]
                 if [[ -n "${gh_token}" ]]; then
                     kernel_sub="$(
-                        curl -s "${server_kernel_url}/${k}" \
+                        curl -s "${server_kernel_url}/${kd}" \
                             --header "authorization: Bearer ${gh_token}" |
                             grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
                             sed -e "s|${kernel_verpatch}.||g" |
@@ -301,7 +319,7 @@ query_version() {
                     query_api="Authenticated user request"
                 else
                     kernel_sub="$(
-                        curl -s "${server_kernel_url}/${k}" |
+                        curl -s "${server_kernel_url}/${kd}" |
                             grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
                             sed -e "s|${kernel_verpatch}.||g" |
                             sort -n | sed -n '$p'
@@ -324,6 +342,12 @@ query_version() {
             if [[ "${k}" == "rk3588" ]]; then
                 unset rk3588_kernel
                 rk3588_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "h6" ]]; then
+                unset h6_kernel
+                h6_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                unset specify_kernel
+                specify_kernel=(${tmp_arr_kernels[*]})
             else
                 unset stable_kernel
                 stable_kernel=(${tmp_arr_kernels[*]})
@@ -332,15 +356,11 @@ query_version() {
             let x++
         }
     done
-
-    echo -e "${INFO} The latest version of the stable_kernel: [ ${stable_kernel[*]} ]"
-    echo -e "${INFO} The latest version of the rk3588_kernel: [ ${rk3588_kernel[*]} ]\n"
 }
 
 check_kernel() {
     [[ -n "${1}" ]] && check_path="${1}" || error_msg "Invalid kernel path to check."
     check_files=($(cat "${check_path}/sha256sums" | awk '{print $2}'))
-    m="1"
     for cf in ${check_files[*]}; do
         {
             # Check if file exists
@@ -349,7 +369,6 @@ check_kernel() {
             tmp_sha256sum="$(sha256sum "${check_path}/${cf}" | awk '{print $1}')"
             tmp_checkcode="$(cat ${check_path}/sha256sums | grep ${cf} | awk '{print $1}')"
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "[ ${cf} ]: sha256sum verification failed."
-            let m++
         }
     done
     echo -e "${INFO} All [ ${#check_files[*]} ] kernel files are sha256sum checked to be complete.\n"
@@ -357,14 +376,20 @@ check_kernel() {
 
 download_kernel() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading the kernel files..."
+    echo -e "${STEPS} Start downloading the kernel files for [ $(echo ${kernel_dir[*]} | xargs) ]..."
 
     x="1"
     for k in ${kernel_dir[*]}; do
         {
             # Set the kernel download list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
                 down_kernel_list=(${rk3588_kernel[*]})
+            elif [[ "${k}" == "h6" ]]; then
+                down_kernel_list=(${h6_kernel[*]})
+            elif [[ "${k}" == "specify" ]]; then
+                down_kernel_list=(${specify_kernel[*]})
+                kd="stable"
             else
                 down_kernel_list=(${stable_kernel[*]})
             fi
@@ -372,15 +397,15 @@ download_kernel() {
             # Download the kernel to the storage directory
             i="1"
             for kernel_var in ${down_kernel_list[*]}; do
-                if [[ ! -d "${kernel_path}/${k}/${kernel_var}" ]]; then
-                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${k}/${kernel_var} ]"
-                    svn export ${kernel_repo}/${k}/${kernel_var} ${kernel_path}/${k}/${kernel_var} --force
+                if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
+                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${kd}/${kernel_var} ]"
+                    svn export ${kernel_repo}/${kd}/${kernel_var} ${kernel_path}/${kd}/${kernel_var} --force
                 else
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
                 fi
 
                 # If the kernel contains the sha256sums file, check the files integrity
-                [[ -f "${kernel_path}/${k}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${k}/${kernel_var}"
+                [[ -f "${kernel_path}/${kd}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${kd}/${kernel_var}"
 
                 let i++
             done
@@ -953,12 +978,16 @@ loop_rebuild() {
             confirm_version
 
             # Determine kernel branch
+            kd="${KERNEL_BRANCH}"
             if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
                 kernel_list=(${rk3588_kernel[*]})
-                kd="rk3588"
+            elif [[ "${KERNEL_BRANCH}" == "h6" ]]; then
+                kernel_list=(${h6_kernel[*]})
+            elif [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+                kernel_list=(${specify_kernel[*]})
+                kd="stable"
             else
                 kernel_list=(${stable_kernel[*]})
-                kd="$(echo "${kernel_dir[@]}" | sed -e "s|rk3588||" | xargs)"
             fi
 
             i="1"
@@ -967,13 +996,12 @@ loop_rebuild() {
                     kernel="${k}"
 
                     # Skip inapplicable kernels
-                    if { [[ "${KERNEL_BRANCH}" == "rk3588" ]] && [[ "${kernel:0:5}" != "5.10." ]]; } ||
-                        { [[ "${KERNEL_BRANCH}" == "6.x.y" ]] && [[ "${kernel:0:2}" != "6." ]]; } ||
-                        { [[ "${KERNEL_BRANCH}" == "5.10.y" ]] && [[ "${kernel:0:5}" != "5.10." ]]; } ||
-                        { [[ "${KERNEL_BRANCH}" == "5.15.y" ]] && [[ "${kernel:0:5}" != "5.15." && "${kernel:0:4}" != "5.4." ]]; }; then
-                        echo -e "(${j}.${i}) ${TIPS} The [ ${board} ] device cannot use [ ${kd}/${kernel} ] kernel, skip."
-                        let i++
-                        continue
+                    if [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+                        [[ "${kernel}" != "$(echo ${KERNEL_BRANCH} | awk -F'.' '{print $1"."$2"."}')"* ]] && {
+                            echo -e "(${j}.${i}) ${TIPS} The [ ${board} ] device cannot use [ ${kd}/${kernel} ] kernel, skip."
+                            let i++
+                            continue
+                        }
                     fi
 
                     # Check disk space size
@@ -1029,12 +1057,8 @@ download_kernel
 
 # Show rebuild settings
 echo -e "${INFO} [ ${#build_armbian[*]} ] lists of Armbian board: [ $(echo ${build_armbian[*]} | xargs) ]"
-echo -e "${INFO} [ ${#stable_kernel[*]} ] lists of stable kernel: [ $(echo ${stable_kernel[*]} | xargs) ]"
-echo -e "${INFO} [ ${#rk3588_kernel[*]} ] lists of rk3588 Kernel: [ $(echo ${rk3588_kernel[*]} | xargs) ]"
 echo -e "${INFO} ROOTFS type: [ ${rootfs_type} ] \n"
 # Show server start information
-echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "${INFO} Server memory usage: \n$(free -h) \n"
 echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
 
 # Loop to rebuild armbian

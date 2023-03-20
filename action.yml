@@ -15,15 +15,11 @@ inputs:
   armbian_board:
     description: "Set device Board."
     required: false
-    default: "s905d_s905x3"
+    default: "all"
   armbian_kernel:
     description: "Set kernel version."
     required: false
-    default: "5.10.125_5.15.50"
-  version_branch:
-    description: "Set kernel branch."
-    required: false
-    default: "stable"
+    default: "6.1.1_5.15.1"
   auto_kernel:
     description: "Auto use the latest kernel."
     required: false
@@ -56,7 +52,7 @@ inputs:
   kernel_version:
     description: "Select kernel version"
     required: false
-    default: "5.10.125_5.15.50"
+    default: "6.1.1_5.15.1"
   kernel_auto:
     description: "Auto use the latest kernel"
     required: false
@@ -123,7 +119,6 @@ runs:
             [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
             [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
-            [[ -n "${{ inputs.version_branch }}" ]] && make_command="${make_command} -v ${{ inputs.version_branch }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
