@@ -9,8 +9,9 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Description: Run on Armbian, Compile the kernel.
-# Copyright (C) 2021- https://github.com/unifreq
-# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2021~ https://www.kernel.org
+# Copyright (C) 2021~ https://github.com/unifreq
+# Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-kernel
 # Command optional parameters please refer to the source code repository
@@ -53,7 +54,7 @@ ophub_release_file="/etc/ophub-release"
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
-build_kernel=("6.1.15" "5.15.100")
+build_kernel=("6.1.1" "5.15.1")
 auto_kernel="true"
 custom_name="-ophub"
 # Set the kernel compile object, options: dtbs / all
@@ -605,8 +606,6 @@ echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel from: [ ${code_owner} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
 # Show server start information
-echo -e "${INFO} Server CPU configuration information: \n$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-echo -e "${INFO} Server memory usage: \n$(free -h) \n"
 echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
 
 # Loop to compile the kernel
