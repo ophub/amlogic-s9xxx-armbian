@@ -426,49 +426,14 @@ blacklist meson_ir
 
 #### 12.7.1 使用 interfaces 设置网络
 
-网络配置文件 [/etc/network/interfaces](../armbian-files/common-files/etc/network/interfaces) 的内容如下：
+网络配置文件 `/etc/network/interfaces` 的默认内容如下：
 
 ```yaml
 source /etc/network/interfaces.d/*
-
 # Network is managed by Network manager
-# You can choose one of the following two IP setting methods:
-# Use # to disable another setting method
-
-
-# 01. Enable dynamic DHCP to assign IP
-auto eth0
-iface eth0 inet dhcp
-        hwaddress ether 12:34:56:78:9A:BC
-
-
-# 02. Enable static IP settings(IP is modified according to the actual)
-#auto eth0
-#allow-hotplug eth0
-#iface eth0 inet static
-#address 192.168.1.100
-#netmask 255.255.255.0
-#gateway 192.168.1.6
-#dns-nameservers 192.168.1.6
-
-
-# 03. Docker install OpenWrt and communicate with each other
-#allow-hotplug eth0
-#no-auto-down eth0
-#auto eth0
-#iface eth0 inet manual
-#
-#auto macvlan
-#iface macvlan inet dhcp
-#        hwaddress ether 12:34:56:78:9a:bc
-#        pre-up ip link add macvlan link eth0 type macvlan mode bridge
-#        post-down ip link del macvlan link eth0 type macvlan mode bridge
-#
-#auto lo
-#iface lo inet loopback
+auto lo
+iface lo inet loopback
 ```
-
-默认采用 DHCP 动态 分配 IP 的策略（方法1），由 Armbian 所接入的网络路由器自动分配 IP。如果想改为静态 IP，可以把设置方法 1 禁用或删除，启用方法 2 的静态 IP 设置。
 
 ##### 12.7.1.1 由 DHCP 动态分配 IP 地址
 
