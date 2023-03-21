@@ -415,49 +415,14 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 ### 12.7 Network settings
 
-The content of the network configuration file [/etc/network/interfaces](../armbian-files/common-files/etc/network/interfaces) is as follows:
+The default content of the network configuration file `/etc/network/interfaces` is as follows:
 
 ```yaml
 source /etc/network/interfaces.d/*
-
 # Network is managed by Network manager
-# You can choose one of the following two IP setting methods:
-# Use # to disable another setting method
-
-
-# 01. Enable dynamic DHCP to assign IP
-auto eth0
-iface eth0 inet dhcp
-        hwaddress ether 12:34:56:78:9A:BC
-
-
-# 02. Enable static IP settings(IP is modified according to the actual)
-#auto eth0
-#allow-hotplug eth0
-#iface eth0 inet static
-#address 192.168.1.100
-#netmask 255.255.255.0
-#gateway 192.168.1.6
-#dns-nameservers 192.168.1.6
-
-
-# 03. Docker install OpenWrt and communicate with each other
-#allow-hotplug eth0
-#no-auto-down eth0
-#auto eth0
-#iface eth0 inet manual
-#
-#auto macvlan
-#iface macvlan inet dhcp
-#        hwaddress ether 12:34:56:78:9a:bc
-#        pre-up ip link add macvlan link eth0 type macvlan mode bridge
-#        post-down ip link del macvlan link eth0 type macvlan mode bridge
-#
-#auto lo
-#iface lo inet loopback
+auto lo
+iface lo inet loopback
 ```
-
-By default, the DHCP dynamic IP allocation strategy (method 1) is used, and the IP is automatically allocated by the network router connected to Armbian. If you want to change to static IP, you can disable or delete the setting method 1, and enable the static IP setting of method 2.
 
 #### 12.7.1 Dynamic IP address assignment by DHCP
 
