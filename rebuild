@@ -891,10 +891,6 @@ refactor_rootfs() {
     mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
     random_macaddr="9E:61${mac_end}"
 
-    # Set interfaces macaddr
-    interfaces_file="etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
     # Optimize wifi/bluetooth module
     [[ -d "usr/lib/firmware/brcm" ]] && (
         cd usr/lib/firmware/brcm/ && mv -f ../*.hcd . 2>/dev/null
