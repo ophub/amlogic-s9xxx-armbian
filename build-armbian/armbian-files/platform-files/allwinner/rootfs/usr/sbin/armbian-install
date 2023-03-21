@@ -122,11 +122,6 @@ init_var() {
     ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The new UUID is invalid, cannot continue."
-
-    # Get random macaddr
-    mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
-    random_macaddr="9E:61${mac_end}"
 }
 
 # Set the type of file system
@@ -331,10 +326,7 @@ EOF
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}
 
-    # Set interfaces macaddr
-    interfaces_file="${DIR_INSTALL}/etc/network/interfaces"
-    [[ -f "${interfaces_file}" ]] && sed -i "s|hwaddress ether.*|hwaddress ether ${random_macaddr}:AA|g" ${interfaces_file}
-
+    # Remove useless scripts
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
 
     sync && sleep 3
