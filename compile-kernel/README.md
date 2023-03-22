@@ -6,6 +6,10 @@ This kernel can be used in `Armbian` and `OpenWrt` systems. For example [amlogic
 
 You can adjust the configuration of the kernel as needed, such as adding drivers and patches. It is also possible to compile personalized signature kernels with special meanings according to mood, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` and so on.
 
+## Kernel Repository
+
+There is a compiled kernel in the [ophub/kernel](https://github.com/ophub/kernel) repository. There are more historical versions of the kernel stored in [Releases](https://github.com/ophub/kernel/releases).
+
 ## Local compilation
 
 - ### Run under Ubuntu system
