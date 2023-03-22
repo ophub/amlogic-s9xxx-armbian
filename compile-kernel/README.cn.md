@@ -6,6 +6,10 @@
 
 你可以根据需要对内核的配置进行调整，如添加驱动和补丁。也可以根据心情编译具有特殊意义的个性化签名内核，如 `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` 等等。
 
+## 内核存储库
+
+在 [ophub/kernel](https://github.com/ophub/kernel) 存储库里有已经编译好的内核。在 [Releases](https://github.com/ophub/kernel/releases) 里存放了更多内核的历史版本。
+
 ## 本地编译
 
 - ### 在 Ubuntu 系统下运行
@@ -125,4 +129,5 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 - #### 将内核安装到已有的 OpenWrt 系统
 
 可以使用 [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.cn.md) 插件将编译好的内核安装到已有的 OpenWrt 系统中，具体操作方法详见：[升级 OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.cn.md#升级-openwrt)
+
 
