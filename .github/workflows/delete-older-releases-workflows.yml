@@ -9,15 +9,15 @@ on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
+      delete_releases:
+        description: "Delete Releases file?"
+        required: true
+        default: true
+        type: boolean
       delete_tags:
         description: "Delete related Tags?"
         required: false
         default: true
-        type: boolean
-      out_log:
-        description: "Output a list log for each step?"
-        required: false
-        default: false
         type: boolean
       releases_keep_latest:
         description: "How many latest releases to keep."
@@ -42,6 +42,11 @@ on:
         description: "Keyword of the keep releases."
         required: false
         default: "s9xxx"
+      delete_workflows:
+        description: "Delete workflows records?"
+        required: true
+        default: true
+        type: boolean
       workflows_keep_day:
         description: "Days to keep workflows."
         required: false
@@ -65,6 +70,11 @@ on:
         description: "keywords for keep workflows."
         required: false
         default: ""
+      out_log:
+        description: "Output a list log for each step?"
+        required: false
+        default: false
+        type: boolean
 
 env:
   TZ: America/New_York
@@ -89,10 +99,12 @@ jobs:
       - name: Delete releases and workflows runs
         uses: ophub/delete-releases-workflows@main
         with:
+          delete_releases: ${{ inputs.delete_releases }}
           delete_tags: ${{ inputs.delete_tags }}
-          out_log: ${{ inputs.out_log }}
           releases_keep_latest: ${{ inputs.releases_keep_latest }}
           releases_keep_keyword: ${{ inputs.releases_keep_keyword }}
+          delete_workflows: ${{ inputs.delete_workflows }}
           workflows_keep_day: ${{ inputs.workflows_keep_day }}
           workflows_keep_keyword: ${{ inputs.workflows_keep_keyword }}
+          out_log: ${{ inputs.out_log }}
           gh_token: ${{ secrets.GH_TOKEN }}
