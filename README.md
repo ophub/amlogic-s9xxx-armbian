@@ -66,13 +66,15 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-| Optional  | Default     | Value       | Description                   |
-| -------   | -------     | ----------  | ---------------------------   |
+| Optional  | Default     | Value         | Description                   |
+| --------- | ----------- | ------------- | ----------------------------- |
 | -k        | latest      | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
 | -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
-| -m        | no          | yes/no      | Use Mainline u-boot           |
-| -b        | yes         | yes/no      | Automatically backup the current system kernel  |
-| -r        | ""          | ""          | [Rescue] Update eMMC with system kernel from USB |
+| -m        | no          | yes/no        | Use Mainline u-boot           |
+| -b        | yes         | yes/no        | Automatically backup the current system kernel  |
+| -d        | releases    | releases/repo | Set the kernel to download from [Releases](https://github.com/ophub/kernel/releases) or [Repo](https://github.com/ophub/kernel/tree/main/pub) |
+| -c        | ""          | domain-name   | Set the cdn domain name for accelerated access to github.com  |
+| -r        | ""          | ""            | [Rescue] Update eMMC with system kernel from USB |
 
 Example: `armbian-update -k 5.15.50 -v dev`
 
