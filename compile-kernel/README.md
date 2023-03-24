@@ -8,7 +8,7 @@ You can adjust the configuration of the kernel as needed, such as adding drivers
 
 ## Kernel Repository
 
-There is a compiled kernel in the [ophub/kernel](https://github.com/ophub/kernel) repository. There are more historical versions of the kernel stored in [Releases](https://github.com/ophub/kernel/releases).
+There are compiled kernels in [Releases](https://github.com/ophub/kernel/releases) of [ophub/kernel](https://github.com/ophub/kernel).
 
 ## Local compilation
 
