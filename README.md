@@ -72,7 +72,7 @@ armbian-update
 | -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
 | -m        | no          | yes/no        | Use Mainline u-boot           |
 | -b        | yes         | yes/no        | Automatically backup the current system kernel  |
-| -r        | ophub/kernel | `<owner>/<repo>` | Set the kernel download repository |
+| -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
 | -c        | ""          | domain-name   | Set the cdn domain name for accelerated access to github.com  |
 | -s        | ""          | ""            | [SOS] Restore eMMC with system kernel from USB |
 
