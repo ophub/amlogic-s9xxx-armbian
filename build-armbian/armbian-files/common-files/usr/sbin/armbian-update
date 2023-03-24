@@ -324,23 +324,22 @@ download_kernel() {
     if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
         if [[ "${download_from}" == "repo" ]]; then
             # Download the kernel from [ repo ]
-            kernel_down_from="https://github.com/${kernel_repo}/trunk/pub/${kernel_tag}"
+            kernel_down_from="https://github.com/${kernel_repo}/trunk/pub/${kernel_tag}/${inputs_kernel}"
 
-            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from/trunk/tree\/main}/${inputs_kernel} ]"
+            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from/trunk/tree\/main} ]"
             echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
-            svn export ${kernel_down_from}/${inputs_kernel} ${kernel_path} --force
+            svn export ${kernel_down_from} ${kernel_path} --force
             [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
         else
             # Download the kernel from [ releases ]
-            kernel_down_from="${github_cdn}https://github.com/${kernel_repo}/releases/download/kernel_${kernel_tag}"
+            kernel_down_from="${github_cdn}https://github.com/${kernel_repo}/releases/download/kernel_${kernel_tag}/${inputs_kernel}.tar.gz"
 
-            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from}/${inputs_kernel}.tar.gz ]"
+            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from} ]"
             echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
-            wget "${kernel_down_from}/${inputs_kernel}.tar.gz" -q -P "${kernel_path}"
+            wget "${kernel_down_from}" -q -P "${kernel_path}"
             [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
-            # Unpack the kernel and redefine the kernel_path
-            cd ${kernel_path}
-            tar -xf "${inputs_kernel}.tar.gz"
+            tar -xf "${kernel_path}/${inputs_kernel}.tar.gz" -C "${kernel_path}"
+            [[ "${?}" -ne "0" ]] && error_msg "[ ${inputs_kernel} ] kernel decompression failed, stop updating."
             kernel_path="${kernel_path}/${inputs_kernel}"
         fi
     else
