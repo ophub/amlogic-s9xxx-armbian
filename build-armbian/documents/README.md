@@ -320,13 +320,15 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-| Optional  | Default     | Value       | Description                   |
-| -------   | -------     | ----------  | ---------------------------   |
+| Optional  | Default     | Value         | Description                   |
+| --------- | ----------- | ------------- | ----------------------------- |
 | -k        | latest      | [kernel name](https://github.com/ophub/kernel/tree/main/pub/stable)  | Set the kernel name |
 | -v        | stable      | stable/rk3588/dev  | Set the kernel version branch |
-| -m        | no          | yes/no      | Use Mainline u-boot           |
-| -b        | yes         | yes/no      | Automatically backup the current system kernel  |
-| -r        | ""          | ""          | [Rescue] Update eMMC with system kernel from USB |
+| -m        | no          | yes/no        | Use Mainline u-boot           |
+| -b        | yes         | yes/no        | Automatically backup the current system kernel  |
+| -d        | releases    | releases/repo | Set the kernel to download from [Releases](https://github.com/ophub/kernel/releases) or [Repo](https://github.com/ophub/kernel/tree/main/pub) |
+| -c        | ""          | domain-name   | Set the cdn domain name for accelerated access to github.com  |
+| -r        | ""          | ""            | [Rescue] Update eMMC with system kernel from USB |
 
 Example: `armbian-update -k 5.15.50 -v dev`
 
@@ -341,6 +343,8 @@ armbian-update
 When the system cannot be started from eMMC due to incomplete updates and other problems caused by special reasons, you can start any kernel version of the Armian system from USB, and run the `armbian-update -r` command to update the system kernel in USB to eMMC to achieve the purpose of rescue.
 
 If the network where you access github.com is blocked and you cannot download updates online, you can manually download the kernel, upload it to any directory on the Armbian system, enter the kernel directory, and execute `armbian-update` for local installation. If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
+
+If your local network access to github.com is not smooth, you can add CDN acceleration service through `armbian-update -c https://xxxcdn.com/`, please check the accelerated CDN domain name suitable for local use.
 
 ## 11. Install common software
 

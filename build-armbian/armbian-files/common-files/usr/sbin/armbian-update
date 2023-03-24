@@ -33,6 +33,7 @@
 # check_depends      : Check dependencies
 # get_textoffset     : Get kernel TEXT_OFFSET
 # init_var           : Initialize all variables
+# query_version      : Query the latest kernel version
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files list
 # backup_kernel      : Backup current kernel
@@ -52,10 +53,15 @@ auto_backup_kernel="yes"
 rescue_path="/ddbr/rescue"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
-# Set the kernel download repository
-kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
-# Set the kernel directory
-kernel_dir=("stable" "rk3588" "h6" "dev")
+# Set the kernel download repository from github.com
+kernel_repo="ophub/kernel"
+kernel_api="https://api.github.com/repos/${kernel_repo}"
+# Set default download kernel from: [ releases / repo ]
+download_from="releases"
+# Set the kernel version branch
+version_branch=("stable" "rk3588" "h6" "dev")
+# Set github.com to access CDN
+github_cdn=""
 # Set default installation mainline u-boot (-m)
 auto_mainline_uboot="no"
 
@@ -80,7 +86,7 @@ check_depends() {
     echo -e "${STEPS} Start checking dependencies..."
 
     is_missing="0"
-    necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils")
+    necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils" "jq")
     i="1"
     for package in ${necessary_packages[*]}; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
@@ -129,7 +135,7 @@ init_var() {
     [[ -z "${KERNEL_BRANCH}" ]] && error_msg "[ KERNEL_BRANCH ] is missing, stop updating the kernel."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:v:m:b:" "${@}")"
+    get_all_ver="$(getopt "k:d:v:m:b:c:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -141,9 +147,17 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
+        -d | --Download_from)
+            if [[ -n "${2}" ]]; then
+                download_from="${2}"
+                shift
+            else
+                error_msg "Invalid -d parameter [ ${2} ]!"
+            fi
+            ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                [[ -n "$(echo "${kernel_dir[@]}" | tr " " "\n" | grep -w "^${2}$")" ]] && KERNEL_BRANCH="${2}"
+                [[ -n "$(echo "${version_branch[@]}" | tr " " "\n" | grep -w "^${2}$")" ]] && KERNEL_BRANCH="${2}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
@@ -165,6 +179,14 @@ init_var() {
                 error_msg "Invalid -b parameter [ ${2} ]!"
             fi
             ;;
+        -c | --cdn)
+            if [[ -n "${2}" ]]; then
+                github_cdn="${2}"
+                shift
+            else
+                error_msg "Invalid -c parameter [ ${2} ]!"
+            fi
+            ;;
         *)
             error_msg "Invalid option [ ${1} ]!"
             ;;
@@ -174,29 +196,21 @@ init_var() {
 
     # Set kernel download directory
     if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
-        kernel_download_dir="rk3588"
+        kernel_tag="rk3588"
     elif [[ "${KERNEL_BRANCH}" == "h6" ]]; then
-        kernel_download_dir="h6"
+        kernel_tag="h6"
     elif [[ "${KERNEL_BRANCH}" == "dev" ]]; then
-        kernel_download_dir="dev"
+        kernel_tag="dev"
     else
-        kernel_download_dir="stable"
+        kernel_tag="stable"
     fi
 
     # Display settings results
-    echo -e "${INFO} Armbian PLATFORM: [ ${PLATFORM} ]"
+    echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
+    echo -e "${INFO} Kernel download from: [ ${download_from} ]"
+    echo -e "${INFO} Kernel download cdn: [ ${github_cdn} ]"
     echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
-    echo -e "${INFO} Kernel download directory: [ ${kernel_download_dir} ]"
-    echo -e "${INFO} Kernel name: [ ${inputs_kernel} ]"
-
-    # Convert kernel library address to svn format
-    [[ "${kernel_repo}" == http* && -n "$(echo "${kernel_repo}" | grep "tree/main")" ]] && kernel_repo="${kernel_repo//tree\/main/trunk}"
-    kernel_repo="${kernel_repo}/${kernel_download_dir}"
-
-    # Convert kernel library address to API format
-    kernel_api="${kernel_repo#*com\/}"
-    kernel_api="${kernel_api//trunk/contents}"
-    kernel_api="https://api.github.com/repos/${kernel_api}"
+    echo -e "${INFO} Kernel version: [ ${inputs_kernel} ]"
 
     # Find the partition where root is located
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
@@ -217,15 +231,20 @@ init_var() {
         error_msg "Unable to recognize the disk type of ${ROOT_PTNAME}!"
         ;;
     esac
-    echo -e "${INFO} Armbian running: [ /dev/${DISK_NAME} ]."
+    echo -e "${INFO} Armbian running: [ /dev/${DISK_NAME} ]"
+
+    # Checking network
+    curl --connect-timeout 10 -s "github.com" >/dev/null 2>&1 || {
+        error_msg "Your network cannot access [ github.com ], unable to download the kernel."
+    }
 
     sync && echo ""
 }
 
-# Download the kernel
-download_kernel() {
+# Query the latest kernel version
+query_version() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading kernel..."
+    echo -e "${STEPS} Start querying kernel version..."
 
     # Query the current version
     current_kernel_signature="$(uname -r)"
@@ -243,7 +262,7 @@ download_kernel() {
     [[ "${try_tarfile}" -ge "4" && -n "${try_boot}" ]] && {
         # Use local kernel
         inputs_kernel="${try_boot}"
-        echo -e "${INFO} Use local kernel: [ ${inputs_kernel} ]"
+        echo -e "${INFO} Found the kernel in the current directory: [ ${inputs_kernel} ]"
 
         # Move the kernel to the temporary directory
         echo -e "${INFO} Move kernel files to temporary directory: [ ${kernel_path} ]"
@@ -252,25 +271,80 @@ download_kernel() {
         [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files to [ ${kernel_path} ] directory, stop updating."
     }
 
-    # Automatically query the latest kernel version
+    # Query the latest kernel version
     [[ -z "${inputs_kernel}" ]] && {
-        # E.g: latest_version="160"
-        latest_version="$(curl -s "${kernel_api}" | grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" | sed -e "s/${kernel_verpatch}.//g" | sort -n | sed -n '$p')"
-        [[ ! -z "${latest_version}" ]] || error_msg "Failed to get the version on the server."
+        if [[ "${download_from}" == "repo" ]]; then
+            echo -e "${INFO} Query the latest kernel version in the [ repository ]"
+            latest_version="$(
+                curl -s -H "Accept: application/vnd.github+json" \
+                    ${kernel_api}/contents/pub/${kernel_tag} |
+                    jq -r '.[].name' |
+                    grep -oE "${kernel_verpatch}\.[0-9]+" |
+                    sort -rV | head -n 1
+            )"
+        else
+            echo -e "${INFO} Query the latest kernel version in the [ releases ]"
+            latest_version="$(
+                curl -s -H "Accept: application/vnd.github+json" \
+                    ${kernel_api}/releases/tags/kernel_${kernel_tag} |
+                    jq -r '.assets[].name' |
+                    grep -oE "${kernel_verpatch}\.[0-9]+" |
+                    sort -rV | head -n 1
+            )"
+        fi
+        [[ -n "${latest_version}" ]] || error_msg "Failed to get the version on the server."
 
-        # Use the latest version of the server's kernel
-        inputs_kernel="${kernel_verpatch}.${latest_version}"
-        echo -e "${INFO} Current version: [ ${current_kernel} ], Latest version: [ ${inputs_kernel} ]."
+        # Use the latest version
+        inputs_kernel="${latest_version}"
     }
 
+    echo -e "${INFO} Current version: [ ${current_kernel} ], updated version: [ ${inputs_kernel} ]"
     # Kernel version comparison
-    if [[ "${current_kernel}" == "${inputs_kernel}" ]]; then
-        echo -e "${FINISH} Already the latest version, no need to update." && exit 0
-    elif [[ "$(ls ${kernel_path}/*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
-        echo -e "${INFO} Start downloading the kernel from [ ${kernel_repo/trunk/tree\/main}/${inputs_kernel} ]"
-        echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
-        svn export ${kernel_repo}/${inputs_kernel} ${kernel_path} --force
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
+    [[ "${current_kernel}" == "${inputs_kernel}" ]] && {
+        echo -e "${FINISH} Already the latest version, no need to update."
+        exit 0
+    }
+
+    # Check for inapplicable kernels
+    if [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+        [[ "${inputs_kernel}" != "$(echo ${KERNEL_BRANCH} | sed -e 's/\.[xy]/\.1/g' | awk -F'.' '{print $1"."$2"."}')"* ]] && {
+            error_msg "According to the [ ${ophub_release_file} ] file settings, the [ ${inputs_kernel} ] kernel is not available."
+        }
+    fi
+
+    sync && echo ""
+}
+
+# Download the kernel
+download_kernel() {
+    cd ${current_path}
+    echo -e "${STEPS} Start downloading kernel..."
+
+    # Download kernel
+    if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
+        if [[ "${download_from}" == "repo" ]]; then
+            # Download the kernel from [ repo ]
+            kernel_down_from="https://github.com/${kernel_repo}/trunk/pub/${kernel_tag}"
+
+            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from/trunk/tree\/main}/${inputs_kernel} ]"
+            echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
+            svn export ${kernel_down_from}/${inputs_kernel} ${kernel_path} --force
+            [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
+        else
+            # Download the kernel from [ releases ]
+            kernel_down_from="${github_cdn}https://github.com/${kernel_repo}/releases/download/kernel_${kernel_tag}"
+
+            echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from}/${inputs_kernel}.tar.gz ]"
+            echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
+            wget "${kernel_down_from}/${inputs_kernel}.tar.gz" -q -P "${kernel_path}"
+            [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
+            # Unpack the kernel and redefine the kernel_path
+            cd ${kernel_path}
+            tar -xf "${inputs_kernel}.tar.gz"
+            kernel_path="${kernel_path}/${inputs_kernel}"
+        fi
+    else
+        echo -e "${INFO} Use local kernel: [ ${inputs_kernel} ]"
     fi
 
     sync && echo ""
@@ -281,17 +355,11 @@ check_kernel() {
     cd ${kernel_path}
     echo -e "${STEPS} Start checking the kernel..."
 
-    # Check for inapplicable kernels
-    if [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
-        [[ "${inputs_kernel}" != "$(echo ${KERNEL_BRANCH} | sed -e 's/\.[xy]/\.1/g' | awk -F'.' '{print $1"."$2"."}')"* ]] && {
-            error_msg "Kernel [ ${inputs_kernel} ] is not available for this device."
-        }
-    fi
-
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot:5:-7}"
     KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
+    [[ -z "${KERNEL_VERSION}" ]] && error_msg "Invalid kernel in [ ${kernel_path} ]"
     echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
 
     # Check if the file is added with TEXT_OFFSET patch
@@ -392,7 +460,7 @@ backup_kernel() {
     cd ${backup_path}/${current_kernel}
     sha256sum * >sha256sums
     echo -e "${INFO} The [ sha256sums ] file has been generated."
-    echo -e "${INFO} The current kernel backup path: [ ${backup_path}/${current_kernel} ]. It can be deleted if it is not needed."
+    echo -e "${INFO} The current kernel backup path: [ ${backup_path}/${current_kernel} ]."
 
     sync && echo ""
 }
@@ -550,6 +618,7 @@ if [[ "${1}" != "-r" ]]; then
     # Start updating the kernel
     check_depends
     init_var "${@}"
+    query_version
     download_kernel
     check_kernel
     [[ "${auto_backup_kernel}" == "yes" ]] && backup_kernel
