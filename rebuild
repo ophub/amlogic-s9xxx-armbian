@@ -76,8 +76,8 @@ firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
 # Convert firmware library address to svn format
 firmware_repo="${firmware_repo//tree\/main/trunk}"
 
-# Kernel files download repository
-kernel_repo="https://github.com/ophub/kernel/tree/main/pub"
+# Set the kernel download repository from github.com
+kernel_repo="ophub/kernel"
 # Set the list of kernels used by default
 stable_kernel=("6.1.1" "5.15.1")
 rk3588_kernel=("5.10.1")
@@ -243,8 +243,9 @@ init_var() {
     # Check the kernel directory
     [[ "${#kernel_dir[*]}" -eq "0" ]] && error_msg "The [ kernel_dir ] is missing, stop building."
 
-    # Convert kernel library address to svn format
-    kernel_repo="${kernel_repo//tree\/main/trunk}"
+    # Convert kernel library address to api format
+    [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
+    kernel_api="https://api.github.com/repos/${kernel_repo}"
 }
 
 find_armbian() {
@@ -276,11 +277,6 @@ download_depends() {
 query_version() {
     echo -e "${STEPS} Start querying the latest kernel version for [ $(echo ${kernel_dir[*]} | xargs) ]..."
 
-    # Convert kernel library address to API format
-    server_kernel_url="${kernel_repo#*com\/}"
-    server_kernel_url="${server_kernel_url//trunk/contents}"
-    server_kernel_url="https://api.github.com/repos/${server_kernel_url}"
-
     # Check the version on the kernel library
     x="1"
     for k in ${kernel_dir[*]}; do
@@ -307,28 +303,29 @@ query_version() {
                 # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
                 kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
-                # Check the kernel <SUBLEVEL>, such as [ 15 ]
                 if [[ -n "${gh_token}" ]]; then
-                    kernel_sub="$(
-                        curl -s "${server_kernel_url}/${kd}" \
+                    latest_version="$(
+                        curl -s -H "Accept: application/vnd.github+json" \
                             --header "authorization: Bearer ${gh_token}" |
-                            grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
-                            sed -e "s|${kernel_verpatch}.||g" |
-                            sort -n | sed -n '$p'
+                            ${kernel_api}/releases/tags/kernel_${kd} |
+                            jq -r '.assets[].name' |
+                            grep -oE "${kernel_verpatch}\.[0-9]+" |
+                            sort -rV | head -n 1
                     )"
                     query_api="Authenticated user request"
                 else
-                    kernel_sub="$(
-                        curl -s "${server_kernel_url}/${kd}" |
-                            grep "name" | grep -oE "${kernel_verpatch}.[0-9]+" |
-                            sed -e "s|${kernel_verpatch}.||g" |
-                            sort -n | sed -n '$p'
+                    latest_version="$(
+                        curl -s -H "Accept: application/vnd.github+json" \
+                            ${kernel_api}/releases/tags/kernel_${kd} |
+                            jq -r '.assets[].name' |
+                            grep -oE "${kernel_verpatch}\.[0-9]+" |
+                            sort -rV | head -n 1
                     )"
                     query_api="Unauthenticated user request"
                 fi
 
-                if [[ "${?}" -eq "0" && -n "${kernel_sub}" ]]; then
-                    tmp_arr_kernels[${i}]="${kernel_verpatch}.${kernel_sub}"
+                if [[ "${?}" -eq "0" && -n "${latest_version}" ]]; then
+                    tmp_arr_kernels[${i}]="${latest_version}"
                 else
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
@@ -398,8 +395,15 @@ download_kernel() {
             i="1"
             for kernel_var in ${down_kernel_list[*]}; do
                 if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
-                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel loading from [ ${kernel_repo/trunk/tree\/main}/${kd}/${kernel_var} ]"
-                    svn export ${kernel_repo}/${kd}/${kernel_var} ${kernel_path}/${kd}/${kernel_var} --force
+                    kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_${kd}/${kernel_var}.tar.gz"
+                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
+
+                    mkdir -p ${kernel_path}/${kd}
+                    wget "${kernel_down_from}" -q -P "${kernel_path}/${kd}"
+                    [[ "${?}" -ne "0" ]] && error_msg "Failed to download the kernel files from the server."
+
+                    tar -xf "${kernel_path}/${kd}/${kernel_var}.tar.gz" -C "${kernel_path}/${kd}"
+                    [[ "${?}" -ne "0" ]] && error_msg "[ ${kernel_var} ] kernel decompression failed."
                 else
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
                 fi
@@ -409,6 +413,9 @@ download_kernel() {
 
                 let i++
             done
+
+            # Delete downloaded kernel temporary files
+            rm -f ${kernel_path}/${kd}/*.tar.gz
             sync
 
             let x++
