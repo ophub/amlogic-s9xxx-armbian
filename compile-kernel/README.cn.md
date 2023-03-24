@@ -8,7 +8,7 @@
 
 ## 内核存储库
 
-在 [ophub/kernel](https://github.com/ophub/kernel) 存储库里有已经编译好的内核。在 [Releases](https://github.com/ophub/kernel/releases) 里存放了更多内核的历史版本。
+在 [ophub/kernel](https://github.com/ophub/kernel) 的 [Releases](https://github.com/ophub/kernel/releases) 里有已经编译好的内核。
 
 ## 本地编译
 

@@ -208,6 +208,7 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
+    echo -e "${INFO} Kernel download repository: [ ${kernel_repo} ]"
     echo -e "${INFO} Kernel download cdn: [ ${github_cdn} ]"
     echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
     echo -e "${INFO} Kernel version: [ ${inputs_kernel} ]"
@@ -273,7 +274,6 @@ query_version() {
 
     # Query the latest kernel version
     [[ -z "${inputs_kernel}" ]] && {
-        echo -e "${INFO} Query the latest kernel version in the [ releases ]"
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
                 ${kernel_api}/releases/tags/kernel_${kernel_tag} |
