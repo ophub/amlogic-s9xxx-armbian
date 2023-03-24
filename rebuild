@@ -305,8 +305,9 @@ query_version() {
 
                 if [[ -n "${gh_token}" ]]; then
                     latest_version="$(
-                        curl -s -H "Accept: application/vnd.github+json" \
-                            --header "authorization: Bearer ${gh_token}" |
+                        curl -s \
+                            -H "Accept: application/vnd.github+json" \
+                            -H "Authorization: Bearer ${gh_token}" \
                             ${kernel_api}/releases/tags/kernel_${kd} |
                             jq -r '.assets[].name' |
                             grep -oE "${kernel_verpatch}\.[0-9]+" |
@@ -315,7 +316,8 @@ query_version() {
                     query_api="Authenticated user request"
                 else
                     latest_version="$(
-                        curl -s -H "Accept: application/vnd.github+json" \
+                        curl -s \
+                            -H "Accept: application/vnd.github+json" \
                             ${kernel_api}/releases/tags/kernel_${kd} |
                             jq -r '.assets[].name' |
                             grep -oE "${kernel_verpatch}\.[0-9]+" |
