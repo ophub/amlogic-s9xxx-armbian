@@ -222,7 +222,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | 参数  | 含义       | 说明        |
 | ---- | ---------- | ---------- |
 | -b   | Board      | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 使用 `all` 表示全部型号。型号代码详见 [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) 中的 `BOARD` 设置。 |
-| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable` 目录里的内核有效，其他例如 `rk3588` 等内核由 [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) 文件指定。  |
+| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable` 的内核有效，其他例如 `rk3588` 等内核由 [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) 文件指定。  |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.10.125 的同系列是否有更新的版本，如有 5.10.125 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -r   | KernelRepo | 指定 github.com 内核仓库的 `<owner>/<repo>`，如 `ophub/kernel` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，默认大小为 2560MiB, 系统大小必须大于 2048MiB. 例如： `-s 2560` |
