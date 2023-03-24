@@ -11,13 +11,13 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
   - [2. 设置隐私变量 GITHUB\_TOKEN](#2-设置隐私变量-github_token)
   - [3. Fork 仓库并设置 GH\_TOKEN](#3-fork-仓库并设置-gh_token)
-  - [4. 个性化 Armbian 固件定制文件说明](#4-个性化-armbian-固件定制文件说明)
-  - [5. 编译固件](#5-编译固件)
+  - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
+  - [5. 编译系统](#5-编译系统)
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
-    - [5.3 自定义默认固件配置](#53-自定义默认固件配置)
-  - [6. 保存固件](#6-保存固件)
-  - [7. 下载固件](#7-下载固件)
+    - [5.3 自定义默认系统配置](#53-自定义默认系统配置)
+  - [6. 保存系统](#6-保存系统)
+  - [7. 下载系统](#7-下载系统)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
     - [8.1 Amlogic 系列安装方法](#81-amlogic-系列安装方法)
     - [8.2 Rockchip 系列安装方法](#82-rockchip-系列安装方法)
@@ -82,11 +82,11 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 1. 注册自己的 Github 的账户
 
-注册自己的账户，以便进行固件个性化定制的继续操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
+注册自己的账户，以便进行系统个性化定制的继续操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
 
 ## 2. 设置隐私变量 GITHUB_TOKEN
 
-设置 Github 隐私变量 `GITHUB_TOKEN` 。在固件编译完成后，我们需要上传固件到 Releases ，我们根据 Github 官方的要求设置这个变量，方法如下：
+设置 Github 隐私变量 `GITHUB_TOKEN` 。在系统编译完成后，我们需要上传系统到 Releases ，我们根据 Github 官方的要求设置这个变量，方法如下：
 Personal center: Settings > Developer settings > Personal access tokens > Generate new token ( Name: GITHUB_TOKEN, Select: public_repo )。其他选项根据自己需要可以多选。提交保存，复制系统生成的加密 KEY 的值，先保存到自己电脑的记事本，下一步会用到这个值。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
@@ -109,9 +109,9 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
 <img src=https://user-images.githubusercontent.com/68696949/167585338-841d3b05-8d98-4d73-ba72-475aad4a95a9.png width="300" />
 </div>
 
-## 4. 个性化 Armbian 固件定制文件说明
+## 4. 个性化 Armbian 系统定制文件说明
 
-固件编译的流程在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译固件时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
+系统编译的流程在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译系统时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
 
 ```yaml
 - name: Compile Armbian [ ${{ env.ARMBIAN_BOARD }} ]
@@ -124,9 +124,9 @@ Personal center: Settings > Developer settings > Personal access tokens > Genera
     echo "status=success" >> ${GITHUB_OUTPUT}
 ```
 
-## 5. 编译固件
+## 5. 编译系统
 
-固件编译的方式很多，可以设置定时编译，手动编译，或者设置一些特定事件来触发编译。我们先从简单的操作开始。
+系统编译的方式很多，可以设置定时编译，手动编译，或者设置一些特定事件来触发编译。我们先从简单的操作开始。
 
 ### 5.1 手动编译
 
@@ -147,17 +147,17 @@ schedule:
   - cron: '0 17 * * *'
 ```
 
-### 5.3 自定义默认固件配置
+### 5.3 自定义默认系统配置
 
-默认固件的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，将需要编译固件的 `BUILD` 值设置为 `yes`，其中的 `BOARD` 名字要求唯一。
+默认系统的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，将需要编译系统的 `BUILD` 值设置为 `yes`，其中的 `BOARD` 名字要求唯一。
 
 在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。
 
-一般情况下只需要编译具有通用性的固件即可，同家族的其他盒子可以参考配置文件信息表，通过修改 `/boot/uEnv.txt` 中的 `dtb` 值进行使用。
+一般情况下只需要编译具有通用性的系统即可，同家族的其他盒子可以参考配置文件信息表，通过修改 `/boot/uEnv.txt` 中的 `dtb` 值进行使用。
 
-## 6. 保存固件
+## 6. 保存系统
 
-固件保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的固件通过脚本自动上传到 github 官方提供的 Releases 里面。
+系统保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的系统通过脚本自动上传到 github 官方提供的 Releases 里面。
 
 ```yaml
 - name: Upload Armbian image to Release
@@ -177,9 +177,9 @@ schedule:
       Update command: armbian-update
 ```
 
-## 7. 下载固件
+## 7. 下载系统
 
-从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的固件。图示如下：
+从仓库首页右下角的 Release 版块进入，选择和自己盒子型号对应的系统。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/163204798-0d98524c-73df-4876-8912-fcae2845fbba.png width="300" />
@@ -224,7 +224,7 @@ Radxa-Rock5B 有 microSD/eMMC/NVMe 等多种存储介质可以选择，相应的
 
 ##### 8.2.1.1 安装系统至 microSD
 
-使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 microSD 里，然后把写好固件的 microSD 插入设备即可使用。
+使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 microSD 里，然后把写好系统的 microSD 插入设备即可使用。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/202972996-300f223b-f6f6-48af-86ca-bdc842e5017d.png width="600" /><br />
@@ -233,7 +233,7 @@ Radxa-Rock5B 有 microSD/eMMC/NVMe 等多种存储介质可以选择，相应的
 
 ##### 8.2.1.2 安装系统至 eMMC
 
-- 使用 USB 转 eMMC 读卡器安装：将 eMMC 模块与电脑连接，使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 eMMC 里，然后把写好固件的 eMMC 插入设备即可使用。
+- 使用 USB 转 eMMC 读卡器安装：将 eMMC 模块与电脑连接，使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 eMMC 里，然后把写好系统的 eMMC 插入设备即可使用。
 - 使用 Maskrom 模式安装：关闭开发板电源。按住金色按钮。将 USB-A 转 C 型电缆插入 ROCK 5B C 型端口，另一端插入 PC。松开金色按钮。检查 USB 设备提示找到一个 MASKROM 设备。右键单击列表的空白区域，然后选择加载 `rock-5b-emmc.cfg` 配置文件（配置文件和 RKDevTool 在同一个目录下）。将 `rk3588_spl_loader_v1.08.111.bin` 和 `Armbian.img` 按下图所示设置，选择写入即可。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
@@ -256,7 +256,7 @@ ROCK-5B 在主板上有一个 SPI 闪存，将引导加载程序安装到 SPI �
 <img src=https://user-images.githubusercontent.com/68696949/202961447-49c0941a-e233-4b2a-b96b-b47636ce3cf2.png width="600" />
 </div>
 
-- 使用读卡器安装：将 M.2 NVMe SSD 插入 M.2 NVMe SSD 到 USB3.0 读卡器，以连接到主机。使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 NVMe 里，然后把写好固件的 NVMe 插入设备即可使用。
+- 使用读卡器安装：将 M.2 NVMe SSD 插入 M.2 NVMe SSD 到 USB3.0 读卡器，以连接到主机。使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 NVMe 里，然后把写好系统的 NVMe 插入设备即可使用。
 - 使用 microSD 卡安装：将 Armbian 系统镜像写入 microSD 卡，将 microSD 卡插入设备并启动，上传 `Armbian.img` 镜像文件到 microSD 卡，使用 `dd` 命令将 Armbian 镜像写入 NVMe 中，命令如下：
 
 ```Shell
@@ -265,7 +265,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 #### 8.2.2 电犀牛 R66S 的安装方法
 
-使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 microSD 里，然后把写好固件的 microSD 插入设备即可使用。
+使用 Rufus 或者 balenaEtcher 等工具将 Armbian 系统镜像写入 microSD 里，然后把写好系统的 microSD 插入设备即可使用。
 
 #### 8.2.3 电犀牛 R68S 的安装方法
 
@@ -295,7 +295,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 打开 RKDevTool 刷机工具，右键添加项。
 
 - 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](../u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`。
-- 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 固件。
+- 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
 
 点击执行写入即可。
 
@@ -304,7 +304,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 方法转载自 [cc747](https://post.smzdm.com/p/a4wkdo7l/) 的教程。刷机需要进入 Maskrom 模式。使我家云处于断电状态，拔掉所有线。用 USB 双公头线，一头插入我家云的 USB2.0 接口，一头插入电脑。用回形针插进 Reset 孔，并按压住不松开。插入电源线。等待几秒钟，直到 RKDevTool 框的下方出现`发现一个LOADER设备`后才松开回形针。将 RKDevTool 切换到`高级功能`点击`进入Maskrom`按钮，提示`发现一个MASKROM设备`。右键添加项。
 
 - 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](../u-boot/rockchip/l1pro) `rk3328_loader.bin`。
-- 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 固件。
+- 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
 
 点击执行写入即可。
 
@@ -332,7 +332,7 @@ armbian-update
 
 | 可选参数  | 默认值     | 选项           | 说明               |
 | -------- | --------- | ------------- | ----------------- |
-| -k       | 最新版     | [内核名称](https://github.com/ophub/kernel/tree/main/pub/stable) | 设置更新内核名称  |
+| -k       | 最新版     | [内核名称](https://github.com/ophub/kernel/releases/tag/kernel_stable) | 设置更新内核名称  |
 | -v       | stable    | stable/rk3588/dev | 指定内核版本分支     |
 | -m       | no        | yes/no        | 使用主线 u-boot     |
 | -b       | yes       | yes/no        | 更新内核时自动备份当前系统使用的内核    |
@@ -392,13 +392,13 @@ armbian-software
 
 - 如果接入显示器后，屏幕是黑屏状态，无法从 USB 启动，就需要进行盒子的短接初始化了。先将盒子恢复到原来的安卓系统，再重新刷入 Armbian 系统。首先下载 [amlogic_usb_burning_tool](https://github.com/ophub/kernel/releases/tag/tools) 系统恢复工具并安装好。准备一条 [USB 双公头数据线](https://user-images.githubusercontent.com/68696949/159267576-74ad69a5-b6fc-489d-b1a6-0f8f8ff28634.png)，准备一个 [曲别针](https://user-images.githubusercontent.com/68696949/159267790-38cf4681-6827-4cb6-86b2-19c7f1943342.png)。
 
-- 以 x96max+ 为例，在盒子的主板上确认 [短接点](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) 的位置，下载盒子的 [Android TV 固件包](https://github.com/ophub/kernel/releases/tag/tools)。其他常见设备的安卓 TV 系统固件及对应的短接点示意图也可以在此[下载查看](https://github.com/ophub/kernel/releases/tag/tools)。
+- 以 x96max+ 为例，在盒子的主板上确认 [短接点](https://user-images.githubusercontent.com/68696949/110590933-67785300-81b3-11eb-9860-986ef35dca7d.jpg) 的位置，下载盒子的 [Android TV 系统包](https://github.com/ophub/kernel/releases/tag/tools)。其他常见设备的安卓 TV 系统系统及对应的短接点示意图也可以在此[下载查看](https://github.com/ophub/kernel/releases/tag/tools)。
 
 ```
 操作方法：
 
 1. 打开刷机软件 USB Burning Tool:
-   [ 文件 → 导入固件包 ]: X96Max_Plus2_20191213-1457_ATV9_davietPDA_v1.5.img
+   [ 文件 → 导入系统包 ]: X96Max_Plus2_20191213-1457_ATV9_davietPDA_v1.5.img
    [ 选择 ]：擦除 flash
    [ 选择 ]：擦除 bootloader
    点击 [ 开始 ] 按钮
@@ -415,12 +415,12 @@ armbian-software
 
 ### 12.4 设置盒子从 USB/TF/SD 中启动
 
-- 把刷好固件的 USB/TF/SD 插入盒子。
+- 把刷好系统的 USB/TF/SD 插入盒子。
 - 开启开发者模式: 设置 → 关于本机 → 版本号 (如: X96max plus...), 在版本号上快速连击 5 次鼠标左键, 看到系统显示 `开启开发者模式` 的提示。
 - 开启 USB 调试模式: 系统 → 高级选选 → 开发者选项 (设置 `开启USB调试` 为启用)。启用 `ADB` 调试。
 - 安装 ADB 工具：下载 [adb](https://github.com/ophub/kernel/releases/tag/tools) 并解压，将 `adb.exe`，`AdbWinApi.dll`，`AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，然后打开 `cmd` 命令面板，使用 `adb --version` 命令，如果有显示就表示可以使用了。
 - 进入 `cmd` 命令模式。输入 `adb connect 192.168.1.137` 命令（其中的 ip 根据你的盒子修改，可以到盒子所接入的路由器设备里查看），如果链接成功会显示 `connected to 192.168.1.137:5555`
-- 输入 `adb shell reboot update` 命令，盒子将重启并从你插入的 USB/TF/SD 启动，从浏览器访问固件的 IP 地址，或者 SSH 访问即可进入固件。
+- 输入 `adb shell reboot update` 命令，盒子将重启并从你插入的 USB/TF/SD 启动，从浏览器访问系统的 IP 地址，或者 SSH 访问即可进入系统。
 
 ### 12.5 禁用红外接收器
 
@@ -434,7 +434,7 @@ blacklist meson_ir
 
 ### 12.6 启动引导文件的选择
 
-- 目前已知的设备中，只有 `T95(s905x)` / `T95Z-Plus(s912)` / `BesTV-R3300L(s905l-b)` 等少数设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，已经在固件里默认添加了。其他设备如果需要，可以将固件写入 USB 后，双击打开 `boot` 分区，将固件自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
+- 目前已知的设备中，只有 `T95(s905x)` / `T95Z-Plus(s912)` / `BesTV-R3300L(s905l-b)` 等少数设备需要使用 `/bootfs/extlinux/extlinux.conf` 文件，已经在系统里默认添加了。其他设备如果需要，可以将系统写入 USB 后，双击打开 `boot` 分区，将系统自带的 `/boot/extlinux/extlinux.conf.bak` 文件名称中的 `.bak` 删除即可使用。当写入 eMMC 时 `armbian-install` 会自动检查，如果存在 `extlinux.conf` 文件，会自动创建。
 
 - 其他设备只需要 `/boot/uEnv.txt` 即可启动，不要修改 `extlinux.conf.bak` 文件。
 
@@ -761,7 +761,7 @@ https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0%20re
 
 #### 12.10.3 分区信息解读
 
-DTB 表是安卓 DTB 中记录的每个盒子**固件**希望的分区布局，这一布局里一般会以一个大小为自动填充的 `data` 分区为结尾，所以同固件（也必然包括同型号）的盒子，这里的布局必然是相同的。盒子上实际的分区布局会因为 eMMC 的容量不同而各有差别，但总是由 DTB 的分区布局所决定的（即已知 DTB 分区布局 +eMMC 准确大小，必然可推知 eMMC 分区情况。 *上面的 DTB 分区信息和 eMMC 分区信息并非来自同一个盒子，你看出来了吗？*）。
+DTB 表是安卓 DTB 中记录的每个盒子**系统**希望的分区布局，这一布局里一般会以一个大小为自动填充的 `data` 分区为结尾，所以同系统（也必然包括同型号）的盒子，这里的布局必然是相同的。盒子上实际的分区布局会因为 eMMC 的容量不同而各有差别，但总是由 DTB 的分区布局所决定的（即已知 DTB 分区布局 +eMMC 准确大小，必然可推知 eMMC 分区情况。 *上面的 DTB 分区信息和 eMMC 分区信息并非来自同一个盒子，你看出来了吗？*）。
 
 eMMC 表是盒子上实际的 eMMC 分区布局。其中每一行表示一块存储区域，这一存储区域既可能是一个分区，也可能是分区间的空隙（因为晶晨的诡异决策，每个分区之间都至少有 8M 的空隙，计划留作他用，结果到最新的 S905X4 都没有用上，十分浪费空间）。对应分区的行中，字体为黑色，且偏移和掩码栏均有数值；对应空隙的行中，字体为灰色，偏移和掩码栏没有数值，且分区名为 `gap` 。
 
@@ -828,7 +828,7 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 
 #### 12.11.2 制作 acs.bin 文件
 
-主线 u-boot 最重要的是 acs.bin，用于初始化内存的部分，原厂 u-boot 位于固件最前面的 4MB 位置。使用刚才获得的 `bootloader.bin` 文件提取 `acs.bin` 文件。
+主线 u-boot 最重要的是 acs.bin，用于初始化内存的部分，原厂 u-boot 位于系统最前面的 4MB 位置。使用刚才获得的 `bootloader.bin` 文件提取 `acs.bin` 文件。
 
 打开 HxD 软件，打开上面导出的 `bootloader.bin` 文件，`右键 - 选择范围`，起始位置 `F200`，长度 `1000`，选`十六进制`。
 
