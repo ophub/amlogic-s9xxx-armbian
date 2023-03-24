@@ -336,9 +336,9 @@ armbian-update
 | -v       | stable    | stable/rk3588/dev | 指定内核版本分支     |
 | -m       | no        | yes/no        | 使用主线 u-boot     |
 | -b       | yes       | yes/no        | 更新内核时自动备份当前系统使用的内核    |
-| -d       | releases  | releases/repo | 设置内核从 [Releases](https://github.com/ophub/kernel/releases) 或 [Repo](https://github.com/ophub/kernel/tree/main/pub) 下载 |
-| -c       | ""        | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
-| -r       | ""        | ""            | [救援] 使用 USB 中的系统内核更新 eMMC |
+| -r       | ophub/kernel | `<owner>/<repo>` | 设置内核下载仓库 |
+| -c       | ""        | 自定义域名      | 设置加速访问 github.com 的 cdn 域名 |
+| -s       | ""        | ""            | [SOS] 使用 USB 中的系统内核恢复 eMMC |
 
 举例: `armbian-update -k 5.15.50 -v dev`
 
@@ -350,7 +350,7 @@ cd /ddbr/backup/5.10.125
 armbian-update
 ```
 
-因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -r` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
+因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -s` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
 
 如果你访问 github.com 的网络不通畅，无法在线下载更新时，可以手动下载内核，上传至 Armbian 系统的任意目录，并进入内核目录，执行 `armbian-update` 进行本地安装。如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
 
