@@ -450,7 +450,7 @@ update_kernel() {
 
     # Delete the current kernel files
     rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-*
-    rm -rf /boot/uInitrd /boot/Image /boot/zImage /boot/dtb*
+    rm -rf /boot/uInitrd /boot/Image /boot/zImage /boot/dtb-*
 
     # 01. For /boot five files
     tar -xzf boot-${kernel_name}.tar.gz -C /boot
