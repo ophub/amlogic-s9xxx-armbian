@@ -229,6 +229,8 @@ sub board_special_config() {
         &optimize_eth_parameters("eth0","eth1");
     } elsif($board eq "Radxa ROCK 5B") {
         &optimize_eth_parameters("eth0","eth1");
+    } elsif($board eq "FriendlyElec NanoPi R5") {
+        &optimize_eth_parameters("eth0","eth1","eth2");
     }
 }
 
