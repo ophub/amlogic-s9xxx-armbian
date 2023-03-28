@@ -333,7 +333,7 @@ EOF
     esac
 }
 
-# For pve
+# For pve, Tutorials for using [ Cooip JM ]
 software_308() {
     # pve general settings
     my_interfaces="/etc/network/interfaces"
@@ -391,6 +391,17 @@ EOF
         # Disable zram
         sudo systemctl disable armbian-zram-config.service
         sudo systemctl disable armbian-ramlog.service
+
+        # Optimizing LXC container logs
+        rsyslog_conf="/etc/rsyslog.conf"
+        [[ -f "${rsyslog_conf}" ]] && {
+            echo -e "${STEPS} Optimizing LXC container logs..."
+            sed -i s'|^*.*;auth,authpriv|#&|'g ${rsyslog_conf}
+            sed -i s'|^daemon.*|#&|'g ${rsyslog_conf}
+            [[ -f "/var/log/syslog" ]] && echo "" >/var/log/syslog
+            [[ -f "/var/log/daemon.log" ]] && echo "" >/var/log/daemon.log
+            sudo service syslog restart
+        }
 
         echo -e "${STEPS} Start adding pimox7 software source..."
         echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
