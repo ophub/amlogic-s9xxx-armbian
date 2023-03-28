@@ -345,7 +345,7 @@ software_308() {
 
         # Add network settings
         echo -e "${STEPS} Start adding network settings..."
-        [[ -z "${my_network_card}" || -z "${my_mac}" || -z "${my_address}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
+        [[ -z "${my_network_card}" || -z "${my_mac}" || -z "${my_address}" || -z "${my_broadcast}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
             echo -ne "${OPTIONS} Please input IP address, the default is [ ${my_address} ]: "
             read get_address
             [[ -n "${get_address}" ]] && my_address="${get_address}"
@@ -368,7 +368,9 @@ iface ${my_network_card} inet manual
 auto vmbr0
 iface vmbr0 inet static
         hwaddress ether ${my_mac}
-        address ${my_address}
+        address ${my_address}/24
+        broadcast ${my_broadcast}
+        netmask ${my_netmask}
         gateway ${my_gateway}
         bridge-ports ${my_network_card}
         bridge-stp off
@@ -378,8 +380,8 @@ EOF
 
         # Confirm host
         echo -ne "${OPTIONS} Please input the host name, the default is [ ${my_hostname} ]: "
-        read my_hostname
-        [[ -n "${my_hostname}" ]] && my_hostname="${my_hostname}"
+        read get_hostname
+        [[ -n "${get_hostname}" ]] && my_hostname="${get_hostname}"
         sudo hostnamectl set-hostname ${my_hostname}
         sudo cat >/etc/hosts <<EOF
 127.0.0.1	localhost
