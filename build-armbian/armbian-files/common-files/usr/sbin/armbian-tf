@@ -75,6 +75,11 @@ do_checkdisk() {
     # Check the current system running disk
     run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
     [[ -n "${run_on_emmc}" ]] && error_msg "You run on eMMC, no partition required."
+
+    # Repair disk size
+    echo -e "${STEPS} Start repairing hard disk size..."
+    printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit MiB print || repair_status="no"
+    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
 }
 
 # Create new partition
@@ -108,11 +113,6 @@ EOF
     [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
     echo -e "${INFO} ROOTFS_UUID: ${ROOTFS_UUID}"
-
-    # Repair disk size
-    echo -e "${STEPS} Start repairing hard disk size..."
-    printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} print || repair_status="no"
-    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
 
     # Calculate partition positions
     echo -e "${STEPS} Start calculating partition location..."
@@ -150,21 +150,12 @@ EOF
     sync && sleep 3
     echo -e "${INFO} The new partition information: \n$(df -hT /dev/${PT_PRE}3)"
     echo -e "${SUCCESS} Create partition successfully, mount it in [ ${data_path} ]"
-    exit 0
 }
 
 # Expand the current partition
 expand_current_part() {
     echo -e "${STEPS} Start to expand the current partition..."
-
-    echo -e "${STEPS} Install growpart or xfsprogs expansion and formatting tool..."
-    apt-get update
-    apt-get install cloud-guest-utils xfsprogs -y
-    [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
-
-    echo -e "${STEPS} Expansion Partition..."
-    growpart /dev/${DISK_NAME} 2
-    [[ "${?}" -ne "0" ]] && error_msg "[ growpart ] operation failed."
+    printf 'Yes\n-1\n' | parted ---pretend-input-tty /dev/${DISK_NAME} resizepart 2 100%
 
     echo -e "${STEPS} Expansion file system..."
     ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
@@ -179,7 +170,6 @@ expand_current_part() {
     sync && sleep 3
     echo -e "${INFO} Current partition information: \n$(df -hT /)"
     echo -e "${SUCCESS} The current partition expansion is successful."
-    exit 0
 }
 
 echo -e "${STEPS} Welcome to use TF/SD/USB partition management tool."
@@ -190,7 +180,10 @@ echo -e "${STEPS} Welcome to use TF/SD/USB partition management tool."
 do_checkdisk
 
 # Prompt the user to select Expand/Create
-cat <<EOF
+if [[ "${1}" == "auto" ]]; then
+    ec="auto"
+else
+    cat <<EOF
 --------------------------------------------------
   Option  Function
 --------------------------------------------------
@@ -198,11 +191,13 @@ cat <<EOF
     c     :Create a third new partition
 --------------------------------------------------
 EOF
-echo -ne "${OPTIONS} Please select (e/c): "
-read ec
+    echo -ne "${OPTIONS} Please select (e/c): "
+    read ec
+fi
 
 case "${ec}" in
-e | E | expand) expand_current_part ;;
-c | C | create) create_new_part ;;
-*) exit 0 ;;
+    a | A | auto)   expand_current_part ;;
+    e | E | expand) expand_current_part ;;
+    c | C | create) create_new_part ;;
+                    *) exit 0 ;;
 esac
