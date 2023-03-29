@@ -799,3 +799,10 @@ In addition to solving problems through the system software layer, you can also 
 
 Please refer to the method in [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) to set.
 
+```shell
+wget https://github.com/ophub/kernel/releases/download/tools/bullseye_g12_sound-khadas-utils-4-2-any.tar.gz
+tar -xzf bullseye_g12_sound-khadas-utils-4-2-any.tar.gz -C /
+```
+
+Restart the Armbian test. If the sound still does not work, it may be because your box uses the old conf corresponding sound output route, you need to comment out the new configuration corresponding to `L137-L142` in /usr/bin/g12_sound.sh (mainly for G12B is used, that is, S922X, the old G12A/S905X2 before, and SM1/S905X3 based on G12A are mostly not used), and then cancel the comment of the old configuration corresponding to `L130-L134`.
+

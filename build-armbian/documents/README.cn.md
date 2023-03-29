@@ -1020,3 +1020,10 @@ max-frequency = <208000000>;
 
 请参考 [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) 中的方法进行设置。
 
+```shell
+wget https://github.com/ophub/kernel/releases/download/tools/bullseye_g12_sound-khadas-utils-4-2-any.tar.gz
+tar -xzf bullseye_g12_sound-khadas-utils-4-2-any.tar.gz -C /
+```
+
+重启 Armbian 测试。如果声音仍然不工作，可能是因为你的盒子用的是旧的 conf 对应的声音输出路线，需要在 /usr/bin/g12_sound.sh 里面注释掉 `L137-L142` 对应的新配置（主要是给 G12B 用的，也就是 S922X，旧的 G12A/S905X2 之前，以及基于 G12A 的 SM1/S905X3 大部分用不来），然后取消 `L130-L134` 对应的旧配置的注释。
+
