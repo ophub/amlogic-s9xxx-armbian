@@ -409,6 +409,10 @@ EOF
 
         echo -e "${STEPS} Start installing packages..."
         software_install "${pve_package_list}"
+
+        # Remove ceph-dkms package error
+        sudo rm -rf /usr/src/ceph-dkms-0.0.2
+        sudo dpkg --configure -a
         software_update
 
         sync && sleep 3
