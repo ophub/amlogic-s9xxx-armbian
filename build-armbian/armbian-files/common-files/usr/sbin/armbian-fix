@@ -168,5 +168,13 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     }
 }
 
+# Automatic expansion of the third and fourth partitions
+todo_rootfs_resize="/root/.no_rootfs_resize"
+[[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
+    armbian-tf auto 2>/dev/null &&
+        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Automatic expansion succeeded..." >>${fix_log}
+    rm -f ${todo_rootfs_resize}
+}
+
 # Show end message
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: successfully fixed." >>${fix_log}
