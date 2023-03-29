@@ -337,7 +337,7 @@ EOF
 software_308() {
     # pve general settings
     my_interfaces="/etc/network/interfaces"
-    pve_package_list="pve-manager proxmox-ve"
+    pve_package_list="pve-manager proxmox-ve ifupdown2"
 
     case "${software_manage}" in
     install)
