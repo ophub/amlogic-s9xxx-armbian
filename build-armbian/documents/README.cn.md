@@ -1018,6 +1018,13 @@ max-frequency = <208000000>;
 
 ### 12.17 如何解决 Bullseye 版本没有声音的问题
 
+声音问题的错误日志信息：
+
+```shell
+Mar 29 15:47:18 armbian-ct2000 kernel:  fe.dai-link-0: ASoC: dpcm_fe_dai_prepare() failed (-22)
+Mar 29 15:47:18 armbian-ct2000 kernel:  fe.dai-link-0: ASoC: no backend DAIs enabled for fe.dai-link-0
+```
+
 请参考 [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) 中的方法进行设置。
 
 ```shell
