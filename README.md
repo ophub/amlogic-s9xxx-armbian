@@ -118,57 +118,6 @@ armbian-openvfd
 
 Debug according to [LED screen display control instructions](build-armbian/documents/led_screen_display_control.md).
 
-- ### Use Armbian in TF/SD/USB
-
-`Amlogic` box needs to manually activate the remaining space of TF/SD/USB (Rockchip and Allwinner have been activated automatically), Login in to armbian → input command:
-
-```yaml
-armbian-tf
-```
-
-According to the prompt, enter `e` to expand the remaining space to the current system partition and file system, and enter `c` to create a new third partition.
-
-<details>
-  <summary>Or manually allocate the remaining space</summary>
-
-#### View [Operation screenshot](https://user-images.githubusercontent.com/68696949/137860992-fbd4e2fa-e90c-4bbb-8985-7f5db9f49927.jpg)
-
-```yaml
-# 1. Confirm the name of the TF/SD/USB according to the size of the space. The TF/SD is [ `mmcblk` ], USB is [ `sd` ]
-Command: Enter [ fdisk -l | grep "sd" ]
-
-# 2. Get the starting value of the remaining space, Copy and save, used below  (E.g: 5382144)
-Command: Enter [ fdisk -l | grep "sd" | sed -n '$p' | awk '{print $3}' | xargs -i expr {} + 1 ]
-
-# 3. Start allocating unused space (E.g: sda, mmcblk0 or mmcblk1)
-Command: Enter [ fdisk /dev/sda ] Start allocating the remaining space
-Command: Select [ n ] to create a partition
-Command: Select [ p ] to specify the partition type as primary partition
-Command: Set the partition number to [ 3 ]
-Command: The start value of the partition, enter the value obtained in the second step, E.g: [ 5382144 ]
-Command: End value, press [ Enter ] to use the default value
-Command: If there is a hint: Do you want to remove the signature? [Y]es/[N]o: Enter [ Y ]
-Command: Enter [ t ] to specify the partition type
-Command: Enter Partition number [ 3 ]
-Command: Enter Hex code (type L to list all codes): [ 83 ]
-Command: Enter [ w ] to save
-Command: Enter [ reboot ] to restart
-
-# 4. After restarting, format the new partition
-Command: Enter [ mkfs.ext4 -F -L SHARED /dev/sda3 ] to format the new partition
-
-# 5. Set the mount directory for the new partition
-Command: Enter [ mkdir -p /mnt/share ] to Create mount directory
-Command: Enter [ mount -t ext4 /dev/sda3 /mnt/share ] to Mount the newly created partition to the directory
-
-# 6. Add automatic mount at boot
-Command: Enter [ vi /etc/fstab ]
-# Press [ i ] to enter the input mode, copy the following values to the end of the file
-/dev/sda3 /mnt/share ext4 defaults 0 0
-# Press [ esc ] to exit, Input [ :wq! ] and [ Enter ] to Save, Finish.
-```
-</details>
-
 - ### Backup/restore the original EMMC system
 
 Supports backup/restore of the box's `EMMC` partition in `TF/SD/USB`. It is recommended that you back up the Android TV system that comes with the current box before installing the Armbian system in a brand new box, so that you can use it in the future when restoring the TV system.
