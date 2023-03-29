@@ -662,7 +662,14 @@ software_118() {
             [[ -n "${gw}" ]] && my_gateway="${gw}"
 
             my_subnet="${my_gateway%.*}.0"
-            [[ -n "$(ifconfig | grep 'br0')" ]] && parent_lan="br0" || parent_lan="eth0"
+            if [[ -n "$(ifconfig | grep -oE '^br0:')" ]]; then
+                parent_lan="br0"
+            elif [[ -n "$(ifconfig | grep -oE '^vmbr0:')" ]]; then
+                parent_lan="vmbr0"
+            else
+                parent_lan="eth0"
+            fi
+
             docker network create -d macvlan --subnet=${my_subnet}/24 --gateway=${my_gateway} -o parent=${parent_lan} macnet
         }
 
