@@ -1030,6 +1030,9 @@ Mar 29 15:47:18 armbian-ct2000 kernel:  fe.dai-link-0: ASoC: no backend DAIs ena
 ```shell
 wget https://github.com/ophub/kernel/releases/download/tools/bullseye_g12_sound-khadas-utils-4-2-any.tar.gz
 tar -xzf bullseye_g12_sound-khadas-utils-4-2-any.tar.gz -C /
+
+systemctl enable sound.service
+systemctl restart sound.service
 ```
 
 重启 Armbian 测试。如果声音仍然不工作，可能是因为你的盒子用的是旧的 conf 对应的声音输出路线，需要在 /usr/bin/g12_sound.sh 里面注释掉 `L137-L142` 对应的新配置（主要是给 G12B 用的，也就是 S922X，旧的 G12A/S905X2 之前，以及基于 G12A 的 SM1/S905X3 大部分用不来），然后取消 `L130-L134` 对应的旧配置的注释。
