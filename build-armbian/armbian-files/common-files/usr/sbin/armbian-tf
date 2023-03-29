@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Create TF/USB remaining space partition
+# Function: Partition Expansion Tool
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -16,9 +16,6 @@
 #
 #========================= Set default parameters ==========================
 #
-# Set the release check file
-ophub_release_file="/etc/ophub-release"
-
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -36,16 +33,6 @@ error_msg() {
 
 # Check disk
 do_checkdisk() {
-    # Check release file
-    [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
-    # Get values
-    source "${ophub_release_file}"
-    PLATFORM="${PLATFORM}"
-    [[ -z "${PLATFORM}" ]] && error_msg "Invalid PLATFORM: [ ${PLATFORM} ]"
-
-    # Only the [ amlogic ] box needs manual expansion
-    [[ "${PLATFORM}" != "amlogic" ]] && error_msg "The [ ${PLATFORM} ] box has been expanded without operation."
-
     # Find the partition where root is located
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
     [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
@@ -72,92 +59,22 @@ do_checkdisk() {
         ;;
     esac
 
-    # Check the current system running disk
-    run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
-    [[ -n "${run_on_emmc}" ]] && error_msg "You run on eMMC, no partition required."
-
-    # Repair disk size
-    echo -e "${STEPS} Start repairing hard disk size..."
-    printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit MiB print || repair_status="no"
-    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
-}
-
-# Create new partition
-create_new_part() {
-    echo -e "${STEPS} Start creating a new partition..."
-
-    # Set the type of file system
-    cat <<EOF
------------------------------------------------
- ID  TYPE
------------------------------------------------
- 1   ext4
- 2   btrfs
------------------------------------------------
-EOF
-    echo -ne "${OPTIONS} Please Input ID: "
-    read filetype
-    if [[ "${filetype}" -eq "2" ]]; then
-        file_system_type="btrfs"
-        fstab_mount_string="defaults,noatime,compress=zstd:6"
-    else
-        file_system_type="ext4"
-        fstab_mount_string="defaults,noatime,errors=remount-ro"
-    fi
-    echo -e "${INFO} Input Type ID: [ ${filetype} ]"
-    echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
-
-    # Confirm UUID
-    echo -e "${STEPS} Start generating new partition UUID..."
-    ROOTFS_UUID="$(cat /proc/sys/kernel/random/uuid)"
-    [[ -z "${ROOTFS_UUID}" ]] && ROOTFS_UUID="$(uuidgen)"
-    [[ -z "${ROOTFS_UUID}" ]] && error_msg "The uuidgen is invalid, cannot continue."
-    echo -e "${INFO} ROOTFS_UUID: ${ROOTFS_UUID}"
-
-    # Calculate partition positions
-    echo -e "${STEPS} Start calculating partition location..."
-    END_P2="$(fdisk -l | grep "${ROOT_PTNAME}" | sed -n '$p' | awk '{print $3}' | xargs)"
-    [[ -z "${END_P2}" || -z "$(echo ${END_P2} | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to get starting position!"
-    START_P3="$(((END_P2 + 1) / 2048 + 1))"
-
-    # Create the partition
-    echo -e "${STEPS} Start creating new partitions..."
-    parted /dev/${DISK_NAME} mkpart primary ${file_system_type} $((START_P3))MiB 100% 2>/dev/null
-    # Show partition results
-    parted /dev/${DISK_NAME} unit MiB print
-
-    echo -e "${STEPS} Create data filesystem..."
-    # Set mount path
-    data_path="/data"
-    mkdir -p ${data_path} && sync
-
-    umount -f /dev/${PT_PRE}3 2>/dev/null
-    if [[ "${file_system_type}" == "btrfs" ]]; then
-        mkfs.btrfs -f -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -m single "/dev/${PT_PRE}3"
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
-        mount -t btrfs -o compress=zstd:6 "/dev/${PT_PRE}3" "${data_path}"
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount [ /dev/${PT_PRE}3 ] partition."
-    else
-        mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "${LB_PRE}DATA" -b 4k -m 0 "/dev/${PT_PRE}3"
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.ext4 ]"
-        mount -t ext4 "/dev/${PT_PRE}3" "${data_path}"
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to mount [ /dev/${PT_PRE}3 ] partition."
-    fi
-
-    # Add auto mount to /etc/fstab
-    echo "UUID=${ROOTFS_UUID}  ${data_path}  ${file_system_type}  ${fstab_mount_string}  0 0" >>/etc/fstab
-
     sync && sleep 3
-    echo -e "${INFO} The new partition information: \n$(df -hT /dev/${PT_PRE}3)"
-    echo -e "${SUCCESS} Create partition successfully, mount it in [ ${data_path} ]"
 }
 
 # Expand the current partition
 expand_current_part() {
-    echo -e "${STEPS} Start to expand the current partition..."
+    echo -e "${INFO} Start repairing hard disk size..."
+    printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit MiB print || repair_status="no"
+    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
+
+    pt_num="$(parted -s /dev/${DISK_NAME} print | awk '$1~/[1-9]+/ {print $1}' | wc -l)"
+    [[ "${pt_num}" -ne "2" ]] && error_msg "Not 2 partitions, stop automatic expansion."
+
+    echo -e "${INFO} Start to expand the current partition..."
     printf 'Yes\n-1\n' | parted ---pretend-input-tty /dev/${DISK_NAME} resizepart 2 100%
 
-    echo -e "${STEPS} Expansion file system..."
+    echo -e "${INFO} Expansion file system..."
     ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         btrfs filesystem resize max /
@@ -167,37 +84,12 @@ expand_current_part() {
         [[ "${?}" -ne "0" ]] && error_msg "[ resize2fs ] operation failed."
     fi
 
-    sync && sleep 3
-    echo -e "${INFO} Current partition information: \n$(df -hT /)"
     echo -e "${SUCCESS} The current partition expansion is successful."
 }
 
-echo -e "${STEPS} Welcome to use TF/SD/USB partition management tool."
-# Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+echo -e "${STEPS} Welcome to Partition Expansion Tool."
 
 # Check disk
 do_checkdisk
-
-# Prompt the user to select Expand/Create
-if [[ "${1}" == "auto" ]]; then
-    ec="auto"
-else
-    cat <<EOF
---------------------------------------------------
-  Option  Function
---------------------------------------------------
-    e     :Expand the remaining available space
-    c     :Create a third new partition
---------------------------------------------------
-EOF
-    echo -ne "${OPTIONS} Please select (e/c): "
-    read ec
-fi
-
-case "${ec}" in
-    a | A | auto)   expand_current_part ;;
-    e | E | expand) expand_current_part ;;
-    c | C | create) create_new_part ;;
-                    *) exit 0 ;;
-esac
+# Expansion partition
+expand_current_part
