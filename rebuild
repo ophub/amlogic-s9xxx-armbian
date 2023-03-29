@@ -876,7 +876,7 @@ refactor_rootfs() {
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
     # Explicitly disable resizing for Amlogic device [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
-    [[ "${PLATFORM}" == "amlogic" ]] && echo "no" >root/.no_rootfs_resize
+    echo "yes" >root/.no_rootfs_resize
 
     # Reduce network latency [ A start job is running for raise network interfaces (5 mins 1 sec) ]
     network_service="usr/lib/systemd/system/networking.service"
