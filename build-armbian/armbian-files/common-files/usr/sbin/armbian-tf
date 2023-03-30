@@ -63,7 +63,7 @@ do_checkdisk() {
 }
 
 # Expand the current partition
-expand_current_part() {
+expansion_partition() {
     echo -e "${INFO} Start repairing hard disk size..."
     printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit MiB print || repair_status="no"
     [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
@@ -89,9 +89,8 @@ expand_current_part() {
     echo -e "${SUCCESS} The current partition expansion is successful."
 }
 
+# Show welcome message
 echo -e "${STEPS} Welcome to Partition Expansion Tool."
 
-# Check disk
 do_checkdisk
-# Expansion partition
-expand_current_part
+expansion_partition
