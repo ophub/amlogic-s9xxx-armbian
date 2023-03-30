@@ -555,6 +555,7 @@ EOF
 
     # Remove useless scripts
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
+    rm -f ${DIR_INSTALL}/root/.no_rootfs_resize
 
     sync && sleep 3
     umount -f ${DIR_INSTALL}
