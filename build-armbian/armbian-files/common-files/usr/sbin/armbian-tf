@@ -84,6 +84,8 @@ expand_current_part() {
         [[ "${?}" -ne "0" ]] && error_msg "[ resize2fs ] operation failed."
     fi
 
+    # Do not delete files, only modify values to prevent secondary expansion of the armbian-resize-filesystem
+    echo "no" >/root/.no_rootfs_resize
     echo -e "${SUCCESS} The current partition expansion is successful."
 }
 
