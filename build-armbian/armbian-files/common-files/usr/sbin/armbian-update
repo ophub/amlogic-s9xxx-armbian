@@ -179,6 +179,7 @@ init_var() {
         -c | --cdn)
             if [[ -n "${2}" ]]; then
                 github_cdn="${2}"
+                [[ "${github_cdn:0-1}" != "/" ]] && echo github_cdn="${github_cdn}/"
                 shift
             else
                 error_msg "Invalid -c parameter [ ${2} ]!"
