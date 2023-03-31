@@ -372,7 +372,11 @@ armbian-software
 
 ### 12.1 每个盒子的 dtb 和 u-boot 对应关系表
 
-请查阅[说明](amlogic_model_database.md)
+支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)，在 `OpenWrt` 系统中配置文件的位置为 [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf)。
+
+其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
+
+对于 `fork` 源码仓库进行自定义编译的用户，如果自己的设备不在默认打包列表，可以修改 `BUILD` 中的 `no` 为 `yes`，并给 `BOARD` 设置 `唯一值`，实现直接打包自己的设备。给 `BOARD` 添加的 `唯一值` 在打包 Armbian 系统时可以独立使用，例如 `./rebuild -b s905x3` 生成 `s905x3` 配置对应的系统，在 `github Actions` 进行单独编译时需要把 `BOARD` 添加到工作流控制文件的 [armbian_board](../../.github/workflows/build-armbian.yml#L20) 选项中。全部打包时 `BUILD` 为 `yes` 的会全部打包。
 
 ### 12.2 LED 屏显示控制说明
 
