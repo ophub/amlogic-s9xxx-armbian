@@ -362,7 +362,7 @@ In the use of Armbian, some common problems that may be encountered are summariz
 
 ### 12.1 dtb and u-boot correspondence table for each box
 
-The list of supported TV boxes is located in the configuration file of the `Armbian` system is [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf), and the configuration file in the `OpenWrt` system is [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf).
+The list of supported TV boxes is located in the configuration file of the `Armbian` system is [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf).
 
 Where the value of `BUILD` is `yes`, it is the system of some boxes packed by default, and these boxes can be used directly. The default value is `no`, and these unpacked boxes need to download the same `FAMILY` packaged system (it is recommended to download the `5.15/5.4` kernel system). After writing to `USB`, you can open the `boot partition on USB` on the computer, modify the `dtb name of FDT` in the `/boot/uEnv.txt` file, and other boxes in the adaptation list.
 
