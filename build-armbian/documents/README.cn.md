@@ -372,7 +372,7 @@ armbian-software
 
 ### 12.1 每个盒子的 dtb 和 u-boot 对应关系表
 
-支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)，在 `OpenWrt` 系统中配置文件的位置为 [/etc/model_database.conf](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/etc/model_database.conf)。
+支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)。
 
 其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
