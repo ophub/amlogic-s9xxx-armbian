@@ -69,7 +69,7 @@ armbian-update
 | Optional  | Default     | Value         | Description                   |
 | --------- | ----------- | ------------- | ----------------------------- |
 | -k        | latest      | [kernel name](https://github.com/ophub/kernel/releases/tag/kernel_stable)  | Set the kernel name |
-| -v        | stable      | stable/rk3588/h6/flippy/dev  | Set the kernel version branch |
+| -v        | stable      | stable/rk3588/h6/flippy/dev  | Set the kernel [version branch](https://github.com/ophub/kernel) |
 | -m        | no          | yes/no        | Use Mainline u-boot           |
 | -b        | yes         | yes/no        | Automatically backup the current system kernel  |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
