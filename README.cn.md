@@ -69,7 +69,7 @@ armbian-update
 | 可选参数  | 默认值     | 选项           | 说明               |
 | -------- | --------- | ------------- | ----------------- |
 | -k       | 最新版     | [内核名称](https://github.com/ophub/kernel/releases/tag/kernel_stable) | 设置更新内核名称  |
-| -v       | stable    | stable/rk3588/dev | 指定内核版本分支     |
+| -v       | stable    | stable/rk3588/h6/flippy/dev | 指定内核版本分支     |
 | -m       | no        | yes/no        | 使用主线 u-boot     |
 | -b       | yes       | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库 |
