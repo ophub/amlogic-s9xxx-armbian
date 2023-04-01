@@ -253,7 +253,7 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.10.125_5.15.50
+    kernel_version: 5.15.1_6.1.1
     kernel_auto: true
     kernel_sign: -yourname
 ```
