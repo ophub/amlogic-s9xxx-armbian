@@ -55,8 +55,6 @@ rescue_path="/ddbr/rescue"
 ophub_release_file="/etc/ophub-release"
 # Set the kernel download repository from github.com
 kernel_repo="ophub/kernel"
-# Set the kernel version branch
-version_branch=("stable" "rk3588" "h6" "dev")
 # Set github.com to access CDN
 github_cdn=""
 # Set default installation mainline u-boot (-m)
@@ -146,7 +144,7 @@ init_var() {
             ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                [[ -n "$(echo "${version_branch[@]}" | tr " " "\n" | grep -w "^${2}$")" ]] && KERNEL_BRANCH="${2}"
+                KERNEL_BRANCH="${2}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
@@ -197,12 +195,8 @@ init_var() {
     kernel_api="https://api.github.com/repos/${kernel_repo}"
 
     # Set kernel download directory
-    if [[ "${KERNEL_BRANCH}" == "rk3588" ]]; then
-        kernel_tag="rk3588"
-    elif [[ "${KERNEL_BRANCH}" == "h6" ]]; then
-        kernel_tag="h6"
-    elif [[ "${KERNEL_BRANCH}" == "dev" ]]; then
-        kernel_tag="dev"
+    if [[ -n "$(echo ${KERNEL_BRANCH} | grep -oE "(stable|rk3588|h6|flippy|dev)")" ]]; then
+        kernel_tag="${KERNEL_BRANCH}"
     else
         kernel_tag="stable"
     fi
