@@ -419,10 +419,8 @@ EOF
         sudo rm -rf /usr/src/ceph-dkms-0.0.2
         sudo dpkg --configure -a
 
-        echo -e "${INFO} Install ifupdown2 package."
+        # Install optional packages
         software_install "ifupdown2"
-
-        echo -e "${STEPS} Update package settings..."
         software_update
 
         sync && sleep 3
