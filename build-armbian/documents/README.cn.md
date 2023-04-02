@@ -337,8 +337,8 @@ armbian-update
 | -m       | no        | yes/no        | 使用主线 u-boot     |
 | -b       | yes       | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库 |
-| -c       | ""        | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
-| -s       | ""        | ""            | [SOS] 使用 USB 中的系统内核恢复 eMMC |
+| -c       | 无        | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
+| -s       | 无        | 无            | [SOS] 使用 USB 中的系统内核恢复 eMMC |
 
 举例: `armbian-update -k 5.15.50 -v dev`
 
