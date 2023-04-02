@@ -337,7 +337,7 @@ EOF
 software_308() {
     # pve general settings
     my_interfaces="/etc/network/interfaces"
-    pve_package_list="pve-manager proxmox-ve ifupdown2"
+    pve_package_list="pve-manager proxmox-ve"
 
     case "${software_manage}" in
     install)
@@ -378,21 +378,27 @@ iface vmbr0 inet static
         dns-nameservers ${my_gateway}
 EOF
 
-        # Confirm host
-        echo -ne "${OPTIONS} Please input the host name, the default is [ ${my_hostname} ]: "
+        # Confirm hostname
+        echo -ne "${OPTIONS} Please input the hostname, the default is [ ${my_hostname} ]: "
         read get_hostname
         [[ -n "${get_hostname}" ]] && my_hostname="${get_hostname}"
+        echo -e "${INFO} Set the hostname: [ ${my_hostname} ]"
         sudo hostnamectl set-hostname ${my_hostname}
         sudo cat >/etc/hosts <<EOF
 127.0.0.1	localhost
 ${my_address}	${my_hostname}
 EOF
 
-        # Disable zram
-        sudo systemctl disable armbian-zram-config.service
-        sudo systemctl disable armbian-ramlog.service
+        # Add pimox7 software source KEY
+        echo -e "${STEPS} Start adding pimox7 software source..."
+        echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
+        curl https://raw.githubusercontent.com/pimox/pimox7/master/KEY.gpg | apt-key add -
+
+        echo -e "${STEPS} Start installing packages..."
+        software_install "${pve_package_list}"
 
         # Optimizing LXC container logs
+        echo -e "${INFO} Optimizing LXC container logs."
         rsyslog_conf="/etc/rsyslog.conf"
         [[ -f "${rsyslog_conf}" ]] && {
             echo -e "${STEPS} Optimizing LXC container logs..."
@@ -403,16 +409,20 @@ EOF
             sudo service syslog restart
         }
 
-        echo -e "${STEPS} Start adding pimox7 software source..."
-        echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
-        curl https://raw.githubusercontent.com/pimox/pimox7/master/KEY.gpg | apt-key add -
-
-        echo -e "${STEPS} Start installing packages..."
-        software_install "${pve_package_list}"
+        # Disable zram
+        echo -e "${INFO} Disable zram service."
+        sudo systemctl disable armbian-zram-config.service
+        sudo systemctl disable armbian-ramlog.service
 
         # Remove ceph-dkms package error
+        echo -e "${INFO} Remove ceph-dkms package error."
         sudo rm -rf /usr/src/ceph-dkms-0.0.2
         sudo dpkg --configure -a
+
+        echo -e "${INFO} Install ifupdown2 package."
+        software_install "ifupdown2"
+
+        echo -e "${STEPS} Update package settings..."
         software_update
 
         sync && sleep 3
