@@ -137,11 +137,11 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
 
     # Adjust parameter name(After 2022.12.03)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && {
-        sed -i "s|ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
+        sed -i "s|^ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
         echo "80. Adjust the ANDROID_UBOOT name"
     }
     [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && {
-        sed -i "s|UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
+        sed -i "s|^UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
         echo "81. Adjust the UBOOT_STATUS name"
     }
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BRANCH=")" ]] || {
@@ -149,14 +149,14 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
         echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
         echo "82. Add the KERNEL_BRANCH name"
     }
-    sed -i "s|KERNEL_BRANCH='6.x.y'|KERNEL_BRANCH='6.1.y'|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_BRANCH='6.x.y'|KERNEL_BRANCH='6.1.y'|g" ${ophub_release_file}
 
     # Fix custom banner name
     [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml-${soc_name}"
     [[ "${platform_name}" == "rockchip" ]] && bd_name="RK-${board_name}"
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
-        sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
+        sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
         echo "83. Fix custom board name: ${bd_name}"
     }
 
