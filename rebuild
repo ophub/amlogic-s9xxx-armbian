@@ -822,17 +822,19 @@ refactor_rootfs() {
         fstab_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
     # Update mount settings
-    sed -i "s|LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${rootfs_type}  ${fstab_string}  0 1|g" etc/fstab
+    sed -i "s|^LABEL=ROOTFS.*|UUID=${ROOTFS_UUID}  /      ${rootfs_type}  ${fstab_string}  0 1|g" etc/fstab
     [[ "${bootfs_type}" == "ext4" ]] && {
-        sed -i "s|LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
+        sed -i "s|^LABEL=BOOT.*|UUID=${BOOT_UUID}  /boot  ext4  defaults  0 2|g" etc/fstab
     }
 
     # Update release information
     [[ -f "${armbian_release_file}" ]] && {
+        # Shorten release version number
+        sed -i "s|^VERSION=.*|VERSION=${armbian_rebuild_version}-trunk|g" ${armbian_release_file}
         # Custom banner name
-        sed -i "s|BOARD_NAME=.*|BOARD_NAME=\"${board}\"|g" ${armbian_release_file}
+        sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${board}\"|g" ${armbian_release_file}
         # Remove [ No end-user support ] prompt in [ /etc/update-motd.d/10-armbian-header ]
-        sed -i "s|IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
+        sed -i "s|^IMAGE_TYPE=.*|IMAGE_TYPE=stable|g" ${armbian_release_file}
     }
 
     # Add custom startup script
