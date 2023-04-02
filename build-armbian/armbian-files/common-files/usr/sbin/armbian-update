@@ -144,7 +144,7 @@ init_var() {
             ;;
         -v | --Version_branch)
             if [[ -n "${2}" ]]; then
-                KERNEL_BRANCH="${2}"
+                KERNEL_BRANCH="${2//kernel_/}"
                 shift
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
