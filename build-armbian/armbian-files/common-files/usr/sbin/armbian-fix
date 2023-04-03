@@ -145,13 +145,14 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
         sed -i "s|^UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
         echo "81. Adjust the UBOOT_STATUS name"
     }
-    # Add default kernel branch
-    [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BRANCH=")" ]] || {
-        [[ "${soc_name,,}" == "rk3588" ]] && KERNEL_BRANCH="rk3588" || KERNEL_BRANCH="stable"
-        echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
-        echo "82. Add the KERNEL_BRANCH name"
+    # Add default kernel tags
+    sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_TAGS='6.x.y'|KERNEL_TAGS='6.1.y'|g" ${ophub_release_file}
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_TAGS=")" ]] || {
+        [[ "${soc_name,,}" == "rk3588" ]] && KERNEL_TAGS="rk3588" || KERNEL_TAGS="stable"
+        echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
+        echo "82. Add the KERNEL_TAGS name"
     }
-    sed -i "s|^KERNEL_BRANCH='6.x.y'|KERNEL_BRANCH='6.1.y'|g" ${ophub_release_file}
     # Add default GITHUB_CDN URL (CDN accelerated domain name)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^GITHUB_CDN=")" ]] || {
         echo "GITHUB_CDN=''" >>${ophub_release_file}
