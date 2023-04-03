@@ -346,6 +346,8 @@ If the network where you access github.com is blocked and you cannot download up
 
 If your local network access to github.com is not smooth, you can add CDN acceleration service through `armbian-update -c https://xxxcdn.com/`, please check the accelerated CDN domain name suitable for local use. The acceleration domain name can also be fixed to the `GITHUB_CDN='https://xxxcdn.com/'` parameter in the personalized configuration file `/etc/ophub-release` to avoid each input.
 
+The custom kernel download repository for `-r` parameter settings can be fixed to the `KERNEL_REPO='ophub/kernel'` parameter in the personalized configuration file `/etc/ophub-release` to avoid each input.
+
 ## 11. Install common software
 
 Login in to armbian → input command:
