@@ -15,16 +15,6 @@
 # Kernel download server: https://github.com/ophub/kernel/tree/main/pub
 #
 # Command: armbian-update
-# Optional parameter meaning: -k = set the kernel name
-#                             -v = set the kernel version branch
-#                             -m = ues mainline_u-boot
-#                             -r = Rescue the kernel
-#
-# Command optional parameters:   armbian-update -k 5.15.50 -v stable/dev -m yes/no
-# Set the kernel name command:   armbian-update -k 5.15.50
-# Set the kernel branch command: armbian-update -v dev
-# Use mainline u-boot command:   armbian-update -m yes/no
-# Rescue the Armbian kernel:     armbian-update -r
 #
 #========================================= Functions list =========================================
 #
@@ -115,20 +105,22 @@ init_var() {
 
     # Check release file
     [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
+    # Adjust parameter name
+    sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_REPO="${KERNEL_REPO}"
-    KERNEL_BRANCH="${KERNEL_BRANCH}"
+    KERNEL_TAGS="${KERNEL_TAGS}"
     KERNEL_BACKUP="${KERNEL_BACKUP}"
     GITHUB_CDN="${GITHUB_CDN}"
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
-    [[ -z "${KERNEL_BRANCH}" ]] && error_msg "[ KERNEL_BRANCH ] is missing, stop updating the kernel."
+    [[ -z "${KERNEL_TAGS}" ]] && error_msg "[ KERNEL_TAGS ] is missing, stop updating the kernel."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:v:m:b:r:c:" "${@}")"
+    get_all_ver="$(getopt "k:t:m:b:r:c:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -140,12 +132,12 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
-        -v | --Version_branch)
+        -t | --Kernel_Tags)
             if [[ -n "${2}" ]]; then
-                KERNEL_BRANCH="${2//kernel_/}"
+                KERNEL_TAGS="${2}"
                 shift
             else
-                error_msg "Invalid -v parameter [ ${2} ]!"
+                error_msg "Invalid -t parameter [ ${2} ]!"
             fi
             ;;
         -m | --Mainline_u-boot)
@@ -195,18 +187,15 @@ init_var() {
     [[ "${KERNEL_REPO}" =~ ^https: ]] && KERNEL_REPO="$(echo ${KERNEL_REPO} | awk -F'/' '{print $4"/"$5}')"
     kernel_api="https://api.github.com/repos/${KERNEL_REPO}"
 
-    # Set kernel download directory
-    if [[ -n "$(echo ${KERNEL_BRANCH} | grep -oE "(stable|rk3588|h6|flippy|dev)")" ]]; then
-        kernel_tag="${KERNEL_BRANCH}"
-    else
-        kernel_tag="stable"
-    fi
+    # Set kernel download tags
+    KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|rk3588|h6|flippy|dev)")" ]] && KERNEL_TAGS="stable"
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
     echo -e "${INFO} Kernel download repository: [ ${KERNEL_REPO} ]"
     echo -e "${INFO} Kernel download cdn: [ ${GITHUB_CDN} ]"
-    echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
+    echo -e "${INFO} Kernel tags: [ ${KERNEL_TAGS} ]"
     echo -e "${INFO} Kernel version: [ ${inputs_kernel} ]"
 
     # Find the partition where root is located
@@ -272,7 +261,7 @@ query_version() {
     [[ -z "${inputs_kernel}" ]] && {
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
-                ${kernel_api}/releases/tags/kernel_${kernel_tag} |
+                ${kernel_api}/releases/tags/kernel_${KERNEL_TAGS} |
                 jq -r '.assets[].name' |
                 grep -oE "${kernel_verpatch}\.[0-9]+" |
                 sort -rV | head -n 1
@@ -291,8 +280,8 @@ query_version() {
     }
 
     # Check for inapplicable kernels
-    if [[ "${KERNEL_BRANCH}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
-        [[ "${inputs_kernel}" != "$(echo ${KERNEL_BRANCH} | sed -e 's/\.[xy]/\.1/g' | awk -F'.' '{print $1"."$2"."}')"* ]] && {
+    if [[ "${KERNEL_TAGS}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+        [[ "${inputs_kernel}" != "$(echo ${KERNEL_TAGS} | sed -e 's/\.[xy]/\.1/g' | awk -F'.' '{print $1"."$2"."}')"* ]] && {
             error_msg "According to the [ ${ophub_release_file} ] file settings, the [ ${inputs_kernel} ] kernel is not available."
         }
     fi
@@ -308,7 +297,7 @@ download_kernel() {
     # Download kernel
     if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
         # Download the kernel from [ releases ]
-        kernel_down_from="${GITHUB_CDN}https://github.com/${KERNEL_REPO}/releases/download/kernel_${kernel_tag}/${inputs_kernel}.tar.gz"
+        kernel_down_from="${GITHUB_CDN}https://github.com/${KERNEL_REPO}/releases/download/kernel_${KERNEL_TAGS}/${inputs_kernel}.tar.gz"
 
         echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from} ]"
         echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
