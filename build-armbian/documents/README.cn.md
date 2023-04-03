@@ -356,7 +356,15 @@ armbian-update
 
 如果你本地的网络访问 github.com 不流畅，可以通过 `armbian-update -c https://xxxcdn.com/` 这样的方式添加 CDN 加速服务，请自行查阅适合当地使用的加速 CDN 域名。加速域名也可以固定填写到个性化配置文件 `/etc/ophub-release` 的 `GITHUB_CDN='https://xxxcdn.com/'` 参数里，避免每次输入。
 
-通过 `-r` 参数设置的自定义内核下载仓库，可以固定填写到个性化配置文件 `/etc/ophub-release` 的 `KERNEL_REPO='ophub/kernel'` 参数里，避免每次输入。
+通过 `-r`/`-v`/`-b`/`-c` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
+
+```shell
+# 自定义修改参数的赋值
+-r  :  KERNEL_REPO='ophub/kernel'
+-v  :  KERNEL_BRANCH='stable'
+-b  :  KERNEL_BACKUP='yes'
+-c  :  GITHUB_CDN='https://xxxcdn.com/'
+```
 
 ## 11. 安装常用软件
 

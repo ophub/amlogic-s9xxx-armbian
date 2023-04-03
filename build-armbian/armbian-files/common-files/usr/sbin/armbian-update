@@ -48,7 +48,6 @@
 current_path="${PWD}"
 # Set kernel backup directory
 backup_path="/ddbr/backup"
-auto_backup_kernel="yes"
 # Set kernel rescue temporary directory
 rescue_path="/ddbr/rescue"
 # Set the release check file
@@ -123,6 +122,7 @@ init_var() {
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_REPO="${KERNEL_REPO}"
     KERNEL_BRANCH="${KERNEL_BRANCH}"
+    KERNEL_BACKUP="${KERNEL_BACKUP}"
     GITHUB_CDN="${GITHUB_CDN}"
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
     [[ -z "${KERNEL_BRANCH}" ]] && error_msg "[ KERNEL_BRANCH ] is missing, stop updating the kernel."
@@ -158,7 +158,7 @@ init_var() {
             ;;
         -b | --Backup_kenlel)
             if [[ -n "${2}" ]]; then
-                [[ "${2}" == "no" ]] && auto_backup_kernel="no" || auto_backup_kernel="yes"
+                [[ "${2}" == "no" ]] && KERNEL_BACKUP="no" || KERNEL_BACKUP="yes"
                 shift
             else
                 error_msg "Invalid -b parameter [ ${2} ]!"
@@ -595,7 +595,7 @@ if [[ "${1}" != "-s" ]]; then
     query_version
     download_kernel
     check_kernel
-    [[ "${auto_backup_kernel}" == "yes" ]] && backup_kernel
+    [[ "${KERNEL_BACKUP}" != "no" ]] && backup_kernel
     update_kernel
     [[ "${PLATFORM}" == "amlogic" ]] && update_uboot
 
