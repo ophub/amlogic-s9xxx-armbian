@@ -899,7 +899,7 @@ refactor_rootfs() {
 
     # Get random macaddr
     mac_hexchars="0123456789ABCDEF"
-    mac_end="$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')"
+    mac_end=$(for i in {1..6}; do echo -n ${mac_hexchars:$((${RANDOM} % 16)):1}; done | sed -e 's/\(..\)/:\1/g')
     random_macaddr="9E:61${mac_end}"
 
     # Optimize wifi/bluetooth module
@@ -935,6 +935,7 @@ refactor_rootfs() {
     echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
+    echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
     echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
