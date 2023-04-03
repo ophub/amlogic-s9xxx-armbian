@@ -157,6 +157,11 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
         echo "GITHUB_CDN=''" >>${ophub_release_file}
         echo "83. Add the custom GITHUB_CDN URL"
     }
+    # Add default KERNEL_REPO
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
+        echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
+        echo "84. Add the custom KERNEL_REPO URL"
+    }
 
     # Fix custom banner name
     [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml-${soc_name}"
@@ -164,21 +169,21 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        echo "84. Fix custom board name: ${bd_name}"
+        echo "85. Fix custom board name: ${bd_name}"
     }
 
     # Shorten release version number
     short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${short_version}" && -f "${armbian_release_file}" ]] && {
         sed -i "s|^VERSION=.*|VERSION=${short_version}-trunk|g" ${armbian_release_file}
-        echo "85. Set release version: ${short_version}-trunk"
+        echo "86. Set release version: ${short_version}-trunk"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" == "rockchip" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        echo "86. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        echo "87. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 }
 
