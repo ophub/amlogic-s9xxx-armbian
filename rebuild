@@ -928,21 +928,20 @@ refactor_rootfs() {
     echo "PLATFORM='${PLATFORM}'" >>${ophub_release_file}
     echo "VERSION_CODEID='${release_codeid}'" >>${ophub_release_file}
     echo "VERSION_CODENAME='${release_codename}'" >>${ophub_release_file}
-    echo "SOC='${SOC}'" >>${ophub_release_file}
-    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
     echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
     echo "BOARD='${board}'" >>${ophub_release_file}
+    echo "SOC='${SOC}'" >>${ophub_release_file}
+    echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
     echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
-    echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
+    echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
-    echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
-    echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
-    echo "DISK_TYPE='usb'" >>${ophub_release_file}
-    echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
-    echo "AMPART_STATUS='no'" >>${ophub_release_file}
     echo "GITHUB_CDN=''" >>${ophub_release_file}
-    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
+    echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
+    echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
+    echo "DISK_TYPE='usb'" >>${ophub_release_file}
+    echo "AMPART_STATUS='no'" >>${ophub_release_file}
+    echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
     echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
     if [[ "${PLATFORM}" == "amlogic" ]]; then
@@ -950,6 +949,7 @@ refactor_rootfs() {
     elif [[ "${PLATFORM}" == "rockchip" ]]; then
         echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
     fi
+    echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
 
     sync && sleep 3
 }
