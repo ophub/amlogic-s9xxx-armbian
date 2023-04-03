@@ -55,8 +55,6 @@ rescue_path="/ddbr/rescue"
 ophub_release_file="/etc/ophub-release"
 # Set the kernel download repository from github.com
 kernel_repo="ophub/kernel"
-# Set github.com to access CDN
-github_cdn=""
 # Set default installation mainline u-boot (-m)
 auto_mainline_uboot="no"
 
@@ -126,6 +124,7 @@ init_var() {
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_BRANCH="${KERNEL_BRANCH}"
+    GITHUB_CDN="${GITHUB_CDN}"
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
     [[ -z "${KERNEL_BRANCH}" ]] && error_msg "[ KERNEL_BRANCH ] is missing, stop updating the kernel."
 
@@ -176,8 +175,7 @@ init_var() {
             ;;
         -c | --cdn)
             if [[ -n "${2}" ]]; then
-                github_cdn="${2}"
-                [[ "${github_cdn:0-1}" != "/" ]] && echo github_cdn="${github_cdn}/"
+                GITHUB_CDN="${2}"
                 shift
             else
                 error_msg "Invalid -c parameter [ ${2} ]!"
@@ -189,6 +187,9 @@ init_var() {
         esac
         shift
     done
+
+    # Complete URL
+    [[ -n "${GITHUB_CDN}" && "${GITHUB_CDN:0-1}" != "/" ]] && echo GITHUB_CDN="${GITHUB_CDN}/"
 
     # Adjust the custom kernel repository url format
     [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
@@ -204,7 +205,7 @@ init_var() {
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
     echo -e "${INFO} Kernel download repository: [ ${kernel_repo} ]"
-    echo -e "${INFO} Kernel download cdn: [ ${github_cdn} ]"
+    echo -e "${INFO} Kernel download cdn: [ ${GITHUB_CDN} ]"
     echo -e "${INFO} Kernel branch: [ ${KERNEL_BRANCH} ]"
     echo -e "${INFO} Kernel version: [ ${inputs_kernel} ]"
 
@@ -307,7 +308,7 @@ download_kernel() {
     # Download kernel
     if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
         # Download the kernel from [ releases ]
-        kernel_down_from="${github_cdn}https://github.com/${kernel_repo}/releases/download/kernel_${kernel_tag}/${inputs_kernel}.tar.gz"
+        kernel_down_from="${GITHUB_CDN}https://github.com/${kernel_repo}/releases/download/kernel_${kernel_tag}/${inputs_kernel}.tar.gz"
 
         echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from} ]"
         echo -e "${INFO} Download the kernel files to the temporary directory: [ ${kernel_path} ]"
