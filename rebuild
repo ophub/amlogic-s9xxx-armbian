@@ -932,6 +932,7 @@ refactor_rootfs() {
     echo "FDTFILE='${FDTFILE}'" >>${ophub_release_file}
     echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
     echo "BOARD='${board}'" >>${ophub_release_file}
+    echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BRANCH='${KERNEL_BRANCH}'" >>${ophub_release_file}
     echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
