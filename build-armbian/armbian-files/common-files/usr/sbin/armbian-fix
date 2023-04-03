@@ -152,15 +152,20 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
         echo "82. Add the KERNEL_BRANCH name"
     }
     sed -i "s|^KERNEL_BRANCH='6.x.y'|KERNEL_BRANCH='6.1.y'|g" ${ophub_release_file}
-    # Add default GITHUB_CDN URL
+    # Add default GITHUB_CDN URL (CDN accelerated domain name)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^GITHUB_CDN=")" ]] || {
         echo "GITHUB_CDN=''" >>${ophub_release_file}
         echo "83. Add the custom GITHUB_CDN URL"
     }
-    # Add default KERNEL_REPO
+    # Add default KERNEL_REPO (Kernel download repository)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
         echo "84. Add the custom KERNEL_REPO URL"
+    }
+    # Add default KERNEL_BACKUP (Automatic backup kernel)
+    [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BACKUP=")" ]] || {
+        echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
+        echo "85. Add the custom KERNEL_BACKUP"
     }
 
     # Fix custom banner name
@@ -169,21 +174,21 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        echo "85. Fix custom board name: ${bd_name}"
+        echo "86. Fix custom board name: ${bd_name}"
     }
 
     # Shorten release version number
     short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${short_version}" && -f "${armbian_release_file}" ]] && {
         sed -i "s|^VERSION=.*|VERSION=${short_version}-trunk|g" ${armbian_release_file}
-        echo "86. Set release version: ${short_version}-trunk"
+        echo "87. Set release version: ${short_version}-trunk"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" == "rockchip" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        echo "87. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        echo "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 }
 
