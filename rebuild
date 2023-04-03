@@ -939,6 +939,7 @@ refactor_rootfs() {
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
     echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
     echo "AMPART_STATUS='no'" >>${ophub_release_file}
+    echo "GITHUB_CDN=''" >>${ophub_release_file}
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
     echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
