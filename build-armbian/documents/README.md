@@ -316,19 +316,19 @@ Login in to armbian → input command:
 
 ```yaml
 # Run as root user (sudo -i)
-# If no other parameters are specified, the following update command will update to the latest version of the current kernel of the same series.
+# If no parameter is specified, it will update to the latest version.
 armbian-update
 ```
 
-| Optional  | Default     | Value         | Description                   |
-| --------- | ----------- | ------------- | ----------------------------- |
-| -k        | latest      | [kernel name](https://github.com/ophub/kernel/releases/tag/kernel_stable)  | Set the kernel name |
-| -t        | automate    | stable/rk3588/h6/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
-| -m        | no          | yes/no        | Use Mainline u-boot           |
-| -b        | yes         | yes/no        | Automatically backup the current system kernel  |
+| Optional  | Default      | Value          | Description                   |
+| --------- | ------------ | -------------- | ----------------------------- |
+| -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -t        | automate     | stable/rk3588/h6/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
+| -m        | no           | yes/no         | Use Mainline u-boot           |
+| -b        | yes          | yes/no         | Automatically backup the current system kernel |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
-| -c        | None        | domain-name   | Set the cdn domain name for accelerated access to github.com  |
-| -s        | None        | None          | [SOS] Restore eMMC with system kernel from USB |
+| -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com  |
+| -s        | None         | None           | [SOS] Restore eMMC with system kernel from USB |
 
 Example: `armbian-update -k 5.15.50 -t dev`
 
