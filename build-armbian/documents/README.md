@@ -344,16 +344,16 @@ When the system cannot be started from eMMC due to incomplete updates and other 
 
 If the network where you access github.com is blocked and you cannot download updates online, you can manually download the kernel, upload it to any directory on the Armbian system, enter the kernel directory, and execute `armbian-update` for local installation. If there is a set of kernel files in the current directory, it will be updated with the kernel in the current directory (The 4 kernel files required for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not required. If they exist at the same time, it will not affect the update. The system can accurately identify the required kernel files). The optional kernel supported by the device can be freely updated, such as from 5.10.125 kernel to 5.15.50 kernel.
 
-If your local network access to github.com is not smooth, you can add CDN acceleration service through `armbian-update -c https://xxxcdn.com/`, please check the accelerated CDN domain name suitable for local use. The acceleration domain name can also be fixed to the `GITHUB_CDN='https://xxxcdn.com/'` parameter in the personalized configuration file `/etc/ophub-release` to avoid each input.
+If your local network access to github.com is not smooth, you can add CDN acceleration service through `armbian-update -c https://gh...xy.com/`, please check the accelerated CDN domain name suitable for local use. The acceleration domain name can also be fixed to the `GITHUB_CDN='https://gh...xy.com/'` parameter in the personalized configuration file `/etc/ophub-release` to avoid each input.
 
-Custom options such as `-r`/`-v`/`-b`/`-c` can be fixed to the relevant parameters in the personalized configuration file `/etc/ophub-release` to avoid each input. The corresponding settings are:
+Custom options such as `-r`/`-t`/`-b`/`-c` can be fixed to the relevant parameters in the personalized configuration file `/etc/ophub-release` to avoid each input. The corresponding settings are:
 
 ```shell
 # Customize the value of the modification parameter
 -r  :  KERNEL_REPO='ophub/kernel'
 -t  :  KERNEL_TAGS='stable'
 -b  :  KERNEL_BACKUP='yes'
--c  :  GITHUB_CDN='https://xxxcdn.com/'
+-c  :  GITHUB_CDN='https://gh...xy.com/'
 ```
 
 ## 11. Install common software
