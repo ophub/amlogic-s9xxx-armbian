@@ -323,14 +323,14 @@ armbian-update
 | Optional  | Default     | Value         | Description                   |
 | --------- | ----------- | ------------- | ----------------------------- |
 | -k        | latest      | [kernel name](https://github.com/ophub/kernel/releases/tag/kernel_stable)  | Set the kernel name |
-| -v        | automate    | stable/rk3588/h6/flippy/dev  | Set the kernel [version branch](https://github.com/ophub/kernel) |
+| -t        | automate    | stable/rk3588/h6/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
 | -m        | no          | yes/no        | Use Mainline u-boot           |
 | -b        | yes         | yes/no        | Automatically backup the current system kernel  |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
 | -c        | None        | domain-name   | Set the cdn domain name for accelerated access to github.com  |
 | -s        | None        | None          | [SOS] Restore eMMC with system kernel from USB |
 
-Example: `armbian-update -k 5.15.50 -v dev`
+Example: `armbian-update -k 5.15.50 -t dev`
 
 When updating the kernel, the kernel used by the current system will be automatically backed up. The storage path is in the `/ddbr/backup` directory, and the three recently used versions of the kernel will be preserved. If the newly installed kernel is unstable, the backed up kernel can be restored at any time:
 ```shell
@@ -351,7 +351,7 @@ Custom options such as `-r`/`-v`/`-b`/`-c` can be fixed to the relevant paramete
 ```shell
 # Customize the value of the modification parameter
 -r  :  KERNEL_REPO='ophub/kernel'
--v  :  KERNEL_BRANCH='stable'
+-t  :  KERNEL_TAGS='stable'
 -b  :  KERNEL_BACKUP='yes'
 -c  :  GITHUB_CDN='https://xxxcdn.com/'
 ```
