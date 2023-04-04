@@ -74,7 +74,6 @@ toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
 
 # QEMU BINARY
-qemu_binary_arm="qemu-arm-static"
 qemu_binary_arm64="qemu-aarch64-static"
 
 # Set font color
@@ -463,7 +462,6 @@ generate_uinitrd() {
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
     echo "COMPRESS=gzip" >>${compress_initrd_file}
 
-    [[ -f "/usr/bin/${qemu_binary_arm}" ]] && cp -f /usr/bin/${qemu_binary_arm} ${tag_rootfs}/usr/bin/
     [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
