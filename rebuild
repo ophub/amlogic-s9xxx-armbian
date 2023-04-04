@@ -273,7 +273,7 @@ download_depends() {
     echo -e "${STEPS} Start downloading dependency files..."
 
     # Download Armbian firmware files
-    svn co ${firmware_repo} ${firmware_path} --force
+    svn co ${firmware_repo} ${firmware_path} --force --quiet
 }
 
 query_version() {
