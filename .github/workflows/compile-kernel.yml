@@ -50,6 +50,13 @@ on:
         options:
           - clang
           - gcc
+      kernel_sign:
+        description: "Set the kernel custom signature"
+        required: false
+        default: "-ophub"
+        type: choice
+        options:
+          - -ophub
 
 env:
   TZ: America/New_York
@@ -90,6 +97,7 @@ jobs:
           kernel_version: ${{ inputs.kernel_version }}
           kernel_auto: ${{ inputs.kernel_auto }}
           kernel_package: ${{ inputs.kernel_package }}
+          kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
 
       - name: Upload Kernel to Release
