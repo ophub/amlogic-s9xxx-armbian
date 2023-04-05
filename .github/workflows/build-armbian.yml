@@ -26,7 +26,7 @@ on:
           - all
           - s922x_s905x3_s905d_s912_s905l3a
           - r66s_r68s_h66k_h68k_e25_nanopi-r5s
-          - eaidk-610_king3399_tn3399_kylin3399
+          - eaidk-610_king3399_tn3399_kylin3399_hugsun-zm
           - vplus_tanix-tx6
           - a311d
           - s922x
@@ -157,7 +157,7 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ inputs.set_release }}${{ env.ARMBIAN_MINIMAL_TAG }} ]
+      - name: Compile Armbian [ ${{ env.ARMBIAN_RELEASE }}${{ env.ARMBIAN_MINIMAL_TAG }} ]
         id: compile
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
