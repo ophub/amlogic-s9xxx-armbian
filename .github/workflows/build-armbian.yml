@@ -157,7 +157,7 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ env.ARMBIAN_RELEASE }}${{ env.ARMBIAN_MINIMAL_TAG }} ]
+      - name: Compile Armbian [ ${{ inputs.set_release }}${{ env.ARMBIAN_MINIMAL_TAG }} ]
         id: compile
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
