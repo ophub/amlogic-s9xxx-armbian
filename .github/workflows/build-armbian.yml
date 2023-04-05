@@ -92,6 +92,10 @@ on:
         description: "Set the kernel repository."
         required: false
         default: "ophub/kernel"
+        type: choice
+        options:
+          - ophub/kernel
+          - breakings/OpenWrt
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
