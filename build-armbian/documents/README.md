@@ -323,7 +323,7 @@ armbian-update
 | Optional  | Default      | Value          | Description                   |
 | --------- | ------------ | -------------- | ----------------------------- |
 | -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -t        | automate     | stable/rk3588/h6/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
+| -t        | automate     | stable/rk3588/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
 | -m        | no           | yes/no         | Use Mainline u-boot           |
 | -b        | yes          | yes/no         | Automatically backup the current system kernel |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |

@@ -333,7 +333,7 @@ armbian-update
 | 可选参数  | 默认值        | 选项           | 说明               |
 | -------- | ------------ | ------------- | ----------------- |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
-| -t       | 自动化        | stable/rk3588/h6/flippy/dev | 设置[内核 tags](https://github.com/ophub/kernel)     |
+| -t       | 自动化        | stable/rk3588/flippy/dev | 设置[内核 tags](https://github.com/ophub/kernel)     |
 | -m       | no           | yes/no        | 使用主线 u-boot     |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
