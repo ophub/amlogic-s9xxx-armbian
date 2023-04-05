@@ -57,12 +57,12 @@ on:
           - nanopi-r5s
           - eaidk-610
           - king3399
-          - kylin3399
           - tn3399
+          - kylin3399
+          - hugsun-zm
           - beikeyun
           - l1pro
           - vplus
-          - tqc-a01
           - tanix-tx6
       armbian_kernel:
         description: "Select kernel version."
