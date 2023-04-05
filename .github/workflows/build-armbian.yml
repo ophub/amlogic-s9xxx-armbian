@@ -27,7 +27,7 @@ on:
           - s922x_s905x3_s905d_s912_s905l3a
           - r66s_r68s_h66k_h68k_e25_nanopi-r5s
           - eaidk-610_king3399_tn3399_kylin3399
-          - vplus_tqc-a01_tanix-tx6
+          - vplus_tanix-tx6
           - a311d
           - s922x
           - s922x-reva
@@ -91,7 +91,7 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "https://github.com/ophub/kernel/tree/main/pub"
+        default: "ophub/kernel"
       armbian_size:
         description: "Set armbian rootfs size(Unit: MiB)."
         required: false
