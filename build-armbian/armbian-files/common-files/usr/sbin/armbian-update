@@ -542,8 +542,12 @@ sos_kernel() {
 
     # 01. For /boot files
     cd ${rescue_path}/bootfs
-    rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb*
-    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf /boot/{u-boot.ext,u-boot.emmc} -t . 2>/dev/null
+    rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb* u-boot.ext u-boot.emmc
+    [[ "${PLATFORM}" == "amlogic" && -f "/boot/u-boot.ext" ]] && {
+        cp -rf /boot/u-boot.ext -t .
+        cp -rf /boot/u-boot.ext -t u-boot.emmc
+        chmod +x u-boot.ext u-boot.emmc
+    }
     cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
     [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
     echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
