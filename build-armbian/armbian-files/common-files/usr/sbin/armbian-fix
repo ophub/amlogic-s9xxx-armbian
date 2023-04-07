@@ -199,11 +199,11 @@ tolog "58. Disable the armbian-resize-filesystem.service"
     }
 }
 
-# Automatic expansion of the third and fourth partitions
+# Maximize root partition size
 todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf 2>/dev/null &&
-        tolog "Automatic expansion succeeded..."
+        tolog "89. Root partition resized successfully..."
 }
 
 # Show end message
