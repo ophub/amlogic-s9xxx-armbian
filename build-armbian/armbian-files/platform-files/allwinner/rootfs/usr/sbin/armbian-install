@@ -159,10 +159,6 @@ create_partition() {
     cd /
     echo -e "${STEPS} Start creating eMMC partition..."
 
-    # Disable the system's partition adjustment service
-    systemctl stop armbian-resize-filesystem.service
-    systemctl disable armbian-resize-filesystem.service
-
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
     if [[ "${exists_pts}" -gt "0" ]]; then
