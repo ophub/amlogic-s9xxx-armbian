@@ -115,6 +115,11 @@ sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
 sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer
 sudo rm -f /etc/update-motd.d/50-motd-news
 
+# Disable the system's partition adjustment service
+sudo systemctl stop armbian-resize-filesystem.service 2>/dev/null
+sudo systemctl disable armbian-resize-filesystem.service 2>/dev/null
+echo "58. Disable the armbian-resize-filesystem.service"
+
 # Start adjusting custom settings
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom settings..." >>${fix_log}
 

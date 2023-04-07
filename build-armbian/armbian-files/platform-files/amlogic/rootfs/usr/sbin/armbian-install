@@ -324,10 +324,6 @@ create_partition() {
     cd /
     echo -e "${STEPS} Start creating eMMC partition..."
 
-    # Disable the system's partition adjustment service
-    systemctl stop armbian-resize-filesystem.service
-    systemctl disable armbian-resize-filesystem.service
-
     # Backup the bootloader, if necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
