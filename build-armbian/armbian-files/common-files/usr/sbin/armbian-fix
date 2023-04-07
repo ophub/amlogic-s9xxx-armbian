@@ -25,74 +25,76 @@ fix_log="/tmp/armbian-fix.log"
 #
 #======================================================================================
 
-# Show start message
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start fixing..." >${fix_log}
+# Add log
+tolog() {
+    echo -e "${1}"
+    echo -e "[$(date +"%Y.%m.%d.%H:%M:%S")] ${1}" >>${fix_log}
+}
 
-# Start repairing system permissions
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start repairing system permissions..." >>${fix_log}
+# Show start message
+echo "" >${fix_log} && tolog "Start fixing..."
+
+# ===== Start repairing system permissions =====
 
 # Fix common releases permissions
-[[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && echo "01. Fix tmp permissions"
-[[ -d "/etc/update-motd.d" ]] && sudo chmod 755 /etc/update-motd.d/* && echo "02. Fix update-motd.d permissions"
-[[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R && echo "03. Fix man permissions"
-[[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R && echo "04. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers && echo "05. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && sudo chmod 440 /etc/sudoers && echo "06. Fix man permissions"
-[[ -f "/usr/bin/sudo" ]] && sudo chown root:root /usr/bin/sudo && echo "07. Fix sudo permissions"
-[[ -f "/usr/bin/sudo" ]] && sudo chmod 4755 /usr/bin/sudo && echo "08. Fix sudo permissions"
+[[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && tolog "01. Fix tmp permissions"
+[[ -d "/etc/update-motd.d" ]] && sudo chmod 755 /etc/update-motd.d/* && tolog "02. Fix update-motd.d permissions"
+[[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R && tolog "03. Fix man permissions"
+[[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R && tolog "04. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers && tolog "05. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && sudo chmod 440 /etc/sudoers && tolog "06. Fix man permissions"
+[[ -f "/usr/bin/sudo" ]] && sudo chown root:root /usr/bin/sudo && tolog "07. Fix sudo permissions"
+[[ -f "/usr/bin/sudo" ]] && sudo chmod 4755 /usr/bin/sudo && tolog "08. Fix sudo permissions"
 # Fix focal permissions
-[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chown 0 /usr/lib/sudo/sudoers.so && echo "09. Fix sudoers.so permissions"
-[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chmod 644 /usr/lib/sudo/sudoers.so && echo "10. Fix sudoers.so permissions"
-[[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 && echo "11. Fix polkit-agent-helper-1 permissions"
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chown 0 /usr/lib/sudo/sudoers.so && tolog "09. Fix sudoers.so permissions"
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chmod 644 /usr/lib/sudo/sudoers.so && tolog "10. Fix sudoers.so permissions"
+[[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 && tolog "11. Fix polkit-agent-helper-1 permissions"
 # Fix jammy permissions
-[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && echo "12. Fix sudoers.so permissions"
-[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && echo "13. Fix sudoers.so permissions"
-[[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && echo "14. Fix polkit-agent-helper-1 permissions"
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so && tolog "12. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && tolog "13. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && tolog "14. Fix polkit-agent-helper-1 permissions"
 
-# Start removing useless packages and scripts
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start removing useless packages and scripts..." >>${fix_log}
-
+# ===== Start removing useless packages and scripts =====
 # Remove packages
-sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && echo "20. Clean up local installation packages"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && echo "21. Remove linux-image-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && echo "22. Remove linux-dtb-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && echo "23. Remove linux-u-boot-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli-*)" ]] && sudo apt-mark hold armbian-bsp-cli-* && echo "24. Hold armbian-bsp-cli-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools)" ]] && sudo apt-mark hold u-boot-tools && echo "25. Hold u-boot-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools)" ]] && sudo apt-mark hold sunxi-tools && echo "26. Hold sunxi-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools*)" ]] && sudo apt-mark hold initramfs-tools* && echo "27. Hold initramfs-tools*"
+sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && tolog "20. Clean up local installation packages"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && tolog "21. Remove linux-image-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && tolog "22. Remove linux-dtb-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && tolog "23. Remove linux-u-boot-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli-*)" ]] && sudo apt-mark hold armbian-bsp-cli-* && tolog "24. Hold armbian-bsp-cli-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools)" ]] && sudo apt-mark hold u-boot-tools && tolog "25. Hold u-boot-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools)" ]] && sudo apt-mark hold sunxi-tools && tolog "26. Hold sunxi-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools*)" ]] && sudo apt-mark hold initramfs-tools* && tolog "27. Hold initramfs-tools*"
 
 # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
 # Move /usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
-[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak && echo "28. Move /usr/share/armbian to .bak"
+[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak && tolog "28. Move /usr/share/armbian to .bak"
 # Move /usr/lib/nand-sata-install to nand-sata-install.bak. [ Useless bootloader and u-boot ]
-[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install /usr/lib/nand-sata-install.bak && echo "29. Move /usr/lib/nand-sata-install to .bak"
+[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install /usr/lib/nand-sata-install.bak && tolog "29. Move /usr/lib/nand-sata-install to .bak"
 # Disable update_initramfs
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
-[[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && echo "30. Set update-initramfs.conf"
+[[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && tolog "30. Set update-initramfs.conf"
 
-# Start disabling system services
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start disabling system services..." >>${fix_log}
+# ===== Start disabling system services =====
 
 # Regenerate new machine-id
-sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && echo "50. Delete machine-id"
-sudo dbus-uuidgen --ensure=/etc/machine-id && echo "51. Generate /etc/machine-id"
-sudo dbus-uuidgen --ensure && echo "52. Generate /var/lib/dbus/machine-id"
+sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && tolog "50. Delete machine-id"
+sudo dbus-uuidgen --ensure=/etc/machine-id && tolog "51. Generate /etc/machine-id"
+sudo dbus-uuidgen --ensure && tolog "52. Generate /var/lib/dbus/machine-id"
 
 # Turn off automatic hibernation to prevent hard drives from hanging
-sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && echo "53. Turn off automatic sleep mode"
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target && tolog "53. Turn off automatic sleep mode"
 
 # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
 motd_tips="/etc/default/armbian-motd"
 [[ -f "${motd_tips}" ]] && {
     sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${motd_tips}
-    echo "54. Disable tips of the day"
+    tolog "54. Disable tips of the day"
 }
 quotes_cron="/etc/cron.weekly/armbian-quotes"
 [[ -f "${quotes_cron}" ]] && {
     sed -i "s|^curl |#curl |g" ${quotes_cron}
-    echo "55. Disable quotes cron plan"
+    tolog "55. Disable quotes cron plan"
 }
 
 # Remove motd-news service
@@ -101,14 +103,14 @@ motd_timer="/usr/lib/systemd/system/motd-news.timer"
     sudo systemctl stop motd-news.timer
     sudo systemctl disable motd-news.timer
     sudo rm -f ${motd_timer}
-    echo "56. Disable motd-news.timer"
+    tolog "56. Disable motd-news.timer"
 }
 motd_service="/usr/lib/systemd/system/motd-news.service"
 [[ -f "${motd_service}" ]] && {
     sudo systemctl stop motd-news.service
     sudo systemctl disable motd-news.service
     sudo rm -f ${motd_service}
-    echo "57. Disable motd-news.service"
+    tolog "57. Disable motd-news.service"
 }
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
@@ -118,19 +120,18 @@ sudo rm -f /etc/update-motd.d/50-motd-news
 # Disable the system's partition adjustment service
 sudo systemctl stop armbian-resize-filesystem.service 2>/dev/null
 sudo systemctl disable armbian-resize-filesystem.service 2>/dev/null
-echo "58. Disable the armbian-resize-filesystem.service"
+tolog "58. Disable the armbian-resize-filesystem.service"
 
-# Start adjusting custom settings
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom settings..." >>${fix_log}
+# ===== Start adjusting custom settings =====
 
 # Fix version differences(After 2022.12.03)
 [[ -f "/etc/amlogic_model_database.conf" ]] && {
     mv -f /etc/amlogic_model_database.conf /etc/model_database.conf
-    echo "70. Adjust the model_database.conf file name"
+    tolog "70. Adjust the model_database.conf file name"
 }
 [[ -f "/etc/rockchip_model_database.conf" ]] && {
     mv -f /etc/rockchip_model_database.conf /etc/model_database.conf
-    echo "71. Adjust the model_database.conf file name"
+    tolog "71. Adjust the model_database.conf file name"
 }
 
 # Confirm device information
@@ -143,12 +144,12 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     # Adjustment parameter name for ANDROID_UBOOT
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && {
         sed -i "s|^ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
-        echo "80. Adjust the ANDROID_UBOOT name"
+        tolog "80. Adjust the ANDROID_UBOOT name"
     }
     # Adjustment parameter name for UBOOT_STATUS
     [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && {
         sed -i "s|^UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
-        echo "81. Adjust the UBOOT_STATUS name"
+        tolog "81. Adjust the UBOOT_STATUS name"
     }
     # Add default kernel tags
     sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
@@ -156,22 +157,22 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_TAGS=")" ]] || {
         [[ "${soc_name,,}" == "rk3588" ]] && KERNEL_TAGS="rk3588" || KERNEL_TAGS="stable"
         echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
-        echo "82. Add the KERNEL_TAGS name"
+        tolog "82. Add the KERNEL_TAGS name"
     }
     # Add default GITHUB_CDN URL (CDN accelerated domain name)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^GITHUB_CDN=")" ]] || {
         echo "GITHUB_CDN=''" >>${ophub_release_file}
-        echo "83. Add the custom GITHUB_CDN URL"
+        tolog "83. Add the custom GITHUB_CDN URL"
     }
     # Add default KERNEL_REPO (Kernel download repository)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
-        echo "84. Add the custom KERNEL_REPO URL"
+        tolog "84. Add the custom KERNEL_REPO URL"
     }
     # Add default KERNEL_BACKUP (Automatic backup kernel)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BACKUP=")" ]] || {
         echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
-        echo "85. Add the custom KERNEL_BACKUP"
+        tolog "85. Add the custom KERNEL_BACKUP"
     }
 
     # Fix custom banner name
@@ -180,21 +181,21 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        echo "86. Fix custom board name: ${bd_name}"
+        tolog "86. Fix custom board name: ${bd_name}"
     }
 
     # Shorten release version number
     short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${short_version}" && -f "${armbian_release_file}" ]] && {
         sed -i "s|^VERSION=.*|VERSION=${short_version}-trunk|g" ${armbian_release_file}
-        echo "87. Set release version: ${short_version}-trunk"
+        tolog "87. Set release version: ${short_version}-trunk"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" == "rockchip" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        echo "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        tolog "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 }
 
@@ -202,8 +203,8 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Start adjusting custom setting
 todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf 2>/dev/null &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: Automatic expansion succeeded..." >>${fix_log}
+        tolog "Automatic expansion succeeded..."
 }
 
 # Show end message
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] armbian-fix: successfully fixed." >>${fix_log}
+tolog "successfully fixed."
