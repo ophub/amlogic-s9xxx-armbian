@@ -58,6 +58,8 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
           - [12.7.2.3.1 静态 IP 地址 - IPv4](#127231-静态-ip-地址---ipv4)
           - [12.7.2.3.2 DHCP 获取动态 IP 地址 - IPv4 / IPv6](#127232-dhcp-获取动态-ip-地址---ipv4--ipv6)
         - [12.7.2.4 修改网络连接 MAC 地址](#12724-修改网络连接-mac-地址)
+      - [12.7.3 如何启用无线](#1273-如何启用无线)
+      - [12.7.4 如何启用蓝牙](#1274-如何启用蓝牙)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
     - [12.9 如何更新系统中的服务脚本](#129-如何更新系统中的服务脚本)
     - [12.10 如何获取 eMMC 上的安卓系统分区信息](#1210-如何获取-emmc-上的安卓系统分区信息)
@@ -202,7 +204,7 @@ Amlogic, Rockchip 和 Allwinner 的安装方法不同。不同的设备具有不
 
 登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
-```yaml
+```shell
 armbian-install
 ```
 
@@ -312,7 +314,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
-```yaml
+```shell
 armbian-install
 ```
 
@@ -324,7 +326,7 @@ armbian-install
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 # 使用 root 用户运行 (sudo -i)
 # 如果不指定参数，将更新为最新版本。
 armbian-update
@@ -370,7 +372,7 @@ armbian-update
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-software
 ```
 
@@ -440,7 +442,7 @@ armbian-software
 
 默认情况下启用对红外接收器的支持，但如果您将电视盒用作服务器，那么您可能希望禁用 IR 内核模块以防止错误地关闭您的盒子。 要完全禁用 IR，请添加以下行：
 
-```yaml
+```shell
 blacklist meson_ir
 ```
 
@@ -458,7 +460,7 @@ blacklist meson_ir
 
 网络配置文件 `/etc/network/interfaces` 的默认内容如下：
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 # Network is managed by Network manager
 auto lo
@@ -467,7 +469,7 @@ iface lo inet loopback
 
 ##### 12.7.1.1 由 DHCP 动态分配 IP 地址
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 auto eth0
@@ -478,7 +480,7 @@ iface eth0 inet dhcp
 
 其中的 IP 和网关和 DNS 根据自己的网络情况修改。
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 auto eth0
@@ -494,7 +496,7 @@ dns-nameservers 192.168.1.1
 
 其中的 MAC 地址根据自己的需要修改。
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 allow-hotplug eth0
@@ -521,7 +523,7 @@ iface lo inet loopback
 
 查看设备中有哪些网络接口可以用来建立网络连接。
 
-```
+```shell
 nmcli device | grep -E "^[e].*|^[w].*|^[D].*|^[T].*" | awk '{printf "%-19s%-19s\n",$1,$2}'
 ```
 
@@ -529,7 +531,7 @@ nmcli device | grep -E "^[e].*|^[w].*|^[D].*|^[T].*" | awk '{printf "%-19s%-19s\
 
 其中 `eth0` = 第1块有线网卡的名称, `eth1` = 第2块有线网卡的名称, 以此类推, 无线网卡同理。
 
-```
+```shell
 DEVICE             TYPE
 eth0               ethernet
 eth1               ethernet
@@ -545,7 +547,7 @@ wlan1              wifi
 
 *) 在新建网络连接时, 不建议使用已经存在的连接名称。
 
-```
+```shell
 nmcli connection show | grep -E ".*|^[N].*" | awk '{printf "%-19s%-19s\n", $1,$3}'
 ```
 
@@ -553,7 +555,7 @@ nmcli connection show | grep -E ".*|^[N].*" | awk '{printf "%-19s%-19s\n", $1,$3
 
 其中 `ethernet` = 有线网卡, `wifi` = 无线网卡, `bridge` = 网桥
 
-```
+```shell
 NAME               TYPE
 cnc                ethernet
 lan                ethernet
@@ -568,7 +570,7 @@ cpe                wifi
 
 在网络接口 `eth0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
 
-```
+```shell
 # Set ENV
 MYCON=ether1                  # 新建网络连接名称
 MYETH=eth0                    # 网络接口名称 = eth0 / eth1 / eht2 / eth3
@@ -587,7 +589,7 @@ ip -c -br address
 
 在网络接口 `eth0` 上新建网络连接并立即生效 (`静态 IP 地址` - `IPv4`)。
 
-```
+```shell
 # Set ENV
 MYCON=ether1                  # 网络连接名称
 MYETH=eth0                    # 网络接口名称 = eth0 / eth1 / eht2 / eth3
@@ -613,7 +615,7 @@ ip -c -br address
 
 在网络接口 `wlan0` 上新建网络连接并立即生效 (`动态 IP 地址` - `IPv4 / IPv6`)。
 
-```
+```shell
 # Set ENV
 MYCON=ssid                    # 新建网络连接名称, 建议使用 WiFi SSID 来指定连接名称
 MYSSID=ssid                   # WiFi SSID 区分大小写
@@ -640,7 +642,7 @@ ip -c -br address
 
 修改无线网络连接 `ssid` 中的 `WiFi SSID or PASSWD` 并立即生效。
 
-```
+```shell
 # Set ENV
 MYCON=ssid                    # 无线网络连接名称
 MYSSID=ssid                   # WiFi SSID 区分大小写
@@ -664,7 +666,7 @@ ip -c -br address
 
 *适用 有线连接 / 无线连接
 
-```
+```shell
 # Set ENV
 MYCON=ether1                  # 网络连接名称
 IP=192.168.67.167/24          # HOST IP 地址, 其中 24 是子网掩码 对应 255.255.255.0
@@ -687,7 +689,7 @@ ip -c -br address
 
 *适用 有线连接 / 无线连接
 
-```
+```shell
 # Set ENV
 MYCON=ether1                  # 网络连接名称
 
@@ -705,7 +707,7 @@ ip -c -br address
 
 *适用 有线连接 / 无线连接
 
-```
+```shell
 # Set ENV
 MYCON=ether1                  # 网络连接名称, 注意匹配网络接口类型
 MYTYPE=ethernet               # 网络接口类型 = 有线网卡 / 无线网卡 = ethernet / wifi
@@ -720,6 +722,99 @@ ip -c -br address
 
 * 新建或修改部分网络参数, 网络连接可能会被断开, 并重新连接网络。
 * 由于软硬件环境不同（盒子, 系统, 网络设备等）, 生效所需时间 `1-15` 秒左右, 更长时间未生效的建议检查软硬件环境。
+
+#### 12.7.3 如何启用无线
+
+有的设备支持使用无线，启用方法如下：
+
+```shell
+# 安装管理工具
+sudo apt-get install network-manager
+
+# 查看网络设备
+sudo nmcli dev
+
+# 启用无线
+sudo nmcli r wifi on
+
+# 扫描无线
+sudo nmcli dev wifi
+
+# 连接无线
+sudo nmcli dev wifi connect "wifi名称" password "wifi密码"
+```
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/230541872-565a655e-2781-4170-8898-0ae096725506.png">
+</div>
+
+#### 12.7.4 如何启用蓝牙
+
+有的设备支持使用蓝牙，启用方法如下：
+
+```shell
+# 安装蓝牙支持
+armbian-config >> Network >> BT: Install Bluetooth support
+
+# 重启系统
+reboot
+```
+
+系统重启后，查看蓝牙驱动是否正常。桌面系统的可以在菜单里连接蓝牙设备。也可以使用终端图形界面安装。
+
+```shell
+dmesg | grep Bluetooth
+```
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/230545883-755a137d-f574-4b32-a26b-bea9cfbf6384.png">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/230544120-5a63dcd4-9716-40d2-ba59-c27f7b9937f8.png">
+</div>
+
+```shell
+# 连接蓝牙设备
+armbian-config >> Network >> BT: Discover and connect Bluetooth devices
+```
+
+也可以在终端中使用命令安装：
+```shell
+# 查看蓝牙服务运行状态
+sudo systemctl status bluetooth
+
+# 如果未启动，先开启蓝牙服务
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+
+# 扫描附近的蓝牙设备
+bluetoothctl scan on
+
+# 启用蓝牙发现
+bluetoothctl discoverable on
+
+# 进行蓝牙 MAC 地址配对
+bluetoothctl pair 12:34:56:78:90:AB
+
+# 查看配对好的蓝牙设备
+bluetoothctl paired-devices
+
+# 连接蓝牙设备
+bluetoothctl connect 12:34:56:78:90:AB
+
+# 信任设备，方便以后直接连接
+bluetoothctl trust 12:34:56:78:90:AB
+
+# 断开蓝牙设备
+bluetoothctl disconnect 12:34:56:78:90:AB
+
+# 解除蓝牙配对
+bluetoothctl remove 12:34:56:78:90:AB
+
+# 阻止连接设备
+bluetoothctl block 12:34:56:78:90:AB
+```
 
 ### 12.8 如何添加开机启动任务
 
@@ -741,19 +836,19 @@ ip -c -br address
 
 如果你使用的是 2022.11 之后本仓库中发布的 Armbian，你可以复制粘贴以下命令来获得一个记录完整分区信息的网址（设备本身并不需要联网）
 
-```
+```shell
 ampart /dev/mmcblk2 --mode webreport 2>/dev/null
 ```
 
 *ampart 的 webreport 模式为 2023.02.03 发布的 v1.2 版本引入的，如果你使用上面的命令无输出，则可能为不支持直接输出网址的旧版，你可以转而使用下面这条命令：*
 
-```
+```shell
 echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
 得到的网址将会类似于下面这样：
 
-```
+```shell
 https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0%20reserved:37748736:67108864:0%20cache:113246208:754974720:2%20env:876609536:8388608:0%20logo:893386752:33554432:1%20recovery:935329792:33554432:1%20rsv:977272832:8388608:1%20tee:994050048:8388608:1%20crypt:1010827264:33554432:1%20misc:1052770304:33554432:1%20instaboot:1094713344:536870912:1%20boot:1639972864:33554432:1%20system:1681915904:1073741824:1%20params:2764046336:67108864:2%20bootfiles:2839543808:754974720:2%20data:3602907136:4131389440:4&dsnapshot=logo::33554432:1%20recovery::33554432:1%20rsv::8388608:1%20tee::8388608:1%20crypt::33554432:1%20misc::33554432:1%20instaboot::536870912:1%20boot::33554432:1%20system::1073741824:1%20cache::536870912:2%20params::67108864:2%20data::-1:4
 ```
 

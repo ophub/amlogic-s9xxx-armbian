@@ -46,6 +46,8 @@ View Chinese description  |  [查看中文说明](README.cn.md)
       - [12.7.1 Dynamic IP address assignment by DHCP](#1271-dynamic-ip-address-assignment-by-dhcp)
       - [12.7.2 Manually set a static IP address](#1272-manually-set-a-static-ip-address)
       - [12.7.3 Use OpenWrt in docker to establish interworking network](#1273-use-openwrt-in-docker-to-establish-interworking-network)
+      - [12.7.4 how to enable wireless](#1274-how-to-enable-wireless)
+      - [12.7.5 How to enable Bluetooth](#1275-how-to-enable-bluetooth)
     - [12.8 How to add startup tasks](#128-how-to-add-startup-tasks)
     - [12.9 How to update service scripts in the system](#129-how-to-update-service-scripts-in-the-system)
     - [12.10 How to obtain Android partition info on eMMC](#1210-how-to-obtain-android-partition-info-on-emmc)
@@ -190,7 +192,7 @@ When the installation is complete, Connect the Armbian device to the `router`. A
 
 Login in to armbian (default user: root, default password: 1234) → input command:
 
-```yaml
+```shell
 armbian-install
 ```
 
@@ -247,7 +249,7 @@ Power off the board. Remove bootable device like MicroSD card, eMMC module, etc.
 - Install with a card reader: insert the M.2 NVMe SSD into the M.2 NVMe SSD to the USB3.0 card reader to connect to the host. Use tools such as Rufus or balenaEtcher to write the Armbian system image to NVMe, and then insert the NVMe with the system into the device for use.
 - Installation with microSD card: write the image of the Armbian system into the microSD card, insert the microSD card into the device, start it, and upload the Armbian image file is to the microSD card, and then use the `dd` command to write the `Armbian.img` to NVMe. The command is as follows:
 
-```Shell
+```shell
 dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 ```
 
@@ -302,7 +304,7 @@ Click to execute the write.
 
 Login in to armbian (default user: root, default password: 1234) → input command:
 
-```yaml
+```shell
 armbian-install
 ```
 
@@ -314,7 +316,7 @@ Supports compiling the kernel in Ubuntu20.04/22.04 or Armbian system. It support
 
 Login in to armbian → input command:
 
-```yaml
+```shell
 # Run as root user (sudo -i)
 # If no parameter is specified, it will update to the latest version.
 armbian-update
@@ -333,6 +335,7 @@ armbian-update
 Example: `armbian-update -k 5.15.50 -t dev`
 
 When updating the kernel, the kernel used by the current system will be automatically backed up. The storage path is in the `/ddbr/backup` directory, and the three recently used versions of the kernel will be preserved. If the newly installed kernel is unstable, the backed up kernel can be restored at any time:
+
 ```shell
 # Enter the backup kernel directory, such as 5.10.125
 cd /ddbr/backup/5.10.125
@@ -360,7 +363,7 @@ Custom options such as `-r`/`-t`/`-b`/`-c` can be fixed to the relevant paramete
 
 Login in to armbian → input command:
 
-```yaml
+```shell
 armbian-software
 ```
 
@@ -431,7 +434,7 @@ When the factory reset is completed, the box has been restored to the Android TV
 
 Support for the infrared receiver is enabled by default but if you are using your TV box as a server then you may wish to disable the IR kernel module to prevent switching your TV box off by mistake. To completely disable IR, add the line:
 
-```yaml
+```shell
 blacklist meson_ir
 ```
 
@@ -447,7 +450,7 @@ to `/etc/modprobe.d/blacklist.conf` and reboot.
 
 The default content of the network configuration file `/etc/network/interfaces` is as follows:
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 # Network is managed by Network manager
 auto lo
@@ -456,7 +459,7 @@ iface lo inet loopback
 
 #### 12.7.1 Dynamic IP address assignment by DHCP
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 auto eth0
@@ -467,7 +470,7 @@ iface eth0 inet dhcp
 
 The IP, gateway and DNS are modified according to your own network conditions.
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 auto eth0
@@ -483,7 +486,7 @@ dns-nameservers 192.168.1.1
 
 The MAC address in it can be modified according to your needs.
 
-```yaml
+```shell
 source /etc/network/interfaces.d/*
 
 allow-hotplug eth0
@@ -498,6 +501,99 @@ iface macvlan inet dhcp
 
 auto lo
 iface lo inet loopback
+```
+
+#### 12.7.4 how to enable wireless
+
+Some devices support the use of wireless, and the enabling method is as follows:
+
+```shell
+# Install management tools
+sudo apt-get install network-manager
+
+# View network devices
+sudo nmcli dev
+
+# Enable wireless
+sudo nmcli r wifi on
+
+# Scan wireless
+sudo nmcli dev wifi
+
+# Connect to wireless network
+sudo nmcli dev wifi connect "wifi-name" password "wifi-password"
+```
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/68696949/230541872-565a655e-2781-4170-8898-0ae096725506.png">
+</div>
+
+#### 12.7.5 How to enable Bluetooth
+
+Some devices support the use of Bluetooth, and the enabling method is as follows:
+
+```shell
+# Install Bluetooth support
+armbian-config >> Network >> BT: Install Bluetooth support
+
+# Restart the system
+reboot
+```
+
+After the system restarts, check whether the Bluetooth driver is normal. The desktop system can connect the bluetooth device in the menu. It can also be installed using a terminal GUI.
+
+```shell
+dmesg | grep Bluetooth
+```
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/230545883-755a137d-f574-4b32-a26b-bea9cfbf6384.png">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="600" alt="image" src="https://user-images.githubusercontent.com/68696949/230544120-5a63dcd4-9716-40d2-ba59-c27f7b9937f8.png">
+</div>
+
+```shell
+# Connect a Bluetooth device
+armbian-config >> Network >> BT: Discover and connect Bluetooth devices
+```
+
+It can also be installed using the command in the terminal:
+```shell
+# View the running status of the Bluetooth service
+sudo systemctl status bluetooth
+
+# If it is not started, turn on the Bluetooth service first
+sudo systemctl enable bluetooth
+sudo systemctl start bluetooth
+
+# Scan for nearby Bluetooth devices
+bluetoothctl scan on
+
+# Enable Bluetooth discovery
+bluetoothctl discoverable on
+
+# Perform Bluetooth MAC address pairing
+bluetoothctl pair 12:34:56:78:90:AB
+
+# View paired Bluetooth devices
+bluetoothctl paired-devices
+
+# Connect a Bluetooth device
+bluetoothctl connect 12:34:56:78:90:AB
+
+# Trust the device for direct connection in the future
+bluetoothctl trust 12:34:56:78:90:AB
+
+# Disconnect bluetooth device
+bluetoothctl disconnect 12:34:56:78:90:AB
+
+# Unpair Bluetooth
+bluetoothctl remove 12:34:56:78:90:AB
+
+# Block connected devices
+bluetoothctl block 12:34:56:78:90:AB
 ```
 
 ### 12.8 How to add startup tasks
@@ -521,19 +617,19 @@ When writing the Armbian system onto eMMC where Android system resides, you need
 
 If you're using Armbian released in this repo after Nov.2022, you can copy&paste the following command to get a URL that records the whole partition info (the device itself does not need to be online)
 
-```
+```shell
 ampart /dev/mmcblk2 --mode webreport 2>/dev/null
 ```
 
 *The webreport mode of ampart was added in the v1.2 version released on Feb 3rd 2022, if the above command outputs nothing, then the built-in ampart in your installation is probably older than this. You could use the following command instead:*
 
-```
+```shell
 echo "https://7ji.github.io/ampart-web-reporter/?dsnapshot=$(ampart /dev/mmcblk2 --mode dsnapshot 2>/dev/null | head -n 1)&esnapshot=$(ampart /dev/mmcblk2 --mode esnapshot 2>/dev/null | head -n 1)"
 ```
 
 The URL should look like this：
 
-```
+```shell
 https://7ji.github.io/ampart-web-reporter/?esnapshot=bootloader:0:4194304:0%20reserved:37748736:67108864:0%20cache:113246208:754974720:2%20env:876609536:8388608:0%20logo:893386752:33554432:1%20recovery:935329792:33554432:1%20rsv:977272832:8388608:1%20tee:994050048:8388608:1%20crypt:1010827264:33554432:1%20misc:1052770304:33554432:1%20instaboot:1094713344:536870912:1%20boot:1639972864:33554432:1%20system:1681915904:1073741824:1%20params:2764046336:67108864:2%20bootfiles:2839543808:754974720:2%20data:3602907136:4131389440:4&dsnapshot=logo::33554432:1%20recovery::33554432:1%20rsv::8388608:1%20tee::8388608:1%20crypt::33554432:1%20misc::33554432:1%20instaboot::536870912:1%20boot::33554432:1%20system::1073741824:1%20cache::536870912:2%20params::67108864:2%20data::-1:4
 ```
 
