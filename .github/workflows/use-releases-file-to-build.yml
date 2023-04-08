@@ -150,10 +150,9 @@ jobs:
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
-          echo "ARMBIAN_RELEASE=${{ inputs.set_release }}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Rebuild Armbian [ ${{ env.ARMBIAN_RELEASE }} ]
+      - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         with:
@@ -170,7 +169,7 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
-          tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: Armbian_${{ inputs.set_release }}_${{ env.PACKAGED_OUTPUTDATE }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
