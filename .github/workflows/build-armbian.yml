@@ -146,7 +146,6 @@ jobs:
           echo "ARMBIAN_MINIMAL_TAG=${minimal_tag}" >> ${GITHUB_ENV}
           echo "ARMBIAN_MINIMAL_OPTION=${minimal_option}" >> ${GITHUB_ENV}
 
-          echo "ARMBIAN_RELEASE=${{ inputs.set_release }}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download source code
@@ -157,16 +156,16 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ env.ARMBIAN_RELEASE }}${{ env.ARMBIAN_MINIMAL_TAG }} ]
+      - name: Compile Armbian [ Release:${{ inputs.set_release }} / Minimal:${{ inputs.minimal_image }} ]
         id: compile
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ env.ARMBIAN_RELEASE }} BUILD_MINIMAL=${{ env.ARMBIAN_MINIMAL_OPTION }} \
+              ./compile.sh RELEASE=${{ inputs.set_release }} BUILD_MINIMAL=${{ env.ARMBIAN_MINIMAL_OPTION }} \
                   BOARD=odroidn2 BRANCH=current BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes \
                   KERNEL_CONFIGURE=no CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE="sha"
-          echo "build_tag=Armbian_${{ env.ARMBIAN_RELEASE }}${{ env.ARMBIAN_MINIMAL_TAG }}_$(date +"%m.%d.%H%M")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_${{ inputs.set_release }}${{ env.ARMBIAN_MINIMAL_TAG }}_$(date +"%m.%d.%H%M")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clean up server space
