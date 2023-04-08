@@ -139,11 +139,11 @@ schedule:
 
 ### 5.3 Customize the default system configuration
 
-The configuration information of the default system is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, the `BUILD` value of the system to be compiled is set to `yes`, and the `BOARD` name must be unique.
+The configuration information of the default system is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, the `BOARD` name must be unique.
 
-It is specified by the `-b` parameter when compiling `locally`, and specified by the `armbian_board` parameter when compiling in `Actions` of github.com.
+Where the value of `BUILD` is `yes`, it is the system of some boxes packed by default, and these boxes can be used directly. The default value is `no`, and these unpacked boxes need to download the same `FAMILY` packaged system (it is recommended to download the `5.15/5.4` kernel system). After writing to `USB`, you can open the `boot partition on USB` on the computer, modify the `dtb name of FDT` in the `/boot/uEnv.txt` file, and other boxes in the adaptation list.
 
-In general, you only need to compile the general system. Other boxes in the same family can refer to the configuration file information table and use it by modifying the `dtb` value in `/boot/uEnv.txt`.
+It is specified by the `-b` parameter when compiling `locally`, and specified by the `armbian_board` parameter when compiling in `Actions` of github.com. Use `-b all` to pack all devices where `BUILD` is `yes`. When packaging with the specified `BOARD` parameter, no matter `BUILD` is `yes` or `no`, it can be packaged, for example: `-b r68s_s905x3-tx3_s905l3a-cm311`
 
 ## 6. Save the system
 
@@ -376,10 +376,6 @@ In the use of Armbian, some common problems that may be encountered are summariz
 ### 12.1 dtb and u-boot correspondence table for each box
 
 The list of supported TV boxes is located in the configuration file of the `Armbian` system is [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf).
-
-Where the value of `BUILD` is `yes`, it is the system of some boxes packed by default, and these boxes can be used directly. The default value is `no`, and these unpacked boxes need to download the same `FAMILY` packaged system (it is recommended to download the `5.15/5.4` kernel system). After writing to `USB`, you can open the `boot partition on USB` on the computer, modify the `dtb name of FDT` in the `/boot/uEnv.txt` file, and other boxes in the adaptation list.
-
-For users who perform custom compilation in the `fork` source code repository, if their device is not in the default packaging list, they can modify `no` in `BUILD` to `yes`, and set `a unique value` for `BOARD` to directly package their own device. The `unique value` added to `BOARD` can be used independently when packaging system, for example, `./rebuild -b s905x3` will generate the Armbian system corresponding to `s905x3` configuration, You need to add `BOARD` to [armbian_board](../../.github/workflows/build-armbian.yml#L20) option in the workflow control file when compiling separately in `github Actions`. When building all, `BUILD` is `yes`, all will be packaged.
 
 ### 12.2 LED screen display control instructions
 

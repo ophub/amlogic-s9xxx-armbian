@@ -151,11 +151,11 @@ schedule:
 
 ### 5.3 自定义默认系统配置
 
-默认系统的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，将需要编译系统的 `BUILD` 值设置为 `yes`，其中的 `BOARD` 名字要求唯一。
+默认系统的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，其中的 `BOARD` 名字要求唯一。
 
-在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。
+其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
-一般情况下只需要编译具有通用性的系统即可，同家族的其他盒子可以参考配置文件信息表，通过修改 `/boot/uEnv.txt` 中的 `dtb` 值进行使用。
+在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。使用 `-b all` 代表打包 `BUILD` 是 `yes` 的全部设备。使用指定 `BOARD` 参数打包时，无论 `BUILD` 是 `yes` 或者 `no` 均可打包，例如：`-b r68s_s905x3-tx3_s905l3a-cm311`
 
 ## 6. 保存系统
 
@@ -385,10 +385,6 @@ armbian-software
 ### 12.1 每个盒子的 dtb 和 u-boot 对应关系表
 
 支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)。
-
-其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
-
-对于 `fork` 源码仓库进行自定义编译的用户，如果自己的设备不在默认打包列表，可以修改 `BUILD` 中的 `no` 为 `yes`，并给 `BOARD` 设置 `唯一值`，实现直接打包自己的设备。给 `BOARD` 添加的 `唯一值` 在打包 Armbian 系统时可以独立使用，例如 `./rebuild -b s905x3` 生成 `s905x3` 配置对应的系统，在 `github Actions` 进行单独编译时需要把 `BOARD` 添加到工作流控制文件的 [armbian_board](../../.github/workflows/build-armbian.yml#L20) 选项中。全部打包时 `BUILD` 为 `yes` 的会全部打包。
 
 ### 12.2 LED 屏显示控制说明
 
