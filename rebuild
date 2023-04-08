@@ -207,8 +207,8 @@ init_var() {
     done
 
     # Columns of ${model_conf}:
-    # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG
-    # 8.KERNEL_TAGS  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
+    # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.DESCRIPTION
+    # 9.KERNEL_TAGS  10.PLATFORM  11.FAMILY  12.BOOT_CONF  13.BOARD  14.BUILD
 
     # Get a list of build devices
     if [[ "${build_board}" == "all" ]]; then
@@ -216,7 +216,7 @@ init_var() {
         build_armbian=($(
             cat ${model_conf} |
                 sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
-                grep -E "^[^#].*:yes$" | awk -F':' '{print $12}' |
+                grep -E "^[^#].*:yes$" | awk -F':' '{print $13}' |
                 sort | uniq | xargs
         ))
     else
@@ -229,7 +229,7 @@ init_var() {
     kernel_from=($(
         cat ${model_conf} |
             sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' -e 's/\.y/\.1/g' |
-            grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{print $8}' |
+            grep -E "^[^#].*${board_list}:yes$" | awk -F':' '{print $9}' |
             sort | uniq | xargs
     ))
     [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
@@ -424,8 +424,8 @@ confirm_version() {
     cd ${current_path}
 
     # Columns of ${model_conf}:
-    # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG
-    # 8.KERNEL_TAGS  9.PLATFORM  10.FAMILY  11.BOOT_CONF 12.BOARD  13.BUILD
+    # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.DESCRIPTION
+    # 9.KERNEL_TAGS  10.PLATFORM  11.FAMILY  12.BOOT_CONF  13.BOARD  14.BUILD
     # Column 5, called <UBOOT_OVERLOAD> in Amlogic, <TRUST_IMG> in Rockchip, Not used in Allwinner.
 
     # Find [ the first ] configuration information with [ the same BOARD name ] and [ BUILD as yes ] in the ${model_conf} file.
@@ -445,10 +445,10 @@ confirm_version() {
     TRUST_IMG="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="$(echo ${board_conf} | awk -F':' '{print $6}')"
     BOOTLOADER_IMG="$(echo ${board_conf} | awk -F':' '{print $7}')"
-    KERNEL_TAGS="$(echo ${board_conf} | awk -F':' '{print $8}')"
-    PLATFORM="$(echo ${board_conf} | awk -F':' '{print $9}')"
-    FAMILY="$(echo ${board_conf} | awk -F':' '{print $10}')"
-    BOOT_CONF="$(echo ${board_conf} | awk -F':' '{print $11}')"
+    KERNEL_TAGS="$(echo ${board_conf} | awk -F':' '{print $9}')"
+    PLATFORM="$(echo ${board_conf} | awk -F':' '{print $10}')"
+    FAMILY="$(echo ${board_conf} | awk -F':' '{print $11}')"
+    BOOT_CONF="$(echo ${board_conf} | awk -F':' '{print $12}')"
 
     # Check whether the key parameters are correct
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
@@ -944,10 +944,10 @@ refactor_rootfs() {
     echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
     echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
     echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
-    if [[ "${PLATFORM}" == "amlogic" ]]; then
+    if [[ "${PLATFORM}" == "rockchip" ]]; then
+        echo "TRUST_IMG='/usr/lib/${TRUST_IMG}'" >>${ophub_release_file}
+    elif [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
-    elif [[ "${PLATFORM}" == "rockchip" ]]; then
-        echo "TRUST_IMG='${TRUST_IMG}'" >>${ophub_release_file}
     fi
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
 
