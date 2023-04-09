@@ -175,6 +175,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k       | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable), Such as `-k 5.10.125` . Multiple kernel use `_` connection such as `-k 5.10.125_5.15.50` . The kernel version freely specified by the `-k` parameter is only valid for the kernel in the `stable`, and other kernels such as `rk3588` are specified by the [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) file. |
 | -a       | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.10.125 version. If there is the latest version of same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
 | -r       | KernelRepo | Specifies the `<owner>/<repo>` of the github.com kernel repository, Such as `-r ophub/kernel` |
+| -u       | kernelUsage | Set the tags suffix of [stable series kernel](https://github.com/ophub/kernel), such as `stable`, `flippy`, `dev`. Default: `stable` |
 | -s       | Size       | Specify the ROOTFS partition size for the system. The default is 2560MiB, and the specified size must be greater than 2048MiB. Such as `-s 2560` |
 | -t       | RootfsType | Set the file system type of the ROOTFS partition of the system, the default is `ext4` type, and the options are `ext4` or `btrfs` type. Such as `-t btrfs` |
 | -n       | CustomName | Set the signature part of the system name. The default value is empty. You can add signatures such as `_server`, `_gnome_desktop` or `_ophub` as needed. Do not include spaces when setting custom signatures. |
@@ -220,7 +221,8 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | armbian_board      | all               | Set the `board` of the packaged TV Boxes, function reference `-b`    |
 | armbian_kernel     | 6.1.1_5.15.1      | Set kernel [version](https://github.com/ophub/kernel/releases/tag/kernel_stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
-| kernel_repo        | ophub/kernel | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
+| kernel_repo        | ophub/kernel      | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
+| kernel_usage       | ophub/kernel      | Set the tags suffix of [stable series kernel](https://github.com/ophub/kernel), function reference `-u` |
 | armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
 | armbian_fstype     | ext4              | Set the file system type of the system ROOTFS partition, function reference `-t` |
 | armbian_sign       | None              | Set the signature part of the system name, function reference `-n`               |
