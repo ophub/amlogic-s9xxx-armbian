@@ -16,6 +16,14 @@ inputs:
     description: "Set device Board."
     required: false
     default: "all"
+  kernel_repo:
+    description: "Set kernel repository."
+    required: false
+    default: "ophub/kernel"
+  kernel_usage:
+    description: "Set the tags of the stable kernel."
+    required: false
+    default: "stable"
   armbian_kernel:
     description: "Set kernel version."
     required: false
@@ -24,22 +32,14 @@ inputs:
     description: "Auto use the latest kernel."
     required: false
     default: "true"
-  kernel_repo:
-    description: "Set kernel repository."
-    required: false
-    default: "https://github.com/ophub/kernel"
-  kernel_usage:
-    description: "Set the tags of the stable kernel."
-    required: false
-    default: "stable"
-  armbian_size:
-    description: "Set armbian rootfs size(Unit: MiB)."
-    required: false
-    default: "2560"
   armbian_fstype:
     description: "Set armbian rootfs type: ext4 / btrfs"
     required: false
     default: "ext4"
+  armbian_size:
+    description: "Set armbian rootfs size(Unit: MiB)."
+    required: false
+    default: "2560"
   armbian_sign:
     description: "Set armbian custom name."
     required: false
@@ -65,14 +65,14 @@ inputs:
     description: "Select compile package list"
     required: false
     default: "all"
-  kernel_toolchain:
-    description: "Select the compilation toolchain"
-    required: false
-    default: "clang"
   kernel_sign:
     description: "Set the kernel custom signature"
     required: false
     default: "-ophub"
+  kernel_toolchain:
+    description: "Select the compilation toolchain"
+    required: false
+    default: "clang"
   kernel_config:
     description: "Set the path of kernel .config"
     required: false
@@ -121,12 +121,12 @@ runs:
             echo -e "Start to rebuild armbian..."
             make_command=""
             [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
-            [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
-            [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
             [[ -n "${{ inputs.kernel_usage }}" ]] && make_command="${make_command} -u ${{ inputs.kernel_usage }}"
-            [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
+            [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
+            [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
+            [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.armbian_sign }}" ]] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
             [[ -n "${{ inputs.gh_token }}" ]] && make_command="${make_command} -g ${{ inputs.gh_token }}"
             sudo ./rebuild ${make_command}
@@ -169,8 +169,8 @@ runs:
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
             [[ -n "${{ inputs.kernel_auto }}" ]] && make_command="${make_command} -a ${{ inputs.kernel_auto }}"
             [[ -n "${{ inputs.kernel_package }}" ]] && make_command="${make_command} -p ${{ inputs.kernel_package }}"
-            [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
+            [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
             sudo ./recompile ${make_command}
 
             cd ${GITHUB_ACTION_PATH}
