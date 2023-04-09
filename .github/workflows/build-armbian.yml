@@ -95,7 +95,15 @@ on:
         type: choice
         options:
           - ophub/kernel
-          - breakings/OpenWrt
+      kernel_usage:
+        description: "Set the tags of the stable kernel."
+        required: false
+        default: "stable"
+        type: choice
+        options:
+          - stable
+          - flippy
+          - dev
       armbian_fstype:
         description: "Select armbian rootfs type."
         required: false
@@ -201,6 +209,7 @@ jobs:
           armbian_kernel: ${{ inputs.armbian_kernel }}
           auto_kernel: ${{ inputs.auto_kernel }}
           kernel_repo: ${{ inputs.kernel_repo }}
+          kernel_usage: ${{ inputs.kernel_usage }}
           armbian_fstype: ${{ inputs.armbian_fstype }}
           gh_token: ${{ secrets.GH_TOKEN }}
 
