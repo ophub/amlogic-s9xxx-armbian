@@ -222,7 +222,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | armbian_kernel     | 6.1.1_5.15.1      | Set kernel [version](https://github.com/ophub/kernel/releases/tag/kernel_stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | kernel_repo        | ophub/kernel      | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
-| kernel_usage       | ophub/kernel      | Set the tags suffix of [stable series kernel](https://github.com/ophub/kernel), function reference `-u` |
+| kernel_usage       | stable            | Set the tags suffix of [stable series kernel](https://github.com/ophub/kernel), function reference `-u` |
 | armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
 | armbian_fstype     | ext4              | Set the file system type of the system ROOTFS partition, function reference `-t` |
 | armbian_sign       | None              | Set the signature part of the system name, function reference `-n`               |
