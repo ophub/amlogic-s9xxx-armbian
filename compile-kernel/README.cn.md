@@ -39,10 +39,10 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | ------ | ----------- | ------------------------------- |
 | -k     | Kernel      | 指定 kernel 名称，如 `-k 5.15.100` . 多个内核使用 `_` 进行连接，如 `-k 5.15.100_5.15.50` |
 | -a     | AutoKernel  | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.15.100` 的同系列是否有更新的版本，如有 `5.15.100` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
-| -p     | PackageList | 设置编译内核的包列表。默认值为 `all` ，将编译 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅编译 3 个 dtbs 文件。 |
-| -t     | Toolchain   | 设置编译内核的工具链。默认值为 `gcc`，可选项：`clang / gcc` |
-| -n     | CustomName  | 设置内核自定义签名。默认值为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。 |
-| -r     | Repository  | 指定编译内核的源代码仓库。默认为 `unifreq` 。可选择 `github.com` 的内核源代码仓库。例如 `-r unifreq` 等。可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch` |
+| -p     | PackageList | 设置编译内核的包列表。当设置为 `all` ，将编译 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅编译 3 个 dtbs 文件。默认值：`all` |
+| -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc`。默认值：`gcc` |
+| -n     | CustomName  | 设置内核自定义签名。当设置为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。默认值：`-ophub` |
+| -r     | Repository  | 指定编译内核的源代码仓库。可选择 `github.com` 的内核源代码仓库。例如 `-r unifreq` 等。可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch`。默认值：`unifreq` |
 
 - `sudo ./recompile` : 使用默认配置编译内核。
 - `sudo ./recompile -k 5.15.100` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
