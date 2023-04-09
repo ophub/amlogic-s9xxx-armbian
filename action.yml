@@ -27,7 +27,11 @@ inputs:
   kernel_repo:
     description: "Set kernel repository."
     required: false
-    default: "https://github.com/ophub/kernel/tree/main/pub"
+    default: "https://github.com/ophub/kernel"
+  kernel_usage:
+    description: "Set the tags of the stable kernel."
+    required: false
+    default: "stable"
   armbian_size:
     description: "Set armbian rootfs size(Unit: MiB)."
     required: false
@@ -120,6 +124,7 @@ runs:
             [[ -n "${{ inputs.armbian_kernel }}" ]] && make_command="${make_command} -k ${{ inputs.armbian_kernel }}"
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
+            [[ -n "${{ inputs.kernel_usage }}" ]] && make_command="${make_command} -u ${{ inputs.kernel_usage }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_sign }}" ]] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
