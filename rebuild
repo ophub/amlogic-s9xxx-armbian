@@ -77,7 +77,9 @@ firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
 firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Set the kernel download repository from github.com
-kernel_repo="ophub/kernel"
+kernel_repo="https://github.com/ophub/kernel"
+# Set the tags suffix of the stable kernel, such as kernel_stable, etc.
+kernel_usage="stable"
 # Set the list of kernels used by default
 stable_kernel=("6.1.1" "5.15.1")
 rk3588_kernel=("5.10.1")
@@ -128,7 +130,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "b:k:a:r:s:t:n:g:" "${@}")"
+    get_all_ver="$(getopt "b:k:a:r:u:s:t:n:g:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -165,6 +167,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -r parameter [ ${2} ]!"
+            fi
+            ;;
+        -u | --kernelUsage)
+            if [[ -n "${2}" ]]; then
+                kernel_usage="${2//kernel_/}"
+                shift
+            else
+                error_msg "Invalid -u parameter [ ${2} ]!"
             fi
             ;;
         -s | --Size)
@@ -285,13 +295,14 @@ query_version() {
     for k in ${tags_list[*]}; do
         {
             # Select the corresponding kernel directory and list
-            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
+                kd="${k}"
                 down_kernel_list=(${rk3588_kernel[*]})
             elif [[ "${k}" == "specify" ]]; then
-                kd="stable"
+                kd="${kernel_usage}"
                 down_kernel_list=(${specify_kernel[*]})
             else
+                kd="${kernel_usage}"
                 down_kernel_list=(${stable_kernel[*]})
             fi
 
@@ -379,13 +390,14 @@ download_kernel() {
     for k in ${tags_list[*]}; do
         {
             # Set the kernel download list
-            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
+                kd="${k}"
                 down_kernel_list=(${rk3588_kernel[*]})
             elif [[ "${k}" == "specify" ]]; then
+                kd="${kernel_usage}"
                 down_kernel_list=(${specify_kernel[*]})
-                kd="stable"
             else
+                kd="${kernel_usage}"
                 down_kernel_list=(${stable_kernel[*]})
             fi
 
@@ -988,13 +1000,14 @@ loop_rebuild() {
             confirm_version
 
             # Determine kernel tags
-            kd="${KERNEL_TAGS}"
             if [[ "${KERNEL_TAGS}" == "rk3588" ]]; then
+                kd="${KERNEL_TAGS}"
                 kernel_list=(${rk3588_kernel[*]})
             elif [[ "${KERNEL_TAGS}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
+                kd="${kernel_usage}"
                 kernel_list=(${specify_kernel[*]})
-                kd="stable"
             else
+                kd="${kernel_usage}"
                 kernel_list=(${stable_kernel[*]})
             fi
 
