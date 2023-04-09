@@ -218,14 +218,14 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 |------------------|-------------------|--------------------------------------------------|
 | armbian_path     | 无                | 设置原版 Armbian 文件的路径，支持使用当前工作流中的文件路径如 `build/output/images/*.img` ，也支持使用网络下载地址如： `https://dl.armbian.com/*/Armbian_*.img.xz` |
 | armbian_board    | all               | 设置打包盒子的 `board` ，功能参考 `-b`                 |
+| kernel_repo      | ophub/kernel      | 指定 github.com 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
+| kernel_usage     | stable            | 设置使用的内核的 `tags 后缀`。功能参考 `-u` |
 | armbian_kernel   | 6.1.1_5.15.1      | 设置内核 [版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)，功能参考 `-k` |
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
-| kernel_repo      | ophub/kernel      | 指定 github.com 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
-| kernel_usage     | stable            | 设置 [stable 系列内核](https://github.com/ophub/kernel) 的 tags 后缀。功能参考 `-u` |
-| armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
+| armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
 | armbian_sign     | 无                | 设置系统名称中的签名部分，功能参考 `-n`               |
-| gh_token         | 无                | 可选项。设置 ${{ secrets.GH_TOKEN }}。功能参考 `-g`      |
+| gh_token         | 无                | 可选项。设置 ${{ secrets.GH_TOKEN }}。功能参考 `-g` |
 
 - ### GitHub Actions 输出变量说明
 

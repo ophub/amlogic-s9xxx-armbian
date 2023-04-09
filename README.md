@@ -219,12 +219,12 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | ------------------ | ----------------- | ----------------------------------- |
 | armbian_path       | None              | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
 | armbian_board      | all               | Set the `board` of the packaged TV Boxes, function reference `-b`    |
+| kernel_repo        | ophub/kernel      | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
+| kernel_usage       | stable            | Set the `tags suffix` of the kernel used, function reference `-u` |
 | armbian_kernel     | 6.1.1_5.15.1      | Set kernel [version](https://github.com/ophub/kernel/releases/tag/kernel_stable), function reference `-k`        |
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
-| kernel_repo        | ophub/kernel      | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
-| kernel_usage       | stable            | Set the tags suffix of [stable series kernel](https://github.com/ophub/kernel), function reference `-u` |
-| armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
 | armbian_fstype     | ext4              | Set the file system type of the system ROOTFS partition, function reference `-t` |
+| armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
 | armbian_sign       | None              | Set the signature part of the system name, function reference `-n`               |
 | gh_token           | None              | Optional. Set ${{ secrets.GH_TOKEN }}, function reference `-g` |
 
