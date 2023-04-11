@@ -43,7 +43,7 @@
 # software_122  : For navidrome:4533
 # software_123  : For alist:5244
 # software_124  : For qinglong:5700
-# software_124  : For chatgpt-web:3002
+# software_125  : For chatgpt-web:3002
 #
 #============================================================================
 
