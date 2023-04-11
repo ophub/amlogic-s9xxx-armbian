@@ -61,7 +61,7 @@ software_303() {
         sudo nps start
 
         sync && sleep 3
-        echo -e "${NOTE} The NPS address: [ http://ip:8080 ]"
+        echo -e "${NOTE} The NPS address: [ http://${my_address}:8080 ]"
         echo -e "${NOTE} The NPS account: [ username:admin  /  password:123 ]"
         echo -e "${NOTE} The NPS Instructions for Use: [ https://ehang-io.github.io/nps ]"
         echo -e "${SUCCESS} The NPS installation is successful."
@@ -162,9 +162,9 @@ software_305() {
         echo -e "${STEPS} Confirm the service is enabled..."
         systemctl is-enabled plexmediaserver.service
 
-        # Configure Plex Media Server: http://ip:32400/web
+        # Configure Plex Media Server
         sync && sleep 3
-        echo -e "${NOTE} The Plex Media Server address: [ http://ip:32400/web ]"
+        echo -e "${NOTE} The Plex Media Server address: [ http://${my_address}:32400/web ]"
         echo -e "${SUCCESS} The Plex Media Server installation is successful."
         ;;
     update) software_update ;;
@@ -208,9 +208,9 @@ software_306() {
         echo -e "${STEPS} Confirm the service is enabled..."
         systemctl is-enabled emby-server.service
 
-        # Configure Emby Server: http://ip:8096
+        # Configure Emby Server
         sync && sleep 3
-        echo -e "${NOTE} The Emby Server address: [ http://ip:8096 ]"
+        echo -e "${NOTE} The Emby Server address: [ http://${my_address}:8096 ]"
         echo -e "${SUCCESS} The Emby Server installation is successful."
         ;;
     update) software_update ;;
