@@ -43,6 +43,7 @@
 # software_122  : For navidrome:4533
 # software_123  : For alist:5244
 # software_124  : For qinglong:5700
+# software_124  : For chatgpt-web:3002
 #
 #============================================================================
 
@@ -81,7 +82,7 @@ software_102() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ https://ip:9443 ]"
+        echo -e "${NOTE} The ${container_name} address: [ https://${my_address}:9443 ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
@@ -116,7 +117,7 @@ software_103() {
         sudo ufw allow 8001/tcp 2>/dev/null
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ http://ip:8001 ]"
+        echo -e "${NOTE} The ${container_name} address: [ http://${my_address}:8001 ]"
         echo -e "${NOTE} The ${container_name} account: [ username:admin@yacht.local  /  password:pass ]"
         echo -e "${NOTE} The ${container_name} website: [ https://yacht.sh ]"
         echo -e "${NOTE} The ${container_name} template: [ https://raw.githubusercontent.com/SelfhostedPro/selfhosted_templates/yacht/Template/template.json ]"
@@ -177,7 +178,7 @@ software_104() {
         #bash <(curl -fsSL ${tr_cn_url}) ${install_path}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ http://ip:9091 ]"
+        echo -e "${NOTE} The ${container_name} address: [ http://${my_address}:9091 ]"
         echo -e "${NOTE} The ${container_name} account: [ username:${tr_user}  /  password:${tr_pass} ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
@@ -213,7 +214,7 @@ software_105() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address: [ http://ip:8080 ]"
+        echo -e "${NOTE} The ${container_name} address: [ http://${my_address}:8080 ]"
         echo -e "${NOTE} The ${container_name} account: [ username:admin  /  password:adminadmin ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
@@ -248,7 +249,7 @@ software_106() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8088 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8088 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -284,7 +285,7 @@ software_107() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8096  /  https://ip:8920 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8096  /  https://${my_address}:8920 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -319,7 +320,7 @@ software_108() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} app [ Home Assistant ]"
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8123 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8123 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -351,7 +352,7 @@ software_109() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8081 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8081 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -384,7 +385,7 @@ software_110() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:5050 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5050 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -417,7 +418,7 @@ software_111() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8989 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8989 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -450,7 +451,7 @@ software_112() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:7878 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:7878 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -487,7 +488,7 @@ software_113() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8384 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8384 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -520,7 +521,7 @@ software_114() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8002 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8002 ]"
         echo -e "${NOTE} The ${container_name} account: [ username:admin  /  password:admin ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
@@ -553,7 +554,7 @@ software_115() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:8003  /  https://ip:8004 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:8003  /  https://${my_address}:8004 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -584,7 +585,7 @@ software_116() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:1880 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:1880 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -628,7 +629,7 @@ EOF
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name}  address [ http://ip:1883  /  http://ip:9001 ]"
+        echo -e "${NOTE} The ${container_name}  address [ http://${my_address}:1883  /  http://${my_address}:9001 ]"
         echo -e "${NOTE} The ${container_name} tutorial [ https://www.mosquitto.org/ ]"
         echo -e "${NOTE} The ${container_name}  MQTT.fx [ https://softblade.de/en/download-2/ ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
@@ -725,7 +726,7 @@ software_119() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:19999 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:19999 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -760,7 +761,7 @@ software_120() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:2345 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:2345 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -799,9 +800,9 @@ software_121() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} Usage [ https://github.com/infrastlabs/docker-headless ]"
-        echo -e "${NOTE} The ${container_name} noVnc [ http://ip:10081 ], PASS [ headless ], ReadOnly [ View123 ]"
-        echo -e "${NOTE} The ${container_name} RDP [ ip:10089 ]"
-        echo -e "${NOTE} The ${container_name} SSH [ ssh -p 10022 headless@ip ]"
+        echo -e "${NOTE} The ${container_name} noVnc [ http://${my_address}:10081 ], PASS [ headless ], ReadOnly [ View123 ]"
+        echo -e "${NOTE} The ${container_name} RDP [ ${my_address}:10089 ]"
+        echo -e "${NOTE} The ${container_name} SSH [ ssh -p 10022 headless@${my_address} ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -832,7 +833,7 @@ software_122() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:4533 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:4533 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -863,7 +864,7 @@ software_123() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:5244 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5244 ]"
         echo -e "${NOTE} View the initialization account and password commands [ docker exec -it alist ./alist password ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
@@ -896,7 +897,52 @@ software_124() {
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://ip:5700 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5700 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For chatgpt-web
+software_125() {
+    # Set basic information
+    container_name="chatgpt-web"
+    image_name="chenzhaoyu94/chatgpt-web:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+
+        # Set your OPENAI_API_KEY
+        echo -ne "${OPTIONS} Please input your OPENAI_API_KEY, such as sk-xxxxx: "
+        read oak
+        [[ -n "${oak}" ]] && your_api_key="${oak}" || error_msg "OPENAI_API_KEY is invalid."
+
+        # Set your login password
+        echo -ne "${OPTIONS} Please input your login password: "
+        read pw
+        [[ -n "${pw}" ]] && your_password="${pw}" || error_msg "PassWord is invalid."
+
+        # Instructions: https://hub.docker.com/r/chenzhaoyu94/chatgpt-web
+        docker run -d --name=chatgpt-web \
+            -p 3002:3002 \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -e TIMEOUT_MS=100000 \
+            -e MAX_REQUEST_PER_HOUR=0 \
+            -e OPENAI_API_KEY=${your_api_key} \
+            -e AUTH_SECRET_KEY=${your_password} \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3002 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
