@@ -330,8 +330,8 @@ armbian-update
 | -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com |
 | -b        | yes          | yes/no         | Automatically backup the current system kernel               |
 | -m        | no           | yes/no         | Use Mainline u-boot                                          |
-| -h        | None         | None           | View usage help                                              |
 | -s        | None         | None           | [SOS] Restore eMMC with system kernel from USB               |
+| -h        | None         | None           | View usage help                                              |
 
 Example: `armbian-update -k 5.15.50 -u dev`
 
