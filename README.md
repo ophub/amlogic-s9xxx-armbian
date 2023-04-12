@@ -66,17 +66,18 @@ Login in to armbian → input command:
 armbian-update
 ```
 
-| Optional  | Default      | Value          | Description                   |
-| --------- | ------------ | -------------- | ----------------------------- |
-| -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -t        | automate     | stable/rk3588/flippy/dev  | Set the [kernel tags](https://github.com/ophub/kernel) |
-| -m        | no           | yes/no         | Use Mainline u-boot           |
-| -b        | yes          | yes/no         | Automatically backup the current system kernel |
+| Optional  | Default      | Value          | Description                                                  |
+| --------- | ------------ | -------------- | ------------------------------------------------------------ |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
-| -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com  |
-| -s        | None         | None           | [SOS] Restore eMMC with system kernel from USB |
+| -u        | automate     | stable/rk3588/flippy/dev  | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel used |
+| -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com |
+| -b        | yes          | yes/no         | Automatically backup the current system kernel               |
+| -m        | no           | yes/no         | Use Mainline u-boot                                          |
+| -h        | None         | None           | View usage help                                              |
+| -s        | None         | None           | [SOS] Restore eMMC with system kernel from USB               |
 
-Example: `armbian-update -k 5.15.50 -t dev`
+Example: `armbian-update -k 5.15.50 -u dev`
 
 When updating the kernel, the kernel used by the current system will be automatically backed up. The storage path is in the `/ddbr/backup` directory, and the three recently used versions of the kernel will be preserved. If the newly installed kernel is unstable, the backed up kernel can be restored at any time. If the update fails and the system cannot be started, you can start any version of Armbian via USB to recover the system in eMMC. For more instructions, see the help [documentation](build-armbian/documents/).
 
