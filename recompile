@@ -95,7 +95,7 @@ mount_again() {
     # Check mount parameters
     m_dev="${1}"
     m_target="${2}"
-    [[-n "${m_dev}" && -n "${m_target}" ]] || {
+    [[ -n "${m_dev}" && -n "${m_target}" ]] || {
         error_msg "Mount parameter is missing: [ ${m_dev}, ${m_target} ]"
     }
 
