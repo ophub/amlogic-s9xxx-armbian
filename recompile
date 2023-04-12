@@ -19,6 +19,7 @@
 #======================================= Functions list =======================================
 #
 # error_msg          : Output error message
+# mount_again        : Mount the image file, fail again
 #
 # init_var           : Initialize all variables
 # toolchain_check    : Check and install the cross-compilation toolchain
@@ -88,6 +89,29 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+mount_again() {
+    # Check mount parameters
+    m_dev="${1}"
+    m_target="${2}"
+    [[-n "${m_dev}" && -n "${m_target}" ]] || {
+        error_msg "Mount parameter is missing: [ ${m_dev}, ${m_target} ]"
+    }
+
+    i="1"
+    max_try="10"
+    while [[ "${i}" -le "${max_try}" ]]; do
+        mount ${m_dev} ${m_target}
+        if [[ "${?}" -eq "0" ]]; then
+            break
+        else
+            sync && sleep 3
+            umount -f ${m_target} 2>/dev/null
+            i="$((i + 1))"
+        fi
+    done
+    [[ "${i}" -gt "${max_try}" ]] && error_msg "[ ${i} ] attempts to mount failed."
 }
 
 init_var() {
@@ -430,12 +454,8 @@ generate_uinitrd() {
     loop_armbian="$(losetup -P -f --show "${chroot_file}")"
     [[ -n "${loop_armbian}" ]] || error_msg "losetup ${chroot_file} failed."
 
-    if ! mount ${loop_armbian}p2 ${tag_rootfs}; then
-        error_msg "mount ${loop_armbian}p2 failed!"
-    fi
-    if ! mount ${loop_armbian}p1 ${tag_rootfs}/boot; then
-        error_msg "mount ${loop_armbian}p1 failed!"
-    fi
+    mount_again ${loop_armbian}p2 ${tag_rootfs}
+    mount_again ${loop_armbian}p1 ${tag_rootfs}/boot
 
     ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
     echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
