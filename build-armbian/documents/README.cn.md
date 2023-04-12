@@ -332,17 +332,18 @@ armbian-install
 armbian-update
 ```
 
-| 可选参数  | 默认值        | 选项           | 说明               |
-| -------- | ------------ | ------------- | ----------------- |
-| -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
-| -t       | 自动化        | stable/rk3588/flippy/dev | 设置[内核 tags](https://github.com/ophub/kernel)     |
-| -m       | no           | yes/no        | 使用主线 u-boot     |
-| -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
+| 可选参数  | 默认值        | 选项           | 说明                              |
+| -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
+| -u       | 自动化        | stable/rk3588/flippy/dev | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
+| -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -c       | 无           | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
+| -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
+| -m       | no           | yes/no        | 使用主线 u-boot                    |
+| -h       | 无           | 无             | 查看使用帮助                       |
 | -s       | 无           | 无             | [SOS] 使用 USB 中的系统内核恢复 eMMC |
 
-举例: `armbian-update -k 5.15.50 -t dev`
+举例: `armbian-update -k 5.15.50 -u dev`
 
 更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核：
 ```shell
@@ -358,14 +359,14 @@ armbian-update
 
 如果你本地的网络访问 github.com 不流畅，可以通过 `armbian-update -c https://gh...xy.com/` 这样的方式添加 CDN 加速服务，请自行查阅适合当地使用的加速 CDN 域名。加速域名也可以固定填写到个性化配置文件 `/etc/ophub-release` 的 `GITHUB_CDN='https://gh...xy.com/'` 参数里，避免每次输入。
 
-通过 `-r`/`-t`/`-b`/`-c` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
+通过 `-r`/`-u`/`-c`/`-b` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
 
 ```shell
 # 自定义修改参数的赋值
 -r  :  KERNEL_REPO='ophub/kernel'
--t  :  KERNEL_TAGS='stable'
--b  :  KERNEL_BACKUP='yes'
+-u  :  KERNEL_TAGS='stable'
 -c  :  GITHUB_CDN='https://gh...xy.com/'
+-b  :  KERNEL_BACKUP='yes'
 ```
 
 ## 11. 安装常用软件
