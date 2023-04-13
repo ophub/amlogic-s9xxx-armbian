@@ -1013,7 +1013,8 @@ clean_tmp() {
 
     cd ${tmp_outpath}
 
-    pigz -f *.img && mv -f *.img.gz ${armbian_outputpath} && sync
+    pigz -qf *.img || gzip -qf *.img
+    mv -f *.img.gz -t ${armbian_outputpath} && sync
 
     cd ${current_path}
 
