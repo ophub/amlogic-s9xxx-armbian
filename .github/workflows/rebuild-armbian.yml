@@ -46,6 +46,7 @@ on:
           - s905lb-r3300l
           - rock5b
           - h88k
+          - ipc-r
           - r66s
           - r68s
           - h66k
