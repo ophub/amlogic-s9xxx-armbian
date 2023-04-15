@@ -41,7 +41,7 @@ on:
       releases_keep_keyword:
         description: "Keyword of the keep releases."
         required: false
-        default: "s9xxx/kernel"
+        default: "v0/kernel"
       delete_workflows:
         description: "Delete workflows records?"
         required: true
