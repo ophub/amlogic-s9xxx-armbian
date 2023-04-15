@@ -21,29 +21,77 @@ on:
         options:
           - all
           - s922x_s905x3_s905d_s912_s905l3a
-          - r66s_r68s_h66k_h68k_e25_nanopi-r5s
-          - eaidk-610_king3399_tn3399_kylin3399_hugsun-zm
-          - vplus_tanix-tx6
-          - a311d
-          - s922x
-          - s922x-reva
-          - s922x-ct2000
-          - s905x3
-          - s905x3-b
-          - s905x2
-          - s912
-          - s912-m8s-pro
           - s905d
           - s905d-ki-pro
           - s905x
+          - s905x-tx9
+          - s905x-t95
+          - s905x-b860h
+          - s905x-tbee
           - s905w
-          - s905
+          - s905w-w95
+          - s905w-x96w
+          - s905w-x96-mini
           - s905l2
+          - s905l2-wojia
+          - s905l2-e900v21e
           - s905l3
           - s905l3-unt400g1
           - s905l3a
+          - s905l3a-cm311
+          - s905l3a-m401a
           - s905l3b
+          - s905l3b-e900v22e
+          - s905l3b-e900v22d
+          - s905l3b-ip103h
+          - s905lb-q96-mini
           - s905lb-r3300l
+          - s912
+          - s912-zyxq-fake
+          - s912-h96pro-plus
+          - s912-tx92
+          - s912-z6-plus
+          - s912-m8s-pro
+          - s912-t95z-plus
+          - s912-tx9-pro-3g
+          - s912-tx9-pro-2g
+          - s912-nexbox-a1
+          - s912-nexbox-a2
+          - s912-tx8-max
+          - s912-x92
+          - s912-phicomm-t1
+          - s905x2
+          - s905x2-x96max-2g
+          - s905x2-km3
+          - s922x
+          - s922x-gtking
+          - s922x-gtkingpro-h
+          - s922x-reva
+          - s922x-odroid-n2
+          - s922x-ugoos-am6
+          - s922x-ct2000
+          - a311d
+          - s905x3
+          - s905x3-b
+          - s905x3-hk1
+          - s905x3-x96max
+          - s905x3-h96max
+          - s905x3-ugoosx3
+          - s905x3-tx3
+          - s905x3-tx3-bz
+          - s905x3-a95xf3
+          - s905x3-a95xf3-gb
+          - s905x3-x96air
+          - s905x3-x96air-gb
+          - s905x3-ip1001m
+          - s905x3-q1
+          - s905x3-q2
+          - s905x3-q1000
+          - s905x3-a100
+          - s905x3-2101
+          - s905
+          - s905-beelink-mini
+          - s905-mxqpro-plus
           - rock5b
           - h88k
           - ipc-r
