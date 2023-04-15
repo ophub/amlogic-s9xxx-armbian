@@ -163,8 +163,12 @@ docker_remove() {
     docker_container_remove "${container_name}"
     # Delete old image
     docker_image_remove "${image_name}"
+
     # Delete the installation directory
-    [[ -d "${install_path}" ]] && rm -rf ${install_path} 2>/dev/null
+    echo -ne "${OPTIONS} Delete [ ${install_path} ] directory? (y/n): "
+    read del_dir
+    [[ "${del_dir,,}" == "y" ]] && [[ -d "${install_path}" ]] && rm -rf ${install_path} 2>/dev/null
+
     exit 0
 }
 
