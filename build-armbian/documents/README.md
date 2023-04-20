@@ -814,6 +814,8 @@ In Amlogic devices, settings such as adding/modifying/deleting can be done in th
 
 For example, the `Home Assistant Supervisor` application only supports the `docker cgroup v1` version, and currently docker installs the latest v2 version by default. If you need to switch to v1 version, you can add `systemd.unified_cgroup_hierarchy=0` parameter setting in cmdline, and you can switch to `docker cgroup v1` version after restarting.
 
+By adding the setting `max_loop=128` in cmdline, you can adjust the allowed number of loop mounts.
+
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
