@@ -348,5 +348,5 @@ copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
 
-echo -e "${SUCCESS} Successful installed, please unplug the USB, re-insert the power supply to start the Armbian."
+echo -e "${SUCCESS} Installation successful. Run `poweroff`, remove the installation media then re-insert the power supply to boot Armbian."
 exit 0
