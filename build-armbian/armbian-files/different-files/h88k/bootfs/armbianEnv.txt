@@ -10,7 +10,7 @@ usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
 earlycon=on
 docker_optimizations=on
 extraargs=
-extraboardargs=net.ifnames=0
+extraboardargs=net.ifnames=0 max_loop=128
 overlay_prefix=rk3588
 overlays=
 user_overlays=
