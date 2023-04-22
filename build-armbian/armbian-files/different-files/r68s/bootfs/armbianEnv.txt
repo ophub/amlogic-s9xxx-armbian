@@ -11,7 +11,7 @@ docker_optimizations=on
 earlycon=on
 earlyconargs=earlycon=uart8250,mmio32,0xfe660000
 extraargs=
-extraboardargs=net.ifnames=0
+extraboardargs=net.ifnames=0 max_loop=128
 overlay_prefix=rk3568
 overlays=
 user_overlays=
