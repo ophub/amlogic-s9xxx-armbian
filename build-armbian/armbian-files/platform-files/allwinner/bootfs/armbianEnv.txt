@@ -7,5 +7,5 @@ rootflags=rw,errors=remount-ro
 overlay_prefix=sun50i-h6
 overlays=
 extraargs=
-extraboardargs=net.ifnames=0
+extraboardargs=net.ifnames=0 max_loop=128
 docker_optimizations=on
