@@ -769,7 +769,8 @@ refactor_bootfs() {
     [[ -f "${uenv_conf_file}" ]] && {
         sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${uenv_conf_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
-        sed -i "s|sun50i.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
+        sed -i "s|sun.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
+        sed -i "s|rk.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
     }
 
     # Add an alternate file (/boot/extlinux/extlinux.conf)
@@ -778,7 +779,8 @@ refactor_bootfs() {
     [[ -f "${boot_extlinux_file}" ]] && {
         sed -i "s|LABEL=ROOTFS|${uenv_rootdev}|g" ${boot_extlinux_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
-        sed -i "s|sun50i.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+        sed -i "s|sun.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+        sed -i "s|rk.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
         # If needed, such as t95z(s905x), rename delete .bak
         [[ "${BOOT_CONF}" == "extlinux.conf" ]] && mv -f ${boot_extlinux_file} ${rename_extlinux_file}
     }
