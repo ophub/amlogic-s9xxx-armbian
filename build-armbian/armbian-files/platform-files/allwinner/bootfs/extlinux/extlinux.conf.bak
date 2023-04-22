@@ -2,4 +2,4 @@ LABEL Armbian
   LINUX /Image
   INITRD /uInitrd
   FDT /dtb/allwinner/sun50i-h6-tanix-tx6.dtb
-  APPEND root=LABEL=ROOTFS console=ttyS0,115200 console=tty0 mem=2048M video=HDMI-A-1:e no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 bootsplash.bootfile=bootsplash.armbian
+  APPEND root=LABEL=ROOTFS console=ttyS0,115200 console=tty0 mem=2048M video=HDMI-A-1:e no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 bootsplash.bootfile=bootsplash.armbian
