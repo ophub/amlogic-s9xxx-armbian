@@ -228,7 +228,7 @@ copy_bootfs() {
         echo -e "${INFO} Update the [ uEnv.txt ] file."
         BOOT_CONF="uEnv.conf"
         sed -i "s|root=.*console=ttyS0|root=${uenv_mount_string} console=ttyS0|g" ${uenv_conf_file}
-        sed -i "s|sun50i.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
+        sed -i "s|sun.*.dtb|${FDTFILE}|g" ${uenv_conf_file}
     }
 
     # Update [ /boot/armbianEnv.txt ] settings
@@ -249,7 +249,7 @@ copy_bootfs() {
         echo -e "${INFO} Update the [ extlinux.conf ] file."
         BOOT_CONF="extlinux.conf"
         sed -i "s|root=.*console=ttyS0|root=${uenv_mount_string} console=ttyS0|g" ${boot_extlinux_file}
-        sed -i "s|sun50i.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
+        sed -i "s|sun.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     }
 
     # Replace eMMC boot files
