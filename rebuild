@@ -80,11 +80,13 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Set the kernel download repository from github.com
 kernel_repo="https://github.com/ophub/kernel"
-# Set the tags suffix of the stable kernel, such as kernel_stable, etc.
-kernel_usage="stable"
+# Set tags for the default kernel(kernel_xxx)
+kernel_default="stable"
 # Set the list of kernels used by default
-stable_kernel=("6.1.1" "5.15.1")
 rk3588_kernel=("5.10.1")
+flippy_kernel=("6.1.1" "5.15.1")
+stable_kernel=("6.1.1" "5.15.1")
+dev_kernel=("6.1.1" "5.15.1")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
@@ -130,9 +132,9 @@ mount_again() {
         error_msg "Mount parameter is missing: [ ${m_type}, ${m_dev}, ${m_target} ]"
     }
 
-    i="1"
+    t="1"
     max_try="10"
-    while [[ "${i}" -le "${max_try}" ]]; do
+    while [[ "${t}" -le "${max_try}" ]]; do
         # Mount according to the image partition format
         if [[ "${m_type}" == "btrfs" ]]; then
             mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target}
@@ -146,10 +148,10 @@ mount_again() {
         else
             sync && sleep 3
             umount -f ${m_target} 2>/dev/null
-            i="$((i + 1))"
+            t="$((t + 1))"
         fi
     done
-    [[ "${i}" -gt "${max_try}" ]] && error_msg "[ ${i} ] attempts to mount failed."
+    [[ "${t}" -gt "${max_try}" ]] && error_msg "[ ${t} ] attempts to mount failed."
 }
 
 get_textoffset() {
@@ -195,7 +197,9 @@ init_var() {
             if [[ -n "${2}" ]]; then
                 oldIFS=${IFS}
                 IFS=_
+                flippy_kernel=(${2})
                 stable_kernel=(${2})
+                dev_kernel=(${2})
                 IFS=${oldIFS}
                 shift
             else
@@ -279,6 +283,11 @@ check_data() {
             sort | uniq | xargs
     ))
     [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
+    # Replace custom kernel tags
+    [[ -n "${kernel_usage}" ]] && {
+        kernel_default="${kernel_usage}"
+        kernel_from=(${kernel_from[*]//${kernel_default}/${kernel_usage}})
+    }
 
     # The [ specified kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. download from [ kernel_stable ].
     specify_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
@@ -330,22 +339,27 @@ query_version() {
     for k in ${tags_list[*]}; do
         {
             # Select the corresponding kernel directory and list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
-                kd="${k}"
                 down_kernel_list=(${rk3588_kernel[*]})
+            elif [[ "${k}" == "flippy" ]]; then
+                down_kernel_list=(${flippy_kernel[*]})
+            elif [[ "${k}" == "stable" ]]; then
+                down_kernel_list=(${stable_kernel[*]})
+            elif [[ "${k}" == "dev" ]]; then
+                down_kernel_list=(${dev_kernel[*]})
             elif [[ "${k}" == "specify" ]]; then
-                kd="${kernel_usage}"
+                kd="${kernel_default}"
                 down_kernel_list=(${specify_kernel[*]})
             else
-                kd="${kernel_usage}"
-                down_kernel_list=(${stable_kernel[*]})
+                error_msg "Invalid tags."
             fi
 
             # Query the name of the latest kernel version
             tmp_arr_kernels=()
             i=1
             for kernel_var in ${down_kernel_list[*]}; do
-                echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${kd} - ${kernel_var} ]"
+                echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${k} - ${kernel_var} ]"
 
                 # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
                 kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
@@ -379,7 +393,7 @@ query_version() {
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
 
-                echo -e "${INFO} (${x}.${i}) [ ${kd} - ${tmp_arr_kernels[$i]} ] is latest kernel (${query_api}). \n"
+                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel (${query_api}). \n"
 
                 let i++
             done
@@ -388,12 +402,18 @@ query_version() {
             if [[ "${k}" == "rk3588" ]]; then
                 unset rk3588_kernel
                 rk3588_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "flippy" ]]; then
+                unset flippy_kernel
+                flippy_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "stable" ]]; then
+                unset stable_kernel
+                stable_kernel=(${tmp_arr_kernels[*]})
+            elif [[ "${k}" == "dev" ]]; then
+                unset dev_kernel
+                dev_kernel=(${tmp_arr_kernels[*]})
             elif [[ "${k}" == "specify" ]]; then
                 unset specify_kernel
                 specify_kernel=(${tmp_arr_kernels[*]})
-            else
-                unset stable_kernel
-                stable_kernel=(${tmp_arr_kernels[*]})
             fi
 
             let x++
@@ -425,15 +445,20 @@ download_kernel() {
     for k in ${tags_list[*]}; do
         {
             # Set the kernel download list
+            kd="${k}"
             if [[ "${k}" == "rk3588" ]]; then
-                kd="${k}"
                 down_kernel_list=(${rk3588_kernel[*]})
+            elif [[ "${k}" == "flippy" ]]; then
+                down_kernel_list=(${flippy_kernel[*]})
+            elif [[ "${k}" == "stable" ]]; then
+                down_kernel_list=(${stable_kernel[*]})
+            elif [[ "${k}" == "dev" ]]; then
+                down_kernel_list=(${dev_kernel[*]})
             elif [[ "${k}" == "specify" ]]; then
-                kd="${kernel_usage}"
+                kd="${kernel_default}"
                 down_kernel_list=(${specify_kernel[*]})
             else
-                kd="${kernel_usage}"
-                down_kernel_list=(${stable_kernel[*]})
+                error_msg "Invalid tags."
             fi
 
             # Download the kernel to the storage directory
@@ -441,7 +466,7 @@ download_kernel() {
             for kernel_var in ${down_kernel_list[*]}; do
                 if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
                     kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_${kd}/${kernel_var}.tar.gz"
-                    echo -e "${INFO} (${x}.${i}) [ ${kd} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
+                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
 
                     mkdir -p ${kernel_path}/${kd}
                     wget "${kernel_down_from}" -q -P "${kernel_path}/${kd}"
@@ -450,7 +475,7 @@ download_kernel() {
                     tar -xf "${kernel_path}/${kd}/${kernel_var}.tar.gz" -C "${kernel_path}/${kd}"
                     [[ "${?}" -ne "0" ]] && error_msg "[ ${kernel_var} ] kernel decompression failed."
                 else
-                    echo -e "${INFO} (${x}.${i}) [ ${kd} - ${kernel_var} ] Kernel is in the local directory."
+                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
                 fi
 
                 # If the kernel contains the sha256sums file, check the files integrity
@@ -502,6 +527,9 @@ confirm_version() {
     # Set supported platform name
     support_platform=("amlogic" "rockchip" "allwinner")
     [[ -n "$(echo "${support_platform[*]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
+
+    # Replace custom kernel tags
+    [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${kernel_default}" ]] && KERNEL_TAGS="${kernel_usage}"
 }
 
 extract_armbian() {
@@ -1035,15 +1063,20 @@ loop_rebuild() {
             confirm_version
 
             # Determine kernel tags
+            kd="${KERNEL_TAGS}"
             if [[ "${KERNEL_TAGS}" == "rk3588" ]]; then
-                kd="${KERNEL_TAGS}"
                 kernel_list=(${rk3588_kernel[*]})
+            elif [[ "${KERNEL_TAGS}" == "flippy" ]]; then
+                kernel_list=(${flippy_kernel[*]})
+            elif [[ "${KERNEL_TAGS}" == "stable" ]]; then
+                kernel_list=(${stable_kernel[*]})
+            elif [[ "${KERNEL_TAGS}" == "dev" ]]; then
+                kernel_list=(${dev_kernel[*]})
             elif [[ "${KERNEL_TAGS}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
-                kd="${kernel_usage}"
+                kd="${kernel_default}"
                 kernel_list=(${specify_kernel[*]})
             else
-                kd="${kernel_usage}"
-                kernel_list=(${stable_kernel[*]})
+                error_msg "Invalid tags."
             fi
 
             i="1"
