@@ -325,7 +325,7 @@ armbian-update
 | Optional  | Default      | Value          | Description                                                  |
 | --------- | ------------ | -------------- | ------------------------------------------------------------ |
 | -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
-| -u        | automate     | stable/rk3588/flippy/dev  | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel used |
+| -u        | automate     | stable/flippy/dev/rk3588 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel used |
 | -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com |
 | -b        | yes          | yes/no         | Automatically backup the current system kernel               |
