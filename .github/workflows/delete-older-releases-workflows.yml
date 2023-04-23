@@ -71,9 +71,9 @@ on:
         required: false
         default: ""
       out_log:
-        description: "Output a list log for each step?"
+        description: "Output detailed JSON logs."
         required: false
-        default: false
+        default: true
         type: boolean
 
 env:
