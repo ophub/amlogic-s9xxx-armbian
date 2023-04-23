@@ -105,7 +105,6 @@ on:
           - h68k
           - e25
           - nanopi-r5s
-          - photonicat
           - eaidk-610
           - king3399
           - tn3399
