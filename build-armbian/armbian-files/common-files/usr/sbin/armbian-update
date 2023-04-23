@@ -22,6 +22,7 @@
 #
 # check_depends      : Check dependencies
 # get_textoffset     : Get kernel TEXT_OFFSET
+# check_network      : Checking network
 # init_var           : Initialize all variables
 # query_version      : Query the latest kernel version
 # download_kernel    : Download the kernel
@@ -65,7 +66,7 @@ error_msg() {
 
 # Check dependencies
 check_depends() {
-    echo -e "${STEPS} Start checking dependencies..."
+    echo -e "${STEPS} Starting to check dependencies..."
 
     is_missing="0"
     necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils" "jq")
@@ -76,12 +77,12 @@ check_depends() {
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
-        echo -e "${INFO} Start installing the necessary dependencies."
+        echo -e "${INFO} Starting to install dependencies..."
         sudo apt-get update
         sudo apt-get install -y ${necessary_packages[*]}
         [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed, stop update."
     else
-        echo -e "${INFO} Dependency check completes, start updating the kernel."
+        echo -e "${INFO} Dependency check completed."
     fi
 
     sync && echo ""
@@ -91,19 +92,29 @@ check_depends() {
 get_textoffset() {
     boot_tgz_file="${1}"
     vmlinuz_name="${2}"
-    NEED_OVERLOAD="yes"
+    need_overload="yes"
     temp_dir="$(mktemp -d)"
     (
         cd ${temp_dir}
         tar -xzf "${boot_tgz_file}" "${vmlinuz_name}"
     )
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
-    [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && NEED_OVERLOAD="no"
+    [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && need_overload="no"
+}
+
+# Checking network
+check_network() {
+    # Download from Chinese mirrors, check the status of connecting to the Chinese network
+    curl --connect-timeout 10 -s "myip.ipip.net" 2>/dev/null | grep -qo "中国" && cn_net="yes" || cn_net="no"
+
+    # Download from github.com, check the status of connection to github.com
+    curl --connect-timeout 10 -s "github.com" >/dev/null 2>&1 && github_net="yes" || github_net="no"
+    [[ "${github_net}" == "yes" ]] || error_msg "Your network cannot access [ github.com ], unable to download the kernel."
 }
 
 # Initialize all variables
 init_var() {
-    echo -e "${STEPS} Start initializing the environment..."
+    echo -e "${STEPS} Starting to initialize environment..."
 
     # Check release file
     [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
@@ -221,18 +232,13 @@ init_var() {
     esac
     echo -e "${INFO} Armbian running: [ /dev/${DISK_NAME} ]"
 
-    # Checking network
-    curl --connect-timeout 10 -s "github.com" >/dev/null 2>&1 || {
-        error_msg "Your network cannot access [ github.com ], unable to download the kernel."
-    }
-
     sync && echo ""
 }
 
 # Query the latest kernel version
 query_version() {
     cd ${current_path}
-    echo -e "${STEPS} Start querying kernel version..."
+    echo -e "${STEPS} Starting to query kernel version..."
 
     # Query the current version
     current_kernel_signature="$(uname -r)"
@@ -261,6 +267,7 @@ query_version() {
 
     # Query the latest kernel version
     [[ -z "${inputs_kernel}" ]] && {
+        check_network
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
                 ${kernel_api}/releases/tags/kernel_${KERNEL_TAGS} |
@@ -294,11 +301,12 @@ query_version() {
 # Download the kernel
 download_kernel() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading kernel..."
+    echo -e "${STEPS} Starting to download kernel packages..."
 
     # Download kernel
     if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
         # Download the kernel from [ releases ]
+        # [[ "${cn_net}" == "yes" ]] && kernel_down_from="${china_mirrors}"
         kernel_down_from="${GITHUB_CDN}https://github.com/${KERNEL_REPO}/releases/download/kernel_${KERNEL_TAGS}/${inputs_kernel}.tar.gz"
 
         echo -e "${INFO} Start downloading the kernel from [ ${kernel_down_from} ]"
@@ -318,7 +326,7 @@ download_kernel() {
 # Check kernel files list
 check_kernel() {
     cd ${kernel_path}
-    echo -e "${STEPS} Start checking the kernel..."
+    echo -e "${STEPS} Starting to check kernel packages..."
 
     # Determine custom kernel filename
     kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
@@ -330,8 +338,8 @@ check_kernel() {
     # Check if the file is added with TEXT_OFFSET patch
     [[ "${PLATFORM}" == "amlogic" ]] && {
         get_textoffset "${kernel_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
-        echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
-        if [[ "${NEED_OVERLOAD}" == "yes" ]]; then
+        echo -e "${INFO} Need to use overload: [ ${need_overload} ]"
+        if [[ "${need_overload}" == "yes" ]]; then
             [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The UBOOT_OVERLOAD file is missing and cannot be update."
         fi
     }
@@ -342,7 +350,7 @@ check_kernel() {
     [[ -s "${sha256sums_file}" && -n "$(cat ${sha256sums_file})" ]] || sha256sums_check="0"
     # Loop check file
     [[ "${sha256sums_check}" -eq "1" ]] && {
-        echo -e "${INFO} Enable sha256sum checking..."
+        echo -e "${INFO} Starting sha256sum check..."
 
         kernel_list=("boot" "dtb-${PLATFORM}" "header" "modules")
         i="1"
@@ -365,7 +373,7 @@ check_kernel() {
 
 # Backup current kernel
 backup_kernel() {
-    echo -e "${STEPS} Start backing up the current kernel..."
+    echo -e "${STEPS} Starting to backup the current kernel packages..."
 
     [[ -d "${backup_path}" ]] || mkdir -p ${backup_path}
     rm -rf ${backup_path}/${current_kernel}
@@ -433,7 +441,7 @@ backup_kernel() {
 # Update the kernel
 update_kernel() {
     cd ${kernel_path}
-    echo -e "${STEPS} Start unpacking the kernel..."
+    echo -e "${STEPS} Starting to unpack kernel packages..."
 
     # Delete the current kernel files
     rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-*
@@ -480,10 +488,10 @@ update_kernel() {
 
 # Update the uboot
 update_uboot() {
-    echo -e "${STEPS} Start updating the uboot..."
+    echo -e "${STEPS} Starting to update u-boot..."
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${NEED_OVERLOAD}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+    if [[ "${need_overload}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
         echo -e "${INFO} Copy u-boot: [ ${UBOOT_OVERLOAD} ]"
         run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
         [[ ! -f "/boot/u-boot.ext" ]] && cp -f /boot/${UBOOT_OVERLOAD} /boot/u-boot.ext
@@ -504,7 +512,7 @@ update_uboot() {
 
 # Rescue the kernel
 sos_kernel() {
-    echo -e "${STEPS} Start rescuing kernel files..."
+    echo -e "${STEPS} Starting kernel rescue..."
 
     # Check the current system running disk
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
