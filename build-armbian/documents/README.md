@@ -473,6 +473,7 @@ source /etc/network/interfaces.d/*
 auto eth0
 allow-hotplug eth0
 iface eth0 inet static
+hwaddress ether 12:34:56:78:9A:DA
 address 192.168.1.100
 netmask 255.255.255.0
 gateway 192.168.1.1
