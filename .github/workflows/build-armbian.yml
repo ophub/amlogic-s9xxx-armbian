@@ -12,7 +12,7 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "jammy"
+        default: "bullseye"
         type: choice
         options:
           - jammy
@@ -20,7 +20,7 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "s339am"
         type: choice
         options:
           - all
@@ -116,6 +116,7 @@ on:
           - l1pro
           - vplus
           - tanix-tx6
+          - s339am
       minimal_image:
         description: "Build a minimal image."
         required: false
@@ -124,7 +125,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.1_6.1.1"
+        default: "6.1.1"
         type: choice
         options:
           - 5.4.1_5.10.1_5.15.1
