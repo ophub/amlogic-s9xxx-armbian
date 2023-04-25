@@ -1,0 +1,16 @@
+verbosity=7
+bootlogo=true
+fdtfile=rockchip/rk3566-panther-x2.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=btrfs
+rootflags=compress=zstd:6
+earlycon=on
+console=both
+consoleargs=console=ttyS02,1500000 console=tty0
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+docker_optimizations=on
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk3568
+overlays=
+user_overlays=
