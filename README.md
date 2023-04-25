@@ -2,13 +2,13 @@
 
 View Chinese description  |  [查看中文说明](README.cn.md)
 
-[Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC of most TV boxes.
+[Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes.
 
-Now you can replace the Android system of your TV box with Armbian, turning it into a powerful server. This project builds Armbian images for `Amlogic`, `Rockchip` and `Allwinner` boxes, including scripts for installation to eMMC and updating the kernel. Please refer to the [Armbian Documentation](./build-armbian/documents) for more information on Armbian.
+Now you can replace the Android system of your TV box with Armbian, turning it into a powerful server. This project builds Armbian images for **Amlogic**, **Rockchip** and **Allwinner** TV boxes, including scripts for installation to eMMC and updating the kernel. Please refer to the [Armbian Documentation](./build-armbian/documents) for more information on Armbian.
 
 The latest Armbian builds can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). You are welcome to fork and personalize it. If it is useful to you then please click on the star in the upper right corner of the github repository page to show your support. Thanks!
 
-## Armbian system instructions
+## Armbian system specific instructions
 
 | SoC  | Device | [Optional-kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) | Armbian-System |
 | ---- | ---- | ---- | ---- |
@@ -35,26 +35,34 @@ The latest Armbian builds can be downloaded from [Releases](https://github.com/o
 
 💡Tip: Currently [s905 Boxes](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only boot from TF/SD/USB. Most other TV boxes support installing Armbian to eMMC.
 
-## Installation and updates
+## Generic installation instructions
 
-The installation process varies depending upon your device. You will need to know the exact make and model of your box and which .dtb you need to use to get your box to boot. Under Android, go to **Settings -> System -> About phone** to find out the model of your TV box.
+The exact installation process for Armbian varies depending upon your devices chipset and model but these instructions are written to be as generic as possible and should apply to all TV boxes.
 
-To find the correct dtb to use with Armbian for your box, see [Description of Supported Device List](build-armbian/armbian-files/common-files/etc/model_database.conf). If your have got your box working but its not listed on that page, see section 12.15 of the documentation for details on how to [add support for new devices](build-armbian/documents/README.md#1215-how-to-add-new-supported-devices).
+### Hardware support
+
+You need to know the exact make and model of your box and which .dtb (Device Tree Blob) file you need to use to get your box to boot with all supported devices working. Under Android, go to **Settings -> System -> About phone** to find out the exact model of your TV box.
+
+If you have got your box working but its not listed on either page then see section 12.15 of the documentation for details on how to [add support for new devices](build-armbian/documents/README.md#1215-how-to-add-new-supported-devices).
 
 
 ### Write the Armbian image to a disk
 
-For instructions on installing Armbian on Rockchip TV boxes, please refer to [Section 8](build-armbian/documents) of the documentation.
+For instructions covering installing Armbian on Rockchip TV boxes, please refer to [Section 8](build-armbian/documents) of the documentation.
 
-For Amlogic and Allwinner boxes，you will have to uncompress the installation image using `gunzip` first before writing the image to a TF, SD or USB disk using [Rufus](https://rufus.ie/), [balenaEtcher](https://www.balena.io/etcher/) or `gnome-disk-utility` if you are running the GNOME or MATE desktop.
+For Amlogic and Allwinner boxes，you will have to uncompress the installation image using `gunzip` first before writing the image to a TF, SD or USB disk using [Rufus](https://rufus.ie/), [balenaEtcher](https://www.balena.io/etcher/) or `gnome-disk-utility`. You could also use `dd` but that is not recommended.
 
 After writing the Armbian image, you may need to edit the **FDT** line in `uEnv.txt` on the **BOOT** partition of the disk to use the correct **.dtb** file for your TV box.
 
-### Enable multi-boot mode (Amlogic boxes only)
+To find the correct dtb to use with Armbian for your box, see [Description of Supported Device List](build-armbian/armbian-files/common-files/etc/model_database.conf) or search for your box in the list of system specific instructions at the top of this page.
 
-If this is your first time attempting to boot from an SD card or USB disk on an Amlogic TV box, you must enable multi-boot mode. Insert the Armbian disk then hold down the button in the AV port by inserting a paper clip, a pin or something similar and keep it depressed while powering the device on. Keep the button pressed until you see the boot screen of your box. After a few seconds it should reboot off your SD card or USB disk. You are only required to enable multi-boot mode once.
+### Enable multi-boot mode - Amlogic TV boxes only
 
-On first boot, Armbian will resize its partition to use all of the space available on the install disk and it will ask you several system configuration questions like your timezone, keyboard layout, username and password etc. After logging in as root or using `sudo` run:
+If this is your first time attempting to boot from a SD card or USB disk on an Amlogic TV box, you must first enable multi-boot mode. Insert the Armbian disk then hold down the button in the AV port by inserting a paper clip, a pin or something similar and keep it depressed while powering the device on. Keep the button pressed until you see the boot screen of your box. After a few seconds it should reboot from your SD card or USB disk. You are only required to enable multi-boot mode once.
+
+### Running `armbian-install`
+
+On first boot, Armbian will resize its root partition to use all of the space available on its disk and it will ask you several system configuration questions like your timezone, keyboard layout, username and password etc. After logging in as **root** or using `sudo` run:
 
 ```bash
 armbian-install
@@ -72,9 +80,9 @@ If you can boot Armbian fine from TF/SD/USB and the install script says it insta
 
 `armbian-install -m yes`
 
-### Update the Armbian Kernel
+### Updating the Armbian Kernel
 
-You won't be able to use all of your hardware properly unless you are running the correct kernel and .dtb, Armbian cannot detect these for you. In most cases, you are recommended to run the latest kernel version available for your TV box but some features of some devices will only work on specific kernels. For example, 4K HDMI output only works on the X96 Max+ 2T when running a 5.10 series kernel, 4K output doesn't currently work under the 5.15.x or 6.x kernels for that specific model.
+You won't be able to use all of your hardware properly unless you are running the correct kernel and using the right .dtb. Unfortuntely Armbian cannot auto-detect these for you. In most cases, you are recommended to run the latest kernel version available for your TV box but some features on some devices will only work on specific kernels. For example, 4K HDMI output only works on the X96 Max+ 2T when running a 5.10 series kernel, 4K output doesn't currently work under the 5.15.x or 6.x kernels for that specific model.
 
 Login in to Armbian and run:
 
@@ -83,6 +91,8 @@ Login in to Armbian and run:
 # If no parameter is specified, it will update to the latest version.
 armbian-update
 ```
+
+`armbian-update`'s options include:
 
 | Optional  | Default      | Value          | Description                                                  |
 | --------- | ------------ | -------------- | ------------------------------------------------------------ |
@@ -101,6 +111,14 @@ See here for a list of all [currently available stable kernel tarballs.](https:/
 
 When updating the kernel, the current kernel will be automatically backed up. The three most recently used kernels are stored in the `/ddbr/backup` directory. If the newly installed kernel is unstable, the backed up kernel can be restored at any time. If the update fails and the system cannot be started, you can start any version of Armbian via USB/TF/SD to recover the system in eMMC. For more instructions, see the help [documentation](build-armbian/documents/).
 
+### Update Armbian scripts
+
+To update all Armbian scripts to the latest versions, run:
+
+```bash
+armbian-sync
+```
+
 ### Install common software
 
 Login in to armbian → input command:
@@ -109,11 +127,11 @@ Login in to armbian → input command:
 armbian-software
 ```
 
-Run `armbian-software -u` to update the local software center list. Apps are added to the Armbian software center according to user demand and feedback given in the github [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrating commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall of popular programs such as **docker images**, **desktop software**, **popular server solutions**, etc. See more [here](build-armbian/documents/armbian_software.md).
+Run `armbian-software -u` to update the local software center list. Apps are added to the Armbian software center according to user demand and feedback given in github [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrating commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall of popular programs such as **docker images**, **desktop software**, **popular server solutions**, etc. See more [here](build-armbian/documents/armbian_software.md).
 
 ### Modify Armbian Config
 
-Login in to armbian → input command:
+Armbian has a handy TUI config tool for changing key system settings:
 
 ```bash
 armbian-config
@@ -121,7 +139,7 @@ armbian-config
 
 ### Create swap for Armbian
 
-If you feel that your TV box has insufficient memory for running demanding applications such as `docker`, you can create a swap virtual memory partition. `armbian-swap` lets the user configure how much disk space is reserved for swap memory. The input parameter defines how many gigabytes of space you want to reserve for swap. The default is **1**.
+If you feel that your TV box has insufficient memory for running demanding applications such as `docker`, you can create a swap virtual memory partition. `armbian-swap` lets the user configure how much disk space is reserved for swap memory. The input parameter defines how many gigabytes of space you want to reserve for swap. The default is **1** GB.
 
 Login in to armbian → input command:
 
@@ -131,7 +149,7 @@ armbian-swap 1
 
 ### Controlling the LED display
 
-It is worthwhile configuring your LED clock, if your box has one, so that you know when your TV box has finished booting if it is not connected to a display (running 'headless').
+It is worthwhile configuring your LED clock, if your box has one, so that you know when your TV box has finished booting if it is not connected to a display.
 
 Login in to armbian → input command:
 
@@ -151,7 +169,7 @@ Please login in to armbian → input command:
 armbian-ddbr
 ```
 
-According to the prompt, enter `b` to perform system backup, and enter `r` to perform system recovery.
+Following the prompt, enter `b` to perform a system backup or `r` to perform a system recovery.
 
 ### Compile the kernel in Armbian
 
@@ -162,15 +180,6 @@ armbian-kernel -u
 armbian-kernel -k 5.10.125
 ```
 
-### More instructions for use
-
-To update all service scripts in the local system to the latest version, you can login in to armbian → input command:
-
-```bash
-armbian-sync
-```
-
-See these [documents](build-armbian/documents) for some common problems that may be encountered and their solutions.
 
 ## Local build instructions
 
