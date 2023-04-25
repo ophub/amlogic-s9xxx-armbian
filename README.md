@@ -1,6 +1,6 @@
 # Armbian
 
-View Chinese description  |  [查看中文说明](README.cn.md)
+Read the Chinese version:  |  [查看中文说明](README.cn.md)
 
 [Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes.
 
@@ -119,17 +119,11 @@ To update all Armbian scripts to the latest versions, run:
 armbian-sync
 ```
 
-### Install common software
+### armbian-software store
 
-Login in to armbian → input command:
+`armbian-software` can be used to install various popular apps, added to the Armbian software center according to user demand and feedback given in github [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrating commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall of popular programs such as **docker images**, **desktop software**, **popular server solutions**, etc. See more [here](build-armbian/documents/armbian_software.md).
 
-```bash
-armbian-software
-```
-
-Run `armbian-software -u` to update the local software center list. Apps are added to the Armbian software center according to user demand and feedback given in github [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrating commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall of popular programs such as **docker images**, **desktop software**, **popular server solutions**, etc. See more [here](build-armbian/documents/armbian_software.md).
-
-### Modify Armbian Config
+### Armbian config tool
 
 Armbian has a handy TUI config tool for changing key system settings:
 
@@ -141,29 +135,25 @@ armbian-config
 
 If you feel that your TV box has insufficient memory for running demanding applications such as `docker`, you can create a swap virtual memory partition. `armbian-swap` lets the user configure how much disk space is reserved for swap memory. The input parameter defines how many gigabytes of space you want to reserve for swap. The default is **1** GB.
 
-Login in to armbian → input command:
-
 ```bash
 armbian-swap 1
 ```
 
-### Controlling the LED display
+### Configuring the TV box LED display
 
-It is worthwhile configuring your LED clock, if your box has one, so that you know when your TV box has finished booting if it is not connected to a display.
-
-Login in to armbian → input command:
+It is worthwhile configuring your LED display, if your box has one, if only so that you know when your TV box has finished booting when it is not connected to a HDMI screen.
 
 ```bash
 armbian-openvfd
 ```
 
-Full configuration instructions for the [LED screen display are here.](build-armbian/documents/led_screen_display_control.md).
+Full configuration instructions for the [LED display are here.](build-armbian/documents/led_screen_display_control.md)
 
-### Backup/restore the original EMMC system
+### Backup and restore the original eMMC Android OS
 
-Armbian supports backing up and restoring your eMMC partition to TF/SD/USB. It is recommended that you back up the Android system that comes with your box before installing Armbian.
+Armbian supports backing up and restoring your TV box's Android eMMC OS partition to TF/SD/USB. It is recommended that you back up the Android system that comes with your box before installing Armbian so that you have the option to restore your TV box to its original state.
 
-Please login in to armbian → input command:
+You may back up your TV box's Android OS by running:
 
 ```bash
 armbian-ddbr
@@ -270,13 +260,6 @@ To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ 
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | Packing date(month.day.hour.minute) |
 | ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure   |
 
-## Armbian system default information
-
-| Name | Value |
-| ---- | ---- |
-| Default IP | Get IP from the router |
-| Default username | root |
-| Default password | 1234 |
 
 ## Compile the kernel using GitHub Actions
 
