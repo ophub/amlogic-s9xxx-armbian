@@ -102,6 +102,7 @@ on:
           - h68k
           - e25
           - nanopi-r5s
+          - panther-x2
           - eaidk-610
           - king3399
           - tn3399
