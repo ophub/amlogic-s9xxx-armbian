@@ -1,6 +1,6 @@
 # Armbian
 
-Read the Chinese version:  |  [查看中文说明](README.cn.md)
+Read the Chinese version: [查看中文说明](README.cn.md)
 
 [Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes.
 
@@ -260,6 +260,13 @@ To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ 
 | ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | Packing date(month.day.hour.minute) |
 | ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure   |
 
+## Default account for Armbian system
+
+| Name             | Value                  |
+| ---------------- | ---------------------- |
+| Default IP       | Get IP from the router |
+| Default username | root                   |
+| Default password | 1234                   |
 
 ## Compile the kernel using GitHub Actions
 
