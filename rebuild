@@ -80,9 +80,9 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Set the kernel download repository from github.com
 kernel_repo="https://github.com/ophub/kernel"
-# Set the default kernel tags(kernel_xxx) that can be replaced via the [ -u ] parameter
+# Set the tags(kernel_xxx) of the default kernel that can be replaced via the [ -u ] parameter
 default_tags="stable"
-# Set the tags of the specified kernel
+# Set the tags(kernel_xxx) of the specified kernel, such as 5.15.y, 6.1.y, etc.
 specify_tags="${default_tags}"
 # Set the list of kernels used by default
 rk3588_kernel=("5.10.1")
