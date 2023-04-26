@@ -80,10 +80,10 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 
 # Set the kernel download repository from github.com
 kernel_repo="https://github.com/ophub/kernel"
-# Kernel tags(kernel_xxx) that can be replaced via the [ -u ] parameter
-kernel_replaceable="stable"
+# Set the default kernel tags(kernel_xxx) that can be replaced via the [ -u ] parameter
+default_tags="stable"
 # Set the tags of the specified kernel
-specify_tags="${kernel_replaceable}"
+specify_tags="${default_tags}"
 # Set the list of kernels used by default
 rk3588_kernel=("5.10.1")
 flippy_kernel=("6.1.1" "5.15.1")
@@ -288,7 +288,7 @@ check_data() {
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" ]] && {
         specify_tags="${kernel_usage}"
-        kernel_from=(${kernel_from[*]//${kernel_replaceable}/${kernel_usage}})
+        kernel_from=(${kernel_from[*]//${default_tags}/${kernel_usage}})
     }
 
     # The [ specified kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. download from [ kernel_stable ].
@@ -531,7 +531,7 @@ confirm_version() {
     [[ -n "$(echo "${support_platform[*]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
 
     # Replace custom kernel tags
-    [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${kernel_replaceable}" ]] && KERNEL_TAGS="${kernel_usage}"
+    [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${default_tags}" ]] && KERNEL_TAGS="${kernel_usage}"
 }
 
 extract_armbian() {
