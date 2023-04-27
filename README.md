@@ -33,7 +33,7 @@ The latest Armbian builds can be downloaded from [Releases](https://github.com/o
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1007), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313) | All | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120) | All | allwinner_boxname.img |
 
-💡Tip: Currently [s905 Boxes](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only boot from TF/SD/USB. Most other TV boxes support installing Armbian to eMMC.
+💡Tip: Currently [s905 Boxes](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only boot from TF/SD/USB. Most other TV boxes support installing Armbian to eMMC. Detailed configuration information of the device can be viewed in [the device model database](build-armbian/armbian-files/common-files/etc/model_database.conf).
 
 ## Generic installation instructions
 
