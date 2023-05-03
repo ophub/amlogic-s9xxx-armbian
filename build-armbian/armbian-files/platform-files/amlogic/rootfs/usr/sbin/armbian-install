@@ -68,7 +68,7 @@ error_msg() {
 
 # Check dependencies
 check_depends() {
-    echo -e "${STEPS} Start checking dependencies..."
+    echo -e "${STEPS} Checking dependencies..."
 
     is_missing="0"
     necessary_packages=("tar" "hexdump" "mkfs.vfat" "mkfs.ext4" "mkfs.btrfs" "parted" "losetup" "fdisk" "lsblk")
@@ -81,18 +81,18 @@ check_depends() {
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
-        echo -e "${INFO} Start installing the necessary dependencies."
+        echo -e "${INFO} Installing necessary dependencies."
         sudo apt-get update
         sudo apt-get install -y ${install_packages[*]}
-        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop install."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to install dependencies, aborting!"
     else
-        echo -e "${INFO} Dependency check completes, Start installing Armbian."
+        echo -e "${INFO} Dependency check completed. Proceeding installation..."
     fi
 }
 
 # Initialize all variables
 init_var() {
-    echo -e "${STEPS} Start initializing the environment..."
+    echo -e "${STEPS} Initializing the environment..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     get_all_ver="$(getopt "m:a:l:" "${@}")"
@@ -132,7 +132,7 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
-    echo -e "${INFO} Using the Ampart tool: [ ${use_ampart} ]"
+    echo -e "${INFO} Using ampart tool: [ ${use_ampart} ]"
     echo -e "${INFO} Show all lists: [ ${show_all_list} ]"
 
     # Find a list of devices of the same family
@@ -146,12 +146,12 @@ init_var() {
     # Check if the ${model_conf} file exists
     [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
     model_database="$(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[0-9]{1,3}:.*${SEARCH_FAMILY}.*")"
-    [[ -n "${model_database}" ]] || error_msg "The [ ${SEARCH_FAMILY} ] series in the [ ${model_conf} ] file is empty and does not support writing to eMMC."
+    [[ -n "${model_database}" ]] || error_msg "The [ ${SEARCH_FAMILY} ] series in the [ ${model_conf} ] file is empty and does not support write to eMMC!"
 
-    # Check the current system running disk
+    # Check if current system is booted from eMMC
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
     if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
+        error_msg "Current system is already installed to eMMC!"
     fi
 
     # Find emmc disk, first find emmc containing boot0 partition
@@ -159,10 +159,10 @@ init_var() {
     # Find emmc disk, find emmc that does not contain the boot0 partition
     [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
     # Check if emmc exists
-    [[ -z "${install_emmc}" ]] && error_msg "The eMMC storage not found in this device!"
+    [[ -z "${install_emmc}" ]] && error_msg "Internal eMMC storage was't found in this device!"
     # Location of emmc
     DEV_EMMC="/dev/${install_emmc}"
-    echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
+    echo -e "${INFO} Internal eMMC : [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
     [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/*
@@ -255,14 +255,14 @@ show_aml_model() {
     echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
 
     # Check dtb file
-    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The [ ${FDTFILE} ] is missing, stop install."
+    [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "The [ ${FDTFILE} ] is missing, aborting!"
     # Check UBOOT_OVERLOAD file
-    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The [ ${UBOOT_OVERLOAD} ] is missing, stop install."
+    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "The [ ${UBOOT_OVERLOAD} ] is missing, aborting!"
 }
 
 # Set the type of file system
 set_rootfs_type() {
-    echo -e "${STEPS} Start selecting file system type..."
+    echo -e "${STEPS} Which type of filesystem do you want for your root? "
     cat <<EOF
 -----------------------------------------------
   ID   TYPE
@@ -283,12 +283,12 @@ EOF
         fstab_mount_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
     echo -e "${INFO} Input Type ID: [ ${filetype} ]"
-    echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
+    echo -e "${INFO} Type of filesystem: [ ${file_system_type} ]"
 }
 
 # Project repository:   https://github.com/7Ji/ampart
 # Download from:        https://github.com/7Ji/ampart/releases/download/v1.2/ampart-v1.2-aarch64-static.gz
-# Function description: ampart is a partitioning tool. Can repartition eMMC inside Amlogic device.
+# Function description: ampart is a partitioning tool which can modify the proprieary partition table on internal eMMC.
 ampart_tool() {
     # declare the partition layout
     local snapshot_expected='data::-1:4'
@@ -322,9 +322,9 @@ ampart_tool() {
 # Create emmc partition
 create_partition() {
     cd /
-    echo -e "${STEPS} Start creating eMMC partition..."
+    echo -e "${STEPS} Partitioning eMMC..."
 
-    # Backup the bootloader, if necessary for system recovery
+    # Backup the bootloader, necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
     [[ -f "${MYBOX_UBOOT}" ]] && rm -f ${MYBOX_UBOOT}
@@ -340,7 +340,7 @@ create_partition() {
         while [[ "${i}" -le "${exists_pts}" ]]; do
             umount -f ${DEV_EMMC}p${i} 2>/dev/null
             parted -s ${DEV_EMMC} rm ${i}
-            [[ "${?}" -eq "0" ]] || error_msg "Failed to delete the [ ${i} ] partition. Please try again."
+            [[ "${?}" -eq "0" ]] || error_msg "Failed to delete partition [ ${i} ]. Please try again."
             let i++
         done
     fi
@@ -350,12 +350,12 @@ create_partition() {
     AMPART_STATUS="no"
     [[ -x "/usr/bin/ampart" && "${use_ampart}" == "yes" ]] && {
         ampart_tool
-        [[ "${?}" -eq "0" ]] && AMPART_STATUS="yes" && echo -e "${STEPS} Use ampart partition successfully."
+        [[ "${?}" -eq "0" ]] && AMPART_STATUS="yes" && echo -e "${STEPS} Successfully partitioned internal eMMC with amaprt."
     }
 
     # Set partition size (Unit: MiB)
     if [[ "${AMPART_STATUS}" == "yes" ]]; then
-        BLANK1="117" # After using the ampart partition, it can be used after [ 117 MiB ]
+        BLANK1="117" # After using the ampart to part disk, space after [ 117 MiB ] could be used.
         BOOT="256"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
@@ -373,7 +373,7 @@ create_partition() {
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "305" ]]; then
         BLANK1="108" # CM311-1a-YST: Must skip [ 108 MiB ]
         BOOT="512"   # A total of [ 1024 MiB ] can be used in this block, gave up [ 1024-512=512 MiB ]
-        BLANK2="778" # Can set the rootfs partition after [ 1398 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1398-108-512=778 MiB ]
+        BLANK2="778" # Rootfs partition could be set after [ 1398 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1398-108-512=778 MiB ]
     elif [[ "${AMLOGIC_SOC}" == "s905l3b" ]]; then
         BLANK1="128" # https://github.com/janko888/MBH-M30xA
         BOOT="513"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
@@ -381,11 +381,11 @@ create_partition() {
     elif [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
         BLANK1="108" # Tencent Aurora 3Pro: Must skip [ 108 MiB ]
         BOOT="512"   # A total of [ 768 MiB ] can be used in this block, gave up [ 768-512=256 MiB ]
-        BLANK2="562" # Can set the rootfs partition after [ 1182 MiB ] of the total disk, [ 1182-108-512=562 MiB ]
+        BLANK2="562" # Rootfs partition could be set after [ 1182 MiB ] of the total disk, [ 1182-108-512=562 MiB ]
     else
         BLANK1="68"
         BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
-        BLANK2="1026" # Can set the rootfs partition after [ 1350 MiB ] of the total disk.
+        BLANK2="1026" # Rootfs partition could be set after [ 1350 MiB ] of the total disk.
     fi
 
     # Format emmc disk
@@ -393,7 +393,7 @@ create_partition() {
     parted -s "${DEV_EMMC}" mklabel msdos
     parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB
     parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100%
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to create partition using [ parted ]."
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to partition internal eMMC using [ parted ]."
 
     # Write bootloader
     if [[ -n "${MAINLINE_UBOOT}" && -f "/usr/lib/u-boot/${MAINLINE_UBOOT}" && "${auto_mainline_uboot}" == "yes" ]]; then
@@ -415,7 +415,7 @@ create_partition() {
 # Copy bootfs partition files
 copy_bootfs() {
     cd /
-    echo -e "${STEPS} Start processing the BOOTFS partition..."
+    echo -e "${STEPS} Processing BOOTFS partition..."
 
     PART_BOOT="${DEV_EMMC}p1"
 
@@ -425,14 +425,14 @@ copy_bootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_BOOT} ]."
     fi
 
-    echo -e "${INFO} Start formatting BOOTFS partition..."
+    echo -e "${INFO} Formatting BOOTFS partition..."
     mkfs.vfat -F 32 -n "BOOT_EMMC" ${PART_BOOT}
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.vfat ]."
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to format BOOTFS with [ mkfs.vfat ]."
 
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to mount BOOTFS partition."
 
-    echo -e "${INFO} Start copy BOOTFS partition data."
+    echo -e "${INFO} Copying BOOTFS ..."
     cp -rf /boot/* ${DIR_INSTALL}
     # Remove useless files
     rm -rf ${DIR_INSTALL}/'System Volume Information'
@@ -494,29 +494,29 @@ copy_rootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_ROOT} ]."
     fi
 
-    echo -e "${INFO} Start formatting ROOTFS partition..."
+    echo -e "${INFO} Formatting ROOTFS ..."
     if [[ "${file_system_type}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -m single ${PART_ROOT}
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to format ROOTFS with [ mkfs.btrfs ]"
 
         mount -t btrfs -o compress=zstd:6 ${PART_ROOT} ${DIR_INSTALL}
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS partition."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS."
     else
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -b 4k -m 0 ${PART_ROOT}
-        [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.ext4 ]"
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to format ROOTFS with [ mkfs.ext4 ]"
 
         mount -t ext4 ${PART_ROOT} ${DIR_INSTALL}
         [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS partition."
     fi
 
-    echo -e "${INFO} Start copy ROOTFS partition data."
+    echo -e "${INFO} Copying ROOTFS ..."
     # Create relevant directories
     mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
     chmod 777 ${DIR_INSTALL}/tmp
     # Copy the relevant directory
     COPY_SRC="etc home lib64 opt root selinux srv usr var"
     for src in ${COPY_SRC}; do
-        echo -e "${INFO} Copy the [ ${src} ] directory."
+        echo -e "${INFO} Copying [ ${src} ] ..."
         tar -cf - ${src} | (
             cd ${DIR_INSTALL}
             tar -xf -
@@ -560,7 +560,7 @@ EOF
 
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
-echo -e "${STEPS} Start install Armbian to eMMC..."
+echo -e "${STEPS} Installing Armbian to internal eMMC..."
 
 # Check dependencies
 check_depends
@@ -577,5 +577,5 @@ copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
 
-echo -e "${SUCCESS} Installation successful. Run [ poweroff ], remove the installation media then re-insert the power supply to boot Armbian."
+echo -e "${SUCCESS} Installation successful. Run [ poweroff ], remove the installation media then re-insert the power supply to boot new system."
 exit 0
