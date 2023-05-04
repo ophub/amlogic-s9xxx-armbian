@@ -86,9 +86,9 @@ default_tags="stable"
 specify_tags="${default_tags}"
 # Set the list of kernels used by default
 stable_kernel=("6.1.1" "5.15.1")
+flippy_kernel=("6.1.1" "5.15.1")
 dev_kernel=("6.1.1" "5.15.1")
 rk3588_kernel=("5.10.1")
-flippy_kernel=("6.1.1" "5.15.1")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
@@ -346,14 +346,14 @@ query_kernel() {
             stable)
                 down_kernel_list=(${stable_kernel[*]})
                 ;;
+            flippy)
+                down_kernel_list=(${flippy_kernel[*]})
+                ;;
             dev)
                 down_kernel_list=(${dev_kernel[*]})
                 ;;
             rk3588)
                 down_kernel_list=(${rk3588_kernel[*]})
-                ;;
-            flippy)
-                down_kernel_list=(${flippy_kernel[*]})
                 ;;
             specify)
                 down_kernel_list=(${specify_kernel[*]})
@@ -411,6 +411,10 @@ query_kernel() {
                 unset stable_kernel
                 stable_kernel=(${tmp_arr_kernels[*]})
                 ;;
+            flippy)
+                unset flippy_kernel
+                flippy_kernel=(${tmp_arr_kernels[*]})
+                ;;
             dev)
                 unset dev_kernel
                 dev_kernel=(${tmp_arr_kernels[*]})
@@ -418,10 +422,6 @@ query_kernel() {
             rk3588)
                 unset rk3588_kernel
                 rk3588_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            flippy)
-                unset flippy_kernel
-                flippy_kernel=(${tmp_arr_kernels[*]})
                 ;;
             specify)
                 unset specify_kernel
@@ -464,14 +464,14 @@ download_kernel() {
             stable)
                 down_kernel_list=(${stable_kernel[*]})
                 ;;
+            flippy)
+                down_kernel_list=(${flippy_kernel[*]})
+                ;;
             dev)
                 down_kernel_list=(${dev_kernel[*]})
                 ;;
             rk3588)
                 down_kernel_list=(${rk3588_kernel[*]})
-                ;;
-            flippy)
-                down_kernel_list=(${flippy_kernel[*]})
                 ;;
             specify)
                 down_kernel_list=(${specify_kernel[*]})
@@ -1087,14 +1087,14 @@ loop_rebuild() {
             stable)
                 kernel_list=(${stable_kernel[*]})
                 ;;
+            flippy)
+                kernel_list=(${flippy_kernel[*]})
+                ;;
             dev)
                 kernel_list=(${dev_kernel[*]})
                 ;;
             rk3588)
                 kernel_list=(${rk3588_kernel[*]})
-                ;;
-            flippy)
-                kernel_list=(${flippy_kernel[*]})
                 ;;
             [0-9]*)
                 kernel_list=(${specify_kernel[*]})
