@@ -82,8 +82,8 @@ firmware_repo="${firmware_repo//tree\/main/trunk}"
 kernel_repo="https://github.com/ophub/kernel"
 # Set the tags(kernel_xxx) of the default kernel that can be replaced via the [ -u ] parameter
 default_tags="stable"
-# Set the tags(kernel_xxx) of the specified kernel, such as 5.15.y, 6.1.y, etc.
-specify_tags="${default_tags}"
+# Set the tags(kernel_xxx) of the specific kernel, such as 5.15.y, 6.1.y, etc.
+specific_tags="${default_tags}"
 # Set the list of kernels used by default
 stable_kernel=("6.1.1" "5.15.1")
 flippy_kernel=("6.1.1" "5.15.1")
@@ -287,17 +287,17 @@ check_data() {
     [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" ]] && {
-        specify_tags="${kernel_usage}"
+        specific_tags="${kernel_usage}"
         kernel_from=(${kernel_from[*]//${default_tags}/${kernel_usage}})
     }
 
-    # The [ specified kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. download from [ kernel_stable ].
-    specify_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
+    # The [ specific kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. download from [ kernel_stable ].
+    specific_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort | uniq | xargs))
 
     # The [ suffix ] of KERNEL_TAGS starts with a [ letter ], such as kernel_stable, kernel_rk3588, etc.
     tags_list=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort | uniq | xargs))
-    # Add the specified kernel to the list
-    [[ "${#specify_kernel[*]}" -ne "0" ]] && tags_list=(${tags_list[*]} "specify")
+    # Add the specific kernel to the list
+    [[ "${#specific_kernel[*]}" -ne "0" ]] && tags_list=(${tags_list[*]} "specific")
     # Check the kernel list
     [[ "${#tags_list[*]}" -eq "0" ]] && error_msg "The [ tags_list ] is missing, stop building."
 
@@ -355,9 +355,9 @@ query_kernel() {
             rk3588)
                 down_kernel_list=(${rk3588_kernel[*]})
                 ;;
-            specify)
-                down_kernel_list=(${specify_kernel[*]})
-                kd="${specify_tags}"
+            specific)
+                down_kernel_list=(${specific_kernel[*]})
+                kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
             esac
@@ -423,9 +423,9 @@ query_kernel() {
                 unset rk3588_kernel
                 rk3588_kernel=(${tmp_arr_kernels[*]})
                 ;;
-            specify)
-                unset specify_kernel
-                specify_kernel=(${tmp_arr_kernels[*]})
+            specific)
+                unset specific_kernel
+                specific_kernel=(${tmp_arr_kernels[*]})
                 ;;
             *) error_msg "Invalid tags." ;;
             esac
@@ -473,9 +473,9 @@ download_kernel() {
             rk3588)
                 down_kernel_list=(${rk3588_kernel[*]})
                 ;;
-            specify)
-                down_kernel_list=(${specify_kernel[*]})
-                kd="${specify_tags}"
+            specific)
+                down_kernel_list=(${specific_kernel[*]})
+                kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
             esac
@@ -642,7 +642,7 @@ make_image() {
         mkfs.ext4 -F -q -U ${ROOTFS_UUID} -L "ROOTFS" -b 4k -m 0 ${loop_new}p2 >/dev/null 2>&1
     fi
 
-    # Write the specified bootloader for [ Amlogic ] boxes
+    # Write the specific bootloader for [ Amlogic ] boxes
     [[ "${PLATFORM}" == "amlogic" ]] && {
         bootloader_path="${uboot_path}/${PLATFORM}/bootloader"
         if [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]]; then
@@ -656,7 +656,7 @@ make_image() {
         fi
     }
 
-    # Write the specified bootloader for [ Rockchip ] boxes
+    # Write the specific bootloader for [ Rockchip ] boxes
     [[ "${PLATFORM}" == "rockchip" ]] && {
         bootloader_path="${uboot_path}/${PLATFORM}/${board}"
         if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
@@ -677,7 +677,7 @@ make_image() {
         fi
     }
 
-    # Write the specified bootloader for [ Allwinner ] boxes
+    # Write the specific bootloader for [ Allwinner ] boxes
     [[ "${PLATFORM}" == "allwinner" ]] && {
         bootloader_path="${uboot_path}/${PLATFORM}/${board}"
         if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
@@ -1097,8 +1097,8 @@ loop_rebuild() {
                 kernel_list=(${rk3588_kernel[*]})
                 ;;
             [0-9]*)
-                kernel_list=(${specify_kernel[*]})
-                kd="${specify_tags}"
+                kernel_list=(${specific_kernel[*]})
+                kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
             esac
