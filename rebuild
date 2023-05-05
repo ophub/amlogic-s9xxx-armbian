@@ -340,7 +340,7 @@ query_kernel() {
     x="1"
     for k in ${tags_list[*]}; do
         {
-            # Select the corresponding kernel directory and list
+            # Select the kernel list
             kd="${k}"
             case "${k}" in
             stable)
@@ -720,27 +720,27 @@ copy_files() {
     cp -af ${tmp_armbian}/* ${tag_rootfs}
 
     # Copy the common files
-    [[ -d "${common_files}" ]] && cp -rf ${common_files}/* ${tag_rootfs}
+    [[ -d "${common_files}" ]] && cp -af ${common_files}/* ${tag_rootfs}
 
     # Copy the platform files
     platform_bootfs="${platform_files}/${PLATFORM}/bootfs"
     platform_rootfs="${platform_files}/${PLATFORM}/rootfs"
-    [[ -d "${platform_bootfs}" ]] && cp -rf ${platform_bootfs}/* ${tag_bootfs}
-    [[ -d "${platform_rootfs}" ]] && cp -rf ${platform_rootfs}/* ${tag_rootfs}
+    [[ -d "${platform_bootfs}" ]] && cp -af ${platform_bootfs}/* ${tag_bootfs}
+    [[ -d "${platform_rootfs}" ]] && cp -af ${platform_rootfs}/* ${tag_rootfs}
 
     # Copy the different files
     different_bootfs="${different_files}/${board}/bootfs"
     different_rootfs="${different_files}/${board}/rootfs"
-    [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/* ${tag_bootfs}
-    [[ -d "${different_rootfs}" ]] && cp -rf ${different_rootfs}/* ${tag_rootfs}
+    [[ -d "${different_bootfs}" ]] && cp -af ${different_bootfs}/* ${tag_bootfs}
+    [[ -d "${different_rootfs}" ]] && cp -af ${different_rootfs}/* ${tag_rootfs}
 
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p ${tag_rootfs}/usr/lib/u-boot
     rm -rf ${tag_rootfs}/usr/lib/u-boot/*
-    [[ -d "${bootloader_path}" ]] && cp -rf ${bootloader_path}/* ${tag_rootfs}/usr/lib/u-boot
+    [[ -d "${bootloader_path}" ]] && cp -af ${bootloader_path}/* ${tag_rootfs}/usr/lib/u-boot
 
     # Copy the overload files
-    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/amlogic/overload/* ${tag_bootfs}
+    [[ "${PLATFORM}" == "amlogic" ]] && cp -af ${uboot_path}/${PLATFORM}/overload/* ${tag_bootfs}
 }
 
 replace_kernel() {
