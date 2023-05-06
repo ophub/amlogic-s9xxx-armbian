@@ -1,22 +1,22 @@
-# Kernel compilation and usage instructions
+# Kernel Compilation and Usage Instructions
 
-View Chinese description  |  [查看中文说明](README.cn.md)
+View Chinese description | [查看中文说明](README.cn.md)
 
-This kernel can be used in `Armbian` and `OpenWrt` systems. For example [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions) and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit). It can be integrated when compiling firmware, or it can be installed into an existing system for use.
+This kernel can be used for `Armbian` and `OpenWrt` systems, such as [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions) and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) projects. It can be integrated into firmware compilation or installed into an existing system.
 
-You can adjust the configuration of the kernel as needed, such as adding drivers and patches. It is also possible to compile personalized signature kernels with special meanings according to mood, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day` and so on.
+You can adjust the configuration of the kernel according to your needs, by adding drivers and patches. You can also compile personalized signature kernels with special meanings, such as `5.10.95-happy-new-year`, `5.10.96-beijing-winter-olympics`, `5.10.99-valentines-day`, etc.
 
 ## Kernel Repository
 
-There are compiled kernels in [Releases](https://github.com/ophub/kernel/releases) of [ophub/kernel](https://github.com/ophub/kernel).
+Pre-compiled kernels are available in the [Releases](https://github.com/ophub/kernel/releases) section of [ophub/kernel](https://github.com/ophub/kernel).
 
-## Local compilation
+## Local Compilation
 
-- ### Run under Ubuntu system
+- ### Running on Ubuntu System
 
-1. Clone the repository to local: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+1. Clone the repository to your local machine: `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
+2. Install necessary packages (the script has only been tested on x86_64 Ubuntu-20.04/22.04)
 
 ```yaml
 sudo apt-get update -y
@@ -25,41 +25,39 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run `sudo ./recompile -k 5.15.100` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `compile-kernel/output` directory.
+3. Enter the root directory of `~/amlogic-s9xxx-armbian` and run the command with specified parameters, such as `sudo ./recompile -k 5.15.100`, to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and set everything up. The packaged kernel files will be saved in the `compile-kernel/output` directory.
 
-- ### Run under Armbian system
+- ### Running on Armbian System
 
-1. Update the local compile environment and config files: `armbian-kernel -u`
+1. Update local compilation environment and configuration file: `armbian-kernel -u`
 
-2. Compile the kernel: Run `armbian-kernel -k 5.15.100` and other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and make all settings. The packaged kernel file is stored in the `/opt/kernel/compile-kernel/output` directory.
+2. Compile the kernel: Run the command with specified parameters, such as `armbian-kernel -k 5.15.100`, to compile the kernel. The script will automatically download and install the compilation environment and kernel source code and set everything up. The packaged kernel files will be saved in the `/opt/kernel/compile-kernel/output` directory.
 
 - ### Description of local compilation parameters
 
 | Parameter | Meaning     | Description                    |
 | --------- | ----------- | ------------------------------ |
-| -r        | Repository  | Specifies the source code repository for the compiled kernel. You can choose the source code repository of `github.com`. For example `-r unifreq`, etc., The parameter format can be set to the three-item combination of `owner/repo@branch` , The owner name `owner` in the parameters is a required parameter, the kernel source code repository name `/repo` and the repository branch name `@branch` are optional parameters. When only the owner name `owner` parameter is specified, it will automatically match kernel source code repositories whose owner's name is in `linux-5.x.y` format and branch is `main`. If the repository name or branch name is different, use a combination, such as `owner@branch` or `owner/repo` or `owner/repo@branch`. Default value: `unifreq` |
-| -k        | Kernel      | Specify kernel name, such as `-k 5.15.100`. Multiple kernels use `_` to connect, such as `- k 5.15.100_5.15.50` |
-| -a        | AutoKernel  | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find whether there is a newer version of the kernel specified in `-k` such as `5.15.100` of the series. If there is the latest version after `5.15.100`, it will be automatically replaced with the latest version . When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -p        | PackageList | Set the package list for compiling the kernel. When set to `all`, which will compile all files of `Image, modules, dtbs`. When set to `dtbs` only 3 dtbs files are compiled. Default value: `all` |
-| -n        | CustomName  | Set the kernel custom signature. When set to `-ophub` and the generated kernel is `5.15.100-ophub`. Do not include spaces when setting a custom signature. Default value: `-ophub` |
-| -t        | Toolchain   | Set the compilation toolchain. Options: `clang / gcc`. Default value: `gcc` |
+| -r        | Repository  | Specifies the source code repository of the kernel to be compiled. You can choose the kernel source code repository on `github.com`, for example `-r unifreq`, etc. The parameter format can be a combination of three items: `owner/repo@branch`. The owner name `owner` is a required parameter, and the repository name `/repo` and branch name `@branch` are optional parameters. When only the owner name `owner` parameter is specified, the kernel source code repository will automatically match the repository with the format of `linux-5.x.y` owned by the owner and with the branch `main`. If the repository name or branch name is different, please use a combination of `owner@branch` or `owner/repo` or `owner/repo@branch` to specify. Default value: `unifreq`. |
+| -k        | Kernel      | Specifies the kernel name, such as `-k 5.15.100`. Multiple kernels can be connected using `_`, such as `-k 5.15.100_5.15.50`. |
+| -a        | AutoKernel  | Sets whether to automatically use the latest version of the same series kernel. When set to `true`, it will automatically search for updated versions of the same series as the kernel specified in `-k`, such as `5.15.100`. If there is a newer version after `5.15.100`, it will be automatically replaced with the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true`. |
+| -p        | PackageList | Sets the package list for compiling the kernel. When set to `all`, it will compile all files of `Image, modules, dtbs`. When set to `dtbs`, it will only compile three dtbs files. Default value: `all`. |
+| -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name will be `5.15.100-ophub`. Please do not include spaces when setting the custom signature. Default value: `-ophub`. |
+| -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options are: `clang / gcc`. Default value: `gcc`. |
 
-- `sudo ./recompile`: Use the default configuration to compiled kernel.
-- `sudo ./recompile -k 5.15.100`: Use the default configuration, and use the `-k` parameter to specify the kernel version to be compiled, and use `_` to link when multiple versions are compiled at the same time.
-- `sudo ./recompile -k 5.15.100 -a true`: Use the default configuration, and use the `-a` parameter to set whether to automatically upgrade to the latest kernel of the same series when compiling the kernel.
-- `sudo ./recompile -k 5.15.100 -n -ophub`: Use the default configuration, and use the `-n` parameter to set the kernel custom signature.
-- `sudo ./recompile -k 5.15.100 -p dtbs`: Use the default configuration, and compile the dtbs file with the `-p` parameter setting.
-- `sudo ./recompile -k 5.15.100_6.1.10 -a true -n -ophub`: Use the default configuration, and set through multiple parameters.
+- `sudo ./recompile`: Compiles the kernel with default configurations.
+- `sudo ./recompile -k 5.15.100`: Compiles the kernel with default configuration and specifies the kernel version to be compiled using `-k`. Multiple versions can be compiled simultaneously by connecting them with `_`.
+- `sudo ./recompile -k 5.15.100 -a true`: Compiles the kernel with default configuration and sets whether to automatically upgrade to the latest kernel of the same series during compilation through the `-a` parameter.
+- `sudo ./recompile -k 5.15.100 -n -ophub`: Compiles the kernel with default configuration and sets a custom signature for the kernel through the `-n` parameter.
+- `sudo ./recompile -k 5.15.100 -p dtbs`: Compiles only dtbs files with default configuration, specified by the `-p` parameter.
+- `sudo ./recompile -k 5.15.100_6.1.10 -a true -n -ophub`: Compiles the kernel with multiple parameters set using the default configuration.
 
-💡Tip: It is recommended to use the kernel source code of unifreq's [linux-6.1.y](https://github.com/unifreq/linux-6.1.y), [linux-5.15.y](https://github.com/unifreq/linux-5.15.y), [linux-5.10.y](https://github.com/unifreq/linux-5.10.y) and [linux-5.4.y](https://github.com/unifreq/linux-5.4.y) and other repositories for compilation. He has added drivers and patches for related TV Boxes. It is recommended to use the templates in [tools/config](tools/config), which have been pre-configured according to the relevant TV Boxes and can be customized on this basis.
+💡Note: It is recommended to use the kernel source code from `unifreq`'s repositories such as [linux-6.1.y](https://github.com/unifreq/linux-6.1.y), [linux-5.15.y](https://github.com/unifreq/linux-5.15.y), [linux-5.10.y](https://github.com/unifreq/linux-5.10.y) and [linux-5.4.y](https://github.com/unifreq/linux-5.4.y) for compiling, which adds drivers and patches for related boxes. It is recommended to use the templates in [tools/config](tools/config), which are pre-configured according to related boxes and can be customized based on them.
 
-## Compile the kernel using GitHub Actions
+## Compiling Kernel using GitHub Actions
 
-This way you compile the kernel using your modified repository.
+1. Select ***`Compile the kernel`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page and click on the ***`Run workflow`*** button to compile.
 
-1. Select ***`Compile the kernel`*** on the [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
-
-2. Using Templates [compile-kernel.yml](../.github/workflows/compile-kernel.yml). The code is as follows:
+2. See the template [compile-kernel.yml](../.github/workflows/compile-kernel.yml) for details. The code is as follows:
 
 ```yaml
 - name: Compile the kernel
@@ -71,64 +69,59 @@ This way you compile the kernel using your modified repository.
     kernel_sign: -yourname
 ```
 
-💡Note: If you `fork` the repository and make changes, When using, you must change the `username` of Actions to your own repository name, and [Add TOKEN](../build-armbian/documents#2-set-the-privacy-variable-github_token) according to clause 2-3 in the description. Eg:
+💡Note: If you `fork` the repository and make changes, you need to change the `username` of the Actions to your own repository, and follow steps 2-3 in the instructions [Add TOKEN](../build-armbian/documents/README.md#2-set-private-variable-github_token), for example:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 ```
 
-- ### GitHub Action Input parameter description
+- ### Input Parameters for GitHub Action
 
-The relevant parameters correspond to the `local compilation commands`, please refer to the above description.
+Related parameters correspond to the `Local Compilation Command`, please refer to the above instructions.
 
 | Parameter        | Defaults         | Description                 |
 | ---------------- | ---------------- | --------------------------- |
-| build_target     | kernel           | Fixed parameter `kernel`, set the compilation target to the kernel. |
-| kernel_source    | unifreq          | Specifies the source code repository for the compiled kernel. The default is `unifreq` . Function reference `-r` |
-| kernel_version   | 5.15.1_6.1.1     | Specify kernel name, such as `5.15.100`. Function reference `-k` |
-| kernel_auto      | true             | Set whether to automatically adopt the latest kernel version of the same series. The default value is `true`. Function reference `-a` |
-| kernel_package   | all              | Set the package list for compiling the kernel. The default is `all`. Function reference `-p` |
-| kernel_sign      | -ophub           | Set the kernel custom signature. The default is `-ophub`. Function reference `-n` |
-| kernel_toolchain | gcc              | Set the compilation toolchain. The default is `gcc`. Function reference `-t` |
-| kernel_config    | None             | The default uses the configuration templates in the [tools/config](tools/config) directory. You can set the directory where the compiled kernel configuration files are stored in your repository, such as `kernel/config_path` . configuration templates stored in this directory must be named after the major version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| build_target     | kernel           | Set the fixed parameter `kernel` to compile the kernel as the compilation target. |
+| kernel_source    | unifreq          | Specifies the source code repository of the kernel to be compiled. The default value is `unifreq`. This function is the same as `-r`. |
+| kernel_version   | 5.15.1_6.1.1     | Specifies the kernel name, such as `5.15.100`. This function is the same as `-k`. |
+| kernel_auto      | true             | Sets whether to automatically use the latest version of the same series kernel. The default value is `true`. This function is the same as `-a`. |
+| kernel_package   | all              | Sets the package list for compiling the kernel. The default value is `all`. This function is the same as `-p`. |
+| kernel_sign      | -ophub           | Sets the custom signature of the kernel. The default value is `-ophub`. This function is the same as `-n`. |
+| kernel_toolchain | gcc              | Sets the toolchain for compiling the kernel. The default value is `gcc`. This function is the same as `-t`. |
+| kernel_config    | None             | By default, the configuration templates in [tools/config](tools/config) directory are used. You can set the directory of the configuration file for compiling the kernel in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 
-- ### GitHub Action Output variable description
+- ### Output Variables for GitHub Action
 
-To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`, see the [instructions for details](../build-armbian/documents#2-set-the-privacy-variable-github_token).
+Uploading to `Releases` requires adding `GITHUB_TOKEN` and `GH_TOKEN` to the repository and setting `Workflow Read and Write Permissions`. See [instructions](../build-armbian/documents/README.md#2-set-private-variable-github_token) for details.
 
 | Parameter                         | For example              | Description                         |
 |-----------------------------------|--------------------------|-------------------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.1_6.1.1             | The name of the compiled kernel     |
-| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | kernel files storage path           |
-| ${{ env.PACKAGED_OUTPUTDATE }}    | 04.13.1058               | compile date(month.day.hour.minute) |
-| ${{ env.PACKAGED_STATUS }}        | success                  | Compile status. success / failure   |
+| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.1_6.1.1             | The name of the compiled kernel.    |
+| ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | The path where the compiled kernel is saved. |
+| ${{ env.PACKAGED_OUTPUTDATE }}    | 04.13.1058               | The compilation date (Month.Day.HourMinute). |
+| ${{ env.PACKAGED_STATUS }}        | success                  | The compilation status: success / failure.   |
 
+## Instructions for Using the Kernel
 
-## Kernel usage Instructions
+This kernel can be used on `Armbian` and `OpenWrt` systems. Taking ophub's project as an example, the following will explain how to integrate it when compiling Armbian firmware and how to install and use it in existing systems.
 
-This kernel can be used in `Armbian` and `OpenWrt` systems. Take ophub's project as an example.
+### Using the Kernel to Compile Armbian Firmware
 
-### Use on Armbian systems
+Compiling Armbian firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](../README.md#local-packaging), and the method for compiling online using Actions is detailed in: [Compiling using GitHub Actions](../README.md#compiling-using-github-actions).
 
-The following describes how to integrate when compiling Armbian firmware and how to install it into an existing system.
+### Installing the Kernel in an Existing Armbian System
 
-- #### Compiling Armbian firmware with the kernel
+You can use the `armbian-update` command to install the compiled kernel into an existing Armbian system. The specific operation method is detailed in: [Updating Armbian kernel](../README.md#updating-armbian-kernel)
 
-Compiling Armbian firmware supports localized operations and online compilation using Actions from github.com. For details on how to use localized compilation, see: [Local build instructions](../README.md#local-build-instructions), For details on how to compile online with Actions: [Use GitHub Action to build](../README.md#use-github-actions-to-build)
+### Using the Kernel in an OpenWrt System
 
-- #### Install the kernel to an existing Armbian system
+The following describes how to integrate the kernel when compiling firmware and how to install and use it in an existing OpenWrt system.
 
-The compiled kernel can be installed into an existing Armbian system using the `armbian-update` command, For specific operation methods, please refer to: [Update Armbian Kernel](../README.md#update-armbian-kernel)
+- #### Using the Kernel to Compile OpenWrt Firmware
 
-### Use in OpenWrt system
+Compiling OpenWrt firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#local-packaging), and the method for compiling online using Actions is detailed in: [Compiling using Actions](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#compiling-using-github-actions).
 
-The following describes the integration when compiling the OpenWrt firmware and how to install it in an existing system.
+- #### Installing the Kernel in an Existing OpenWrt System
 
-- #### Compile OpenWrt firmware with kernel
-
-Compiling OpenWrt firmware supports localized operations, as well as online compilation using Actions from github.com. For details on how to use localized compilation, see: [Local build instructions](https://github.com/ophub/amlogic-s9xxx-openwrt#local-build-instructions), For details on how to compile online with Actions: [Use GitHub Actions to build](https://github.com/ophub/amlogic-s9xxx-openwrt#use-github-actions-to-build)
-
-- #### Install the kernel to an existing OpenWrt system
-
-You can use the [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.cn.md) plugin to install the compiled kernel into the existing OpenWrt system, For specific operation methods, please refer to: [Update OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt#update-openwrt)
+You can use the [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.md) plugin to install the compiled kernel into an existing OpenWrt system. The specific operation method is detailed in: [Upgrading OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#upgrading-openwrt).
 
