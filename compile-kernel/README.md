@@ -69,7 +69,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     kernel_sign: -yourname
 ```
 
-💡Note: If you `fork` the repository and make changes, you need to change the `username` of the Actions to your own repository, and follow steps 2-3 in the instructions [Add TOKEN](../build-armbian/documents/README.md#2-set-private-variable-github_token), for example:
+💡Note: If you `fork` the repository and make changes, you need to change the `username` of the Actions to your own repository, and follow steps 2-3 in the instructions [Add TOKEN](../build-armbian/documents/README.md#2-set-up-privacy-variable-github_token), for example:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
@@ -92,7 +92,7 @@ Related parameters correspond to the `Local Compilation Command`, please refer t
 
 - ### Output Variables for GitHub Action
 
-Uploading to `Releases` requires adding `GITHUB_TOKEN` and `GH_TOKEN` to the repository and setting `Workflow Read and Write Permissions`. See [instructions](../build-armbian/documents/README.md#2-set-private-variable-github_token) for details.
+Uploading to `Releases` requires adding `GITHUB_TOKEN` and `GH_TOKEN` to the repository and setting `Workflow Read and Write Permissions`. See [instructions](../build-armbian/documents/README.md#2-set-up-privacy-variable-github_token) for details.
 
 | Parameter                         | For example              | Description                         |
 |-----------------------------------|--------------------------|-------------------------------------|
@@ -107,11 +107,11 @@ This kernel can be used on `Armbian` and `OpenWrt` systems. Taking ophub's proje
 
 ### Using the Kernel to Compile Armbian Firmware
 
-Compiling Armbian firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](../README.md#local-packaging), and the method for compiling online using Actions is detailed in: [Compiling using GitHub Actions](../README.md#compiling-using-github-actions).
+Compiling Armbian firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](../README.md#local-build-instructions), and the method for compiling online using Actions is detailed in: [Compiling using GitHub Actions](../README.md#github-actions-input-parameter-description).
 
 ### Installing the Kernel in an Existing Armbian System
 
-You can use the `armbian-update` command to install the compiled kernel into an existing Armbian system. The specific operation method is detailed in: [Updating Armbian kernel](../README.md#updating-armbian-kernel)
+You can use the `armbian-update` command to install the compiled kernel into an existing Armbian system. The specific operation method is detailed in: [Updating the Armbian kernel](../README.md#updating-the-armbian-kernel)
 
 ### Using the Kernel in an OpenWrt System
 
@@ -119,9 +119,9 @@ The following describes how to integrate the kernel when compiling firmware and 
 
 - #### Using the Kernel to Compile OpenWrt Firmware
 
-Compiling OpenWrt firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#local-packaging), and the method for compiling online using Actions is detailed in: [Compiling using Actions](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#compiling-using-github-actions).
+Compiling OpenWrt firmware supports localization operations and can also be compiled online using `github.com`'s Actions. The usage method for local compilation is detailed in: [Local Packaging](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#local-packaging-parameters), and the method for compiling online using Actions is detailed in: [Compiling using Actions](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#compiling-with-github-actions).
 
 - #### Installing the Kernel in an Existing OpenWrt System
 
-You can use the [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.md) plugin to install the compiled kernel into an existing OpenWrt system. The specific operation method is detailed in: [Upgrading OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#upgrading-openwrt).
+You can use the [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic/blob/main/README.md) plugin to install the compiled kernel into an existing OpenWrt system. The specific operation method is detailed in: [Update OpenWrt](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/README.md#update-openwrt).
 
