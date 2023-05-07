@@ -48,7 +48,7 @@
 # Related file storage path
 current_path="${PWD}"
 armbian_outputpath="${current_path}/build/output/images"
-armbian_rebuild_file="${armbian_outputpath}/*.img"
+armbian_rebuild_file="${armbian_outputpath}/*-trunk*.img"
 build_path="${current_path}/build-armbian"
 kernel_path="${build_path}/kernel"
 uboot_path="${build_path}/u-boot"
@@ -741,6 +741,9 @@ copy_files() {
 
     # Copy the overload files
     [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/${PLATFORM}/overload/* ${tag_bootfs}
+
+    # Remove the .svn and .git directories
+    rm -rf $(find ${tmp_build} -type d -name '.svn' -o -name '.git')
 }
 
 replace_kernel() {
