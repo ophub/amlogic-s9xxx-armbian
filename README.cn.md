@@ -10,7 +10,7 @@
 
 ## Armbian 系统说明
 
-| 芯片  | 设备 | [内核](https://github.com/ophub/kernel) | Armbian |
+| 芯片  | 设备 | [内核](https://github.com/ophub/kernel) | [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) |
 | ---- | ---- | ---- | ---- |
 | a311d | [Khadas-VIM3](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/99) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | amlogic_a311d.img |
 | s922x | [Beelink-GT-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/370), [Beelink-GT-King-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/707), [Ugoos-AM6-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/213), [ODROID-N2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/201), [X88-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/988), [Ali-CT2000](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1150) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | amlogic_s922x.img |
