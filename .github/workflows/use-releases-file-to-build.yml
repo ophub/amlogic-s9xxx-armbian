@@ -215,7 +215,7 @@ jobs:
                               jq '.[]' |
                               jq -s --arg RTK "Armbian_${{ inputs.set_release }}_" '.[] | select(.tag_name | contains($RTK))' |
                               jq -s '.[].assets[] | {data:.updated_at, url:.browser_download_url}' |
-                              jq -s --arg BOARD "-trunk_" '.[] | select((.url | contains($BOARD)))' |
+                              jq -s --arg BOARD "-trunk_" '.[] | select((.url | contains($BOARD)) and (.url | endswith(".img.gz")))' |
                               jq -s 'sort_by(.data)|reverse[]' |
                               jq -s '.[0]' -c
                           )"
