@@ -13,6 +13,14 @@ on:
         description: "Set Armbian file path."
         required: false
         default: ""
+      armbian_fstype:
+        description: "Set armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
       armbian_board:
         description: "Select device board."
         required: false
@@ -150,14 +158,14 @@ on:
           - stable
           - flippy
           - dev
-      armbian_fstype:
-        description: "Set armbian rootfs type."
+      armbian_storage:
+        description: "Select Armbian image storage time."
         required: false
-        default: "ext4"
+        default: "lts"
         type: choice
         options:
-          - ext4
-          - btrfs
+          - lts
+          - tmp
 
 env:
   TZ: America/New_York
@@ -203,18 +211,18 @@ jobs:
           echo "ARMBIAN_URL=${armbian_url}" >> ${GITHUB_ENV}
 
           # Get the release name of the rebuild armbian file
-          set_release="_"
+          set_release=""
           ARR_RELEASE=("jammy" "focal" "bullseye" "buster" "sid")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${armbian_url}" == *"${r}"* ]]; then
-                  set_release="_${r}_"
+                  set_release="_${r}"
                   break
               fi
               let i++
           done
-          echo "ARMBIAN_RELEASE=${set_release}" >> ${GITHUB_ENV}
           sudo timedatectl set-timezone "${TZ}"
+          echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
@@ -235,9 +243,11 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
-          tag: Armbian${{ env.ARMBIAN_RELEASE }}${{ env.PACKAGED_OUTPUTDATE }}
+          tag: ${{ steps.init.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
             These are the Armbian OS image

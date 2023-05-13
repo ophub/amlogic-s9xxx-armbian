@@ -17,6 +17,14 @@ on:
         options:
           - jammy
           - bullseye
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
       armbian_board:
         description: "Select device board."
         required: false
@@ -154,14 +162,14 @@ on:
           - stable
           - flippy
           - dev
-      armbian_fstype:
-        description: "Select armbian rootfs type."
+      armbian_storage:
+        description: "Select Armbian image storage time."
         required: false
-        default: "ext4"
+        default: "lts"
         type: choice
         options:
-          - ext4
-          - btrfs
+          - lts
+          - tmp
 
 env:
   TZ: America/New_York
@@ -213,6 +221,7 @@ jobs:
           wget -q -P "${armbian_buildpath}" "${down_file}" && sync
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
+          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
@@ -233,9 +242,11 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
-          tag: Armbian_${{ inputs.set_release }}_${{ env.PACKAGED_OUTPUTDATE }}
+          tag: ${{ steps.down.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
             These are the Armbian OS image
