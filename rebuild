@@ -606,7 +606,8 @@ make_image() {
     }
 
     # Set Armian file name
-    build_image_file="${tmp_outpath}/Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
+    armbian_filename="Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
+    build_image_file="${tmp_outpath}/${armbian_filename}"
     rm -f ${build_image_file}
 
     IMG_SIZE="$((skip_mb + boot_mb + root_mb))"
@@ -1065,8 +1066,12 @@ clean_tmp() {
 
     cd ${tmp_outpath}
 
-    pigz -qf *.img || gzip -qf *.img
-    mv -f *.img.gz -t ${armbian_outputpath} && sync
+    # Compress Armbian image file
+    pigz -qf ${armbian_filename} || gzip -qf ${armbian_filename}
+    # Generate independent sha256sum verification file for each Armbian image
+    sha256sum ${armbian_filename}.gz >${armbian_filename}.gz.sha && sync
+    # Move Armbian files to the output directory
+    mv -f ${armbian_filename}* -t ${armbian_outputpath} && sync
 
     cd ${current_path}
 
@@ -1151,7 +1156,7 @@ loop_rebuild() {
     cd ${armbian_outputpath}
 
     # Generate sha256sum check file
-    sha256sum * >sha256sums && sync
+    sha256sum ${armbian_rebuild_name} >${armbian_rebuild_name}.gz.sha && sync
 }
 
 # Show welcome message
