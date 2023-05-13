@@ -17,6 +17,14 @@ on:
         options:
           - jammy
           - bullseye
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
       armbian_board:
         description: "Select device board."
         required: false
@@ -121,11 +129,6 @@ on:
           - station-m1
           - vplus
           - tanix-tx6
-      minimal_image:
-        description: "Build a minimal image."
-        required: false
-        default: false
-        type: boolean
       armbian_kernel:
         description: "Select kernel version."
         required: false
@@ -159,14 +162,14 @@ on:
           - stable
           - flippy
           - dev
-      armbian_fstype:
-        description: "Select armbian rootfs type."
+      armbian_storage:
+        description: "Select Armbian image storage time."
         required: false
-        default: "ext4"
+        default: "lts"
         type: choice
         options:
-          - ext4
-          - btrfs
+          - lts
+          - tmp
 
 env:
   TZ: America/New_York
@@ -196,19 +199,6 @@ jobs:
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
           sudo timedatectl set-timezone "${TZ}"
-
-          # Add BUILD_MINIMAL settings: build bare CLI image suitable for application deployment.
-          minimal_image="${{ inputs.minimal_image }}"
-          if [[ "${minimal_image}" == "true" ]]; then
-              minimal_option="yes"
-              minimal_tag="_minimal"
-          else
-              minimal_option="no"
-              minimal_tag=""
-          fi
-          echo "ARMBIAN_MINIMAL_TAG=${minimal_tag}" >> ${GITHUB_ENV}
-          echo "ARMBIAN_MINIMAL_OPTION=${minimal_option}" >> ${GITHUB_ENV}
-
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download source code
@@ -219,16 +209,16 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ Release:${{ inputs.set_release }} / Minimal:${{ inputs.minimal_image }} ]
+      - name: Compile Armbian [ ${{ inputs.set_release }} ]
         id: compile
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ inputs.set_release }} BUILD_MINIMAL=${{ env.ARMBIAN_MINIMAL_OPTION }} \
-                  BOARD=odroidn2 BRANCH=current BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes \
-                  KERNEL_CONFIGURE=no CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE="sha"
-          echo "build_tag=Armbian_${{ inputs.set_release }}${{ env.ARMBIAN_MINIMAL_TAG }}_$(date +"%m.%d.%H%M")" >> ${GITHUB_OUTPUT}
+              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+                  BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
+                  CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE="sha"
+          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clean up server space
@@ -275,6 +265,8 @@ jobs:
           tag: ${{ steps.compile.outputs.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
+          removeArtifacts: false
+          replacesArtifacts: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
             These are the Armbian OS image
