@@ -208,17 +208,24 @@ jobs:
           armbian_buildpath="build/output/images"
           [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
 
-          down_filename="$(curl \
-                            --header "authorization: Bearer ${{ secrets.GH_TOKEN }}" \
-                            -s "https://api.github.com/repos/${GITHUB_REPOSITORY}/releases" |
-                            grep -oE "Armbian_${{ inputs.set_release }}.*/Armbian_.*-trunk_.*.img.gz" |
-                            head -n 1
-                        )"
+          latest_version="$(curl -s \
+                              -H "Accept: application/vnd.github+json" \
+                              -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+                              https://api.github.com/repos/${GITHUB_REPOSITORY}/releases |
+                              jq '.[]' |
+                              jq -s --arg RTK "Armbian_${{ inputs.set_release }}_" '.[] | select(.tag_name | contains($RTK))' |
+                              jq -s '.[].assets[] | {data:.updated_at, url:.browser_download_url}' |
+                              jq -s --arg BOARD "-trunk_" '.[] | select((.url | contains($BOARD)))' |
+                              jq -s 'sort_by(.data)|reverse[]' |
+                              jq -s '.[0]' -c
+                          )"
 
-          [[ -z "${down_filename}" ]] && echo "Invalid download file." && exit 1
-          down_file="https://github.com/${GITHUB_REPOSITORY}/releases/download/${down_filename}"
+          [[ "${latest_version}" == "null" ]] && echo "Invalid Armbian image download address." && exit 1
+          latest_updated_at="$(echo ${latest_version} | jq -r '.data')"
+          latest_url="$(echo ${latest_version} | jq -r '.url')"
 
-          wget -q -P "${armbian_buildpath}" "${down_file}" && sync
+          wget -q -P "${armbian_buildpath}" "${latest_url}"
+          [[ "${?}" -ne "0" ]] && echo "Invalid Armbian image download address." && exit 1
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
           echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
