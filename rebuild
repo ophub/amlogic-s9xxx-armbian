@@ -1148,10 +1148,6 @@ loop_rebuild() {
             let j++
         }
     done
-
-    cd ${armbian_outputpath}
-    # Generate a sha256sum verification file for each Armbian image file
-    for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
 }
 
 # Show welcome message
