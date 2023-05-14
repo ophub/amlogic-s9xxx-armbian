@@ -269,9 +269,10 @@ jobs:
           replacesArtifacts: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
-            These are the Armbian OS image
-            * OS information
-            Default username: root
-            Default password: 1234
-            Install command: armbian-install
-            Update command: armbian-update
+            ## Armbian Image information
+            - Default username: root
+            - Default password: 1234
+            - Install command: armbian-install
+            - Update command: armbian-update
+            ## Armbian Image Verification
+            - sha256sum
