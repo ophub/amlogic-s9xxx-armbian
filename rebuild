@@ -1065,16 +1065,12 @@ clean_tmp() {
     losetup -d ${loop_new} 2>/dev/null
 
     cd ${tmp_outpath}
-
     # Compress Armbian image file
     pigz -qf ${armbian_filename} || gzip -qf ${armbian_filename}
-    # Generate independent sha256sum verification file for each Armbian image
-    sha256sum ${armbian_filename}.gz >${armbian_filename}.gz.sha && sync
     # Move Armbian files to the output directory
-    mv -f ${armbian_filename}* -t ${armbian_outputpath} && sync
+    mv -f ${armbian_filename}* -t ${armbian_outputpath}
 
     cd ${current_path}
-
     rm -rf ${tmp_dir} && sync
 }
 
@@ -1154,9 +1150,8 @@ loop_rebuild() {
     done
 
     cd ${armbian_outputpath}
-
-    # Generate sha256sum check file
-    sha256sum ${armbian_rebuild_name} >${armbian_rebuild_name}.gz.sha && sync
+    # Generate a sha256sum verification file for each Armbian image file
+    for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
 }
 
 # Show welcome message
