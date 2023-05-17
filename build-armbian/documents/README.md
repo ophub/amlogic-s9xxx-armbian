@@ -1037,6 +1037,8 @@ For example, the `Home Assistant Supervisor` application only supports the `dock
 
 By adding the `max_loop=128` setting in cmdline, you can adjust the number of loop mounts allowed.
 
+By adding `usbcore.usbfs_memory_mb=1024` to cmdline, the USBFS memory buffer can be permanently changed from the default `16 mb` to a larger size (`cat /sys/module/usbcore/parameters/usbfs_memory_mb`), improving the ability to transfer large files via USB.
+
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
