@@ -1037,6 +1037,8 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 通过在 cmdline 中添加 `max_loop=128` 设置，可以调整允许的 loop 挂载数量。
 
+通过在 cmdline 中添加 `usbcore.usbfs_memory_mb=1024` 设置，可以永久将 USBFS 内存缓冲区从默认的 `16 mb` 改为更大（`cat /sys/module/usbcore/parameters/usbfs_memory_mb`），提升 USB 传输大文件的能力。
+
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
