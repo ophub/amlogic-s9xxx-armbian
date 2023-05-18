@@ -1031,16 +1031,22 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 ### 12.14 如何修改 cmdline 设置
 
-在 Amlogic 设备中，可以在 `/boot/uEnv.txt` 文件中进行添加/修改/删除等设置。在 Rockchip 设备中在 `/boot/armbianEnv.txt` 文件中进行设置。每次更改后要重启才能生效。
+在 Amlogic 设备中，可以在 `/boot/uEnv.txt` 文件中进行添加/修改/删除等设置。在 Rockchip 和 Allwinner 设备中在 `/boot/armbianEnv.txt` 文件中进行设置（添加至 `extraargs` 或 `extraboardargs` 参数里）。使用 `/boot/extlinux/extlinux.conf` 的设备在这个文件里配置。每次更改后要重启才能生效。
 
-比如 `Home Assistant Supervisor` 应用只支持 `docker cgroup v1` 版本，而目前 docker 默认安装的都是最新的 v2 版本。如需切换至 v1 版本，可以在 cmdline 中添加 `systemd.unified_cgroup_hierarchy=0` 参数设置，重启后就可以切换至 `docker cgroup v1` 版本。
+- 比如 `Home Assistant Supervisor` 应用只支持 `docker cgroup v1` 版本，而目前 docker 默认安装的都是最新的 v2 版本。如需切换至 v1 版本，可以在 cmdline 中添加 `systemd.unified_cgroup_hierarchy=0` 参数设置，重启后就可以切换至 `docker cgroup v1` 版本。
 
-通过在 cmdline 中添加 `max_loop=128` 设置，可以调整允许的 loop 挂载数量。
+- 通过在 cmdline 中添加 `max_loop=128` 设置，可以调整允许的 loop 挂载数量。
 
-通过在 cmdline 中添加 `usbcore.usbfs_memory_mb=1024` 设置，可以永久将 USBFS 内存缓冲区从默认的 `16 mb` 改为更大（`cat /sys/module/usbcore/parameters/usbfs_memory_mb`），提升 USB 传输大文件的能力。
+- 通过在 cmdline 中添加 `usbcore.usbfs_memory_mb=1024` 设置，可以永久将 USBFS 内存缓冲区从默认的 `16 mb` 改为更大（`cat /sys/module/usbcore/parameters/usbfs_memory_mb`），提升 USB 传输大文件的能力。
+
+- 通过在 cmdline 中添加 `usbcore.usb3_disable=1` 设置，可以禁用 USB 3.0 的所有设备。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a600dcad-d817-47eb-b529-4014019915b3">
 </div>
 
 ### 12.15 如何添加新的支持设备
