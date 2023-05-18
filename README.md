@@ -2,11 +2,9 @@
 
 Read the Chinese version: [查看中文说明](README.cn.md)
 
-[Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes.
+[Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes. Now you can replace the Android system of your TV box with Armbian, turning it into a powerful server.
 
-Now you can replace the Android system of your TV box with Armbian, turning it into a powerful server. This project builds Armbian images for **Amlogic**, **Rockchip** and **Allwinner** TV boxes, including scripts for installation to eMMC and updating the kernel. Please refer to the [Armbian Documentation](./build-armbian/documents) for more information on Armbian.
-
-The latest Armbian builds can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). You are welcome to fork and personalize it. If it is useful to you then please click on the star in the upper right corner of the github repository page to show your support. Thanks!
+This project relies on many [contributors](CONTRIBUTORS.md) to build Armbian systems for `Amlogic`, `Rockchip`, and `Allwinner` boxes. It supports writing to eMMC, updating the kernel, and other functions. Please refer to the [Armbian Documentation](./build-armbian/documents) for more information on Armbian. The latest Armbian builds can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). You are welcome to fork and personalize it. If it is useful to you then please click on the star in the upper right corner of the github repository page to show your support. Thanks!
 
 ## Armbian system specific instructions
 
