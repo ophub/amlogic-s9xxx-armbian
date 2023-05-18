@@ -1031,16 +1031,22 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 ### 12.14 How to modify cmdline settings
 
-In Amlogic devices, you can add/modify/delete settings in the `/boot/uEnv.txt` file. In Rockchip devices, you can set it in the `/boot/armbianEnv.txt` file. You need to restart after each change to take effect.
+In Amlogic devices, settings such as addition/modification/deletion can be made in the `/boot/uEnv.txt` file. In Rockchip and Allwinner devices, settings are made in the `/boot/armbianEnv.txt` file (added to the `extraargs` or `extraboardargs` parameter). For devices using `/boot/extlinux/extlinux.conf`, configurations are made in this file. Restart the device after each change for it to take effect.
 
-For example, the `Home Assistant Supervisor` application only supports the `docker cgroup v1` version, while the docker installed by default is the latest version of v2. If you need to switch to v1 version, you can add the `systemd.unified_cgroup_hierarchy=0` parameter setting in the cmdline, and after restarting, you can switch to the `docker cgroup v1` version.
+- For example, the `Home Assistant Supervisor` application only supports the `docker cgroup v1` version, while the docker installed by default is the latest version of v2. If you need to switch to v1 version, you can add the `systemd.unified_cgroup_hierarchy=0` parameter setting in the cmdline, and after restarting, you can switch to the `docker cgroup v1` version.
 
-By adding the `max_loop=128` setting in cmdline, you can adjust the number of loop mounts allowed.
+- By adding the `max_loop=128` setting in cmdline, you can adjust the number of loop mounts allowed.
 
-By adding `usbcore.usbfs_memory_mb=1024` to cmdline, the USBFS memory buffer can be permanently changed from the default `16 mb` to a larger size (`cat /sys/module/usbcore/parameters/usbfs_memory_mb`), improving the ability to transfer large files via USB.
+- By adding `usbcore.usbfs_memory_mb=1024` to cmdline, the USBFS memory buffer can be permanently changed from the default `16 mb` to a larger size (`cat /sys/module/usbcore/parameters/usbfs_memory_mb`), improving the ability to transfer large files via USB.
+
+- By adding `usbcore.usb3_disable=1` to the cmdline, you can disable all USB 3.0 devices.
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a600dcad-d817-47eb-b529-4014019915b3">
 </div>
 
 ### 12.15 How to add support for new devices
