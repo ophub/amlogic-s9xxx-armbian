@@ -4,7 +4,7 @@
 
 [Armbian（中文名：岸边）](https://www.armbian.com/) 系统是基于 Debian/Ubuntu 而构建的专门用于 ARM 芯片的轻量级 Linux 系统。Armbian 系统精益、干净，并且 100% 兼容并继承了 Debian/Ubuntu 系统的功能和丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 里。现在你可以将电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。
 
-本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见[Armbian 使用文档](./build-armbian/documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
+本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见 [Armbian 使用文档](./build-armbian/documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎到 [Armbian 讨论区](https://github.com/ophub/amlogic-s9xxx-armbian/discussions)交流分享。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
 ## Armbian 系统说明
 
