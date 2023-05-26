@@ -310,7 +310,7 @@ download_kernel() {
     echo -e "${STEPS} Start downloading kernel package..."
 
     # Download kernel
-    if [[ "$(ls ${kernel_path}/*-${inputs_kernel}-*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
+    if [[ "$(ls ${kernel_path}/*-${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
         # Download the kernel from [ releases ]
         kernel_down_from="${GITHUB_CDN}https://github.com/${KERNEL_REPO}/releases/download/kernel_${KERNEL_TAGS}/${inputs_kernel}.tar.gz"
 
@@ -334,11 +334,11 @@ check_kernel() {
     echo -e "${STEPS} Start checking kernel package..."
 
     # Determine custom kernel filename
-    kernel_boot="$(ls boot-${inputs_kernel}-*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_boot="$(ls boot-${inputs_kernel}*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot:5:-7}"
+    echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
     KERNEL_VERSION="$(echo ${kernel_name} | grep -oE '^[1-9].[0-9]{1,3}.[0-9]+')"
     [[ -z "${KERNEL_VERSION}" ]] && error_msg "Invalid kernel in [ ${kernel_path} ]"
-    echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
 
     # Check if the file is added with TEXT_OFFSET patch
     [[ "${PLATFORM}" == "amlogic" ]] && {
