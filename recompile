@@ -51,6 +51,8 @@ armbian_file="${armbian_path}/armbian.img"
 out_kernel="${compile_path}/output"
 chroot_path="${out_kernel}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
+
+# Set the system file path to be used
 arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
 
@@ -474,7 +476,7 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
 
     rm -rf ${tag_rootfs}/usr/lib/modules/*
-    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} ${tag_rootfs}/usr/lib/modules
+    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} -t ${tag_rootfs}/usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
