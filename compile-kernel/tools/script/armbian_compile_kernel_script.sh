@@ -46,6 +46,11 @@ kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 out_kernel="${compile_path}/output"
+tmp_backup_path="/ddbr/tmp"
+boot_backup_path="${tmp_backup_path}/boot"
+modules_backup_path="${tmp_backup_path}/modules"
+
+# Set the system file path to be used
 arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d"=" -f2)"
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
@@ -416,10 +421,9 @@ generate_uinitrd() {
     echo -e "${STEPS} Generate uInitrd environment initialization..."
 
     # Backup current system files for /boot
-    echo -e "${INFO} Backup the files in the [ /boot ] directory."
-    boot_backup_path="/boot/backup"
+    echo -e "${INFO} Backup the files in the [ ${boot_backup_path} ] directory."
     rm -rf ${boot_backup_path} && mkdir -p ${boot_backup_path}
-    mv -f /boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image} ${boot_backup_path} 2>/dev/null
+    mv -f /boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image} -t ${boot_backup_path}
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map /boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config /boot/config-${kernel_outname}
@@ -432,12 +436,11 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ /boot ] directory: \n$(ls -l /boot) \n"
 
     # Backup current system files for /usr/lib/modules
-    echo -e "${INFO} Backup the files in the [ /usr/lib/modules ] directory."
-    modules_backup_path="/usr/lib/modules/backup"
+    echo -e "${INFO} Backup the files in the [ ${modules_backup_path} ] directory."
     rm -rf ${modules_backup_path} && mkdir -p ${modules_backup_path}
-    mv -f /usr/lib/modules/$(uname -r) ${modules_backup_path}
+    mv -f /usr/lib/modules/$(uname -r) -t ${modules_backup_path}
     # Copy modules files
-    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} /usr/lib/modules
+    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} -t /usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
@@ -452,14 +455,14 @@ generate_uinitrd() {
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
 
     # Generate uInitrd file directly under armbian system
-    update-initramfs -c -k ${kernel_outname} 2>/dev/null
+    update-initramfs -c -k ${kernel_outname}
 
     # Disable update_initramfs
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
 
-    if [[ -f uInitrd ]]; then
+    if [[ -f "uInitrd" ]]; then
         echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
-        mv -f uInitrd uInitrd-${kernel_outname} 2>/dev/null
+        [[ ! -L "uInitrd" ]] && mv -vf uInitrd uInitrd-${kernel_outname}
     else
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
@@ -468,11 +471,11 @@ generate_uinitrd() {
 
     # Restore the files in the [ /boot ] directory
     mv -f *${kernel_outname} ${out_kernel}/boot
-    mv -f ${boot_backup_path}/* .
+    mv -f ${boot_backup_path}/* -t .
 
     # Restore the files in the [ /usr/lib/modules ] directory
     rm -rf /usr/lib/modules/${kernel_outname}
-    mv -f ${modules_backup_path}/* /usr/lib/modules
+    mv -f ${modules_backup_path}/* -t /usr/lib/modules
 
     # Remove temporary backup directory
     sync && sleep 3
@@ -561,6 +564,7 @@ clean_tmp() {
 
     sync && sleep 3
     rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
+    rm -rf ${tmp_backup_path}
 
     echo -e "${SUCCESS} All processes have been completed."
 }
