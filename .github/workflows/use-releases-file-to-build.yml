@@ -17,6 +17,8 @@ on:
         options:
           - jammy
           - bullseye
+          - lunar
+          - bookworm
       armbian_fstype:
         description: "Select armbian rootfs type."
         required: false
