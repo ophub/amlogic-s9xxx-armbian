@@ -523,7 +523,7 @@ copy_rootfs() {
         echo -e "${INFO} Copying [ ${src} ] ..."
         tar -cf - ${src} | (
             cd ${DIR_INSTALL}
-            tar -xf -
+            tar -xf - --touch
         )
     done
     # Create relevant symbolic link
