@@ -112,7 +112,7 @@ get_textoffset() {
     temp_dir="$(mktemp -d)"
     (
         cd ${temp_dir}
-        tar -xzf "${boot_tgz_file}" --touch "${vmlinuz_name}"
+        tar -mxzf "${boot_tgz_file}" "${vmlinuz_name}"
     )
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
     [[ "$(hexdump -n 15 -x "${temp_dir}/${vmlinuz_name}" 2>/dev/null | head -n 1 | awk '{print $7}')" == "0108" ]] && need_overload="no"
@@ -318,7 +318,7 @@ download_kernel() {
         echo -e "${INFO} Download kernel to:   [ ${kernel_path} ]"
         wget "${kernel_down_from}" -q -P "${kernel_path}"
         [[ "${?}" -ne "0" ]] && error_msg "Failed to download kernel."
-        tar -xzf "${kernel_path}/${inputs_kernel}.tar.gz" --touch -C "${kernel_path}"
+        tar -mxzf "${kernel_path}/${inputs_kernel}.tar.gz" -C "${kernel_path}"
         [[ "${?}" -ne "0" ]] && error_msg "Failed to extract kernel [ ${inputs_kernel} ], stop updating."
         kernel_path="${kernel_path}/${inputs_kernel}"
     else
@@ -453,7 +453,7 @@ update_kernel() {
     rm -rf /boot/uInitrd /boot/Image /boot/zImage /boot/dtb-*
 
     # 01. For /boot five files
-    tar -xzf boot-${kernel_name}.tar.gz --touch -C /boot
+    tar -mxzf boot-${kernel_name}.tar.gz -C /boot
     [[ "${PLATFORM}" == "amlogic" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage)
     [[ "${PLATFORM}" == "rockchip" ]] && (cd /boot && ln -sf uInitrd-${kernel_name} uInitrd && ln -sf vmlinuz-${kernel_name} Image)
     [[ "${PLATFORM}" == "allwinner" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} Image)
@@ -462,7 +462,7 @@ update_kernel() {
 
     # 02. For /boot/dtb/${PLATFORM}/*
     [[ -d "/boot/dtb/${PLATFORM}" ]] || mkdir -p /boot/dtb/${PLATFORM}
-    tar -xzf dtb-${PLATFORM}-${kernel_name}.tar.gz --touch -C /boot/dtb/${PLATFORM}
+    tar -mxzf dtb-${PLATFORM}-${kernel_name}.tar.gz -C /boot/dtb/${PLATFORM}
     [[ "${PLATFORM}" == "rockchip" ]] && ln -sf dtb /boot/dtb-${kernel_name}
     [[ "$(ls /boot/dtb/${PLATFORM} -l 2>/dev/null | grep "^-" | wc -l)" -ge "2" ]] || error_msg "/boot/dtb/${PLATFORM} files is missing."
     echo -e "${INFO} (2/4) Unpacking [ dtb-${PLATFORM}-${kernel_name}.tar.gz ] succeeded."
@@ -470,13 +470,13 @@ update_kernel() {
     # 03. For /usr/src/linux-headers-${kernel_name}
     header_path="linux-headers-${kernel_name}"
     rm -rf /usr/src/linux-headers-* && mkdir -p "/usr/src/${header_path}"
-    tar -xzf header-${kernel_name}.tar.gz --touch -C /usr/src/${header_path}
+    tar -mxzf header-${kernel_name}.tar.gz -C /usr/src/${header_path}
     [[ -d "/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
     echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] succeeded."
 
     # 04. For /usr/lib/modules/${kernel_name}
     rm -rf /usr/lib/modules/*
-    tar -xzf modules-${kernel_name}.tar.gz --touch -C /usr/lib/modules
+    tar -mxzf modules-${kernel_name}.tar.gz -C /usr/lib/modules
     (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build)
     [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
     echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
