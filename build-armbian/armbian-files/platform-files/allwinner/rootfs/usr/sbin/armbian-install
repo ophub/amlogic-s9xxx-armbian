@@ -299,7 +299,7 @@ copy_rootfs() {
         echo -e "${INFO} Copy the [ ${src} ] directory."
         tar -cf - ${src} | (
             cd ${DIR_INSTALL}
-            tar -xf - --touch
+            tar -mxf -
         )
     done
     # Create relevant symbolic link
