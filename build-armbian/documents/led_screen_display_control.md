@@ -47,6 +47,7 @@ sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_se
 | t95z-plus  |  20     |  armbian-openvfd 20   |   openwrt-openvfd 20    | Enable LED  |
 | tx9-pro    |  21     |  armbian-openvfd 21   |   openwrt-openvfd 21    | Enable LED  |
 | x92        |  22     |  armbian-openvfd 22   |   openwrt-openvfd 22    | Enable LED  |
+| whale      |  23     |  armbian-openvfd 23   |   openwrt-openvfd 23    | Enable LED  |
 | diy        |  99     |  armbian-openvfd 99   |   openwrt-openvfd 99    | Enable LED  |
 | -          |  0      |  armbian-openvfd 0    |   openwrt-openvfd 0     | Disable LED |
 | -          |  -u     |  armbian-openvfd -u   |   openwrt-openvfd -u    | Update Conf |
@@ -100,6 +101,7 @@ sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_se
 | t95z-plus  |  20      |  armbian-openvfd 20   |   openwrt-openvfd 20    | 启用 LED |
 | tx9-pro    |  21      |  armbian-openvfd 21   |   openwrt-openvfd 21    | 启用 LED |
 | x92        |  22      |  armbian-openvfd 22   |   openwrt-openvfd 22    | 启用 LED |
+| whale      |  23      |  armbian-openvfd 23   |   openwrt-openvfd 23    | 启用 LED |
 | diy        |  99      |  armbian-openvfd 99   |   openwrt-openvfd 99    | 启用 LED |
 | -          |  0       |  armbian-openvfd 0    |   openwrt-openvfd 0     | 禁用 LED |
 | -          |  -u      |  armbian-openvfd -u   |   openwrt-openvfd -u    | 更新配置  |
