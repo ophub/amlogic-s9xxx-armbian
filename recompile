@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on x86_64 Ubuntu-22.04(jammy), Compile the kernel.
+# Description: Run on the x86_64 and aarch64 platforms (ubuntu/debian), Compile the kernel.
 # Copyright (C) 2021~ https://www.kernel.org
 # Copyright (C) 2021~ https://github.com/unifreq
 # Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
@@ -68,7 +68,8 @@ package_list="all"
 # Cross compile toolchain download mirror
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+gun_file_x86_64="arm-gnu-toolchain-12.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+gun_file_aarch64="arm-gnu-toolchain-12.2.rel1-aarch64-aarch64-none-elf.tar.xz"
 # Armenian file source: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian.tar.xz"
 # Set the toolchain path
@@ -199,7 +200,11 @@ toolchain_check() {
 
     # Install dependencies for jammy
     apt-get -qq update
-    apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+    if [[ "${arch_info}" == "x86_64" ]]; then
+        apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+    else
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
+    fi
 
     # Download armbian
     if [[ ! -f "${armbian_file}" ]]; then
@@ -229,6 +234,15 @@ toolchain_check() {
         export LD="ld.lld"
         export MFLAGS=" LLVM=1 LLVM_IAS=1 "
     else
+        # Choosing Arm GNU Toolchain based on the platform
+        if [[ "${arch_info}" == "x86_64" ]]; then
+            gun_file="${gun_file_x86_64}"
+            gun_bin="aarch64-none-linux-gnu-"
+        else
+            gun_file="${gun_file_aarch64}"
+            gun_bin="aarch64-none-elf-"
+        fi
+
         # Download Arm GNU Toolchain
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
@@ -241,12 +255,12 @@ toolchain_check() {
         fi
 
         # Add ${PATH} variable
-        path_ubuntu="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-        path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_ubuntu}"
+        path_os_variable="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+        path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_os_variable}"
         export PATH="${path_gcc}"
 
         # Set cross compilation parameters
-        export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
+        export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/${gun_bin}"
         export CC="${CROSS_COMPILE}gcc"
         export LD="${CROSS_COMPILE}ld.bfd"
         export MFLAGS=""
@@ -631,9 +645,9 @@ loop_recompile() {
 # Show welcome message
 echo -e "${STEPS} Welcome to compile kernel! \n"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
-# Check script permission, supports running on x86_64 Ubuntu: [ jammy ]
+# Check script permission, supports running on the x86_64 and aarch64 platforms (ubuntu/debian)
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
-[[ "${arch_info}" == "x86_64" ]] || error_msg "Running this tool on non-x86_64 Ubuntu build hosts is not supported."
+[[ "x86_64 aarch64" == *"${arch_info}"* ]] || error_msg "This script is only supported on the x86_64 and aarch64 platforms."
 
 # Initialize variables
 init_var "${@}"
