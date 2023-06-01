@@ -157,7 +157,7 @@ init_var() {
     # Find emmc disk, first find emmc containing boot0 partition
     install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
     # Find emmc disk, find emmc that does not contain the boot0 partition
-    [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
+    [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
     # Check if emmc exists
     [[ -z "${install_emmc}" ]] && error_msg "Internal eMMC storage was't found in this device!"
     # Location of emmc
