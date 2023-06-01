@@ -528,9 +528,9 @@ sos_kernel() {
     # Find emmc disk, first find emmc containing boot0 partition
     box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
     # Find emmc disk, find emmc that does not contain the boot0 partition
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort | uniq)"
+    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
     # Find NVMe disk
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme0n1)' | grep -vE ^${root_devname} | sort | uniq)"
+    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme0n1)' | grep -vE ^${root_devname} | sort -u)"
     # Check if emmc exists
     [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe storage not found in this device!"
     # Location of disk
