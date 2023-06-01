@@ -92,7 +92,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:p:r:t:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:m:r:t:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -124,12 +124,12 @@ init_var() {
                 error_msg "Invalid -n parameter [ ${2} ]!"
             fi
             ;;
-        -p | --PackageList)
+        -m | --MakePackage)
             if [[ -n "${2}" ]]; then
                 package_list="${2}"
                 shift
             else
-                error_msg "Invalid -p parameter [ ${2} ]!"
+                error_msg "Invalid -m parameter [ ${2} ]!"
             fi
             ;;
         -r | --repo)
