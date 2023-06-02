@@ -133,10 +133,10 @@ init_var() {
         case "${1}" in
         -k | --Kernel)
             if [[ -n "${2}" ]]; then
-                oldIFS=$IFS
-                IFS=_
+                oldIFS="${IFS}"
+                IFS="_"
                 build_kernel=(${2})
-                IFS=$oldIFS
+                IFS="${oldIFS}"
                 shift
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
