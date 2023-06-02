@@ -23,8 +23,9 @@
 # init_var           : Initialize all variables
 # toolchain_check    : Check and install the toolchain
 # query_version      : Query the latest kernel version
-#
+# apply_patch        : Apply custom kernel patches
 # get_kernel_source  : Get the kernel source code
+#
 # headers_install    : Deploy the kernel headers file
 # compile_env        : Set up the compile kernel environment
 # compile_dtbs       : Compile the dtbs
@@ -45,6 +46,7 @@ compile_path="${current_path}/compile-kernel"
 kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
+kernel_patch_path="${compile_path}/tools/patch"
 out_kernel="${compile_path}/output"
 tmp_backup_path="/ddbr/tmp"
 boot_backup_path="${tmp_backup_path}/boot"
@@ -60,9 +62,13 @@ ophub_release_file="/etc/ophub-release"
 repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("6.1.1" "5.15.1")
+# Set whether to use the latest kernel, options: [ true / false ]
 auto_kernel="true"
+# Set whether to apply custom kernel patches, options: [ true / false ]
+auto_patch="false"
+# Set custom signature for the kernel
 custom_name="-ophub"
-# Set the kernel compile object, options: dtbs / all
+# Set the kernel compile object, options: [ dtbs / all ]
 package_list="all"
 
 # Compile toolchain download mirror, run on Armbian
@@ -92,16 +98,16 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:m:r:t:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:m:p:r:t:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
         -k | --kernel)
             if [[ -n "${2}" ]]; then
-                oldIFS=$IFS
-                IFS=_
+                oldIFS="${IFS}"
+                IFS="_"
                 build_kernel=(${2})
-                IFS=$oldIFS
+                IFS="${oldIFS}"
                 shift
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
@@ -118,7 +124,7 @@ init_var() {
         -n | --customName)
             if [[ -n "${2}" ]]; then
                 custom_name="${2// /}"
-                [[ ${custom_name:0:1} != "-" ]] && custom_name="-${custom_name}"
+                [[ "${custom_name:0:1}" != "-" ]] && custom_name="-${custom_name}"
                 shift
             else
                 error_msg "Invalid -n parameter [ ${2} ]!"
@@ -130,6 +136,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -m parameter [ ${2} ]!"
+            fi
+            ;;
+        -p | --AutoPatch)
+            if [[ -n "${2}" ]]; then
+                auto_patch="${2}"
+                shift
+            else
+                error_msg "Invalid -p parameter [ ${2} ]!"
             fi
             ;;
         -r | --repo)
@@ -260,6 +274,41 @@ query_version() {
     build_kernel="${tmp_arr_kernels[*]}"
 }
 
+apply_patch() {
+    cd ${current_path}
+    echo -e "${STEPS} Start applying custom kernel patches..."
+
+    # Apply the common kernel patches
+    if [[ -d "${kernel_patch_path}/common-kernel-patches" ]]; then
+        echo -e "${INFO} Copy common kernel patches..."
+        cp -vf ${kernel_patch_path}/common-kernel-patches/*.patch -t ${kernel_path}/${local_kernel_path}
+
+        cd ${kernel_path}/${local_kernel_path}
+        for file in *.patch; do
+            echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
+            patch -p1 <"${file}"
+        done
+        rm -f *.patch
+    else
+        echo -e "${INFO} No common kernel patches, skipping."
+    fi
+
+    # Apply the dedicated kernel patches
+    if [[ -d "${kernel_patch_path}/${local_kernel_path}" ]]; then
+        echo -e "${INFO} Copy [ ${local_kernel_path} ] version dedicated kernel patches..."
+        cp -vf ${kernel_patch_path}/${local_kernel_path}/*.patch -t ${kernel_path}/${local_kernel_path}
+
+        cd ${kernel_path}/${local_kernel_path}
+        for file in *.patch; do
+            echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
+            patch -p1 <"${file}"
+        done
+        rm -f *.patch
+    else
+        echo -e "${INFO} No [ ${local_kernel_path} ] version dedicated kernel patches, skipping."
+    fi
+}
+
 get_kernel_source() {
     cd ${current_path}
     echo -e "${STEPS} Start downloading the kernel source code..."
@@ -292,6 +341,9 @@ get_kernel_source() {
             echo -e "${INFO} Use local source code, compile the kernel version [ ${kernel_version} ]."
         fi
     fi
+
+    # Apply custom kernel patches
+    [[ "${auto_patch}" == "true" ]] && apply_patch
 }
 
 headers_install() {
