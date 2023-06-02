@@ -80,7 +80,7 @@ inputs:
   kernel_patch:
     description: "Set the directory for kernel patches"
     required: false
-    default: "no"
+    default: "false"
   auto_patch:
     description: "Set whether to use kernel patches"
     required: false
@@ -179,12 +179,12 @@ runs:
 
             custom_kernel_patch="compile-kernel/tools/patch"
             [[ -d "${custom_kernel_patch}" ]] || mkdir -p ${custom_kernel_patch}
-            if [[ -n "${{ inputs.kernel_patch }}" && "${{ inputs.kernel_patch }}" != "no" ]]; then
+            if [[ -n "${{ inputs.kernel_patch }}" && "${{ inputs.kernel_patch }}" != "false" ]]; then
                 if [[ -d "${GITHUB_WORKSPACE}/${{ inputs.kernel_patch }}" ]]; then
-                    echo -e "Use common kernel patches..."
+                    echo -e "Use custom kernel patches..."
                     rm -rf ${custom_kernel_patch}/* 2>/dev/null && sync
                     cp -vrf ${GITHUB_WORKSPACE}/${{ inputs.kernel_patch }}/* -t ${custom_kernel_patch} && sync
-                    echo -e "Directory of common kernel patches: \n$(ls -l ${custom_kernel_patch})"
+                    echo -e "Directory of custom kernel patches: \n$(ls -l ${custom_kernel_patch})"
                 else
                     echo -e "Invalid custom kernel patch directory, skipping."
                 fi

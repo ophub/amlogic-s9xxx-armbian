@@ -90,7 +90,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_sign       | -ophub           | 设置内核自定义签名。默认值为 `-ophub`。功能参考 `-n`             |
 | kernel_toolchain  | gcc              | 设置编译内核的工具链。默认值为 `gcc`。功能参考 `-t`             |
 | kernel_config     | 无               | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。该目录下存储的配置模板必须以内核的主版本命名，如`config-5.10`、`config-5.15`等。 |
-| kernel_patch      | 无               | 设置自定义内核补丁目录。 |
+| kernel_patch      | false            | 设置自定义内核补丁目录。 |
 | auto_patch        | false            | 设置是否使用自定义内核补丁。默认值为 `false`。功能参考 `-p` |
 
 - ### GitHub Action 输出变量说明
