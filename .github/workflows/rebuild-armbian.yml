@@ -161,6 +161,7 @@ on:
           - stable
           - flippy
           - dev
+          - beta
       armbian_storage:
         description: "Select Armbian image storage time."
         required: false
