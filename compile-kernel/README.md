@@ -41,6 +41,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k        | Kernel      | Specifies the kernel name, such as `-k 5.15.100`. Multiple kernels can be connected using `_`, such as `-k 5.15.100_5.15.50`. |
 | -a        | AutoKernel  | Sets whether to automatically use the latest version of the same series kernel. When set to `true`, it will automatically search for updated versions of the same series as the kernel specified in `-k`, such as `5.15.100`. If there is a newer version after `5.15.100`, it will be automatically replaced with the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true`. |
 | -m        | MakePackage | Sets the package list for compiling the kernel. When set to `all`, it will make all files of `Image, modules, dtbs`. When set to `dtbs`, it will only make three dtbs files. Default value: `all`. |
+| -p        | AutoPatch   | Set whether to use custom kernel patches. When set to `true`, the kernel patches in the [patch](tool/patch) directory will be used. For detailed instructions, please refer to [README.md](../build-armbian/documents/README.md#9-compile-armbian-kernel). Default value: `false`. |
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name will be `5.15.100-ophub`. Please do not include spaces when setting the custom signature. Default value: `-ophub`. |
 | -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options are: `clang / gcc`. Default value: `gcc`. |
 
@@ -89,6 +90,8 @@ Related parameters correspond to the `Local Compilation Command`, please refer t
 | kernel_sign      | -ophub           | Sets the custom signature of the kernel. The default value is `-ophub`. This function is the same as `-n`. |
 | kernel_toolchain | gcc              | Sets the toolchain for compiling the kernel. The default value is `gcc`. This function is the same as `-t`. |
 | kernel_config    | None             | By default, the configuration templates in [tools/config](tools/config) directory are used. You can set the directory of the configuration file for compiling the kernel in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| kernel_patch     | no               | Set the directory for custom kernel patches. |
+| auto_patch       | false            | Set whether to use custom kernel patches. The default value is `false`. This function is the same as `-p`. |
 
 - ### Output Variables for GitHub Action
 
