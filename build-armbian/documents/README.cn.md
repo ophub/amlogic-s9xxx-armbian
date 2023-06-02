@@ -31,6 +31,8 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [8.2.5 我家云的安装方法](#825-我家云的安装方法)
     - [8.3 Allwinner 系列安装方法](#83-allwinner-系列安装方法)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
+    - [9.1 如何添加自定义内核补丁](#91-如何添加自定义内核补丁)
+    - [9.2 如何制作内核补丁](#92-如何制作内核补丁)
   - [10. 更新 Armbian 内核](#10-更新-armbian-内核)
   - [11. 安装常用软件](#11-安装常用软件)
   - [12. 常见问题](#12-常见问题)
@@ -320,7 +322,46 @@ armbian-install
 
 ## 9. 编译 Armbian 内核
 
-支持在 Ubuntu20.04/22.04 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
+支持在 Ubuntu20.04/22.04，debian11 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
+
+### 9.1 如何添加自定义内核补丁
+
+当内核补丁目录中有通用内核补丁目录（`common-kernel-patches`），或者有 `与内核源码库同名` 的目录时，可以使用 `-p true` 自动应用内核补丁。补丁目录的命名规范如下：
+
+```shell
+~/amlogic-s9xxx-armbian
+    └── compile-kernel
+        └── tools
+            └── patch
+                ├── common-kernel-patches  # 固定目录名：存放各版本都通用的内核补丁
+                ├── linux-5.15.y           # 与内核源码库同名：存放专用补丁
+                ├── linux-6.1.y
+                ├── linux-5.10.y-rk35xx
+                └── more kernel...
+```
+
+- 在本地编译内核时，可以手动创建相应目录，添加对应的自定义内核补丁。
+- 在 GitHub Actions 云编译时，可以使用 `kernel_patch` 参数指定内核补丁在你仓库中的目录，例如 [kernel](https://github.com/ophub/kernel) 仓库中 [compile-beta-kernel.yml](https://github.com/ophub/kernel/blob/main/.github/workflows/compile-beta-kernel.yml) 的使用方法：
+
+```yaml
+- name: Compile the kernel
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: kernel
+    kernel_version: 5.15.1_6.1.1
+    kernel_auto: true
+    kernel_patch: kernel-patch/stable
+    auto_patch: true
+```
+
+当使用 `kernel_patch` 参数指定自定义内核补丁时，补丁目录请参照上述规范进行命名。
+
+### 9.2 如何制作内核补丁
+
+- 从 [Armbian](https://github.com/armbian/build) 和 [OpenWrt](https://github.com/openwrt/openwrt) 等仓库中获得：例如 [armbian/patch/kernel](https://github.com/armbian/build/tree/main/patch/kernel/archive) 和 [openwrt/rockchip/patches-6.1](https://github.com/openwrt/openwrt/tree/main/target/linux/rockchip/patches-6.1)，[lede/rockchip/patches-5.15](https://github.com/coolsnowwolf/lede/tree/master/target/linux/rockchip/patches-5.15) 等等，这些使用主线内核的仓库中的补丁一般可以直接使用。
+- 从 github.com 仓库的 commits 中获得：在相应的 `commit` 地址后添加 `.patch` 后缀即可生成对应的补丁。
+
+在添加自定义内核补丁前，需要先和上游的内核源码仓库 [unifreq/linux-k.x.y](https://github.com/unifreq) 进行比较，确认此补丁是否已经添加，避免造成冲突。通过测试的内核补丁，建议向 unifreq 大佬维护的系列内核仓库进行提交。每人一小步，世界一大步，大家的贡献会让我们在盒子里使用 Armbian 和 OpenWrt 系统时更加稳定和有趣。
 
 ## 10. 更新 Armbian 内核
 
