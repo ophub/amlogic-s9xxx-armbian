@@ -31,6 +31,8 @@ Github Actions is a service launched by Microsoft that provides virtual server e
       - [8.2.5 Installation method of Chainedbox-L1-Pro](#825-installation-method-of-chainedbox-l1-pro)
     - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
   - [9. Compile Armbian Kernel](#9-compile-armbian-kernel)
+    - [9.1 How to Add Custom Kernel Patches](#91-how-to-add-custom-kernel-patches)
+    - [9.2 How to create kernel patches](#92-how-to-create-kernel-patches)
   - [10. Update Armbian Kernel](#10-update-armbian-kernel)
   - [11. Install Common Software](#11-install-common-software)
   - [12. Common Issues](#12-common-issues)
@@ -319,7 +321,46 @@ armbian-install
 
 ## 9. Compile Armbian Kernel
 
-Supports compiling the kernel in Ubuntu20.04/22.04 or Armbian system. Both local compilation and GitHub Actions cloud compilation are supported. For specific methods, please refer to [Kernel Compilation Instructions](../../compile-kernel/README.md).
+Supports compiling the kernel in Ubuntu20.04/22.04, debian11 or Armbian system. Both local compilation and GitHub Actions cloud compilation are supported. For specific methods, please refer to [Kernel Compilation Instructions](../../compile-kernel/README.md).
+
+### 9.1 How to Add Custom Kernel Patches
+
+When there is a directory of common kernel patches (`common-kernel-patches`) in the kernel patch directory, or there is a directory with the same name as the kernel source code repository, you can use `-p true` to automatically apply the kernel patch. The naming convention for patch directories is as follows:
+
+```shell
+~/amlogic-s9xxx-armbian
+    └── compile-kernel
+        └── tools
+            └── patch
+                ├── common-kernel-patches  # Fixed directory name: Storing common kernel patches
+                ├── linux-5.15.y           # Same as kernel source repository: storing dedicated kernel patches
+                ├── linux-6.1.y
+                ├── linux-5.10.y-rk35xx
+                └── more kernel...
+```
+
+- When compiling the kernel locally, you can manually create the corresponding directory and add the corresponding custom kernel patches.
+- When compiling in GitHub Actions cloud, you can use the `kernel_patch` parameter to specify the directory of the kernel patch in your repository. For example, the usage in the [compile-beta-kernel.yml](https://github.com/ophub/kernel/blob/main/.github/workflows/compile-beta-kernel.yml) file in the [kernel](https://github.com/ophub/kernel) repository.
+
+```yaml
+- name: Compile the kernel
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: kernel
+    kernel_version: 5.15.1_6.1.1
+    kernel_auto: true
+    kernel_patch: kernel-patch/stable
+    auto_patch: true
+```
+
+When using the `kernel_patch` parameter to specify a custom kernel patch, please name the patch directory according to the above specifications.
+
+### 9.2 How to create kernel patches
+
+- Obtain from repositories such as [Armbian](https://github.com/armbian/build) and [OpenWrt](https://github.com/openwrt/openwrt), for example [armbian/patch/kernel](https://github.com/armbian/build/tree/main/patch/kernel/archive) and [openwrt/rockchip/patches-6.1](https://github.com/openwrt/openwrt/tree/main/target/linux/rockchip/patches-6.1), [lede/rockchip/patches-5.15](https://github.com/coolsnowwolf/lede/tree/master/target/linux/rockchip/patches-5.15), etc. Generally, patches in these repositories that use the mainline kernel can be used directly.
+- Obtain from commits in github.com repositories: add the `.patch` suffix to the corresponding `commit` address to generate the corresponding patch.
+
+Before adding custom kernel patches, it is necessary to compare them with the upstream kernel source repository [unifreq/linux-k.x.y](https://github.com/unifreq) to confirm whether the patches have already been added to avoid conflicts. Tested kernel patches are recommended to be submitted to the series of kernel repositories maintained by unifreq. Every little bit helps and everyone's contribution will make using Armbian and OpenWrt systems on boxes more stable and interesting.
 
 ## 10. Update Armbian Kernel
 
