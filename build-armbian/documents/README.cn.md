@@ -326,7 +326,7 @@ armbian-install
 
 ### 9.1 如何添加自定义内核补丁
 
-当内核补丁目录中有通用内核补丁目录（`common-kernel-patches`），或者有 `与内核源码库同名` 的目录时，可以使用 `-p true` 自动应用内核补丁。补丁目录的命名规范如下：
+当内核补丁目录 [tools/patch](../../compile-kernel/tools/patch) 中有通用内核补丁目录（`common-kernel-patches`），或者有 `与内核源码库同名` 的目录时，可以使用 `-p true` 自动应用内核补丁。补丁目录的命名规范如下：
 
 ```shell
 ~/amlogic-s9xxx-armbian
@@ -337,7 +337,7 @@ armbian-install
                 ├── linux-5.15.y           # 与内核源码库同名：存放专用补丁
                 ├── linux-6.1.y
                 ├── linux-5.10.y-rk35xx
-                └── more kernel...
+                └── more kernel directory...
 ```
 
 - 在本地编译内核时，可以手动创建相应目录，添加对应的自定义内核补丁。
@@ -350,7 +350,7 @@ armbian-install
     build_target: kernel
     kernel_version: 5.15.1_6.1.1
     kernel_auto: true
-    kernel_patch: kernel-patch/stable
+    kernel_patch: kernel-patch/beta
     auto_patch: true
 ```
 
