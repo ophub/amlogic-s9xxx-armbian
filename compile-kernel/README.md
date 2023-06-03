@@ -89,7 +89,7 @@ Related parameters correspond to the `Local Compilation Command`, please refer t
 | kernel_package   | all              | Sets the package list for compiling the kernel. The default value is `all`. This function is the same as `-m`. |
 | kernel_sign      | -ophub           | Sets the custom signature of the kernel. The default value is `-ophub`. This function is the same as `-n`. |
 | kernel_toolchain | gcc              | Sets the toolchain for compiling the kernel. The default value is `gcc`. This function is the same as `-t`. |
-| kernel_config    | None             | By default, the configuration templates in [tools/config](tools/config) directory are used. You can set the directory of the configuration file for compiling the kernel in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
+| kernel_config    | false            | By default, the configuration templates in [tools/config](tools/config) directory are used. You can set the directory of the configuration file for compiling the kernel in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 | kernel_patch     | false            | Set the directory for custom kernel patches. |
 | auto_patch       | false            | Set whether to use custom kernel patches. The default value is `false`. This function is the same as `-p`. |
 
