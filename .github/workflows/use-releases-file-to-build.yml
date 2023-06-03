@@ -168,13 +168,13 @@ on:
           - flippy
           - dev
       armbian_storage:
-        description: "Select Armbian image storage time."
+        description: "Select image storage type."
         required: false
-        default: "lts"
+        default: "save"
         type: choice
         options:
-          - lts
-          - tmp
+          - save
+          - temp
 
 env:
   TZ: America/New_York
