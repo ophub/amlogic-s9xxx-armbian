@@ -138,6 +138,8 @@ docker_image_remove() {
     # Query the image ID based on the image name and delete it
     echo -e "${STEPS} Start removing image: [ ${image_name} ]..."
     docker image rm -f $(docker images -q --filter reference=${image_name})
+    # Automatic deletion of unused docker images
+    docker image prune -f >/dev/null
     echo -e "${SUCCESS} ${image_name} removed successfully."
 }
 
@@ -152,6 +154,8 @@ docker_update() {
     docker_container_remove "${container_name}"
     # Start a new one
     sudo bash ${command_docker} -s ${software_id} -m install
+    # Automatic deletion of unused docker images
+    docker image prune -f >/dev/null
 }
 
 # Remove docker
