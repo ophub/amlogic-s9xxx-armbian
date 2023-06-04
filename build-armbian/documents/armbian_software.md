@@ -31,6 +31,7 @@ According to user feedback and demands in the [Issue](https://github.com/ophub/a
 | 123 | Alist                 | [Home](https://alist.nn.ci/) | [Docker](https://hub.docker.com/r/xhofe/alist) :5244  | A file list program that supports multiple storage, powered by Gin and Solidjs. |
 | 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | A timed task management panel that supports typescript, javaScript, python3, and shell. |
 | 125 | Chatgpt-Web           | [Home](https://github.com/Chanzhaoyu/chatgpt-web) | [Docker](https://hub.docker.com/r/chenzhaoyu94/chatgpt-web) :3002  | ChatGPT demo webpage built with Express and Vue3. |
+| 126 | Pandora(Chatgpt)      | [Home](https://github.com/pengzhile/pandora) | [Docker](https://hub.docker.com/r/pengzhile/pandora) :3003  | Pandora has achieved a local offline deployment of the web version of ChatGPT, with the same functionality and impressive speed. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
@@ -144,6 +145,7 @@ Welcome everyone to add more software. You can also submit support requirements 
 | 123 | Alist                 | [Home](https://alist.nn.ci/zh/) | [Docker](https://hub.docker.com/r/xhofe/alist) :5244  | 一个支持多种存储的文件列表程序，使用 Gin 和 Solidjs。 |
 | 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | 支持 python3、javaScript、shell、typescript 的定时任务管理面板。 |
 | 125 | Chatgpt-Web           | [Home](https://github.com/Chanzhaoyu/chatgpt-web) | [Docker](https://hub.docker.com/r/chenzhaoyu94/chatgpt-web) :3002  | 用 Express 和 Vue3 搭建的 ChatGPT 演示网页。 |
+| 126 | Pandora(Chatgpt)      | [Home](https://github.com/pengzhile/pandora) | [Docker](https://hub.docker.com/r/pengzhile/pandora) :3003  | 潘多拉实现了网页版 ChatGPT 本地离线部署，功能相同,速度喜人。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
