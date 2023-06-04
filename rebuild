@@ -1179,7 +1179,7 @@ find_armbian
 # Download the dependency files
 download_depends
 # Query the latest kernel version
-[[ "${auto_kernel}" == "true" ]] && query_kernel
+[[ "${auto_kernel}" == "true" || "${auto_kernel}" == "yes" ]] && query_kernel
 # Download the kernel files
 download_kernel
 
