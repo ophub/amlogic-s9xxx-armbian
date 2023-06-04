@@ -44,6 +44,7 @@
 # software_123  : For alist:5244
 # software_124  : For qinglong:5700
 # software_125  : For chatgpt-web:3002
+# software_126  : For pandora(chatgpt):3003
 #
 #============================================================================
 
@@ -929,7 +930,7 @@ software_125() {
         [[ -n "${pw}" ]] && your_password="${pw}" || error_msg "PassWord is invalid."
 
         # Instructions: https://hub.docker.com/r/chenzhaoyu94/chatgpt-web
-        docker run -d --name=chatgpt-web \
+        docker run -d --name=${container_name} \
             -p 3002:3002 \
             -e PUID=${docker_puid} \
             -e PGID=${docker_pgid} \
@@ -943,6 +944,40 @@ software_125() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3002 ]"
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For pandora(chatgpt):3003
+software_126() {
+    # Set basic information
+    container_name="pandora"
+    image_name="pengzhile/pandora:latest"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+
+        # Instructions: https://hub.docker.com/r/pengzhile/pandora
+        docker run -d --name=${container_name} \
+            -p 3003:3003 \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -e PANDORA_CLOUD=cloud \
+            -e PANDORA_SERVER=0.0.0.0:3003 \
+            --restart unless-stopped \
+            ${image_name}
+
+        sync && sleep 3
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3003 ]"
+        echo -e "${NOTE} Get your Access Token [ https://github.com/pengzhile/pandora ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
