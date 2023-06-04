@@ -327,7 +327,7 @@ get_kernel_source() {
         local_makefile_sublevel="$(cat ${local_makefile} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
 
         # Local version and server version comparison
-        if [[ "${auto_kernel}" == "true" && "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
+        if [[ "${auto_kernel}" == "true" || "${auto_kernel}" == "yes" ]] && [[ "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
             # Pull the latest source code of the server
             cd ${kernel_path}/${local_kernel_path}
             git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull
@@ -343,7 +343,7 @@ get_kernel_source() {
     fi
 
     # Apply custom kernel patches
-    [[ "${auto_patch}" == "true" ]] && apply_patch
+    [[ "${auto_patch}" == "true" || "${auto_patch}" == "yes" ]] && apply_patch
 }
 
 headers_install() {
@@ -664,7 +664,7 @@ init_var "${@}"
 # Check and install the toolchain
 toolchain_check
 # Query the latest kernel version
-[[ "${auto_kernel}" == "true" ]] && query_version
+[[ "${auto_kernel}" == "true" || "${auto_kernel}" == "yes" ]] && query_version
 
 # Show compile settings
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
