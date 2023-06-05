@@ -123,24 +123,24 @@ install_chinese_fonts() {
     # Install the Chinese language packages for the desktop system
     sudo apt-get update
     case "${VERSION_CODENAME}" in
-        jammy)
-            echo -e "${STEPS} Start to install Chinese language pack for [ jammy ]..."
-            sudo apt-get install -y ${ubuntu_packages[*]}
-            sudo apt-get install -y ${jammy_packages[*]}
-            set_chinese_env
-            ;;
-        focal)
-            echo -e "${STEPS} Start to install Chinese language pack for [ focal ]..."
-            sudo apt-get install -y ${ubuntu_packages[*]}
-            sudo apt-get install -y ${focal_packages[*]}
-            set_chinese_env
-            ;;
-        bullseye)
-            echo -e "${STEPS} Start to install Chinese language pack for [ bullseye ]..."
-            sudo apt-get install -y ${debian_packages[*]}
-            set_chinese_env
-            ;;
-        *) error_msg "unsupported system: [ ${VERSION_CODENAME} ]" ;;
+    jammy | lunar)
+        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        sudo apt-get install -y ${ubuntu_packages[*]}
+        sudo apt-get install -y ${jammy_packages[*]}
+        set_chinese_env
+        ;;
+    focal)
+        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        sudo apt-get install -y ${ubuntu_packages[*]}
+        sudo apt-get install -y ${focal_packages[*]}
+        set_chinese_env
+        ;;
+    bullseye | bookworm)
+        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        sudo apt-get install -y ${debian_packages[*]}
+        set_chinese_env
+        ;;
+    *) error_msg "unsupported system: [ ${VERSION_CODENAME} ]" ;;
     esac
 
     echo -e "${SUCCESS} Chinese desktop support setting completed."

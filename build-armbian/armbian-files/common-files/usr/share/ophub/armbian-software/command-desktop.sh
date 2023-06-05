@@ -58,11 +58,11 @@ software_201() {
         fi
 
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
-            # Install ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
-            software_install "ubuntu-desktop lightdm"
+            # Install ubuntu-desktop(gdm3) on Ubuntu (lunar/jammy/focal)
+            software_install "ubuntu-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Install Xfce(lightdm) on Debian 11 (bullseye)
-            software_install "task-xfce-desktop lightdm"
+            software_install "task-xfce-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
@@ -77,11 +77,11 @@ software_201() {
     update) software_update ;;
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
-            # Remove ubuntu-desktop(gdm3) on Ubuntu (jammy/focal)
-            software_remove "ubuntu-desktop lightdm"
+            # Remove ubuntu-desktop(gdm3) on Ubuntu (lunar/jammy/focal)
+            software_remove "ubuntu-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Remove Xfce(lightdm) on Debian 11 (bullseye)
-            software_remove "task-xfce-desktop lightdm"
+            software_remove "task-xfce-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
@@ -98,7 +98,7 @@ software_201() {
 software_202() {
     case "${software_manage}" in
     install)
-        [[ "${VERSION_CODENAME}" == "jammy" ]] && {
+        [[ "${VERSION_CODENAME}" == "jammy" || "${VERSION_CODENAME}" == "lunar" ]] && {
             sudo add-apt-repository ppa:mozillateam/ppa -y
             sudo apt-get update
             software_install "firefox-esr"
@@ -108,7 +108,7 @@ software_202() {
         ;;
     update) software_update ;;
     remove)
-        [[ "${VERSION_CODENAME}" == "jammy" ]] && {
+        [[ "${VERSION_CODENAME}" == "jammy" || "${VERSION_CODENAME}" == "lunar" ]] && {
             software_remove "firefox-esr"
             sudo add-apt-repository --remove ppa:mozillateam/ppa -y
         }
