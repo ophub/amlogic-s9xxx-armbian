@@ -100,7 +100,7 @@ install_chinese_fonts() {
         "ibus-table-wubi" "ibus-libpinyin"
     )
 
-    # Packages of jammy system
+    # Packages of lunar/jammy system
     local jammy_packages=(
         "kde-config-fcitx5"
     )
@@ -110,7 +110,7 @@ install_chinese_fonts() {
         "kde-config-fcitx"
     )
 
-    # Packages of bullseye system
+    # Packages of bookworm/bullseye system
     local debian_packages=(
         "fonts-noto-cjk" "fonts-noto-cjk-extra" "fonts-droid-fallback" "fonts-wqy-zenhei"
         "fonts-wqy-microhei" "fonts-arphic-ukai" "fonts-arphic-uming"
