@@ -59,10 +59,10 @@ software_201() {
 
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Install ubuntu-desktop(gdm3) on Ubuntu (lunar/jammy/focal)
-            software_install "ubuntu-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
+            software_install "ubuntu-desktop lightdm lightdm-gtk-greeter"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Install Xfce(lightdm) on Debian 11 (bullseye)
-            software_install "task-xfce-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
+            # Install Xfce(lightdm) on Debian (bookworm/bullseye)
+            software_install "task-xfce-desktop lightdm lightdm-gtk-greeter"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
@@ -78,10 +78,10 @@ software_201() {
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Remove ubuntu-desktop(gdm3) on Ubuntu (lunar/jammy/focal)
-            software_remove "ubuntu-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
+            software_remove "ubuntu-desktop lightdm lightdm-gtk-greeter"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Remove Xfce(lightdm) on Debian 11 (bullseye)
-            software_remove "task-xfce-desktop lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings lightdm-settings"
+            # Remove Xfce(lightdm) on Debian (bookworm/bullseye)
+            software_remove "task-xfce-desktop lightdm lightdm-gtk-greeter"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
@@ -104,7 +104,7 @@ software_202() {
             software_install "firefox-esr"
         }
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_install "firefox"
-        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_install "firefox-esr"
+        [[ "${VERSION_CODENAME}" == "bullseye" || "${VERSION_CODENAME}" == "bookworm" ]] && software_install "firefox-esr"
         ;;
     update) software_update ;;
     remove)
@@ -113,7 +113,7 @@ software_202() {
             sudo add-apt-repository --remove ppa:mozillateam/ppa -y
         }
         [[ "${VERSION_CODENAME}" == "focal" ]] && software_remove "firefox"
-        [[ "${VERSION_CODENAME}" == "bullseye" ]] && software_remove "firefox-esr"
+        [[ "${VERSION_CODENAME}" == "bullseye" || "${VERSION_CODENAME}" == "bookworm" ]] && software_remove "firefox-esr"
         ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
