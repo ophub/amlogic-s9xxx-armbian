@@ -167,6 +167,7 @@ on:
           - stable
           - flippy
           - dev
+          - beta
       armbian_storage:
         description: "Select image storage type."
         required: false
