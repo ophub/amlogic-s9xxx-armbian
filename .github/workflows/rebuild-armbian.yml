@@ -110,6 +110,7 @@ on:
           - r68s
           - h66k
           - h68k
+          - h69k
           - e25
           - nanopi-r5s
           - panther-x2
