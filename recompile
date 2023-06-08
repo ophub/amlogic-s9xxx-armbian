@@ -384,6 +384,9 @@ get_kernel_source() {
         fi
     fi
 
+    # Remove the local version number
+    rm -f ${kernel_path}/${local_kernel_path}/localversion
+
     # Apply custom kernel patches
     [[ "${auto_patch}" == "true" || "${auto_patch}" == "yes" ]] && apply_patch
 }
