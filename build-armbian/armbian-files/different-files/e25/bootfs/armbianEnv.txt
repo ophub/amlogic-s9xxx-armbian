@@ -1,0 +1,17 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3568-radxa-e25.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4 
+rootflags=rw,errors=remount-ro
+console=serial
+consoleargs=console=ttyS2,115200
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+docker_optimizations=on
+earlycon=on
+earlyconargs=earlycon=uart8250,mmio32,0xfe660000
+extraargs=
+extraboardargs=net.ifnames=0
+overlay_prefix=rk3568
+overlays=
+user_overlays=
