@@ -213,9 +213,9 @@ toolchain_check() {
     echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
     # Install dependencies for jammy
-    apt-get -qq update
+    sudo apt-get -qq update
     if [[ "${arch_info}" == "x86_64" ]]; then
-        apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
     else
         sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
     fi
@@ -239,7 +239,8 @@ toolchain_check() {
     if [[ "${toolchain_name}" == "clang" ]]; then
         # Install LLVM
         echo -e "${INFO} Start installing the LLVM toolchain..."
-        curl -fsSL https://apt.llvm.org/llvm.sh | bash -s all
+        sudo apt-get -qq install -y lsb-release software-properties-common gnupg
+        curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s all
         [[ "${?}" -eq "0" ]] || error_msg "LLVM installation failed."
 
         # Set cross compilation parameters
