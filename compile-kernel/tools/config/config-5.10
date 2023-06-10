@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.180 Kernel Configuration
+# Linux/arm64 5.10.183 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.2.Rel1 (Build arm-12.24)) 12.2.1 20221205"
 CONFIG_CC_IS_GCC=y
@@ -2200,6 +2200,7 @@ CONFIG_ISCSI_BOOT_SYSFS=m
 # CONFIG_SCSI_HISI_SAS is not set
 # CONFIG_SCSI_MVSAS is not set
 # CONFIG_SCSI_MVUMI is not set
+# CONFIG_SCSI_DPT_I2O is not set
 # CONFIG_SCSI_ADVANSYS is not set
 # CONFIG_SCSI_ARCMSR is not set
 # CONFIG_SCSI_ESAS2R is not set
@@ -4903,7 +4904,7 @@ CONFIG_ROCKCHIP_RK3066_HDMI=y
 # CONFIG_DRM_AST is not set
 # CONFIG_DRM_MGAG200 is not set
 # CONFIG_DRM_RCAR_DW_HDMI is not set
-# CONFIG_DRM_RCAR_LVDS is not set
+# CONFIG_DRM_RCAR_USE_LVDS is not set
 CONFIG_DRM_SUN4I=y
 CONFIG_DRM_SUN4I_HDMI=y
 CONFIG_DRM_SUN4I_HDMI_CEC=y
