@@ -207,7 +207,8 @@ toolchain_check() {
     if [[ "${toolchain_name}" == "clang" ]]; then
         # Install LLVM
         echo -e "${INFO} Start installing the LLVM toolchain..."
-        curl -fsSL https://apt.llvm.org/llvm.sh | bash -s all
+        sudo apt-get -qq install -y lsb-release software-properties-common gnupg
+        curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s all
         [[ "${?}" -eq "0" ]] || error_msg "LLVM installation failed."
 
         # Set cross compilation parameters
