@@ -218,7 +218,7 @@ jobs:
           latest_version="$(curl -s \
                               -H "Accept: application/vnd.github+json" \
                               -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
-                              https://api.github.com/repos/${GITHUB_REPOSITORY}/releases |
+                              https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=100 |
                               jq '.[]' |
                               jq -s --arg RTK "Armbian_${{ inputs.set_release }}_" '.[] | select(.tag_name | contains($RTK))' |
                               jq -s '.[].assets[] | {data:.updated_at, url:.browser_download_url}' |
