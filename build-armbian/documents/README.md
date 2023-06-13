@@ -236,6 +236,12 @@ Use tools such as Rufus or balenaEtcher to write the Armbian system image to the
 
 ##### 8.2.1.2 Install the system to eMMC
 
+- Install using microSD card: Write the Armbian system image to the microSD card, insert the microSD card into the device and boot it up, upload the `armbian.img` image file to the microSD card, and use the `dd` command to write the Armbian image to the NVMe, as follows:
+
+```Shell
+dd if=armbian.img of=/dev/mmcblk1 bs=1M status=progress
+```
+
 - Use USB to eMMC card reader for installation: Connect the eMMC module to the computer, and use tools such as Rufus or balenaEtcher to write the Armbian system image to the eMMC. Then insert the eMMC with the written system into the device to use.
 - Use Maskrom mode for installation: Turn off the development board power. Hold down the gold button. Insert the USB-A to C cable into the ROCK 5B C port, and the other end into the PC. Release the gold button. Check the USB device prompt to find a MASKROM device. Right-click on the blank area of ​​the list, and then select to load the `rock-5b-emmc.cfg` configuration file (the configuration file and RKDevTool are in the same directory). Set `rk3588_spl_loader_v1.08.111.bin` and `Armbian.img` as shown below, and select write.
 
@@ -260,7 +266,7 @@ Turn off the development board power. Remove the bootable device, such as MicroS
 </div>
 
 - Install using a card reader: Insert the M.2 NVMe SSD into the M.2 NVMe SSD to USB3.0 card reader to connect to the host. Write the Armbian system image to the NVMe using tools such as Rufus or balenaEtcher and then insert the NVMe with the written system into the device to use.
-- Install using microSD card: Write the Armbian system image to the microSD card, insert the microSD card into the device and boot it up, upload the `Armbian.img` image file to the microSD card, and use the `dd` command to write the Armbian image to the NVMe, as follows:
+- Install using microSD card: Write the Armbian system image to the microSD card, insert the microSD card into the device and boot it up, upload the `armbian.img` image file to the microSD card, and use the `dd` command to write the Armbian image to the NVMe, as follows:
 
 ```Shell
 dd if=armbian.img of=/dev/nvme0n1 bs=1M status=progress
