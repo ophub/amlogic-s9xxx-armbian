@@ -152,17 +152,17 @@ show_software_list() {
     check_software_status
 
     # Define split line style
-    split_line="--------------------------------------------------------------"
+    split_line="───────────────────────────────────────────────────────────────────"
     # Show software list
     echo "${software_database}" | awk -F ':' '{print $1,$2,$7,$8}' | while read line; do
         # Add a header for each software list category
         [[ "$(echo ${line} | awk '{print $1}')" == *"01" ]] && {
             printf "%-s\n" "${split_line}"
-            printf "%-5s %-25s %-15s %-15s\n" ID NAME STATE MANAGE
+            printf "%-5s %-30s %-15s %-15s\n" ID NAME STATE MANAGE
             printf "%-s\n" "${split_line}"
         }
         # Print software information
-        printf "%-5s %-25s %-15s %-15s\n" $(echo "${line}")
+        printf "%-5s %-30s %-15s %-15s\n" $(echo "${line}")
     done
     # Add end split line
     printf "%-s\n" "${split_line}"
