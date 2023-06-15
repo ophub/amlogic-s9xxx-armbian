@@ -122,6 +122,11 @@ sudo systemctl stop armbian-resize-filesystem.service 2>/dev/null
 sudo systemctl disable armbian-resize-filesystem.service 2>/dev/null
 tolog "58. Disable the armbian-resize-filesystem.service"
 
+# Disable the ssh.socket: https://github.com/ophub/amlogic-s9xxx-armbian/discussions/1476
+sudo systemctl disable --now ssh.socket 2>/dev/null
+sudo systemctl enable --now ssh.service 2>/dev/null
+tolog "59. Disable the ssh.socket and enable ssh.service"
+
 # ===== Start adjusting custom settings =====
 
 # Fix version differences(After 2022.12.03)
