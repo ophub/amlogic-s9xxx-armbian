@@ -36,6 +36,7 @@ on:
           - all
           - s922x_s905x3_s905d_s912_s905l3a
           - s905x-t95_s912-t95z-plus_s905l3-unt400g1
+          - smart-am40_station-m1_sw799_tn3399_vplus_zysj
           - s905d
           - s905d-ki-pro
           - s905x
