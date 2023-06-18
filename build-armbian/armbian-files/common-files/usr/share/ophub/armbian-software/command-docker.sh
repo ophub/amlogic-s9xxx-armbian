@@ -73,16 +73,41 @@ software_102() {
     case "${software_manage}" in
     install)
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+
+        # Prompt users whether to use their own SSL certificate
+        echo -ne "${OPTIONS} Using your own SSL certificate? (y/N): "
+        read use_ssl
+        [[ "${use_ssl,,}" =~ ^[y] ]] && use_ssl="yes" || use_ssl="no"
+        echo -e "${INFO} Your own SSL Certificate Selection: [ ${use_ssl} ]"
+
         # Instructions(English): https://hub.docker.com/r/portainer/portainer-ce
         docker volume create ${container_name}_data
-        docker run -d --name ${container_name} \
-            -p 8000:8000 -p 9443:9443 \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -v ${install_path}/portainer_data:/data \
-            --restart always \
-            ${image_name}
+        if [[ "${use_ssl}" == "yes" ]]; then
+            # https://docs.portainer.io/advanced/ssl
+            docker run -d --name ${container_name} \
+                --restart always \
+                -p 8000:8000 \
+                -p 9443:9443 \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v ${install_path}/portainer_data:/data \
+                -v ${install_path}/certs:/certs \
+                ${image_name} \
+                --sslcert /certs/portainer.crt \
+                --sslkey /certs/portainer.key
+        else
+            docker run -d --name ${container_name} \
+                --restart always \
+                -p 8000:8000 \
+                -p 9443:9443 \
+                -v /var/run/docker.sock:/var/run/docker.sock \
+                -v ${install_path}/portainer_data:/data \
+                ${image_name}
+        fi
 
         sync && sleep 3
+        [[ "${use_ssl}" == "yes" ]] && {
+            echo -e "${NOTE} Please place your SSL certificate in: [ ${install_path}/certs/portainer.crt & portainer.key]"
+        }
         echo -e "${NOTE} The ${container_name} address: [ https://${my_address}:9443 ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
