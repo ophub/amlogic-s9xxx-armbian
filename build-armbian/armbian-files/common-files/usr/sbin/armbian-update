@@ -272,8 +272,16 @@ query_version() {
         [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files to [ ${kernel_path} ] directory, stop updating."
     }
 
-    # Query the latest kernel version
-    [[ -z "${inputs_kernel}" ]] && {
+    # If the last character of the string (e.g: 6.1.) is ".", append "y" to it.
+    [[ -n "${inputs_kernel}" && "${inputs_kernel: -1}" == "." ]] && inputs_kernel="${inputs_kernel}y"
+    # If the string (e.g: 6.1) contains only one period, add ".y" to it.
+    [[ -n "${inputs_kernel}" && "$(grep -o "\." <<<"${inputs_kernel}" | wc -l)" -eq "1" ]] && inputs_kernel="${inputs_kernel}.y"
+    # Automatically retrieve the latest version of the current kernel series and the specified kernel series (e.g: 6.1.y)
+    [[ -z "${inputs_kernel}" || "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && {
+        # Setting the kernel series for the query (e.g: armbian-update -k 6.1.y)
+        [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && kernel_verpatch="${inputs_kernel%.*}"
+
+        # Query the latest version
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
                 ${kernel_api}/releases/tags/kernel_${KERNEL_TAGS} |
