@@ -97,9 +97,7 @@ check_network() {
 
     # Download from github.com, check the status of connection to github.com
     curl --connect-timeout 10 -s "github.com" >/dev/null 2>&1 && github_net="yes" || github_net="no"
-    [[ "${github_net}" == "yes" ]] || error_msg "Your network cannot access [ github.com ], unable to download the kernel."
-
-    echo -e "${INFO} Network status is normal."
+    [[ "${github_net}" == "yes" ]] && echo -e "${INFO} You can access [ github.com ] normally."
 
     sync && echo ""
 }
@@ -281,6 +279,9 @@ query_version() {
         # Setting the kernel series for the query (e.g: armbian-update -k 6.1.y)
         [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && kernel_verpatch="${inputs_kernel%.*}"
 
+        # Check network status
+        [[ "${github_net}" == "yes" ]] || error_msg "Your network cannot access [ github.com ], unable to query the kernel."
+
         # Query the latest version
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
@@ -319,6 +320,9 @@ download_kernel() {
 
     # Download kernel
     if [[ "$(ls ${kernel_path}/*-${inputs_kernel}*.tar.gz -l 2>/dev/null | grep "^-" | wc -l)" -lt "4" ]]; then
+        # Check network status
+        [[ "${github_net}" == "yes" ]] || error_msg "Your network cannot access [ github.com ], unable to download the kernel."
+
         # Download the kernel from [ releases ]
         kernel_down_from="${GITHUB_CDN}https://github.com/${KERNEL_REPO}/releases/download/kernel_${KERNEL_TAGS}/${inputs_kernel}.tar.gz"
 
