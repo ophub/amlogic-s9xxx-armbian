@@ -225,12 +225,16 @@ sub board_special_config() {
         &optimize_eth_parameters("eth0","eth1","eth2");
     } elsif($board eq "HINLINK OPC-H68K Board") {
         &optimize_eth_parameters("eth0","eth1","eth2","eth3");
+    } elsif($board eq "HINLINK OPC-H69K Board") {
+        &optimize_eth_parameters("eth0","eth1","eth2","eth3");
     } elsif($board eq "Radxa E25") {
-        &optimize_eth_parameters("eth0","eth1");
-    } elsif($board eq "Radxa ROCK 5B") {
         &optimize_eth_parameters("eth0","eth1");
     } elsif($board eq "FriendlyElec NanoPi R5") {
         &optimize_eth_parameters("eth0","eth1","eth2");
+    } elsif($board eq "Radxa ROCK 5B") {
+        &optimize_eth_parameters("eth0","eth1");
+    } elsif($board eq "HINLINK OWL H88K Board") {
+        &optimize_eth_parameters("eth0","eth1");
     } elsif($board eq "Beelink IPC-R Board") {
         &optimize_eth_parameters("eth0","eth1","eth2","eth3","eth4","eth5");
     }
