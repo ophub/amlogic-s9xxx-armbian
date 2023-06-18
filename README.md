@@ -105,6 +105,8 @@ armbian-update
 
 Example: `armbian-update -k 5.15.50 -u dev`
 
+When specifying the kernel version using the `-k` parameter, you can provide an exact version number, for example: `armbian-update -k 5.15.50`. Alternatively, you can provide a fuzzy specification to indicate the kernel series, for example: `armbian-update -k 5.15.y` or `armbian-update -k 5.15`. When using a fuzzy specification, the tool will automatically select the latest version available in the specified series.
+
 See here for a list of all [currently available stable kernel tarballs.](https://github.com/ophub/kernel/releases/tag/kernel_stable)
 
 When updating the kernel, the current kernel will be automatically backed up. The three most recently used kernels are stored in the `/ddbr/backup` directory. If the newly installed kernel is unstable, the backed up kernel can be restored at any time. If the update fails and the system cannot be started, you can start any version of Armbian via USB/TF/SD to recover the system in eMMC. For more instructions, see the help [documentation](build-armbian/documents/).

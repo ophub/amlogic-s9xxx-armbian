@@ -78,6 +78,8 @@ armbian-update
 
 举例: `armbian-update -k 5.15.50 -u dev`
 
+通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15.y` 或者 `armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
+
 更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新失败导致系统无法启动，可以通过 USB 启动任意版本的 Armbian 来恢复 eMMC 里的系统。更多说明详见 [帮助文档](build-armbian/documents/README.cn.md)
 
 - ### 安装常用软件
