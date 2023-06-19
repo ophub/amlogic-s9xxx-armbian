@@ -786,7 +786,16 @@ sudo nmcli r wifi on
 sudo nmcli dev wifi
 
 # Connect to a wireless network
-sudo nmcli dev wifi connect "WiFi Name" password "WiFi Password"
+sudo nmcli dev wifi connect "wifi_name" password "WiFi_Password"
+
+# Show the list of saved network connections
+sudo nmcli connection show
+
+# Disconnect from a connection
+sudo nmcli connection down "wifi_name"
+
+# Forget the connection and disable automatic connection
+sudo nmcli connection delete "wifi_name"
 ```
 
 <div style="width:100%;margin-top:40px;margin:5px;">

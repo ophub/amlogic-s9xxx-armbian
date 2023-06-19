@@ -789,6 +789,15 @@ sudo nmcli dev wifi
 
 # 连接无线
 sudo nmcli dev wifi connect "wifi名称" password "wifi密码"
+
+# 显示已保存的网络连接列表
+sudo nmcli connection show
+
+# 断开连接
+sudo nmcli connection down "wifi名称"
+
+# 忘记连接并取消自动连接
+sudo nmcli connection delete "wifi名称"
 ```
 
 <div style="width:100%;margin-top:40px;margin:5px;">
