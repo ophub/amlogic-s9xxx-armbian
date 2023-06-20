@@ -38,7 +38,7 @@ echo "" >${fix_log} && tolog "Start fixing..."
 
 # Fix common releases permissions
 [[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && tolog "01. Fix tmp permissions"
-[[ -d "/etc/update-motd.d" ]] && sudo chmod 755 /etc/update-motd.d/* && tolog "02. Fix update-motd.d permissions"
+[[ -d "/etc/update-motd.d" ]] && sudo chmod -x /etc/update-motd.d/* && sudo chmod +x /etc/update-motd.d/{10-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
 [[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R && tolog "03. Fix man permissions"
 [[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R && tolog "04. Fix man permissions"
 [[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers && tolog "05. Fix man permissions"
