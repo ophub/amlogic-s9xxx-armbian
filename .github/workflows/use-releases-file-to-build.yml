@@ -48,6 +48,7 @@ on:
           - s905w-w95
           - s905w-x96w
           - s905w-x96-mini
+          - s905l
           - s905l2
           - s905l2-wojia
           - s905l2-e900v21e
