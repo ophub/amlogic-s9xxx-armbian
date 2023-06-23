@@ -197,7 +197,7 @@ search_aml_model() {
 # Functions: Displays a list of supported amlogic devices
 # Configure: View ${model_database}
 # 1.ID  2.MODEL  3.SOC  4.FDTFILE  5.UBOOT_OVERLOAD  6.MAINLINE_UBOOT  7.BOOTLOADER_IMG  8.DESCRIPTION
-# 9.KERNEL_TAGS  10.PLATFORM  11.FAMILY  12.BOOT_CONF  13.BOARD  14.BUILD
+# 9.KERNEL_TAGS  10.PLATFORM  11.FAMILY  12.BOOT_CONF  13.CONTRIBUTORS  14.BOARD  15.BUILD
 show_aml_model() {
     echo -e "${STEPS} Start selecting device..."
 
@@ -205,17 +205,17 @@ show_aml_model() {
     split_line="--------------------------------------------------------------------------------------"
     # Print header information
     printf "%-s\n" "${split_line}"
-    printf "%-5s %-10s %-30s %-50s\n" ID SOC MODEL DTB
+    printf "%-5s %-10s %-35s %-50s\n" ID SOC MODEL DTB
     printf "%-s\n" "${split_line}"
     # Print device list
     echo "${model_database}" | awk -F':' '{print $1,$3,$2,$4}' | while read line; do
         # Print device information
-        printf "%-5s %-10s %-30s %-50s\n" $(echo "${line}")
+        printf "%-5s %-10s %-35s %-50s\n" $(echo "${line}")
         # Add a split line every 10 lines
         [[ "$(echo ${line} | awk '{print $1}')" == *"0" ]] && printf "%-s\n" "${split_line}"
     done
     # Print custom options and end split lines
-    printf "%-5s %-10s %-30s %-50s\n" 0 Other Customize Enter-custom-dtb-name
+    printf "%-5s %-10s %-35s %-50s\n" 0 Other Customize Enter-custom-dtb-name
     printf "%-s\n" "${split_line}"
 
     # Display device options
