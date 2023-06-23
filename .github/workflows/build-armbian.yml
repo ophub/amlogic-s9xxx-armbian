@@ -67,8 +67,6 @@ on:
           - s912
           - s912-zyxq-fake
           - s912-h96pro-plus
-          - s912-tx92
-          - s912-z6-plus
           - s912-m8s-pro
           - s912-t95z-plus
           - s912-tx9-pro-3g
@@ -103,7 +101,6 @@ on:
           - s905x3-ip1001m
           - s905x3-q1
           - s905x3-q2
-          - s905x3-q1000
           - s905x3-a100
           - s905x3-2101
           - s905x3-whale
