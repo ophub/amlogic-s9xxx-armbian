@@ -423,6 +423,15 @@ EOF
         software_install "ifupdown2"
         software_update
 
+        # Adjust sshd_config (Fix the SSH certificate access modified by PVE)
+        [[ -L ~/.ssh/authorized_keys ]] && {
+            cp -f $(ls -l ~/.ssh/authorized_keys | awk '{print $NF}') ~/.ssh/authorized_keys_2
+            chmod 600 ~/.ssh/authorized_keys_2
+            sudo sed -i '/AuthorizedKeysFile/d' /etc/ssh/sshd_config
+            sudo echo "AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys_2" >>/etc/ssh/sshd_config
+            sudo /etc/init.d/ssh restart
+        }
+
         sync && sleep 3
         echo -e "${NOTE} The network address: [ https://${my_address}:8006 ]"
         echo -e "${NOTE} Username and Password: [  Your system account ]"
