@@ -248,7 +248,7 @@ For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TO
 | auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
 | armbian_fstype     | ext4              | Set the file system type of the system ROOTFS partition, function reference `-t` |
 | armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
-| builder_name       | None              | Set Armbian system builder's signature, function reference `-n`               |
+| builder_name       | None              | Set Armbian system builder's signature, function reference `-n` |
 | gh_token           | None              | Optional. Set ${{ secrets.GH_TOKEN }}, function reference `-g` |
 
 ### GitHub Actions Output variable description
