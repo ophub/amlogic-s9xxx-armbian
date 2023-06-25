@@ -331,7 +331,7 @@ Supports compiling the kernel in Ubuntu20.04/22.04, debian11 or Armbian system. 
 
 ### 9.1 How to Add Custom Kernel Patches
 
-When there is a directory of common kernel patches (`common-kernel-patches`) in the kernel patch directory [tools/patch](../../compile-kernel/tools/patch), or there is a directory with the same name as the `kernel source code repository`, you can use `-p true` to automatically apply the kernel patch. The naming convention for patch directories is as follows:
+When there is a directory of common kernel patches (`common-kernel-patches`) in the kernel patch directory [tools/patch](../../compile-kernel/tools/patch), or there is a directory with the same name as the `kernel source code repository` (e.g., [linux-5.15.y](https://github.com/unifreq/linux-5.15.y)), you can use `-p true` to automatically apply the kernel patch. The naming convention for patch directories is as follows:
 
 ```shell
 ~/amlogic-s9xxx-armbian
