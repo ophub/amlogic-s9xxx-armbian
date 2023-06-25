@@ -180,7 +180,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.10.125 的同系列是否有更新的版本，如有 5.10.125 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |
-| -n   | CustomName | 设置系统名称中的签名部分。可根据需要添加签名如 `_server`，`_gnome_desktop` 或 `_ophub` 等，设置自定义签名时请勿包含空格。默认值：`无` |
+| -n   | BuilderName | 设置 Armbian 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
 | -g   | GH_TOKEN   | 可选项。设置 ${{ secrets.GH_TOKEN }}，用于 [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) 查询。默认值：`无` |
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
@@ -227,7 +227,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 | armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
-| armbian_sign     | 无                | 设置系统名称中的签名部分，功能参考 `-n`               |
+| builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`               |
 | gh_token         | 无                | 可选项。设置 ${{ secrets.GH_TOKEN }}。功能参考 `-g` |
 
 - ### GitHub Actions 输出变量说明

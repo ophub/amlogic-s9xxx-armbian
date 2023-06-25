@@ -101,8 +101,8 @@ boot_mb="256"
 root_mb="2560"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 rootfs_type="ext4"
-# Custom name in Armbian file: ${build_image_file}, such as _server, _dev, etc.
-custom_name="_server"
+# Armbian system builder's signature
+builder_name=""
 
 # Get gh_token for api.github.com
 gh_token=""
@@ -234,9 +234,9 @@ init_var() {
                 error_msg "Invalid -s parameter [ ${2} ]!"
             fi
             ;;
-        -n | --customName)
+        -n | --BuilderName)
             if [[ -n "${2}" ]]; then
-                custom_name="${2// /}"
+                builder_name="${2// /}"
                 shift
             else
                 error_msg "Invalid -n parameter [ ${2} ]!"
@@ -619,7 +619,7 @@ make_image() {
     }
 
     # Set Armian file name
-    armbian_filename="Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}${custom_name}_$(date +"%Y.%m.%d").img"
+    armbian_filename="Armbian_${armbian_rebuild_version}_${PLATFORM}_${board}_${release_codename}_${kernel}_$(date +"%Y.%m.%d").img"
     build_image_file="${tmp_outpath}/${armbian_filename}"
     rm -f ${build_image_file}
 
@@ -1059,7 +1059,10 @@ refactor_rootfs() {
     elif [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     fi
+    echo "BUILD_REPOSITORY='https://github.com/armbian/build'" >>${ophub_release_file}
+    echo "REBUILD_REPOSITORY='https://github.com/ophub/amlogic-s9xxx-armbian'" >>${ophub_release_file}
     echo "CONTRIBUTORS='${CONTRIBUTORS}'" >>${ophub_release_file}
+    echo "BUILDER_NAME='${builder_name}'" >>${ophub_release_file}
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
 
     sync && sleep 3
