@@ -177,7 +177,7 @@ on:
           - save
           - temp
       builder_name:
-        description: "Armbian builder's signature."
+        description: "Set Armbian builder signature."
         required: false
         default: "angel"
         type: choice
