@@ -41,7 +41,7 @@ inputs:
     required: false
     default: "2560"
   builder_name:
-    description: "Set armbian custom name."
+    description: "Set Armbian builder signature."
     required: false
     default: ""
   gh_token:

@@ -227,7 +227,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 | armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
-| builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`               |
+| builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`           |
 | gh_token         | 无                | 可选项。设置 ${{ secrets.GH_TOKEN }}。功能参考 `-g` |
 
 - ### GitHub Actions 输出变量说明
