@@ -40,7 +40,7 @@ inputs:
     description: "Set armbian rootfs size(Unit: MiB)."
     required: false
     default: "2560"
-  armbian_sign:
+  builder_name:
     description: "Set armbian custom name."
     required: false
     default: ""
@@ -135,7 +135,7 @@ runs:
             [[ -n "${{ inputs.auto_kernel }}" ]] && make_command="${make_command} -a ${{ inputs.auto_kernel }}"
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
-            [[ -n "${{ inputs.armbian_sign }}" ]] && make_command="${make_command} -n ${{ inputs.armbian_sign }}"
+            [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
             [[ -n "${{ inputs.gh_token }}" ]] && make_command="${make_command} -g ${{ inputs.gh_token }}"
             sudo ./rebuild ${make_command}
 
