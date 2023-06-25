@@ -552,6 +552,7 @@ confirm_version() {
     PLATFORM="$(echo ${board_conf} | awk -F':' '{print $10}')"
     FAMILY="$(echo ${board_conf} | awk -F':' '{print $11}')"
     BOOT_CONF="$(echo ${board_conf} | awk -F':' '{print $12}')"
+    CONTRIBUTORS="$(echo ${board_conf} | awk -F':' '{print $13}')"
 
     # Check whether the key parameters are correct
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
@@ -1058,6 +1059,7 @@ refactor_rootfs() {
     elif [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     fi
+    echo "CONTRIBUTORS='${CONTRIBUTORS}'" >>${ophub_release_file}
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
 
     sync && sleep 3
