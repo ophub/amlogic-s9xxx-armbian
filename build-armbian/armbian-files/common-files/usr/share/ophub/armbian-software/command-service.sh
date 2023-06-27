@@ -25,6 +25,7 @@
 # software_306  : For emby-server
 # software_307  : For kvm
 # software_308  : For pve
+# software_309  : For casaos
 #
 #============================================================================
 
@@ -439,6 +440,26 @@ EOF
         ;;
     update) software_update ;;
     remove) software_remove "${pve_package_list}" ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For casaos
+software_309() {
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing CasaOS..."
+        wget -qO- https://get.casaos.io | sudo bash
+
+        sync && sleep 3
+        echo -e "${NOTE} The CasaOS access address: [ http://${my_address}:81 ]"
+        echo -e "${SUCCESS} CasaOS installation successful."
+        ;;
+    update) software_update ;;
+    remove)
+        sudo casaos-uninstall
+        echo -e "${SUCCESS} CasaOS uninstallation successful."
+        ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
