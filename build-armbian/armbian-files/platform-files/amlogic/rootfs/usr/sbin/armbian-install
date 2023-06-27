@@ -240,6 +240,7 @@ show_aml_model() {
         ret="$(search_aml_model "${boxid}")"
         [[ -z "${ret}" ]] && error_msg "Input error, exit!"
 
+        MODEL_NAME="$(echo "${ret}" | awk -F ':' '{print $2}')"
         AMLOGIC_SOC="$(echo "${ret}" | awk -F ':' '{print $3}')"
         FDTFILE="$(echo "${ret}" | awk -F ':' '{print $4}')"
         UBOOT_OVERLOAD="$(echo "${ret}" | awk -F ':' '{print $5}')"
@@ -248,6 +249,7 @@ show_aml_model() {
     fi
 
     echo -e "${INFO} Input Box ID: [ ${boxid} ]"
+    echo -e "${INFO} Model Name: [ ${MODEL_NAME} ]"
     echo -e "${INFO} FDTFILE: [ ${FDTFILE} ]"
     echo -e "${INFO} MAINLINE_UBOOT: [ ${MAINLINE_UBOOT} ]"
     echo -e "${INFO} BOOTLOADER_IMG:  [ ${BOOTLOADER_IMG} ]"
@@ -542,6 +544,8 @@ EOF
 
     echo -e "${INFO} Update the relevant parameters."
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
+    sed -i "s|^MODEL_ID=.*|MODEL_ID='${boxid}'|g" ${ophub_release_file}
+    sed -i "s|^MODEL_NAME=.*|MODEL_NAME='${MODEL_NAME}'|g" ${ophub_release_file}
     sed -i "s|^SOC=.*|SOC='${AMLOGIC_SOC}'|g" ${ophub_release_file}
     sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file}
     sed -i "s|^MAINLINE_UBOOT=.*|MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'|g" ${ophub_release_file}
