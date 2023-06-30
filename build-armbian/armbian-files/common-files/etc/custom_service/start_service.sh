@@ -52,16 +52,17 @@ openvfd_boxid="15"
 
 # For vplus(Allwinner h6) led color lights
 [[ -x "/usr/bin/rgb-vplus" ]] && {
-    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE &
+    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE 2>/dev/null &
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
 }
 
 # Enable Realtek protocol Bluetooth support (https://post.smzdm.com/p/a8xm0rkq/)
 rtk_bluetooth="no"
 [[ "${rtk_bluetooth}" == "yes" ]] && {
-    /usr/bin/rtk_hciattach -n -s 115200 ttyAML1 rtk_h5 &
-    gpioset -s 1 -m time 0 82=0
-    gpioset 0 82=1
+    /usr/bin/rtk_hciattach -n -s 115200 ttyAML1 rtk_h5 2>/dev/null &
+    gpioset -s 1 -m time 0 82=0 2>/dev/null
+    gpioset 0 82=1 2>/dev/null
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Realtek protocol bluetooth enabled successfully." >>${custom_log}
 }
 
 # Add custom log
