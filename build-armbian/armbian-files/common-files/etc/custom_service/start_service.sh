@@ -56,5 +56,13 @@ openvfd_boxid="15"
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
 }
 
+# Enable Realtek protocol Bluetooth support (https://post.smzdm.com/p/a8xm0rkq/)
+rtk_bluetooth="no"
+[[ "${rtk_bluetooth}" == "yes" ]] && {
+    /usr/bin/rtk_hciattach -n -s 115200 ttyAML1 rtk_h5 &
+    gpioset -s 1 -m time 0 82=0
+    gpioset 0 82=1
+}
+
 # Add custom log
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] All custom services executed successfully!" >>${custom_log}
