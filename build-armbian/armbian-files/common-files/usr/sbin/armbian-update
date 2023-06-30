@@ -275,7 +275,8 @@ query_version() {
     # If the string (e.g: 6.1) contains only one period, add ".y" to it.
     [[ -n "${inputs_kernel}" && "$(grep -o "\." <<<"${inputs_kernel}" | wc -l)" -eq "1" ]] && inputs_kernel="${inputs_kernel}.y"
     # Automatically retrieve the latest version of the current kernel series and the specified kernel series (e.g: 6.1.y)
-    [[ -z "${inputs_kernel}" || "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && {
+    # However, when the specified kernel parameter contains a "-" character, the specified version will be used (e.g: 5.10.160-rk3588)
+    [[ -z "${inputs_kernel}" ]] || [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ && "${inputs_kernel}" != *"-"* ]] && {
         # Setting the kernel series for the query (e.g: armbian-update -k 6.1.y)
         [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && kernel_verpatch="${inputs_kernel%.*}"
 
