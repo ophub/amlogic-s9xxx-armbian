@@ -284,6 +284,7 @@ query_version() {
         [[ "${github_net}" == "yes" ]] || error_msg "Your network cannot access [ github.com ], unable to query the kernel."
 
         # Query the latest version
+        echo -e "${INFO} Query the latest kernel version of the [ ${kernel_verpatch} ] series within [ kernel_${KERNEL_TAGS} ]..."
         latest_version="$(
             curl -s -H "Accept: application/vnd.github+json" \
                 ${kernel_api}/releases/tags/kernel_${KERNEL_TAGS} |
