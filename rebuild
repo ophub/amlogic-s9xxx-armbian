@@ -85,11 +85,11 @@ default_tags="stable"
 # Set the tags(kernel_xxx) of the specific kernel, such as 5.15.y, 6.1.y, etc.
 specific_tags="${default_tags}"
 # Set the list of kernels used by default
-stable_kernel=("6.1.1" "5.15.1")
-flippy_kernel=("6.1.1" "5.15.1")
-dev_kernel=("6.1.1" "5.15.1")
-beta_kernel=("6.1.1" "5.15.1")
 rk3588_kernel=("5.10.1")
+stable_kernel=("6.1.1" "5.15.1")
+flippy_kernel=(${stable_kernel[*]})
+dev_kernel=(${stable_kernel[*]})
+beta_kernel=(${stable_kernel[*]})
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
