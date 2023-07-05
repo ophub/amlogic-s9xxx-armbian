@@ -1056,8 +1056,8 @@ refactor_rootfs() {
     elif [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     fi
-    echo "BUILD_REPOSITORY='https://github.com/armbian/build'" >>${ophub_release_file}
-    echo "REBUILD_REPOSITORY='https://github.com/ophub/amlogic-s9xxx-armbian'" >>${ophub_release_file}
+    echo "BUILD_REPOSITORY='github.com/armbian/build'" >>${ophub_release_file}
+    echo "REBUILD_REPOSITORY='github.com/ophub/amlogic-s9xxx-armbian'" >>${ophub_release_file}
     echo "CONTRIBUTORS='${CONTRIBUTORS}'" >>${ophub_release_file}
     echo "BUILDER_NAME='${builder_name}'" >>${ophub_release_file}
     echo "PACKAGED_DATE='$(date +%Y-%m-%d)'" >>${ophub_release_file}
