@@ -900,7 +900,6 @@ refactor_rootfs() {
 
     # Fix common releases permissions
     [[ -d "var/tmp" ]] && chmod 777 var/tmp
-    [[ -d "etc/update-motd.d" ]] && chmod 755 etc/update-motd.d/*
     [[ -d "var/cache/man" ]] && chown man:root var/cache/man -R
     [[ -d "var/cache/man" ]] && chmod g+s var/cache/man -R
     [[ -f "etc/sudoers" ]] && chown root:root etc/sudoers
