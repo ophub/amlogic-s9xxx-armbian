@@ -60,6 +60,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
           - [12.7.2.3.1 静态 IP 地址 - IPv4](#127231-静态-ip-地址---ipv4)
           - [12.7.2.3.2 DHCP 获取动态 IP 地址 - IPv4 / IPv6](#127232-dhcp-获取动态-ip-地址---ipv4--ipv6)
         - [12.7.2.4 修改网络连接 MAC 地址](#12724-修改网络连接-mac-地址)
+        - [12.7.2.5 如何禁用 IPv6](#12725-如何禁用-ipv6)
       - [12.7.3 如何启用无线](#1273-如何启用无线)
       - [12.7.4 如何启用蓝牙](#1274-如何启用蓝牙)
     - [12.8 如何添加开机启动任务](#128-如何添加开机启动任务)
@@ -769,6 +770,43 @@ ip -c -br address
 
 * 新建或修改部分网络参数, 网络连接可能会被断开, 并重新连接网络。
 * 由于软硬件环境不同（盒子, 系统, 网络设备等）, 生效所需时间 `1-15` 秒左右, 更长时间未生效的建议检查软硬件环境。
+
+##### 12.7.2.5 如何禁用 IPv6
+
+您可以使用 `nmcli` 实用程序在命令行中禁用 `IPv6` 协议，参考来源 [disable-ipv6](https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/8/html/configuring_and_managing_networking/using-networkmanager-to-disable-ipv6-for-a-specific-connection_configuring-and-managing-networking)。
+
+第一步，先使用 `nmcli connection show` 命令查看网络连接列表，返回结果如下：
+
+```shell
+NAME                 UUID                                   TYPE       DEVICE
+Wired connection 1   8a7e0151-9c66-4e6f-89ee-65bb2d64d366   ethernet   eth0
+...
+```
+
+第二步，将连接的 ipv6.method 参数设为 disabled ：
+
+```shell
+nmcli connection modify "Wired connection 1" ipv6.method "disabled"
+```
+
+第三步，重新连接网络：
+
+```shell
+nmcli connection up "Wired connection 1"
+```
+
+第四步，查看网络连接状态，如果没有显示 inet6 条目，则 IPv6 在该设备上被禁用：
+
+```shell
+ip address show eth0
+```
+
+第五步，验证 `/proc/sys/net/ipv6/conf/eth0/disable_ipv6` 文件现在是否包含值 `1`
+
+```shell
+# cat /proc/sys/net/ipv6/conf/eth0/disable_ipv6
+1
+```
 
 #### 12.7.3 如何启用无线
 

@@ -60,6 +60,7 @@ Github Actions is a service launched by Microsoft that provides virtual server e
           - [12.7.2.3.1 Static IP Address - IPv4](#127231-static-ip-address---ipv4)
           - [12.7.2.3.2 DHCP Obtains Dynamic IP Address - IPv4 / IPv6](#127232-dhcp-obtains-dynamic-ip-address---ipv4--ipv6)
         - [12.7.2.4 Modifying Network Connection MAC Address](#12724-modifying-network-connection-mac-address)
+        - [12.7.2.5 How to Disable IPv6](#12725-how-to-disable-ipv6)
       - [12.7.3 How to Enable Wireless](#1273-how-to-enable-wireless)
       - [12.7.4 How to Enable Bluetooth](#1274-how-to-enable-bluetooth)
     - [12.8 How to Add Startup Tasks](#128-how-to-add-startup-tasks)
@@ -767,6 +768,43 @@ ip -c -br address
 
 * Creating or modifying some network parameters may cause the network connection to be disconnected and reconnected.
 * Due to different software and hardware environments (boxes, systems, network devices, etc.), it may take `1-15` seconds for the changes to take effect. If it takes longer, please check the software and hardware environment.
+
+##### 12.7.2.5 How to Disable IPv6
+
+You can disable the IPv6 protocol using the nmcli utility on the command line. Refer to the source [disable-ipv6](https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/8/html/configuring_and_managing_networking/using-networkmanager-to-disable-ipv6-for-a-specific-connection_configuring-and-managing-networking).
+
+First, use the command `nmcli connection show` to view the list of network connections. The result will be as follows:
+
+```shell
+NAME                 UUID                                   TYPE       DEVICE
+Wired connection 1   8a7e0151-9c66-4e6f-89ee-65bb2d64d366   ethernet   eth0
+...
+```
+
+Set the ipv6.method parameter of the connection to disabled:
+
+```shell
+nmcli connection modify "Wired connection 1" ipv6.method "disabled"
+```
+
+Reconnect to the network:
+
+```shell
+nmcli connection up "Wired connection 1"
+```
+
+Check the network connection status. If there is no inet6 entry displayed, it means IPv6 is disabled on that device:
+
+```shell
+ip address show eth0
+```
+
+Verify that the file `/proc/sys/net/ipv6/conf/eth0/disable_ipv6` now contains the value `1`:
+
+```shell
+# cat /proc/sys/net/ipv6/conf/eth0/disable_ipv6
+1
+```
 
 #### 12.7.3 How to Enable Wireless
 
