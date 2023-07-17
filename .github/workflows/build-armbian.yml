@@ -36,6 +36,7 @@ on:
           - all
           - s922x_s905x3_s905d_s912_s905l3a
           - s905x-t95_s912-t95z-plus_s905l3-unt400g1
+          - s912_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_vplus_zysj
           - s905d
           - s905d-ki-pro
@@ -129,10 +130,10 @@ on:
           - smart-am40
           - sw799
           - zysj
-          - dlfr100
           - dg3399
-          - beikeyun
+          - dlfr100
           - emb3531
+          - beikeyun
           - l1pro
           - station-m1
           - vplus
