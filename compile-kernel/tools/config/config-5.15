@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.119 Kernel Configuration
+# Linux/arm64 5.15.120 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.2.Rel1 (Build arm-12.24)) 12.2.1 20221205"
 CONFIG_CC_IS_GCC=y
@@ -1833,6 +1833,7 @@ CONFIG_NET_SELFTESTS=y
 CONFIG_NET_SOCK_MSG=y
 CONFIG_NET_DEVLINK=y
 CONFIG_PAGE_POOL=y
+# CONFIG_PAGE_POOL_STATS is not set
 CONFIG_FAILOVER=y
 CONFIG_SHORTCUT_FE=y
 CONFIG_ETHTOOL_NETLINK=y
