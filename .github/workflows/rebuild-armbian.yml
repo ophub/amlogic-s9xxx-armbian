@@ -20,7 +20,6 @@ on:
         type: choice
         options:
           - all
-          - s922x_s905x3_s905d_s912_s905l3a
           - s905x-t95_s912-t95z-plus_s905l3-unt400g1
           - s912_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_vplus_zysj
