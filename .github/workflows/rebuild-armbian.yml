@@ -13,14 +13,6 @@ on:
         description: "Set Armbian file path."
         required: false
         default: ""
-      armbian_fstype:
-        description: "Set armbian rootfs type."
-        required: false
-        default: "ext4"
-        type: choice
-        options:
-          - ext4
-          - btrfs
       armbian_board:
         description: "Select device board."
         required: false
@@ -166,6 +158,14 @@ on:
           - flippy
           - dev
           - beta
+      armbian_fstype:
+        description: "Set armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
       armbian_storage:
         description: "Select image storage type."
         required: false
