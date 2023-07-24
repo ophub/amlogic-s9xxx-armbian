@@ -710,6 +710,7 @@ copy_files() {
     tag_bootfs="${tmp_build}/bootfs"
     tag_rootfs="${tmp_build}/rootfs"
     mkdir -p ${tag_bootfs} ${tag_rootfs}
+    chown root:root ${tag_bootfs} ${tag_rootfs}
 
     # Mount bootfs
     if [[ "${bootfs_type}" == "fat32" ]]; then
