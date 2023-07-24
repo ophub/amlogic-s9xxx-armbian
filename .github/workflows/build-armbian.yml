@@ -233,24 +233,42 @@ jobs:
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
               ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
-                  BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
-                  CLEAN_LEVEL="make,cache,alldebs,sources" COMPRESS_OUTPUTIMAGE="sha"
+                           BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
+                           COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Clean up server space
         id: clean
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         run: |
-          cd build/
-            sudo rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
-          cd output/images/
-            img_name="$(ls *.img | head -n 1)"
-            img_version="$(echo ${img_name} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-            img_kernel="$(echo ${img_name} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
-            sudo mv -f ${img_name} Armbian_${img_version}-trunk_${img_kernel}.img
-            sudo pigz -f *.img && sync
-            sudo rm -rf $(ls . | grep -v ".img.gz" | xargs) 2>/dev/null
-            df -hT ${PWD}
+          # Rename Armbian image
+          cd build/output/images/
+              img_name="$(ls *.img 2>/dev/null | head -n 1)"
+              img_version="$(echo ${img_name} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+              img_kernel="$(echo ${img_name} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
+              sudo mv -f ${img_name} Armbian_${img_version}-trunk_${img_kernel}.img
+              sudo pigz -f *.img
+              sudo rm -rf $(ls . | grep -v ".img.gz" | xargs) 2>/dev/null
+
+          # Save Armbian rootfs
+          cd ../../cache/rootfs/
+              rootfs_file="$(ls rootfs-*.tar.zst 2>/dev/null | head -n 1)"
+              save_file="Armbian_${img_version}-${{ inputs.set_release }}_rootfs.tar.zst"
+              [[ -n "${rootfs_file}" ]] && {
+                  cp -f ${rootfs_file} ../../output/images/${save_file}
+              }
+
+          # Generate a sha256sum verification file for each file
+          cd ../../output/images/
+              for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
+
+          # Delete Armbian build source codes and temporary files
+          cd ../../
+              sync && sudo rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
+
+          # Output cleaning result information
+          df -hT ${PWD}
+          echo -e "List of files in the [ output/images ] directory: \n$(ls -l output/images)"
           echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
@@ -259,7 +277,7 @@ jobs:
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
           tag: ${{ steps.clean.outputs.build_tag }}
-          artifacts: build/output/images/*.img.gz
+          artifacts: build/output/images/*
           allowUpdates: true
           token: ${{ secrets.GH_TOKEN }}
 
