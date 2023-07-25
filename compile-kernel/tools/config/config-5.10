@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.186 Kernel Configuration
+# Linux/arm64 5.10.187 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.2.Rel1 (Build arm-12.24)) 12.2.1 20221205"
 CONFIG_CC_IS_GCC=y
@@ -2555,7 +2555,7 @@ CONFIG_MESON_GXL_PHY=y
 # CONFIG_CORTINA_PHY is not set
 # CONFIG_DAVICOM_PHY is not set
 CONFIG_ICPLUS_PHY=m
-CONFIG_JLSEMI_JL2XX1_PHY=y
+CONFIG_JLSEMI_PHY=y
 # CONFIG_LXT_PHY is not set
 # CONFIG_INTEL_XWAY_PHY is not set
 # CONFIG_LSI_ET1011C_PHY is not set
