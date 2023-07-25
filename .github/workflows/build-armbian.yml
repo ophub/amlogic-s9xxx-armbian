@@ -241,34 +241,44 @@ jobs:
         id: clean
         if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
         run: |
-          # Rename Armbian image
+          # Searching for Armbian image
+          image_file="$(basename $(ls build/output/images/*.img 2>/dev/null | head -n 1))"
+          img_version="$(echo ${image_file} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+          img_kernel="$(echo ${image_file} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
+          save_image_name="Armbian_${img_version}-trunk_${img_kernel}.img"
+
+          # Searching for rootfs file
+          rootfs_file="$(basename $(ls build/cache/rootfs/rootfs-*.tar.zst 2>/dev/null | head -n 1))"
+          save_rootfs_name="Armbian_${img_version}-${{ inputs.set_release }}_rootfs"
+
+          # Processing the Armbian image and rootfs file
           cd build/output/images/
-              img_name="$(ls *.img 2>/dev/null | head -n 1)"
-              img_version="$(echo ${img_name} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-              img_kernel="$(echo ${img_name} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
-              sudo mv -f ${img_name} Armbian_${img_version}-trunk_${img_kernel}.img
-              sudo pigz -f *.img
-              sudo rm -rf $(ls . | grep -v ".img.gz" | xargs) 2>/dev/null
+              # Save Armbian image
+              mv -f ${image_file} ${save_image_name}
+              pigz -f *.img
+              [[ "${?}" == "0" ]] && echo -e "01. Renaming Armbian completed."
 
-          # Save Armbian rootfs
-          cd ../../cache/rootfs/
-              rootfs_file="$(ls rootfs-*.tar.zst 2>/dev/null | head -n 1)"
-              save_file="Armbian_${img_version}-${{ inputs.set_release }}_rootfs.tar.zst"
-              [[ -n "${rootfs_file}" ]] && {
-                  cp -f ${rootfs_file} ../../output/images/${save_file}
-              }
+              # Save Armbian rootfs
+              cp -f ../../cache/rootfs/${rootfs_file} ${save_rootfs_name}.tar.zst
+              [[ "${?}" == "0" ]] && echo -e "02. Copying rootfs completed."
 
-          # Generate a sha256sum verification file for each file
-          cd ../../output/images/
+              # Convert format .tar.zst to .tar.gz
+              zstd -d ${save_rootfs_name}.tar.zst
+              tar -czf ${save_rootfs_name}.tar.gz ${save_rootfs_name}.tar
+              [[ "${?}" == "0" ]] && echo -e "03. The rootfs format conversion is completed."
+
+              # Add sha256sum verification files
+              rm -rf $(ls . | grep -vE ".img.gz|.tar.gz" | xargs) 2>/dev/null
               for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
+              [[ "${?}" == "0" ]] && echo -e "04. The files in the current directory:\n$(ls -l .)"
 
           # Delete Armbian build source codes and temporary files
           cd ../../
-              sync && sudo rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
+              sync && sudo rm -rf $(ls . | grep -v "^output$" | xargs)
+              [[ "${?}" == "0" ]] && echo -e "04. Temporary file cleanup completed."
 
           # Output cleaning result information
           df -hT ${PWD}
-          echo -e "List of files in the [ output/images ] directory: \n$(ls -l output/images)"
           echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
