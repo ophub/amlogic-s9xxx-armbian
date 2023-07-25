@@ -44,7 +44,7 @@
 
 2. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将系统写入 USB 里，然后把写好系统的 USB 插入盒子。登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
-```yaml
+```shell
 armbian-install
 ```
 
@@ -60,7 +60,7 @@ armbian-install
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 # 使用 root 用户运行 (sudo -i)
 # 如果不指定参数，将更新为最新版本。
 armbian-update
@@ -87,7 +87,7 @@ armbian-update
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-software
 ```
 
@@ -97,7 +97,7 @@ armbian-software
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-config
 ```
 
@@ -107,7 +107,7 @@ armbian-config
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-swap 1
 ```
 
@@ -115,7 +115,7 @@ armbian-swap 1
 
 登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-openvfd
 ```
 
@@ -127,7 +127,7 @@ armbian-openvfd
 
 请从 `TF/SD/USB` 启动 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-ddbr
 ```
 
@@ -137,7 +137,7 @@ armbian-ddbr
 
 在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-kernel -u
 armbian-kernel -k 5.10.125
 ```
@@ -146,7 +146,7 @@ armbian-kernel -k 5.10.125
 
 将本地系统中的全部服务脚本更新到最新版本，可以登录 Armbian 系统 → 输入命令：
 
-```yaml
+```shell
 armbian-sync
 ```
 
@@ -158,7 +158,7 @@ armbian-sync
 
 2. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
 
-```yaml
+```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
@@ -181,7 +181,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |
 | -n   | BuilderName | 设置 Armbian 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
-| -g   | GH_TOKEN   | 可选项。设置 ${{ secrets.GH_TOKEN }}，用于 [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) 查询。默认值：`无` |
+| -g   | GH_TOKEN   | 可选项。设置 `${{ secrets.GH_TOKEN }}`，用于 [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) 查询。默认值：`无` |
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -b s905x3 -k 5.10.125` : 推荐使用. 使用默认配置进行相关内核打包。
@@ -228,7 +228,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 | armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
 | builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`           |
-| gh_token         | 无                | 可选项。设置 ${{ secrets.GH_TOKEN }}。功能参考 `-g` |
+| gh_token         | 无                | 可选项。设置 `${{ secrets.GH_TOKEN }}`。功能参考 `-g` |
 
 - ### GitHub Actions 输出变量说明
 
@@ -266,7 +266,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 首先感谢 [150balbes](https://github.com/150balbes) 为在 Amlogic 电视盒子中使用 Armbian 所做出的杰出贡献和奠定的良好基础。这里编译的 [Armbian](https://github.com/armbian/build) 系统直接使用了官方当前的最新源码进行实时编译。程序的开发思路来自 [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box) 等作者的教程。感谢各位的奉献和分享，让我们可以在更多盒子里使用 Armbian 系统。
 
-本系统所使用的 `kernel` / `u-boot` 等资源主要从 [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) 的项目中复制而来，部分文件由用户在 [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) / [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian) / [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic) / [kernel](https://github.com/ophub/kernel) 等项目的 [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) 和 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提供分享。为感谢这些开拓者和分享者，从现在开始（本源代码库创建于2021-09-19），我统一在 [CONTRIBUTORS.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md) 中进行了记录。再次感谢大家为盒子赋予了新的生命和意义。
+本系统所使用的 `kernel` / `u-boot` 等资源主要从 [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) 的项目中复制而来，部分文件由用户在 [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) / [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian) / [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic) / [kernel](https://github.com/ophub/kernel) 等项目的 [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) 和 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提供分享。为感谢这些开拓者和分享者，从现在开始（本源代码库创建于`2021-09-19`），我统一在 [CONTRIBUTORS.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md) 中进行了记录。再次感谢大家为盒子赋予了新的生命和意义。
 
 ## 其他发行版
 

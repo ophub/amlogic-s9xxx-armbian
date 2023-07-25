@@ -1,14 +1,14 @@
 # Armbian
 
-Read the Chinese version: [查看中文说明](README.cn.md)
+View Chinese description | [查看中文说明](README.cn.md)
 
-[Armbian](https://www.armbian.com/) is a lightweight Linux-based operating system based on Debian/Ubuntu built specifically for ARM devices. Armbian is lean, clean, 100% compatible and inherits the functions and rich software ecosystem of Debian/Ubuntu. It can run safely and stably from TF/SD/USB and can be installed to the eMMC on most TV boxes. Now you can replace the Android system of your TV box with Armbian, turning it into a powerful server.
+[Armbian](https://www.armbian.com/) is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. Now you can replace your Android TV system with the Armbian system, turning it into a powerful server.
 
-This project relies on many [contributors](CONTRIBUTORS.md) to build Armbian systems for `Amlogic`, `Rockchip`, and `Allwinner` boxes. It supports writing to eMMC, updating the kernel, and other functions. Please refer to the [Armbian Documentation](./build-armbian/documents) for more information on Armbian. The latest Armbian builds can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to the [Armbian Discussions](https://github.com/ophub/amlogic-s9xxx-armbian/discussions) to discuss and share. You are welcome to fork and personalize it. If it is useful to you then please click on the star in the upper right corner of the github repository page to show your support. Thanks!
+This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./build-armbian/documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Feel free to exchange and share in the [Armbian Discussion Area](https://github.com/ophub/amlogic-s9xxx-armbian/discussions). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
 
-## Armbian system specific instructions
+## Armbian System Description
 
-| SoC  | Device | [Kernel](https://github.com/ophub/kernel) | [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) |
+| SoC | Device | [Kernel](https://github.com/ophub/kernel) | [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) |
 | ---- | ---- | ---- | ---- |
 | a311d | [Khadas-VIM3](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/99) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | amlogic_a311d.img |
 | s922x | [Beelink-GT-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/370), [Beelink-GT-King-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/707), [Ugoos-AM6-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/213), [ODROID-N2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/201), [X88-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/988), [Ali-CT2000](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1150) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | amlogic_s922x.img |
@@ -32,196 +32,177 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build Armbian sys
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1007), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | allwinner_boxname.img |
 
-💡Tip: Currently [s905 Boxes](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only boot from TF/SD/USB. Most other TV boxes support installing Armbian to eMMC. Detailed configuration information of the device can be viewed in [the device model database](build-armbian/armbian-files/common-files/etc/model_database.conf).
+💡 Tip: At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used in `TF/SD/USB`. Other models of boxes support writing to `EMMC` for use. For more information, please refer to the [Supported Device List Description](build-armbian/armbian-files/common-files/etc/model_database.conf). You can refer to the method in Section 12.15 of the instruction document to [add new supported devices](build-armbian/documents/README.md#1215-how-to-add-new-supported-devices).
 
-## Generic installation instructions
+## Installation and Upgrade Instructions for Armbian
 
-The exact installation process for Armbian varies depending upon your devices chipset and model but these instructions are written to be as generic as possible and should apply to all TV boxes.
+Choose the Armbian system that corresponds to your box model, and refer to the corresponding instructions for different devices.
 
-### Hardware support
+- ### Install Armbian to EMMC
 
-You need to know the exact make and model of your box and which .dtb (Device Tree Blob) file you need to use to get your box to boot with all supported devices working. Under Android, go to **Settings -> System -> About phone** to find out the exact model of your TV box.
+1. For `Rockchip` platform, please refer to the [Chapter 8](build-armbian/documents) in the instruction document.
 
-If you have got your box working but its not listed on either page then see section 12.15 of the documentation for details on how to [add support for new devices](build-armbian/documents/README.md#1215-how-to-add-new-supported-devices).
+2. For `Amlogic` and `Allwinner` platforms, use tools such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) to write the system to a USB stick, then insert the USB stick with the written system into the box. Log in to the Armbian system (default user: root, default password: 1234) → Enter the command:
 
-
-### Write the Armbian image to a disk
-
-For instructions covering installing Armbian on Rockchip TV boxes, please refer to [Section 8](build-armbian/documents) of the documentation.
-
-For Amlogic and Allwinner boxes，you will have to uncompress the installation image using `gunzip` first before writing the image to a TF, SD or USB disk using [Rufus](https://rufus.ie/), [balenaEtcher](https://www.balena.io/etcher/) or `gnome-disk-utility`. You could also use `dd` but that is not recommended.
-
-After writing the Armbian image, you may need to edit the **FDT** line in `uEnv.txt` on the **BOOT** partition of the disk to use the correct **.dtb** file for your TV box.
-
-To find the correct dtb to use with Armbian for your box, see [Description of Supported Device List](build-armbian/armbian-files/common-files/etc/model_database.conf) or search for your box in the list of system specific instructions at the top of this page.
-
-### Enable multi-boot mode - Amlogic TV boxes only
-
-If this is your first time attempting to boot from a SD card or USB disk on an Amlogic TV box, you must first enable multi-boot mode. Insert the Armbian disk then hold down the button in the AV port by inserting a paper clip, a pin or something similar and keep it depressed while powering the device on. Keep the button pressed until you see the boot screen of your box. After a few seconds it should reboot from your SD card or USB disk. You are only required to enable multi-boot mode once.
-
-### Running `armbian-install`
-
-On first boot, Armbian will resize its root partition to use all of the space available on its disk and it will ask you several system configuration questions like your timezone, keyboard layout, username and password etc. After logging in as **root** or using `sudo` run:
-
-```bash
+```shell
 armbian-install
 ```
 
-To start the eMMC installation script. The available options are:
+| Optional | Default | Options | Description       |
+| -------- | ------- | ------- | ----------------- |
+| -m       | no      | yes/no  | Use Mainline u-boot |
+| -a       | yes     | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
+| -l       | no      | yes/no  | List. Display all device lists |
 
-| Optional  | Default  | Value    | Description           |
-| --------- | -------  | -------- | --------------------  |
-| -m        | no       | yes/no   | Use Mainline u-boot   |
-| -a        | yes      | yes/no   | Use [ampart](https://github.com/7Ji/ampart) tool |
-| -l        | no       | yes/no   | List all .dtb files         |
+Example: `armbian-install -m yes -a no`
 
-If you can boot Armbian fine from TF/SD/USB and the install script says it installed Armbian to eMMC OK but Armbian fails to boot from eMMC then you should try re-installing Armbian using mainline u-boot instead by running:
+- ### Update Armbian Kernel
 
-`armbian-install -m yes`
+Log in to the Armbian system → Enter the command:
 
-### Updating the Armbian Kernel
-
-You won't be able to use all of your hardware properly unless you are running the correct kernel and using the right .dtb. Unfortuntely Armbian cannot auto-detect these for you. In most cases, you are recommended to run the latest kernel version available for your TV box but some features on some devices will only work on specific kernels. For example, 4K HDMI output only works on the X96 Max+ 2T when running a 5.10 series kernel, 4K output doesn't currently work under the 5.15.x or 6.x kernels for that specific model.
-
-Login in to Armbian and run:
-
-```bash
+```shell
 # Run as root user (sudo -i)
-# If no parameter is specified, it will update to the latest version.
+# If no parameter is specified, it will be updated to the latest version.
 armbian-update
 ```
 
-`armbian-update`'s options include:
-
-| Optional  | Default      | Value          | Description                                                  |
-| --------- | ------------ | -------------- | ------------------------------------------------------------ |
-| -r        | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
-| -u        | automate     | stable/flippy/dev/beta/rk3588 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel used |
-| -k        | latest       | kernel-version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -c        | None         | domain-name    | Set the cdn domain name for accelerated access to github.com |
-| -b        | yes          | yes/no         | Automatically backup the current system kernel               |
-| -m        | no           | yes/no         | Use Mainline u-boot                                          |
-| -s        | None         | None           | [SOS] Restore eMMC with system kernel from USB               |
-| -h        | None         | None           | View usage help                                              |
+| Optional | Default      | Options       | Description                      |
+| -------- | ------------ | ------------- | -------------------------------- |
+| -r       | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
+| -u       | Automation   | stable/flippy/dev/beta/rk3588 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel in use |
+| -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -c       | None         | Custom domain name | Set the cdn domain name for accelerated access to github.com |
+| -b       | yes          | yes/no        | Automatically back up the current system's kernel when updating the kernel |
+| -m       | no           | yes/no        | Use mainline u-boot |
+| -s       | None         | None          | [SOS] Use the system kernel in USB to restore eMMC |
+| -h       | None         | None          | View help |
 
 Example: `armbian-update -k 5.15.50 -u dev`
 
-When specifying the kernel version using the `-k` parameter, you can provide an exact version number, for example: `armbian-update -k 5.15.50`. Alternatively, you can provide a fuzzy specification to indicate the kernel series, for example: `armbian-update -k 5.15`. When using a fuzzy specification, the tool will automatically select the latest version available in the specified series.
+When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 
-See here for a list of all [currently available stable kernel tarballs.](https://github.com/ophub/kernel/releases/tag/kernel_stable)
+The current system's kernel is automatically backed up when updating the kernel. The storage path is in the `/ddbr/backup` directory. The three most recent versions of the kernel used are retained. If the newly installed kernel is unstable, you can restore the backed-up kernel at any time. If the update fails and the system cannot be started, you can use any version of Armbian to boot via USB to restore the system in eMMC. For more details, see the [Help Document](build-armbian/documents).
 
-When updating the kernel, the current kernel will be automatically backed up. The three most recently used kernels are stored in the `/ddbr/backup` directory. If the newly installed kernel is unstable, the backed up kernel can be restored at any time. If the update fails and the system cannot be started, you can start any version of Armbian via USB/TF/SD to recover the system in eMMC. For more instructions, see the help [documentation](build-armbian/documents/).
+- ### Install Common Software
 
-### Update Armbian scripts
+Log in to the Armbian system → Enter the command:
 
-To update all Armbian scripts to the latest versions, run:
-
-```bash
-armbian-sync
+```shell
+armbian-software
 ```
 
-### armbian-software store
+The command `armbian-software -u` can update the local software center list. Based on the demand feedback from users in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click installation/update/uninstallation and other shortcut operations. This includes `docker images`, `desktop software`, `application services`, etc. For more details, see the [instructions](build-armbian/documents/armbian_software.md).
 
-`armbian-software` can be used to install various popular apps, added to the Armbian software center according to user demand and feedback given in github [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), gradually integrating commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click install/update/uninstall of popular programs such as **docker images**, **desktop software**, **popular server solutions**, etc. See more [here](build-armbian/documents/armbian_software.md).
+- ### Modify Armbian Configuration
 
-### Armbian config tool
+Log in to the Armbian system → Enter the command:
 
-Armbian has a handy TUI config tool for changing key system settings:
-
-```bash
+```shell
 armbian-config
 ```
 
-### Create swap for Armbian
+- ### Create swap for Armbian
 
-If you feel that your TV box has insufficient memory for running demanding applications such as `docker`, you can create a swap virtual memory partition. `armbian-swap` lets the user configure how much disk space is reserved for swap memory. The input parameter defines how many gigabytes of space you want to reserve for swap. The default is **1** GB.
+If you feel that the current box's memory is insufficient when using applications that consume a lot of memory, such as `docker`, you can create a `swap` virtual memory partition, virtually using a certain capacity of disk space as memory. The unit of the input parameter of the following command is `GB`, the default is `1`.
 
-```bash
+Log in to the Armbian system → Enter the command:
+
+```shell
 armbian-swap 1
 ```
 
-### Configuring the TV box LED display
+- ### Control LED Display
 
-It is worthwhile configuring your LED display, if your box has one, if only so that you know when your TV box has finished booting when it is not connected to a HDMI screen.
+Log in to the Armbian system → Enter the command:
 
-```bash
+```shell
 armbian-openvfd
 ```
 
-Full configuration instructions for the [LED display are here.](build-armbian/documents/led_screen_display_control.md)
+Debug according to the [LED Screen Display Control Instructions](build-armbian/documents/led_screen_display_control.md).
 
-### Backup and restore the original eMMC Android OS
+- ### Backup/Restore EMMC Original System
 
-Armbian supports backing up and restoring your TV box's Android eMMC OS partition to TF/SD/USB. It is recommended that you back up the Android system that comes with your box before installing Armbian so that you have the option to restore your TV box to its original state.
+Supports backing up/restoring the `EMMC` partition of the box in `TF/SD/USB`. Before installing the Armbian system in a brand new box, it is recommended that you back up the Android TV system that comes with the current box so that it can be used in the future to restore the TV system and other situations.
 
-You may back up your TV box's Android OS by running:
+Please boot the Armbian system from `TF/SD/USB` → Enter the command:
 
-```bash
+```shell
 armbian-ddbr
 ```
 
-Following the prompt, enter `b` to perform a system backup or `r` to perform a system recovery.
+Enter `b` according to the prompt to back up the system, and enter `r` to restore the system.
 
-### Compile the kernel in Armbian
+- ### Compile the Kernel in Armbian
 
-To build your own Armbian kernel, see the [compile-kernel](compile-kernel) documentation. Please login in to armbian → input command:
+For the usage of compiling the kernel in Armbian, please refer to the [Compile Kernel](compile-kernel) instruction document. Log in to the Armbian system → Enter the command:
 
-```bash
+```shell
 armbian-kernel -u
 armbian-kernel -k 5.10.125
 ```
 
+- ### More Usage Instructions
 
-## Local build instructions
+To update all service scripts in the local system to the latest version, you can log in to the Armbian system → Enter the command:
 
-1. Clone the repository `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+```shell
+armbian-sync
+```
 
-2. Install the necessary packages (The script has only been tested on x86_64 Ubuntu-20.04/22.04)
+In the use of Armbian, some common problems that may be encountered can be found in [documents](build-armbian/documents)
 
-```bash
+## Local Packaging
+
+1. Clone the repository to local `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
+
+2. Install the necessary software packages (scripts have only been tested under x86_64 Ubuntu-20.04/22.04)
+
+```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
 # For Ubuntu-22.04
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
 ```
 
-3. Enter the `~/amlogic-s9xxx-armbian` root directory, create the `build/output/images` folder and then upload the Armbian image ( Eg: `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) to this `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (e.g. `21.11.0`) and kernel version number (e.g. `5.15.50`) in the name of the original Armbian image file, It will be used as the name of the armbian system after rebuilding.
+3. Enter the `~/amlogic-s9xxx-armbian` root directory, create a `build/output/images` folder in the root directory, and upload the Armbian image file (such as `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img`) to `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (such as `21.11.0`) and the kernel version number (such as `5.15.50`) in the original Armbian image file name. It will be used as the name of the Armbian system after restructuring.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run, for example `sudo ./rebuild -b s905x3 -k 5.10.125` to build armbian for `amlogic s9xxx`. The generated Armbian image is in the `build/output/images` directory under the root directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run the `sudo ./rebuild -b s905x3 -k 5.10.125` command to generate the Armbian image file for the specified board. The generated file is saved in the `build/output/images` directory.
 
+- ### Local Packaging Parameter Description
 
-### Description of localized packaging parameters
+| Parameter | Meaning     | Description |
+| ----      | ----------  | ----------  |
+| -b        | Board      | Specify the TV box model, such as `-b s905x3`. Connect multiple models with `_`, such as `-b s905x3_s905d`. Use `all` to represent all models. The model code can be found in the `BOARD` setting in [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf). Default value: `all` |
+| -r        | KernelRepo | Specify the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/kernel` |
+| -u        | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
+| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 5.10.125`. Connect multiple kernels with `_`, such as `-k 5.10.125_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/dev/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) can only use specific kernels. |
+| -a        | AutoKernel | Set whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically look for whether there is a newer version of the same series in the kernel library in the kernel specified in `-k`, such as 5.10.125. If there is a latest version after 5.10.125, it will be automatically changed to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
+| -t        | RootfsType | Set the file system type of the system's ROOTFS partition, the options are `ext4` or `btrfs` type. For example: `-t btrfs`. Default value: `ext4` |
+| -s        | Size       | Set the size of the system's ROOTFS partition, the system size must be greater than 2048MiB. For example: `-s 2560`. Default value: `2560` |
+| -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces when setting the signature. Default value: `None` |
+| -g        | GH_TOKEN   | Optional. Set `${{ secrets.GH_TOKEN }}`, used for [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) queries. Default value: `None` |
 
-| Optional | Meaning    | Description                               |
-| -------- | ---------- | ----------------------------------------- |
-| -b       | Board      | Specify the Build system type. Write the build system name individually, such as `-b s905x3` . Multiple system use `_` connect such as `-b s905x3_s905d` . Use `all` for all board models. The model code is detailed in the `BOARD` setting in [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) file. Default value: `all` |
-| -r       | KernelRepo | Specifies the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/kernel` |
-| -u       | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
-| -k       | Kernel     | Specify the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable), Such as `-k 5.10.125` . Multiple kernel use `_` connection such as `-k 5.10.125_5.15.50` . The kernel version freely specified by the `-k` parameter is only valid for the kernel in the `stable/flippy/dev/beta`. Other kernel families such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) can only use specific kernels. |
-| -a       | AutoKernel | Set whether to automatically adopt the latest version of the kernel of the same series. When it is `true`, it will automatically find in the kernel library whether there is an updated version of the kernel specified in `-k` such as 5.10.125 version. If there is the latest version of same series, it will automatically Replace with the latest version. When set to `false`, the specified version of the kernel will be compiled. Default value: `true` |
-| -t       | RootfsType | Set the file system type of the ROOTFS partition of the system, and the options are `ext4` or `btrfs` type. Such as `-t btrfs`. Default value: `ext4` |
-| -s       | Size       | Specify the ROOTFS partition size for the system, and the specified size must be greater than 2048MiB. Such as `-s 2560`, Default value: `2560` |
-| -n       | BuilderName | Set Armbian builder signature. Please do not include spaces in the signature. Default value: `None` |
-| -g       | GH_TOKEN   | Optional. Set ${{ secrets.GH_TOKEN }} for [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) query. Default value: `None` |
+- `sudo ./rebuild`: Use the default configuration to package all models of TV boxes.
+- `sudo ./rebuild -b s905x3 -k 5.10.125`: Recommended. Use the default configuration to package related kernels.
+- `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, package multiple kernels at the same time. Use `_` to connect multiple kernel parameters.
+- `sudo ./rebuild -
 
-- `sudo ./rebuild`: Use the default configuration to build all TV box images.
-- `sudo ./rebuild -b s905x3 -k 5.10.125`: recommend. Use the default configuration, specify a kernel and a system for compilation.
-- `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, specify multiple cores, and multiple system for compilation. use `_` to connect.
-- `sudo ./rebuild -b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a system, and set the partition size for compilation.
-- `sudo ./rebuild -b s905x3_s905d`: Use the default configuration, specify multiple system, use `_` to connect. compile all kernels.
-- `sudo ./rebuild -k 5.10.125_5.15.50`: Use the default configuration. Specify multiple cores, use `_` to connect.
-- `sudo ./rebuild -k 5.10.125_5.15.50 -a true`: Use the default configuration. Specify multiple cores, use `_` to connect. Auto update to the latest kernel of the same series.
-- `sudo ./rebuild -t btrfs -s 2560 -k 5.10.125`: Use the default configuration, set the file system to btrfs format and the partition size to 2560MiB, and only compile the armbian system with the kernel version 5.10.125.
+b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a model for packaging, the system size is set to 2560MiB.
+- `sudo ./rebuild -b s905x3_s905d` Use the default configuration, package all kernels for multiple models of TV boxes, use `_` to connect multiple models.
+- `sudo ./rebuild -k 5.10.125_5.15.50`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection.
+- `sudo ./rebuild -k 5.10.125_5.15.50 -a true`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection. Automatically upgrade to the latest kernel of the same series.
+- `sudo ./rebuild -t btrfs -s 2560 -k 5.10.125`: Use the default configuration, set the file system to btrfs format, the partition size is 2560MiB, and specify the kernel as 5.10.125, package for all models of TV boxes.
 
-## Use GitHub Actions to build
+## Use GitHub Actions for Compilation
 
-1. Workflows configuration in [build-armbian.yml](.github/workflows/build-armbian.yml) file.
+1. The configuration of the Workflows file can be found in the [build-armbian.yml](.github/workflows/build-armbian.yml) file.
 
-2. New compilation: Select ***`Build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, According to the OS version officially supported by Armbian, you can choose Ubuntu series: `jammy`, or Debian series: `bullseye`. Click the ***`Run workflow`*** button. More parameter setting methods can be found in [the official document of Armbian](https://docs.armbian.com/Developer-Guide_Build-Options/).
+2. Full compile: On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Build armbian`***. According to the OS versions supported by Armbian official, you can choose the Ubuntu series: `jammy`, or the Debian series: `bullseye` etc. Click the ***`Run workflow`*** button to compile. More parameter setting methods can be found in the [Armbian official documentation](https://docs.armbian.com/Developer-Guide_Build-Options/).
 
-3. Compile again: If there is an `Armbian_.*-trunk_.*.img.gz` file in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), you do not need to compile it completely, you can directly use this file to `build amlogic armbian` for a different board. Select ***`Use Releases file to build armbian`*** on the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page. Click the ***`Run workflow`*** button.
+3. Recompile: If there are already compiled `Armbian_.*-trunk_.*.img.gz` files in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), and you just want to make another box of different boards, you can skip the compilation of Armbian source files and proceed with the second production directly. On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Use Releases file to build armbian`***, and click the ***`Run workflow`*** button to compile again.
 
-4. Use other Armbian system, such as [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) provided by the official Armbian system download site [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), only by introducing the script of this repository in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml) for Armbian reconstruction, it can be adapted to the use of other TV Boxes. In the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, and enter the Armbian network download url such as `https://dl.armbian.com/*/Armbian_*.img.xz`, or in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml), set the load path of the rebuild file through the `armbian_path` parameter. code show as below:
+4. Use other Armbian systems, such as the [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) system provided by the Armbian official system download website [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), and only introduce the script of this repository in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml) to restructure Armbian, which can be adapted to the use of other boxes. On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Rebuild armbian`***, input the network download address of Armbian like `https://dl.armbian.com/*/Armbian_*.img.xz`, or set the loading path of the restructuring file in the process control file [rebuild-armbian.yml](.github/workflows/rebuild-armbian.yml) through the `armbian_path` parameter. The code is as follows:
 
 ```yaml
 - name: Rebuild Armbian
@@ -234,44 +215,44 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     gh_token: ${{ secrets.GH_TOKEN }}
 ```
 
-### GitHub Actions Input parameter description
+- ### GitHub Actions Input Parameter Description
 
-For the related settings of GitHUB RELEASES_TOKEN, please refer to: [RELEASES_TOKEN](build-armbian/documents/README.md#3-fork-repository-and-set-gh_token). The relevant parameters correspond to the `local packaging command`, please refer to the above description.
+About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](build-armbian/documents/README.md#3-fork-the-repository-and-set-up-gh_token). The related parameters correspond to the `local packaging command`, please refer to the above description.
 
-| Optional           | Defaults          | Description                         |
-| ------------------ | ----------------- | ----------------------------------- |
-| armbian_path       | None              | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the use of the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz`  |
-| armbian_board      | all               | Set the `board` of the packaged TV Boxes, function reference `-b`    |
-| kernel_repo        | ophub/kernel      | Specifies the `<owner>/<repo>` of the github.com kernel repository, function reference `-r` |
-| kernel_usage       | stable            | Set the `tags suffix` of the kernel used, function reference `-u` |
-| armbian_kernel     | 6.1.1_5.15.1      | Set kernel [version](https://github.com/ophub/kernel/releases/tag/kernel_stable), function reference `-k`        |
-| auto_kernel        | true              | Set whether to automatically use the latest version of the same series of kernels, function reference `-a` |
-| armbian_fstype     | ext4              | Set the file system type of the system ROOTFS partition, function reference `-t` |
-| armbian_size       | 2560              | Set the size of the system ROOTFS partition, function reference `-s`             |
-| builder_name       | None              | Set Armbian builder signature, function reference `-n` |
-| gh_token           | None              | Optional. Set ${{ secrets.GH_TOKEN }}, function reference `-g` |
+| Parameter              | Default                  | Description                                             |
+|------------------------|--------------------------|---------------------------------------------------------|
+| armbian_path           | None                     | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
+| armbian_board          | all                      | Set the `board` of the package box, refer to `-b`                 |
+| kernel_repo            | ophub/kernel             | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
+| kernel_usage           | stable                   | Set the `tags suffix` of the used kernel. Refer to `-u` |
+| armbian_kernel         | 6.1.1_5.15.1             | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
+| auto_kernel            | true                     | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
+| armbian_fstype         | ext4                     | Set the file system type of the system's ROOTFS partition, refer to `-t`     |
+| armbian_size           | 2560                     | Set the size of the system's ROOTFS partition, refer to `-s`            |
+| builder_name           | None                     | Set the Armbian system builder signature, refer to `-n`           |
+| gh_token               | None                     | Optional. Set `${{ secrets.GH_TOKEN }}`. Refer to `-g` |
 
-### GitHub Actions Output variable description
+- ### GitHub Actions Output Variable Description
 
-To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read and write permissions`, see the [instructions for details](build-armbian/documents#2-set-the-privacy-variable-github_token).
+To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read/write permissions`. For details, see the [usage instructions](build-armbian/documents/README.md#2-set-up-private-variable-github_token).
 
-| Parameter                                | For example       | Description                         |
-|------------------------------------------|-------------------|-------------------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}           | out               | OpenWrt system storage path       |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | Packing date(month.day.hour.minute) |
-| ${{ env.PACKAGED_STATUS }}               | success           | Package status: success / failure   |
+| Parameter                              | Default                  | Description                       |
+|----------------------------------------|--------------------------|-----------------------------------|
+| ${{ env.PACKAGED_OUTPUTPATH }}         | out                      | Path of the folder where the packaged system is located   |
+| ${{ env.PACKAGED_OUTPUTDATE }}         | 04.13.1058               | Packaging date (month.day.hourminute)        |
+| ${{ env.PACKAGED_STATUS }}             | success                  | Packaging status: success / failure |
 
-## Default account for Armbian system
+## Default Information for Armbian System
 
-| Name             | Value                  |
-| ---------------- | ---------------------- |
-| Default IP       | Get IP from the router |
-| Default username | root                   |
-| Default password | 1234                   |
+| Name | Value |
+| ---- | ---- |
+| Default IP | Obtain IP from router |
+| Default account | root |
+| Default password | 1234 |
 
-## Compile the kernel using GitHub Actions
+## Compiling Kernel using GitHub Actions
 
-For the compilation method of the kernel, see [compile-kernel](compile-kernel)
+For the method of compiling the kernel, refer to [compile-kernel](compile-kernel)
 
 ```yaml
 - name: Compile the kernel
@@ -285,16 +266,16 @@ For the compilation method of the kernel, see [compile-kernel](compile-kernel)
 
 ## Armbian Contributors
 
-First of all, I would like to thank [150balbes](https://github.com/150balbes) for his outstanding contributions and a good foundation for using Armbian in the Amlogic TV Boxes. The [Armbian](https://github.com/armbian/build) system compiled here directly uses the latest official source code for real-time compilation. The development idea of the program comes from the tutorials of authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you for your dedication and sharing, so that we can use the Armian system in more boxes.
+First of all, thanks to [150balbes](https://github.com/150balbes) for the outstanding contributions and the solid foundation laid for using Armbian in Amlogic TV boxes. The [Armbian](https://github.com/armbian/build) system compiled here directly uses the latest source code from the official in real-time. The development ideas of the program come from tutorials from authors such as [ebkso](https://www.kflyo.com/howto-compile-armbian-for-n1-box). Thank you all for your dedication and sharing, allowing us to use the Armbian system in more boxes.
 
-The `kernel` / `u-boot` and other resources used by this system are mainly copied from the project of [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit), Some files are shared by users in [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) and [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) of [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) / [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian) / [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic) / [kernel](https://github.com/ophub/kernel) and other projects. To thank these pioneers and sharers, From now on (This source code repository was created on 2021-09-19), I have recorded them in [CONTRIBUTORS.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md). Thanks again everyone for giving new life and meaning to the TV Boxes.
+The `kernel` / `u-boot` and other resources used in this system are mainly copied from the [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) project, and some files are provided by users in [Pull](https://github.com/ophub/amlogic-s9xxx-armbian/pulls) and [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) of projects such as [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [luci-app-amlogic](https://github.com/ophub/luci-app-amlogic), and [kernel](https://github.com/ophub/kernel). To thank these pioneers and sharers, from now on (this source code repository was created on `2021-09-19`), I have recorded it uniformly in [CONTRIBUTORS.md](https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md). Thanks again to everyone for giving the box a new life and meaning.
 
-## Other distributions
+## Other Distributions
 
-- The [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) project provides the `OpenWrt` system used in the box, which is also applicable to the relevant devices that support Armbian.
-- [unifreq](https://github.com/unifreq/openwrt_packit) has made `OpenWrt` system for more boxes such as `Amlogic`, `Rockchip` and `Allwinner`, which is a benchmark in the box circle and is recommended for use.
-- [Scirese](https://github.com/Scirese/alarm) tested the production, installation and use of `Arch Linux ARM` / `Manjaro` system in the Android TV boxes, please refer to the relevant instructions in his repository for details.
-- [7Ji](https://7ji.github.io/) published some articles on reverse engineering and development on the Amlogic platform in his blog, such as installing the ArchLinux ARM system in the way of ArchLinux, and introducing the startup mechanism of the Amlogic platform. In his [ampart](https://github.com/7Ji/ampart) project, he provided a partitioning tool that supports reading and editing Amlogic's eMMC partition table and DTB partitions, and can make 100% use of the eMMC space. The method of making and using `Arch Linux ARM` is provided in [amlogic-s9xxx-archlinuxarm](https://github.com/7Ji/amlogic-s9xxx-archlinuxarm) project. Yet Another openvfd Daemon is provided in [YAopenvfD](https://github.com/7Ji/YAopenvfD) project.
+- The [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt) project provides the `OpenWrt` system used in the box, which is also applicable to devices that support Armbian.
+- [unifreq](https://github.com/unifreq/openwrt_packit) has made `OpenWrt` system for more boxes such as Amlogic, Rockchip, and Allwinner, which is a benchmark in the box circle and recommended to use.
+- [Scirese](https://github.com/Scirese/alarm) tested the production, installation, and use of `Arch Linux ARM` / `Manjaro` system in Android TV boxes, for details refer to the relevant instructions in his repository.
+- [7Ji](https://7ji.github.io/) has published some articles on reverse engineering and development on the Amlogic platform in his blog, such as installing the ArchLinux ARM system in the way of ArchLinux, an introduction to the boot mechanism of the Amlogic platform, etc. In his [ampart](https://github.com/7Ji/ampart) project, a partition tool is provided that can read and edit the Amlogic eMMC partition table and DTB internal partition, and can utilize 100% of eMMC space. The [amlogic-s9xxx-archlinuxarm](https://github.com/7Ji/amlogic-s9xxx-archlinuxarm) project provides the production and use method of `Arch Linux ARM` system. In the [YAopenvfD](https://github.com/7Ji/YAopenvfD) project, another openvfd daemon is provided.
 
 ## Links
 
