@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on x86_64 Ubuntu-20.04/22.04, Rebuild armbian.
+# Description: Run on x86_64 Ubuntu-22.04, Rebuild armbian.
 # Copyright (C) 2021~ https://www.armbian.com
 # Copyright (C) 2021~ https://github.com/unifreq
 # Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md
