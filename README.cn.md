@@ -4,7 +4,7 @@
 
 [Armbian（中文名：岸边）](https://www.armbian.com/) 系统是基于 Debian/Ubuntu 而构建的专门用于 ARM 芯片的轻量级 Linux 系统。Armbian 系统精益、干净，并且 100% 兼容并继承了 Debian/Ubuntu 系统的功能和丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 里。现在你可以将电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。
 
-本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见 [Armbian 使用文档](./build-armbian/documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎到 [Armbian 讨论区](https://github.com/ophub/amlogic-s9xxx-armbian/discussions)交流分享。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
+本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见 [Armbian 使用文档](./documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎到 [Armbian 讨论区](https://github.com/ophub/amlogic-s9xxx-armbian/discussions)交流分享。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
 ## Armbian 系统说明
 
@@ -32,7 +32,7 @@
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1007), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | allwinner_boxname.img |
 
-💡提示：目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)只能在 `TF/SD/USB` 中使用，其他型号的盒子支持写入 `EMMC` 中使用。更多信息请查阅[支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。可以参考说明文档中 12.15 章节的方法[添加新的支持设备](build-armbian/documents/README.cn.md#1215-如何添加新的支持设备)。
+💡提示：目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)只能在 `TF/SD/USB` 中使用，其他型号的盒子支持写入 `EMMC` 中使用。更多信息请查阅[支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。可以参考说明文档中 12.15 章节的方法[添加新的支持设备](documents/README.cn.md#1215-如何添加新的支持设备)。
 
 ## 安装及升级 Armbian 的相关说明
 
@@ -40,7 +40,7 @@
 
 - ### 安装 Armbian 到 EMMC
 
-1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](build-armbian/documents/README.cn.md)。
+1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](documents/README.cn.md)。
 
 2. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将系统写入 USB 里，然后把写好系统的 USB 插入盒子。登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
@@ -81,7 +81,7 @@ armbian-update
 
 通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
 
-更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新失败导致系统无法启动，可以通过 USB 启动任意版本的 Armbian 来恢复 eMMC 里的系统。更多说明详见 [帮助文档](build-armbian/documents/README.cn.md)
+更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新失败导致系统无法启动，可以通过 USB 启动任意版本的 Armbian 来恢复 eMMC 里的系统。更多说明详见 [帮助文档](documents/README.cn.md)
 
 - ### 安装常用软件
 
@@ -91,7 +91,7 @@ armbian-update
 armbian-software
 ```
 
-使用 `armbian-software -u` 命令可以更新本地的软件中心列表。根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](build-armbian/documents/armbian_software.md)。
+使用 `armbian-software -u` 命令可以更新本地的软件中心列表。根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](documents/armbian_software.md)。
 
 - ### 修改 Armbian 配置
 
@@ -119,7 +119,7 @@ armbian-swap 1
 armbian-openvfd
 ```
 
-根据 [LED 屏显示控制说明](build-armbian/documents/led_screen_display_control.md) 进行调试。
+根据 [LED 屏显示控制说明](documents/led_screen_display_control.md) 进行调试。
 
 - ### 备份/还原 EMMC 原系统
 
@@ -150,7 +150,7 @@ armbian-kernel -k 5.10.125
 armbian-sync
 ```
 
-在 Armbian 的使用中，一些可能遇到的常见问题详见 [documents](build-armbian/documents/README.cn.md)
+在 Armbian 的使用中，一些可能遇到的常见问题详见 [documents](documents/README.cn.md)
 
 ## 本地化打包
 
@@ -215,7 +215,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### GitHub Actions 输入参数说明
 
-关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](build-armbian/documents/README.cn.md#3-fork-仓库并设置-gh_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
+关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](documents/README.cn.md#3-fork-仓库并设置-gh_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
 
 | 参数              | 默认值             | 说明                                             |
 |------------------|-------------------|--------------------------------------------------|
@@ -232,7 +232,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### GitHub Actions 输出变量说明
 
-上传到 `Releases` 需要给仓库添加 `${{ secrets.GITHUB_TOKEN }}` 和 `${{ secrets.GH_TOKEN }}` 并设置 `Workflow 读写权限`，详见[使用说明](build-armbian/documents/README.cn.md#2-设置隐私变量-github_token)。
+上传到 `Releases` 需要给仓库添加 `${{ secrets.GITHUB_TOKEN }}` 和 `${{ secrets.GH_TOKEN }}` 并设置 `Workflow 读写权限`，详见[使用说明](documents/README.cn.md#2-设置隐私变量-github_token)。
 
 | 参数                                      | 默认值             | 说明                       |
 |------------------------------------------|-------------------|---------------------------|
