@@ -4,7 +4,7 @@ View Chinese description | [查看中文说明](README.cn.md)
 
 [Armbian](https://www.armbian.com/) is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. Now you can replace your Android TV system with the Armbian system, turning it into a powerful server.
 
-This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./build-armbian/documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Feel free to exchange and share in the [Armbian Discussion Area](https://github.com/ophub/amlogic-s9xxx-armbian/discussions). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
+This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Feel free to exchange and share in the [Armbian Discussion Area](https://github.com/ophub/amlogic-s9xxx-armbian/discussions). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
 
 ## Armbian System Description
 
@@ -32,7 +32,7 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1007), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | allwinner_boxname.img |
 
-💡 Tip: At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used in `TF/SD/USB`. Other models of boxes support writing to `EMMC` for use. For more information, please refer to the [Supported Device List Description](build-armbian/armbian-files/common-files/etc/model_database.conf). You can refer to the method in Section 12.15 of the instruction document to [add new supported devices](build-armbian/documents/README.md#1215-how-to-add-new-supported-devices).
+💡 Tip: At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used in `TF/SD/USB`. Other models of boxes support writing to `EMMC` for use. For more information, please refer to the [Supported Device List Description](build-armbian/armbian-files/common-files/etc/model_database.conf). You can refer to the method in Section 12.15 of the instruction document to [add new supported devices](documents/README.md#1215-how-to-add-new-supported-devices).
 
 ## Installation and Upgrade Instructions for Armbian
 
@@ -40,7 +40,7 @@ Choose the Armbian system that corresponds to your box model, and refer to the c
 
 - ### Install Armbian to EMMC
 
-1. For `Rockchip` platform, please refer to the [Chapter 8](build-armbian/documents) in the instruction document.
+1. For `Rockchip` platform, please refer to the [Chapter 8](documents) in the instruction document.
 
 2. For `Amlogic` and `Allwinner` platforms, use tools such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) to write the system to a USB stick, then insert the USB stick with the written system into the box. Log in to the Armbian system (default user: root, default password: 1234) → Enter the command:
 
@@ -81,7 +81,7 @@ Example: `armbian-update -k 5.15.50 -u dev`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 
-The current system's kernel is automatically backed up when updating the kernel. The storage path is in the `/ddbr/backup` directory. The three most recent versions of the kernel used are retained. If the newly installed kernel is unstable, you can restore the backed-up kernel at any time. If the update fails and the system cannot be started, you can use any version of Armbian to boot via USB to restore the system in eMMC. For more details, see the [Help Document](build-armbian/documents).
+The current system's kernel is automatically backed up when updating the kernel. The storage path is in the `/ddbr/backup` directory. The three most recent versions of the kernel used are retained. If the newly installed kernel is unstable, you can restore the backed-up kernel at any time. If the update fails and the system cannot be started, you can use any version of Armbian to boot via USB to restore the system in eMMC. For more details, see the [Help Document](documents).
 
 - ### Install Common Software
 
@@ -91,7 +91,7 @@ Log in to the Armbian system → Enter the command:
 armbian-software
 ```
 
-The command `armbian-software -u` can update the local software center list. Based on the demand feedback from users in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click installation/update/uninstallation and other shortcut operations. This includes `docker images`, `desktop software`, `application services`, etc. For more details, see the [instructions](build-armbian/documents/armbian_software.md).
+The command `armbian-software -u` can update the local software center list. Based on the demand feedback from users in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to achieve one-click installation/update/uninstallation and other shortcut operations. This includes `docker images`, `desktop software`, `application services`, etc. For more details, see the [instructions](documents/armbian_software.md).
 
 - ### Modify Armbian Configuration
 
@@ -119,7 +119,7 @@ Log in to the Armbian system → Enter the command:
 armbian-openvfd
 ```
 
-Debug according to the [LED Screen Display Control Instructions](build-armbian/documents/led_screen_display_control.md).
+Debug according to the [LED Screen Display Control Instructions](documents/led_screen_display_control.md).
 
 - ### Backup/Restore EMMC Original System
 
@@ -150,7 +150,7 @@ To update all service scripts in the local system to the latest version, you can
 armbian-sync
 ```
 
-In the use of Armbian, some common problems that may be encountered can be found in [documents](build-armbian/documents)
+In the use of Armbian, some common problems that may be encountered can be found in [documents](documents)
 
 ## Local Packaging
 
@@ -217,7 +217,7 @@ b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, 
 
 - ### GitHub Actions Input Parameter Description
 
-About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](build-armbian/documents/README.md#3-fork-the-repository-and-set-up-gh_token). The related parameters correspond to the `local packaging command`, please refer to the above description.
+About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](documents/README.md#3-fork-the-repository-and-set-up-gh_token). The related parameters correspond to the `local packaging command`, please refer to the above description.
 
 | Parameter              | Default                  | Description                                             |
 |------------------------|--------------------------|---------------------------------------------------------|
@@ -234,7 +234,7 @@ About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](
 
 - ### GitHub Actions Output Variable Description
 
-To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read/write permissions`. For details, see the [usage instructions](build-armbian/documents/README.md#2-set-up-private-variable-github_token).
+To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read/write permissions`. For details, see the [usage instructions](documents/README.md#2-set-up-private-variable-github_token).
 
 | Parameter                              | Default                  | Description                       |
 |----------------------------------------|--------------------------|-----------------------------------|
