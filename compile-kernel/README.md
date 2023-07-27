@@ -42,7 +42,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k        | Kernel      | Specifies the kernel name, such as `-k 5.15.100`. Multiple kernels are connected with `_`, such as `-k 5.15.100_5.15.50` |
 | -a        | AutoKernel  | Sets whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically search whether there is a newer version of the same series of kernels specified in `-k`, such as `5.15.100`. If there is a latest version after `5.15.100`, it will automatically switch to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
 | -m        | MakePackage | Sets the package list for making the kernel. When set to `all`, it will make all the files of `Image, modules, dtbs`. When the setting value is `dtbs`, only 3 dtbs files will be produced. Default value: `all` |
-| -p        | AutoPatch   | Sets whether to use custom kernel patches. When set to `true`, it will use the kernel patches in the [tools/patch](tools/patch) directory. For detailed instructions, refer to [how to add kernel patches](../build-armbian/documents/README.md#9-compiling-armbian-kernel). Default value: `false` |
+| -p        | AutoPatch   | Sets whether to use custom kernel patches. When set to `true`, it will use the kernel patches in the [tools/patch](tools/patch) directory. For detailed instructions, refer to [how to add kernel patches](../documents/README.md#9-compiling-armbian-kernel). Default value: `false` |
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name is `5.15.100-ophub`. Please do not include spaces when setting custom signatures. Default value: `-ophub` |
 | -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc`. Default value: `gcc` |
 
@@ -71,7 +71,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     kernel_sign: -yourname
 ```
 
-💡 Note: If you `fork` the repository and made modifications, you need to change the Actions `username` to your own repository when using it, and according to the instructions in items 2-3, [Add TOKEN](../build-armbian/documents/README.md#2-set-up-private-variable-github_token), for example:
+💡 Note: If you `fork` the repository and made modifications, you need to change the Actions `username` to your own repository when using it, and according to the instructions in items 2-3, [Add TOKEN](../documents/README.md#2-set-up-private-variable-github_token), for example:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
@@ -96,7 +96,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 
 - ### GitHub Action Output Variables
 
-To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`. For more details, see [Usage Instructions](../build-armbian/documents/README.md#2-set-up-private-variable-github_token).
+To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`. For more details, see [Usage Instructions](../documents/README.md#2-set-up-private-variable-github_token).
 
 | Parameter                        | Default Value   | Description                            |
 |----------------------------------|-----------------|----------------------------------------|
