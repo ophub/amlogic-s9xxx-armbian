@@ -10,10 +10,6 @@ The files stored here are related files that need to be used when building Armbi
 
 The required firmware will be automatically downloaded from the [ophub/firmware](https://github.com/ophub/firmware) repository to the `common-files/usr/lib/firmware` directory.
 
-## documents
-
-This is where the Armbian usage documentation is stored.
-
 ## kernel
 
 Create a folder corresponding to the version number under the `kernel` directory, such as `stable/5.10.125`. Multiple kernels create directories in sequence and put the corresponding kernel files into them. Kernel files can be downloaded from the [kernel](https://github.com/ophub/kernel) repository, or you can [customize the compilation](../compile-kernel). If the kernel files are not manually downloaded and stored, the script will automatically download from the kernel repository during compilation.
