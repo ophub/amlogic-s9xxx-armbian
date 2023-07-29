@@ -186,9 +186,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 - `sudo ./rebuild`: Use the default configuration to package all models of TV boxes.
 - `sudo ./rebuild -b s905x3 -k 5.10.125`: Recommended. Use the default configuration to package related kernels.
 - `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, package multiple kernels at the same time. Use `_` to connect multiple kernel parameters.
-- `sudo ./rebuild -
-
-b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a model for packaging, the system size is set to 2560MiB.
+- `sudo ./rebuild -b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a model for packaging, the system size is set to 2560MiB.
 - `sudo ./rebuild -b s905x3_s905d` Use the default configuration, package all kernels for multiple models of TV boxes, use `_` to connect multiple models.
 - `sudo ./rebuild -k 5.10.125_5.15.50`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection.
 - `sudo ./rebuild -k 5.10.125_5.15.50 -a true`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection. Automatically upgrade to the latest kernel of the same series.
