@@ -88,6 +88,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [12.15.4 Add Process Control Files](#12154-add-process-control-files)
     - [12.16 How to Resolve the Issue of I/O Errors While Writing to eMMC](#1216-how-to-resolve-the-issue-of-io-errors-while-writing-to-emmc)
     - [12.17 How to Solve the Issue of No Sound in the Bullseye Version](#1217-how-to-solve-the-issue-of-no-sound-in-the-bullseye-version)
+    - [12.18 How to build the boot.scr \& boot.scr file](#1218-how-to-build-the-bootscr--bootscr-file)
 
 ## 1. Register your own Github account
 
@@ -1309,4 +1310,32 @@ systemctl restart sound.service
 ```
 
 Restart Armbian for testing. If the sound still doesn't work, it may be because your box is using the old conf corresponding to the sound output route. You need to comment out the new configuration corresponding to `L137-L142` in /usr/bin/g12_sound.sh (mainly for G12B, that is, S922X, before the old G12A/S905X2, and most of the SM1/S905X3 based on G12A can't be used), and then uncomment the old configuration corresponding to `L130-L134`.
+
+### 12.18 How to build the boot.scr & boot.scr file
+
+In the Armbian system, `boot.scr` is a file used for booting the system. `boot.scr` is the compiled version of the `boot.cmd` file. `boot.cmd` is the source code file for `boot.scr`. You can modify the `boot.cmd` file to make changes to the `boot.scr` file and then compile it into a `boot.scr` file using the mkimage command.
+
+Normally, these two files do not need to be modified. If adjustments are necessary, you can follow the methods below.
+
+```shell
+# Install dependencies
+sudo apt-get update
+sudo apt-get install -y u-boot-tools
+
+# Edit the boot.cmd file
+cd /boot
+copy /boot/boot.cmd /boot/boot.cmd.bak
+copy /boot/boot.scr /boot/boot.scr.bak
+nano boot.cmd
+
+# Compile the boot.scr file
+mkimage -C none -A arm -T script -d boot.cmd boot.scr
+
+# Restart to test
+sync
+reboot
+
+# Additional Explanation
+# For Amlogic devices, the file used in USB is /boot/boot.scr, while the file used for writing to eMMC is /boot/boot-emmc.scr.
+```
 
