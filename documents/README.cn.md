@@ -88,7 +88,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
     - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
     - [12.17 如何解决 Bullseye 版本没有声音的问题](#1217-如何解决-bullseye-版本没有声音的问题)
-    - [12.18 如何编译 boot.scr 和 boot.scr 文件](#1218-如何编译-bootscr-和-bootscr-文件)
+    - [12.18 如何编译 boot.scr 文件](#1218-如何编译-bootscr-文件)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -1306,9 +1306,9 @@ systemctl restart sound.service
 
 重启 Armbian 测试。如果声音仍然不工作，可能是因为你的盒子用的是旧的 conf 对应的声音输出路线，需要在 /usr/bin/g12_sound.sh 里面注释掉 `L137-L142` 对应的新配置（主要是给 G12B 用的，也就是 S922X，旧的 G12A/S905X2 之前，以及基于 G12A 的 SM1/S905X3 大部分用不来），然后取消 `L130-L134` 对应的旧配置的注释。
 
-### 12.18 如何编译 boot.scr 和 boot.scr 文件
+### 12.18 如何编译 boot.scr 文件
 
-在 Armbian 系统中，`boot.scr` 是用于引导系统的文件。`boot.scr` 是 `boot.cmd` 的编译文件。`boot.cmd` 是 `boot.scr` 的源码文件。可以通过修改 `boot.cmd` 文件来修改 `boot.scr.` 文件，然后通过 `mkimage` 命令编译成 `boot.scr` 文件。
+在 Armbian 系统中的 `/boot` 目录下，`boot.scr` 是用于引导系统的文件。`boot.scr` 是 `boot.cmd` 的编译文件。`boot.cmd` 是 `boot.scr` 的源码文件。可以通过修改 `boot.cmd` 文件来修改 `boot.scr.` 文件，然后通过 `mkimage` 命令编译成 `boot.scr` 文件。
 
 这两个文件一般不需要修改，如果有调整需求，可以参考以下方法。
 
