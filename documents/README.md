@@ -70,13 +70,14 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [12.10.2 Sharing Partition Information](#12102-sharing-partition-information)
       - [12.10.3 Interpreting Partition Information](#12103-interpreting-partition-information)
       - [12.10.4 For eMMC Installation](#12104-for-emmc-installation)
-    - [12.11 How to Create a u-boot File](#1211-how-to-create-a-u-boot-file)
-      - [12.11.1 How to extract the bootloader and dtb files of Amlogic devices](#12111-how-to-extract-the-bootloader-and-dtb-files-of-amlogic-devices)
-      - [12.11.2 How to create the acs.bin file for Amlogic devices](#12112-how-to-create-the-acsbin-file-for-amlogic-devices)
-      - [12.11.3 How to create the u-boot file for Amlogic devices](#12113-how-to-create-the-u-boot-file-for-amlogic-devices)
-      - [12.11.4 How to create the u-boot file for Rockchip devices](#12114-how-to-create-the-u-boot-file-for-rockchip-devices)
-        - [12.11.4.1 How to use Radxa's u-boot building script](#121141-how-to-use-radxas-u-boot-building-script)
-        - [12.11.4.2 How to use cm9vdA's u-boot building script](#121142-how-to-use-cm9vdas-u-boot-building-script)
+    - [12.11 How to build the u-boot file](#1211-how-to-build-the-u-boot-file)
+      - [12.11.1 How to build the u-boot file for Amlogic devices](#12111-how-to-build-the-u-boot-file-for-amlogic-devices)
+        - [12.11.1.1 How to extract the bootloader and dtb files](#121111-how-to-extract-the-bootloader-and-dtb-files)
+        - [12.11.1.2 How to create the acs.bin file](#121112-how-to-create-the-acsbin-file)
+        - [12.11.1.3 How to build the u-boot file](#121113-how-to-build-the-u-boot-file)
+      - [12.11.2 How to build the u-boot file for Rockchip devices](#12112-how-to-build-the-u-boot-file-for-rockchip-devices)
+        - [12.11.2.1 How to use Radxa's u-boot building script](#121121-how-to-use-radxas-u-boot-building-script)
+        - [12.11.2.2 How to use cm9vdA's u-boot building script](#121122-how-to-use-cm9vdas-u-boot-building-script)
     - [12.12 Error in Memory Size Recognition](#1212-error-in-memory-size-recognition)
     - [12.13 How to Decompile dtb Files](#1213-how-to-decompile-dtb-files)
     - [12.14 How to Modify cmdline Settings](#1214-how-to-modify-cmdline-settings)
@@ -1005,11 +1006,15 @@ elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
     BLANK2="1"
 ```
 
-### 12.11 How to Create a u-boot File
+### 12.11 How to build the u-boot file
 
-The u-boot file is an important file for the system to boot normally.
+The u-boot file is a crucial component for the proper startup of the system. The process of obtaining source code and the compilation workflow varies slightly for Amlogic, Allwinner, and Rockchip devices.
 
-#### 12.11.1 How to extract the bootloader and dtb files of Amlogic devices
+#### 12.11.1 How to build the u-boot file for Amlogic devices
+
+Due to the fact that most manufacturers of Amlogic devices keep their source code closed, we need to extract u-boot related files from the device before proceeding with compilation. The method presented here is derived from the production tutorial shared by [unifreq](https://github.com/unifreq).
+
+##### 12.11.1.1 How to extract the bootloader and dtb files
 
 Extraction requires the HxD software. You can get the installation from the [official download link](https://mh-nexus.de/en/downloads.php?product=HxD20) or the [backup download link](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip).
 
@@ -1035,7 +1040,7 @@ adb pull /data/local/mybox.dtb C:\mybox
 adb pull /data/local/mybox_gpio.txt C:\mybox
 ```
 
-#### 12.11.2 How to create the acs.bin file for Amlogic devices
+##### 12.11.1.2 How to create the acs.bin file
 
 The most important part of the mainline u-boot is the acs.bin, which is used to initialize part of the memory. The original factory u-boot is located at the very front of the system, at a 4MB position. Use the `bootloader.bin` file obtained just now to extract the `acs.bin` file.
 
@@ -1053,7 +1058,7 @@ Copy the selected result, then create a new file, paste in insert mode, ignore t
 
 If the bootloader is locked, the code in this area is garbled and useless. Normally, there should be many `0`s as in the picture above, `cfg` will appear several times in succession, and `ddr` related words will appear in the middle. This normal code can be used.
 
-#### 12.11.3 How to create the u-boot file for Amlogic devices
+##### 12.11.1.3 How to build the u-boot file
 
 Creating u-boot requires source repositories https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot to compile two u-boot files for your device.
 
@@ -1109,13 +1114,13 @@ Two types of files are ultimately generated: the `u-boot.bin` file in the u-boot
 💡 Tip: Before writing to eMMC for testing, please refer to section 12.3 for unbricking methods. Be sure to understand the short circuit point location, have the original .img format Android system file, and have performed short-circuit flashing tests. Ensure that you have mastered all the unbricking methods before proceeding with writing tests.
 
 
-#### 12.11.4 How to create the u-boot file for Rockchip devices
+#### 12.11.2 How to build the u-boot file for Rockchip devices
 
 Since most manufacturers of Rockchip devices have opened up their u-boot source code, it's relatively easy to obtain the relevant u-boot source code from the manufacturer's source code repository and proceed with the compilation. Additionally, some open-source enthusiasts have also shared numerous user-friendly u-boot compilation scripts. Below, I'll provide a few examples to illustrate various compilation methods.
 
-##### 12.11.4.1 How to use Radxa's u-boot building script
+##### 12.11.2.1 How to use Radxa's u-boot building script
 
-Taking compiling [Rock5](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) as an example.
+Taking compiling [Rock5b(rk3588)](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) as an example.
 
 ```shell
 # 01.Install the necessary build dependencies
@@ -1149,7 +1154,7 @@ cd ~/rk3588-sdk
 By adding more options in the `board_configs.sh` and `mk-uboot.sh` within the [radxa/build](https://github.com/radxa/build) source code, it's possible to compile u-boot files for other devices as well. For instance, you can follow the instructions provided for compiling the [Beelink-IPC-R(rk3588)](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415#issuecomment-1508234307) device.
 
 
-##### 12.11.4.2 How to use cm9vdA's u-boot building script
+##### 12.11.2.2 How to use cm9vdA's u-boot building script
 
 cm9vdA provides scripts and usage instructions for compiling u-boot and the kernel in his open-source project [cm9vdA/build-linux](https://github.com/cm9vdA/build-linux). I have utilized his project for u-boot compilation in various Rockchip devices and documented the processes for reference. Here are some excerpts:
 
