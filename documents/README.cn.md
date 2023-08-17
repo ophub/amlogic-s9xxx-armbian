@@ -71,9 +71,12 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.10.3 分区信息解读](#12103-分区信息解读)
       - [12.10.4 用于 eMMC 安装](#12104-用于-emmc-安装)
     - [12.11 如何制作 u-boot 文件](#1211-如何制作-u-boot-文件)
-      - [12.11.1 提取 bootloader 和 dtb 文件](#12111-提取-bootloader-和-dtb-文件)
-      - [12.11.2 制作 acs.bin 文件](#12112-制作-acsbin-文件)
-      - [12.11.3 制作 u-boot 文件](#12113-制作-u-boot-文件)
+      - [12.11.1 如何提取 Amlogic 设备的 bootloader 和 dtb 文件](#12111-如何提取-amlogic-设备的-bootloader-和-dtb-文件)
+      - [12.11.2 如何制作 Amlogic 设备的 acs.bin 文件](#12112-如何制作-amlogic-设备的-acsbin-文件)
+      - [12.11.3 如何制作 Amlogic 设备的 u-boot 文件](#12113-如何制作-amlogic-设备的-u-boot-文件)
+      - [12.11.4 如何制作 Rockchip 设备的 u-boot 文件](#12114-如何制作-rockchip-设备的-u-boot-文件)
+        - [12.11.4.1 如何使用 Radxa 的 u-boot 制作脚本](#121141-如何使用-radxa-的-u-boot-制作脚本)
+        - [12.11.4.2 如何使用 cm9vdA 的 u-boot 制作脚本](#121142-如何使用-cm9vda-的-u-boot-制作脚本)
     - [12.12 内存大小识别错误](#1212-内存大小识别错误)
     - [12.13 如何反编译 dtb 文件](#1213-如何反编译-dtb-文件)
     - [12.14 如何修改 cmdline 设置](#1214-如何修改-cmdline-设置)
@@ -1003,7 +1006,7 @@ elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
 
 u-boot 文件是引导系统正常启动的重要文件。
 
-#### 12.11.1 提取 bootloader 和 dtb 文件
+#### 12.11.1 如何提取 Amlogic 设备的 bootloader 和 dtb 文件
 
 提取需要使用 HxD 软件。可以从 [官网下载链接](https://mh-nexus.de/en/downloads.php?product=HxD20) 或 [备份下载链接](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip) 获取安装。
 
@@ -1029,7 +1032,7 @@ adb pull /data/local/mybox.dtb C:\mybox
 adb pull /data/local/mybox_gpio.txt C:\mybox
 ```
 
-#### 12.11.2 制作 acs.bin 文件
+#### 12.11.2 如何制作 Amlogic 设备的 acs.bin 文件
 
 主线 u-boot 最重要的是 acs.bin，用于初始化内存的部分，原厂 u-boot 位于系统最前面的 4MB 位置。使用刚才获得的 `bootloader.bin` 文件提取 `acs.bin` 文件。
 
@@ -1047,7 +1050,7 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 
 如果是锁了 bootloader 的话这个区域的代码是是乱码就没用了。正常的应该像上图中这样有很多 `0` ，有 `cfg` 会连续出现几次，中间会出现 `ddr` 相关的字样，这种正常代码就是可以使用的。
 
-#### 12.11.3 制作 u-boot 文件
+#### 12.11.3 如何制作 Amlogic 设备的 u-boot 文件
 
 制作 u-boot 需要 https://github.com/unifreq/amlogic-boot-fip 和 https://github.com/unifreq/u-boot 这两个源码库，编译自己盒子的两个 u-boot 文件。
 
@@ -1101,6 +1104,54 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 </div>
 
 💡提示：在写入 eMMC 进行测试前，请先查看 12.3 的救砖方法。务必掌握短接点位置，有原厂 .img 格式的安卓系统文件，并进行过短接刷机测试，确保救砖方法都已经掌握的情况下再进行写入测试。
+
+#### 12.11.4 如何制作 Rockchip 设备的 u-boot 文件
+
+由于 Rockchip 设备的大部分厂商都开放了他们的 u-boot 源码，所以可以比较方便地从厂商的源码库中获取到相关的 u-boot 源码，然后进行编译。同时一些开源大佬们也分享了很多更易使用的 u-boot 编译脚本，下面以几个实例介绍几种编译方法。
+
+##### 12.11.4.1 如何使用 Radxa 的 u-boot 制作脚本
+
+以编译 [Rock5](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) 为例。
+
+```shell
+# 01.安装依赖
+sudo apt-get update
+sudo apt-get install -y git device-tree-compiler libncurses5 libncurses5-dev build-essential libssl-dev mtools bc python dosfstools flex bison
+
+# 02.克隆源码
+mkdir ~/rk3588-sdk && cd ~/rk3588-sdk
+git clone -b stable-5.10-rock5 https://github.com/radxa/u-boot.git
+git clone -b master https://github.com/radxa/rkbin.git
+git clone -b debian https://github.com/radxa/build.git
+
+# 源码说明：
+# ~/rk3588-sdk/build/：Radxa 辅助脚本文件和用于构建 U-Boot、Linux 内核和根文件系统的配置文件。
+# ~/rk3588-sdk/rkbin/：预构建的 Rockchip 二进制文件，包括第一阶段加载程序和 ATF（Arm Trustzone固件）。
+# ~/rk3588-sdk/u-boot/：用于启动操作系统（如 Linux 或 Android）的第二阶段引导加载程序。
+
+# 03.编译 u-boot （For ROCK 5B）
+cd ~/rk3588-sdk
+./build/mk-uboot.sh rk3588-rock-5b
+
+# 04.构建成功后，将放置在 ~/rk3588-sdk/out/u-boot 目录
+~/rk3588-sdk/out/u-boot
+├── idbloader.img
+├── rk3588_spl_loader_v1.08.111.bin
+├── spi
+│   └── spi_image.img
+└── u-boot.itb
+```
+
+通过在 [radxa/build](https://github.com/radxa/build) 源码的 `board_configs.sh` 和 `mk-uboot.sh` 里添加更多选项，可以编译其他设备的 u-boot 文件，例如我编译 [Beelink-IPC-R(rk3588)](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415#issuecomment-1508234307) 设备的使用方法。
+
+##### 12.11.4.2 如何使用 cm9vdA 的 u-boot 制作脚本
+
+cm9vdA 在他的 [cm9vdA/build-linux](https://github.com/cm9vdA/build-linux) 开源项目里提供了编译 u-boot 和 kernel 的脚本和使用方法，我在一些 Rockchip 设备的 u-boot 编译中使用了他的项目并进行了过程记录，摘录部分以供参考。
+
+- 编译 Lenovo-Leez-P710(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609#issuecomment-1681494735)
+- 编译 DLFR100(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522#issuecomment-1622919423)
+- 编译 ZYSJ(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380#issuecomment-1539325464)
+
 
 ### 12.12 内存大小识别错误
 

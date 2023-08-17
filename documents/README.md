@@ -71,9 +71,12 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [12.10.3 Interpreting Partition Information](#12103-interpreting-partition-information)
       - [12.10.4 For eMMC Installation](#12104-for-emmc-installation)
     - [12.11 How to Create a u-boot File](#1211-how-to-create-a-u-boot-file)
-      - [12.11.1 Extracting the bootloader and dtb files](#12111-extracting-the-bootloader-and-dtb-files)
-      - [12.11.2 Creating acs.bin file](#12112-creating-acsbin-file)
-      - [12.11.3 Creating u-boot Files](#12113-creating-u-boot-files)
+      - [12.11.1 How to extract the bootloader and dtb files of Amlogic devices](#12111-how-to-extract-the-bootloader-and-dtb-files-of-amlogic-devices)
+      - [12.11.2 How to create the acs.bin file for Amlogic devices](#12112-how-to-create-the-acsbin-file-for-amlogic-devices)
+      - [12.11.3 How to create the u-boot file for Amlogic devices](#12113-how-to-create-the-u-boot-file-for-amlogic-devices)
+      - [12.11.4 How to create the u-boot file for Rockchip devices](#12114-how-to-create-the-u-boot-file-for-rockchip-devices)
+        - [12.11.4.1 How to use Radxa's u-boot building script](#121141-how-to-use-radxas-u-boot-building-script)
+        - [12.11.4.2 How to use cm9vdA's u-boot building script](#121142-how-to-use-cm9vdas-u-boot-building-script)
     - [12.12 Error in Memory Size Recognition](#1212-error-in-memory-size-recognition)
     - [12.13 How to Decompile dtb Files](#1213-how-to-decompile-dtb-files)
     - [12.14 How to Modify cmdline Settings](#1214-how-to-modify-cmdline-settings)
@@ -1006,7 +1009,7 @@ elif [[ "${AMLOGIC_SOC}" == "s905x3" ]]; then
 
 The u-boot file is an important file for the system to boot normally.
 
-#### 12.11.1 Extracting the bootloader and dtb files
+#### 12.11.1 How to extract the bootloader and dtb files of Amlogic devices
 
 Extraction requires the HxD software. You can get the installation from the [official download link](https://mh-nexus.de/en/downloads.php?product=HxD20) or the [backup download link](https://github.com/ophub/kernel/releases/download/tools/HxDSetup.2.5.0.0.zip).
 
@@ -1032,7 +1035,7 @@ adb pull /data/local/mybox.dtb C:\mybox
 adb pull /data/local/mybox_gpio.txt C:\mybox
 ```
 
-#### 12.11.2 Creating acs.bin file
+#### 12.11.2 How to create the acs.bin file for Amlogic devices
 
 The most important part of the mainline u-boot is the acs.bin, which is used to initialize part of the memory. The original factory u-boot is located at the very front of the system, at a 4MB position. Use the `bootloader.bin` file obtained just now to extract the `acs.bin` file.
 
@@ -1050,7 +1053,7 @@ Copy the selected result, then create a new file, paste in insert mode, ignore t
 
 If the bootloader is locked, the code in this area is garbled and useless. Normally, there should be many `0`s as in the picture above, `cfg` will appear several times in succession, and `ddr` related words will appear in the middle. This normal code can be used.
 
-#### 12.11.3 Creating u-boot Files
+#### 12.11.3 How to create the u-boot file for Amlogic devices
 
 Creating u-boot requires source repositories https://github.com/unifreq/amlogic-boot-fip and https://github.com/unifreq/u-boot to compile two u-boot files for your device.
 
@@ -1104,6 +1107,56 @@ Two types of files are ultimately generated: the `u-boot.bin` file in the u-boot
 </div>
 
 💡 Tip: Before writing to eMMC for testing, please refer to section 12.3 for unbricking methods. Be sure to understand the short circuit point location, have the original .img format Android system file, and have performed short-circuit flashing tests. Ensure that you have mastered all the unbricking methods before proceeding with writing tests.
+
+
+#### 12.11.4 How to create the u-boot file for Rockchip devices
+
+Since most manufacturers of Rockchip devices have opened up their u-boot source code, it's relatively easy to obtain the relevant u-boot source code from the manufacturer's source code repository and proceed with the compilation. Additionally, some open-source enthusiasts have also shared numerous user-friendly u-boot compilation scripts. Below, I'll provide a few examples to illustrate various compilation methods.
+
+##### 12.11.4.1 How to use Radxa's u-boot building script
+
+Taking compiling [Rock5](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) as an example.
+
+```shell
+# 01.Install the necessary build dependencies
+sudo apt-get update
+sudo apt-get install -y git device-tree-compiler libncurses5 libncurses5-dev build-essential libssl-dev mtools bc python dosfstools flex bison
+
+# 02.Set up your workspace and get the source code from the Radxa Git repositories
+mkdir ~/rk3588-sdk && cd ~/rk3588-sdk
+git clone -b stable-5.10-rock5 https://github.com/radxa/u-boot.git
+git clone -b master https://github.com/radxa/rkbin.git
+git clone -b debian https://github.com/radxa/build.git
+
+# Explanation of the source code:
+# ~/rk3588-sdk/build/: Radxa helper script files and configuration files for building U-Boot, Linux kernel and rootfs.
+# ~/rk3588-sdk/rkbin/: Pre-built Rockchip binaries, including first stage loader and ATF (Arm Trustzone Firmware)
+# ~/rk3588-sdk/u-boot/: Second stage bootloader used to start the OS (e.g. Linux or Android)
+
+# 03.Build u-boot （For ROCK 5B）
+cd ~/rk3588-sdk
+./build/mk-uboot.sh rk3588-rock-5b
+
+# 04.After a successful build, the ~/rk3588-sdk/out/u-boot directory will be populated
+~/rk3588-sdk/out/u-boot
+├── idbloader.img
+├── rk3588_spl_loader_v1.08.111.bin
+├── spi
+│   └── spi_image.img
+└── u-boot.itb
+```
+
+By adding more options in the `board_configs.sh` and `mk-uboot.sh` within the [radxa/build](https://github.com/radxa/build) source code, it's possible to compile u-boot files for other devices as well. For instance, you can follow the instructions provided for compiling the [Beelink-IPC-R(rk3588)](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415#issuecomment-1508234307) device.
+
+
+##### 12.11.4.2 How to use cm9vdA's u-boot building script
+
+cm9vdA provides scripts and usage instructions for compiling u-boot and the kernel in his open-source project [cm9vdA/build-linux](https://github.com/cm9vdA/build-linux). I have utilized his project for u-boot compilation in various Rockchip devices and documented the processes for reference. Here are some excerpts:
+
+- Build u-boot for Lenovo-Leez-P710 (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609#issuecomment-1681494735)
+- Build u-boot for DLFR100 (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522#issuecomment-1622919423)
+- Build u-boot for ZYSJ (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380#issuecomment-1539325464)
+
 
 ### 12.12 Error in Memory Size Recognition
 
