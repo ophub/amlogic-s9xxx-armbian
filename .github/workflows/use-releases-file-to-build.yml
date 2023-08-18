@@ -112,6 +112,7 @@ on:
           - h69k
           - e25
           - nanopi-r5s
+          - nanopi-r5c
           - panther-x2
           - eaidk-610
           - king3399
