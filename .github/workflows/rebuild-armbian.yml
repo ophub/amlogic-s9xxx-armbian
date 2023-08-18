@@ -21,7 +21,7 @@ on:
         options:
           - all
           - s905x-t95_s912-t95z-plus_s905l3-unt400g1_tanix-tx6_tanix-tx6-a
-          - s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
+          - s905x3-x88-pro-x3_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_vplus_zysj
           - s905d
           - s905d-ki-pro
@@ -90,6 +90,7 @@ on:
           - s905x3-q2
           - s905x3-a100
           - s905x3-2101
+          - s905x3-x88-pro-x3
           - s905x3-whale
           - s905x3-b
           - s905
