@@ -20,7 +20,7 @@ on:
         type: choice
         options:
           - all
-          - s905x-t95_s912-t95z-plus_s905l3-unt400g1_tanix-tx6_tanix-tx6-a
+          - s905x-t95_s912-t95z-plus_s905l3-unt400g1_tanix-tx6
           - s905x3-x88-pro-x3_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_vplus_zysj
           - s905d
@@ -126,7 +126,6 @@ on:
           - station-m1
           - vplus
           - tanix-tx6
-          - tanix-tx6-a
       armbian_kernel:
         description: "Select kernel version."
         required: false
