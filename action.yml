@@ -125,6 +125,21 @@ runs:
             [[ "${down_file:0-4}" == ".zip" ]] && unzip -o ${down_file} 2>/dev/null && sync
             echo -e "Armbian file: \n$(ls -l *.img 2>/dev/null)"
 
+            cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
+            echo -e "Check the armbian file name (-trunk_)..."
+            image_file="$(basename $(ls *.img 2>/dev/null | head -n 1))"
+            if [[ "${image_file}" =~ "-trunk_" ]]; then
+                echo -e "The armbian file name is correct."
+            else
+                echo -e "The armbian file name is incorrect, renaming..."
+                image_version="$(echo ${image_file} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+                image_kernel="$(echo ${image_file} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
+                image_save_name="Armbian_${image_version}-trunk_${image_kernel}.img"
+                rm -f ${image_save_name}
+                mv -f ${image_file} ${image_save_name}
+                echo -e "Armbian file: \n$(ls -l *.img 2>/dev/null)"
+            fi
+
             cd ${GITHUB_ACTION_PATH}
             echo -e "Start to rebuild armbian..."
             make_command=""
