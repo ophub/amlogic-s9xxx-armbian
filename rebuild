@@ -48,7 +48,7 @@
 # Related file storage path
 current_path="${PWD}"
 armbian_outputpath="${current_path}/build/output/images"
-armbian_rebuild_file="${armbian_outputpath}/*-trunk*.img"
+armbian_rebuild_file="${armbian_outputpath}/*-trunk_*.img"
 build_path="${current_path}/build-armbian"
 kernel_path="${build_path}/kernel"
 uboot_path="${build_path}/u-boot"
