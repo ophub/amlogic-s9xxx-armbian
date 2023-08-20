@@ -232,7 +232,7 @@ The installation method for each device is different, introduced separately as f
 
 #### 8.2.1 Installation Method for Radxa-Rock5B
 
-Radxa-Rock5B has multiple storage mediums such as microSD/eMMC/NVMe to choose from, and the corresponding installation methods are also different. Download [rk3588_spl_loader_v1.08.111.bin and spi_image.img](../u-boot/rockchip/rock5b) files for later use. Download [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/Radxa_rock5b_RKDevTool_Release_v2.96__DriverAssitant_v5.1.1.tar.gz) tool and driver for later use. Download [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) disc writing tools for later use.
+Radxa-Rock5B has multiple storage mediums such as microSD/eMMC/NVMe to choose from, and the corresponding installation methods are also different. Download [rk3588_spl_loader_v1.08.111.bin and spi_image.img](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/rock5b) files for later use. Download [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/Radxa_rock5b_RKDevTool_Release_v2.96__DriverAssitant_v5.1.1.tar.gz) tool and driver for later use. Download [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) disc writing tools for later use.
 
 ##### 8.2.1.1 Install the System to MicroSD
 
@@ -312,7 +312,7 @@ The method is reproduced from [milton](https://www.cnblogs.com/milton/p/15391525
 
 Open the RKDevTool flashing tool, right-click to add an item.
 
-- Address `0xCCCCCCCC`, name `Boot`, path [select](../u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`.
+- Address `0xCCCCCCCC`, name `Boot`, path [select](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`.
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
 
 Click execute to write.
@@ -321,7 +321,7 @@ Click execute to write.
 
 The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tutorial. Flashing requires entering the Maskrom mode. Make Chainedbox-L1-Pro in a power-off state, unplug all cables. With a USB male-to-male cable, one end is inserted into the USB2.0 interface of Chainedbox-L1-Pro, and the other end is inserted into the computer. Insert a paperclip into the Reset hole and press and hold it. Insert the power cord. Wait a few seconds until the `discovered a LOADER device` appears at the bottom of the RKDevTool box before releasing the paperclip. Switch RKDevTool to `Advanced Features` and click the `Enter Maskrom` button, prompting `Found a MASKROM device`. Right-click to add an item.
 
-- Address `0xCCCCCCCC`, name `Boot`, path [select](../u-boot/rockchip/l1pro) `rk3328_loader.bin`.
+- Address `0xCCCCCCCC`, name `Boot`, path [select](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/l1pro) `rk3328_loader.bin`.
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
 
 Click execute to write.
@@ -1105,7 +1105,7 @@ For example, creating a u-boot for X96Max Plus:
 - Download the [u-boot](https://github.com/unifreq/u-boot) source code. Create a corresponding [x96max-plus_defconfig](https://github.com/unifreq/u-boot/blob/master/configs/x96max-plus_defconfig) file and put it into the [configs](https://github.com/unifreq/u-boot/tree/master/configs) directory. Create the corresponding [meson-sm1-x96-max-plus-u-boot.dtsi](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus-u-boot.dtsi) and [meson-sm1-x96-max-plus.dts](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus.dts) files and put them in the [arch/arm/dts](https://github.com/unifreq/u-boot/tree/master/arch/arm/dts) directory, then edit the [Makefile](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/Makefile) in this directory to add the `meson-sm1-x96-max-plus.dtb` file index.
 - In the root directory of the u-boot source code, follow the steps in the document https://github.com/unifreq/u-boot/blob/master/doc/board/amlogic/x96max-plus.rst.
 
-Two types of files are ultimately generated: the `u-boot.bin` file in the u-boot root directory is an incomplete version of u-boot used in the `/boot` directory (corresponds to the [overload](../amlogic-u-boot/overload) directory in the repository); the `u-boot.bin` and `u-boot.bin.sd.bin` in the `fip` directory are complete versions of u-boot files used in the `/usr/lib/u-boot/` directory (corresponds to the [bootloader](../amlogic-u-boot/bootloader/) directory in the repository). The complete versions of the two files differ by 512 bytes, the larger one has 512 bytes of 0 filled in front.
+Two types of files are ultimately generated: the `u-boot.bin` file in the u-boot root directory is an incomplete version of u-boot used in the `/boot` directory (corresponds to the [overload](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/overload) directory in the repository); the `u-boot.bin` and `u-boot.bin.sd.bin` in the `fip` directory are complete versions of u-boot files used in the `/usr/lib/u-boot/` directory (corresponds to the [bootloader](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/bootloader) directory in the repository). The complete versions of the two files differ by 512 bytes, the larger one has 512 bytes of 0 filled in front.
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189039426-c127631f-77ca-4fcb-9fb6-4220045d712b.png">
@@ -1226,9 +1226,9 @@ If individual devices have special differential setting requirements, add an ind
 
 #### 12.15.3 Add u-boot Files
 
-`Amlogic` series devices, share [bootloader](../u-boot/amlogic/bootloader/) files and [u-boot](../u-boot/amlogic/overload) files. If there are new files, put them in the corresponding directory. The `bootloader` files will automatically be added to the Armbian system's `/usr/lib/u-boot` directory during system construction, and `u-boot` files will be automatically added to the `/boot` directory.
+`Amlogic` series devices, share [bootloader](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/bootloader) files and [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/overload) files. If there are new files, put them in the corresponding directory. The `bootloader` files will automatically be added to the Armbian system's `/usr/lib/u-boot` directory during system construction, and `u-boot` files will be automatically added to the `/boot` directory.
 
-`Rockchip` and `Allwinner` series devices, add an independent [u-boot](../u-boot) file directory named after `BOARD` for each device, and the corresponding series files are placed in this directory.
+`Rockchip` and `Allwinner` series devices, add an independent [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot) file directory named after `BOARD` for each device, and the corresponding series files are placed in this directory.
 
 During the Armbian image construction, these u-boot files will be written into the corresponding Armbian image files by the rebuild script according to the configuration in [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf).
 
