@@ -232,7 +232,7 @@ armbian-install
 
 #### 8.2.1 Radxa-Rock5B 的安装方法
 
-Radxa-Rock5B 有 microSD/eMMC/NVMe 等多种存储介质可以选择，相应的安装方法也不同。下载 [rk3588_spl_loader_v1.08.111.bin 和 spi_image.img](../u-boot/rockchip/rock5b) 文件备用。下载 [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/Radxa_rock5b_RKDevTool_Release_v2.96__DriverAssitant_v5.1.1.tar.gz) 工具及驱动备用。下载 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 写盘工具备用。
+Radxa-Rock5B 有 microSD/eMMC/NVMe 等多种存储介质可以选择，相应的安装方法也不同。下载 [rk3588_spl_loader_v1.08.111.bin 和 spi_image.img](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/rock5b) 文件备用。下载 [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/Radxa_rock5b_RKDevTool_Release_v2.96__DriverAssitant_v5.1.1.tar.gz) 工具及驱动备用。下载 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 写盘工具备用。
 
 ##### 8.2.1.1 安装系统至 microSD
 
@@ -312,7 +312,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 打开 RKDevTool 刷机工具，右键添加项。
 
-- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](../u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`。
+- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`。
 - 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
 
 点击执行写入即可。
@@ -321,7 +321,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 方法转载自 [cc747](https://post.smzdm.com/p/a4wkdo7l/) 的教程。刷机需要进入 Maskrom 模式。使我家云处于断电状态，拔掉所有线。用 USB 双公头线，一头插入我家云的 USB2.0 接口，一头插入电脑。用回形针插进 Reset 孔，并按压住不松开。插入电源线。等待几秒钟，直到 RKDevTool 框的下方出现`发现一个LOADER设备`后才松开回形针。将 RKDevTool 切换到`高级功能`点击`进入Maskrom`按钮，提示`发现一个MASKROM设备`。右键添加项。
 
-- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](../u-boot/rockchip/l1pro) `rk3328_loader.bin`。
+- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/l1pro) `rk3328_loader.bin`。
 - 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
 
 点击执行写入即可。
@@ -1102,7 +1102,7 @@ adb pull /data/local/mybox_gpio.txt C:\mybox
 - 下载 [u-boot](https://github.com/unifreq/u-boot) 源码。制作对应的 [x96max-plus_defconfig](https://github.com/unifreq/u-boot/blob/master/configs/x96max-plus_defconfig) 文件放入 [configs](https://github.com/unifreq/u-boot/tree/master/configs) 目录。制作对应的 [meson-sm1-x96-max-plus-u-boot.dtsi](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus-u-boot.dtsi) 和 [meson-sm1-x96-max-plus.dts](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/meson-sm1-x96-max-plus.dts) 文件放入 [arch/arm/dts](https://github.com/unifreq/u-boot/tree/master/arch/arm/dts) 目录，并编辑此目录中的 [Makefile](https://github.com/unifreq/u-boot/blob/master/arch/arm/dts/Makefile) 文件，添加 `meson-sm1-x96-max-plus.dtb` 文件的索引。
 - 进入 u-boot 源码目录根目录下，根据文档 https://github.com/unifreq/u-boot/blob/master/doc/board/amlogic/x96max-plus.rst 中的步骤操作。
 
-最终生成的文件有两类：在 u-boot 根目录下的 `u-boot.bin` 文件是 `/boot` 目录下使用的不完整版 u-boot（对应仓库中的 [overload](../amlogic-u-boot/overload) 目录）；在 `fip` 目录下的 `u-boot.bin` 和 `u-boot.bin.sd.bin` 是 `/usr/lib/u-boot/` 目录下使用的完整版 u-boot 文件（对应仓库中的 [bootloader](../amlogic-u-boot/bootloader/) 目录），完整版的两个文件相差 512 字节，大的那个是填充了 512 字节的 0 在前面。
+最终生成的文件有两类：在 u-boot 根目录下的 `u-boot.bin` 文件是 `/boot` 目录下使用的不完整版 u-boot（对应仓库中的 [overload](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/overload) 目录）；在 `fip` 目录下的 `u-boot.bin` 和 `u-boot.bin.sd.bin` 是 `/usr/lib/u-boot/` 目录下使用的完整版 u-boot 文件（对应仓库中的 [bootloader](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/bootloader) 目录），完整版的两个文件相差 512 字节，大的那个是填充了 512 字节的 0 在前面。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="400" alt="image" src="https://user-images.githubusercontent.com/68696949/189039426-c127631f-77ca-4fcb-9fb6-4220045d712b.png">
@@ -1221,9 +1221,9 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 #### 12.15.3 添加 u-boot 文件
 
-`Amlogic` 系列的设备，共用 [bootloader](../u-boot/amlogic/bootloader/) 文件和 [u-boot](../u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
+`Amlogic` 系列的设备，共用 [bootloader](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/bootloader) 文件和 [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/overload) 文件，如果有新增的文件，分别放入对应的目录。其中的 `bootloader` 文件在系统构建时会自动添加至 Armbian 系统的 `/usr/lib/u-boot` 目录，`u-boot` 文件会自动添加至 `/boot` 目录。
 
-`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](../u-boot) 文件目录，对应的系列文件放在此目录中。
+`Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot) 文件目录，对应的系列文件放在此目录中。
 
 构建 Armbian 镜像时，这些 u-boot 文件将根据 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) 中的配置，由 rebuild 脚本写入对应的 Armbian 镜像文件中。
 

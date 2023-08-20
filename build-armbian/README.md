@@ -16,4 +16,4 @@ Create a folder corresponding to the version number under the `kernel` directory
 
 ## u-boot
 
-System boot files, according to different versions of the kernel, will be automated by installation/update and other related scripts when needed.
+System boot files, according to different versions of the kernel, will be automated by installation/update and other related scripts when needed. The necessary u-boot will be automatically downloaded from the [ophub/u-boot](https://github.com/ophub/u-boot) repository to the `u-boot` directory.
