@@ -73,6 +73,11 @@ armbian_release_file="etc/armbian-release"
 # Add custom armbian information
 ophub_release_file="etc/ophub-release"
 
+# U-BOOT files download repository
+uboot_repo="https://github.com/ophub/u-boot/tree/main/u-boot"
+# Convert firmware repository address to svn format
+uboot_repo="${uboot_repo//tree\/main/trunk}"
+
 # Firmware files download repository
 firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
 # Convert firmware repository address to svn format
@@ -332,9 +337,13 @@ download_depends() {
     cd ${current_path}
     echo -e "${STEPS} Start downloading dependency files..."
 
+    # Download Armbian u-boot files
+    svn co ${uboot_repo} ${uboot_path} --force --quiet
+    [[ "${?}" -eq "0" ]] && echo -e "${INFO} u-boot download completed." || error_msg "u-boot download failed."
+
     # Download Armbian firmware files
     svn co ${firmware_repo} ${firmware_path} --force --quiet
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to download the Armbian firmware files."
+    [[ "${?}" -eq "0" ]] && echo -e "${INFO} firmware download completed." || error_msg "firmware download failed."
 }
 
 query_kernel() {
