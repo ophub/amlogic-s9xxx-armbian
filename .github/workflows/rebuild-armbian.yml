@@ -20,7 +20,7 @@ on:
         type: choice
         options:
           - all
-          - s905x-t95_s912-t95z-plus_s905l3-unt400g1
+          - s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905mb
           - s905x3-x88-pro-x3_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_vplus_zysj_tanix-tx6_tqc-a01
           - s905d
@@ -35,6 +35,7 @@ on:
           - s905w-w95
           - s905w-x96w
           - s905w-x96-mini
+          - s905mb
           - s905l
           - s905l2
           - s905l2-wojia
