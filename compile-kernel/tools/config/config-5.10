@@ -1,14 +1,14 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.190 Kernel Configuration
+# Linux/arm64 5.10.192 Kernel Configuration
 #
-CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.2.Rel1 (Build arm-12.24)) 12.2.1 20221205"
+CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.3.Rel1 (Build arm-12.35)) 12.3.1 20230626"
 CONFIG_CC_IS_GCC=y
-CONFIG_GCC_VERSION=120201
-CONFIG_LD_VERSION=239000000
+CONFIG_GCC_VERSION=120301
+CONFIG_LD_VERSION=240000000
 CONFIG_CLANG_VERSION=0
 CONFIG_AS_IS_GNU=y
-CONFIG_AS_VERSION=23900
+CONFIG_AS_VERSION=24000
 CONFIG_LLD_VERSION=0
 CONFIG_CC_CAN_LINK=y
 CONFIG_CC_CAN_LINK_STATIC=y
@@ -1915,6 +1915,7 @@ CONFIG_SUNXI_RSB=y
 CONFIG_VEXPRESS_CONFIG=y
 CONFIG_MHI_BUS=m
 # CONFIG_MHI_BUS_DEBUG is not set
+CONFIG_MHI_BUS_PCI_GENERIC=m
 # end of Bus devices
 
 CONFIG_CONNECTOR=y
@@ -6779,6 +6780,10 @@ CONFIG_ROCKCHIP_SARADC=y
 # CONFIG_VF610_ADC is not set
 # CONFIG_XILINX_XADC is not set
 # end of Analog to digital converters
+
+#
+# Analog to digital and digital to analog converters
+#
 
 #
 # Analog Front Ends
