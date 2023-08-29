@@ -91,6 +91,7 @@ default_tags="stable"
 specific_tags="${default_tags}"
 # Set the list of kernels used by default
 rk3588_kernel=("5.10.1")
+h6_kernel=("6.4.1")
 stable_kernel=("6.1.1" "5.15.1")
 flippy_kernel=(${stable_kernel[*]})
 dev_kernel=(${stable_kernel[*]})
@@ -356,21 +357,12 @@ query_kernel() {
             # Select the kernel list
             kd="${k}"
             case "${k}" in
-            stable)
-                down_kernel_list=(${stable_kernel[*]})
-                ;;
-            flippy)
-                down_kernel_list=(${flippy_kernel[*]})
-                ;;
-            dev)
-                down_kernel_list=(${dev_kernel[*]})
-                ;;
-            beta)
-                down_kernel_list=(${beta_kernel[*]})
-                ;;
-            rk3588)
-                down_kernel_list=(${rk3588_kernel[*]})
-                ;;
+            stable) down_kernel_list=(${stable_kernel[*]}) ;;
+            flippy) down_kernel_list=(${flippy_kernel[*]}) ;;
+            dev) down_kernel_list=(${dev_kernel[*]}) ;;
+            beta) down_kernel_list=(${beta_kernel[*]}) ;;
+            rk3588) down_kernel_list=(${rk3588_kernel[*]}) ;;
+            h6) down_kernel_list=(${h6_kernel[*]}) ;;
             specific)
                 down_kernel_list=(${specific_kernel[*]})
                 kd="${specific_tags}"
@@ -414,30 +406,13 @@ query_kernel() {
 
             # Reset the kernel array to the latest kernel version
             case "${k}" in
-            stable)
-                unset stable_kernel
-                stable_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            flippy)
-                unset flippy_kernel
-                flippy_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            dev)
-                unset dev_kernel
-                dev_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            beta)
-                unset beta_kernel
-                beta_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            rk3588)
-                unset rk3588_kernel
-                rk3588_kernel=(${tmp_arr_kernels[*]})
-                ;;
-            specific)
-                unset specific_kernel
-                specific_kernel=(${tmp_arr_kernels[*]})
-                ;;
+            stable) stable_kernel=(${tmp_arr_kernels[*]}) ;;
+            flippy) flippy_kernel=(${tmp_arr_kernels[*]}) ;;
+            dev) dev_kernel=(${tmp_arr_kernels[*]}) ;;
+            beta) beta_kernel=(${tmp_arr_kernels[*]}) ;;
+            rk3588) rk3588_kernel=(${tmp_arr_kernels[*]}) ;;
+            h6) h6_kernel=(${tmp_arr_kernels[*]}) ;;
+            specific) specific_kernel=(${tmp_arr_kernels[*]}) ;;
             *) error_msg "Invalid tags." ;;
             esac
 
@@ -472,21 +447,12 @@ download_kernel() {
             # Set the kernel download list
             kd="${k}"
             case "${k}" in
-            stable)
-                down_kernel_list=(${stable_kernel[*]})
-                ;;
-            flippy)
-                down_kernel_list=(${flippy_kernel[*]})
-                ;;
-            dev)
-                down_kernel_list=(${dev_kernel[*]})
-                ;;
-            beta)
-                down_kernel_list=(${beta_kernel[*]})
-                ;;
-            rk3588)
-                down_kernel_list=(${rk3588_kernel[*]})
-                ;;
+            stable) down_kernel_list=(${stable_kernel[*]}) ;;
+            flippy) down_kernel_list=(${flippy_kernel[*]}) ;;
+            dev) down_kernel_list=(${dev_kernel[*]}) ;;
+            beta) down_kernel_list=(${beta_kernel[*]}) ;;
+            rk3588) down_kernel_list=(${rk3588_kernel[*]}) ;;
+            h6) down_kernel_list=(${h6_kernel[*]}) ;;
             specific)
                 down_kernel_list=(${specific_kernel[*]})
                 kd="${specific_tags}"
@@ -1115,21 +1081,12 @@ loop_rebuild() {
             # Determine kernel tags
             kd="${KERNEL_TAGS}"
             case "${KERNEL_TAGS}" in
-            stable)
-                kernel_list=(${stable_kernel[*]})
-                ;;
-            flippy)
-                kernel_list=(${flippy_kernel[*]})
-                ;;
-            dev)
-                kernel_list=(${dev_kernel[*]})
-                ;;
-            beta)
-                kernel_list=(${beta_kernel[*]})
-                ;;
-            rk3588)
-                kernel_list=(${rk3588_kernel[*]})
-                ;;
+            stable) kernel_list=(${stable_kernel[*]}) ;;
+            flippy) kernel_list=(${flippy_kernel[*]}) ;;
+            dev) kernel_list=(${dev_kernel[*]}) ;;
+            beta) kernel_list=(${beta_kernel[*]}) ;;
+            rk3588) kernel_list=(${rk3588_kernel[*]}) ;;
+            h6) kernel_list=(${h6_kernel[*]}) ;;
             [0-9]*)
                 kernel_list=(${specific_kernel[*]})
                 kd="${specific_tags}"
