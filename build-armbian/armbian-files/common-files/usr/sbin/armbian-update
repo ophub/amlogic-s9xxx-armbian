@@ -207,7 +207,7 @@ init_var() {
     # Set kernel download tags
     [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(rk3588|stable|flippy|dev|beta)")" ]] && KERNEL_TAGS="stable"
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|dev|beta|rk3588|h6)")" ]] && KERNEL_TAGS="stable"
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
@@ -610,19 +610,19 @@ sos_kernel() {
 help_info() {
     clear
     cat <<EOF
-  ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  Example: armbian-update -k 5.15.50 -u dev                                                                               │
-  ├───────────┬──────────────┬───────────────────────────────┬───────────────────────────────────────────────────────────────┤
-  │  Optional │ Default      │ Value                         │ Description                                                   │
-  ├───────────┼──────────────┼───────────────────────────────┼───────────────────────────────────────────────────────────────┤
-  │  -r       │ ophub/kernel │ <owner>/<repo>                │ Set the repository for downloading kernels from github.com    │
-  │  -u       │ automate     │ rk3588/stable/flippy/dev/beta │ Set the tags suffix of the kernel used                        │
-  │  -k       │ latest       │ kernel-version                │ Set the kernel version                                        │
-  │  -c       │ None         │ domain-name                   │ Set the cdn domain name for accelerated access to github.com  │
-  │  -b       │ yes          │ yes/no                        │ Automatically backup the current system kernel                │
-  │  -m       │ no           │ yes/no                        │ Use Mainline u-boot                                           │
-  │  -s       │ None         │ None                          │ [SOS] Restore eMMC with system kernel from USB                │
-  └───────────┴──────────────┴───────────────────────────────┴───────────────────────────────────────────────────────────────┘
+  ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  Example: armbian-update -k 5.15.50 -u dev                                                                                  │
+  ├───────────┬──────────────┬──────────────────────────────────┬───────────────────────────────────────────────────────────────┤
+  │  Optional │ Default      │ Value                            │ Description                                                   │
+  ├───────────┼──────────────┼──────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │  -r       │ ophub/kernel │ <owner>/<repo>                   │ Set the repository for downloading kernels from github.com    │
+  │  -u       │ automate     │ stable/flippy/dev/beta/rk3588/h6 │ Set the tags suffix of the kernel used                        │
+  │  -k       │ latest       │ kernel-version                   │ Set the kernel version                                        │
+  │  -c       │ None         │ domain-name                      │ Set the cdn domain name for accelerated access to github.com  │
+  │  -b       │ yes          │ yes/no                           │ Automatically backup the current system kernel                │
+  │  -m       │ no           │ yes/no                           │ Use Mainline u-boot                                           │
+  │  -s       │ None         │ None                             │ [SOS] Restore eMMC with system kernel from USB                │
+  └───────────┴──────────────┴──────────────────────────────────┴───────────────────────────────────────────────────────────────┘
 EOF
     exit 0
 }
