@@ -70,7 +70,7 @@ armbian-update
 | 可选参数  | 默认值        | 选项           | 说明                              |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
-| -u       | 自动化        | stable/flippy/dev/beta/rk3588 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
+| -u       | 自动化        | stable/flippy/dev/beta/rk3588/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -c       | 无           | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
@@ -177,7 +177,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -b   | Board      | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 使用 `all` 表示全部型号。型号代码详见 [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) 中的 `BOARD` 设置。默认值：`all` |
 | -r   | KernelRepo | 指定 github.com 内核仓库的 `<owner>/<repo>`。默认值：`ophub/kernel` |
 | -u   | kernelUsage | 设置使用的内核的 `tags 后缀`，如 [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta)。默认值：`stable` |
-| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable/flippy/dev/beta` 的内核有效。其他内核系列例如 [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) 等只能使用特定内核。  |
+| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable/flippy/dev/beta` 的内核有效。其他内核系列例如 [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) 等只能使用特定内核。  |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.10.125 的同系列是否有更新的版本，如有 5.10.125 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |

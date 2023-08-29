@@ -390,7 +390,7 @@ armbian-update
 | 可选参数  | 默认值        | 选项           | 说明                              |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
-| -u       | 自动化        | stable/flippy/dev/rk3588 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
+| -u       | 自动化        | stable/flippy/dev/rk3588/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -c       | 无           | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
