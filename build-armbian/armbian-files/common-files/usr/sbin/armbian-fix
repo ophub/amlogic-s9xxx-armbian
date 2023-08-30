@@ -197,7 +197,7 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
-    [[ "${platform_name}" == "rockchip" ]] && {
+    [[ "${platform_name}" != "amlogic" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
         tolog "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
