@@ -19,6 +19,15 @@ on:
         required: false
         default: true
         type: boolean
+      prerelease_option:
+        description: "Whether to differentiate pre-release."
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - all
+          - true
+          - false
       releases_keep_latest:
         description: "How many latest releases to keep."
         required: false
@@ -101,6 +110,7 @@ jobs:
         with:
           delete_releases: ${{ inputs.delete_releases }}
           delete_tags: ${{ inputs.delete_tags }}
+          prerelease_option: ${{ inputs.prerelease_option }}
           releases_keep_latest: ${{ inputs.releases_keep_latest }}
           releases_keep_keyword: ${{ inputs.releases_keep_keyword }}
           delete_workflows: ${{ inputs.delete_workflows }}
