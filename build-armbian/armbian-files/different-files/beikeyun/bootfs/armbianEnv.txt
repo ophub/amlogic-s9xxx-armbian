@@ -1,0 +1,8 @@
+verbosity=1
+overlay_prefix=rockchip
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+extraargs=usbcore.autosuspend=-1
+extraboardargs=
+fdtfile=/dtb/rockchip/rk3328-beikeyun-1296mhz.dtb
