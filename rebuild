@@ -118,7 +118,7 @@ gh_token=""
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
-TIPS="[\033[93m TIPS \033[0m]"
+HINT="[\033[93m HINT \033[0m]"
 WARNING="[\033[93m WARNING \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
@@ -1102,7 +1102,7 @@ loop_rebuild() {
                     # Skip inapplicable kernels
                     if [[ "${KERNEL_TAGS}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
                         [[ "${kernel}" != "$(echo ${KERNEL_TAGS} | awk -F'.' '{print $1"."$2"."}')"* ]] && {
-                            echo -e "(${j}.${i}) ${TIPS} The [ ${board} ] device cannot use [ ${kd}/${kernel} ] kernel, skip."
+                            echo -e "(${j}.${i}) ${HINT} The [ ${board} ] device cannot use [ ${kd}/${kernel} ] kernel, skip."
                             let i++
                             continue
                         }
