@@ -23,23 +23,40 @@ on:
           - s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905mb_vplus_xiaobao
           - s905x3-x88-pro-x3_s912-m8s-pro_s922x_s922x-ct2000_s922x-reva
           - smart-am40_station-m1_sw799_tn3399_zysj_tanix-tx6_tqc-a01_tvi3315a
+          - a311d
+          - beikeyun
+          - crrc
+          - dg3399
+          - dlfr100
+          - e25
+          - eaidk-610
+          - emb3531
+          - h66k
+          - h68k
+          - h69k
+          - h88k
+          - hugsun-zm
+          - ipc-r
+          - king3399
+          - kylin3399
+          - l1pro
+          - leez
+          - nanopi-r5c
+          - nanopi-r5s
+          - panther-x2
+          - r66s
+          - r68s
+          - rock5b
+          - s905
+          - s905-beelink-mini
+          - s905-mxqpro-plus
           - s905d
           - s905d-ki-pro
           - s905d-sml5442tw
-          - s905x
-          - s905x-tx9
-          - s905x-t95
-          - s905x-b860h
-          - s905x-tbee
-          - s905w
-          - s905w-w95
-          - s905w-x96w
-          - s905w-x96-mini
-          - s905mb
           - s905l
           - s905l2
-          - s905l2-wojia
           - s905l2-e900v21e
+          - s905l2-wojia
           - s905l3
           - s905l3-cm211
           - s905l3-unt400g1
@@ -47,89 +64,72 @@ on:
           - s905l3a-cm311
           - s905l3a-m401a
           - s905l3b
-          - s905l3b-e900v22e
           - s905l3b-e900v22d
+          - s905l3b-e900v22e
           - s905l3b-ip103h
           - s905lb-q96-mini
           - s905lb-r3300l
-          - s912
-          - s912-zyxq-fake
-          - s912-h96pro-plus
-          - s912-m8s-pro
-          - s912-t95z-plus
-          - s912-tx9-pro-3g
-          - s912-tx9-pro-2g
-          - s912-nexbox-a1
-          - s912-nexbox-a2
-          - s912-tx8-max
-          - s912-x92
-          - s912-phicomm-t1
+          - s905mb
+          - s905w
+          - s905w-w95
+          - s905w-x96-mini
+          - s905w-x96w
+          - s905x
+          - s905x-b860h
+          - s905x-t95
+          - s905x-tbee
+          - s905x-tx9
           - s905x2
-          - s905x2-x96max-2g
           - s905x2-km3
-          - a311d
-          - s922x
-          - s922x-gtking
-          - s922x-gtkingpro-h
-          - s922x-reva
-          - s922x-odroid-n2
-          - s922x-ugoos-am6
-          - s922x-ct2000
+          - s905x2-x96max-2g
           - s905x3
-          - s905x3-hk1
-          - s905x3-x96max
-          - s905x3-h96max
-          - s905x3-ugoosx3
-          - s905x3-tx3
-          - s905x3-tx3-bz
+          - s905x3-2101
+          - s905x3-a100
           - s905x3-a95xf3
           - s905x3-a95xf3-gb
-          - s905x3-x96air
-          - s905x3-x96air-gb
+          - s905x3-b
+          - s905x3-h96max
+          - s905x3-hk1
           - s905x3-ip1001m
           - s905x3-q1
           - s905x3-q2
-          - s905x3-a100
-          - s905x3-2101
-          - s905x3-x88-pro-x3
+          - s905x3-tx3
+          - s905x3-tx3-bz
+          - s905x3-ugoosx3
           - s905x3-whale
-          - s905x3-b
-          - s905
-          - s905-mxqpro-plus
-          - s905-beelink-mini
-          - rock5b
-          - h88k
-          - ipc-r
-          - r66s
-          - r68s
-          - h66k
-          - h68k
-          - h69k
-          - e25
-          - nanopi-r5s
-          - nanopi-r5c
-          - panther-x2
-          - eaidk-610
-          - king3399
-          - tn3399
-          - xiaobao
-          - tvi3315a
-          - kylin3399
-          - hugsun-zm
-          - crrc
+          - s905x3-x88-pro-x3
+          - s905x3-x96air
+          - s905x3-x96air-gb
+          - s905x3-x96max
+          - s912
+          - s912-h96pro-plus
+          - s912-m8s-pro
+          - s912-nexbox-a1
+          - s912-nexbox-a2
+          - s912-phicomm-t1
+          - s912-t95z-plus
+          - s912-tx8-max
+          - s912-tx9-pro-2g
+          - s912-tx9-pro-3g
+          - s912-x92
+          - s912-zyxq-fake
+          - s922x
+          - s922x-ct2000
+          - s922x-gtking
+          - s922x-gtkingpro-h
+          - s922x-odroid-n2
+          - s922x-reva
+          - s922x-ugoos-am6
           - smart-am40
-          - sw799
-          - zysj
-          - dg3399
-          - dlfr100
-          - emb3531
-          - leez
-          - beikeyun
-          - l1pro
           - station-m1
-          - vplus
+          - sw799
           - tanix-tx6
+          - tn3399
           - tqc-a01
+          - tvi3315a
+          - vplus
+          - xiaobao
+          - zysj
       armbian_kernel:
         description: "Select kernel version."
         required: false
