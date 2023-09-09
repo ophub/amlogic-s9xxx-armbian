@@ -1,0 +1,7 @@
+verbosity=1
+bootlogo=false
+overlay_prefix=rockchip
+fdtfile=/dtb/rockchip/rk3328-chainedbox.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+console=serial
