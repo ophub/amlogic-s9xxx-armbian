@@ -209,6 +209,12 @@ init_var() {
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
     [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|dev|beta|rk3588|h6)")" ]] && KERNEL_TAGS="stable"
 
+    # Check if the mainline u-boot exists
+    [[ "${auto_mainline_uboot}" == "yes" ]] && {
+        [[ -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]] || error_msg "[ ${MAINLINE_UBOOT} ] is missing, stop updating."
+        sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
+    }
+
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
     echo -e "${INFO} Kernel download repository: [ ${KERNEL_REPO} ]"
@@ -357,7 +363,7 @@ check_kernel() {
     # Check if the file is added with TEXT_OFFSET patch
     [[ "${PLATFORM}" == "amlogic" ]] && {
         get_textoffset "${kernel_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
-        echo -e "${INFO} Overload is required: [ ${need_overload} ]"
+        echo -e "${INFO} Overload file is required: [ ${need_overload} ]"
         if [[ "${need_overload}" == "yes" ]]; then
             [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "[ ${UBOOT_OVERLOAD} ] is missing, stop updating."
         fi
@@ -371,18 +377,27 @@ check_kernel() {
     [[ "${sha256sums_check}" -eq "1" ]] && {
         echo -e "${INFO} Start performing sha256sum verification..."
 
-        kernel_list=("boot" "dtb-${PLATFORM}" "modules")
+        kernel_list=("boot" "dtb-${PLATFORM}" "modules" "header")
         i="1"
         for kernel_file in ${kernel_list[*]}; do
             # Set check filename
             tmp_file="${kernel_file}-${kernel_name}.tar.gz"
             # Check if file exists
-            [[ -s "${tmp_file}" ]] || error_msg "The [ ${kernel_file} ] file is missing."
+            [[ -s "${tmp_file}" ]] || {
+                # Header file is optional
+                if [[ "${kernel_file}" == "header" ]]; then
+                    echo -e "${HINT} (${i}/4) [ ${tmp_file} ] file is missing, skip verification."
+                    let i++
+                    continue
+                else
+                    error_msg "The [ ${tmp_file} ] file is missing."
+                fi
+            }
             # Check if the file sha256sum is correct
             tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
             tmp_checkcode="$(cat ${sha256sums_file} | grep ${tmp_file} | awk '{print $1}')"
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
-            echo -e "${INFO} (${i}/3) Verification of [ ${tmp_file} ] succeeded."
+            echo -e "${INFO} (${i}/4) Verification of [ ${tmp_file} ] succeeded."
             let i++
         done
     }
@@ -439,7 +454,7 @@ backup_kernel() {
     [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to move [ modules-${current_kernel_signature}.tar.gz ] files."
     echo -e "${INFO} (3/4) Backup of [ modules-${current_kernel_signature}.tar.gz ] succeeded."
 
-    # 4. Pack the header-*.tar.gz file
+    # 4. Pack the header-*.tar.gz file, header file is optional
     if [[ -d "/usr/src/linux-headers-${current_kernel_signature}" ]]; then
         rm -rf *
         cp -rf /usr/src/linux-headers-${current_kernel_signature}/* -t .
@@ -492,7 +507,7 @@ update_kernel() {
     [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
     echo -e "${INFO} (3/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
 
-    # 04. For /usr/src/linux-headers-${kernel_name}
+    # 04. For /usr/src/linux-headers-${kernel_name}, header file is optional
     if [[ -f "header-${kernel_name}.tar.gz" ]]; then
         header_path="linux-headers-${kernel_name}"
         rm -rf /usr/src/linux-headers-* && mkdir -p "/usr/src/${header_path}"
@@ -505,7 +520,6 @@ update_kernel() {
 
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
-    [[ "${auto_mainline_uboot}" == "yes" ]] && sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums
@@ -518,21 +532,25 @@ update_uboot() {
     echo -e "${STEPS} Start updating u-boot..."
 
     # Copy u-boot.ext and u-boot.emmc
-    if [[ "${need_overload}" == "yes" && -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]]; then
+    if [[ "${need_overload}" == "yes" ]]; then
         echo -e "${INFO} Copy u-boot: [ ${UBOOT_OVERLOAD} ]"
         run_on_emmc="$(lsblk -l -o NAME | grep -oE "^${DISK_NAME}boot0")"
         [[ ! -f "/boot/u-boot.ext" ]] && cp -f /boot/${UBOOT_OVERLOAD} /boot/u-boot.ext
         [[ ! -f "/boot/u-boot.emmc" && -n "${run_on_emmc}" ]] && cp -f /boot/u-boot.ext /boot/u-boot.emmc
         chmod +x /boot/u-boot.*
+    else
+        echo -e "${INFO} No need for overload file, skip copying."
     fi
 
     # Write mainline u-boot
-    if [[ "${auto_mainline_uboot}" == "yes" && -n "${MAINLINE_UBOOT}" && -f "${MAINLINE_UBOOT}" ]]; then
+    if [[ "${auto_mainline_uboot}" == "yes" ]]; then
         echo -e "${INFO} Write Mainline u-boot: [ ${MAINLINE_UBOOT} ]"
         dd if="${MAINLINE_UBOOT}" of="/dev/${DISK_NAME}" conv=fsync bs=1 count=444 2>/dev/null
         dd if="${MAINLINE_UBOOT}" of="/dev/${DISK_NAME}" conv=fsync bs=512 skip=1 seek=1 2>/dev/null
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to write bootloader using [ dd ]."
+    else
+        echo -e "${INFO} Mainline u-boot not enabled, skip adding."
     fi
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to write bootloader using [ dd ]."
 
     sync && echo ""
 }
