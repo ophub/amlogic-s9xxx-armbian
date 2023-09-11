@@ -344,6 +344,18 @@ software_308() {
     install)
         echo -e "${STEPS} Start installing PVE..."
 
+        # Add PVE software source, Reference documentation: https://www.zhou.pp.ua/2023/08/08/n1/
+        if [[ "${VERSION_CODENAME}" =~ ^(bullseye|bookworm)$ ]]; then
+            echo -e "${STEPS} Start adding [ ${VERSION_CODENAME} ] software source..."
+            echo "deb https://mirrors.apqa.cn/proxmox/debian/pve ${VERSION_CODENAME} port" >/etc/apt/sources.list.d/pveport.list
+            curl https://mirrors.apqa.cn/proxmox/debian/pveport.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg
+        else
+            error_msg "This version is not supported: [ ${VERSION_CODENAME} ]"
+        fi
+
+        # Declare PATH
+        export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
         # Add network settings
         echo -e "${STEPS} Start adding network settings..."
         [[ -z "${my_network_card}" || -z "${my_mac}" || -z "${my_address}" || -z "${my_broadcast}" || -z "${my_netmask}" || -z "${my_gateway}" ]] && {
@@ -390,11 +402,6 @@ EOF
 ${my_address}	${my_hostname}
 EOF
 
-        # Add pimox7 software source KEY
-        echo -e "${STEPS} Start adding pimox7 software source..."
-        echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
-        curl https://raw.githubusercontent.com/pimox/pimox7/master/KEY.gpg | apt-key add -
-
         echo -e "${STEPS} Start installing packages..."
         software_install "${pve_package_list}"
 
@@ -422,7 +429,14 @@ EOF
 
         # Install optional packages
         software_install "ifupdown2"
+        sudo ifup vmbr0 ${my_network_card}
         software_update
+
+        # Adjust the PVE web interface (Fix the PVE web interface certificate access)
+        echo -e "${INFO} Adjust certificate."
+        sudo rm -f /etc/pve/pve-root-ca.pem /etc/pve/priv/pve-root-ca.* /etc/pve/local/pve-ssl.*
+        sudo pvecm updatecerts -f
+        sudo service pveproxy restart
 
         # Adjust sshd_config (Fix the SSH certificate access modified by PVE)
         [[ -L ~/.ssh/authorized_keys ]] && {
@@ -431,6 +445,16 @@ EOF
             sudo sed -i '/AuthorizedKeysFile/d' /etc/ssh/sshd_config
             sudo echo "AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys_2" >>/etc/ssh/sshd_config
             sudo /etc/init.d/ssh restart
+        }
+
+        # Fix log issue
+        [[ -f "/var/log/pveproxy/access.log" ]] || {
+            echo -e "${INFO} Fix the missing log issue."
+            sudo mkdir -p /var/log/pveproxy
+            sudo touch /var/log/pveproxy/access.log
+            sudo chown -R www-data:www-data /var/log/pveproxy/
+            sudo chmod -R 755 /var/log/pveproxy/
+            sudo systemctl restart pveproxy
         }
 
         sync && sleep 3
