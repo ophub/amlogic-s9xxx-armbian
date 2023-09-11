@@ -79,6 +79,7 @@ on:
           - s905x-t95
           - s905x-tbee
           - s905x-tx9
+          - s905x-nexbox-a95x
           - s905x2
           - s905x2-km3
           - s905x2-x96max-2g
