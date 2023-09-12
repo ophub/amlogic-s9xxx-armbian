@@ -436,7 +436,12 @@ EOF
         echo -e "${INFO} Adjust certificate."
         sudo rm -f /etc/pve/pve-root-ca.pem /etc/pve/priv/pve-root-ca.* /etc/pve/local/pve-ssl.*
         sudo pvecm updatecerts -f
-        sudo service pveproxy restart
+
+        # Add startup service
+        echo -e "${INFO} Add pveproxy as a startup service."
+        sudo systemctl daemon-reload
+        sudo systemctl enable --now pveproxy
+        sudo systemctl restart pveproxy
 
         # Adjust sshd_config (Fix the SSH certificate access modified by PVE)
         [[ -L ~/.ssh/authorized_keys ]] && {
