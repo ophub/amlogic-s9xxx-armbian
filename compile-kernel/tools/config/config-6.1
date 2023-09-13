@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.1.48 Kernel Configuration
+# Linux/arm64 6.1.53 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.3.Rel1 (Build arm-12.35)) 12.3.1 20230626"
 CONFIG_CC_IS_GCC=y
@@ -4594,8 +4594,8 @@ CONFIG_V4L2_H264=m
 CONFIG_V4L2_VP9=m
 CONFIG_V4L2_MEM2MEM_DEV=m
 # CONFIG_V4L2_FLASH_LED_CLASS is not set
-CONFIG_V4L2_FWNODE=m
-CONFIG_V4L2_ASYNC=m
+CONFIG_V4L2_FWNODE=y
+CONFIG_V4L2_ASYNC=y
 # end of Video4Linux options
 
 #
@@ -4951,10 +4951,7 @@ CONFIG_MEDIA_ATTACH=y
 # IR I2C driver auto-selected by 'Autoselect ancillary drivers'
 #
 CONFIG_VIDEO_IR_I2C=m
-
-#
-# Camera sensor devices
-#
+CONFIG_VIDEO_CAMERA_SENSOR=y
 CONFIG_VIDEO_APTINA_PLL=m
 # CONFIG_VIDEO_AR0521 is not set
 CONFIG_VIDEO_HI556=m
@@ -5024,7 +5021,6 @@ CONFIG_VIDEO_VS6624=m
 # CONFIG_VIDEO_CCS is not set
 CONFIG_VIDEO_ET8EK8=m
 CONFIG_VIDEO_M5MOLS=m
-# end of Camera sensor devices
 
 #
 # Lens drivers
