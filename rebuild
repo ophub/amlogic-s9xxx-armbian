@@ -842,8 +842,11 @@ refactor_rootfs() {
     # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
     # Move usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
     [[ -d "usr/share/armbian" ]] && mv -f usr/share/armbian usr/share/armbian.bak
-    # Move usr/lib/nand-sata-install to nand-sata-install.bak. [ Useless bootloader and u-boot ]
-    [[ -d "usr/lib/nand-sata-install" ]] && mv -f usr/lib/nand-sata-install usr/lib/nand-sata-install.bak
+    # Move usr/lib/nand-sata-install to bak-nand-sata-install [ Useless bootloader and u-boot ]
+    [[ -d "usr/lib/nand-sata-install" ]] && mv -f usr/lib/nand-sata-install usr/lib/bak-nand-sata-install
+    # Remove invalid install file
+    [[ "${PLATFORM}" == "rockchip" && -f "usr/sbin/armbian-install" ]] && rm -f usr/sbin/armbian-install
+
     # Disable update_initramfs
     initramfs_conf="etc/initramfs-tools/update-initramfs.conf"
     [[ -f "${initramfs_conf}" ]] && {
