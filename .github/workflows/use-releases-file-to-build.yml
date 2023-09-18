@@ -74,6 +74,7 @@ on:
           - s905l3b-e900v22d
           - s905l3b-e900v22e
           - s905l3b-ip103h
+          - s905l3b-unt403a
           - s905lb-q96-mini
           - s905lb-r3300l
           - s905mb
