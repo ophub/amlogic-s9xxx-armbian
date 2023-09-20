@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.192 Kernel Configuration
+# Linux/arm64 5.10.195 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 12.3.Rel1 (Build arm-12.35)) 12.3.1 20230626"
 CONFIG_CC_IS_GCC=y
@@ -2048,8 +2048,8 @@ CONFIG_BLK_DEV=y
 CONFIG_CDROM=m
 # CONFIG_BLK_DEV_PCIESSD_MTIP32XX is not set
 CONFIG_ZRAM=m
-# CONFIG_ZRAM_WRITEBACK is not set
-# CONFIG_ZRAM_MEMORY_TRACKING is not set
+CONFIG_ZRAM_WRITEBACK=y
+CONFIG_ZRAM_MEMORY_TRACKING=y
 # CONFIG_BLK_DEV_UMEM is not set
 CONFIG_BLK_DEV_LOOP=y
 CONFIG_BLK_DEV_LOOP_MIN_COUNT=128
