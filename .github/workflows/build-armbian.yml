@@ -192,9 +192,10 @@ on:
       builder_name:
         description: "Set Armbian builder signature."
         required: false
-        default: "angel"
+        default: "ophub"
         type: choice
         options:
+          - ophub
           - angel
           - yourname
 
