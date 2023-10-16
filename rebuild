@@ -112,9 +112,6 @@ os_type="server"
 # Set Armbian builder signature
 builder_name=""
 
-# Get gh_token for api.github.com
-gh_token=""
-
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -176,7 +173,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "b:r:u:k:a:t:s:n:g:" "${@}")"
+    get_all_ver="$(getopt "b:r:u:k:a:t:s:n:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -250,14 +247,6 @@ init_var() {
                 error_msg "Invalid -n parameter [ ${2} ]!"
             fi
             ;;
-        -g | --Gh_token)
-            if [[ -n "${2}" ]]; then
-                gh_token="${2}"
-                shift
-            else
-                error_msg "Invalid -g parameter [ ${2} ]!"
-            fi
-            ;;
         *)
             error_msg "Invalid option [ ${1} ]!"
             ;;
@@ -313,7 +302,7 @@ check_data() {
 
     # Convert kernel repository address to api format
     [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
-    kernel_api="https://api.github.com/repos/${kernel_repo}"
+    kernel_api="https://github.com/${kernel_repo}"
 }
 
 find_armbian() {
@@ -379,18 +368,11 @@ query_kernel() {
                 # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
                 kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
 
-                # Set the token for api.github.com
-                [[ -n "${gh_token}" ]] && ght="-H \"Authorization: Bearer ${gh_token}\"" || ght=""
-
                 # Query the latest kernel version
                 latest_version="$(
-                    curl -s \
-                        -H "Accept: application/vnd.github+json" \
-                        ${ght} \
-                        ${kernel_api}/releases/tags/kernel_${kd} |
-                        jq -r '.assets[].name' |
-                        grep -oE "${kernel_verpatch}\.[0-9]+" |
-                        sort -rV | head -n 1
+                    curl -fsSL ${kernel_api}/releases/expanded_assets/kernel_${kd} |
+                        grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
+                        sort -urV | head -n 1
                 )"
 
                 if [[ "${?}" -eq "0" && -n "${latest_version}" ]]; then
