@@ -182,7 +182,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -t        | RootfsType | Set the file system type of the system's ROOTFS partition, the options are `ext4` or `btrfs` type. For example: `-t btrfs`. Default value: `ext4` |
 | -s        | Size       | Set the size of the system's ROOTFS partition, the system size must be greater than 2048MiB. For example: `-s 2560`. Default value: `2560` |
 | -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces when setting the signature. Default value: `None` |
-| -g        | GH_TOKEN   | Optional. Set `${{ secrets.GH_TOKEN }}`, used for [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) queries. Default value: `None` |
 
 - `sudo ./rebuild`: Use the default configuration to package all models of TV boxes.
 - `sudo ./rebuild -b s905x3 -k 5.10.125`: Recommended. Use the default configuration to package related kernels.
@@ -211,12 +210,11 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
     armbian_kernel: 5.10.125_5.15.50
-    gh_token: ${{ secrets.GH_TOKEN }}
 ```
 
 - ### GitHub Actions Input Parameter Description
 
-About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](documents/README.md#3-fork-the-repository-and-set-up-gh_token). The related parameters correspond to the `local packaging command`, please refer to the above description.
+The related parameters correspond to the `local packaging command`, please refer to the above description.
 
 | Parameter              | Default                  | Description                                             |
 |------------------------|--------------------------|---------------------------------------------------------|
@@ -229,7 +227,6 @@ About the settings of GitHUB RELEASES_TOKEN, you can refer to: [RELEASES_TOKEN](
 | armbian_fstype         | ext4                     | Set the file system type of the system's ROOTFS partition, refer to `-t`     |
 | armbian_size           | 2560                     | Set the size of the system's ROOTFS partition, refer to `-s`            |
 | builder_name           | None                     | Set the Armbian system builder signature, refer to `-n`           |
-| gh_token               | None                     | Optional. Set `${{ secrets.GH_TOKEN }}`. Refer to `-g` |
 
 - ### GitHub Actions Output Variable Description
 
