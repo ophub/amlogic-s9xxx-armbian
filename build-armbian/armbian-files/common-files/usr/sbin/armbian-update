@@ -202,7 +202,7 @@ init_var() {
     # Adjust the custom kernel repository url format
     [[ -z "${KERNEL_REPO}" ]] && KERNEL_REPO="ophub/kernel"
     [[ "${KERNEL_REPO}" =~ ^https: ]] && KERNEL_REPO="$(echo ${KERNEL_REPO} | awk -F'/' '{print $4"/"$5}')"
-    kernel_api="https://api.github.com/repos/${KERNEL_REPO}"
+    kernel_api="https://github.com/${KERNEL_REPO}"
 
     # Set kernel download tags
     [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
@@ -292,11 +292,9 @@ query_version() {
         # Query the latest version
         echo -e "${INFO} Query the latest kernel version of the [ ${kernel_verpatch} ] series within [ kernel_${KERNEL_TAGS} ]..."
         latest_version="$(
-            curl -s -H "Accept: application/vnd.github+json" \
-                ${kernel_api}/releases/tags/kernel_${KERNEL_TAGS} |
-                jq -r '.assets[].name' |
-                grep -oE "${kernel_verpatch}\.[0-9]+" |
-                sort -rV | head -n 1
+            curl -fsSL ${kernel_api}/releases/expanded_assets/kernel_${KERNEL_TAGS} |
+                grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
+                sort -urV | head -n 1
         )"
         [[ -n "${latest_version}" ]] || error_msg "Failed to query kernel version from [ ${kernel_api} ]."
 
