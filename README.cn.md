@@ -182,7 +182,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |
 | -n   | BuilderName | 设置 Armbian 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
-| -g   | GH_TOKEN   | 可选项。设置 `${{ secrets.GH_TOKEN }}`，用于 [api.github.com](https://docs.github.com/en/rest/overview/resources-in-the-rest-api?apiVersion=2022-11-28#requests-from-personal-accounts) 查询。默认值：`无` |
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -b s905x3 -k 5.10.125` : 推荐使用. 使用默认配置进行相关内核打包。
@@ -211,12 +210,11 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
     armbian_kernel: 5.10.125_5.15.50
-    gh_token: ${{ secrets.GH_TOKEN }}
 ```
 
 - ### GitHub Actions 输入参数说明
 
-关于 GitHUB RELEASES_TOKEN 的相关设置可参考：[RELEASES_TOKEN](documents/README.cn.md#3-fork-仓库并设置-gh_token)。相关参数与`本地打包命令`相对应，请参考上面的说明。
+相关参数与`本地打包命令`相对应，请参考上面的说明。
 
 | 参数              | 默认值             | 说明                                             |
 |------------------|-------------------|--------------------------------------------------|
@@ -229,7 +227,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 | armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
 | builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`           |
-| gh_token         | 无                | 可选项。设置 `${{ secrets.GH_TOKEN }}`。功能参考 `-g` |
 
 - ### GitHub Actions 输出变量说明
 

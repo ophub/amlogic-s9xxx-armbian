@@ -44,10 +44,6 @@ inputs:
     description: "Set Armbian builder signature."
     required: false
     default: ""
-  gh_token:
-    description: "Set the token."
-    required: false
-    default: ""
   # For compile kernel -----
   kernel_source:
     description: "Select the kernel source code"
@@ -151,7 +147,6 @@ runs:
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
-            [[ -n "${{ inputs.gh_token }}" ]] && make_command="${make_command} -g ${{ inputs.gh_token }}"
             sudo ./rebuild ${make_command}
 
             cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
