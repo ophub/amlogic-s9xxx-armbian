@@ -370,7 +370,8 @@ query_kernel() {
 
                 # Query the latest kernel version
                 latest_version="$(
-                    curl -fsSL ${kernel_api}/releases/expanded_assets/kernel_${kd} |
+                    curl -fsSL \
+                        ${kernel_api}/releases/expanded_assets/kernel_${kd} |
                         grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
                         sort -urV | head -n 1
                 )"
