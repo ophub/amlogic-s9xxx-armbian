@@ -314,17 +314,20 @@ Open the RKDevTool flashing tool, right-click to add an item.
 
 - Address `0xCCCCCCCC`, name `Boot`, path [select](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`.
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
-
-Click execute to write.
+- Check the "Force Write by Address" option, click "Execute," and wait for the progress to complete on the right-hand download panel.
 
 #### 8.2.5 Installation method for Chainedbox-L1-Pro
 
 The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tutorial. Flashing requires entering the Maskrom mode. Make Chainedbox-L1-Pro in a power-off state, unplug all cables. With a USB male-to-male cable, one end is inserted into the USB2.0 interface of Chainedbox-L1-Pro, and the other end is inserted into the computer. Insert a paperclip into the Reset hole and press and hold it. Insert the power cord. Wait a few seconds until the `discovered a LOADER device` appears at the bottom of the RKDevTool box before releasing the paperclip. Switch RKDevTool to `Advanced Features` and click the `Enter Maskrom` button, prompting `Found a MASKROM device`. Right-click to add an item.
 
-- Address `0xCCCCCCCC`, name `Boot`, path [select](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/l1pro) `rk3328_loader.bin`.
+- Address `0xCCCCCCCC`, name `Boot`, path [select](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/chainedbox) `rk3328_loader_v1.14.249.bin`.
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
+- Check the "Force Write by Address" option, click "Execute," and wait for the progress to complete on the right-hand download panel.
 
-Click execute to write.
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a6d2d8c0-35c5-44ba-be35-fd2e2758729b width="600" /><br />
+<img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/13aab016-1b93-4ff1-b1ef-c202bd357068 width="600" />
+</div>
 
 ### 8.3 Allwinner Series Installation Method
 
