@@ -314,17 +314,20 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 - 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/beikeyun) `rk3328_loader_v1.14.249.bin`。
 - 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
-
-点击执行写入即可。
+- 勾选`强制按地址写入`，点`执行`，等右侧下载面板显示进度完成即可。
 
 #### 8.2.5 我家云的安装方法
 
 方法转载自 [cc747](https://post.smzdm.com/p/a4wkdo7l/) 的教程。刷机需要进入 Maskrom 模式。使我家云处于断电状态，拔掉所有线。用 USB 双公头线，一头插入我家云的 USB2.0 接口，一头插入电脑。用回形针插进 Reset 孔，并按压住不松开。插入电源线。等待几秒钟，直到 RKDevTool 框的下方出现`发现一个LOADER设备`后才松开回形针。将 RKDevTool 切换到`高级功能`点击`进入Maskrom`按钮，提示`发现一个MASKROM设备`。右键添加项。
 
-- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/l1pro) `rk3328_loader.bin`。
+- 地址 `0xCCCCCCCC`, 名字 `Boot`, 路径[选择](https://github.com/ophub/u-boot/tree/main/u-boot/rockchip/chainedbox) `rk3328_loader_v1.14.249.bin`。
 - 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
+- 勾选`强制按地址写入`，点`执行`，等右侧下载面板显示进度完成即可。
 
-点击执行写入即可。
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a6d2d8c0-35c5-44ba-be35-fd2e2758729b width="600" /><br />
+<img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/13aab016-1b93-4ff1-b1ef-c202bd357068 width="600" />
+</div>
 
 ### 8.3 Allwinner 系列安装方法
 
