@@ -43,8 +43,7 @@
 # software_122  : For navidrome:4533
 # software_123  : For alist:5244
 # software_124  : For qinglong:5700
-# software_125  : For chatgpt-web:3002
-# software_126  : For pandora(chatgpt):3003
+# software_125  : For chatgpt-next-web:3000
 #
 #============================================================================
 
@@ -934,11 +933,11 @@ software_124() {
     esac
 }
 
-# For chatgpt-web
+# For chatgpt-next-web
 software_125() {
     # Set basic information
-    container_name="chatgpt-web"
-    image_name="chenzhaoyu94/chatgpt-web:latest"
+    container_name="chatgpt-next-web"
+    image_name="yidadaa/chatgpt-next-web:latest"
     install_path="${docker_path}/${container_name}"
 
     case "${software_manage}" in
@@ -955,21 +954,20 @@ software_125() {
         read pw
         [[ -n "${pw}" ]] && your_password="${pw}" || error_msg "PassWord is invalid."
 
-        # Instructions: https://hub.docker.com/r/chenzhaoyu94/chatgpt-web
+        # Instructions: https://hub.docker.com/r/yidadaa/chatgpt-next-web
         docker run -d --name=${container_name} \
-            -p 3002:3002 \
+            -p 3000:3000 \
             -e PUID=${docker_puid} \
             -e PGID=${docker_pgid} \
             -e TZ=${docker_tz} \
-            -e TIMEOUT_MS=100000 \
-            -e MAX_REQUEST_PER_HOUR=0 \
             -e OPENAI_API_KEY=${your_api_key} \
-            -e AUTH_SECRET_KEY=${your_password} \
+            -e CODE=${your_password} \
+            -e HIDE_USER_API_KEY=1 \
             --restart unless-stopped \
             ${image_name}
 
         sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3002 ]"
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3000 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -979,39 +977,6 @@ software_125() {
     esac
 }
 
-# For pandora(chatgpt):3003
-software_126() {
-    # Set basic information
-    container_name="pandora"
-    image_name="pengzhile/pandora:latest"
-    install_path="${docker_path}/${container_name}"
-
-    case "${software_manage}" in
-    install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
-
-        # Instructions: https://hub.docker.com/r/pengzhile/pandora
-        docker run -d --name=${container_name} \
-            -p 3003:3003 \
-            -e PUID=${docker_puid} \
-            -e PGID=${docker_pgid} \
-            -e TZ=${docker_tz} \
-            -e PANDORA_CLOUD=cloud \
-            -e PANDORA_SERVER=0.0.0.0:3003 \
-            --restart unless-stopped \
-            ${image_name}
-
-        sync && sleep 3
-        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3003 ]"
-        echo -e "${NOTE} Get your Access Token [ https://github.com/pengzhile/pandora ]"
-        echo -e "${SUCCESS} ${container_name} installed successfully."
-        exit 0
-        ;;
-    update) docker_update ;;
-    remove) docker_remove ;;
-    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
-    esac
-}
 
 # Initialize variables
 init_var "${@}"
