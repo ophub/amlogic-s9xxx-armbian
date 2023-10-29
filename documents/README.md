@@ -395,7 +395,6 @@ armbian-update
 | -r | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
 | -u | Automatic | stable/flippy/dev/rk3588/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -c | None | Custom Domain | Set a cdn domain name for accelerating access to github.com |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
 | -m | no | yes/no | Use the mainline u-boot |
 | -s | None | None | [SOS] Use the system kernel in USB to restore eMMC |
@@ -417,15 +416,12 @@ In case of issues caused by special reasons such as incomplete updates, which re
 
 If your network access to github.com is poor and you can't update online, you can manually download the kernel, upload it to any directory of the Armbian system, and enter the kernel directory to execute `armbian-update` for local installation. If there's a complete set of kernel files in the current directory, it will use the kernel from the current directory for the update (the four kernel files needed for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not necessary and their presence does not affect the update. The system can accurately identify needed kernel files). You can freely update among the optional kernels supported by the device, such as updating from kernel 5.10.125 to kernel 5.15.50.
 
-If your local network access to github.com is poor, you can add a CDN acceleration service like this: `armbian-update -c https://gh...xy.com/`. Please consult suitable local acceleration CDN domain. The acceleration domain can also be permanently written to the individual configuration file `/etc/ophub-release` in the `GITHUB_CDN='https://gh...xy.com/'` parameter, to avoid entering it each time.
-
-Custom options set by `-r`/`-u`/`-c`/`-b` parameters can be permanently written into the relevant parameters in the individual configuration file `/etc/ophub-release`, to avoid entering it each time. The corresponding settings are:
+Custom options set by `-r`/`-u`/`-b` parameters can be permanently written into the relevant parameters in the individual configuration file `/etc/ophub-release`, to avoid entering it each time. The corresponding settings are:
 
 ```shell
 # Assign values to custom parameters
 -r  :  KERNEL_REPO='ophub/kernel'
 -u  :  KERNEL_TAGS='stable'
--c  :  GITHUB_CDN='https://gh...xy.com/'
 -b  :  KERNEL_BACKUP='yes'
 ```
 
