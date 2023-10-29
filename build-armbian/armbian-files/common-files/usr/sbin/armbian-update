@@ -53,7 +53,7 @@ STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 FINISH="[\033[93m FINISH \033[0m]"
-HINT="[\033[93m HINT \033[0m]"
+PROMPT="[\033[93m PROMPT \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
 #==================================================================================================
@@ -383,7 +383,7 @@ check_kernel() {
             [[ -s "${tmp_file}" ]] || {
                 # Header file is optional
                 if [[ "${kernel_file}" == "header" ]]; then
-                    echo -e "${HINT} (${i}/4) [ ${tmp_file} ] file is missing, skip verification."
+                    echo -e "${PROMPT} (${i}/4) [ ${tmp_file} ] file is missing, skip verification."
                     let i++
                     continue
                 else
@@ -461,7 +461,7 @@ backup_kernel() {
         [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to move [ header-${current_kernel_signature}.tar.gz ] files."
         echo -e "${INFO} (4/4) Backup of [ header-${current_kernel_signature}.tar.gz ] succeeded."
     else
-        echo -e "${HINT} (4/4) [ /usr/src/linux-headers-${current_kernel_signature} ] folder does not exist, skip backup."
+        echo -e "${PROMPT} (4/4) [ /usr/src/linux-headers-${current_kernel_signature} ] folder does not exist, skip backup."
     fi
 
     # Add sha256sum integrity verification file
@@ -512,7 +512,7 @@ update_kernel() {
         [[ -d "/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
         echo -e "${INFO} (4/4) Unpacking [ header-${kernel_name}.tar.gz ] succeeded."
     else
-        echo -e "${HINT} (4/4) [ header-${kernel_name}.tar.gz ] file does not exist, skip unpacking."
+        echo -e "${PROMPT} (4/4) [ header-${kernel_name}.tar.gz ] file does not exist, skip unpacking."
     fi
 
     # Update release file
@@ -619,7 +619,7 @@ sos_kernel() {
         [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
         echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
     else
-        echo -e "${HINT} (3/3) [ /usr/src/linux-headers-${kernel_signature} ] folder does not exist, skip rescue."
+        echo -e "${PROMPT} (3/3) [ /usr/src/linux-headers-${kernel_signature} ] folder does not exist, skip rescue."
     fi
 
     # Unmount the emmc partition
