@@ -56,6 +56,12 @@ openvfd_boxid="15"
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
 }
 
+# For fan control service
+[[ -x "/usr/bin/pwm-fan.pl" ]] && {
+    perl /usr/bin/pwm-fan.pl 2>/dev/null &
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The fan control service enabled successfully." >>${custom_log}
+}
+
 # For pveproxy startup service
 [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]] && {
     sudo systemctl restart pveproxy &&
