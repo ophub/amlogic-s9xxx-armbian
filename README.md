@@ -72,7 +72,6 @@ armbian-update
 | -r       | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
 | -u       | Automation   | stable/flippy/dev/beta/rk3588/h6 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel in use |
 | -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -c       | None         | Custom domain name | Set the cdn domain name for accelerated access to github.com |
 | -b       | yes          | yes/no        | Automatically back up the current system's kernel when updating the kernel |
 | -m       | no           | yes/no        | Use mainline u-boot |
 | -s       | None         | None          | [SOS] Use the system kernel in USB to restore eMMC |

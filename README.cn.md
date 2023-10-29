@@ -72,7 +72,6 @@ armbian-update
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
 | -u       | 自动化        | stable/flippy/dev/beta/rk3588/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
-| -c       | 无           | 自定义域名      | 设置加速访问 github.com 的 cdn 域名  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
 | -s       | 无           | 无             | [SOS] 使用 USB 中的系统内核恢复 eMMC |
