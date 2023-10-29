@@ -93,9 +93,9 @@ specific_tags="${default_tags}"
 rk3588_kernel=("5.10.1")
 h6_kernel=("6.5.1")
 stable_kernel=("6.1.1" "5.15.1")
-flippy_kernel=(${stable_kernel[*]})
-dev_kernel=(${stable_kernel[*]})
-beta_kernel=(${stable_kernel[*]})
+flippy_kernel=(${stable_kernel[@]})
+dev_kernel=(${stable_kernel[@]})
+beta_kernel=(${stable_kernel[@]})
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
@@ -274,7 +274,7 @@ check_data() {
         board_list=":($(echo ${build_board} | sed -e 's/_/\|/g')):(yes|no)"
         build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
     fi
-    [[ "${#build_armbian[*]}" -eq "0" ]] && error_msg "The [ BOARD ] is missing, stop building."
+    [[ "${#build_armbian[@]}" -eq "0" ]] && error_msg "The [ BOARD ] is missing, stop building."
 
     # Get a list of kernel
     kernel_from=($(
@@ -283,22 +283,22 @@ check_data() {
             grep -E "^[^#].*${board_list}$" | awk -F':' '{print $9}' |
             sort -u | xargs
     ))
-    [[ "${#kernel_from[*]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
+    [[ "${#kernel_from[@]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" ]] && {
         specific_tags="${kernel_usage}"
-        kernel_from=(${kernel_from[*]//${default_tags}/${kernel_usage}})
+        kernel_from=(${kernel_from[@]//${default_tags}/${kernel_usage}})
     }
 
     # The [ specific kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. download from [ kernel_stable ].
-    specific_kernel=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort -u | xargs))
+    specific_kernel=($(echo ${kernel_from[@]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[0-9]+" | sort -u | xargs))
 
     # The [ suffix ] of KERNEL_TAGS starts with a [ letter ], such as kernel_stable, kernel_rk3588, etc.
-    tags_list=($(echo ${kernel_from[*]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort -u | xargs))
+    tags_list=($(echo ${kernel_from[@]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]" | sort -u | xargs))
     # Add the specific kernel to the list
-    [[ "${#specific_kernel[*]}" -ne "0" ]] && tags_list=(${tags_list[*]} "specific")
+    [[ "${#specific_kernel[@]}" -ne "0" ]] && tags_list=(${tags_list[@]} "specific")
     # Check the kernel list
-    [[ "${#tags_list[*]}" -eq "0" ]] && error_msg "The [ tags_list ] is missing, stop building."
+    [[ "${#tags_list[@]}" -eq "0" ]] && error_msg "The [ tags_list ] is missing, stop building."
 
     # Convert kernel repository address to api format
     [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
@@ -341,19 +341,19 @@ query_kernel() {
 
     # Check the version on the kernel repository
     x="1"
-    for k in ${tags_list[*]}; do
+    for k in "${tags_list[@]}"; do
         {
             # Select the kernel list
             kd="${k}"
             case "${k}" in
-            stable) down_kernel_list=(${stable_kernel[*]}) ;;
-            flippy) down_kernel_list=(${flippy_kernel[*]}) ;;
-            dev) down_kernel_list=(${dev_kernel[*]}) ;;
-            beta) down_kernel_list=(${beta_kernel[*]}) ;;
-            rk3588) down_kernel_list=(${rk3588_kernel[*]}) ;;
-            h6) down_kernel_list=(${h6_kernel[*]}) ;;
+            stable) down_kernel_list=(${stable_kernel[@]}) ;;
+            flippy) down_kernel_list=(${flippy_kernel[@]}) ;;
+            dev) down_kernel_list=(${dev_kernel[@]}) ;;
+            beta) down_kernel_list=(${beta_kernel[@]}) ;;
+            rk3588) down_kernel_list=(${rk3588_kernel[@]}) ;;
+            h6) down_kernel_list=(${h6_kernel[@]}) ;;
             specific)
-                down_kernel_list=(${specific_kernel[*]})
+                down_kernel_list=(${specific_kernel[@]})
                 kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
@@ -362,7 +362,7 @@ query_kernel() {
             # Query the name of the latest kernel version
             tmp_arr_kernels=()
             i=1
-            for kernel_var in ${down_kernel_list[*]}; do
+            for kernel_var in "${down_kernel_list[@]}"; do
                 echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${k} - ${kernel_var} ]"
 
                 # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
@@ -389,13 +389,13 @@ query_kernel() {
 
             # Reset the kernel array to the latest kernel version
             case "${k}" in
-            stable) stable_kernel=(${tmp_arr_kernels[*]}) ;;
-            flippy) flippy_kernel=(${tmp_arr_kernels[*]}) ;;
-            dev) dev_kernel=(${tmp_arr_kernels[*]}) ;;
-            beta) beta_kernel=(${tmp_arr_kernels[*]}) ;;
-            rk3588) rk3588_kernel=(${tmp_arr_kernels[*]}) ;;
-            h6) h6_kernel=(${tmp_arr_kernels[*]}) ;;
-            specific) specific_kernel=(${tmp_arr_kernels[*]}) ;;
+            stable) stable_kernel=(${tmp_arr_kernels[@]}) ;;
+            flippy) flippy_kernel=(${tmp_arr_kernels[@]}) ;;
+            dev) dev_kernel=(${tmp_arr_kernels[@]}) ;;
+            beta) beta_kernel=(${tmp_arr_kernels[@]}) ;;
+            rk3588) rk3588_kernel=(${tmp_arr_kernels[@]}) ;;
+            h6) h6_kernel=(${tmp_arr_kernels[@]}) ;;
+            specific) specific_kernel=(${tmp_arr_kernels[@]}) ;;
             *) error_msg "Invalid tags." ;;
             esac
 
@@ -407,7 +407,7 @@ query_kernel() {
 check_kernel() {
     [[ -n "${1}" ]] && check_path="${1}" || error_msg "Invalid kernel path to check."
     check_files=($(cat "${check_path}/sha256sums" | awk '{print $2}'))
-    for cf in ${check_files[*]}; do
+    for cf in "${check_files[@]}"; do
         {
             # Check if file exists
             [[ -s "${check_path}/${cf}" ]] || error_msg "The [ ${cf} ] file is missing."
@@ -417,7 +417,7 @@ check_kernel() {
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "[ ${cf} ]: sha256sum verification failed."
         }
     done
-    echo -e "${INFO} All [ ${#check_files[*]} ] kernel files are sha256sum checked to be complete.\n"
+    echo -e "${INFO} All [ ${#check_files[@]} ] kernel files are sha256sum checked to be complete.\n"
 }
 
 download_kernel() {
@@ -425,19 +425,19 @@ download_kernel() {
     echo -e "${STEPS} Start downloading the kernel files..."
 
     x="1"
-    for k in ${tags_list[*]}; do
+    for k in "${tags_list[@]}"; do
         {
             # Set the kernel download list
             kd="${k}"
             case "${k}" in
-            stable) down_kernel_list=(${stable_kernel[*]}) ;;
-            flippy) down_kernel_list=(${flippy_kernel[*]}) ;;
-            dev) down_kernel_list=(${dev_kernel[*]}) ;;
-            beta) down_kernel_list=(${beta_kernel[*]}) ;;
-            rk3588) down_kernel_list=(${rk3588_kernel[*]}) ;;
-            h6) down_kernel_list=(${h6_kernel[*]}) ;;
+            stable) down_kernel_list=(${stable_kernel[@]}) ;;
+            flippy) down_kernel_list=(${flippy_kernel[@]}) ;;
+            dev) down_kernel_list=(${dev_kernel[@]}) ;;
+            beta) down_kernel_list=(${beta_kernel[@]}) ;;
+            rk3588) down_kernel_list=(${rk3588_kernel[@]}) ;;
+            h6) down_kernel_list=(${h6_kernel[@]}) ;;
             specific)
-                down_kernel_list=(${specific_kernel[*]})
+                down_kernel_list=(${specific_kernel[@]})
                 kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
@@ -445,7 +445,7 @@ download_kernel() {
 
             # Download the kernel to the storage directory
             i="1"
-            for kernel_var in ${down_kernel_list[*]}; do
+            for kernel_var in "${down_kernel_list[@]}"; do
                 if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
                     kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_${kd}/${kernel_var}.tar.gz"
                     echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
@@ -511,7 +511,7 @@ confirm_version() {
     [[ -n "${PLATFORM}" ]] || error_msg "Invalid PLATFORM parameter: [ ${PLATFORM} ]"
     # Set supported platform name
     support_platform=("amlogic" "rockchip" "allwinner")
-    [[ -n "$(echo "${support_platform[*]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
+    [[ -n "$(echo "${support_platform[@]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
 
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${default_tags}" ]] && KERNEL_TAGS="${kernel_usage}"
@@ -1057,7 +1057,7 @@ loop_rebuild() {
     echo -e "${STEPS} Start building Armbian..."
 
     j="1"
-    for b in ${build_armbian[*]}; do
+    for b in "${build_armbian[@]}"; do
         {
             # Set specific configuration for building Armbian system
             board="${b}"
@@ -1066,21 +1066,21 @@ loop_rebuild() {
             # Determine kernel tags
             kd="${KERNEL_TAGS}"
             case "${KERNEL_TAGS}" in
-            stable) kernel_list=(${stable_kernel[*]}) ;;
-            flippy) kernel_list=(${flippy_kernel[*]}) ;;
-            dev) kernel_list=(${dev_kernel[*]}) ;;
-            beta) kernel_list=(${beta_kernel[*]}) ;;
-            rk3588) kernel_list=(${rk3588_kernel[*]}) ;;
-            h6) kernel_list=(${h6_kernel[*]}) ;;
+            stable) kernel_list=(${stable_kernel[@]}) ;;
+            flippy) kernel_list=(${flippy_kernel[@]}) ;;
+            dev) kernel_list=(${dev_kernel[@]}) ;;
+            beta) kernel_list=(${beta_kernel[@]}) ;;
+            rk3588) kernel_list=(${rk3588_kernel[@]}) ;;
+            h6) kernel_list=(${h6_kernel[@]}) ;;
             [0-9]*)
-                kernel_list=(${specific_kernel[*]})
+                kernel_list=(${specific_kernel[@]})
                 kd="${specific_tags}"
                 ;;
             *) error_msg "Invalid tags." ;;
             esac
 
             i="1"
-            for k in ${kernel_list[*]}; do
+            for k in "${kernel_list[@]}"; do
                 {
                     kernel="${k}"
 
@@ -1141,7 +1141,7 @@ download_depends
 download_kernel
 
 # Show rebuild settings
-echo -e "${INFO} [ ${#build_armbian[*]} ] lists of Armbian board: [ $(echo ${build_armbian[*]} | xargs) ]"
+echo -e "${INFO} [ ${#build_armbian[@]} ] lists of Armbian board: [ $(echo ${build_armbian[@]} | xargs) ]"
 echo -e "${INFO} ROOTFS type: [ ${rootfs_type} ]"
 echo -e "${INFO} Kernel Repo: [ ${kernel_repo} ], Kernel Usage: [ ${kernel_usage} ] \n"
 # Show server start information
