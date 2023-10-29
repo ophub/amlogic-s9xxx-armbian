@@ -71,7 +71,7 @@ check_depends() {
     is_missing="0"
     necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils" "jq")
     i="1"
-    for package in ${necessary_packages[*]}; do
+    for package in "${necessary_packages[@]}"; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
         let i++
     done
@@ -79,7 +79,7 @@ check_depends() {
     if [[ "${is_missing}" -eq "1" ]]; then
         echo -e "${INFO} Start installing dependencies..."
         sudo apt-get update
-        sudo apt-get install -y ${necessary_packages[*]}
+        sudo apt-get install -y ${necessary_packages[@]}
         [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed, stop updating."
     else
         echo -e "${INFO} Dependency check completed."
@@ -291,7 +291,8 @@ query_version() {
         # Query the latest version
         echo -e "${INFO} Query the latest kernel version of the [ ${kernel_verpatch} ] series within [ kernel_${KERNEL_TAGS} ]..."
         latest_version="$(
-            curl -fsSL ${kernel_api}/releases/expanded_assets/kernel_${KERNEL_TAGS} |
+            curl -fsSL \
+                ${kernel_api}/releases/expanded_assets/kernel_${KERNEL_TAGS} |
                 grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
                 sort -urV | head -n 1
         )"
@@ -376,7 +377,7 @@ check_kernel() {
 
         kernel_list=("boot" "dtb-${PLATFORM}" "modules" "header")
         i="1"
-        for kernel_file in ${kernel_list[*]}; do
+        for kernel_file in "${kernel_list[@]}"; do
             # Set check filename
             tmp_file="${kernel_file}-${kernel_name}.tar.gz"
             # Check if file exists
@@ -411,8 +412,8 @@ backup_kernel() {
 
     # Keep the latest 3 kernel backups and delete the others
     backup_kernel_list=($(ls ${backup_path} -lt | grep "^d" | awk '{print $9}'))
-    [[ "${#backup_kernel_list[*]}" -ge "3" ]] && {
-        for ((i = 2; i < ${#backup_kernel_list[*]}; i++)); do rm -rf ${backup_path}/${backup_kernel_list[$i]}; done
+    [[ "${#backup_kernel_list[@]}" -ge "3" ]] && {
+        for ((i = 2; i < ${#backup_kernel_list[@]}; i++)); do rm -rf ${backup_path}/${backup_kernel_list[$i]}; done
     }
 
     # Identify the current kernel files

@@ -291,7 +291,7 @@ query_version() {
 
     # Query the latest kernel in a loop
     i=1
-    for KERNEL_VAR in ${build_kernel[*]}; do
+    for KERNEL_VAR in "${build_kernel[@]}"; do
         echo -e "${INFO} (${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
         # Identify the kernel mainline
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
@@ -312,8 +312,7 @@ query_version() {
     done
 
     # Reset the kernel array to the latest kernel version
-    unset build_kernel
-    build_kernel="${tmp_arr_kernels[*]}"
+    build_kernel=(${tmp_arr_kernels[@]})
 }
 
 apply_patch() {
@@ -374,12 +373,10 @@ get_kernel_source() {
             # Pull the latest source code of the server
             cd ${kernel_path}/${local_kernel_path}
             git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull
-            unset kernel_version
             kernel_version="${local_makefile_version}.${local_makefile_patchlevel}.${kernel_sub}"
             echo -e "${INFO} Synchronize the upstream source code, compile the kernel version [ ${kernel_version} ]."
         else
             # Reset to local kernel version number
-            unset kernel_version
             kernel_version="${local_makefile_version}.${local_makefile_patchlevel}.${local_makefile_sublevel}"
             echo -e "${INFO} Use local source code, compile the kernel version [ ${kernel_version} ]."
         fi
@@ -680,7 +677,7 @@ loop_recompile() {
     cd ${current_path}
 
     j="1"
-    for k in ${build_kernel[*]}; do
+    for k in "${build_kernel[@]}"; do
         # kernel_version, such as [ 6.1.15 ]
         kernel_version="${k}"
         # kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
@@ -728,7 +725,7 @@ echo -e "${INFO} Kernel patch: [ ${auto_patch} ]"
 echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
-echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 
 # Show server start information
 echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
