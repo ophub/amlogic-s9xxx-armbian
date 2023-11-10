@@ -225,6 +225,12 @@ toolchain_check() {
             [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}
+            # List and check directory names, and change them all to lowercase
+            for dir in $(ls ${toolchain_path}); do
+                if [[ -d "${toolchain_path}/${dir}" && "${dir}" != "${dir,,}" ]]; then
+                    mv -f ${toolchain_path}/${dir} ${toolchain_path}/${dir,,}
+                fi
+            done
             [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
         fi
 
