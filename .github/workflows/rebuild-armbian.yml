@@ -33,7 +33,7 @@ on:
           - eaidk-610
           - emb3531
           - fine3399
-          - firefly
+          - firefly-rk3399
           - ipc-r
           - king3399
           - kylin3399
