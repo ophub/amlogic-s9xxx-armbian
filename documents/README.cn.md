@@ -161,7 +161,7 @@ schedule:
 
 ### 5.3 自定义默认系统配置
 
-默认系统的配置信息记录在 [model_database.conf](../armbian-files/common-files/etc/model_database.conf) 文件里，其中的 `BOARD` 名字要求唯一。
+默认系统的配置信息记录在 [model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) 文件里，其中的 `BOARD` 名字要求唯一。
 
 其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
@@ -441,7 +441,7 @@ armbian-software
 
 ### 12.1 每个盒子的 dtb 和 u-boot 对应关系表
 
-支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf)。
+支持的电视盒子列表在 `Armbian` 系统中配置文件的位置为 [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf)。
 
 ### 12.2 LED 屏显示控制说明
 
@@ -1206,7 +1206,7 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 #### 12.15.1 添加设备配置文件
 
-在配置文件 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) 里面，根据设备的测试支持情况，添加对应的配置信息。其中 `BUILD` 的值是 `yes` 的是默认构建的部分设备，对应的 `BOARD` 值 `必须唯一`，这些盒子可以直接使用默认构建的 Armbian 系统。
+在配置文件 [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) 里面，根据设备的测试支持情况，添加对应的配置信息。其中 `BUILD` 的值是 `yes` 的是默认构建的部分设备，对应的 `BOARD` 值 `必须唯一`，这些盒子可以直接使用默认构建的 Armbian 系统。
 
 默认值是 `no` 的没有打包，这些设备使用时需要下载相同 `FAMILY` 的 Armbian 系统，在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他设备。
 
@@ -1224,7 +1224,7 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 `Rockchip` 和 `Allwinner` 系列的设备，为每个设备添加以 `BOARD` 命名的独立 [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot) 文件目录，对应的系列文件放在此目录中。
 
-构建 Armbian 镜像时，这些 u-boot 文件将根据 [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) 中的配置，由 rebuild 脚本写入对应的 Armbian 镜像文件中。
+构建 Armbian 镜像时，这些 u-boot 文件将根据 [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) 中的配置，由 rebuild 脚本写入对应的 Armbian 镜像文件中。
 
 #### 12.15.4 添加流程控制文件
 
