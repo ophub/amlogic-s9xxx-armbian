@@ -161,7 +161,7 @@ schedule:
 
 ### 5.3 Customizing Default System Configuration
 
-The default system configuration information is recorded in the [model_database.conf](../armbian-files/common-files/etc/model_database.conf) file, in which the `BOARD` name must be unique.
+The default system configuration information is recorded in the [model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) file, in which the `BOARD` name must be unique.
 
 For those with `BUILD` value as `yes`, they are part of the default packaged systems for the box, these boxes can be used directly. Those with the default value as `no` are not packaged. To use the unpackaged boxes, you need to download the same `FAMILY` packaged system (recommend downloading `5.15/5.4` kernel system), after writing to `USB`, you can open `USB's boot partition` on the computer, modify `FDT's dtb name` in `/boot/uEnv.txt` file, to adapt to other boxes in the list.
 
@@ -441,7 +441,7 @@ Here's a compilation of some common issues you may encounter while using Armbian
 
 ### 12.1 dtb and u-boot Correspondence Table for Each Box
 
-The supported TV box list is located in the [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf) configuration file in the `Armbian` system.
+The supported TV box list is located in the [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) configuration file in the `Armbian` system.
 
 ### 12.2 Instructions for LED Screen Display Control
 
@@ -1211,7 +1211,7 @@ To build an Armbian system for a device, you need to use the `device configurati
 
 #### 12.15.1 Add Device Configuration File
 
-In the configuration file [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf), add the corresponding configuration information according to the device's test support status. The `BUILD` value is `yes` for some default build devices, the corresponding `BOARD` value `must be unique`, these boxes can use the default built Armbian system directly.
+In the configuration file [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf), add the corresponding configuration information according to the device's test support status. The `BUILD` value is `yes` for some default build devices, the corresponding `BOARD` value `must be unique`, these boxes can use the default built Armbian system directly.
 
 The default value is `no` without packaging, these devices need to download the same `FAMILY` Armbian system when using, after writing to `USB`, you can open `USB's boot partition` on your computer, modify the `FDT dtb name` in `/boot/uEnv.txt` file, adapt to other devices in the list.
 
@@ -1229,7 +1229,7 @@ If individual devices have special differential setting requirements, add an ind
 
 `Rockchip` and `Allwinner` series devices, add an independent [u-boot](https://github.com/ophub/u-boot/tree/main/u-boot) file directory named after `BOARD` for each device, and the corresponding series files are placed in this directory.
 
-During the Armbian image construction, these u-boot files will be written into the corresponding Armbian image files by the rebuild script according to the configuration in [/etc/model_database.conf](../armbian-files/common-files/etc/model_database.conf).
+During the Armbian image construction, these u-boot files will be written into the corresponding Armbian image files by the rebuild script according to the configuration in [/etc/model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf).
 
 #### 12.15.4 Add Process Control Files
 
