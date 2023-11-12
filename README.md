@@ -133,6 +133,8 @@ armbian-ddbr
 
 Enter `b` according to the prompt to back up the system, and enter `r` to restore the system.
 
+In addition, the Android system can also be flashed into eMMC using the method of flashing via a cable. The download image of the Android system can be found in [Tools](https://github.com/ophub/kernel/releases/tag/tools).
+
 - ### Compile the Kernel in Armbian
 
 For the usage of compiling the kernel in Armbian, please refer to the [Compile Kernel](compile-kernel) instruction document. Log in to the Armbian system → Enter the command:

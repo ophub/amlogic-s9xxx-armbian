@@ -449,7 +449,9 @@ Please refer to the [instructions](led_screen_display_control.md).
 
 ### 12.3 How to Restore the Original Android TV System
 
-Typically, the original Android TV system is restored using armbian-ddbr backup and restore, or using the Amlogic flashing tool.
+The Android TV system on the device is usually backed up and restored using `armbian-ddbr`.
+
+In addition, the Android system can also be flashed into eMMC using the method of flashing via a cable. The download image of the Android system can be found in [Tools](https://github.com/ophub/kernel/releases/tag/tools).
 
 #### 12.3.1 Backup and Restore Using Armbian-ddbr
 
