@@ -133,6 +133,8 @@ armbian-ddbr
 
 根据提示输入 `b` 进行系统备份，输入 `r` 进行系统恢复。
 
+除此之外也可以通过线刷的方法，将安卓系统刷入 eMMC 中，安卓系统的下载镜像可在 [Tools](https://github.com/ophub/kernel/releases/tag/tools) 中查找。
+
 - ### 在 Armbian 中编译内核
 
 在 Armbian 中编译内核的用法详见 [编译内核](compile-kernel/README.cn.md) 说明文档。登录 Armbian 系统 → 输入命令：
