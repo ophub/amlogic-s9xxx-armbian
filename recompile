@@ -510,6 +510,8 @@ compile_kernel() {
     echo -e "${STEPS} Install modules..."
     make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${out_kernel}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
+    STRIP="${CROSS_COMPILE}strip"
+    find ${out_kernel}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug
 
     # Install headers
     echo -e "${STEPS} Install headers..."
