@@ -449,7 +449,9 @@ armbian-software
 
 ### 12.3 如何恢复原安卓 TV 系统
 
-通常使用 armbian-ddbr 备份恢复，或者使用 Amlogic 刷机工具恢复原安卓 TV 系统。
+通常使用 `armbian-ddbr` 对设备的安卓 TV 系统进行备份和恢复。
+
+除此之外也可以通过线刷的方法，将安卓系统刷入 eMMC 中，安卓系统的下载镜像可在 [Tools](https://github.com/ophub/kernel/releases/tag/tools) 中查找。
 
 #### 12.3.1 使用 armbian-ddbr 备份恢复
 
