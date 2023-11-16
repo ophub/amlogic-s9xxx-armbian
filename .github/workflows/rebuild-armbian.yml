@@ -34,6 +34,7 @@ on:
           - emb3531
           - fine3399
           - firefly-rk3399
+          - jp-tvbox
           - ipc-r
           - king3399
           - kylin3399
