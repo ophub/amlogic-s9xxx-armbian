@@ -393,7 +393,7 @@ armbian-update
 | Optional Parameters | Default Value | Options | Description |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
-| -u | Automatic | stable/flippy/dev/rk3588/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
+| -u | Automatic | stable/flippy/dev/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
 | -m | no | yes/no | Use the mainline u-boot |
