@@ -2,6 +2,7 @@
 /build
 /tmp_dir
 /build-armbian/kernel
+/build-armbian/u-boot
 /compile-kernel/kernel
 /compile-kernel/output
 /compile-kernel/tools/armbian
