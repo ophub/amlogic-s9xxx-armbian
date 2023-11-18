@@ -35,6 +35,12 @@ on:
           - fine3399
           - firefly-rk3399
           - jp-tvbox
+          - h28k
+          - h66k
+          - h68k
+          - h69k
+          - h88k
+          - h88k-v3
           - ipc-r
           - king3399
           - kylin3399

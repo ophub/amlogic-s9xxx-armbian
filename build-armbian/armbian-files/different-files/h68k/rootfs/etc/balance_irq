@@ -1,0 +1,39 @@
+# /etc/balance_irq
+# 用于中断设备的负载均衡
+# 用法：
+# 首先， 用 cat /proc/interrupts 进行观察
+#        如果某个cpu负载过重，可以把对应的中断设备迁移到其它cpu
+#  /proc/interrupt格式：
+#        最左列：中断号
+#        第 2 至第 2+cpus 列：cpu单核上产生的中断数量
+#        最右列：对应的设备名
+#
+# 本配置文件格式：
+#        第1列： 设备名
+#        第2列： 期望绑定在第几个cpu (从1开始)
+#
+#  配置文件改好，运行 balethirq.pl 即时生效
+
+# wan
+eth0		4
+
+# lan
+eth1		1
+
+# pcie lan rx
+eth2-0		3
+# pcie lan tx-0
+eth2-16		2
+# pcie lan tx-1
+eth2-18		2
+
+# pcie lan rx
+eth3-0		2
+# pcie lan tx-0
+eth3-16		1
+# pcie lan tx-1
+eth3-18		1
+
+# usb 3.0
+xhci-hcd:usb1	2
+xhci-hcd:usb3	4
