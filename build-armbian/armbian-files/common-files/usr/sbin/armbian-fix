@@ -164,11 +164,6 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
         tolog "82. Add the KERNEL_TAGS name"
     }
-    # Add default GITHUB_CDN URL (CDN accelerated domain name)
-    [[ -n "$(cat ${ophub_release_file} | grep -E "^GITHUB_CDN=")" ]] || {
-        echo "GITHUB_CDN=''" >>${ophub_release_file}
-        tolog "83. Add the custom GITHUB_CDN URL"
-    }
     # Add default KERNEL_REPO (Kernel download repository)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
