@@ -100,7 +100,7 @@ install_chinese_fonts() {
         "ibus-table-wubi" "ibus-libpinyin"
     )
 
-    # Packages of lunar/jammy system
+    # Packages of jammy/lunar/mantic system
     local jammy_packages=(
         "kde-config-fcitx5"
     )
@@ -110,7 +110,7 @@ install_chinese_fonts() {
         "kde-config-fcitx"
     )
 
-    # Packages of bookworm/bullseye system
+    # Packages of bookworm/bullseye/trixie system
     local debian_packages=(
         "fonts-noto-cjk" "fonts-noto-cjk-extra" "fonts-droid-fallback" "fonts-wqy-zenhei"
         "fonts-wqy-microhei" "fonts-arphic-ukai" "fonts-arphic-uming"
@@ -123,7 +123,7 @@ install_chinese_fonts() {
     # Install the Chinese language packages for the desktop system
     sudo apt-get update
     case "${VERSION_CODENAME}" in
-    jammy | lunar)
+    jammy | lunar | mantic)
         echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${ubuntu_packages[*]}
         sudo apt-get install -y ${jammy_packages[*]}
@@ -135,7 +135,7 @@ install_chinese_fonts() {
         sudo apt-get install -y ${focal_packages[*]}
         set_chinese_env
         ;;
-    bullseye | bookworm)
+    bullseye | bookworm | trixie)
         echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${debian_packages[*]}
         set_chinese_env
