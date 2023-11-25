@@ -16,9 +16,10 @@ on:
         type: choice
         options:
           - jammy
+          - mantic
           - bullseye
-          - lunar
           - bookworm
+          - trixie
       armbian_board:
         description: "Select device board."
         required: false
