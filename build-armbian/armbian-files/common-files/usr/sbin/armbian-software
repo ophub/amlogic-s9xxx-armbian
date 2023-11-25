@@ -121,10 +121,12 @@ check_software_status() {
 
         # Check whether the software supports running on the current system
         local release="$(echo ${line} | awk -F ':' '{print $5}')"
-        [[ "${release}" == *"${VERSION_CODENAME}"* ]] || {
-            local support="unsupported"
-            local manage="-"
-        }
+        if [[ "${release}" != "all" ]]; then
+            [[ "${release}" == *"${VERSION_CODENAME}"* ]] || {
+                local support="unsupported"
+                local manage="-"
+            }
+        fi
 
         # Query results are written to a temporary file
         [[ "${support}" == "supported" ]] && echo "${line}:${support}:${state}:${manage}" >>${tmp_conf} && sync

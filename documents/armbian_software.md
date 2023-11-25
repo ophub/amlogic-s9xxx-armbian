@@ -90,10 +90,10 @@ The scripts/commands of the software center are stored in the [/usr/share/ophub/
 
 ```yaml
 # 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
-102        :Portainer          :docker@portainer         :command-docker.sh      :jammy@focal@bullseye
-202        :Firefox            :dpkg@firefox             :command-desktop.sh     :jammy@focal@bullseye
-302        :Frpc               :which@frpc               :302-frpc.sh            :jammy@focal@bullseye
-303        :NPS                :which@nps                :command-service.sh     :jammy@focal@bullseye
+102        :Portainer          :docker@portainer         :command-docker.sh      :all
+202        :Firefox            :dpkg@firefox             :command-desktop.sh     :all
+302        :Frpc               :which@frpc               :302-frpc.sh            :all
+308        :PVE                :dpkg@pve-manager         :command-service.sh     :bullseye@bookworm
 ...
 ```
 
@@ -106,7 +106,7 @@ The scripts/commands of the software center are stored in the [/usr/share/ophub/
 - `Execute Selection`: Set the software to use a `unified instruction file` or an `independent script` for management.
   - For `more streamlined` operation commands, they are collectively written in `command-docker.sh / command-desktop.sh / command-service.sh` files according to software classification, and named by software number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`.
   - For operations that are `more complex and long in instructions`, they are managed by independent script files. For example, the independent script for installing `frpc` is named `302-frpc.sh` with the number as the prefix.
-- `Supported Release`: Set the supported Armbian `system version`. Use the `@` symbol for separation.
+- `Supported Release`: Set the supported Armbian `system version codename`. Use `all` to indicate support for all versions. If only certain versions are supported, specify the version codenames separated by `@` symbol.
 
 We welcome everyone to contribute more software. Feel free to submit support requests in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues).
 
@@ -204,10 +204,10 @@ ID    NAME                STATE           MANAGE
 
 ```yaml
 # 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
-102        :Portainer          :docker@portainer         :command-docker.sh      :jammy@focal@bullseye
-202        :Firefox            :dpkg@firefox             :command-desktop.sh     :jammy@focal@bullseye
-302        :Frpc               :which@frpc               :302-frpc.sh            :jammy@focal@bullseye
-303        :NPS                :which@nps                :command-service.sh     :jammy@focal@bullseye
+102        :Portainer          :docker@portainer         :command-docker.sh      :all
+202        :Firefox            :dpkg@firefox             :command-desktop.sh     :all
+302        :Frpc               :which@frpc               :302-frpc.sh            :all
+308        :PVE                :dpkg@pve-manager         :command-service.sh     :bullseye@bookworm
 ...
 ```
 
@@ -220,7 +220,7 @@ ID    NAME                STATE           MANAGE
 - `Execute Selection`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
   - 对于 `比较精简` 的操作命令，按照软件分类，集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
   - 对于 `比较复杂、指令内容较长` 的操作，进行独立脚本文件管理。如安装 `frpc` 的独立脚本，以序号开头，命名为 `302-frpc.sh` 。
-- `Supported Release`：设置支持的 Armbian `系统版本`。使用 `@` 符号分割。
+- `Supported Release`：设置支持的 Armbian `系统版本代号`。全部版本都支持的使用 `all` 表示。仅本支持部分版本的填写版本代号，多个版本代号之间使用 `@` 符号连接。
 
 欢迎大家补充更多软件。欢迎在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
 
