@@ -20,7 +20,7 @@ on:
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "5.15.1_6.1.1"
+        default: "5.15.1"
         type: choice
         options:
           - 5.4.1_5.10.1
@@ -53,11 +53,11 @@ on:
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
-        default: "-ophub"
+        default: "-lover"
         type: choice
         options:
           - -ophub
-          - -yourname
+          - -lover
 
 env:
   TZ: America/New_York
@@ -90,7 +90,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the kernel [ ${{ inputs.kernel_version }} ]
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: w12563789/amlogic-s9xxx-armbian@main
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
