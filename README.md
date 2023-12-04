@@ -2,7 +2,7 @@
 
 View Chinese description | [查看中文说明](README.cn.md)
 
-[Armbian](https://www.armbian.com/) is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. Now you can replace your Android TV system with the Armbian system, turning it into a powerful server.
+Armbian is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. Now you can replace your Android TV system with the Armbian system, turning it into a powerful server.
 
 This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
 
@@ -34,7 +34,7 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [Chainedbox-L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1680), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Renegade-RK3328](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1861) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [All](https://github.com/ophub/kernel/releases/tag/kernel_stable) | allwinner_boxname.img |
 
-💡 Tip: At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used in `TF/SD/USB`. Other models of boxes support writing to `EMMC` for use. For more information, please refer to the [Supported Device List Description](build-armbian/armbian-files/common-files/etc/model_database.conf). You can refer to the method in Section 12.15 of the instruction document to [add new supported devices](documents/README.md#1215-how-to-add-new-supported-devices).
+💡 Tip: At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used in `TF/SD/USB`. Other models of boxes support writing to `EMMC` for use. For more information, please refer to the [Supported Device List Description](build-armbian/armbian-files/common-files/etc/model_database.conf). You can refer to the method in Section 12.15 of the instruction document to [add new supported devices](documents/README.md#1215-how-to-add-new-supported-devices). Please read the [Armbian User Documentation](./documents) before use. It provides solutions to common issues.
 
 ## Installation and Upgrade Instructions for Armbian
 
