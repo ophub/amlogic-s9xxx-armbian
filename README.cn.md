@@ -2,7 +2,7 @@
 
 查看英文说明 | [View English description](README.md)
 
-[Armbian（中文名：岸边）](https://www.armbian.com/) 系统是基于 Debian/Ubuntu 而构建的专门用于 ARM 芯片的轻量级 Linux 系统。Armbian 系统精益、干净，并且 100% 兼容并继承了 Debian/Ubuntu 系统的功能和丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 里。现在你可以将电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。
+Armbian（中文名：岸边）系统是基于 Debian/Ubuntu 而构建的专门用于 ARM 芯片的轻量级 Linux 系统。Armbian 系统精益、干净，并且 100% 兼容并继承了 Debian/Ubuntu 系统的功能和丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 里。现在你可以将电视盒子的安卓 TV 系统更换为 Armbian 系统，让他成为一台功能强大的服务器。
 
 本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见 [Armbian 使用文档](./documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
@@ -34,7 +34,7 @@
 | rk3328 | [BeikeYun](https://github.com/ophub/amlogic-s9xxx-armbian/issues/852), [Chainedbox-L1-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1680), [Station-M1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Bqeel-MVR9](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1313), [Renegade-RK3328](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1861) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | rockchip_boxname.img |
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1120), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [全部](https://github.com/ophub/kernel/releases/tag/kernel_stable) | allwinner_boxname.img |
 
-💡提示：目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)只能在 `TF/SD/USB` 中使用，其他型号的盒子支持写入 `EMMC` 中使用。更多信息请查阅[支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。可以参考说明文档中 12.15 章节的方法[添加新的支持设备](documents/README.cn.md#1215-如何添加新的支持设备)。
+💡提示：目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)只能在 `TF/SD/USB` 中使用，其他型号的盒子支持写入 `EMMC` 中使用。更多信息请查阅[支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。可以参考说明文档中 12.15 章节的方法[添加新的支持设备](documents/README.cn.md#1215-如何添加新的支持设备)。使用前先阅读 [Armbian 使用文档](./documents/README.cn.md)，常见问题都有解决方法。
 
 ## 安装及升级 Armbian 的相关说明
 

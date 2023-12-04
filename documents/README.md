@@ -42,6 +42,8 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [12.3.1 Backup and Restore Using Armbian-ddbr](#1231-backup-and-restore-using-armbian-ddbr)
       - [12.3.2 Recovering using Amlogic Flashing Tool](#1232-recovering-using-amlogic-flashing-tool)
     - [12.4 Setting the box to boot from USB/TF/SD](#124-setting-the-box-to-boot-from-usbtfsd)
+      - [12.4.1 Initial Installation of Armbian System](#1241-initial-installation-of-armbian-system)
+      - [12.4.2 Reinstallation of Armbian System](#1242-reinstallation-of-armbian-system)
     - [12.5 Disable Infrared Receiver](#125-disable-infrared-receiver)
     - [12.6 Boot file selection](#126-boot-file-selection)
     - [12.7 Network Configuration](#127-network-configuration)
@@ -487,12 +489,21 @@ Once you've finished restoring factory settings, the box has been restored to th
 
 ### 12.4 Setting the box to boot from USB/TF/SD
 
+Based on the situation of your own device, there are two methods to use: initial installation and reinstallation of the Armbian system.
+
+#### 12.4.1 Initial Installation of Armbian System
+
 - Insert the USB/TF/SD with the installed system into the box.
 - Enable developer mode: Settings → About device → Version number (e.g., X96max plus...), rapidly click the left mouse button 5 times on the version number, until the system shows the prompt `You are now a developer`.
 - Enable USB debugging: System → Advanced options → Developer options (set `USB debugging` to enabled). Enable `ADB` debugging.
 - Install ADB tool: Download [adb](https://github.com/ophub/kernel/releases/tag/tools) and extract it, copy the three files `adb.exe`, `AdbWinApi.dll`, `AdbWinUsbApi.dll` to the `system32` and `syswow64` folders under `c://windows/`, then open the `cmd` command panel, use the `adb --version` command, if it shows, it means it can be used.
 - Enter `cmd` command mode. Enter the `adb connect 192.168.1.137` command (modify the IP according to your box, you can check it in the router device that the box is connected to), if the connection is successful, it will display `connected to 192.168.1.137:5555`
 - Enter the `adb shell reboot update` command, the box will reboot and boot from your inserted USB/TF/SD, you can enter the system by accessing the system's IP address from the browser, or via SSH.
+
+#### 12.4.2 Reinstallation of Armbian System
+
+- In normal situations, you can directly insert the USB flash drive with Armbian installed and boot from it. USB booting takes priority over eMMC.
+- In some cases, the device may not boot from the USB flash drive. In such cases, you can rename the `boot.scr` file in the `/boot` directory of the Armbian system on the eMMC. For example, you can rename it to `boot.scr.bak`. After that, you can insert the USB flash drive and boot from it. This way, you will be able to boot from the USB flash drive.
 
 ### 12.5 Disable Infrared Receiver
 

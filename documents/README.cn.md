@@ -42,6 +42,8 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [12.3.1 使用 armbian-ddbr 备份恢复](#1231-使用-armbian-ddbr-备份恢复)
       - [12.3.2 使用 Amlogic 刷机工具恢复](#1232-使用-amlogic-刷机工具恢复)
     - [12.4 设置盒子从 USB/TF/SD 中启动](#124-设置盒子从-usbtfsd-中启动)
+      - [12.4.1 初次安装 Armbian 系统](#1241-初次安装-armbian-系统)
+      - [12.4.2 重新安装 Armbian 系统](#1242-重新安装-armbian-系统)
     - [12.5 禁用红外接收器](#125-禁用红外接收器)
     - [12.6 启动引导文件的选择](#126-启动引导文件的选择)
     - [12.7 网络设置](#127-网络设置)
@@ -486,12 +488,21 @@ armbian-software
 
 ### 12.4 设置盒子从 USB/TF/SD 中启动
 
+根据自己盒子的情况，分别使用初次安装和重新安装 Armbian 系统的两种方法。
+
+#### 12.4.1 初次安装 Armbian 系统
+
 - 把刷好系统的 USB/TF/SD 插入盒子。
 - 开启开发者模式: 设置 → 关于本机 → 版本号 (如: X96max plus...), 在版本号上快速连击 5 次鼠标左键, 看到系统显示 `开启开发者模式` 的提示。
 - 开启 USB 调试模式: 系统 → 高级选选 → 开发者选项 (设置 `开启USB调试` 为启用)。启用 `ADB` 调试。
 - 安装 ADB 工具：下载 [adb](https://github.com/ophub/kernel/releases/tag/tools) 并解压，将 `adb.exe`，`AdbWinApi.dll`，`AdbWinUsbApi.dll` 三个文件拷⻉到 `c://windows/` 目录下的 `system32` 和 `syswow64` 两个文件夹内，然后打开 `cmd` 命令面板，使用 `adb --version` 命令，如果有显示就表示可以使用了。
 - 进入 `cmd` 命令模式。输入 `adb connect 192.168.1.137` 命令（其中的 ip 根据你的盒子修改，可以到盒子所接入的路由器设备里查看），如果链接成功会显示 `connected to 192.168.1.137:5555`
 - 输入 `adb shell reboot update` 命令，盒子将重启并从你插入的 USB/TF/SD 启动，从浏览器访问系统的 IP 地址，或者 SSH 访问即可进入系统。
+
+#### 12.4.2 重新安装 Armbian 系统
+
+- 正常情况下，直接把刷写好 Armbian 的 U 盘插入 USB 即可直接从 U 盘中启动。USB 启动比 eMMC 具有优先启动权。
+- 个别设备可能出现无法从 U 盘启动的现象，可以先把 eMMC 里 Armbian 系统 `/boot` 目录下的 `boot.scr` 文件改个名字，例如 `boot.scr.bak`，然后再插入 U 盘启动，这样就可以从 U 盘启动了。
 
 ### 12.5 禁用红外接收器
 
