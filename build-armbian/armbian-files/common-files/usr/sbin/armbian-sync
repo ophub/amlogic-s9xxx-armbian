@@ -25,8 +25,9 @@
 #
 # Armbian firmware config info record file
 ophub_release_file="/etc/ophub-release"
-# The openvfd files download repository
-github_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files"
+# The script files download repository
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
+script_dir="build-armbian/armbian-files"
 # Operation instruction and service storage path
 sbin_path="/usr/sbin"
 # Software service storage path
@@ -72,7 +73,7 @@ check_release() {
 check_depends() {
     # Check the necessary dependencies for apt install
     is_dpkg="0"
-    dpkg_packages=("subversion" "tar" "coreutils")
+    dpkg_packages=("git" "tar" "coreutils")
     i="1"
     for package in ${dpkg_packages[*]}; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_dpkg="1"
@@ -91,39 +92,49 @@ check_depends() {
 sync_config() {
     echo -e "${STEPS} Start syncing all service scripts..."
 
-    # Convert script repository address to svn format
-    if [[ "${github_repo}" == http* && -n "$(echo ${github_repo} | grep "tree/main")" ]]; then
-        github_repo="${github_repo//tree\/main/trunk}"
-    fi
+    # Get the latest scripts
+    echo -e "${INFO} Start syncing latest scripts..."
+    git_tmp_path="$(mktemp -d)"
+    cd ${git_tmp_path}
+    git init --quiet
+    git remote add origin ${script_repo}
+    git config core.sparseCheckout true
+    echo "${script_dir}/*" >>.git/info/sparse-checkout
+    git pull --quiet --depth=1 origin main
+    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${script_repo} ] scripts failed."
 
     # Update operation instruction and service related files
     echo -e "${STEPS} Start syncing operation instruction and service script..."
     [[ -d "${sbin_path}" ]] || mkdir -p ${sbin_path}
-    svn export ${github_repo}/common-files${sbin_path} ${sbin_path} --force
-    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${github_repo}/common-files${sbin_path} ] scripts failed."
+    cp -rf ${git_tmp_path}/${script_dir}/common-files${sbin_path}/* ${sbin_path}
+    [[ "${?}" -ne "0" ]] && error_msg "Sync common-files [ ${sbin_path} ] scripts failed."
     chmod +x ${sbin_path}/armbian-*
 
     # Update software service related files
     echo -e "${STEPS} Start syncing software service script..."
     [[ -d "${share_path}" ]] || mkdir -p ${share_path}
-    svn export ${github_repo}/common-files${share_path} ${share_path} --force
-    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${github_repo}/common-files${share_path} ] scripts failed."
+    cp -rf ${git_tmp_path}/${script_dir}/common-files${share_path}/* ${share_path}
+    [[ "${?}" -ne "0" ]] && error_msg "Sync common-files [ ${share_path} ] scripts failed."
     find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
 
+    # Update Amlogic platform specific scripts
     [[ "${PLATFORM}" == "amlogic" ]] && {
         # Update operation instruction and service related files
         echo -e "${STEPS} Start syncing Amlogic platform specific scripts..."
-        svn export ${github_repo}/platform-files/amlogic/rootfs${sbin_path} ${sbin_path} --force
-        [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${github_repo}/platform-files/amlogic/rootfs${sbin_path} ] scripts failed."
+        cp -rf ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${sbin_path}/* ${sbin_path}
+        [[ "${?}" -ne "0" ]] && error_msg "Sync platform-files [ ${sbin_path} ] scripts failed."
         chmod +x ${sbin_path}/armbian-*
 
         # Update openvfd related files
         echo -e "${STEPS} Start syncing Amlogic platform openvfd service script..."
         [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
-        svn export ${github_repo}/platform-files/amlogic/rootfs${openvfd_path} ${openvfd_path} --force
-        [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${github_repo}/platform-files/amlogic/rootfs${openvfd_path} ] scripts failed."
+        cp -rf ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${openvfd_path}/* ${openvfd_path}
+        [[ "${?}" -ne "0" ]] && error_msg "Sync platform-files [ ${openvfd_path} ] scripts failed."
         chmod +x ${openvfd_path}/vfdservice
     }
+
+    # Clean up temporary files
+    rm -rf ${git_tmp_path} 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} All service scripts are synchronized successfully."
