@@ -69,7 +69,7 @@ check_depends() {
     echo -e "${STEPS} Start checking dependencies..."
 
     is_missing="0"
-    necessary_packages=("subversion" "tar" "coreutils" "bsdextrautils" "jq")
+    necessary_packages=("tar" "coreutils" "bsdextrautils" "jq")
     i="1"
     for package in "${necessary_packages[@]}"; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
