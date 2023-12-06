@@ -27,6 +27,7 @@
 # init_var           : Initialize all variables
 # check_data         : Check the validity of the data
 # find_armbian       : Find Armbian file (build/output/images/*.img)
+# git_pull_dir       : Download the files from the git repository
 # download_depends   : Download the dependency files
 # query_kernel       : Query the latest kernel version
 # check_kernel       : Check kernel files integrity
@@ -74,14 +75,9 @@ armbian_release_file="etc/armbian-release"
 ophub_release_file="etc/ophub-release"
 
 # U-BOOT files download repository
-uboot_repo="https://github.com/ophub/u-boot/tree/main/u-boot"
-# Convert firmware repository address to svn format
-uboot_repo="${uboot_repo//tree\/main/trunk}"
-
+uboot_repo="https://github.com/ophub/u-boot"
 # Firmware files download repository
-firmware_repo="https://github.com/ophub/firmware/tree/main/firmware"
-# Convert firmware repository address to svn format
-firmware_repo="${firmware_repo//tree\/main/trunk}"
+firmware_repo="https://github.com/ophub/firmware"
 
 # Set the kernel download repository from github.com
 kernel_repo="https://github.com/ophub/kernel"
@@ -328,16 +324,41 @@ find_armbian() {
     echo -e "${INFO} Armbian rebuild file: [ ${armbian_rebuild_name} ], Version: [ ${armbian_rebuild_version} ]"
 }
 
-download_depends() {
+git_pull_dir() {
     cd ${current_path}
+
+    # Check git_pull_dir parameters
+    git_repo="${1}"
+    git_branch="${2}"
+    git_dir="${3}"
+    git_path="${4}"
+    [[ -n "${git_repo}" && -n "${git_branch}" && -n "${git_dir}" && -n "${git_path}" ]] || {
+        error_msg "git_pull_dir parameter is missing: [ ${git_repo}, ${git_branch}, ${git_dir}, ${git_path} ]"
+    }
+
+    # Git clone the repository to the temporary directory
+    git_tmp_path="$(mktemp -d)"
+    git clone --quiet --single-branch --depth=1 --branch=${git_branch} ${git_repo} ${git_tmp_path}
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to clone the [ ${git_repo} ] repository."
+
+    # Copy the files to the storage directory
+    mkdir -p ${git_path}
+    cp -rf ${git_tmp_path}/${git_dir}/* ${git_path}
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to move the [ ${git_dir} ] files to the [ ${git_path} ] directory."
+
+    # Delete temporary files
+    rm -rf ${git_tmp_path} 2>/dev/null
+}
+
+download_depends() {
     echo -e "${STEPS} Start downloading dependency files..."
 
     # Download Armbian u-boot files
-    svn co ${uboot_repo} ${uboot_path} --force --quiet
+    git_pull_dir ${uboot_repo} main u-boot ${uboot_path}
     [[ "${?}" -eq "0" ]] && echo -e "${INFO} u-boot download completed." || error_msg "u-boot download failed."
 
     # Download Armbian firmware files
-    svn co ${firmware_repo} ${firmware_path} --force --quiet
+    git_pull_dir ${firmware_repo} main firmware ${firmware_path}
     [[ "${?}" -eq "0" ]] && echo -e "${INFO} firmware download completed." || error_msg "firmware download failed."
 }
 
@@ -718,8 +739,8 @@ copy_files() {
     # Copy the overload files
     [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/${PLATFORM}/overload/* ${tag_bootfs}
 
-    # Remove the .svn and .git directories
-    rm -rf $(find ${tmp_build} -type d -name '.svn' -o -name '.git')
+    # Remove the .git directories
+    rm -rf $(find ${tmp_build} -type d -name '.git')
 }
 
 replace_kernel() {
