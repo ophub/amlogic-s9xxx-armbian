@@ -234,11 +234,11 @@ The related parameters correspond to the `local packaging command`, please refer
 
 To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read/write permissions`. For details, see the [usage instructions](documents/README.md#2-set-up-private-variable-github_token).
 
-| Parameter                              | Default                  | Description                       |
-|----------------------------------------|--------------------------|-----------------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}         | out                      | Path of the folder where the packaged system is located   |
-| ${{ env.PACKAGED_OUTPUTDATE }}         | 04.13.1058               | Packaging date (month.day.hourminute)        |
-| ${{ env.PACKAGED_STATUS }}             | success                  | Packaging status: success / failure |
+| Parameter                        | Default       | Description                           |
+|----------------------------------|---------------|---------------------------------------|
+| ${{ env.PACKAGED_OUTPUTPATH }}   | out           | Armbian system files output path      |
+| ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058    | Packaging date (month.day.hourminute) |
+| ${{ env.PACKAGED_STATUS }}       | success       | Packaging status: success / failure   |
 
 ## Default Information for Armbian System
 
