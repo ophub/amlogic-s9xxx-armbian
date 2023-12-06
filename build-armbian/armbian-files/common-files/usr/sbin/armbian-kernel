@@ -74,9 +74,9 @@ update_script() {
     # Update related files
     cd ${make_path}
     mkdir -p ${compile_path}
-    cp -rf ${git_tmp_path}/${script_dir}/* ${compile_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/* ${compile_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
-    cp -f ${script_name} ${compile_script}
+    cp -f --no-preserve=ownership ${script_name} ${compile_script}
     chmod +x ${compile_script}
 
     # Clean up temporary files

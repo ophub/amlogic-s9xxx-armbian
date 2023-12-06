@@ -68,7 +68,7 @@ do_update_conf() {
 
     # Update related files
     mkdir -p ${openvfd_path}
-    cp -rf ${git_tmp_path}/${openvfd_dir}/* ${openvfd_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${openvfd_dir}/* ${openvfd_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${openvfd_repo} ] scripts failed."
     chmod +x ${openvfd_path}/vfdservice
 
