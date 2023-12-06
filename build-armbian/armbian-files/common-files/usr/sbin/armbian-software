@@ -227,7 +227,7 @@ update_script() {
 
     # Update related files
     mkdir -p ${software_path}
-    cp -rf ${git_tmp_path}/${script_dir}/* ${software_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/* ${software_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
     find ${software_path} -type f -name '*.sh' -exec chmod +x {} \;
 

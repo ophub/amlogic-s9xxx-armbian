@@ -106,14 +106,14 @@ sync_config() {
     # Update operation instruction and service related files
     echo -e "${STEPS} Start syncing operation instruction and service script..."
     [[ -d "${sbin_path}" ]] || mkdir -p ${sbin_path}
-    cp -rf ${git_tmp_path}/${script_dir}/common-files${sbin_path}/* ${sbin_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/common-files${sbin_path}/* ${sbin_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync common-files [ ${sbin_path} ] scripts failed."
     chmod +x ${sbin_path}/armbian-*
 
     # Update software service related files
     echo -e "${STEPS} Start syncing software service script..."
     [[ -d "${share_path}" ]] || mkdir -p ${share_path}
-    cp -rf ${git_tmp_path}/${script_dir}/common-files${share_path}/* ${share_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/common-files${share_path}/* ${share_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync common-files [ ${share_path} ] scripts failed."
     find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
 
@@ -121,14 +121,14 @@ sync_config() {
     [[ "${PLATFORM}" == "amlogic" ]] && {
         # Update operation instruction and service related files
         echo -e "${STEPS} Start syncing Amlogic platform specific scripts..."
-        cp -rf ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${sbin_path}/* ${sbin_path}
+        cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${sbin_path}/* ${sbin_path}
         [[ "${?}" -ne "0" ]] && error_msg "Sync platform-files [ ${sbin_path} ] scripts failed."
         chmod +x ${sbin_path}/armbian-*
 
         # Update openvfd related files
         echo -e "${STEPS} Start syncing Amlogic platform openvfd service script..."
         [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
-        cp -rf ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${openvfd_path}/* ${openvfd_path}
+        cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${openvfd_path}/* ${openvfd_path}
         [[ "${?}" -ne "0" ]] && error_msg "Sync platform-files [ ${openvfd_path} ] scripts failed."
         chmod +x ${openvfd_path}/vfdservice
     }
