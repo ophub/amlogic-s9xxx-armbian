@@ -234,11 +234,11 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 上传到 `Releases` 需要给仓库添加 `${{ secrets.GITHUB_TOKEN }}` 和 `${{ secrets.GH_TOKEN }}` 并设置 `Workflow 读写权限`，详见[使用说明](documents/README.cn.md#2-设置隐私变量-github_token)。
 
-| 参数                                      | 默认值             | 说明                       |
-|------------------------------------------|-------------------|---------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}           | out               | 打包后的系统所在文件夹的路径   |
-| ${{ env.PACKAGED_OUTPUTDATE }}           | 04.13.1058        | 打包日期（月.日.时分）        |
-| ${{ env.PACKAGED_STATUS }}               | success           | 打包状态：success / failure |
+| 参数                                 | 默认值         | 说明                       |
+|-------------------------------------|---------------|----------------------------|
+| ${{ env.PACKAGED_OUTPUTPATH }}      | out           | Armbian 系统文件输出路径      |
+| ${{ env.PACKAGED_OUTPUTDATE }}      | 04.13.1058    | 打包日期（月.日.时分）         |
+| ${{ env.PACKAGED_STATUS }}          | success       | 打包状态：success / failure  |
 
 ## Armbian 系统默认信息
 
