@@ -36,7 +36,8 @@ script_name="${script_path}/armbian_compile_kernel_script.sh"
 arch_info="$(arch)"
 
 # The compile kernel scripts download repository
-script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel"
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
+script_dir="compile-kernel"
 
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -53,26 +54,33 @@ error_msg() {
 }
 
 update_script() {
-    cd ${make_path}
     echo -e "${STEPS} Start updating the compile kernel scripts..."
 
-    # Install subversion
+    # Install git
     echo -e "${INFO} Start installing update dependencies..."
-    sudo apt-get update
-    sudo apt-get install -y subversion
-    [[ "${?}" -ne "0" ]] && error_msg "The [ subversion ] installation failed."
+    [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get update && sudo apt-get install -y git
 
-    # Convert script repository address to svn format
-    if [[ "${script_repo}" == http* && -n "$(echo ${script_repo} | grep "tree/main")" ]]; then
-        script_repo="${script_repo//tree\/main/trunk}"
-    fi
+    # Get the latest scripts
+    echo -e "${INFO} Start syncing latest scripts..."
+    git_tmp_path="$(mktemp -d)"
+    cd ${git_tmp_path}
+    git init --quiet
+    git remote add origin ${script_repo}
+    git config core.sparseCheckout true
+    echo "${script_dir}/*" >>.git/info/sparse-checkout
+    git pull --quiet --depth=1 origin main
+    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${script_repo} ] scripts failed."
 
     # Update related files
-    echo -e "${INFO} Start syncing latest scripts..."
-    svn export ${script_repo} ${compile_path} --force
+    cd ${make_path}
+    mkdir -p ${compile_path}
+    cp -rf ${git_tmp_path}/${script_dir}/* ${compile_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
     cp -f ${script_name} ${compile_script}
     chmod +x ${compile_script}
+
+    # Clean up temporary files
+    rm -rf ${git_tmp_path} 2>/dev/null
 
     # Install dependencies
     echo -e "${INFO} Start installing compilation dependencies..."
@@ -128,9 +136,11 @@ remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo 
 
 # Execute script assist functions
 case "${1}" in
-    -u | --update)  update_script ;;
-    -c | --clean)   clean_tmp ;;
-    -h | --help)    help_info ;;
-    *)              [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
-                    cd ${make_path} && sudo ${compile_script} "${@}" ;;
+-u | --update) update_script ;;
+-c | --clean) clean_tmp ;;
+-h | --help) help_info ;;
+*)
+    [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
+    cd ${make_path} && sudo ${compile_script} "${@}"
+    ;;
 esac

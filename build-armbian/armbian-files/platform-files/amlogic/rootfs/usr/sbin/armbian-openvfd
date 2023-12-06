@@ -31,7 +31,8 @@
 openvfd_path="/usr/share/openvfd"
 openvfd_service="${openvfd_path}/vfdservice"
 # The openvfd files download repository
-openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files/platform-files/amlogic/rootfs${openvfd_path}"
+openvfd_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
+openvfd_dir="build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -53,19 +54,26 @@ do_update_conf() {
     echo -e "${STEPS} Start updating the openfvd config files..."
 
     # Check dependencies
-    [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^subversion$")" ]] && sudo apt-get update && sudo apt-get install -y subversion
+    [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get update && sudo apt-get install -y git
 
-    # Convert script repository address to svn format
-    if [[ "${openvfd_repo}" == http* && -n "$(echo ${openvfd_repo} | grep "tree/main")" ]]; then
-        openvfd_repo="${openvfd_repo//tree\/main/trunk}"
-    fi
+    # Get the latest scripts
+    git_tmp_path="$(mktemp -d)"
+    cd ${git_tmp_path}
+    git init --quiet
+    git config core.sparseCheckout true
+    echo "${openvfd_dir}/*" >>.git/info/sparse-checkout
+    git remote add origin ${openvfd_repo}
+    git pull --quiet --depth=1 origin main
+    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${openvfd_repo} ] scripts failed."
 
     # Update related files
-    echo -e "${STEPS} Start syncing files..."
-    [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
-    svn export ${openvfd_repo} ${openvfd_path} --force
+    mkdir -p ${openvfd_path}
+    cp -rf ${git_tmp_path}/${openvfd_dir}/* ${openvfd_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${openvfd_repo} ] scripts failed."
     chmod +x ${openvfd_path}/vfdservice
+
+    # Clean up temporary files
+    rm -rf ${git_tmp_path} 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} Openfvd config files update completed."
@@ -125,38 +133,38 @@ do_stop() {
 # Call config based on options
 do_select_box() {
     case "${1}" in
-        11 | x96max)      do_start x96max.conf ;;
-        12 | x96maxplus)  do_start x96maxplus.conf ;;
-        13 | x96air)      do_start x96air.conf ;;
-        14 | h96max-x3)   do_start h96max-x3.conf ;;
-        15 | hk1-x3)      do_start hk1-x3.conf ;;
-        16 | hk1box)      do_start hk1box.conf ;;
-        17 | tx3)         do_start tx3.conf ;;
-        18 | tx3-mini)    do_start tx3-mini.conf ;;
-        19 | t95)         do_start t95.conf ;;
-        20 | t95z-plus)   do_start t95z-plus.conf ;;
-        21 | tx9-pro)     do_start tx9-pro.conf ;;
-        22 | x92)         do_start x92.conf ;;
-        23 | whale)       do_start whale.conf ;;
-        24 | x88pro-x3)   do_start x88pro-x3.conf ;;
-        99 | diy)         do_start diy.conf ;;
-         0 | stop)        do_stop ;;
-         1 | quit)        echo "quit!" && exit 0 ;;
-         *)               error_msg "Invalid input!" ;;
+    11 | x96max) do_start x96max.conf ;;
+    12 | x96maxplus) do_start x96maxplus.conf ;;
+    13 | x96air) do_start x96air.conf ;;
+    14 | h96max-x3) do_start h96max-x3.conf ;;
+    15 | hk1-x3) do_start hk1-x3.conf ;;
+    16 | hk1box) do_start hk1box.conf ;;
+    17 | tx3) do_start tx3.conf ;;
+    18 | tx3-mini) do_start tx3-mini.conf ;;
+    19 | t95) do_start t95.conf ;;
+    20 | t95z-plus) do_start t95z-plus.conf ;;
+    21 | tx9-pro) do_start tx9-pro.conf ;;
+    22 | x92) do_start x92.conf ;;
+    23 | whale) do_start whale.conf ;;
+    24 | x88pro-x3) do_start x88pro-x3.conf ;;
+    99 | diy) do_start diy.conf ;;
+    0 | stop) do_stop ;;
+    1 | quit) echo "quit!" && exit 0 ;;
+    *) error_msg "Invalid input!" ;;
     esac
 }
 
 # Execute according to the classification of input parameters
 case "${1}" in
-    -u | u | -update | update)
-        do_update_conf
-        ;;
-    [0-9]*)
-        do_select_box "${1}"
-        ;;
-    *)
-        clear
-        cat <<EOF
+-u | u | -update | update)
+    do_update_conf
+    ;;
+[0-9]*)
+    do_select_box "${1}"
+    ;;
+*)
+    clear
+    cat <<EOF
 
         ┌────────[ Enable LED ]─────────┐
         │                               │
@@ -185,8 +193,8 @@ case "${1}" in
         └───────────────────────────────┘
 
 EOF
-        echo -ne "${OPTIONS} Please Input ID: "
-        read boxid
-        do_select_box "${boxid}"
-        ;;
+    echo -ne "${OPTIONS} Please Input ID: "
+    read boxid
+    do_select_box "${boxid}"
+    ;;
 esac
