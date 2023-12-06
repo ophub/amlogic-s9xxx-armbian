@@ -35,7 +35,8 @@ ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
 #
 # The compile kernel scripts download repository
-script_repo="https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files/common-files${software_path}"
+script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
+script_dir="build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -69,7 +70,7 @@ check_depends() {
     # List of required dependencies
     dpkg_packages=(
         "curl" "wget" "tar" "software-properties-common" "apt-transport-https" "ca-certificates"
-        "subversion" "coreutils" "systemd" "net-tools" "cpu-checker" "dnsmasq-base" "dmidecode"
+        "git" "coreutils" "systemd" "net-tools" "cpu-checker" "dnsmasq-base" "dmidecode"
     )
     # Cyclic check all dependencies
     is_dpkg="0"
@@ -108,10 +109,10 @@ check_software_status() {
         # Check the software installation status by category
         check_status="0"
         case "${auth_method}" in
-            dpkg)   [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] && check_status="1" ;;
-            docker) [[ -n "$(docker ps -q -f name=${package} 2>/dev/null)" ]] && check_status="1" ;;
-            which)  [[ -n "$(which "${package}" 2>/dev/null)" ]] && check_status="1" ;;
-            *)      check_status="0" ;;
+        dpkg) [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] && check_status="1" ;;
+        docker) [[ -n "$(docker ps -q -f name=${package} 2>/dev/null)" ]] && check_status="1" ;;
+        which) [[ -n "$(which "${package}" 2>/dev/null)" ]] && check_status="1" ;;
+        *) check_status="0" ;;
         esac
         # Adjust software installation status
         [[ "${check_status}" -eq "1" ]] && {
@@ -214,16 +215,24 @@ show_software_list() {
 update_script() {
     echo -e "${STEPS} Start update script..."
 
-    # Convert script repository address to svn format
-    if [[ "${script_repo}" == http* && -n "$(echo ${script_repo} | grep "tree/main")" ]]; then
-        script_repo="${script_repo//tree\/main/trunk}"
-    fi
+    # Get the latest scripts
+    git_tmp_path="$(mktemp -d)"
+    cd ${git_tmp_path}
+    git init --quiet
+    git config core.sparseCheckout true
+    echo "${script_dir}/*" >>.git/info/sparse-checkout
+    git remote add origin ${script_repo}
+    git pull --quiet --depth=1 origin main
+    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${script_repo} ] scripts failed."
 
     # Update related files
-    echo -e "${STEPS} Start syncing files..."
-    svn export ${script_repo} ${software_path} --force
+    mkdir -p ${software_path}
+    cp -rf ${git_tmp_path}/${script_dir}/* ${software_path}
     [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
     find ${software_path} -type f -name '*.sh' -exec chmod +x {} \;
+
+    # Clean up temporary files
+    rm -rf ${git_tmp_path} 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} Script update complete."
@@ -268,9 +277,9 @@ check_depends
 
 # Execute script assist functions
 case "${1}" in
-    -u | -update) update_script ;;
-    -c | -clean)  clean_tmp ;;
-    -h | -help)   help_info ;;
-    -q | -quit)   echo "quit!" && exit 0 ;;
-    *)            show_software_list ;;
+-u | -update) update_script ;;
+-c | -clean) clean_tmp ;;
+-h | -help) help_info ;;
+-q | -quit) echo "quit!" && exit 0 ;;
+*) show_software_list ;;
 esac
