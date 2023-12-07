@@ -18,6 +18,7 @@
 #
 # Set the armbian release check file
 armbian_release_file="/etc/armbian-release"
+armbian_image_file="/etc/armbian-image-release"
 # Set the ophub release check file
 ophub_release_file="/etc/ophub-release"
 # Custom armbian-fix Log
@@ -167,12 +168,12 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     # Add default KERNEL_REPO (Kernel download repository)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
-        tolog "84. Add the custom KERNEL_REPO URL"
+        tolog "83. Add the custom KERNEL_REPO URL"
     }
     # Add default KERNEL_BACKUP (Automatic backup kernel)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BACKUP=")" ]] || {
         echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
-        tolog "85. Add the custom KERNEL_BACKUP"
+        tolog "84. Add the custom KERNEL_BACKUP"
     }
 
     # Fix custom banner name
@@ -181,14 +182,18 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        tolog "86. Fix custom board name: ${bd_name}"
+        tolog "85. Fix custom board name: ${bd_name}"
     }
 
     # Shorten release version number
     short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
     [[ -n "${short_version}" && -f "${armbian_release_file}" ]] && {
         sed -i "s|^VERSION=.*|VERSION=${short_version}-trunk|g" ${armbian_release_file}
-        tolog "87. Set release version: ${short_version}-trunk"
+        tolog "86. Set release version: ${short_version}-trunk"
+    }
+    [[ -f "${armbian_image_file}" ]] && {
+        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian\"|g" ${armbian_image_file}
+        tolog "87. Set VENDOR value: Armbian"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
