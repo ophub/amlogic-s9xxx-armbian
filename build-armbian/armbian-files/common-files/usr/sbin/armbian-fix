@@ -189,15 +189,17 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     [[ -f "${armbian_release_file}" ]] && {
         short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
         [[ -n "${short_version}" ]] && {
-            sed -i "s|^VERSION=.*|VERSION=${short_version}-trunk|g" ${armbian_release_file}
-            tolog "86. Set release version: ${short_version}-trunk"
+            sed -i "s|^VERSION=.*|VERSION=${short_version}|g" ${armbian_release_file}
+            tolog "86. Set release version: ${short_version}"
         }
     }
 
     # Set VENDOR value
+    # Unofficially supported devices are displayed as "Armbian-unofficial" by default.
+    # To shorten the text and adhere to the official distinction, I have changed it to "Armbian OS"
     [[ -f "${armbian_image_file}" ]] && {
-        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian\"|g" ${armbian_image_file}
-        tolog "87. Set VENDOR value: Armbian"
+        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_image_file}
+        tolog "87. Set VENDOR value: Armbian OS"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
