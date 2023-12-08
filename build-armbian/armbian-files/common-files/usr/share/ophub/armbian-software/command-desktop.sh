@@ -61,8 +61,8 @@ software_201() {
             # Install ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
             software_install "ubuntu-desktop lightdm lightdm-gtk-greeter"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Install Xfce(lightdm) on Debian (bullseye/bookworm/trixie)
-            software_install "task-xfce-desktop lightdm lightdm-gtk-greeter"
+            # Install gnome(gdm3) on Debian (bullseye/bookworm/trixie)
+            software_install "gnome gdm3"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
@@ -80,8 +80,8 @@ software_201() {
             # Remove ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
             software_remove "ubuntu-desktop lightdm lightdm-gtk-greeter"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Remove Xfce(lightdm) on Debian (bullseye/bookworm/trixie)
-            software_remove "task-xfce-desktop lightdm lightdm-gtk-greeter"
+            # Remove gnome(gdm3) on Debian (bullseye/bookworm/trixie)
+            software_remove "gnome gdm3"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
