@@ -2,7 +2,7 @@
 
 View Chinese description | [查看中文说明](README.cn.md)
 
-Armbian is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. Now you can replace your Android TV system with the Armbian system, turning it into a powerful server.
+Armbian is a lightweight Linux system specially built for ARM chips based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with and inherits the features and rich software ecosystem of the Debian/Ubuntu system. It can run securely and stably in TF/SD/USB and the device's eMMC. This project preserves the integrity of the official Armbian system and further expands its usage on devices such as TV boxes that are not officially supported. It adds some convenient operation commands. Now, you can replace the Android TV system on your TV box with the Armbian system, turning it into a powerful server.
 
 This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
 
