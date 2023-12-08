@@ -59,7 +59,7 @@ software_201() {
 
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Install ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
-            software_install "ubuntu-desktop lightdm lightdm-gtk-greeter"
+            software_install "ubuntu-desktop gdm3"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Install gnome(gdm3) on Debian (bullseye/bookworm/trixie)
             software_install "gnome gdm3"
@@ -78,7 +78,7 @@ software_201() {
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
             # Remove ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
-            software_remove "ubuntu-desktop lightdm lightdm-gtk-greeter"
+            software_remove "ubuntu-desktop gdm3"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
             # Remove gnome(gdm3) on Debian (bullseye/bookworm/trixie)
             software_remove "gnome gdm3"
