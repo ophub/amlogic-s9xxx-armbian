@@ -221,7 +221,7 @@ toolchain_check() {
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
-            wget -q "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}"
+            curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
             [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}

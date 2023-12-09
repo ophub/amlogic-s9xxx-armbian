@@ -102,7 +102,7 @@ The scripts/commands of the software center are stored in the [/usr/share/ophub/
 - `AuthMethod@Package`: The `check method` for the installation status of the software and the corresponding `software package`, separated by the `@` symbol.
   - For software installed with the `docker` container, check with the `docker` method, such as checking whether the `portainer` image is installed, check with `docker@portainer`.
   - For software installed with the `apt` method, check with the `dpkg` method, such as checking whether the `firefox` software package is installed, check with `dpkg@firefox`.
-  - For binary executable files installed by downloading with methods such as `wget`, check with the `which` method, such as checking whether the `frpc` service is installed, check with `which@frpc`.
+  - For binary executable files installed by downloading with methods such as `curl`, check with the `which` method, such as checking whether the `frpc` service is installed, check with `which@frpc`.
 - `Execute Selection`: Set the software to use a `unified instruction file` or an `independent script` for management.
   - For `more streamlined` operation commands, they are collectively written in `command-docker.sh / command-desktop.sh / command-service.sh` files according to software classification, and named by software number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`.
   - For operations that are `more complex and long in instructions`, they are managed by independent script files. For example, the independent script for installing `frpc` is named `302-frpc.sh` with the number as the prefix.
@@ -216,7 +216,7 @@ ID    NAME                STATE           MANAGE
 - `AuthMethod@Package`：软件安装状态的`检查方法`，与对应的`软件包`，使用 `@` 符号分割。
   - 使用 `docker` 容器安装的镜像，采用 `docker` 方式检查，如检查是否安装了 `portainer` 镜像，使用 `docker@portainer` 进行检查；
   - 使用 `apt` 方式安装的软件包采用 `dpkg` 方式检查，如检查是否安装了 `firefox` 软件包，使用 `dpkg@firefox` 进行检查；
-  - 使用 `wget` 等方式下载安装的二进制执行文件，采用 `which` 方式检查，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
+  - 使用 `curl` 等方式下载安装的二进制执行文件，采用 `which` 方式检查，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
 - `Execute Selection`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
   - 对于 `比较精简` 的操作命令，按照软件分类，集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
   - 对于 `比较复杂、指令内容较长` 的操作，进行独立脚本文件管理。如安装 `frpc` 的独立脚本，以序号开头，命名为 `302-frpc.sh` 。
