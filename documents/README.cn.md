@@ -1309,7 +1309,7 @@ Mar 29 15:47:18 armbian-ct2000 kernel:  fe.dai-link-0: ASoC: no backend DAIs ena
 请参考 [Bullseye NO Sound](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1000) 中的方法进行设置。
 
 ```shell
-wget https://github.com/ophub/kernel/releases/download/tools/bullseye_g12_sound-khadas-utils-4-2-any.tar.gz
+curl -fsSOL https://github.com/ophub/kernel/releases/download/tools/bullseye_g12_sound-khadas-utils-4-2-any.tar.gz
 tar -xzf bullseye_g12_sound-khadas-utils-4-2-any.tar.gz -C /
 
 systemctl enable sound.service
