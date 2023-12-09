@@ -69,7 +69,7 @@ check_release() {
 check_depends() {
     # List of required dependencies
     dpkg_packages=(
-        "curl" "wget" "tar" "software-properties-common" "apt-transport-https" "ca-certificates"
+        "curl" "tar" "software-properties-common" "apt-transport-https" "ca-certificates"
         "git" "coreutils" "systemd" "net-tools" "cpu-checker" "dnsmasq-base" "dmidecode"
     )
     # Cyclic check all dependencies

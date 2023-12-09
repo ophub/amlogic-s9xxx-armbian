@@ -63,7 +63,7 @@ software_download() {
     # Download software, E.g: /tmp/tmp.xxx/frp_0.43.0_linux_arm64.tar.gz
     tmp_download="$(mktemp -d)"
     software_filename="${software_url##*/}"
-    wget -q -P ${tmp_download} ${software_url}
+    curl -fsSL "${software_url}" -o "${tmp_download}/${software_filename}"
     [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
     echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
 

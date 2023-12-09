@@ -262,7 +262,8 @@ jobs:
           latest_updated_at="$(echo ${latest_version} | jq -r '.data')"
           latest_url="$(echo ${latest_version} | jq -r '.url')"
 
-          wget -q -P "${armbian_buildpath}" "${latest_url}"
+          armbian_filename="${latest_url##*/}"
+          curl -fsSL "${latest_url}" -o "${armbian_buildpath}/${armbian_filename}"
           [[ "${?}" -ne "0" ]] && echo "Invalid Armbian image download address." && exit 1
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
