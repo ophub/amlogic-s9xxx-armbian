@@ -224,7 +224,7 @@ toolchain_check() {
     if [[ ! -f "${armbian_file}" ]]; then
         echo -e "${INFO} Start downloading Armbian rootfs file [ ${armbian_rootfs_file} ]..."
         rm -rf ${armbian_path} && mkdir -p ${armbian_path}
-        wget -q "${dev_repo}/${armbian_rootfs_file}" -O "${armbian_path}/${armbian_rootfs_file}"
+        curl -fsSL "${dev_repo}/${armbian_rootfs_file}" -o "${armbian_path}/${armbian_rootfs_file}"
         [[ "${?}" -eq "0" ]] || error_msg "Armbian file download failed"
         tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path}
         # Change other names to armbian.img
@@ -262,7 +262,7 @@ toolchain_check() {
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
-            wget -q "${dev_repo}/${gun_file}" -O "${toolchain_path}/${gun_file}"
+            curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
             [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}
