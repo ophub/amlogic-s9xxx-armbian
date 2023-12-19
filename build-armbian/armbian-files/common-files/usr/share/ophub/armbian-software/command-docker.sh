@@ -879,6 +879,11 @@ software_123() {
     case "${software_manage}" in
     install)
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+
+        echo -ne "${OPTIONS} Set your login password: "
+        read alist_pass
+        [[ -z "${alist_pass}" ]] && alist_pass="$(docker exec -it alist ./alist admin random | grep 'password:' | awk '{print $4}')"
+
         # Instructions: https://hub.docker.com/r/xhofe/alist
         docker run -d --name=${container_name} \
             -e PUID=0 \
@@ -889,9 +894,11 @@ software_123() {
             --restart=always \
             ${image_name}
 
+        docker exec -it alist ./alist admin set ${alist_pass}
+
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5244 ]"
-        echo -e "${NOTE} View the initialization account and password commands [ docker exec -it alist ./alist password ]"
+        echo -e "${NOTE} Login name: [ admin ], password [ ${alist_pass} ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -976,7 +983,6 @@ software_125() {
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
 }
-
 
 # Initialize variables
 init_var "${@}"
