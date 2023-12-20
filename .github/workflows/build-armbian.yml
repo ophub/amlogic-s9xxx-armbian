@@ -152,15 +152,15 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.1_6.1.1"
+        default: "5.15.143_6.1.50"
         type: choice
         options:
           - 5.4.1_5.10.1
-          - 5.15.1_6.1.1
+          - 5.15.143_6.1.50
           - 5.4.1
           - 5.10.1
-          - 5.15.1
-          - 6.1.1
+          - 5.15.143
+          - 6.1.50
       auto_kernel:
         description: "Auto use the latest kernel."
         required: false
