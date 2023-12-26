@@ -152,15 +152,15 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.143_6.1.50"
+        default: "5.15.1_6.1.1"
         type: choice
         options:
           - 5.4.1_5.10.1
-          - 5.15.143_6.1.50
+          - 5.15.1_6.1.1
           - 5.4.1
           - 5.10.1
-          - 5.15.143
-          - 6.1.50
+          - 5.15.1
+          - 6.1.1
       auto_kernel:
         description: "Auto use the latest kernel."
         required: false
@@ -220,7 +220,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Initialization environment
         id: init
@@ -240,7 +240,7 @@ jobs:
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Download source code
+      - name: Download github:armbian/build source code
         id: down
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
@@ -306,6 +306,14 @@ jobs:
           replacesArtifacts: true
           token: ${{ secrets.GH_TOKEN }}
           body: |
+            ### Compile information
+            - Armbian source code: https://github.com/armbian/build
+            - Armbian fstype: ${{ inputs.armbian_fstype }}
+            - Armbian kernel: ${{ inputs.armbian_kernel }}
+            - Auto kernel: ${{ inputs.auto_kernel }}
+            - Kernel Repo: ${{ inputs.kernel_repo }}
+            - Kernel Usage: ${{ inputs.kernel_usage }}
+            - Builder name: ${{ inputs.builder_name }}
             ### Armbian Image information
             - Default username: root
             - Default password: 1234
