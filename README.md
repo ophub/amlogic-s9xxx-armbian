@@ -76,14 +76,14 @@ armbian-update
 | -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b       | yes          | yes/no        | Automatically back up the current system's kernel when updating the kernel |
 | -m       | no           | yes/no        | Use mainline u-boot |
-| -s       | None         | None          | [SOS] Use the system kernel in USB to restore eMMC |
+| -s       | None         | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h       | None         | None          | View help |
 
 Example: `armbian-update -k 5.15.50 -u dev`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 
-The current system's kernel is automatically backed up when updating the kernel. The storage path is in the `/ddbr/backup` directory. The three most recent versions of the kernel used are retained. If the newly installed kernel is unstable, you can restore the backed-up kernel at any time. If the update fails and the system cannot be started, you can use any version of Armbian to boot via USB to restore the system in eMMC. For more details, see the [Help Document](documents).
+When updating the kernel, the currently used kernel will be automatically backed up and stored in the `/ddbr/backup` directory. The backup keeps the three most recent versions of the kernel. If the newly installed kernel is unstable, you can easily restore the backup kernel at any time. If the kernel update fails and the system cannot boot, you can restore the system kernel using `armbian-update -s`. For more details, see the [Help Document](documents).
 
 - ### Install Common Software
 

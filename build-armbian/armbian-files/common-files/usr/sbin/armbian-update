@@ -21,8 +21,9 @@
 # error_msg          : Output error message
 #
 # check_depends      : Check dependencies
-# get_textoffset     : Get kernel TEXT_OFFSET
-# check_network      : Checking network
+# check_textoffset   : Check kernel TEXT_OFFSET
+# check_network      : Check network
+# check_disk         : Check the names of the disk
 # init_var           : Initialize all variables
 # query_version      : Query the latest kernel version
 # download_kernel    : Download the kernel
@@ -99,8 +100,31 @@ check_network() {
     fi
 }
 
+# Check the names of the disks running in the system
+check_disk() {
+    # Find the partition where root is located
+    ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
+    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Failed to query system partition information."
+
+    # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+    case "${ROOT_PTNAME}" in
+    mmcblk?p[1-4])
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
+        ;;
+    [hsv]d[a-z][1-4])
+        DISK_NAME="${ROOT_PTNAME:0:-1}"
+        ;;
+    nvme?n?p[1-4])
+        DISK_NAME="${ROOT_PTNAME:0:-2}"
+        ;;
+    *)
+        error_msg "Unrecognized disk type ${ROOT_PTNAME}!"
+        ;;
+    esac
+}
+
 # Get kernel TEXT_OFFSET, For u-boot.ext and u-boot.emmc
-get_textoffset() {
+check_textoffset() {
     boot_tgz_file="${1}"
     vmlinuz_name="${2}"
     need_overload="yes"
@@ -204,32 +228,15 @@ init_var() {
         sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
     }
 
+    # # Check the current system running disk
+    check_disk
+
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
     echo -e "${INFO} Kernel download repository: [ ${KERNEL_REPO} ]"
     echo -e "${INFO} Kernel tags: [ ${KERNEL_TAGS} ]"
     echo -e "${INFO} Specify kernel: [ ${inputs_kernel} ]"
     echo -e "${INFO} Backup kernel: [ ${KERNEL_BACKUP} ]"
-
-    # Find the partition where root is located
-    ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
-    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Failed to query system partition information."
-
-    # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
-    case "${ROOT_PTNAME}" in
-    mmcblk?p[1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-2}"
-        ;;
-    [hsv]d[a-z][1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-1}"
-        ;;
-    nvme?n?p[1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-2}"
-        ;;
-    *)
-        error_msg "Unrecognized disk type ${ROOT_PTNAME}!"
-        ;;
-    esac
     echo -e "${INFO} Armbian is running on: [ /dev/${DISK_NAME} ]"
 
     sync && echo ""
@@ -360,7 +367,7 @@ check_kernel() {
 
     # Check if the file is added with TEXT_OFFSET patch
     [[ "${PLATFORM}" == "amlogic" ]] && {
-        get_textoffset "${kernel_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
+        check_textoffset "${kernel_path}/${kernel_boot}" "vmlinuz-${kernel_name}"
         echo -e "${INFO} Overload file is required: [ ${need_overload} ]"
         if [[ "${need_overload}" == "yes" ]]; then
             [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "[ ${UBOOT_OVERLOAD} ] is missing, stop updating."
@@ -557,23 +564,28 @@ update_uboot() {
 sos_kernel() {
     echo -e "${STEPS} Start rescuing kernel..."
 
-    # Check the current system running disk
-    root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
-    if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
-    fi
+    # Supports specifying disks, such as: [ armbian-update -s mmcblk1 ]
+    box_disk="${2}"
+    [[ -z "${box_disk}" ]] && {
+        # Check the current system running disk
+        check_disk
 
-    # Find emmc disk, first find emmc containing boot0 partition
-    box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
-    # Find emmc disk, find emmc that does not contain the boot0 partition
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
-    # Find NVMe disk
-    [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme0n1)' | grep -vE ^${root_devname} | sort -u)"
-    # Check if emmc exists
+        # Find emmc disk, first find emmc containing boot0 partition
+        box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+        # Find emmc disk, find emmc that does not contain the boot0 partition
+        [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${DISK_NAME} | sort -u)"
+        # Find NVMe disk
+        [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme[0-9]?n[0-9]?)' | grep -vE ^${DISK_NAME} | sort -u)"
+        # Find SATA disk
+        [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '([hsv]d[a-z])' | grep -vE ^${DISK_NAME} | sort -u)"
+    }
+    # Check if disk exists
     [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe storage not found in this device!"
-    # Location of disk
+
+    # Format the disk names
+    box_disk="${box_disk//\/dev\//}"
     rescue_disk="/dev/${box_disk}"
-    echo -e "${INFO} The device eMMC/NVMe name: [ ${rescue_disk} ]"
+    echo -e "${INFO} The device eMMC/NVMe/sdX name: [ ${rescue_disk} ]"
 
     # Check if there is enough free space
     available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
@@ -649,7 +661,7 @@ help_info() {
   │  -c       │ None         │ domain-name                      │ Set the cdn domain name for accelerated access to github.com  │
   │  -b       │ yes          │ yes/no                           │ Automatically backup the current system kernel                │
   │  -m       │ no           │ yes/no                           │ Use Mainline u-boot                                           │
-  │  -s       │ None         │ None                             │ [SOS] Restore eMMC with system kernel from USB                │
+  │  -s       │ None         │ None/mmcblkX/nvmeXnX/sdX         │ [SOS] Restore the system kernel of eMMC/NVMe/sdX disk         │
   └───────────┴──────────────┴──────────────────────────────────┴───────────────────────────────────────────────────────────────┘
 EOF
     exit 0
@@ -660,9 +672,9 @@ EOF
 echo -e "${STEPS} Welcome to the kernel update tool."
 
 # Execute relevant functions based on the options
-if [[ "${@}" == "-s" ]]; then
+if [[ "${@}" =~ ^-s(\s)* ]]; then
     # Start rescuing the kernel
-    sos_kernel
+    sos_kernel "${@}"
 
     # Kernel restore successful
     sync && sleep 3

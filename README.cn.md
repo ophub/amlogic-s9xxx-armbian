@@ -76,14 +76,14 @@ armbian-update
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
-| -s       | 无           | 无             | [SOS] 使用 USB 中的系统内核恢复 eMMC |
+| -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |
 
 举例: `armbian-update -k 5.15.50 -u dev`
 
 通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
 
-更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新失败导致系统无法启动，可以通过 USB 启动任意版本的 Armbian 来恢复 eMMC 里的系统。更多说明详见 [帮助文档](documents/README.cn.md)
+更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新内核失败导致系统无法启动，可以通过 `armbian-update -s` 来恢复系统内核。更多说明详见 [帮助文档](documents/README.cn.md)
 
 - ### 安装常用软件
 

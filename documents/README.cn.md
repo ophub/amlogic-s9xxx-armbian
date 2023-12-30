@@ -399,7 +399,7 @@ armbian-update
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
-| -s       | 无           | 无             | [SOS] 使用 USB 中的系统内核恢复 eMMC |
+| -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |
 
 举例: `armbian-update -k 5.15.50 -u dev`
@@ -414,7 +414,20 @@ cd /ddbr/backup/5.10.125
 armbian-update
 ```
 
-因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -s` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
+[SOS]：因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC/NVMe/sdX 启动时，可以从 USB 等其他磁盘启动任意内核版本的 Armbian 系统，然后运行 `armbian-update -s` 命令可以把 USB 中的系统内核更新至 eMMC/NVMe/sdX 中，实现救援的目的。不指定磁盘参数时，默认将从 USB 设备恢复 eMMC/NVMe/sdX 中的内核，如果设备有多个磁盘，可以准确指定需要恢复的磁盘名称，举例如下：
+
+```shell
+# 恢复 eMMC 中的内核
+armbian-update -s mmcblk1
+# 恢复 NVMe 中的内核
+armbian-update -s nvme0n1
+# 恢复移动存储设备中的内核
+armbian-update -s sda
+# 磁盘名称可以简写为 mmcblk0/mmcblk1/nvme0n1/nvme1n1/sda/sdb/sdc 等，也可以使用完整的名称，如 /dev/sda
+armbian-update -s /dev/sda
+# 当设备只有 eMMC/NVMe/sdX 中的一个内置存储时，可以省略磁盘名称参数
+armbian-update -s
+```
 
 如果你访问 github.com 的网络不通畅，无法在线下载更新时，可以手动下载内核，上传至 Armbian 系统的任意目录，并进入内核目录，执行 `armbian-update` 进行本地安装。如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
 
