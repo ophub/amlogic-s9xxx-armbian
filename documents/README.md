@@ -399,7 +399,7 @@ armbian-update
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
 | -m | no | yes/no | Use the mainline u-boot |
-| -s | None | None | [SOS] Use the system kernel in USB to restore eMMC |
+| -s | None | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h | None | None | View the usage help |
 
 Example: `armbian-update -k 5.15.50 -u dev`
@@ -414,7 +414,20 @@ cd /ddbr/backup/5.10.125
 armbian-update
 ```
 
-In case of issues caused by special reasons such as incomplete updates, which result in the system being unable to boot from eMMC, you can boot any version of the Armbian system from a USB. By running the `armbian-update -s` command, you can update the system kernel in the USB to eMMC, accomplishing a rescue.
+[SOS]: In case of incomplete updates or other issues preventing the system from booting from eMMC/NVMe/sdX due to special reasons, you can boot an Armbian system with any kernel version from another disk such as USB. Then, run the command `armbian-update -s` to update the kernel from the USB to eMMC/NVMe/sdX, achieving the purpose of rescue. If no disk parameter is specified, the kernel will be restored from the USB device to eMMC/NVMe/sdX by default. If there are multiple disks, you can accurately specify the disk name that needs to be restored. Examples are as follows:
+
+```shell
+# Restore the kernel in eMMC
+armbian-update -s mmcblk1
+# Restore the kernel in NVMe
+armbian-update -s nvme0n1
+# Restore the kernel in a removable storage device
+armbian-update -s sda
+# Disk names can be abbreviated as mmcblk1/nvme0n1/sda, etc., or use the complete name such as /dev/sda
+armbian-update -s /dev/sda
+# When the device has only one built-in storage (eMMC/NVMe/sdX), the disk name parameter can be omitted
+armbian-update -s
+```
 
 If your network access to github.com is poor and you can't update online, you can manually download the kernel, upload it to any directory of the Armbian system, and enter the kernel directory to execute `armbian-update` for local installation. If there's a complete set of kernel files in the current directory, it will use the kernel from the current directory for the update (the four kernel files needed for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not necessary and their presence does not affect the update. The system can accurately identify needed kernel files). You can freely update among the optional kernels supported by the device, such as updating from kernel 5.10.125 to kernel 5.15.50.
 
