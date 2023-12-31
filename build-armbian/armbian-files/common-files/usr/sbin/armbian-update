@@ -228,7 +228,7 @@ init_var() {
         sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='yes'|g" ${ophub_release_file}
     }
 
-    # # Check the current system running disk
+    # Check the current system running disk
     check_disk
 
     # Display settings results
@@ -564,28 +564,41 @@ update_uboot() {
 sos_kernel() {
     echo -e "${STEPS} Start rescuing kernel..."
 
+    # Check the current system running disk
+    check_disk
     # Supports specifying disks, such as: [ armbian-update -s mmcblk1 ]
     box_disk="${2}"
-    [[ -z "${box_disk}" ]] && {
-        # Check the current system running disk
-        check_disk
 
+    if [[ -n "${box_disk}" ]]; then
+        # Format the disk names
+        box_disk="${box_disk//\/dev\//}"
+
+        # Check if the disk exists
+        [[ -b "/dev/${box_disk}" ]] || error_msg "The specified disk [ ${box_disk} ] does not exist."
+
+        # Check if the disk is the same as the current system disk
+        [[ "${box_disk}" == "${DISK_NAME}" ]] && error_msg "The specified disk [ ${box_disk} ] is the same as the current system disk [ ${DISK_NAME} ]."
+
+        echo -e "${INFO} The device name of the specified disk: [ ${box_disk} ]"
+    else
         # Find emmc disk, first find emmc containing boot0 partition
         box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?boot0)' | sed "s/boot0//g")"
+
         # Find emmc disk, find emmc that does not contain the boot0 partition
         [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${DISK_NAME} | sort -u)"
         # Find NVMe disk
         [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '(nvme[0-9]?n[0-9]?)' | grep -vE ^${DISK_NAME} | sort -u)"
         # Find SATA disk
         [[ -z "${box_disk}" ]] && box_disk="$(lsblk -l -o NAME | grep -oE '([hsv]d[a-z])' | grep -vE ^${DISK_NAME} | sort -u)"
-    }
-    # Check if disk exists
-    [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe storage not found in this device!"
 
-    # Format the disk names
-    box_disk="${box_disk//\/dev\//}"
+        # Check if disk exists
+        [[ -z "${box_disk}" ]] && error_msg "The eMMC/NVMe/sdX storage not found in this device!"
+
+        echo -e "${INFO} The device name of the target disk: [ ${box_disk} ]"
+    fi
+
     rescue_disk="/dev/${box_disk}"
-    echo -e "${INFO} The device eMMC/NVMe/sdX name: [ ${rescue_disk} ]"
+    echo -e "${INFO} The current Armbian is running on [ /dev/${DISK_NAME} ], and the target disk for restoration is [ ${rescue_disk} ]."
 
     # Check if there is enough free space
     available_space="$(df -Tk / | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
