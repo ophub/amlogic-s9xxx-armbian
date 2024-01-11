@@ -1209,6 +1209,13 @@ dtc -I dtb -O dts -o xxx.dts xxx.dtb
 
 # 2. Compilation command (generate dtb file using dts)
 dtc -I dts -O dtb -o xxx.dtb xxx.dts
+
+# 3. Save data and reboot
+sync && reboot
+
+# 4. [Optional action] Perform testing based on requirements
+# e.g., reinstall for testing when addressing the issue mentioned in 12.16
+armbian-install
 ```
 
 ### 12.14 How to Modify cmdline Settings
