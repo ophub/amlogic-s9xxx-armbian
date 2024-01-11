@@ -1204,6 +1204,13 @@ dtc -I dtb -O dts -o xxx.dts xxx.dtb
 
 # 2. 编译命令（使用 dts 编译生成 dtb 文件）
 dtc -I dts -O dtb -o xxx.dtb xxx.dts
+
+# 3.保存数据并重启
+sync && reboot
+
+# 4.[自选动作]根据需求进行测试
+# 例如在解决 12.16 中介绍的问题时，重新安装测试
+armbian-install
 ```
 
 ### 12.14 如何修改 cmdline 设置
