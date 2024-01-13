@@ -138,6 +138,7 @@ on:
           - s922x-odroid-n2
           - s922x-reva
           - s922x-ugoos-am6
+          - seewo-sv21
           - smart-am40
           - station-m1
           - sw799
