@@ -144,7 +144,7 @@ armbian-ddbr
 
 ```shell
 armbian-kernel -u
-armbian-kernel -k 5.10.125
+armbian-kernel -k 6.6.12
 ```
 
 - ### 更多使用说明
@@ -172,7 +172,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 3. 进入 `~/amlogic-s9xxx-armbian` 根目录，在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.50`）请保留，它将在重构后用作 Armbian 系统的名称。
 
-4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -b s905x3 -k 5.10.125` 命令即可生成指定 board 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
+4. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./rebuild -b s905x3 -k 6.6.12` 命令即可生成指定 board 的 Armbian 镜像文件。生成的文件保存在 `build/output/images` 目录里。
 
 - ### 本地化打包参数说明
 
@@ -181,20 +181,20 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -b   | Board      | 指定电视盒子型号，如 `-b s905x3` . 多个型号使用 `_` 进行连接，如 `-b s905x3_s905d` . 使用 `all` 表示全部型号。型号代码详见 [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) 中的 `BOARD` 设置。默认值：`all` |
 | -r   | KernelRepo | 指定 github.com 内核仓库的 `<owner>/<repo>`。默认值：`ophub/kernel` |
 | -u   | kernelUsage | 设置使用的内核的 `tags 后缀`，如 [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta)。默认值：`stable` |
-| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 5.10.125` . 多个内核使用 `_` 进行连接，如 `-k 5.10.125_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable/flippy/dev/beta` 的内核有效。其他内核系列例如 [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) 等只能使用特定内核。  |
-| -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 5.10.125 的同系列是否有更新的版本，如有 5.10.125 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
+| -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 6.6.12` . 多个内核使用 `_` 进行连接，如 `-k 6.6.12_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable/flippy/dev/beta` 的内核有效。其他内核系列例如 [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) 等只能使用特定内核。  |
+| -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 6.6.12 的同系列是否有更新的版本，如有 6.6.12 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
 | -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |
 | -n   | BuilderName | 设置 Armbian 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
-- `sudo ./rebuild -b s905x3 -k 5.10.125` : 推荐使用. 使用默认配置进行相关内核打包。
-- `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
-- `sudo ./rebuild -b s905x3 -k 5.10.125 -s 2560` : 使用默认配置，指定一个内核，一个型号进行打包，系统大小设定为2560MiB。
+- `sudo ./rebuild -b s905x3 -k 6.6.12` : 推荐使用. 使用默认配置进行相关内核打包。
+- `sudo ./rebuild -b s905x3_s905d -k 6.6.12_5.15.50` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
+- `sudo ./rebuild -b s905x3 -k 6.6.12 -s 2560` : 使用默认配置，指定一个内核，一个型号进行打包，系统大小设定为2560MiB。
 - `sudo ./rebuild -b s905x3_s905d`  使用默认配置，对多个型号的电视盒子进行全部内核打包, 使用 `_` 进行多型号连接。
-- `sudo ./rebuild -k 5.10.125_5.15.50` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
-- `sudo ./rebuild -k 5.10.125_5.15.50 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
-- `sudo ./rebuild -t btrfs -s 2560 -k 5.10.125` : 使用默认配置，设置文件系统为 btrfs 格式，分区大小为 2560MiB, 并指定内核为 5.10.125 ，对全部型号电视盒子进行打包。
+- `sudo ./rebuild -k 6.6.12_5.15.50` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。
+- `sudo ./rebuild -k 6.6.12_5.15.50 -a true` : 使用默认配置，指定多个内核，进行全部型号电视盒子进行打包, 内核包使用 `_` 进行连接。自动升级到同系列最新内核。
+- `sudo ./rebuild -t btrfs -s 2560 -k 6.6.12` : 使用默认配置，设置文件系统为 btrfs 格式，分区大小为 2560MiB, 并指定内核为 6.6.12 ，对全部型号电视盒子进行打包。
 
 ## 使用 GitHub Actions 进行编译
 
@@ -213,7 +213,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
-    armbian_kernel: 5.10.125_5.15.50
+    armbian_kernel: 6.6.12_5.15.50
 ```
 
 - ### GitHub Actions 输入参数说明

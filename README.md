@@ -144,7 +144,7 @@ For the usage of compiling the kernel in Armbian, please refer to the [Compile K
 
 ```shell
 armbian-kernel -u
-armbian-kernel -k 5.10.125
+armbian-kernel -k 6.6.12
 ```
 
 - ### More Usage Instructions
@@ -172,7 +172,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 3. Enter the `~/amlogic-s9xxx-armbian` root directory, create a `build/output/images` folder in the root directory, and upload the Armbian image file (such as `Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img`) to `~/amlogic-s9xxx-armbian/build/output/images` directory. Please keep the release version number (such as `21.11.0`) and the kernel version number (such as `5.15.50`) in the original Armbian image file name. It will be used as the name of the Armbian system after restructuring.
 
-4. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run the `sudo ./rebuild -b s905x3 -k 5.10.125` command to generate the Armbian image file for the specified board. The generated file is saved in the `build/output/images` directory.
+4. Enter the `~/amlogic-s9xxx-armbian` root directory, and then run the `sudo ./rebuild -b s905x3 -k 6.6.12` command to generate the Armbian image file for the specified board. The generated file is saved in the `build/output/images` directory.
 
 - ### Local Packaging Parameter Description
 
@@ -181,20 +181,20 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -b        | Board      | Specify the TV box model, such as `-b s905x3`. Connect multiple models with `_`, such as `-b s905x3_s905d`. Use `all` to represent all models. The model code can be found in the `BOARD` setting in [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf). Default value: `all` |
 | -r        | KernelRepo | Specify the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/kernel` |
 | -u        | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
-| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 5.10.125`. Connect multiple kernels with `_`, such as `-k 5.10.125_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/dev/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) can only use specific kernels. |
-| -a        | AutoKernel | Set whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically look for whether there is a newer version of the same series in the kernel library in the kernel specified in `-k`, such as 5.10.125. If there is a latest version after 5.10.125, it will be automatically changed to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
+| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/dev/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) can only use specific kernels. |
+| -a        | AutoKernel | Set whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically look for whether there is a newer version of the same series in the kernel library in the kernel specified in `-k`, such as 6.6.12. If there is a latest version after 6.6.12, it will be automatically changed to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
 | -t        | RootfsType | Set the file system type of the system's ROOTFS partition, the options are `ext4` or `btrfs` type. For example: `-t btrfs`. Default value: `ext4` |
 | -s        | Size       | Set the size of the system's ROOTFS partition, the system size must be greater than 2048MiB. For example: `-s 2560`. Default value: `2560` |
 | -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces when setting the signature. Default value: `None` |
 
 - `sudo ./rebuild`: Use the default configuration to package all models of TV boxes.
-- `sudo ./rebuild -b s905x3 -k 5.10.125`: Recommended. Use the default configuration to package related kernels.
-- `sudo ./rebuild -b s905x3_s905d -k 5.10.125_5.15.50`: Use the default configuration, package multiple kernels at the same time. Use `_` to connect multiple kernel parameters.
-- `sudo ./rebuild -b s905x3 -k 5.10.125 -s 2560`: Use the default configuration, specify a kernel, a model for packaging, the system size is set to 2560MiB.
+- `sudo ./rebuild -b s905x3 -k 6.6.12`: Recommended. Use the default configuration to package related kernels.
+- `sudo ./rebuild -b s905x3_s905d -k 6.6.12_5.15.50`: Use the default configuration, package multiple kernels at the same time. Use `_` to connect multiple kernel parameters.
+- `sudo ./rebuild -b s905x3 -k 6.6.12 -s 2560`: Use the default configuration, specify a kernel, a model for packaging, the system size is set to 2560MiB.
 - `sudo ./rebuild -b s905x3_s905d` Use the default configuration, package all kernels for multiple models of TV boxes, use `_` to connect multiple models.
-- `sudo ./rebuild -k 5.10.125_5.15.50`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection.
-- `sudo ./rebuild -k 5.10.125_5.15.50 -a true`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection. Automatically upgrade to the latest kernel of the same series.
-- `sudo ./rebuild -t btrfs -s 2560 -k 5.10.125`: Use the default configuration, set the file system to btrfs format, the partition size is 2560MiB, and specify the kernel as 5.10.125, package for all models of TV boxes.
+- `sudo ./rebuild -k 6.6.12_5.15.50`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection.
+- `sudo ./rebuild -k 6.6.12_5.15.50 -a true`: Use the default configuration, specify multiple kernels, and package all models of TV boxes, the kernel package uses `_` for connection. Automatically upgrade to the latest kernel of the same series.
+- `sudo ./rebuild -t btrfs -s 2560 -k 6.6.12`: Use the default configuration, set the file system to btrfs format, the partition size is 2560MiB, and specify the kernel as 6.6.12, package for all models of TV boxes.
 
 ## Use GitHub Actions for Compilation
 
@@ -213,7 +213,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
-    armbian_kernel: 5.10.125_5.15.50
+    armbian_kernel: 6.6.12_5.15.50
 ```
 
 - ### GitHub Actions Input Parameter Description
