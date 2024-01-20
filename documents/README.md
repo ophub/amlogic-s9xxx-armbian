@@ -408,8 +408,8 @@ When specifying the kernel version number through the `-k` parameter, you can ac
 
 When updating the kernel, the currently used system kernel will be automatically backed up, stored in the `/ddbr/backup` directory, retaining the three most recently used kernel versions. If the newly installed kernel is unstable, you can restore to the backed-up kernel at any time:
 ```shell
-# Enter the backup kernel directory, such as 5.10.125
-cd /ddbr/backup/5.10.125
+# Enter the backup kernel directory, such as 6.6.12
+cd /ddbr/backup/6.6.12
 # Execute the kernel update command, which will automatically install the kernel in the current directory
 armbian-update
 ```
@@ -429,7 +429,7 @@ armbian-update -s /dev/sda
 armbian-update -s
 ```
 
-If your network access to github.com is poor and you can't update online, you can manually download the kernel, upload it to any directory of the Armbian system, and enter the kernel directory to execute `armbian-update` for local installation. If there's a complete set of kernel files in the current directory, it will use the kernel from the current directory for the update (the four kernel files needed for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not necessary and their presence does not affect the update. The system can accurately identify needed kernel files). You can freely update among the optional kernels supported by the device, such as updating from kernel 5.10.125 to kernel 5.15.50.
+If your network access to github.com is poor and you can't update online, you can manually download the kernel, upload it to any directory of the Armbian system, and enter the kernel directory to execute `armbian-update` for local installation. If there's a complete set of kernel files in the current directory, it will use the kernel from the current directory for the update (the four kernel files needed for the update are `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`. Other kernel files are not necessary and their presence does not affect the update. The system can accurately identify needed kernel files). You can freely update among the optional kernels supported by the device, such as updating from kernel 6.6.12 to kernel 5.15.50.
 
 Custom options set by `-r`/`-u`/`-b` parameters can be permanently written into the relevant parameters in the individual configuration file `/etc/ophub-release`, to avoid entering it each time. The corresponding settings are:
 
