@@ -91,6 +91,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
     - [12.16 How to Resolve the Issue of I/O Errors While Writing to eMMC](#1216-how-to-resolve-the-issue-of-io-errors-while-writing-to-emmc)
     - [12.17 How to Solve the Issue of No Sound in the Bullseye Version](#1217-how-to-solve-the-issue-of-no-sound-in-the-bullseye-version)
     - [12.18 How to build the boot.scr file](#1218-how-to-build-the-bootscr-file)
+    - [12.19 How to Enable Remote Desktop and Modify the Default Port](#1219-how-to-enable-remote-desktop-and-modify-the-default-port)
 
 ## 1. Register your own Github account
 
@@ -1369,5 +1370,15 @@ reboot
 
 # Additional Explanation
 # For Amlogic devices, the file used in USB is /boot/boot.scr, while the file used for writing to eMMC is /boot/boot-emmc.scr.
+```
+
+### 12.19 How to Enable Remote Desktop and Modify the Default Port
+
+In the software center `armbian-software`, selecting `201` allows you to install a desktop. When installing the desktop, you will be asked whether to enable the remote desktop, input `y` to enable. The default port for the remote desktop is `3389`, and you can use a custom port according to your needs:
+
+```shell
+sudo nano /etc/xrdp/xrdp.ini
+# Change to a custom port, for example 5000
+port=5000
 ```
 
