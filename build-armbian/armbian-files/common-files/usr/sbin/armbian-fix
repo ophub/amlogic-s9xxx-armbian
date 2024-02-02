@@ -177,9 +177,9 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     }
 
     # Fix custom banner name
-    [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml-${soc_name}"
-    [[ "${platform_name}" == "rockchip" ]] && bd_name="RK-${board_name}"
-    [[ "${platform_name}" == "allwinner" ]] && bd_name="AW-${board_name}"
+    [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml.${soc_name}"
+    [[ "${platform_name}" == "rockchip" ]] && bd_name="RK.${board_name}"
+    [[ "${platform_name}" == "allwinner" ]] && bd_name="AW.${board_name}"
     [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
         tolog "85. Fix custom board name: ${bd_name}"
