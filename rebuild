@@ -58,7 +58,7 @@ platform_files="${build_path}/armbian-files/platform-files"
 different_files="${build_path}/armbian-files/different-files"
 model_conf="${common_files}/etc/model_database.conf"
 firmware_path="${common_files}/usr/lib/firmware"
-tmp_dir="${current_path}/tmp_dir"
+tmp_dir="${current_path}/build/tmp_dir"
 tmp_outpath="${tmp_dir}/tmp_out"
 tmp_armbian="${tmp_dir}/tmp_armbian"
 tmp_build="${tmp_dir}/tmp_build"
@@ -1125,7 +1125,7 @@ loop_rebuild() {
 
                     # Check disk space size
                     echo -ne "(${j}.${i}) Start building Armbian [\033[92m ${board} - ${kd}/${kernel} \033[0m]. "
-                    now_remaining_space="$(df -Tk ${current_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+                    now_remaining_space="$(df -Tk ${armbian_outputpath} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
                         echo -e "${WARNING} Remaining space is less than 6G, exit this build."
                         break
@@ -1175,13 +1175,13 @@ echo -e "${INFO} [ ${#build_armbian[@]} ] lists of Armbian board: [ $(echo ${bui
 echo -e "${INFO} ROOTFS type: [ ${rootfs_type} ]"
 echo -e "${INFO} Kernel Repo: [ ${kernel_repo} ], Kernel Usage: [ ${kernel_usage} ] \n"
 # Show server start information
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${armbian_outputpath}) \n"
 
 # Loop to rebuild armbian
 loop_rebuild
 
 # Show server end information
-echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${armbian_outputpath}) \n"
 echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
