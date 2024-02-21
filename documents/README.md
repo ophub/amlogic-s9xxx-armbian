@@ -16,6 +16,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
     - [5.1 Manual Compilation](#51-manual-compilation)
     - [5.2 Scheduled Compilation](#52-scheduled-compilation)
     - [5.3 Customizing Default System Configuration](#53-customizing-default-system-configuration)
+    - [5.4 Expanding Github Actions Compilation Space Using Logical Volumes](#54-expanding-github-actions-compilation-space-using-logical-volumes)
   - [6. Saving the System](#6-saving-the-system)
   - [7. Downloading the System](#7-downloading-the-system)
   - [8. Installing Armbian to EMMC](#8-installing-armbian-to-emmc)
@@ -169,6 +170,30 @@ The default system configuration information is recorded in the [model_database.
 For those with `BUILD` value as `yes`, they are part of the default packaged systems for the box, these boxes can be used directly. Those with the default value as `no` are not packaged. To use the unpackaged boxes, you need to download the same `FAMILY` packaged system (recommend downloading `5.15/5.4` kernel system), after writing to `USB`, you can open `USB's boot partition` on the computer, modify `FDT's dtb name` in `/boot/uEnv.txt` file, to adapt to other boxes in the list.
 
 When compiling locally, specify with the `-b` parameter. When compiling in Actions on github.com, specify with the `armbian_board` parameter. Using `-b all` means to package all devices where `BUILD` is `yes`. When packaging with a specified `BOARD` parameter, it can be packaged whether `BUILD` is `yes` or `no`. For example: `-b r68s_s905x3-tx3_s905l3a-cm311`.
+
+### 5.4 Expanding Github Actions Compilation Space Using Logical Volumes
+
+The default compile space for Github Actions is 84G, with about 50G available after considering the system and necessary software packages. When compiling all firmware, you may encounter an issue with insufficient space, which can be addressed by using logical volumes to expand the compile space to approximately 110G. Refer to the method in the [.github/workflows/build-armbian.yml](../.github/workflows/build-armbian.yml) file, and use the commands below to create a logical volume. Then, use the path of the logical volume during the compilation process.
+
+```yaml
+- name: Create simulated physical disk
+  run: |
+    mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+    root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+    sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+    sudo truncate -s "${root_size}"G /root.img
+    sudo losetup /dev/loop6 /mnt/mnt.img
+    sudo losetup /dev/loop7 /root.img
+    sudo pvcreate /dev/loop6
+    sudo pvcreate /dev/loop7
+    sudo vgcreate github /dev/loop6 /dev/loop7
+    sudo lvcreate -n runner -l 100%FREE github
+    sudo mkfs.xfs /dev/github/runner
+    sudo mkdir -p /builder
+    sudo mount /dev/github/runner /builder
+    sudo chown -R runner.runner /builder
+    df -Th
+```
 
 ## 6. Saving the System
 

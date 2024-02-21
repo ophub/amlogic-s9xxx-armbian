@@ -16,6 +16,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
     - [5.3 自定义默认系统配置](#53-自定义默认系统配置)
+    - [5.4 使用逻辑卷扩大 Github Actions 编译空间](#54-使用逻辑卷扩大-github-actions-编译空间)
   - [6. 保存系统](#6-保存系统)
   - [7. 下载系统](#7-下载系统)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
@@ -169,6 +170,30 @@ schedule:
 其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
 在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。使用 `-b all` 代表打包 `BUILD` 是 `yes` 的全部设备。使用指定 `BOARD` 参数打包时，无论 `BUILD` 是 `yes` 或者 `no` 均可打包，例如：`-b r68s_s905x3-tx3_s905l3a-cm311`
+
+### 5.4 使用逻辑卷扩大 Github Actions 编译空间
+
+Github Actions 编译空间默认是 84G，除去系统和必要软件包外，可用空间在 50G 左右，当编译全部固件时会遇到空间不足的问题，可以使用逻辑卷扩大编译空间至 110G 左右。参考 [.github/workflows/build-armbian.yml](../.github/workflows/build-armbian.yml) 文件里的方法，使用下面的命令创建逻辑卷。并在编译时使用逻辑卷的路径。
+
+```yaml
+- name: Create simulated physical disk
+  run: |
+    mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+    root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+    sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+    sudo truncate -s "${root_size}"G /root.img
+    sudo losetup /dev/loop6 /mnt/mnt.img
+    sudo losetup /dev/loop7 /root.img
+    sudo pvcreate /dev/loop6
+    sudo pvcreate /dev/loop7
+    sudo vgcreate github /dev/loop6 /dev/loop7
+    sudo lvcreate -n runner -l 100%FREE github
+    sudo mkfs.xfs /dev/github/runner
+    sudo mkdir -p /builder
+    sudo mount /dev/github/runner /builder
+    sudo chown -R runner.runner /builder
+    df -Th
+```
 
 ## 6. 保存系统
 
