@@ -10,7 +10,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
 - [Table of Contents](#table-of-contents)
   - [1. Register your own Github account](#1-register-your-own-github-account)
   - [2. Set up private variable GITHUB\_TOKEN](#2-set-up-private-variable-github_token)
-  - [3. Fork the repository and set Workflow permissions](#3-fork-the-repository-and-set-Workflow-permissions)
+  - [3. Fork the repository and set Workflow permissions](#3-fork-the-repository-and-set-workflow-permissions)
   - [4. Customization instructions for personalized Armbian system files](#4-customization-instructions-for-personalized-armbian-system-files)
   - [5. Compile the system](#5-compile-the-system)
     - [5.1 Manual Compilation](#51-manual-compilation)
@@ -100,10 +100,7 @@ Register your own account in order to continue with the customized operation of 
 
 ## 2. Set up private variable GITHUB_TOKEN
 
-According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret):
-> At the start of each workflow job, GitHub automatically creates a unique GITHUB_TOKEN secret to use in your workflow. You can use the GITHUB_TOKEN to authenticate in the workflow job.
-
-Therefore, **no configuration is required** .
+According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique GITHUB_TOKEN secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
 
 ## 3. Fork the repository and set Workflow permissions
 
