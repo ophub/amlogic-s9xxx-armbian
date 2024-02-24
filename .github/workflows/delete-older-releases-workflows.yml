@@ -117,4 +117,4 @@ jobs:
           workflows_keep_day: ${{ inputs.workflows_keep_day }}
           workflows_keep_keyword: ${{ inputs.workflows_keep_keyword }}
           out_log: ${{ inputs.out_log }}
-          gh_token: ${{ secrets.GH_TOKEN }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}

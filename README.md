@@ -234,7 +234,7 @@ The related parameters correspond to the `local packaging command`, please refer
 
 - ### GitHub Actions Output Variable Description
 
-To upload to `Releases`, you need to add `${{ secrets.GITHUB_TOKEN }}` and `${{ secrets.GH_TOKEN }}` to the repository and set `Workflow read/write permissions`. For details, see the [usage instructions](documents/README.md#2-set-up-private-variable-github_token).
+To upload to `Releases`, you need to set `Workflow read/write permissions` for repository. For details, see the [usage instructions](documents/README.md#2-set-up-private-variable-github_token).
 
 | Parameter                        | Default       | Description                           |
 |----------------------------------|---------------|---------------------------------------|
