@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.148 Kernel Configuration
+# Linux/arm64 5.15.149 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7)) 13.2.1 20231009"
 CONFIG_CC_IS_GCC=y
@@ -4370,7 +4370,6 @@ CONFIG_MFD_RK808=y
 # CONFIG_MFD_STMPE is not set
 CONFIG_MFD_SUN6I_PRCM=y
 CONFIG_MFD_SYSCON=y
-# CONFIG_MFD_TI_AM335X_TSCADC is not set
 # CONFIG_MFD_LP3943 is not set
 # CONFIG_MFD_LP8788 is not set
 # CONFIG_MFD_TI_LMU is not set
