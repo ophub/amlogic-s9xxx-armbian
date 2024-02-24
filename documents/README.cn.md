@@ -100,10 +100,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 2. 设置隐私变量 GITHUB_TOKEN
 
-根据 GitHub [官方文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)：
-> 在每个工作流作业开始时，GitHub 会自动创建唯一的 GITHUB_TOKEN 机密以在工作流中使用。 可以使用 GITHUB_TOKEN 在工作流作业中进行身份验证。
-
-所以 **并不需要进行任何配置** 。
+根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 GITHUB_TOKEN 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
 
 ## 3. Fork 仓库并设置工作流权限
 
