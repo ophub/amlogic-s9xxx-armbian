@@ -106,7 +106,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Delete releases and workflows runs
-        uses: ophub/delete-releases-workflows@main
+        uses: matamatmatew/delete-releases-workflows@main
         with:
           delete_releases: ${{ inputs.delete_releases }}
           delete_tags: ${{ inputs.delete_tags }}
