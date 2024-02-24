@@ -276,7 +276,7 @@ jobs:
 
           latest_version="$(curl -s \
                               -H "Accept: application/vnd.github+json" \
-                              -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+                              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                               https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=100 |
                               jq '.[]' |
                               jq -s --arg RTK "Armbian_${{ inputs.set_release }}_" '.[] | select(.tag_name | contains($RTK))' |
@@ -321,7 +321,7 @@ jobs:
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image information
             - Default username: root
