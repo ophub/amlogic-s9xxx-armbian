@@ -19,7 +19,7 @@ inputs:
   kernel_repo:
     description: "Set kernel repository."
     required: false
-    default: "ophub/kernel"
+    default: "matamatmatew/kernel"
   kernel_usage:
     description: "Set the tags of the stable kernel."
     required: false
@@ -48,7 +48,7 @@ inputs:
   kernel_source:
     description: "Select the kernel source code"
     required: false
-    default: "unifreq"
+    default: "matamatmatew"
   kernel_version:
     description: "Select kernel version"
     required: false
@@ -64,7 +64,7 @@ inputs:
   kernel_sign:
     description: "Set the kernel custom signature"
     required: false
-    default: "-ophub"
+    default: ""
   kernel_toolchain:
     description: "Select the compilation toolchain"
     required: false
