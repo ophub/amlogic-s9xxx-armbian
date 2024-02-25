@@ -13,7 +13,7 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "codesnas"
+        default: "matamatmatew"
         type: choice
         options:
           - matamatmatew

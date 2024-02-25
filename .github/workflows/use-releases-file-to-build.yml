@@ -153,7 +153,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.1_6.1.1"
+        default: "6.1.1"
         type: choice
         options:
           - 5.4.1_5.10.1
@@ -172,9 +172,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "matamatmatew/kernel"
         type: choice
         options:
+          - matamatmatew/kernel
           - ophub/kernel
       kernel_usage:
         description: "Set the tags of the stable kernel."

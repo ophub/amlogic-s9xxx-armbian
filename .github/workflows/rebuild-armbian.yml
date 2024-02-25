@@ -147,7 +147,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.1_6.1.1"
+        default: "6.1.1"
         type: choice
         options:
           - 5.4.1_5.10.1
@@ -166,9 +166,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "matamatmatew/kernel"
         type: choice
         options:
+          - matamatmatew/kernel
           - ophub/kernel
       kernel_usage:
         description: "Set the tags of the stable kernel."
@@ -266,7 +267,7 @@ jobs:
           # Get the url of the rebuild armbian file
           armbian_url="${{ inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
-              armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
+              armbian_site="https://sg.sbcmirror.org/armbian/dl/odroidn2/archive/"
               armbian_name="Armbian.*jammy.*.img.xz"
               armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [[ -n "${armbian_file}" ]]; then
