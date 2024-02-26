@@ -19,6 +19,7 @@
 # Set the armbian release check file
 armbian_release_file="/etc/armbian-release"
 armbian_image_file="/etc/armbian-image-release"
+armbian_os_status="/etc/armbian-distribution-status"
 # Set the ophub release check file
 ophub_release_file="/etc/ophub-release"
 # Custom armbian-fix Log
@@ -34,6 +35,11 @@ tolog() {
 
 # Show start message
 echo "" >${fix_log} && tolog "Start fixing..."
+
+# Get the system release version, such as: jammy, noble, bookworm, bullseye, etc.
+[[ -f "/etc/lsb-release" ]] && DISTRIBUTION_CODENAME="$(grep CODENAME /etc/lsb-release | cut -d'=' -f2)"
+[[ -z "${DISTRIBUTION_CODENAME}" && -f "/etc/os-release" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2)"
+[[ -z "${DISTRIBUTION_CODENAME}" && -x "/usr/bin/lsb_release" ]] && DISTRIBUTION_CODENAME="$(/usr/bin/lsb_release -c | cut -d':' -f2 | tr -d '\t')"
 
 # ===== Start repairing system permissions =====
 
@@ -185,29 +191,29 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         tolog "85. Fix custom board name: ${bd_name}"
     }
 
-    # Shorten release version number
-    [[ -f "${armbian_release_file}" ]] && {
-        short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-        [[ -n "${short_version}" ]] && {
-            sed -i "s|^VERSION=.*|VERSION=${short_version}|g" ${armbian_release_file}
-            tolog "86. Set release version: ${short_version}"
-        }
-    }
-
-    # Set VENDOR value
-    # Unofficially supported devices are displayed as "Armbian-unofficial" by default.
-    # To shorten the text and adhere to the official distinction, I have changed it to "Armbian OS"
-    [[ -f "${armbian_image_file}" ]] && {
-        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_image_file}
-        tolog "87. Set VENDOR value: Armbian OS"
-    }
-
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" != "amlogic" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        tolog "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        tolog "86. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
+}
+
+# Shorten release version number
+[[ -f "${armbian_release_file}" ]] && {
+    short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+    [[ -n "${short_version}" ]] && {
+        sed -i "s|^VERSION=.*|VERSION=${short_version}|g" ${armbian_release_file}
+        tolog "87. Set release version: ${short_version}"
+    }
+}
+
+# Set VENDOR value
+# Unofficially supported devices are displayed as "Armbian-unofficial" by default.
+# To shorten the text and adhere to the official distinction, I have changed it to "Armbian OS"
+[[ -f "${armbian_image_file}" ]] && {
+    sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_image_file}
+    tolog "88. Set VENDOR value: Armbian OS"
 }
 
 # Maximize root partition size
@@ -215,6 +221,12 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf 2>/dev/null &&
         tolog "89. Root partition resized successfully..."
+}
+
+# Set system status to supported
+[[ -n "${DISTRIBUTION_CODENAME}" && -f "${armbian_os_status}" ]] && {
+    sed -i "s|^${DISTRIBUTION_CODENAME}=.*|${DISTRIBUTION_CODENAME}=supported|g" ${armbian_os_status}
+    tolog "90. Set the ${DISTRIBUTION_CODENAME} system status to support"
 }
 
 # Show end message
