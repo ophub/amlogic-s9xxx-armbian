@@ -593,6 +593,7 @@ make_image() {
         skip_mb="16"
         partition_table_type="gpt"
         bootfs_type="ext4"
+        boot_mb="512"
     }
     [[ "${PLATFORM}" == "allwinner" ]] && {
         skip_mb="16"
