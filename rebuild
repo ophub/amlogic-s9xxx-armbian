@@ -101,7 +101,7 @@ auto_kernel="true"
 build_board="all"
 
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
-boot_mb="256"
+boot_mb="512"
 root_mb="2560"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 rootfs_type="ext4"
@@ -593,7 +593,6 @@ make_image() {
         skip_mb="16"
         partition_table_type="gpt"
         bootfs_type="ext4"
-        boot_mb="512"
     }
     [[ "${PLATFORM}" == "allwinner" ]] && {
         skip_mb="16"

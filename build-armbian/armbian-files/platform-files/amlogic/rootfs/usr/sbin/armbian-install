@@ -358,7 +358,7 @@ create_partition() {
     # Set partition size (Unit: MiB)
     if [[ "${AMPART_STATUS}" == "yes" ]]; then
         BLANK1="117" # After using the ampart to part disk, space after [ 117 MiB ] could be used.
-        BOOT="256"
+        BOOT="512"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
         BLANK1="68"
@@ -366,11 +366,11 @@ create_partition() {
         BLANK2="220"
     elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
         BLANK1="700"
-        BOOT="160"
+        BOOT="512"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "304" ]]; then
         BLANK1="570" # e900v22c/d: The first [ 570 MiB ] is not writable.
-        BOOT="256"
+        BOOT="512"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "305" ]]; then
         BLANK1="108" # CM311-1a-YST: Must skip [ 108 MiB ]
@@ -390,8 +390,8 @@ create_partition() {
         BLANK2="650" # Rootfs partition could be set after [ 1270 MiB ] of the total disk, [ 1270-108-512=650 MiB ]
     else
         BLANK1="68"
-        BOOT="256"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 864 MiB ] can be used.
-        BLANK2="1026" # Rootfs partition could be set after [ 1350 MiB ] of the total disk.
+        BOOT="512"    # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 608 MiB ] can be used.
+        BLANK2="770" # Rootfs partition could be set after [ 1350 MiB ] of the total disk.
     fi
 
     # Format emmc disk
