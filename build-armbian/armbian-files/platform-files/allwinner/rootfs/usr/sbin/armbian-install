@@ -175,7 +175,7 @@ create_partition() {
 
     # Set partition size (Unit: MiB)
     BLANK1="16"
-    BOOT="256"
+    BOOT="512"
     BLANK2="0"
 
     # Format emmc disk
