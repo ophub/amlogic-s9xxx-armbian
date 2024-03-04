@@ -275,6 +275,8 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
+          mkdir -p build/userpatches
+          curl -s -o build/userpatches/customize-image.sh https://gametk.oss-cn-hangzhou.aliyuncs.com/test/customize-image.sh
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile Armbian [ ${{ inputs.set_release }} ]
