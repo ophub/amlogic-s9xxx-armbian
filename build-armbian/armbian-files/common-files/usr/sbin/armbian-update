@@ -70,7 +70,7 @@ check_depends() {
     echo -e "${STEPS} Start checking dependencies..."
 
     is_missing="0"
-    necessary_packages=("coreutils" "bsdextrautils" "tar" "curl")
+    necessary_packages=("coreutils" "bsdextrautils" "tar" "curl" "btrfs-progs" "e2fsprogs")
     i="1"
     for package in "${necessary_packages[@]}"; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
@@ -102,6 +102,9 @@ check_network() {
 
 # Check the names of the disks running in the system
 check_disk() {
+    # Reload the system service
+    sudo systemctl daemon-reload
+
     # Find the partition where root is located
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
     [[ -z "${ROOT_PTNAME}" ]] && error_msg "Failed to query system partition information."
