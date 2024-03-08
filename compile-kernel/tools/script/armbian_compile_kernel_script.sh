@@ -43,11 +43,15 @@
 # Related file storage path
 current_path="${PWD}"
 compile_path="${current_path}/compile-kernel"
-kernel_path="${compile_path}/kernel"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 kernel_patch_path="${compile_path}/tools/patch"
-out_kernel="${compile_path}/output"
+kernel_path="${compile_path}/kernel"
+output_path="${compile_path}/output"
+[[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
+[[ -d "${output_path}" ]] || mkdir -p ${output_path}
+
+# Set the temporary backup path for the current system kernel
 tmp_backup_path="/ddbr/tmp"
 boot_backup_path="${tmp_backup_path}/boot"
 modules_backup_path="${tmp_backup_path}/modules"
@@ -377,11 +381,11 @@ headers_install() {
     } >${obj_list}
 
     # Install related files to the specified directory
-    tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${out_kernel}/header
-    tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${out_kernel}/header
+    tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${output_path}/header
+    tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${output_path}/header
 
     # copy .config manually to be where it's expected to be
-    cp -f .config ${out_kernel}/header/.config
+    cp -f .config ${output_path}/header/.config
 
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
@@ -396,8 +400,8 @@ compile_env() {
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
     # Create a temp directory
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
-    mkdir -p ${out_kernel}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
+    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,${kernel_version}/}
+    mkdir -p ${output_path}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set compilation parameters."
@@ -469,8 +473,13 @@ compile_kernel() {
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
-    make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${out_kernel}/modules modules_install
+    make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
+
+    # Strip debug information
+    STRIP="${CROSS_COMPILE}strip"
+    find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully."
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
@@ -502,7 +511,7 @@ generate_uinitrd() {
     rm -rf ${modules_backup_path} && mkdir -p ${modules_backup_path}
     mv -f /usr/lib/modules/$(uname -r) -t ${modules_backup_path}
     # Copy modules files
-    cp -rf ${out_kernel}/modules/lib/modules/${kernel_outname} -t /usr/lib/modules
+    cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t /usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
@@ -532,7 +541,7 @@ generate_uinitrd() {
     echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${kernel_outname})"
 
     # Restore the files in the [ /boot ] directory
-    mv -f *${kernel_outname} ${out_kernel}/boot
+    mv -f *${kernel_outname} ${output_path}/boot
     mv -f ${boot_backup_path}/* -t .
 
     # Restore the files in the [ /usr/lib/modules ] directory
@@ -548,7 +557,7 @@ packit_dtbs() {
     # Pack 3 dtbs files
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] dtbs packages..."
 
-    cd ${out_kernel}/dtb/allwinner
+    cd ${output_path}/dtb/allwinner
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
         [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay" ]] && {
@@ -556,11 +565,11 @@ packit_dtbs() {
             cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-allwinner-${kernel_outname}.tar.gz *
-        mv -f *.tar.gz ${out_kernel}/${kernel_version}
+        mv -f *.tar.gz ${output_path}/${kernel_version}
         echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
     }
 
-    cd ${out_kernel}/dtb/amlogic
+    cd ${output_path}/dtb/amlogic
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
         [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay" ]] && {
@@ -568,11 +577,11 @@ packit_dtbs() {
             cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-amlogic-${kernel_outname}.tar.gz *
-        mv -f *.tar.gz ${out_kernel}/${kernel_version}
+        mv -f *.tar.gz ${output_path}/${kernel_version}
         echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
     }
 
-    cd ${out_kernel}/dtb/rockchip
+    cd ${output_path}/dtb/rockchip
     cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
         [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay" ]] && {
@@ -580,7 +589,7 @@ packit_dtbs() {
             cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-rockchip-${kernel_outname}.tar.gz *
-        mv -f *.tar.gz ${out_kernel}/${kernel_version}
+        mv -f *.tar.gz ${output_path}/${kernel_version}
         echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
     }
 }
@@ -589,20 +598,20 @@ packit_kernel() {
     # Pack 3 kernel files
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] boot, modules and header packages..."
 
-    cd ${out_kernel}/boot
+    cd ${output_path}/boot
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz *
-    mv -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${output_path}/${kernel_version}
     echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
 
-    cd ${out_kernel}/modules/lib/modules
+    cd ${output_path}/modules/lib/modules
     tar -czf modules-${kernel_outname}.tar.gz *
-    mv -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${output_path}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
-    cd ${out_kernel}/header
+    cd ${output_path}/header
     tar -czf header-${kernel_outname}.tar.gz *
-    mv -f *.tar.gz ${out_kernel}/${kernel_version}
+    mv -f *.tar.gz ${output_path}/${kernel_version}
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 }
 
@@ -619,14 +628,14 @@ compile_selection() {
     fi
 
     # Add sha256sum integrity verification file
-    cd ${out_kernel}/${kernel_version}
+    cd ${output_path}/${kernel_version}
     sha256sum * >sha256sums
     echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
 
-    cd ${out_kernel}
+    cd ${output_path}
     tar -czf ${kernel_version}.tar.gz ${kernel_version}
 
-    echo -e "${INFO} Kernel series files are stored in [ ${out_kernel} ]."
+    echo -e "${INFO} Kernel series files are stored in [ ${output_path} ]."
 }
 
 clean_tmp() {
@@ -634,7 +643,7 @@ clean_tmp() {
     echo -e "${STEPS} Clear the space..."
 
     sync && sleep 3
-    rm -rf ${out_kernel}/{boot/,dtb/,modules/,header/,${kernel_version}/}
+    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,${kernel_version}/}
     rm -rf ${tmp_backup_path}
 
     echo -e "${SUCCESS} All processes have been completed."
@@ -695,13 +704,13 @@ echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
 
 # Show server start information
-echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${current_path}) \n"
+echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${kernel_path}) \n"
 
 # Loop to compile the kernel
 loop_recompile
 
 # Show server end information
-echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${current_path}) \n"
+echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${kernel_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
 # All process completed
 wait
