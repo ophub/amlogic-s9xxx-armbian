@@ -963,6 +963,16 @@ A custom script for startup tasks has already been added to the system. In the A
 
 By using the `armbian-sync` command, you can update all service scripts in the local system to the latest version with one click.
 
+If the `armbian-sync` update fails, this suggests that the version of the command is too old. You can update the command using the method below:
+
+```shell
+wget https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian/armbian-files/common-files/usr/sbin/armbian-sync -O /usr/sbin/armbian-sync
+
+chmod +x /usr/sbin/armbian-sync
+
+armbian-sync
+```
+
 ### 12.10 How to Get Android System Partition Information on eMMC
 
 When we write the Armbian system into the eMMC system, we need to first confirm the Android system partition table of the device to ensure that data is written to a safe area. Try not to damage the Android system partition table to avoid problems such as the system not being able to start. If you write to an unsafe area, it may fail to start or display an error similar to the one below:
