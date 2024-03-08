@@ -513,6 +513,11 @@ compile_kernel() {
     make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
+    # Strip debug information
+    STRIP="${CROSS_COMPILE}strip"
+    find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully."
+
     # Install headers
     echo -e "${STEPS} Install headers..."
     headers_install
