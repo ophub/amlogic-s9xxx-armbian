@@ -961,6 +961,16 @@ bluetoothctl block 12:34:56:78:90:AB
 
 使用 `armbian-sync` 命令可以一键将本地系统中的全部服务脚本更新到最新版本。
 
+如果 `armbian-sync` 更新失败，说明这个命令的版本过旧，可以使用下面的方法更新这个命令：
+
+```shell
+wget https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian/armbian-files/common-files/usr/sbin/armbian-sync -O /usr/sbin/armbian-sync
+
+chmod +x /usr/sbin/armbian-sync
+
+armbian-sync
+```
+
 ### 12.10 如何获取 eMMC 上的安卓系统分区信息
 
 我们将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。如果写入了不安全的区域，会无法启动，或出现类似下面的错误：
