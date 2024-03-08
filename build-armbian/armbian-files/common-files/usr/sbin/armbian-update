@@ -736,6 +736,28 @@ sos_kernel() {
         cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
         echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
+
+        # Adjust the initrd_addr value to 0x15000000
+        initrd_addr_file="emmc_autoscript.cmd"
+        initrd_addr_mkimage_file="emmc_autoscript"
+        [[ -f "${initrd_addr_file}" ]] && {
+            sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" ${initrd_addr_file}
+            sudo rm -f ${initrd_addr_mkimage_file}
+            sudo mkimage -C none -A arm -T script -d ${initrd_addr_file} ${initrd_addr_mkimage_file} >/dev/null
+        }
+
+        # Adjust the ramdisk_addr_r value to 0x15000000
+        ramdisk_addr_file="s905_autoscript.cmd"
+        ramdisk_addr_mkimage_file="s905_autoscript"
+        [[ -f "${ramdisk_addr_file}" ]] && {
+            sed -i "s|^setenv ramdisk_addr_r.*|setenv ramdisk_addr_r 0x15000000|g" ${ramdisk_addr_file}
+            sudo rm -f ${ramdisk_addr_mkimage_file}
+            sudo mkimage -C none -A arm -T script -d ${ramdisk_addr_file} ${ramdisk_addr_mkimage_file} >/dev/null
+        }
+
+        # Adjust the initrd_addr value to 0x15000000
+        [[ -f "boot.ini" ]] && sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" boot.ini
+        [[ -f "boot-emmc.ini" ]] && sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" boot-emmc.ini
     } || error_msg "(1/3) The [ ${rescue_path}/bootfs ] folder does not exist, stop rescuing."
 
     # 02. For /usr/lib/modules/${kernel_signature}
