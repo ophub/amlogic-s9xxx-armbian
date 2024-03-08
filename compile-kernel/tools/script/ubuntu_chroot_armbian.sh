@@ -15,7 +15,6 @@
 #===================== Set make environment variables =====================
 #
 # Set environment variables
-chroot_make_path="${PWD}"
 chroot_arch_info="$(arch)"
 chroot_kernel_version="${1}"
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
@@ -42,7 +41,6 @@ chroot_env_init() {
 chroot_generate_uinitrd() {
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
-    #echo -e "${INFO} File status in the /boot directory before the update: \n$(ls -l .) \n"
 
     # Enable update_initramfs
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
@@ -62,7 +60,6 @@ chroot_generate_uinitrd() {
 }
 
 echo -e "${INFO} Current system: [ ${chroot_arch_info} ]"
-echo -e "${INFO} Current path: [ ${chroot_make_path} ]"
 echo -e "${INFO} Compile the kernel version: [ ${chroot_kernel_version} ]"
 
 # Check dependencies
