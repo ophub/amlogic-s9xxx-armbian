@@ -45,6 +45,8 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -p        | AutoPatch   | Sets whether to use custom kernel patches. When set to `true`, it will use the kernel patches in the [tools/patch](tools/patch) directory. For detailed instructions, refer to [how to add kernel patches](../documents/README.md#9-compiling-armbian-kernel). Default value: `false` |
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name is `5.15.100-ophub`. Please do not include spaces when setting custom signatures. Default value: `-ophub` |
 | -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc`. Default value: `gcc` |
+| -c        | Compress    | Set the compression format used for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default value: `xz` |
+
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.
 - `sudo ./recompile -k 5.15.100`: Use the default configuration and specify the kernel version to be compiled through `-k`. Multiple versions are connected using `_` for simultaneous compilation.
@@ -93,6 +95,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | kernel_config    | false         | By default, use the configuration template in the [tools/config](tools/config) directory. You can set the directory for storing the kernel configuration file in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 | kernel_patch     | false         | Sets the directory for custom kernel patches. |
 | auto_patch       | false         | Sets whether to use custom kernel patches. Default value is `false`. Refer to `-p` for functionality. |
+| compress_format  | xz            | Set the compression format used for initrd in the kernel. Default value is `xz`. Refer to `-c` for functionality. |
 
 - ### GitHub Action Output Variables
 
