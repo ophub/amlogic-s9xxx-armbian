@@ -53,6 +53,16 @@ on:
         options:
           - clang
           - gcc
+      compress_format:
+        description: "Set the initrd compression format"
+        required: false
+        default: "xz"
+        type: choice
+        options:
+          - xz
+          - gzip
+          - zstd
+          - lzma
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
@@ -136,6 +146,7 @@ jobs:
           kernel_package: ${{ inputs.kernel_package }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
+          compress_format: ${{ inputs.compress_format }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
