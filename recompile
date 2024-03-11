@@ -562,7 +562,7 @@ generate_uinitrd() {
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
-    echo "COMPRESS=gzip" >>${compress_initrd_file}
+    echo "COMPRESS=xz" >>${compress_initrd_file}
 
     [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
