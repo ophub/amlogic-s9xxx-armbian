@@ -74,6 +74,8 @@ auto_patch="false"
 custom_name="-ophub"
 # Set the kernel compile object, options: [ dtbs / all ]
 package_list="all"
+# Set the compression format, options: [ gzip / bzip2 / lz4 / lzma / lzop / xz / zstd ]
+compress_format="xz"
 
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -102,7 +104,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:m:p:r:t:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -164,6 +166,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -t parameter [ ${2} ]!"
+            fi
+            ;;
+        -c | --Compress)
+            if [[ -n "${2}" ]]; then
+                compress_format="${2}"
+                shift
+            else
+                error_msg "Invalid -c parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -517,7 +527,7 @@ generate_uinitrd() {
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
-    echo "COMPRESS=xz" >>${compress_initrd_file}
+    echo "COMPRESS=${compress_format}" >>${compress_initrd_file}
 
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
@@ -701,6 +711,7 @@ echo -e "${INFO} Kernel patch: [ ${auto_patch} ]"
 echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
+echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
 
 # Show server start information
