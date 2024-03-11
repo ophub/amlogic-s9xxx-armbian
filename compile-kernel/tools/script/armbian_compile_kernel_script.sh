@@ -517,7 +517,7 @@ generate_uinitrd() {
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
-    echo "COMPRESS=gzip" >>${compress_initrd_file}
+    echo "COMPRESS=xz" >>${compress_initrd_file}
 
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
