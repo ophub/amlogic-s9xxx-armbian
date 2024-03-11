@@ -525,6 +525,7 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
+    [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     sed -i "/^COMPRESS=/d" ${compress_initrd_file}
     echo "COMPRESS=${compress_format}" >>${compress_initrd_file}
