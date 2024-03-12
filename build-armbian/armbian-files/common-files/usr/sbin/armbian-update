@@ -321,13 +321,6 @@ query_version() {
         }
     }
 
-    # Check for inapplicable kernels
-    if [[ "${KERNEL_TAGS}" =~ ^[0-9]{1,2}\.[0-9]+ ]]; then
-        [[ "${inputs_kernel}" != "$(echo ${KERNEL_TAGS} | sed -e 's/\.[xy]/\.1/g' | awk -F'.' '{print $1"."$2"."}')"* ]] && {
-            error_msg "According to the [ ${ophub_release_file} ] file settings, the [ ${inputs_kernel} ] kernel is not available."
-        }
-    fi
-
     sync && echo ""
 }
 
