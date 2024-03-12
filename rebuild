@@ -85,17 +85,18 @@ kernel_repo="https://github.com/ophub/kernel"
 default_tags="stable"
 # Set the tags(kernel_xxx) of the specific kernel, such as 5.15.y, 6.1.y, etc.
 specific_tags="${default_tags}"
-# Set the list of kernels used by default
-rk3588_kernel=("5.10.1")
-rk35xx_kernel=("5.10.1")
-h6_kernel=("6.6.1")
-stable_kernel=("6.6.1" "6.1.1")
+# Set the list of kernels used by default(Fixed version)
+rk3588_kernel=("5.10.y")
+rk35xx_kernel=("5.10.y")
+h6_kernel=("6.6.y")
+specific_6xy=("6.6.y" "6.1.y")
+specific_5xy=("5.15.y" "5.10.y" "5.4.y")
+specific_kernel=()
+# Set the list of kernels used by default(Selectable version)
+stable_kernel=("6.6.y" "6.1.y")
 flippy_kernel=(${stable_kernel[@]})
 dev_kernel=(${stable_kernel[@]})
 beta_kernel=(${stable_kernel[@]})
-specific_kernel=()
-specific_5xy=("5.15.1" "5.10.1" "5.4.1")
-specific_6xy=("6.6.1" "6.1.1")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 
