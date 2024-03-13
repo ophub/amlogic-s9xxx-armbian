@@ -527,8 +527,12 @@ generate_uinitrd() {
     # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
-    sed -i "/^COMPRESS=/d" ${compress_initrd_file}
-    echo "COMPRESS=${compress_format}" >>${compress_initrd_file}
+    if [[ -f "${compress_initrd_file}" && -n "$(cat ${compress_initrd_file} | grep -E ^COMPRESS=)" ]]; then
+        sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
+        echo -e "${INFO} Set the [ ${compress_format} ] compression format in the [ ${compress_initrd_file} ] file."
+    else
+        error_msg "The [ ${compress_initrd_file} ] file does not exist."
+    fi
 
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
