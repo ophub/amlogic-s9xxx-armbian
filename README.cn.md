@@ -193,7 +193,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
 - `sudo ./rebuild -b s905x3 -k 6.6.12` : 推荐使用. 使用默认配置进行相关内核打包。
-- `sudo ./rebuild -b s905x3 -k 6.x.y` : 使用默认配置进行相关内核打包，内核使用 6.x.y 系列（6.x.y 代表 6.1.y 和 6.6.y 等以 6. 开头的系列内核）。
 - `sudo ./rebuild -b s905x3 -k 6.1.y` : 使用默认配置进行相关内核打包，内核使用 6.1.y 系列的最新版。
 - `sudo ./rebuild -b s905x3_s905d -k 6.6.12_5.15.50` : 使用默认配置，进行多个内核同时打包。使用 `_` 进行多内核参数连接。
 - `sudo ./rebuild -b s905x3 -k 6.6.12 -s 2560` : 使用默认配置，指定一个内核，一个型号进行打包，系统大小设定为2560MiB。
