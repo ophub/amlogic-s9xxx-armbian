@@ -618,6 +618,7 @@ packit_kernel() {
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] boot, modules and header packages..."
 
     cd ${output_path}/boot
+    rm -rf dtb-*
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${output_path}/${kernel_version}
