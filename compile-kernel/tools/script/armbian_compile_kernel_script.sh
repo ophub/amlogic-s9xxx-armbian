@@ -74,7 +74,7 @@ auto_patch="false"
 custom_name="-ophub"
 # Set the kernel compile object, options: [ dtbs / all ]
 package_list="all"
-# Set the compression format, options: [ gzip / bzip2 / lz4 / lzma / lzop / xz / zstd ]
+# Set the compression format, options: [ gzip / lzma / xz / zstd ]
 compress_format="xz"
 
 # Compile toolchain download mirror, run on Armbian
@@ -524,13 +524,13 @@ generate_uinitrd() {
     cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t /usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
-    # COMPRESS: [ gzip | bzip2 | lz4 | lzma | lzop | xz | zstd ]
+    # COMPRESS: [ gzip | lzma | xz | zstd ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     if [[ -f "${compress_initrd_file}" ]]; then
         sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
-        mod_info="$(cat ${compress_initrd_file} | grep -E ^COMPRESS=)"
-        echo -e "${INFO} Set the [ ${mod_info} ] in the [ ${compress_initrd_file} ] file."
+        compress_settings="$(cat ${compress_initrd_file} | grep -E ^COMPRESS=)"
+        echo -e "${INFO} Set the [ ${compress_settings} ] in the initramfs.conf file."
     else
         error_msg "The [ ${compress_initrd_file} ] file does not exist."
     fi
