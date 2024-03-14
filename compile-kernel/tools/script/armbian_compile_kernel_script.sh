@@ -216,6 +216,9 @@ toolchain_check() {
     sudo apt-get -qq update
     sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
 
+    # Set the default path
+    path_os_variable="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+
     # Download the cross-compilation toolchain: [ clang / gcc ]
     [[ -d "/etc/apt/sources.list.d" ]] || mkdir -p /etc/apt/sources.list.d
     if [[ "${toolchain_name}" == "clang" ]]; then
@@ -226,6 +229,7 @@ toolchain_check() {
         [[ "${?}" -eq "0" ]] || error_msg "LLVM installation failed."
 
         # Set cross compilation parameters
+        export PATH="${path_os_variable}"
         export CROSS_COMPILE="aarch64-linux-gnu-"
         export CC="clang"
         export LD="ld.lld"
@@ -249,8 +253,7 @@ toolchain_check() {
         fi
 
         # Add ${PATH} variable
-        path_armbian="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
-        path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_armbian}"
+        path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_os_variable}"
         export PATH="${path_gcc}"
 
         # Set cross compilation parameters
