@@ -115,12 +115,12 @@ mount_try() {
     t="1"
     max_try="10"
     while [[ "${t}" -le "${max_try}" ]]; do
-        mount ${m_dev} ${m_target}
+        sudo mount ${m_dev} ${m_target}
         if [[ "${?}" -eq "0" ]]; then
             break
         else
             sync && sleep 3
-            umount -f ${m_target} 2>/dev/null
+            sudo umount -f ${m_target} 2>/dev/null
             t="$((t + 1))"
         fi
     done
@@ -593,18 +593,27 @@ generate_uinitrd() {
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
     echo -e "${INFO} Enter the chroot armbian system..."
+    sudo mount -t proc /proc ${tag_rootfs}/proc
+    sudo mount --bind /dev ${tag_rootfs}/dev
+    sudo mount --bind /dev/pts ${tag_rootfs}/dev/pts
+    sudo mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
+    sudo chmod 0666 ${tag_rootfs}/dev/null
     chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
     [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
     cd ${current_path}
     # Copy the generated uInitrd file to the current system
     echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot ]"
-    cp -f ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
+    cp -rf ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
 
     # Unmount the armbian system
     sync && sleep 3
-    umount ${tag_rootfs}/boot 2>/dev/null
-    umount ${tag_rootfs} 2>/dev/null
+    sudo umount ${tag_rootfs}/dev/fd 2>/dev/null
+    sudo umount ${tag_rootfs}/dev/pts 2>/dev/null
+    sudo umount ${tag_rootfs}/dev 2>/dev/null
+    sudo umount ${tag_rootfs}/proc 2>/dev/null
+    sudo umount ${tag_rootfs}/boot 2>/dev/null
+    sudo umount ${tag_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
 }
 
@@ -654,6 +663,7 @@ packit_kernel() {
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] boot, modules and header packages..."
 
     cd ${output_path}/boot
+    rm -rf dtb-*
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${output_path}/${kernel_version}
