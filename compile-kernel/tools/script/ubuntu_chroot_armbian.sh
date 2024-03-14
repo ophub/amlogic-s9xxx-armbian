@@ -55,9 +55,9 @@ chroot_env_init() {
 
     # Check the necessary packages
     [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${necessary_packages}$")" ]] || {
-        echo -e "${STEPS} Install the required dependencies..."
-        sudo apt-get update -y -qq
-        sudo apt-get install -y -qq ${necessary_packages}
+        echo -e "${INFO} Install the required dependencies..."
+        apt-get update -y
+        apt-get install -y ${necessary_packages}
     }
 }
 
