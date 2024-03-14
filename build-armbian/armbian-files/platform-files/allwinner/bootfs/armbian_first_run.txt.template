@@ -40,5 +40,5 @@ FR_net_use_static=0
 FR_net_static_ip='192.168.0.100'
 FR_net_static_mask='255.255.255.0'
 FR_net_static_gateway='192.168.0.1'
-FR_net_static_dns='8.8.8.8 8.8.4.4' #2 entries max, seperated by a space.
+FR_net_static_dns='8.8.8.8 8.8.4.4' #2 entries max, separated by a space.
 #-----------------------------------------------------------------
