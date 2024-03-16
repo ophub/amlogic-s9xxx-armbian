@@ -218,7 +218,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
     build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
-    armbian_kernel: 6.6.12_5.15.50
+    armbian_kernel: 6.1.y_5.15.y
 ```
 
 - ### GitHub Actions 输入参数说明
@@ -231,7 +231,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | armbian_board    | all               | 设置打包盒子的 `board` ，功能参考 `-b`                 |
 | kernel_repo      | ophub/kernel      | 指定 github.com 内核仓库的 `<owner>/<repo>`，功能参考 `-r` |
 | kernel_usage     | stable            | 设置使用的内核的 `tags 后缀`。功能参考 `-u` |
-| armbian_kernel   | 6.1.1_5.15.1      | 设置内核 [版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)，功能参考 `-k` |
+| armbian_kernel   | 6.1.y_5.15.y      | 设置内核 [版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)，功能参考 `-k` |
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
 | armbian_size     | 512/2560          | 设置系统 BOOTFS 和 ROOTFS 分区的大小，功能参考 `-s`  |
@@ -264,7 +264,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.15.1_6.1.1
+    kernel_version: 6.1.y_5.15.y
     kernel_auto: true
     kernel_sign: -yourname
 ```
