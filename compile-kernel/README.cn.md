@@ -66,7 +66,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.15.1_6.1.1
+    kernel_version: 6.1.y_5.15.y
     kernel_auto: true
     kernel_sign: -yourname
 ```
@@ -85,7 +85,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 |-------------------|------------------|-----------------------------------------------------------|
 | build_target      | kernel           | 固定参数 `kernel`，设置编译目标为内核。                        |
 | kernel_source     | unifreq          | 指定编译内核的源代码仓库。默认值为 `unifreq` 。功能参考 `-r`      |
-| kernel_version    | 5.15.1_6.1.1     | 指定 kernel 名称，如 `5.15.100`。功能参考 `-k`                |
+| kernel_version    | 6.1.y_5.15.y     | 指定 kernel 名称，如 `5.15.100`。功能参考 `-k`                |
 | kernel_auto       | true             | 设置是否自动采用同系列最新版本内核。默认值为 `true`。功能参考 `-a`  |
 | kernel_package    | all              | 设置制作内核的包列表。默认值为 `all`。功能参考 `-m`             |
 | kernel_sign       | -ophub           | 设置内核自定义签名。默认值为 `-ophub`。功能参考 `-n`             |
@@ -101,7 +101,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 
 | 参数                               | 默认值                    | 说明                       |
 |-----------------------------------|--------------------------|----------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}    | 5.15.1_6.1.1             | 编译好的内核的名称            |
+| ${{ env.PACKAGED_OUTPUTTAGS }}    | 6.1.y_5.15.y             | 编译好的内核的名称            |
 | ${{ env.PACKAGED_OUTPUTPATH }}    | compile-kernel/output    | 编译完成的内核所在文件夹的路径  |
 | ${{ env.PACKAGED_OUTPUTDATE }}    | 04.13.1058               | 编译日期（月.日.时分）        |
 | ${{ env.PACKAGED_STATUS }}        | success                  | 编译状态：success / failure  |

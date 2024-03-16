@@ -68,7 +68,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.15.1_6.1.1
+    kernel_version: 6.1.y_5.15.y
     kernel_auto: true
     kernel_sign: -yourname
 ```
@@ -87,7 +87,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 |------------------|---------------|-----------------------------------------------------------------|
 | build_target     | kernel        | Fixed parameter `kernel`, set the compilation target to the kernel.|
 | kernel_source    | unifreq       | Specifies the source code repository for compiling the kernel. Default value is `unifreq`. Refer to `-r` for functionality. |
-| kernel_version   | 5.15.1_6.1.1  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
+| kernel_version   | 6.1.y_5.15.y  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
 | kernel_auto      | true          | Sets whether to automatically adopt the latest version of the same series kernel. Default value is `true`. Refer to `-a` for functionality. |
 | kernel_package   | all           | Sets the package list for making the kernel. Default value is `all`. Refer to `-m` for functionality. |
 | kernel_sign      | -ophub        | Sets the kernel custom signature. Default value is `-ophub`. Refer to `-n` for functionality. |
@@ -103,7 +103,7 @@ To upload to `Releases`, you need to set `Workflow read/write permissions` for r
 
 | Parameter                        | Default Value   | Description                            |
 |----------------------------------|-----------------|----------------------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}   | 5.15.1_6.1.1    | The name of the compiled kernel.       |
+| ${{ env.PACKAGED_OUTPUTTAGS }}   | 6.1.y_5.15.y    | The name of the compiled kernel.       |
 | ${{ env.PACKAGED_OUTPUTPATH }}   | compile-kernel/output | The path of the directory where the compiled kernel is stored. |
 | ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058      | The compilation date (month.day.hourminute). |
 | ${{ env.PACKAGED_STATUS }}       | success         | Compilation status: success / failure. |
