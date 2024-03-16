@@ -188,7 +188,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/dev/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) can only use specific kernels. |
 | -a        | AutoKernel | Set whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically look for whether there is a newer version of the same series in the kernel library in the kernel specified in `-k`, such as 6.6.12. If there is a latest version after 6.6.12, it will be automatically changed to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
 | -t        | RootfsType | Set the file system type of the system's ROOTFS partition, the options are `ext4` or `btrfs` type. For example: `-t btrfs`. Default value: `ext4` |
-| -s        | Size       | Set the size of the system's ROOTFS partition, the system size must be greater than 2048MiB. For example: `-s 2560`. Default value: `2560` |
+| -s        | Size       | Set the size of the system's image partitions. When setting only the ROOTFS partition size, you can specify a single value, for example: `-s 2560`. When setting both BOOTFS and ROOTFS partition sizes, use / to connect the two values, for example: `-s 512/2560`. The default value is `512/2560` |
 | -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces when setting the signature. Default value: `None` |
 
 - `sudo ./rebuild`: Use the default configuration to package all models of TV boxes.
@@ -234,7 +234,7 @@ The related parameters correspond to the `local packaging command`, please refer
 | armbian_kernel         | 6.1.1_5.15.1             | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
 | auto_kernel            | true                     | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
 | armbian_fstype         | ext4                     | Set the file system type of the system's ROOTFS partition, refer to `-t`     |
-| armbian_size           | 2560                     | Set the size of the system's ROOTFS partition, refer to `-s`            |
+| armbian_size           | 256/1024                 | Set the size of the system BOOTFS and ROOTFS partitions, function reference `-s`  |
 | builder_name           | None                     | Set the Armbian system builder signature, refer to `-n`           |
 
 - ### GitHub Actions Output Variable Description
