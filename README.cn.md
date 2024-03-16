@@ -188,7 +188,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -k   | Kernel     | 指定 [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) 名称，如 `-k 6.6.12` . 多个内核使用 `_` 进行连接，如 `-k 6.6.12_5.15.50` 。通过 `-k` 参数自由指定的内核版本只对使用 `stable/flippy/dev/beta` 的内核有效。其他内核系列例如 [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) 等只能使用特定内核。  |
 | -a   | AutoKernel | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动在内核库中查找在 `-k` 中指定的内核如 6.6.12 的同系列是否有更新的版本，如有 6.6.12 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -t   | RootfsType | 对系统的 ROOTFS 分区的文件系统类型进行设置，可选项为 `ext4` 或 `btrfs` 类型。例如： `-t btrfs`。默认值：`ext4` |
-| -s   | Size       | 对系统的 ROOTFS 分区大小进行设置，系统大小必须大于 2048MiB. 例如： `-s 2560`。默认值：`2560` |
+| -s   | Size       | 对系统的镜像分区大小进行设置，只设置 ROOTFS 分区大小时可以只指定一个数值，例如： `-s 2560`。需要同时设置 BOOTFS 和 ROOTFS 分区大小时，使用 / 对两个数值进行连接，例如： `-s 512/2560`。默认值：`512/2560` |
 | -n   | BuilderName | 设置 Armbian 系统构建者签名。设置签名时请勿包含空格。默认值：`无` |
 
 - `sudo ./rebuild` : 使用默认配置，对全部型号的电视盒子进行打包。
@@ -234,7 +234,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | armbian_kernel   | 6.1.1_5.15.1      | 设置内核 [版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)，功能参考 `-k` |
 | auto_kernel      | true              | 设置是否自动采用同系列最新版本内核，功能参考 `-a`       |
 | armbian_fstype   | ext4              | 设置系统 ROOTFS 分区的文件系统类型，功能参考 `-t`     |
-| armbian_size     | 2560              | 设置系统 ROOTFS 分区的大小，功能参考 `-s`            |
+| armbian_size     | 512/2560          | 设置系统 BOOTFS 和 ROOTFS 分区的大小，功能参考 `-s`  |
 | builder_name     | 无                | 设置 Armbian 系统构建者签名，功能参考 `-n`           |
 
 - ### GitHub Actions 输出变量说明

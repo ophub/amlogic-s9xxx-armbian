@@ -39,7 +39,7 @@ inputs:
   armbian_size:
     description: "Set armbian rootfs size(Unit: MiB)."
     required: false
-    default: "2560"
+    default: ""
   builder_name:
     description: "Set Armbian builder signature."
     required: false
