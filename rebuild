@@ -234,8 +234,8 @@ init_var() {
             fi
             ;;
         -s | --Size)
-            if [[ -n "${2}" && "${2}" -ge "2048" ]]; then
-                root_mb="${2}"
+            if [[ -n "${2}" ]]; then
+                img_mb="${2}"
                 shift
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
@@ -255,6 +255,16 @@ init_var() {
         esac
         shift
     done
+
+    # Set the image size, such as [ -s 512/2560 ] or [ -s 2560 ]
+    [[ -n "${img_mb}" ]] && {
+        if [[ "${img_mb}" =~ / ]]; then
+            boot_mb="${img_mb%%/*}"
+            root_mb="${img_mb##*/}"
+        else
+            root_mb="${img_mb}"
+        fi
+    }
 }
 
 check_data() {
