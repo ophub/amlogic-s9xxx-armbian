@@ -41,7 +41,7 @@ echo "" >${fix_log} && tolog "Start fixing..."
 [[ -z "${DISTRIBUTION_CODENAME}" && -f "/etc/os-release" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -x "/usr/bin/lsb_release" ]] && DISTRIBUTION_CODENAME="$(/usr/bin/lsb_release -c | cut -d':' -f2 | tr -d '\t')"
 
-# ===== Start repairing system permissions =====
+# ===== A. Start repairing system permissions =====
 
 # Fix common releases permissions
 [[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && tolog "01. Fix tmp permissions"
@@ -61,7 +61,8 @@ echo "" >${fix_log} && tolog "Start fixing..."
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so && tolog "13. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 && tolog "14. Fix polkit-agent-helper-1 permissions"
 
-# ===== Start removing useless packages and scripts =====
+# ===== B. Start removing useless packages and scripts =====
+
 # Remove packages
 sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && tolog "20. Clean up local installation packages"
 [[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && tolog "21. Remove linux-image-*"
@@ -82,7 +83,7 @@ sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/ap
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
 [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf} && tolog "30. Set update-initramfs.conf"
 
-# ===== Start disabling system services =====
+# ===== C. Start disabling system services =====
 
 # Regenerate new machine-id
 sudo rm -f /etc/machine-id /var/lib/dbus/machine-id && tolog "50. Delete machine-id"
@@ -134,7 +135,7 @@ sudo systemctl disable --now ssh.socket 2>/dev/null
 sudo systemctl enable --now ssh.service 2>/dev/null
 tolog "59. Disable the ssh.socket and enable ssh.service"
 
-# ===== Start adjusting custom settings =====
+# ===== D. Start adjusting custom settings =====
 
 # Fix version differences(After 2022.12.03)
 [[ -f "/etc/amlogic_model_database.conf" ]] && {
@@ -149,6 +150,7 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
 # Confirm device information
 [[ -f "${ophub_release_file}" ]] && {
     # Get welcome banner value
+    family_name="$(cat ${ophub_release_file} | grep -E "^FAMILY=" | cut -d"'" -f2)"
     platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2)"
     soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
     board_name="$(cat ${ophub_release_file} | grep -E "^BOARD=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
@@ -158,11 +160,13 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         sed -i "s|^ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
         tolog "80. Adjust the ANDROID_UBOOT name"
     }
+
     # Adjustment parameter name for UBOOT_STATUS
     [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && {
         sed -i "s|^UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
         tolog "81. Adjust the UBOOT_STATUS name"
     }
+
     # Add default kernel tags
     sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
     sed -i "s|^KERNEL_TAGS='6.x.y'|KERNEL_TAGS='6.1.y'|g" ${ophub_release_file}
@@ -171,62 +175,89 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
         tolog "82. Add the KERNEL_TAGS name"
     }
+
     # Add default KERNEL_REPO (Kernel download repository)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
         tolog "83. Add the custom KERNEL_REPO URL"
     }
+
     # Add default KERNEL_BACKUP (Automatic backup kernel)
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BACKUP=")" ]] || {
         echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
         tolog "84. Add the custom KERNEL_BACKUP"
     }
 
-    # Fix custom banner name
+    # Get the board name
     [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml.${soc_name}"
     [[ "${platform_name}" == "rockchip" ]] && bd_name="RK.${board_name}"
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW.${board_name}"
-    [[ -f "${armbian_release_file}" && -n "${bd_name}" ]] && {
-        sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
-        tolog "85. Fix custom board name: ${bd_name}"
+
+    # Adjust custom release information
+    [[ -f "${armbian_release_file}" ]] && {
+        [[ -n "${bd_name}" ]] && {
+            sed -i "s|^BOARD=.*|BOARD=\"${board_name}\"|g" ${armbian_release_file}
+            sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_release_file}
+        }
+
+        short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+        [[ -n "${short_version}" ]] && {
+            sed -i "s|^VERSION=.*|VERSION=\"${short_version}\"|g" ${armbian_release_file}
+            sed -i "s|^REVISION=.*|REVISION=\"${short_version}\"|g" ${armbian_release_file}
+        }
+
+        sed -i "s|^BOARDFAMILY=.*|BOARDFAMILY=\"${family_name}\"|g" ${armbian_release_file}
+        sed -i "s|^LINUXFAMILY=.*|LINUXFAMILY=\"${platform_name}\"|g" ${armbian_release_file}
+        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_release_file}
+        sed -i "s|^IMAGE_TYPE=.*|IMAGE_TYPE=rebuild|g" ${armbian_release_file}
+        sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_release_file}
+        sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
+        sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|BOOTSCRIPT_FORCE_UPDATE=\"no\"|g" ${armbian_release_file}
+        tolog "85. Adjust custom board name: ${armbian_release_file}"
+    }
+
+    # Adjust custom image information
+    [[ -f "${armbian_image_file}" ]] && {
+        [[ -n "${bd_name}" ]] && {
+            sed -i "s|^BOARD=.*|BOARD=\"${board_name}\"|g" ${armbian_image_file}
+            sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${bd_name}\"|g" ${armbian_image_file}
+        }
+
+        short_version="$(cat ${armbian_image_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+        [[ -n "${short_version}" ]] && {
+            sed -i "s|^VERSION=.*|VERSION=\"${short_version}\"|g" ${armbian_image_file}
+            sed -i "s|^REVISION=.*|REVISION=\"${short_version}\"|g" ${armbian_image_file}
+        }
+
+        sed -i "s|^BOARDFAMILY=.*|BOARDFAMILY=\"${family_name}\"|g" ${armbian_image_file}
+        sed -i "s|^LINUXFAMILY=.*|LINUXFAMILY=\"${platform_name}\"|g" ${armbian_image_file}
+        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_image_file}
+        sed -i "s|^IMAGE_TYPE=.*|IMAGE_TYPE=rebuild|g" ${armbian_image_file}
+        sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_image_file}
+        sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_image_file}
+        sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|BOOTSCRIPT_FORCE_UPDATE=\"no\"|g" ${armbian_image_file}
+        tolog "86. Adjust custom board name: ${armbian_image_file}"
     }
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" != "amlogic" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        tolog "86. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        tolog "87. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
-}
-
-# Shorten release version number
-[[ -f "${armbian_release_file}" ]] && {
-    short_version="$(cat ${armbian_release_file} | grep -E '^VERSION=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-    [[ -n "${short_version}" ]] && {
-        sed -i "s|^VERSION=.*|VERSION=${short_version}|g" ${armbian_release_file}
-        tolog "87. Set release version: ${short_version}"
-    }
-}
-
-# Set VENDOR value
-# Unofficially supported devices are displayed as "Armbian-unofficial" by default.
-# To shorten the text and adhere to the official distinction, I have changed it to "Armbian OS"
-[[ -f "${armbian_image_file}" ]] && {
-    sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_image_file}
-    tolog "88. Set VENDOR value: Armbian OS"
-}
-
-# Maximize root partition size
-todo_rootfs_resize="/root/.no_rootfs_resize"
-[[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
-    armbian-tf 2>/dev/null &&
-        tolog "89. Root partition resized successfully..."
 }
 
 # Set system status to supported
 [[ -n "${DISTRIBUTION_CODENAME}" && -f "${armbian_os_status}" ]] && {
     sed -i "s|^${DISTRIBUTION_CODENAME}=.*|${DISTRIBUTION_CODENAME}=supported|g" ${armbian_os_status}
     tolog "90. Set the ${DISTRIBUTION_CODENAME} system status to support"
+}
+
+# Maximize root partition size
+todo_rootfs_resize="/root/.no_rootfs_resize"
+[[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
+    armbian-tf 2>/dev/null &&
+        tolog "91. Root partition resized successfully..."
 }
 
 # Show end message
