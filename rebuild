@@ -960,14 +960,17 @@ refactor_rootfs() {
     # Update release information
     [[ -f "${armbian_release_file}" ]] && {
         # Shorten release version number
-        sed -i "s|^VERSION=.*|VERSION=${armbian_rebuild_version}-trunk|g" ${armbian_release_file}
+        sed -i "s|^VERSION=.*|VERSION=\"${armbian_rebuild_version}\"|g" ${armbian_release_file}
+        sed -i "s|^REVISION=.*|REVISION=\"${armbian_rebuild_version}\"|g" ${armbian_release_file}
         # Custom banner name
+        sed -i "s|^BOARD=.*|BOARD=\"${board}\"|g" ${armbian_release_file}
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${board}\"|g" ${armbian_release_file}
         # Use custom type to remove [ No end-user support ] prompt in [ /etc/update-motd.d/10-armbian-header ]
         sed -i "s|^IMAGE_TYPE=.*|IMAGE_TYPE=rebuild|g" ${armbian_release_file}
         sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_release_file}
+        sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_release_file}
         # Disable the update of the boot script
-        sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=no|g" ${armbian_release_file}
+        sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
         sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
     }
 
