@@ -218,6 +218,10 @@ init_var() {
     #
     [[ -n "${code_owner}" ]] || error_msg "The [ -r ] parameter is invalid."
     [[ -n "${code_branch}" ]] || code_branch="${repo_branch}"
+
+    # Set cross compilation parameters
+    export ARCH="arm64"
+    export LOCALVERSION="${custom_name}"
 }
 
 toolchain_check() {
@@ -456,10 +460,6 @@ compile_env() {
 
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set cross compilation parameters..."
-
-    # Set cross compilation parameters
-    export ARCH="arm64"
-    export LOCALVERSION="${custom_name}"
 
     # Show variable
     echo -e "${INFO} ARCH: [ ${ARCH} ]"
