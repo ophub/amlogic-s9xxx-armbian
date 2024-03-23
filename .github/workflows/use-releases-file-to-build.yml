@@ -16,11 +16,9 @@ on:
         type: choice
         options:
           - jammy
-          - lunar
-          - mantic
+          - noble
           - bullseye
           - bookworm
-          - trixie
       armbian_board:
         description: "Select device board."
         required: false
@@ -28,9 +26,9 @@ on:
         type: choice
         options:
           - all
-          - s905w_s905x_s905mb_s905l3b_s905x2_s905x3_s912_s922x_s922x-ct2000_s922x-reva
+          - s905w_s905x_s905mb_s905l3a_s905l3b_s905x2_s905x3_s912_s922x_s922x-ct2000_s922x-reva
           - s905x3-x88-pro-x3_s912-m8s-pro_s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905lb-r3300l
-          - smart-am40_station-m1_sw799_tn3399_zysj_tvi3315a_xiaobao_zcube1-max
+          - seewo-sv21_smart-am40_station-m1_sw799_tn3399_zysj_tvi3315a_xiaobao_zcube1-max
           - vplus_tanix-tx6_tqc-a01
           - a311d
           - beikeyun
@@ -50,16 +48,20 @@ on:
           - h69k
           - h88k
           - h88k-v3
+          - hugsun-x99
           - ipc-r
           - king3399
           - kylin3399
           - leez
+          - lx-r3s
+          - mrkaio-m68s
           - nanopi-r5c
           - nanopi-r5s
           - panther-x2
           - r66s
           - r68s
           - renegade-rk3328
+          - rk3318-box
           - rock5b
           - s905
           - s905-beelink-mini
@@ -138,10 +140,12 @@ on:
           - s922x-odroid-n2
           - s922x-reva
           - s922x-ugoos-am6
+          - seewo-sv21
           - smart-am40
           - station-m1
           - sw799
           - tanix-tx6
+          - tb-ls3399
           - tn3399
           - tqc-a01
           - tvi3315a
@@ -152,15 +156,17 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "5.15.1_6.1.1"
+        default: "6.1.y_5.15.y"
         type: choice
         options:
-          - 5.4.1_5.10.1
-          - 5.15.1_6.1.1
-          - 5.4.1
-          - 5.10.1
-          - 5.15.1
-          - 6.1.1
+          - 5.4.y
+          - 5.10.y
+          - 5.15.y
+          - 6.1.y
+          - 6.6.y
+          - 6.1.y_6.6.y
+          - 6.1.y_5.15.y
+          - 5.4.y_5.10.y
       auto_kernel:
         description: "Auto use the latest kernel."
         required: false
@@ -219,16 +225,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Initialization environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          docker rmi `docker images -q`
+          docker rmi $(docker images -q) 2>/dev/null
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
           sudo -E apt-get -y update
           sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
           sudo -E apt-get -y install $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
@@ -236,19 +244,42 @@ jobs:
           #sudo -E apt-get -y full-upgrade
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          sudo rm -rf ~/{.cargo,.dotnet,.rustup}
           sudo timedatectl set-timezone "${TZ}"
           echo "status=success" >> ${GITHUB_OUTPUT}
 
+      - name: Create simulated physical disk
+        run: |
+          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+          sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+          sudo truncate -s "${root_size}"G /root.img
+          sudo losetup /dev/loop6 /mnt/mnt.img
+          sudo losetup /dev/loop7 /root.img
+          sudo pvcreate /dev/loop6
+          sudo pvcreate /dev/loop7
+          sudo vgcreate github /dev/loop6 /dev/loop7
+          sudo lvcreate -n runner -l 100%FREE github
+          sudo mkfs.xfs /dev/github/runner
+          sudo mkdir -p /builder
+          sudo mount /dev/github/runner /builder
+          sudo chown -R runner.runner /builder
+          df -Th
+
       - name: Download Armbian from Releases
         id: down
+        working-directory: /builder
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           armbian_buildpath="build/output/images"
           [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
+          ln -sf /builder/build ${GITHUB_WORKSPACE}/build
+          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
 
           latest_version="$(curl -s \
                               -H "Accept: application/vnd.github+json" \
-                              -H "Authorization: Bearer ${{ secrets.GH_TOKEN }}" \
+                              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                               https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=100 |
                               jq '.[]' |
                               jq -s --arg RTK "Armbian_${{ inputs.set_release }}_" '.[] | select(.tag_name | contains($RTK))' |
@@ -293,7 +324,7 @@ jobs:
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image information
             - Default username: root

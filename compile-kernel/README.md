@@ -45,6 +45,8 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -p        | AutoPatch   | Sets whether to use custom kernel patches. When set to `true`, it will use the kernel patches in the [tools/patch](tools/patch) directory. For detailed instructions, refer to [how to add kernel patches](../documents/README.md#9-compiling-armbian-kernel). Default value: `false` |
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name is `5.15.100-ophub`. Please do not include spaces when setting custom signatures. Default value: `-ophub` |
 | -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc`. Default value: `gcc` |
+| -c        | Compress    | Set the compression format used for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default value: `xz` |
+
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.
 - `sudo ./recompile -k 5.15.100`: Use the default configuration and specify the kernel version to be compiled through `-k`. Multiple versions are connected using `_` for simultaneous compilation.
@@ -66,12 +68,12 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 5.15.1_6.1.1
+    kernel_version: 6.1.y_5.15.y
     kernel_auto: true
     kernel_sign: -yourname
 ```
 
-💡 Note: If you `fork` the repository and made modifications, you need to change the Actions `username` to your own repository when using it, and according to the instructions in items 2-3, [Add TOKEN](../documents/README.md#2-set-up-private-variable-github_token), for example:
+💡 Note: If you `fork` the repository and made modifications, you need to change the Actions `username` to your own repository when using it, for example:
 
 ```yaml
 uses: YOUR-REPO/amlogic-s9xxx-armbian@main
@@ -85,7 +87,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 |------------------|---------------|-----------------------------------------------------------------|
 | build_target     | kernel        | Fixed parameter `kernel`, set the compilation target to the kernel.|
 | kernel_source    | unifreq       | Specifies the source code repository for compiling the kernel. Default value is `unifreq`. Refer to `-r` for functionality. |
-| kernel_version   | 5.15.1_6.1.1  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
+| kernel_version   | 6.1.y_5.15.y  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
 | kernel_auto      | true          | Sets whether to automatically adopt the latest version of the same series kernel. Default value is `true`. Refer to `-a` for functionality. |
 | kernel_package   | all           | Sets the package list for making the kernel. Default value is `all`. Refer to `-m` for functionality. |
 | kernel_sign      | -ophub        | Sets the kernel custom signature. Default value is `-ophub`. Refer to `-n` for functionality. |
@@ -93,14 +95,15 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | kernel_config    | false         | By default, use the configuration template in the [tools/config](tools/config) directory. You can set the directory for storing the kernel configuration file in your repository, such as `kernel/config_path`. The configuration templates stored in this directory must be named after the main version of the kernel, such as `config-5.10`, `config-5.15`, etc. |
 | kernel_patch     | false         | Sets the directory for custom kernel patches. |
 | auto_patch       | false         | Sets whether to use custom kernel patches. Default value is `false`. Refer to `-p` for functionality. |
+| compress_format  | xz            | Set the compression format used for initrd in the kernel. Default value is `xz`. Refer to `-c` for functionality. |
 
 - ### GitHub Action Output Variables
 
-To upload to `Releases`, you need to add `GITHUB_TOKEN` and `GH_TOKEN` to the repository and set `Workflow read and write permissions`. For more details, see [Usage Instructions](../documents/README.md#2-set-up-private-variable-github_token).
+To upload to `Releases`, you need to set `Workflow read/write permissions` for repository. For more details, see [Usage Instructions](../documents/README.md#2-set-up-private-variable-github_token).
 
 | Parameter                        | Default Value   | Description                            |
 |----------------------------------|-----------------|----------------------------------------|
-| ${{ env.PACKAGED_OUTPUTTAGS }}   | 5.15.1_6.1.1    | The name of the compiled kernel.       |
+| ${{ env.PACKAGED_OUTPUTTAGS }}   | 6.1.y_5.15.y    | The name of the compiled kernel.       |
 | ${{ env.PACKAGED_OUTPUTPATH }}   | compile-kernel/output | The path of the directory where the compiled kernel is stored. |
 | ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058      | The compilation date (month.day.hourminute). |
 | ${{ env.PACKAGED_STATUS }}       | success         | Compilation status: success / failure. |

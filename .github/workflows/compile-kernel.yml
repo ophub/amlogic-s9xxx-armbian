@@ -17,18 +17,21 @@ on:
         type: choice
         options:
           - unifreq
+          - codesnas
       kernel_version:
         description: "Select kernel version"
         required: false
-        default: "5.15.1_6.1.1"
+        default: "6.1.y"
         type: choice
         options:
-          - 5.4.1_5.10.1
-          - 5.15.1_6.1.1
-          - 5.4.1
-          - 5.10.1
-          - 5.15.1
-          - 6.1.1
+          - 5.4.y
+          - 5.10.y
+          - 5.15.y
+          - 6.1.y
+          - 6.6.y
+          - 6.1.y_6.6.y
+          - 6.1.y_5.15.y
+          - 5.4.y_5.10.y
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
@@ -50,6 +53,16 @@ on:
         options:
           - clang
           - gcc
+      compress_format:
+        description: "Set the initrd compression format"
+        required: false
+        default: "xz"
+        type: choice
+        options:
+          - xz
+          - gzip
+          - zstd
+          - lzma
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
@@ -69,16 +82,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Initialization environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          docker rmi `docker images -q`
+          docker rmi $(docker images -q) 2>/dev/null
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
           sudo -E apt-get -y update
           sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
           sudo -E apt-get -y install $(curl -fsSL https://is.gd/depend_ubuntu2204_armbian)
@@ -86,12 +101,43 @@ jobs:
           #sudo -E apt-get -y full-upgrade
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          sudo rm -rf ~/{.cargo,.dotnet,.rustup}
           sudo timedatectl set-timezone "${TZ}"
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Create simulated physical disk
+        id: disk
+        run: |
+          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+          sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+          sudo truncate -s "${root_size}"G /root.img
+          sudo losetup /dev/loop6 /mnt/mnt.img
+          sudo losetup /dev/loop7 /root.img
+          sudo pvcreate /dev/loop6
+          sudo pvcreate /dev/loop7
+          sudo vgcreate github /dev/loop6 /dev/loop7
+          sudo lvcreate -n runner -l 100%FREE github
+          sudo mkfs.xfs /dev/github/runner
+          sudo mkdir -p /builder
+          sudo mount /dev/github/runner /builder
+          sudo chown -R runner.runner /builder
+          df -Th
+
+      - name: Create a mapped directory
+        id: mapped
+        working-directory: /builder
+        run: |
+          df -hT ${PWD}
+          mkdir -p /builder/{kernel,output}
+          ln -sf /builder/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
+          ln -sf /builder/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the kernel [ ${{ inputs.kernel_version }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.mapped.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
           kernel_source: ${{ inputs.kernel_source }}
@@ -100,6 +146,7 @@ jobs:
           kernel_package: ${{ inputs.kernel_package }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
+          compress_format: ${{ inputs.compress_format }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
@@ -110,7 +157,7 @@ jobs:
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
             The kernel source code comes from: ${{ inputs.kernel_source }}

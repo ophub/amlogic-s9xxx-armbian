@@ -10,12 +10,13 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
   - [2. 设置隐私变量 GITHUB\_TOKEN](#2-设置隐私变量-github_token)
-  - [3. Fork 仓库并设置 GH\_TOKEN](#3-fork-仓库并设置-gh_token)
+  - [3. Fork 仓库并设置工作流权限](#3-fork-仓库并设置工作流权限)
   - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
   - [5. 编译系统](#5-编译系统)
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
     - [5.3 自定义默认系统配置](#53-自定义默认系统配置)
+    - [5.4 使用逻辑卷扩大 Github Actions 编译空间](#54-使用逻辑卷扩大-github-actions-编译空间)
   - [6. 保存系统](#6-保存系统)
   - [7. 下载系统](#7-下载系统)
   - [8. 安装 Armbian 到 EMMC](#8-安装-armbian-到-emmc)
@@ -91,6 +92,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
     - [12.17 如何解决 Bullseye 版本没有声音的问题](#1217-如何解决-bullseye-版本没有声音的问题)
     - [12.18 如何编译 boot.scr 文件](#1218-如何编译-bootscr-文件)
+    - [12.19 如何开启远程桌面和修改默认端口](#1219-如何开启远程桌面和修改默认端口)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -98,26 +100,13 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 2. 设置隐私变量 GITHUB_TOKEN
 
-设置 Github 隐私变量 `GITHUB_TOKEN` 。在系统编译完成后，我们需要上传系统到 Releases ，我们根据 Github 官方的要求设置这个变量，方法如下：
-Personal center: Settings > Developer settings > Personal access tokens > Generate new token ( Name: GITHUB_TOKEN, Select: public_repo )。其他选项根据自己需要可以多选。提交保存，复制系统生成的加密 KEY 的值，先保存到自己电脑的记事本，下一步会用到这个值。图示如下：
+根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 GITHUB_TOKEN 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
+
+## 3. Fork 仓库并设置工作流权限
+
+现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-armbian ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-armbian 。在右上角的 `Settings` > `Actions` > `General` > `Workflow permissions` 下选择 `Read and write permissions` 并保存。图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418474-85032b00-7a03-11eb-85a2-759b0320cc2a.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418479-8b91a280-7a03-11eb-8383-9d970f4fffb6.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418483-90565680-7a03-11eb-8320-0df1174b0267.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418493-9815fb00-7a03-11eb-862e-deca4a976374.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418485-93514700-7a03-11eb-848d-36de784a4438.jpg width="300" />
-</div>
-
-## 3. Fork 仓库并设置 GH_TOKEN
-
-现在可以 Fork 仓库了，打开仓库 https://github.com/ophub/amlogic-s9xxx-armbian ，点击右上的 Fork 按钮，复制一份仓库代码到自己的账户下，稍等几秒钟，提示 Fork 完成后，到自己的账户下访问自己仓库里的 amlogic-s9xxx-armbian 。在右上角的 `Settings` > `Secrets` > `Actions` > `New repostiory secret` ( Name: `GH_TOKEN`, Value: `填写刚才GITHUB_TOKEN的值` )，保存。并在左侧导航栏的 `Actions` > `General` > `Workflow permissions` 下选择 `Read and write permissions` 并保存。图示如下：
-
-<div style="width:100%;margin-top:40px;margin:5px;">
-<img src=https://user-images.githubusercontent.com/68696949/109418568-0eb2f880-7a04-11eb-81c9-194e32382998.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/163203032-f044c63f-d113-4076-bf94-41f86c7dd0ce.png width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/109418573-15417000-7a04-11eb-97a7-93973d7479c2.jpg width="300" />
-<img src=https://user-images.githubusercontent.com/68696949/167579714-fdb331f3-5198-406f-b850-13da0024b245.png width="300" />
 <img src=https://user-images.githubusercontent.com/68696949/167585338-841d3b05-8d98-4d73-ba72-475aad4a95a9.png width="300" />
 </div>
 
@@ -169,6 +158,30 @@ schedule:
 
 在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。使用 `-b all` 代表打包 `BUILD` 是 `yes` 的全部设备。使用指定 `BOARD` 参数打包时，无论 `BUILD` 是 `yes` 或者 `no` 均可打包，例如：`-b r68s_s905x3-tx3_s905l3a-cm311`
 
+### 5.4 使用逻辑卷扩大 Github Actions 编译空间
+
+Github Actions 编译空间默认是 84G，除去系统和必要软件包外，可用空间在 50G 左右，当编译全部固件时会遇到空间不足的问题，可以使用逻辑卷扩大编译空间至 110G 左右。参考 [.github/workflows/build-armbian.yml](../.github/workflows/build-armbian.yml) 文件里的方法，使用下面的命令创建逻辑卷。并在编译时使用逻辑卷的路径。
+
+```yaml
+- name: Create simulated physical disk
+  run: |
+    mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+    root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+    sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+    sudo truncate -s "${root_size}"G /root.img
+    sudo losetup /dev/loop6 /mnt/mnt.img
+    sudo losetup /dev/loop7 /root.img
+    sudo pvcreate /dev/loop6
+    sudo pvcreate /dev/loop7
+    sudo vgcreate github /dev/loop6 /dev/loop7
+    sudo lvcreate -n runner -l 100%FREE github
+    sudo mkfs.xfs /dev/github/runner
+    sudo mkdir -p /builder
+    sudo mount /dev/github/runner /builder
+    sudo chown -R runner.runner /builder
+    df -Th
+```
+
 ## 6. 保存系统
 
 系统保存的设置也在 [.github/workflows/build-armbian.yml](../../.github/workflows/build-armbian.yml) 文件里控制。我们将编译好的系统通过脚本自动上传到 github 官方提供的 Releases 里面。
@@ -181,7 +194,7 @@ schedule:
     tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
     artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
     allowUpdates: true
-    token: ${{ secrets.GH_TOKEN }}
+    token: ${{ secrets.GITHUB_TOKEN }}
     body: |
       These are the Armbian OS image
       * OS information
@@ -399,7 +412,7 @@ armbian-update
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
-| -s       | 无           | 无             | [SOS] 使用 USB 中的系统内核恢复 eMMC |
+| -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |
 
 举例: `armbian-update -k 5.15.50 -u dev`
@@ -408,15 +421,28 @@ armbian-update
 
 更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核：
 ```shell
-# 进入备份的内核目录，如 5.10.125
-cd /ddbr/backup/5.10.125
+# 进入备份的内核目录，如 6.6.12
+cd /ddbr/backup/6.6.12
 # 执行更新内核命令，会自动安装当前目录下的内核
 armbian-update
 ```
 
-因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC 启动时，可以从 USB 中启动任意内核版本的 Armbian 系统，运行 `armbian-update -s` 命令可以把 USB 中的系统内核更新至 eMMC 中，实现救援的目的。
+[SOS]：因特殊原因导致的更新不完整等问题，造成系统无法从 eMMC/NVMe/sdX 启动时，可以从 USB 等其他磁盘启动任意内核版本的 Armbian 系统，然后运行 `armbian-update -s` 命令可以把 USB 中的系统内核更新至 eMMC/NVMe/sdX 中，实现救援的目的。不指定磁盘参数时，默认将从 USB 设备恢复 eMMC/NVMe/sdX 中的内核，如果设备有多个磁盘，可以准确指定需要恢复的磁盘名称，举例如下：
 
-如果你访问 github.com 的网络不通畅，无法在线下载更新时，可以手动下载内核，上传至 Armbian 系统的任意目录，并进入内核目录，执行 `armbian-update` 进行本地安装。如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。在设备支持的可选内核里可以自由更新，如从 5.10.125 内核更新为 5.15.50 内核。
+```shell
+# 恢复 eMMC 中的内核
+armbian-update -s mmcblk1
+# 恢复 NVMe 中的内核
+armbian-update -s nvme0n1
+# 恢复移动存储设备中的内核
+armbian-update -s sda
+# 磁盘名称可以简写为 mmcblk0/mmcblk1/nvme0n1/nvme1n1/sda/sdb/sdc 等，也可以使用完整的名称，如 /dev/sda
+armbian-update -s /dev/sda
+# 当设备只有 eMMC/NVMe/sdX 中的一个内置存储时，可以省略磁盘名称参数
+armbian-update -s
+```
+
+如果你访问 github.com 的网络不通畅，无法在线下载更新时，可以手动下载内核，上传至 Armbian 系统的任意目录，并进入内核目录，执行 `armbian-update` 进行本地安装。如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。在设备支持的可选内核里可以自由更新，如从 6.6.12 内核更新为 5.15.50 内核。
 
 通过 `-r`/`-u`/`-b` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
 
@@ -935,6 +961,16 @@ bluetoothctl block 12:34:56:78:90:AB
 
 使用 `armbian-sync` 命令可以一键将本地系统中的全部服务脚本更新到最新版本。
 
+如果 `armbian-sync` 更新失败，说明这个命令的版本过旧，可以使用下面的方法更新这个命令：
+
+```shell
+wget https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/main/build-armbian/armbian-files/common-files/usr/sbin/armbian-sync -O /usr/sbin/armbian-sync
+
+chmod +x /usr/sbin/armbian-sync
+
+armbian-sync
+```
+
 ### 12.10 如何获取 eMMC 上的安卓系统分区信息
 
 我们将 Armbian 系统写入 eMMC 系统时，需要首先确认设备的安卓系统分区表，确保将数据写入至安全区域，尽量不要破坏安卓系统分区表，以免造成系统无法启动等问题。如果写入了不安全的区域，会无法启动，或出现类似下面的错误：
@@ -1191,6 +1227,13 @@ dtc -I dtb -O dts -o xxx.dts xxx.dtb
 
 # 2. 编译命令（使用 dts 编译生成 dtb 文件）
 dtc -I dts -O dtb -o xxx.dtb xxx.dts
+
+# 3.保存数据并重启
+sync && reboot
+
+# 4.[自选动作]根据需求进行测试
+# 例如在解决 12.16 中介绍的问题时，重新安装测试
+armbian-install
 ```
 
 ### 12.14 如何修改 cmdline 设置
@@ -1344,5 +1387,15 @@ reboot
 
 # 补充说明
 # 在 Amlogic 设备中，在 USB 中使用的是 /boot/boot.scr 文件，写入 eMMC 时使用的是 /boot/boot-emmc.scr 文件。
+```
+
+### 12.19 如何开启远程桌面和修改默认端口
+
+在软件中心 `armbian-software` 里选择 `201` 可以安装桌面，在安装桌面时会询问是否开启远程桌面，输入 `y` 即可开启。远程桌面的默认端口是 `3389`，可以根据需要自定义使用其他端口：
+
+```shell
+sudo nano /etc/xrdp/xrdp.ini
+# 修改为自定义端口，例如 5000
+port=5000
 ```
 
