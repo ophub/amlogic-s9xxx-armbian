@@ -47,7 +47,7 @@ Armbian（中文名：岸边）系统是基于 Debian/Ubuntu 而构建的专门�
 
 - ### 安装 Armbian 到 EMMC
 
-1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](documents/README.cn.md)。
+1. `Rockchip` 平台的安装方法请查看说明文档中的 [第 8 章节](documents/README.cn.md#8-安装-armbian-到-emmc)。
 
 2. `Amlogic` 和 `Allwinner` 平台，使用 [Rufus](https://rufus.ie/) 或者 [balenaEtcher](https://www.balena.io/etcher/) 等工具将系统写入 USB 里，然后把写好系统的 USB 插入盒子。登录 Armbian 系统 (默认用户: root, 默认密码: 1234) → 输入命令：
 
@@ -87,7 +87,7 @@ armbian-update
 
 通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
 
-更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新内核失败导致系统无法启动，可以通过 `armbian-update -s` 来恢复系统内核。更多说明详见 [帮助文档](documents/README.cn.md)
+更新内核时会自动备份当前系统使用的内核，存储路径在 `/ddbr/backup` 目录里，保留最近使用过的 3 个版本的内核，如果新安装的内核不稳定，可以随时恢复回备份的内核。如果更新内核失败导致系统无法启动，可以通过 `armbian-update -s` 来恢复系统内核。更多说明详见 [帮助文档](documents/README.cn.md#10-更新-armbian-内核)
 
 - ### 更换 Armbian 源
 
@@ -97,7 +97,7 @@ armbian-update
 armbian-apt
 ```
 
-根据你所在的国家或地区选择合适的软件源，可以提高软件的下载速度。
+根据你所在的国家或地区选择合适的软件源，可以提高软件的下载速度。更多说明详见 [帮助文档](documents/README.cn.md#11-安装常用软件)
 
 - ### 安装常用软件
 
