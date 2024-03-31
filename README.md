@@ -89,6 +89,16 @@ When specifying the kernel version number through the `-k` parameter, you can ac
 
 When updating the kernel, the currently used kernel will be automatically backed up and stored in the `/ddbr/backup` directory. The backup keeps the three most recent versions of the kernel. If the newly installed kernel is unstable, you can easily restore the backup kernel at any time. If the kernel update fails and the system cannot boot, you can restore the system kernel using `armbian-update -s`. For more details, see the [Help Document](documents).
 
+- ### Replace Armbian sources
+
+Log in to the Armbian system → Enter the command:
+
+```shell
+armbian-apt
+```
+
+Choosing the appropriate software source for your country or region can improve software download speeds.
+
 - ### Install Common Software
 
 Log in to the Armbian system → Enter the command:

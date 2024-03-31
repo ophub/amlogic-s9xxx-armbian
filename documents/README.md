@@ -463,6 +463,8 @@ armbian-software
 
 Using the `armbian-software -u` command, you can update the local software center list. Based on user feedback in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](../armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to implement one-click installation/update/uninstallation and other quick operations. This includes `docker images`, `desktop software`, `application services`, etc. See more [instructions](armbian_software.md).
 
+Use the `armbian-apt` command to select the appropriate software source for your country or region, which can improve software download speeds.
+
 ## 12. Frequently Asked Questions
 
 Here's a compilation of some common issues you may encounter while using Armbian.
