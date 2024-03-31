@@ -1,0 +1,248 @@
+#!/bin/bash
+#===========================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Change the source of the system
+# Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-apt
+#
+#============================= Functions list #=============================
+#
+# error_msg           : Output error message
+# check_release       : Check the system release
+# backup_source_list  : Backup the source list
+# change_source_list  : Change the source of the system
+# select_mirror_site  : Select the mirror site
+#
+#========================= Set default parameters ==========================
+#
+# Set the default source of the system
+armbian_source_file="/etc/apt/sources.list"
+armbian_source_backup_file="/etc/apt/sources.list.d/sources.list.bak"
+armbian_list_file="/etc/apt/sources.list.d/armbian.list"
+# Get custom firmware information
+ophub_release_file="/etc/ophub-release"
+
+# Set font color
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+OPTIONS="[\033[93m OPTIONS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+#
+#===========================================================================
+
+# Encountered a serious error, abort the script execution
+error_msg() {
+    echo -e "${ERROR} ${1}"
+    exit 1
+}
+
+# Check the system release
+check_release() {
+    if [[ -f "${ophub_release_file}" ]]; then
+        source "${ophub_release_file}"
+        VERSION_CODEID="${VERSION_CODEID}"
+        VERSION_CODENAME="${VERSION_CODENAME}"
+        [[ -z "${VERSION_CODEID}" ]] && error_msg "The system VERSION_CODEID is not detected!"
+        [[ -z "${VERSION_CODENAME}" ]] && error_msg "The system VERSION_CODENAME is not detected!"
+    else
+        error_msg "The system release file is not detected!"
+    fi
+}
+
+# Backup the source list
+backup_source_list() {
+    [[ -f "${armbian_source_file}" && ! -f "${armbian_source_backup_file}" ]] && {
+        cp -f "${armbian_source_file}" "${armbian_source_backup_file}"
+    }
+}
+
+# Change the source of the system
+change_source_list() {
+    echo -e "${STEPS} Start to change the source of the system: [ ${MIRROR_URL} ]"
+    echo -e "${INFO} The system release is: [ ${VERSION_CODENAME} ]"
+
+    case "${VERSION_CODENAME}" in
+    buster)
+        cat >${armbian_source_file} <<EOF
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
+
+        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
+EOF
+        ;;
+
+    bullseye)
+        cat >${armbian_source_file} <<EOF
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
+
+        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free
+        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free
+EOF
+        ;;
+
+    bookworm | trixie)
+        # non-free firmware in bookworm and later has moved from the non-free archive component to a new non-free-firmware component (alongside main/contrib/non-free).
+        # This was implemented on 2023-01-27, see also https://lists.debian.org/debian-boot/2023/01/msg00235.html
+        cat >${armbian_source_file} <<EOF
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free non-free-firmware
+
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free non-free-firmware
+
+        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free non-free-firmware
+EOF
+        ;;
+
+    focal | jammy | kinetic | lunar | mantic | noble)
+        cat >${armbian_source_file} <<EOF
+        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME} main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME} main restricted universe multiverse
+
+        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-security main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-security main restricted universe multiverse
+
+        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-updates main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-updates main restricted universe multiverse
+
+        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-backports main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-backports main restricted universe multiverse
+EOF
+        ;;
+
+    sid)
+        # sid is permanent unstable development and has no such thing as updates or security
+        cat >${armbian_source_file} <<EOF
+        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
+
+        deb http://${MIRROR_URL}/debian unstable main contrib non-free non-free-firmware
+        #deb-src http://${MIRROR_URL}/debian unstable main contrib non-free non-free-firmware
+EOF
+        ;;
+
+    *)
+        error_msg "The system release is not detected: [ ${VERSION_CODENAME} ]"
+        ;;
+
+    esac
+
+    # Remove the space at the beginning of each line
+    sed 's/^[ t]*//' -i ${armbian_source_file}
+    echo -e "${SUCCESS} Change the source of the system successfully."
+}
+
+# Select the mirror site
+select_mirror_site() {
+    source_id="${1}"
+    echo -e "${INFO} Your selected source ID is: [ ${source_id} ]"
+
+    case "${source_id}" in
+    0)
+        # Restore the default source
+        if [[ -f "${armbian_source_backup_file}" ]]; then
+            cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
+            echo -e "${SUCCESS} Restore the default source successfully." && exit 0
+        else
+            error_msg "The default source file does not exist."
+        fi
+        ;;
+    11) MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
+    12) MIRROR_URL="mirrors.bfsu.edu.cn" ;;
+    13) MIRROR_URL="mirrors.aliyun.com" ;;
+    14) MIRROR_URL="mirrors.xtom.hk" ;;
+    15) MIRROR_URL="opensource.nchc.org.tw" ;;
+    16) MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
+    17) MIRROR_URL="mirrors.xtom.com" ;;
+    18) MIRROR_URL="mirror.it.ubc.ca" ;;
+    19) MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
+    20) MIRROR_URL="mirror.rackspace.com" ;;
+    21) MIRROR_URL="mirrors.ircam.fr/pub" ;;
+    22) MIRROR_URL="mirror.dogado.de" ;;
+    23) MIRROR_URL="mirrors.xtom.de" ;;
+    24) MIRROR_URL="mirror.yandex.ru" ;;
+    25) MIRROR_URL="mirror.truenetwork.ru" ;;
+    26) MIRROR_URL="mirror.fsmg.org.nz" ;;
+    27) MIRROR_URL="mirror.aarnet.edu.au" ;;
+    28) MIRROR_URL="mirror.uq.edu.au" ;;
+    29) MIRROR_URL="mirror.sg.gs" ;;
+    30) MIRROR_URL="mirrors.xtom.jp" ;;
+    *) error_msg "The source ID is not detected." ;;
+    esac
+
+    # Change the source list
+    change_source_list
+}
+
+echo -e "${STEPS} Welcome to the Armbian source change script."
+# Check the system release
+check_release
+# Backup the source list
+backup_source_list
+
+# Prompt the user to input the source ID
+echo -e "${INFO} Please select a [\033[92m ${VERSION_CODENAME} \033[0m] mirror site."
+cat <<EOF
+  ┌──────┬───────────────────┬────────────────────────────────┐
+  │  ID  │  Country/Region   │  Mirror Site                   │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │   0  │  -                │  Restore default source        │
+  │  11  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
+  │  12  │  China            │  mirrors.bfsu.edu.cn           │
+  │  13  │  China            │  mirrors.aliyun.com            │
+  │  14  │  Hongkong, China  │  mirrors.xtom.hk               │
+  │  15  │  Taiwan, China    │  opensource.nchc.org.tw        │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  16  │  United States    │  mirrors.ocf.berkeley.edu      │
+  │  17  │  United States    │  mirrors.xtom.com              │
+  │  18  │  Canada           │  mirror.it.ubc.ca              │
+  │  19  │  Canada           │  mirror.csclub.uwaterloo.ca    │
+  │  20  │  United Kingdom   │  mirror.rackspace.com          │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  21  │  France           │  mirrors.ircam.fr/pub          │
+  │  22  │  Germany          │  mirror.dogado.de              │
+  │  23  │  Germany          │  mirrors.xtom.de               │
+  │  24  │  Russia           │  mirror.yandex.ru              │
+  │  25  │  Russia           │  mirror.truenetwork.ru         │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  26  │  New Zealand      │  mirror.fsmg.org.nz            │
+  │  27  │  Australia        │  mirror.aarnet.edu.au          │
+  │  28  │  Australia        │  mirror.uq.edu.au              │
+  │  29  │  Singapore        │  mirror.sg.gs                  │
+  │  30  │  Japan            │  mirrors.xtom.jp               │
+  └──────┴───────────────────┴────────────────────────────────┘
+EOF
+echo -ne "${OPTIONS} Please Input ID: "
+read mwid
+
+case "${mwid}" in
+    [0-9]*) select_mirror_site "${mwid}" ;;
+         *) error_msg "Input error." && exit 0 ;;
+esac
