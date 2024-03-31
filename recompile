@@ -220,7 +220,7 @@ init_var() {
     [[ -n "${code_branch}" ]] || code_branch="${repo_branch}"
 
     # Set cross compilation parameters
-    export ARCH="arm64"
+    export SRC_ARCH="arm64"
     export LOCALVERSION="${custom_name}"
 }
 
@@ -420,17 +420,17 @@ headers_install() {
     # Set headers files list
     head_list="$(mktemp)"
     (
-        find . arch/${ARCH} -maxdepth 1 -name Makefile\*
+        find . arch/${SRC_ARCH} -maxdepth 1 -name Makefile\*
         find include scripts -type f -o -type l
-        find arch/${ARCH} -name Kbuild.platforms -o -name Platform
-        find $(find arch/${ARCH} -name include -o -name scripts -type d) -type f
+        find arch/${SRC_ARCH} -name Kbuild.platforms -o -name Platform
+        find $(find arch/${SRC_ARCH} -name include -o -name scripts -type d) -type f
     ) >${head_list}
 
     # Set object files list
     obj_list="$(mktemp)"
     {
         [[ -n "$(grep "^CONFIG_OBJTOOL=y" include/config/auto.conf 2>/dev/null)" ]] && echo "tools/objtool/objtool"
-        find arch/${ARCH}/include Module.symvers include scripts -type f
+        find arch/${SRC_ARCH}/include Module.symvers include scripts -type f
         [[ -n "$(grep "^CONFIG_GCC_PLUGINS=y" include/config/auto.conf 2>/dev/null)" ]] && find scripts/gcc-plugins -name \*.so
     } >${obj_list}
 
@@ -462,14 +462,14 @@ compile_env() {
     echo -e "${STEPS} Set cross compilation parameters..."
 
     # Show variable
-    echo -e "${INFO} ARCH: [ ${ARCH} ]"
+    echo -e "${INFO} ARCH: [ ${SRC_ARCH} ]"
     echo -e "${INFO} LOCALVERSION: [ ${LOCALVERSION} ]"
     echo -e "${INFO} CROSS_COMPILE: [ ${CROSS_COMPILE} ]"
     echo -e "${INFO} CC: [ ${CC} ]"
     echo -e "${INFO} LD: [ ${LD} ]"
 
     # Set generic make string
-    MAKE_SET_STRING=" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
+    MAKE_SET_STRING=" ARCH=${SRC_ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
     make ${MAKE_SET_STRING} mrproper
@@ -764,7 +764,7 @@ toolchain_check
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel from: [ ${code_owner} ]"
 echo -e "${INFO} Kernel patch: [ ${auto_patch} ]"
-echo -e "${INFO} Kernel arch: [ ${ARCH} ]"
+echo -e "${INFO} Kernel arch: [ ${SRC_ARCH} ]"
 echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
