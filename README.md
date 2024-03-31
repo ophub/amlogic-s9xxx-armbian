@@ -47,7 +47,7 @@ Choose the Armbian system that corresponds to your box model, and refer to the c
 
 - ### Install Armbian to EMMC
 
-1. For `Rockchip` platform, please refer to the [Chapter 8](documents) in the instruction document.
+1. For `Rockchip` platform, please refer to the [Chapter 8](documents#8-installing-armbian-to-emmc) in the instruction document.
 
 2. For `Amlogic` and `Allwinner` platforms, use tools such as [Rufus](https://rufus.ie/) or [balenaEtcher](https://www.balena.io/etcher/) to write the system to a USB stick, then insert the USB stick with the written system into the box. Log in to the Armbian system (default user: root, default password: 1234) → Enter the command:
 
@@ -87,7 +87,7 @@ Example: `armbian-update -k 5.15.50 -u dev`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 
-When updating the kernel, the currently used kernel will be automatically backed up and stored in the `/ddbr/backup` directory. The backup keeps the three most recent versions of the kernel. If the newly installed kernel is unstable, you can easily restore the backup kernel at any time. If the kernel update fails and the system cannot boot, you can restore the system kernel using `armbian-update -s`. For more details, see the [Help Document](documents).
+When updating the kernel, the currently used kernel will be automatically backed up and stored in the `/ddbr/backup` directory. The backup keeps the three most recent versions of the kernel. If the newly installed kernel is unstable, you can easily restore the backup kernel at any time. If the kernel update fails and the system cannot boot, you can restore the system kernel using `armbian-update -s`. For more details, see the [Help Document](documents#10-updating-armbian-kernel).
 
 - ### Replace Armbian sources
 
@@ -97,7 +97,7 @@ Log in to the Armbian system → Enter the command:
 armbian-apt
 ```
 
-Choosing the appropriate software source for your country or region can improve software download speeds.
+Choosing the appropriate software source for your country or region can improve software download speeds. For more details, see the [Help Document](documents#11-installing-common-software).
 
 - ### Install Common Software
 

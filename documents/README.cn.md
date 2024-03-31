@@ -463,7 +463,47 @@ armbian-software
 
 使用 `armbian-software -u` 命令可以更新本地的软件中心列表。根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](../armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](armbian_software.md)。
 
-根据你所在的国家或地区，使用 armbian-apt 命令选择合适的软件源，提高软件的下载速度。
+根据你所在的国家或地区，使用 `armbian-apt` 命令选择合适的软件源，提高软件的下载速度。例如，选择中国的清华大学源：
+
+```shell
+armbian-apt
+
+[ STEPS ] Welcome to the Armbian source change script.
+[ INFO ] Please select a [ bookworm ] mirror site.
+  ┌──────┬───────────────────┬────────────────────────────────┐
+  │  ID  │  Country/Region   │  Mirror Site                   │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │   0  │  -                │  Restore default source        │
+  │  11  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
+  │  12  │  China            │  mirrors.bfsu.edu.cn           │
+  │  13  │  China            │  mirrors.aliyun.com            │
+  │  14  │  Hongkong, China  │  mirrors.xtom.hk               │
+  │  15  │  Taiwan, China    │  opensource.nchc.org.tw        │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  16  │  United States    │  mirrors.ocf.berkeley.edu      │
+  │  17  │  United States    │  mirrors.xtom.com              │
+  │  18  │  Canada           │  mirror.it.ubc.ca              │
+  │  19  │  Canada           │  mirror.csclub.uwaterloo.ca    │
+  │  20  │  United Kingdom   │  mirror.rackspace.com          │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  21  │  France           │  mirrors.ircam.fr/pub          │
+  │  22  │  Germany          │  mirror.dogado.de              │
+  │  23  │  Germany          │  mirrors.xtom.de               │
+  │  24  │  Russia           │  mirror.yandex.ru              │
+  │  25  │  Russia           │  mirror.truenetwork.ru         │
+  ├──────┼───────────────────┼────────────────────────────────┤
+  │  26  │  New Zealand      │  mirror.fsmg.org.nz            │
+  │  27  │  Australia        │  mirror.aarnet.edu.au          │
+  │  28  │  Australia        │  mirror.uq.edu.au              │
+  │  29  │  Singapore        │  mirror.sg.gs                  │
+  │  30  │  Japan            │  mirrors.xtom.jp               │
+  └──────┴───────────────────┴────────────────────────────────┘
+[ OPTIONS ] Please Input ID: 11
+[ INFO ] Your selected source ID is: [ 11 ]
+[ STEPS ] Start to change the source of the system: [ mirrors.tuna.tsinghua.edu.cn ]
+[ INFO ] The system release is: [ bookworm ]
+[ SUCCESS ] Change the source of the system successfully.
+```
 
 ## 12. 常见问题
 
