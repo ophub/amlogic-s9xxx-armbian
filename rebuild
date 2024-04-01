@@ -581,6 +581,7 @@ confirm_version() {
 
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${default_tags}" ]] && KERNEL_TAGS="${kernel_usage}"
+    [[ "${KERNEL_TAGS}" =~ ^[1-9]+ ]] && KERNEL_DOWN_TAGS="stable" || KERNEL_DOWN_TAGS="${KERNEL_TAGS}"
 }
 
 extract_armbian() {
@@ -1074,7 +1075,7 @@ refactor_rootfs() {
     echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
     echo "BOARD='${board}'" >>${ophub_release_file}
     echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
-    echo "KERNEL_TAGS='${KERNEL_TAGS}'" >>${ophub_release_file}
+    echo "KERNEL_TAGS='${KERNEL_DOWN_TAGS}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
