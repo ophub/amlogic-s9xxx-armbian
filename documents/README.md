@@ -475,32 +475,32 @@ armbian-apt
   │  ID  │  Country/Region   │  Mirror Site                   │
   ├──────┼───────────────────┼────────────────────────────────┤
   │   0  │  -                │  Restore default source        │
-  │  11  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
-  │  12  │  China            │  mirrors.bfsu.edu.cn           │
-  │  13  │  China            │  mirrors.aliyun.com            │
-  │  14  │  Hongkong, China  │  mirrors.xtom.hk               │
-  │  15  │  Taiwan, China    │  opensource.nchc.org.tw        │
+  │   1  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
+  │   2  │  China            │  mirrors.bfsu.edu.cn           │
+  │   3  │  China            │  mirrors.aliyun.com            │
+  │   4  │  Hongkong, China  │  mirrors.xtom.hk               │
+  │   5  │  Taiwan, China    │  opensource.nchc.org.tw        │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  16  │  United States    │  mirrors.ocf.berkeley.edu      │
-  │  17  │  United States    │  mirrors.xtom.com              │
-  │  18  │  Canada           │  mirror.it.ubc.ca              │
-  │  19  │  Canada           │  mirror.csclub.uwaterloo.ca    │
-  │  20  │  United Kingdom   │  mirror.rackspace.com          │
+  │   6  │  United States    │  mirrors.ocf.berkeley.edu      │
+  │   7  │  United States    │  mirrors.xtom.com              │
+  │   8  │  United States    │  mirrors.mit.edu               │
+  │   9  │  Canada           │  mirror.csclub.uwaterloo.ca    │
+  │  10  │  Canada           │  muug.ca/mirror                │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  21  │  France           │  mirrors.ircam.fr/pub          │
-  │  22  │  Germany          │  mirror.dogado.de              │
-  │  23  │  Germany          │  mirrors.xtom.de               │
-  │  24  │  Russia           │  mirror.yandex.ru              │
-  │  25  │  Russia           │  mirror.truenetwork.ru         │
+  │  11  │  Finland          │  mirror.kumi.systems           │
+  │  12  │  Netherlands      │  mirrors.xtom.nl               │
+  │  13  │  Germany          │  mirrors.xtom.de               │
+  │  14  │  Russia           │  mirror.yandex.ru              │
+  │  15  │  India            │  in.mirror.coganng.com         │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  26  │  New Zealand      │  mirror.fsmg.org.nz            │
-  │  27  │  Australia        │  mirror.aarnet.edu.au          │
-  │  28  │  Australia        │  mirror.uq.edu.au              │
-  │  29  │  Singapore        │  mirror.sg.gs                  │
-  │  30  │  Japan            │  mirrors.xtom.jp               │
+  │  16  │  Estonia          │  mirrors.xtom.ee               │
+  │  17  │  Australia        │  mirrors.xtom.au               │
+  │  18  │  South Korea      │  mirror.yuki.net.uk            │
+  │  19  │  Singapore        │  mirror.sg.gs                  │
+  │  20  │  Japan            │  mirrors.xtom.jp               │
   └──────┴───────────────────┴────────────────────────────────┘
-[ OPTIONS ] Please Input ID: 11
-[ INFO ] Your selected source ID is: [ 11 ]
+[ OPTIONS ] Please Input ID: 1
+[ INFO ] Your selected source ID is: [ 1 ]
 [ STEPS ] Start to change the source of the system: [ mirrors.tuna.tsinghua.edu.cn ]
 [ INFO ] The system release is: [ bookworm ]
 [ SUCCESS ] Change the source of the system successfully.
