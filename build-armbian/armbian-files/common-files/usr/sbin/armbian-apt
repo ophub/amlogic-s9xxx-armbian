@@ -123,17 +123,17 @@ EOF
 
     focal | jammy | kinetic | lunar | mantic | noble)
         cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME} main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME} main restricted universe multiverse
+        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
 
-        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-security main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-security main restricted universe multiverse
+        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-security main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-security main restricted universe multiverse
 
-        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-updates main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-updates main restricted universe multiverse
+        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-updates main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-updates main restricted universe multiverse
 
-        deb http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-backports main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu ${VERSION_CODENAME}-backports main restricted universe multiverse
+        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-backports main restricted universe multiverse
+        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-backports main restricted universe multiverse
 EOF
         ;;
 
@@ -174,26 +174,26 @@ select_mirror_site() {
             error_msg "The default source file does not exist."
         fi
         ;;
-    11) MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
-    12) MIRROR_URL="mirrors.bfsu.edu.cn" ;;
-    13) MIRROR_URL="mirrors.aliyun.com" ;;
-    14) MIRROR_URL="mirrors.xtom.hk" ;;
-    15) MIRROR_URL="opensource.nchc.org.tw" ;;
-    16) MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
-    17) MIRROR_URL="mirrors.xtom.com" ;;
-    18) MIRROR_URL="mirror.it.ubc.ca" ;;
-    19) MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
-    20) MIRROR_URL="mirror.rackspace.com" ;;
-    21) MIRROR_URL="mirrors.ircam.fr/pub" ;;
-    22) MIRROR_URL="mirror.dogado.de" ;;
-    23) MIRROR_URL="mirrors.xtom.de" ;;
-    24) MIRROR_URL="mirror.yandex.ru" ;;
-    25) MIRROR_URL="mirror.truenetwork.ru" ;;
-    26) MIRROR_URL="mirror.fsmg.org.nz" ;;
-    27) MIRROR_URL="mirror.aarnet.edu.au" ;;
-    28) MIRROR_URL="mirror.uq.edu.au" ;;
-    29) MIRROR_URL="mirror.sg.gs" ;;
-    30) MIRROR_URL="mirrors.xtom.jp" ;;
+    1) MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
+    2) MIRROR_URL="mirrors.bfsu.edu.cn" ;;
+    3) MIRROR_URL="mirrors.aliyun.com" ;;
+    4) MIRROR_URL="mirrors.xtom.hk" ;;
+    5) MIRROR_URL="opensource.nchc.org.tw" ;;
+    6) MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
+    7) MIRROR_URL="mirrors.xtom.com" ;;
+    8) MIRROR_URL="mirrors.mit.edu" ;;
+    9) MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
+    10) MIRROR_URL="muug.ca/mirror" ;;
+    11) MIRROR_URL="mirror.kumi.systems" ;;
+    12) MIRROR_URL="mirrors.xtom.nl" ;;
+    13) MIRROR_URL="mirrors.xtom.de" ;;
+    14) MIRROR_URL="mirror.yandex.ru" ;;
+    15) MIRROR_URL="in.mirror.coganng.com" ;;
+    16) MIRROR_URL="mirrors.xtom.ee" ;;
+    17) MIRROR_URL="mirrors.xtom.au" ;;
+    18) MIRROR_URL="mirror.yuki.net.uk" ;;
+    19) MIRROR_URL="mirror.sg.gs" ;;
+    20) MIRROR_URL="mirrors.xtom.jp" ;;
     *) error_msg "The source ID is not detected." ;;
     esac
 
@@ -214,29 +214,29 @@ cat <<EOF
   │  ID  │  Country/Region   │  Mirror Site                   │
   ├──────┼───────────────────┼────────────────────────────────┤
   │   0  │  -                │  Restore default source        │
-  │  11  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
-  │  12  │  China            │  mirrors.bfsu.edu.cn           │
-  │  13  │  China            │  mirrors.aliyun.com            │
-  │  14  │  Hongkong, China  │  mirrors.xtom.hk               │
-  │  15  │  Taiwan, China    │  opensource.nchc.org.tw        │
+  │   1  │  China            │  mirrors.tuna.tsinghua.edu.cn  │
+  │   2  │  China            │  mirrors.bfsu.edu.cn           │
+  │   3  │  China            │  mirrors.aliyun.com            │
+  │   4  │  Hongkong, China  │  mirrors.xtom.hk               │
+  │   5  │  Taiwan, China    │  opensource.nchc.org.tw        │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  16  │  United States    │  mirrors.ocf.berkeley.edu      │
-  │  17  │  United States    │  mirrors.xtom.com              │
-  │  18  │  Canada           │  mirror.it.ubc.ca              │
-  │  19  │  Canada           │  mirror.csclub.uwaterloo.ca    │
-  │  20  │  United Kingdom   │  mirror.rackspace.com          │
+  │   6  │  United States    │  mirrors.ocf.berkeley.edu      │
+  │   7  │  United States    │  mirrors.xtom.com              │
+  │   8  │  United States    │  mirrors.mit.edu               │
+  │   9  │  Canada           │  mirror.csclub.uwaterloo.ca    │
+  │  10  │  Canada           │  muug.ca/mirror                │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  21  │  France           │  mirrors.ircam.fr/pub          │
-  │  22  │  Germany          │  mirror.dogado.de              │
-  │  23  │  Germany          │  mirrors.xtom.de               │
-  │  24  │  Russia           │  mirror.yandex.ru              │
-  │  25  │  Russia           │  mirror.truenetwork.ru         │
+  │  11  │  Finland          │  mirror.kumi.systems           │
+  │  12  │  Netherlands      │  mirrors.xtom.nl               │
+  │  13  │  Germany          │  mirrors.xtom.de               │
+  │  14  │  Russia           │  mirror.yandex.ru              │
+  │  15  │  India            │  in.mirror.coganng.com         │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  26  │  New Zealand      │  mirror.fsmg.org.nz            │
-  │  27  │  Australia        │  mirror.aarnet.edu.au          │
-  │  28  │  Australia        │  mirror.uq.edu.au              │
-  │  29  │  Singapore        │  mirror.sg.gs                  │
-  │  30  │  Japan            │  mirrors.xtom.jp               │
+  │  16  │  Estonia          │  mirrors.xtom.ee               │
+  │  17  │  Australia        │  mirrors.xtom.au               │
+  │  18  │  South Korea      │  mirror.yuki.net.uk            │
+  │  19  │  Singapore        │  mirror.sg.gs                  │
+  │  20  │  Japan            │  mirrors.xtom.jp               │
   └──────┴───────────────────┴────────────────────────────────┘
 EOF
 echo -ne "${OPTIONS} Please Input ID: "
