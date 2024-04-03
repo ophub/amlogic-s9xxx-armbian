@@ -462,11 +462,10 @@ chroot_armbian() {
     git config --global --add safe.directory ${PWD}
     git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
     cp -f .config Module.symvers ${armbian_kernel_path}
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel source tree is copied successfully."
+    [[ "${?}" -eq "0" ]] || error_msg "Copy the kernel source tree to the armbian system failed."
 
     cd ${current_path}
 
-    echo -e "${INFO} Set the initramfs compression format..."
     # COMPRESS: [ gzip | lzma | xz | zstd ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
@@ -489,7 +488,7 @@ chroot_armbian() {
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
-    echo -e "${INFO} Enter the chroot armbian system..."
+    echo -e "${STEPS} Enter the chroot Armbian system..."
     mount -t proc /proc ${tag_rootfs}/proc
     mount --bind /dev ${tag_rootfs}/dev
     mount --bind /dev/pts ${tag_rootfs}/dev/pts
@@ -500,12 +499,14 @@ chroot_armbian() {
 
     cd ${current_path}
 
+    echo -e "${STEPS} Start copying files from Armbian system..."
+
     # Copy the generated uInitrd file to the current system
-    echo -e "${INFO} Copy the boot files from [ ${tag_rootfs}/boot ]"
+    echo -e "${INFO} Copy the boot files from armbian [ /boot ]"
     cp -rf ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
 
     # Copy the generated header files to the current system
-    echo -e "${INFO} Copy the header files from [ ${tag_rootfs}/opt/header ]"
+    echo -e "${INFO} Copy the header files from armbian [ /opt/header ]"
     cp -f ${tag_rootfs}/opt/header/header-${kernel_outname}.tar.gz ${output_path}/${kernel_version}
 
     # Unmount the armbian system
