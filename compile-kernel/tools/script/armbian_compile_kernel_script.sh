@@ -463,7 +463,7 @@ compile_env() {
 
     # Set max process
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
-    [[ -z "${PROCESS}" ]] && PROCESS="1" && echo "PROCESS: 1"
+    [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 }
 
 compile_dtbs() {
@@ -528,6 +528,7 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | lzma | xz | zstd ]
+    echo -e "${INFO} Set the [ ${compress_format} ] compression format for the initrd.img file."
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     if [[ -f "${compress_initrd_file}" ]]; then
@@ -557,7 +558,7 @@ generate_uinitrd() {
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
 
-    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${kernel_outname})"
+    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -hl *${kernel_outname})"
 
     # Restore the files in the [ /boot ] directory
     mv -f *${kernel_outname} ${output_path}/boot

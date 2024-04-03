@@ -109,7 +109,7 @@ generate_uinitrd() {
         echo -e "${WARNING} The initrd.img and uInitrd file not updated."
     fi
 
-    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${chroot_kernel_version})"
+    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -hl *${chroot_kernel_version})"
 }
 
 # Make kernel scripts
@@ -144,10 +144,15 @@ make_kernel_scripts() {
     export CC="${CROSS_COMPILE}gcc"
     export LD="${CROSS_COMPILE}ld.bfd"
     export MFLAGS=""
+
     # Set generic make string
     MAKE_SET_STRING=" ARCH=${SRC_ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
 
-    make ${MAKE_SET_STRING} scripts
+    # Set max process
+    PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
+    [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
+
+    make ${MAKE_SET_STRING} scripts -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
 }
 
