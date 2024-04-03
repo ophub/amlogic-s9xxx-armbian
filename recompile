@@ -432,6 +432,7 @@ chroot_armbian() {
     ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
     echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
 
+    echo -e "${INFO} Copy the kernel files to the armbian system..."
     # Remove current system files for /boot
     rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image}
     # Copy /boot related files into armbian system
@@ -451,19 +452,21 @@ chroot_armbian() {
     cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t ${tag_rootfs}/usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
-    # Copy the kernel source tree to the armbian system
-    (
-        cd ${kernel_path}/${local_kernel_path}
+    cd ${kernel_path}/${local_kernel_path}
 
-        armbian_kernel_path="${tag_rootfs}/opt/linux-kernel"
-        mkdir -p ${armbian_kernel_path}
+    echo -e "${INFO} Copy the kernel source tree to the armbian system..."
+    # Set the kernel source tree path
+    armbian_kernel_path="${tag_rootfs}/opt/linux-kernel"
+    mkdir -p ${armbian_kernel_path}
+    # Set the git configuration and copy the kernel source tree
+    git config --global --add safe.directory ${PWD}
+    git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
+    cp -f .config Module.symvers ${armbian_kernel_path}
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel source tree is copied successfully."
 
-        git config --global --add safe.directory ${PWD}
-        git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
-        cp -f .config Module.symvers ${armbian_kernel_path}
-        [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel source tree is copied successfully."
-    )
+    cd ${current_path}
 
+    echo -e "${INFO} Set the initramfs compression format..."
     # COMPRESS: [ gzip | lzma | xz | zstd ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
@@ -475,9 +478,11 @@ chroot_armbian() {
         error_msg "The [ ${compress_initrd_file} ] file does not exist."
     fi
 
+    echo -e "${INFO} Copy the [ ${qemu_binary_arm64} ] file to the armbian system..."
     [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
     #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
 
+    echo -e "${INFO} Copy the [ ubuntu_chroot_armbian.sh ] script to the armbian system..."
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
     chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
     sync && sleep 3
@@ -494,6 +499,7 @@ chroot_armbian() {
     [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
     cd ${current_path}
+
     # Copy the generated uInitrd file to the current system
     echo -e "${INFO} Copy the boot files from [ ${tag_rootfs}/boot ]"
     cp -rf ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
@@ -569,7 +575,7 @@ compile_env() {
 
     # Set max process
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
-    [[ -z "${PROCESS}" ]] && PROCESS="1" && echo "PROCESS: 1"
+    [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 }
 
 compile_dtbs() {
