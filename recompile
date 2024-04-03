@@ -27,11 +27,10 @@
 # apply_patch        : Apply custom kernel patches
 # get_kernel_source  : Get the kernel source code
 #
-# headers_install    : Deploy the kernel headers file
+# chroot_armbian     : Chroot into Armbian to generate initrd.img, uInitrd and make scripts
 # compile_env        : Set up the compile kernel environment
 # compile_dtbs       : Compile the dtbs
 # compile_kernel     : Compile the kernel
-# generate_uinitrd   : Chroot into Armbian to generate initrd.img and uInitrd
 # packit_dtbs        : Packit dtbs files
 # packit_kernel      : Packit boot, modules and header files
 # compile_selection  : Choose to compile dtbs or all kernels
@@ -115,12 +114,12 @@ mount_try() {
     t="1"
     max_try="10"
     while [[ "${t}" -le "${max_try}" ]]; do
-        sudo mount ${m_dev} ${m_target}
+        mount ${m_dev} ${m_target}
         if [[ "${?}" -eq "0" ]]; then
             break
         else
             sync && sleep 3
-            sudo umount -f ${m_target} 2>/dev/null
+            umount -f ${m_target} 2>/dev/null
             t="$((t + 1))"
         fi
     done
@@ -229,11 +228,11 @@ toolchain_check() {
     echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
 
     # Install dependencies for jammy
-    sudo apt-get -qq update
+    apt-get -qq update
     if [[ "${arch_info}" == "x86_64" ]]; then
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+        apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
     else
-        sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
+        apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
     fi
 
     # Download armbian
@@ -258,8 +257,8 @@ toolchain_check() {
     if [[ "${toolchain_name}" == "clang" ]]; then
         # Install LLVM
         echo -e "${INFO} Start installing the LLVM toolchain..."
-        sudo apt-get -qq install -y lsb-release software-properties-common gnupg
-        curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s all
+        apt-get -qq install -y lsb-release software-properties-common gnupg
+        curl -fsSL https://apt.llvm.org/llvm.sh | bash -s all
         [[ "${?}" -eq "0" ]] || error_msg "LLVM installation failed."
 
         # Set cross compilation parameters
@@ -414,35 +413,104 @@ get_kernel_source() {
     [[ "${auto_patch}" == "true" || "${auto_patch}" == "yes" ]] && apply_patch
 }
 
-headers_install() {
-    cd ${kernel_path}/${local_kernel_path}
+chroot_armbian() {
+    cd ${current_path}
+    echo -e "${STEPS} Create chroot..."
 
-    # Set headers files list
-    head_list="$(mktemp)"
+    rm -f ${chroot_file}
+    cp -f ${armbian_file} ${chroot_file}
+
+    # Mount the armbian system
+    tag_rootfs="${chroot_path}/root"
+
+    loop_armbian="$(losetup -P -f --show "${chroot_file}")"
+    [[ -n "${loop_armbian}" ]] || error_msg "losetup ${chroot_file} failed."
+
+    mount_try ${loop_armbian}p2 ${tag_rootfs}
+    mount_try ${loop_armbian}p1 ${tag_rootfs}/boot
+
+    ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
+    echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
+
+    # Remove current system files for /boot
+    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image}
+    # Copy /boot related files into armbian system
+    cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
+    if [[ "${ARMBIAN_PLATFORM}" == "rockchip" || "${ARMBIAN_PLATFORM}" == "allwinner" ]]; then
+        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/Image
+    else
+        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/zImage
+    fi
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
+
+    # Remove current system files for /usr/lib/modules
+    rm -rf ${tag_rootfs}/usr/lib/modules/*
+    # Copy /usr/lib/modules related files into armbian system
+    cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t ${tag_rootfs}/usr/lib/modules
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
+
+    # Copy the kernel source tree to the armbian system
     (
-        find . arch/${SRC_ARCH} -maxdepth 1 -name Makefile\*
-        find include scripts -type f -o -type l
-        find arch/${SRC_ARCH} -name Kbuild.platforms -o -name Platform
-        find $(find arch/${SRC_ARCH} -name include -o -name scripts -type d) -type f
-    ) >${head_list}
+        cd ${kernel_path}/${local_kernel_path}
 
-    # Set object files list
-    obj_list="$(mktemp)"
-    {
-        [[ -n "$(grep "^CONFIG_OBJTOOL=y" include/config/auto.conf 2>/dev/null)" ]] && echo "tools/objtool/objtool"
-        find arch/${SRC_ARCH}/include Module.symvers include scripts -type f
-        [[ -n "$(grep "^CONFIG_GCC_PLUGINS=y" include/config/auto.conf 2>/dev/null)" ]] && find scripts/gcc-plugins -name \*.so
-    } >${obj_list}
+        armbian_kernel_path="${tag_rootfs}/opt/linux-kernel"
+        mkdir -p ${armbian_kernel_path}
 
-    # Install related files to the specified directory
-    tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${output_path}/header
-    tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${output_path}/header
+        git config --global --add safe.directory ${PWD}
+        git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
+        cp -f .config Module.symvers ${armbian_kernel_path}
+        [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel source tree is copied successfully."
+    )
 
-    # copy .config manually to be where it's expected to be
-    cp -f .config ${output_path}/header/.config
+    # COMPRESS: [ gzip | lzma | xz | zstd ]
+    [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
+    compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
+    if [[ -f "${compress_initrd_file}" ]]; then
+        sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
+        compress_settings="$(cat ${compress_initrd_file} | grep -E ^COMPRESS=)"
+        echo -e "${INFO} Set the [ ${compress_settings} ] in the initramfs.conf file."
+    else
+        error_msg "The [ ${compress_initrd_file} ] file does not exist."
+    fi
 
-    # Delete temporary files
-    rm -f ${head_list} ${obj_list}
+    [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
+    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
+
+    cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
+    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
+    sync && sleep 3
+    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
+
+    # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
+    echo -e "${INFO} Enter the chroot armbian system..."
+    mount -t proc /proc ${tag_rootfs}/proc
+    mount --bind /dev ${tag_rootfs}/dev
+    mount --bind /dev/pts ${tag_rootfs}/dev/pts
+    mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
+    chmod 0666 ${tag_rootfs}/dev/null
+    chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
+    [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
+
+    cd ${current_path}
+    # Copy the generated uInitrd file to the current system
+    echo -e "${INFO} Copy the boot files from [ ${tag_rootfs}/boot ]"
+    cp -rf ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
+
+    # Copy the generated header files to the current system
+    echo -e "${INFO} Copy the header files from [ ${tag_rootfs}/opt/header ]"
+    cp -f ${tag_rootfs}/opt/header/header-${kernel_outname}.tar.gz ${output_path}/${kernel_version}
+
+    # Unmount the armbian system
+    sync && sleep 3
+    umount ${tag_rootfs}/dev/fd 2>/dev/null
+    umount ${tag_rootfs}/dev/pts 2>/dev/null
+    umount ${tag_rootfs}/dev 2>/dev/null
+    umount ${tag_rootfs}/proc 2>/dev/null
+    umount ${tag_rootfs}/boot 2>/dev/null
+    umount ${tag_rootfs} 2>/dev/null
+    losetup -D 2>/dev/null
 }
 
 compile_env() {
@@ -531,90 +599,8 @@ compile_kernel() {
     find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully."
 
-    # Install headers
-    echo -e "${STEPS} Install headers..."
-    headers_install
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The headers is installed successfully."
-}
-
-generate_uinitrd() {
-    cd ${current_path}
-    echo -e "${STEPS} Create chroot..."
-
-    cp -f ${armbian_file} ${chroot_file}
-
-    # Mount the armbian system
-    tag_rootfs="${chroot_path}/root"
-
-    loop_armbian="$(losetup -P -f --show "${chroot_file}")"
-    [[ -n "${loop_armbian}" ]] || error_msg "losetup ${chroot_file} failed."
-
-    mount_try ${loop_armbian}p2 ${tag_rootfs}
-    mount_try ${loop_armbian}p1 ${tag_rootfs}/boot
-
-    ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
-    echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
-
-    # Remove current system files for /boot
-    rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image}
-    # Copy /boot related files into armbian system
-    cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
-    if [[ "${ARMBIAN_PLATFORM}" == "rockchip" || "${ARMBIAN_PLATFORM}" == "allwinner" ]]; then
-        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/Image
-    else
-        cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/zImage
-    fi
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/boot ] directory: \n$(ls -l ${tag_rootfs}/boot) \n"
-
-    rm -rf ${tag_rootfs}/usr/lib/modules/*
-    cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t ${tag_rootfs}/usr/lib/modules
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
-
-    # COMPRESS: [ gzip | lzma | xz | zstd ]
-    [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
-    compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
-    if [[ -f "${compress_initrd_file}" ]]; then
-        sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
-        compress_settings="$(cat ${compress_initrd_file} | grep -E ^COMPRESS=)"
-        echo -e "${INFO} Set the [ ${compress_settings} ] in the initramfs.conf file."
-    else
-        error_msg "The [ ${compress_initrd_file} ] file does not exist."
-    fi
-
-    [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
-    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
-
-    cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
-    chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
-    sync && sleep 3
-    #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
-
-    # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
-    echo -e "${INFO} Enter the chroot armbian system..."
-    sudo mount -t proc /proc ${tag_rootfs}/proc
-    sudo mount --bind /dev ${tag_rootfs}/dev
-    sudo mount --bind /dev/pts ${tag_rootfs}/dev/pts
-    sudo mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
-    sudo chmod 0666 ${tag_rootfs}/dev/null
-    chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
-    [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
-
-    cd ${current_path}
-    # Copy the generated uInitrd file to the current system
-    echo -e "${INFO} Copy the generated files from [ ${tag_rootfs}/boot ]"
-    cp -rf ${tag_rootfs}/boot/*${kernel_outname} ${output_path}/boot
-
-    # Unmount the armbian system
-    sync && sleep 3
-    sudo umount ${tag_rootfs}/dev/fd 2>/dev/null
-    sudo umount ${tag_rootfs}/dev/pts 2>/dev/null
-    sudo umount ${tag_rootfs}/dev 2>/dev/null
-    sudo umount ${tag_rootfs}/proc 2>/dev/null
-    sudo umount ${tag_rootfs}/boot 2>/dev/null
-    sudo umount ${tag_rootfs} 2>/dev/null
-    losetup -D 2>/dev/null
+    # Chroot into Armbian to generate initrd.img, uInitrd and make scripts
+    chroot_armbian
 }
 
 packit_dtbs() {
@@ -674,10 +660,10 @@ packit_kernel() {
     mv -f *.tar.gz ${output_path}/${kernel_version}
     echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
 
-    cd ${output_path}/header
-    tar -czf header-${kernel_outname}.tar.gz *
-    mv -f *.tar.gz ${output_path}/${kernel_version}
-    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
+    cd ${output_path}/${kernel_version}
+    [[ -n "$(ls header-${kernel_outname}.tar.gz 2>/dev/null)" ]] && {
+        echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
+    }
 }
 
 compile_selection() {
@@ -687,7 +673,6 @@ compile_selection() {
         packit_dtbs
     else
         compile_kernel
-        generate_uinitrd
         packit_dtbs
         packit_kernel
     fi
