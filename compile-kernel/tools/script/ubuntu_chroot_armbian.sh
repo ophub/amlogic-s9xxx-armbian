@@ -12,6 +12,16 @@
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
+#======================================= TIPS =======================================
+#
+# To enhance the kernel compilation speed within the Armbian system,
+# the required compilation dependencies, including the gcc toolchain,
+# have been pre-installed in the Armbian system.
+# https://github.com/ophub/kernel/releases/download/dev/armbian.tar.xz
+# Include the following contents:
+# ~/compile-kernel/tools/script/armbian-compile-kernel-depends
+# https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-x.tar.xz
+#
 #================================== Functions list ==================================
 #
 # error_msg           : Output error message
