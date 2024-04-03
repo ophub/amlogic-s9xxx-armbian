@@ -1,25 +1,44 @@
 #!/bin/bash
-#==========================================================================
+#====================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
 # warranty of any kind, whether express or implied.
 #
-# This file is a part of the Rebuild Armbian
+# This file is a part of the compile kernel script for Armbian.
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on Armbian, generate uInitrd.
+# Description: Run on Armbian, generate uInitrd, make kernel scripts, packit header.
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-#===================== Set make environment variables =====================
+#================================== Functions list ==================================
+#
+# error_msg           : Output error message
+# check_dependencies  : Install the required dependencies
+# generate_uinitrd    : Generate uInitrd
+# make_kernel_scripts : Make kernel scripts
+# packit_header       : Packit header
+#
+#========================== Set make environment variables ==========================
 #
 # Set environment variables
 chroot_arch_info="$(arch)"
 chroot_kernel_version="${1}"
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
 compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
-#
+header_output_path="/opt/header"
+armbian_kernel_path="/opt/linux-kernel"
+
+# Compile toolchain download mirror, run on Armbian
+dev_repo="https://github.com/ophub/kernel/releases/download/dev"
+# Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+gun_file="arm-gnu-toolchain-13.2.rel1-aarch64-aarch64-none-elf.tar.xz"
+# Set the toolchain path
+toolchain_path="/usr/local/toolchain"
+# Set the kernel arch
+SRC_ARCH="arm64"
+
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
@@ -36,7 +55,7 @@ error_msg() {
 }
 
 # Install the required dependencies
-chroot_env_init() {
+check_dependencies() {
     echo -e "${STEPS} Start checking dependencies..."
     # Check the compression algorithm
     if [[ -f "${compress_initrd_file}" ]]; then
@@ -48,9 +67,9 @@ chroot_env_init() {
 
     # Set the necessary packages
     case "${compress_settings}" in
-        xz | lzma) necessary_packages="xz-utils" ;;
-        zstd) necessary_packages="zstd" ;;
-        gzip | *) necessary_packages="gzip" ;;
+    xz | lzma) necessary_packages="xz-utils" ;;
+    zstd) necessary_packages="zstd" ;;
+    gzip | *) necessary_packages="gzip" ;;
     esac
 
     # Check the necessary packages
@@ -62,7 +81,7 @@ chroot_env_init() {
 }
 
 # Generate uInitrd
-chroot_generate_uinitrd() {
+generate_uinitrd() {
     cd /boot
     echo -e "${STEPS} Generate uInitrd file..."
 
@@ -83,10 +102,92 @@ chroot_generate_uinitrd() {
     echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -l *${chroot_kernel_version})"
 }
 
+# Make kernel scripts
+make_kernel_scripts() {
+    cd ${armbian_kernel_path}
+    echo -e "${STEPS} Make kernel scripts..."
+
+    # Download Arm GNU Toolchain
+    [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
+    if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
+        echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
+        curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
+        [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
+        tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
+        rm -f ${toolchain_path}/${gun_file}
+        # List and check directory names, and change them all to lowercase
+        for dir in $(ls ${toolchain_path}); do
+            if [[ -d "${toolchain_path}/${dir}" && "${dir}" != "${dir,,}" ]]; then
+                mv -f ${toolchain_path}/${dir} ${toolchain_path}/${dir,,}
+            fi
+        done
+        [[ -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]] || error_msg "The gcc is not set!"
+    fi
+
+    # Set the default path
+    path_os_variable="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+    # Add ${PATH} variable
+    path_gcc="${toolchain_path}/${gun_file//.tar.xz/}/bin:${path_os_variable}"
+    # Set cross compilation parameters
+    export PATH="${path_gcc}"
+    export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-"
+    export CC="${CROSS_COMPILE}gcc"
+    export LD="${CROSS_COMPILE}ld.bfd"
+    export MFLAGS=""
+    # Set generic make string
+    MAKE_SET_STRING=" ARCH=${SRC_ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
+
+    make ${MAKE_SET_STRING} scripts
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
+}
+
+packit_header() {
+    cd ${armbian_kernel_path}
+    echo -e "${STEPS} Packit header files..."
+
+    # Set headers files list
+    head_list="$(mktemp)"
+    (
+        find . arch/${SRC_ARCH} -maxdepth 1 -name Makefile\*
+        find include scripts -type f -o -type l
+        find arch/${SRC_ARCH} -name Kbuild.platforms -o -name Platform
+        find $(find arch/${SRC_ARCH} -name include -o -name scripts -type d) -type f
+    ) >${head_list}
+
+    # Set object files list
+    obj_list="$(mktemp)"
+    {
+        [[ -n "$(grep "^CONFIG_OBJTOOL=y" include/config/auto.conf 2>/dev/null)" ]] && echo "tools/objtool/objtool"
+        find arch/${SRC_ARCH}/include Module.symvers include scripts -type f
+        [[ -n "$(grep "^CONFIG_GCC_PLUGINS=y" include/config/auto.conf 2>/dev/null)" ]] && find scripts/gcc-plugins -name \*.so
+    } >${obj_list}
+
+    # Install related files to the specified directory
+    mkdir -p ${header_output_path}
+    tar --exclude '*.orig' -c -f - -C ${armbian_kernel_path} -T ${head_list} | tar -xf - -C ${header_output_path}
+    tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${header_output_path}
+
+    # Delete temporary files
+    rm -f ${head_list} ${obj_list}
+
+    # copy .config manually to be where it's expected to be
+    cp -f .config ${header_output_path}/.config
+
+    # Compress the header files
+    cd ${header_output_path}
+    tar -czf header-${chroot_kernel_version}.tar.gz *
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel header files are successfully generated."
+}
+
+# Show welcome message
 echo -e "${INFO} Current system: [ ${chroot_arch_info} ]"
 echo -e "${INFO} Compile the kernel version: [ ${chroot_kernel_version} ]"
 
 # Check dependencies
-chroot_env_init
+check_dependencies
 # Generate uInitrd
-chroot_generate_uinitrd
+generate_uinitrd
+# Make kernel scripts
+make_kernel_scripts
+# Packit header
+packit_header
