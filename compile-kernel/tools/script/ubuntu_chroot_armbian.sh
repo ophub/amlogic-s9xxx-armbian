@@ -206,3 +206,6 @@ generate_uinitrd
 make_kernel_scripts
 # Packit header
 packit_header
+
+echo -e "${SUCCESS} Chroot task finished, exiting Armbian system..."
+exit 0
