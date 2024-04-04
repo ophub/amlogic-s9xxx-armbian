@@ -155,7 +155,7 @@ EOF
     esac
 
     # Remove the space at the beginning of each line
-    sed 's/^[ t]*//' -i ${armbian_source_file}
+    sed -i 's|^[ t]*||g' ${armbian_source_file}
     echo -e "${SUCCESS} Change the source of the system successfully."
 }
 
