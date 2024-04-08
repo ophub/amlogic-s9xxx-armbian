@@ -57,9 +57,9 @@ armbian-install
 
 | Optional | Default | Options | Description       |
 | -------- | ------- | ------- | ----------------- |
-| -m       | no      | yes/no  | Use Mainline u-boot |
+| -m       | no      | yes/no  | Use mainline u-boot |
 | -a       | yes     | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
-| -l       | no      | yes/no  | List. Display all device lists |
+| -l       | no      | yes/no  | Show a list of all devices |
 
 Example: `armbian-install -m yes -a no`
 
