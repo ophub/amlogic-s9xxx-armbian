@@ -240,7 +240,7 @@ software_105() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address: [ http://${my_address}:8080 ]"
-        echo -e "${NOTE} The ${container_name} account: [ username:admin  /  password:adminadmin ]"
+        echo -e "${NOTE} View ${container_name} username and password: [ docker logs -f qbittorrent ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
         exit 0
         ;;
