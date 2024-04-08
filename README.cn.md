@@ -57,9 +57,9 @@ armbian-install
 
 | 可选参数  | 默认值   | 选项     | 说明                |
 | -------  | ------- | ------  | -----------------   |
-| -m       | no      | yes/no  | 使用 Mainline u-boot |
+| -m       | no      | yes/no  | 使用主线 u-boot |
 | -a       | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
-| -l       | no      | yes/no  | List. 显示全部设备列表 |
+| -l       | no      | yes/no  | 显示全部设备列表 |
 
 举例: `armbian-install -m yes -a no`
 
