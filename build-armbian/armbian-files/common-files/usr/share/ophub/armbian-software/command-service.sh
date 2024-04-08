@@ -486,7 +486,13 @@ software_309() {
         curl -fsSL https://get.casaos.io | sudo bash
 
         sync && sleep 3
-        echo -e "${NOTE} The CasaOS access address: [ http://${my_address}:81 ]"
+
+        # Get the CasaOS service port
+        CASA_CONF_PATH="/etc/casaos/gateway.ini"
+        CASA_PORT="$(grep "port" ${CASA_CONF_PATH} | awk -F "=" '{print $2}')"
+        [[ "${CASA_PORT}" -eq "80" ]] && my_casa_port="" || my_casa_port=":${CASA_PORT}"
+
+        echo -e "${NOTE} The CasaOS access address: [ http://${my_address}${my_casa_port} ]"
         echo -e "${SUCCESS} CasaOS installation successful."
         ;;
     update) software_update ;;
