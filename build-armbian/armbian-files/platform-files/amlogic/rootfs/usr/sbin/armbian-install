@@ -13,15 +13,15 @@
 # Copyright (C) 2022- https://github.com/7Ji/ampart
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: armbian-install
-# Optional parameter meaning: -m = ues Mainline_u-boot
-#                             -a = ues Ampart
-#                             -l = List show all
+# Command: armbian-install [-m yes/no] [-a yes/no] [-l yes/no]
+# Optional parameters: -m = use mainline u-boot (default: no)
+#                      -a = use ampart partition table adjustment tool (default: yes)
+#                      -l = show a list of all devices (default: no)
 #
-# Command optional parameters:  armbian-install -m yes/no -a yes/no -l yes/no
-# Use mainline u-boot command:  armbian-install -m yes
-# Disable ampart tool command:  armbian-install -a no
-# list show all command:        armbian-install -l yes
+# Examples:
+#  Use mainline u-boot       : armbian-install -m yes
+#  Disable ampart tool       : armbian-install -a no
+#  Show all available devices: armbian-install -l yes
 #
 #======================================== Functions list ========================================
 #
@@ -120,7 +120,7 @@ init_var() {
                 [[ "${2}" == "yes" ]] && show_all_list="yes" || show_all_list="no"
                 shift
             else
-                error_msg "Invalid -s parameter [ ${2} ]!"
+                error_msg "Invalid -l parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -132,8 +132,8 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
-    echo -e "${INFO} Using ampart tool: [ ${use_ampart} ]"
-    echo -e "${INFO} Show all lists: [ ${show_all_list} ]"
+    echo -e "${INFO} Use ampart tool: [ ${use_ampart} ]"
+    echo -e "${INFO} Show all devices: [ ${show_all_list} ]"
 
     # Find a list of devices of the same family
     SEARCH_FAMILY=""
