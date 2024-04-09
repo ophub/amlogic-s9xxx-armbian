@@ -55,6 +55,7 @@ on:
           - leez
           - lx-r3s
           - mrkaio-m68s
+          - nanopi-r2s
           - nanopi-r5c
           - nanopi-r5s
           - panther-x2
