@@ -566,16 +566,12 @@ update_initrd_addr() {
     initrd_addr_file="/boot/emmc_autoscript.cmd"
     initrd_addr_mkimage_file="/boot/emmc_autoscript"
     if [[ -f "${initrd_addr_file}" ]]; then
-        echo -e "${INFO} Start checking [ ${initrd_addr_file} ]..."
-
         # Get the initrd_addr value
         initrd_addr_value="$(grep 'setenv initrd_addr' ${initrd_addr_file} | awk '{print $3}')"
         [[ -z "${initrd_addr_value}" ]] && error_msg "Failed to query [ initrd_addr ] value from [ ${initrd_addr_file} ]."
 
         # Check if the initrd_addr value is 0x15000000
-        if [[ "${initrd_addr_value}" == "0x15000000" ]]; then
-            echo -e "${INFO} The [ initrd_addr ] value is [ ${initrd_addr_value} ], no need to adjust."
-        else
+        [[ "${initrd_addr_value}" != "0x15000000" ]] && {
             echo -e "${INFO} The [ initrd_addr ] value is [ ${initrd_addr_value} ], need to adjust."
 
             # Adjust the initrd_addr value to 0x15000000
@@ -588,7 +584,7 @@ update_initrd_addr() {
             sudo mkimage -C none -A arm -T script -d ${initrd_addr_file} ${initrd_addr_mkimage_file} >/dev/null
             [[ "${?}" -ne "0" ]] && error_msg "Failed to create [ ${initrd_addr_mkimage_file} ] file."
             echo -e "${INFO} Create [ ${initrd_addr_mkimage_file} ] file succeeded."
-        fi
+        }
     else
         error_msg "The [ ${initrd_addr_file} ] file is missing, stop updating."
     fi
@@ -597,16 +593,12 @@ update_initrd_addr() {
     ramdisk_addr_file="/boot/s905_autoscript.cmd"
     ramdisk_addr_mkimage_file="/boot/s905_autoscript"
     if [[ -f "${ramdisk_addr_file}" ]]; then
-        echo -e "${INFO} Start checking [ ${ramdisk_addr_file} ]..."
-
         # Get the ramdisk_addr_r value
         ramdisk_addr_value="$(grep 'setenv ramdisk_addr_r' ${ramdisk_addr_file} | awk '{print $3}')"
         [[ -z "${ramdisk_addr_value}" ]] && error_msg "Failed to query [ initrd_addr ] value from [ ${ramdisk_addr_file} ]."
 
         # Check if the ramdisk_addr_r value is 0x15000000
-        if [[ "${ramdisk_addr_value}" == "0x15000000" ]]; then
-            echo -e "${INFO} The [ ramdisk_addr_r ] value is [ ${ramdisk_addr_value} ], no need to adjust."
-        else
+        [[ "${ramdisk_addr_value}" != "0x15000000" ]] && {
             echo -e "${INFO} The [ ramdisk_addr_r ] value is [ ${ramdisk_addr_value} ], need to adjust."
 
             # Adjust the ramdisk_addr_r value to 0x15000000
@@ -619,27 +611,23 @@ update_initrd_addr() {
             sudo mkimage -C none -A arm -T script -d ${ramdisk_addr_file} ${ramdisk_addr_mkimage_file} >/dev/null
             [[ "${?}" -ne "0" ]] && error_msg "Failed to create [ ${ramdisk_addr_mkimage_file} ] file."
             echo -e "${INFO} Create [ ${ramdisk_addr_mkimage_file} ] file succeeded."
-        fi
+        }
     fi
 
     # Check if the file exists for boot.ini
     boot_ini_file="/boot/boot.ini"
     if [[ -f "${boot_ini_file}" ]]; then
-        echo -e "${INFO} Start checking [ ${boot_ini_file} ]..."
-
         # Get the initrd_addr value
         boot_ini_addr_value="$(grep 'setenv initrd_addr' ${boot_ini_file} | awk '{print $3}')"
         [[ -z "${boot_ini_addr_value}" ]] && error_msg "Failed to query [ initrd_addr ] value from [ ${boot_ini_file} ]."
 
         # Check if the initrd_addr value is 0x15000000
-        if [[ "${boot_ini_addr_value}" == "0x15000000" ]]; then
-            echo -e "${INFO} The [ initrd_addr ] value is [ ${boot_ini_addr_value} ], no need to adjust."
-        else
+        [[ "${boot_ini_addr_value}" != "0x15000000" ]] && {
             echo -e "${INFO} The [ initrd_addr ] value is [ ${boot_ini_addr_value} ], need to adjust."
             sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" ${boot_ini_file}
             [[ "${?}" -ne "0" ]] && error_msg "Failed to adjust [ initrd_addr ] value in [ ${boot_ini_file} ]."
             echo -e "${INFO} Adjust [ initrd_addr ] value to [ 0x15000000 ] succeeded."
-        fi
+        }
     else
         error_msg "The [ ${boot_ini_file} ] file is missing, stop updating."
     fi
@@ -647,23 +635,20 @@ update_initrd_addr() {
     # Check if the file exists for boot-emmc.ini
     boot_emmc_ini_file="/boot/boot-emmc.ini"
     if [[ -f "${boot_emmc_ini_file}" ]]; then
-        echo -e "${INFO} Start checking [ ${boot_emmc_ini_file} ]..."
-
         # Get the initrd_addr value
         boot_emmc_ini_addr_value="$(grep 'setenv initrd_addr' ${boot_emmc_ini_file} | awk '{print $3}')"
         [[ -z "${boot_emmc_ini_addr_value}" ]] && error_msg "Failed to query [ initrd_addr ] value from [ ${boot_emmc_ini_file} ]."
 
         # Check if the initrd_addr value is 0x15000000
-        if [[ "${boot_emmc_ini_addr_value}" == "0x15000000" ]]; then
-            echo -e "${INFO} The [ initrd_addr ] value is [ ${boot_emmc_ini_addr_value} ], no need to adjust."
-        else
+        [[ "${boot_emmc_ini_addr_value}" != "0x15000000" ]] && {
             echo -e "${INFO} The [ initrd_addr ] value is [ ${boot_emmc_ini_addr_value} ], need to adjust."
             sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" ${boot_emmc_ini_file}
             [[ "${?}" -ne "0" ]] && error_msg "Failed to adjust [ initrd_addr ] value in [ ${boot_emmc_ini_file} ]."
             echo -e "${INFO} Adjust [ initrd_addr ] value to [ 0x15000000 ] succeeded."
-        fi
+        }
     fi
 
+    echo -e "${INFO} All checked."
     sync && echo ""
 }
 
