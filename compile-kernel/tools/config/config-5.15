@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.15.153 Kernel Configuration
+# Linux/arm64 5.15.154 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7)) 13.2.1 20231009"
 CONFIG_CC_IS_GCC=y
@@ -757,6 +757,7 @@ CONFIG_GCC_PLUGINS=y
 # CONFIG_GCC_PLUGIN_CYC_COMPLEXITY is not set
 # CONFIG_GCC_PLUGIN_LATENT_ENTROPY is not set
 # CONFIG_GCC_PLUGIN_RANDSTRUCT is not set
+CONFIG_FUNCTION_ALIGNMENT=0
 # end of General architecture-dependent options
 
 CONFIG_RT_MUTEXES=y
@@ -8112,7 +8113,7 @@ CONFIG_NFS_DEBUG=y
 CONFIG_NFS_DISABLE_UDP_SUPPORT=y
 # CONFIG_NFS_V4_2_READ_PLUS is not set
 CONFIG_NFSD=m
-CONFIG_NFSD_V3=y
+# CONFIG_NFSD_V2 is not set
 # CONFIG_NFSD_V3_ACL is not set
 CONFIG_NFSD_V4=y
 # CONFIG_NFSD_BLOCKLAYOUT is not set
