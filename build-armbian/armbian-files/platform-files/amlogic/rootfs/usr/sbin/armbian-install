@@ -360,6 +360,10 @@ create_partition() {
         BLANK1="117" # After using the ampart to part disk, space after [ 117 MiB ] could be used.
         BOOT="512"
         BLANK2="0"
+    elif [[ "${AMLOGIC_SOC}" == "s912" && "${boxid}" -eq "213" ]]; then
+        BLANK1="700"
+        BOOT="512"
+        BLANK2="220"
     elif [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
         BLANK1="68"
         BOOT="512"
