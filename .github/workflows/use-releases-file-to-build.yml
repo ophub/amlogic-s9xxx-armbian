@@ -126,6 +126,7 @@ on:
           - s912-m8s-pro
           - s912-nexbox-a1
           - s912-nexbox-a2
+          - s912-onecloudpro
           - s912-phicomm-t1
           - s912-t95z-plus
           - s912-tx8-max
