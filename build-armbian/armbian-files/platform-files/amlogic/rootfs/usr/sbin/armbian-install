@@ -524,7 +524,7 @@ copy_rootfs() {
     mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
     chmod 777 ${DIR_INSTALL}/tmp
     # Copy the relevant directory
-    COPY_SRC="etc home lib64 opt root selinux srv usr var"
+    COPY_SRC="etc home opt root selinux srv usr var"
     for src in ${COPY_SRC}; do
         echo -e "${INFO} Copying [ ${src} ] ..."
         tar -cf - ${src} | (
