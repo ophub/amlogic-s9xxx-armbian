@@ -1,6 +1,6 @@
 # LED Screen Display Control Instructions
 
-- The configuration files are located in the [/usr/share/openvfd](../armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The command file for the `Armbian` system is at [/usr/sbin/armbian-openvfd](../armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the command file for the `OpenWrt` system is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If they are not currently in the system, they can be manually uploaded, and file execution permissions can be assigned: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
+- The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The command file for the `Armbian` system is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the command file for the `OpenWrt` system is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If they are not currently in the system, they can be manually uploaded, and file execution permissions can be assigned: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
 
 - Upgrade the system kernel to the latest version. The `Armbian` system uses the `armbian-update` command for upgrades. The `OpenWrt` system upgrades using `System Menu` → `Amlogic Service` → `Online Download Update`.
 
@@ -17,7 +17,7 @@ vfd_gpio_clk='0,68,0'
 vfd_gpio_dat='0,69,0'
 ```
 
-- Taking the configuration of [x96maxplus](../armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd/conf/x96maxplus.conf) as an example: If the order of the displayed time text is incorrect, you can adjust the order of numbers in `vfd_chars='4,0,1,2,3'` to `vfd_chars='1,2,3,4,0'` for testing. If the time is displayed upside down, you can adjust the `first value 0x02` in `vfd_display_type='0x02,0x00,0x01,0x00'` to `0x01` for testing. The content displayed can be adjusted according to the specific situation of your device in `functions='usb apps setup sd hdmi cvbs'`.
+- Taking the configuration of [x96maxplus](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd/conf/x96maxplus.conf) as an example: If the order of the displayed time text is incorrect, you can adjust the order of numbers in `vfd_chars='4,0,1,2,3'` to `vfd_chars='1,2,3,4,0'` for testing. If the time is displayed upside down, you can adjust the `first value 0x02` in `vfd_display_type='0x02,0x00,0x01,0x00'` to `0x01` for testing. The content displayed can be adjusted according to the specific situation of your device in `functions='usb apps setup sd hdmi cvbs'`.
 
 - Rename the configuration file to `diy.conf` and upload it to the `/usr/share/openvfd/conf` directory, then enter the command `armbian-openvfd 99` for testing.
 
@@ -55,7 +55,7 @@ sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_se
 
 # LED 屏显示控制说明
 
-- 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](../armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-openvfd](../armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd)。如果当前系统中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`
+- 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd)。如果当前系统中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`
 
 - 将系统的内核升级到最新版本。`Armbian` 系统使用 `armbian-update` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
 
@@ -72,7 +72,7 @@ vfd_gpio_clk='0,68,0'
 vfd_gpio_dat='0,69,0'
 ```
 
-- 以 [x96maxplus](../armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd/conf/x96maxplus.conf) 的配置为例：如果显示的时间文字顺序不正确，可以调整 `vfd_chars='4,0,1,2,3'` 的数字顺序为 `vfd_chars='1,2,3,4,0'` 等进行测试。如果时间是翻转显示，可以调整 `vfd_display_type='0x02,0x00,0x01,0x00'` 中的 `第一个值 0x02` 为 `0x01` 等进行测试。显示的内容可根据自己的设备支持的具体情况调整 `functions='usb apps setup sd hdmi cvbs'` 中的值。
+- 以 [x96maxplus](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd/conf/x96maxplus.conf) 的配置为例：如果显示的时间文字顺序不正确，可以调整 `vfd_chars='4,0,1,2,3'` 的数字顺序为 `vfd_chars='1,2,3,4,0'` 等进行测试。如果时间是翻转显示，可以调整 `vfd_display_type='0x02,0x00,0x01,0x00'` 中的 `第一个值 0x02` 为 `0x01` 等进行测试。显示的内容可根据自己的设备支持的具体情况调整 `functions='usb apps setup sd hdmi cvbs'` 中的值。
 
 - 将配置文件命名为 `diy.conf` 并上传至 `/usr/share/openvfd/conf` 目录下，输入命令 `armbian-openvfd 99` 进行测试。
 

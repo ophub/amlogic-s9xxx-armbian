@@ -461,7 +461,7 @@ armbian-update -s
 armbian-software
 ```
 
-使用 `armbian-software -u` 命令可以更新本地的软件中心列表。根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](../armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](armbian_software.md)。
+使用 `armbian-software -u` 命令可以更新本地的软件中心列表。根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。详见更多[说明](armbian_software.md)。
 
 根据你所在的国家或地区，使用 `armbian-apt` 命令选择合适的软件源，提高软件的下载速度。例如，选择中国的清华大学源：
 
@@ -997,7 +997,7 @@ bluetoothctl block 12:34:56:78:90:AB
 
 ### 12.8 如何添加开机启动任务
 
-系统中已经添加了自定义开机启动任务脚本文件，在 Armbian 系统中的路径是 [/etc/custom_service/start_service.sh](../armbian-files/common-files/etc/custom_service/start_service.sh) 文件，可以根据个人需求在该脚本中自定义添加相关任务。
+系统中已经添加了自定义开机启动任务脚本文件，在 Armbian 系统中的路径是 [/etc/custom_service/start_service.sh](../build-armbian/armbian-files/common-files/etc/custom_service/start_service.sh) 文件，可以根据个人需求在该脚本中自定义添加相关任务。
 
 ### 12.9 如何更新系统中的服务脚本
 
@@ -1080,7 +1080,7 @@ eMMC 表中，每一块存储区域的最后一栏为可写入的情况，绿色
 
 #### 12.10.4 用于 eMMC 安装
 
-如果你的设备在使用 `armbian-install` 且 `-a` 参数（使用 [ampart](https://github.com/7Ji/ampart) 调整 eMMC 分区布局）为 `yes`（默认值）的情况下失败，则你的盒子不能使用最优化的布局（即把 DTB 分区信息调整为只有 `data` ，再由此生成 eMMC 分区信息，然后将所有还存在的分区均向前挪动，如此一来，117M 向后的空间便均可使用），你需要在 [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install) 中修改对应的分区信息。
+如果你的设备在使用 `armbian-install` 且 `-a` 参数（使用 [ampart](https://github.com/7Ji/ampart) 调整 eMMC 分区布局）为 `yes`（默认值）的情况下失败，则你的盒子不能使用最优化的布局（即把 DTB 分区信息调整为只有 `data` ，再由此生成 eMMC 分区信息，然后将所有还存在的分区均向前挪动，如此一来，117M 向后的空间便均可使用），你需要在 [armbian-install](../build-armbian/armbian-files/common-files/usr/sbin/armbian-install) 中修改对应的分区信息。
 
 此文件中，声明分区布局的关键参数有三个：`BLANK1`, `BOOT`, `BLANK2`。其中 `BLANK1` 表示从 eMMC 开头算起的不能使用的大小；`BOOT` 表示在 `BLANK1` 以后创建的用来存放内核、DTB 等的分区的大小，最好不要小于 256M，`BLANK2` 表示 `BOOT` 以后不能使用的大小；在此之后的空间会全部用来创建 `ROOT` 分区，储存整个系统中 `/boot` 挂载点以外的数据。三者均应为整数，且单位为MiB (1 MiB = 1024 KiB = 1024^2 Byte)
 
@@ -1312,7 +1312,7 @@ armbian-install
 
 通用文件放在：`build-armbian/armbian-files/common-files` 目录下，各平台通用。
 
-平台文件分别放在 `build-armbian/armbian-files/platform-files/<platform>` 目录下，[Amlogic](../armbian-files/platform-files/amlogic)，[Rockchip](../armbian-files/platform-files/rockchip) 和 [Allwinner](../armbian-files/platform-files/allwinner) 分别共用各自平台的文件，其中 `bootfs` 目录下是 /boot 分区的文件，`rootfs` 目录下的是 Armbian 系统文件。
+平台文件分别放在 `build-armbian/armbian-files/platform-files/<platform>` 目录下，[Amlogic](../build-armbian/armbian-files/platform-files/amlogic)，[Rockchip](../build-armbian/armbian-files/platform-files/rockchip) 和 [Allwinner](../build-armbian/armbian-files/platform-files/allwinner) 分别共用各自平台的文件，其中 `bootfs` 目录下是 /boot 分区的文件，`rootfs` 目录下的是 Armbian 系统文件。
 
 如果个别设备有特殊差异化设置需求，在 `build-armbian/armbian-files/different-files` 目录下添加以 `BOARD` 命名的独立目录，根据需要建立 `bootfs` 目录添加系统 `/boot` 分区下的相关文件，根据需要建立 `rootfs` 目录添加系统文件。各文件夹命名以 `Armbian` 系统中的实际路径为准。用于添加新文件，或覆盖从通用文件和平台文件中添加的同名文件。
 

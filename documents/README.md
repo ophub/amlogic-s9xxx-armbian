@@ -461,7 +461,7 @@ Log in to the Armbian system → Enter the command:
 armbian-software
 ```
 
-Using the `armbian-software -u` command, you can update the local software center list. Based on user feedback in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](../armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to implement one-click installation/update/uninstallation and other quick operations. This includes `docker images`, `desktop software`, `application services`, etc. See more [instructions](armbian_software.md).
+Using the `armbian-software -u` command, you can update the local software center list. Based on user feedback in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), we gradually integrate commonly used [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) to implement one-click installation/update/uninstallation and other quick operations. This includes `docker images`, `desktop software`, `application services`, etc. See more [instructions](armbian_software.md).
 
 Use the `armbian-apt` command to select the appropriate software source for your country or region, which can improve software download speeds. For example, select the `mirrors.tuna.tsinghua.edu.cn` source in China:
 
@@ -1000,7 +1000,7 @@ bluetoothctl block 12:34:56:78:90:AB
 
 ### 12.8 How to Add Startup Tasks
 
-A custom script for startup tasks has already been added to the system. In the Armbian system, the path is [/etc/custom_service/start_service.sh](../armbian-files/common-files/etc/custom_service/start_service.sh). You can customize and add related tasks to this script according to your personal needs.
+A custom script for startup tasks has already been added to the system. In the Armbian system, the path is [/etc/custom_service/start_service.sh](../build-armbian/armbian-files/common-files/etc/custom_service/start_service.sh). You can customize and add related tasks to this script according to your personal needs.
 
 ### 12.9 How to Update Service Scripts in the System
 
@@ -1084,7 +1084,7 @@ If the Android boot logo is needed, additionally, the 852M + 32M (`852M~884M`) a
 
 #### 12.10.4 For eMMC Installation
 
-If your device fails when using `armbian-install` and the `-a` parameter (use [ampart](https://github.com/7Ji/ampart) to adjust the eMMC partition layout) is `yes` (default value), then your box cannot use the optimal layout (that is, adjust the DTB partition information to only have `data`, then generate eMMC partition information from this, and then move all remaining partitions forward. In this way, the space from 117M onwards can be used). You need to modify the corresponding partition information in [armbian-install](../armbian-files/common-files/usr/sbin/armbian-install).
+If your device fails when using `armbian-install` and the `-a` parameter (use [ampart](https://github.com/7Ji/ampart) to adjust the eMMC partition layout) is `yes` (default value), then your box cannot use the optimal layout (that is, adjust the DTB partition information to only have `data`, then generate eMMC partition information from this, and then move all remaining partitions forward. In this way, the space from 117M onwards can be used). You need to modify the corresponding partition information in [armbian-install](../build-armbian/armbian-files/common-files/usr/sbin/armbian-install).
 
 In this file, the key parameters for declaring the partition layout are three: `BLANK1`, `BOOT`, `BLANK2`. Among them, `BLANK1` represents the unusable size starting from the beginning of eMMC; `BOOT` represents the size of the partition created after `BLANK1` for storing the kernel, DTB, etc., preferably not less than 256M, `BLANK2` represents the unusable size after `BOOT`. The space after this will be used to create the `ROOT` partition to store all the data outside the `/boot` mount point in the system. All three should be integers, and the unit is MiB (1 MiB = 1024 KiB = 1024^2 Byte)
 
@@ -1318,7 +1318,7 @@ The default value is `no` without packaging, these devices need to download the 
 
 Common files are placed in the `build-armbian/armbian-files/common-files` directory, universally applicable across platforms.
 
-Platform files are respectively placed in `build-armbian/armbian-files/platform-files/<platform>` directory, [Amlogic](../armbian-files/platform-files/amlogic), [Rockchip](../armbian-files/platform-files/rockchip), and [Allwinner](../armbian-files/platform-files/allwinner) share files of their respective platforms. The `bootfs` directory contains /boot partition files, and the `rootfs` directory contains Armbian system files.
+Platform files are respectively placed in `build-armbian/armbian-files/platform-files/<platform>` directory, [Amlogic](../build-armbian/armbian-files/platform-files/amlogic), [Rockchip](../build-armbian/armbian-files/platform-files/rockchip), and [Allwinner](../build-armbian/armbian-files/platform-files/allwinner) share files of their respective platforms. The `bootfs` directory contains /boot partition files, and the `rootfs` directory contains Armbian system files.
 
 If individual devices have special differential setting requirements, add an independent directory named after `BOARD` in the `build-armbian/armbian-files/different-files` directory, create `bootfs` directory as needed to add related files under system `/boot` partition, create `rootfs` directory as needed to add system files. All folder names are based on the actual path in the `Armbian` system. Used to add new files, or to override the same name files added from the common files and platform files.
 
