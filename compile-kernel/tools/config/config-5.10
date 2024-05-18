@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.216 Kernel Configuration
+# Linux/arm64 5.10.217 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 13.2.rel1 (Build arm-13.7)) 13.2.1 20231009"
 CONFIG_CC_IS_GCC=y
@@ -5163,7 +5163,8 @@ CONFIG_SND_JACK_INPUT_DEV=y
 # CONFIG_SND_OSSEMUL is not set
 CONFIG_SND_PCM_TIMER=y
 CONFIG_SND_HRTIMER=y
-# CONFIG_SND_DYNAMIC_MINORS is not set
+CONFIG_SND_DYNAMIC_MINORS=y
+CONFIG_SND_MAX_CARDS=32
 # CONFIG_SND_SUPPORT_OLD_API is not set
 CONFIG_SND_PROC_FS=y
 CONFIG_SND_VERBOSE_PROCFS=y
