@@ -239,11 +239,20 @@ toolchain_check() {
     if [[ ! -f "${armbian_file}" ]]; then
         echo -e "${INFO} Start downloading Armbian rootfs file [ ${armbian_rootfs_file} ]..."
         rm -rf ${armbian_path} && mkdir -p ${armbian_path}
-        curl -fsSL "${dev_repo}/${armbian_rootfs_file}" -o "${armbian_path}/${armbian_rootfs_file}"
+
+        # Download Armbian rootfs file. If it fails, wait 1 minute and try again, try 10 times.
+        for i in {1..10}; do
+            curl -fsSL "${dev_repo}/${armbian_rootfs_file}" -o "${armbian_path}/${armbian_rootfs_file}"
+            [[ "${?}" -eq "0" ]] && break || sleep 60
+        done
         [[ "${?}" -eq "0" ]] || error_msg "Armbian file download failed"
+
+        # Decompress the Armbian rootfs file
         tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path}
+
         # Change other names to armbian.img
         [[ -f "${armbian_file}" ]] || mv -f ${armbian_path}/*.img ${armbian_file}
+
         # Delete download file
         rm -f ${armbian_path}/${armbian_rootfs_file}
         [[ -f "${armbian_file}" ]] || error_msg "There is no Armbian rootfs file: [ ${armbian_file} ]"
@@ -281,10 +290,18 @@ toolchain_check() {
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
-            curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
+
+            # Download the ARM GNU toolchain file. If it fails, wait 1 minute and try again, try 10 times.
+            for i in {1..10}; do
+                curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
+                [[ "${?}" -eq "0" ]] && break || sleep 60
+            done
             [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
+
+            # Decompress the ARM GNU toolchain file
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}
+
             # List and check directory names, and change them all to lowercase
             for dir in $(ls ${toolchain_path}); do
                 if [[ -d "${toolchain_path}/${dir}" && "${dir}" != "${dir,,}" ]]; then
@@ -383,7 +400,12 @@ get_kernel_source() {
     # Download the kernel source code from github.com
     if [[ ! -d "${kernel_path}/${local_kernel_path}" ]]; then
         echo -e "${INFO} Start cloning from [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
-        git clone -q --single-branch --depth=1 --branch=${code_branch} https://github.com/${server_kernel_repo} ${kernel_path}/${local_kernel_path}
+
+        # Clone the latest kernel source code. If it fails, wait 1 minute and try again, try 10 times.
+        for i in {1..10}; do
+            git clone -q --single-branch --depth=1 --branch=${code_branch} https://github.com/${server_kernel_repo} ${kernel_path}/${local_kernel_path}
+            [[ "${?}" -eq "0" ]] && break || sleep 60
+        done
         [[ "${?}" -eq "0" ]] || error_msg "[ https://github.com/${server_kernel_repo} ] Clone failed."
     else
         # Get a local kernel version
