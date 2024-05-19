@@ -521,7 +521,7 @@ download_kernel() {
 
                     # Download the kernel files. If the download fails, try again 10 times.
                     [[ -d "${kernel_path}/${kd}" ]] || mkdir -p ${kernel_path}/${kd}
-                    for i in {1..10}; do
+                    for t in {1..10}; do
                         curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${kd}/${kernel_var}.tar.gz"
                         [[ "${?}" -eq "0" ]] && break || sleep 60
                     done
