@@ -243,10 +243,18 @@ toolchain_check() {
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
             echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
-            curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
+
+            # Download the ARM GNU toolchain. If it fails, wait 1 minute and try again, try 10 times.
+            for i in {1..10}; do
+                curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
+                [[ "${?}" -eq "0" ]] && break || sleep 60
+            done
             [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
+
+            # Decompress the ARM GNU toolchain
             tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
             rm -f ${toolchain_path}/${gun_file}
+
             # List and check directory names, and change them all to lowercase
             for dir in $(ls ${toolchain_path}); do
                 if [[ -d "${toolchain_path}/${dir}" && "${dir}" != "${dir,,}" ]]; then
@@ -345,7 +353,12 @@ get_kernel_source() {
 
     if [[ ! -d "${kernel_path}/${local_kernel_path}" ]]; then
         echo -e "${INFO} Start cloning from [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
-        git clone -q --single-branch --depth=1 --branch=${code_branch} https://github.com/${server_kernel_repo} ${kernel_path}/${local_kernel_path}
+
+        # Clone the latest kernel source code. If it fails, wait 1 minute and try again, try 10 times.
+        for i in {1..10}; do
+            git clone -q --single-branch --depth=1 --branch=${code_branch} https://github.com/${server_kernel_repo} ${kernel_path}/${local_kernel_path}
+            [[ "${?}" -eq "0" ]] && break || sleep 60
+        done
         [[ "${?}" -eq "0" ]] || error_msg "[ https://github.com/${server_kernel_repo} ] Clone failed."
     else
         # Get a local kernel version
