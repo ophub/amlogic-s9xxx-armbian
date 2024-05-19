@@ -36,6 +36,7 @@ on:
           - crrc
           - dg3399
           - dlfr100
+          - e20c
           - e25
           - eaidk-610
           - emb3531
@@ -64,6 +65,7 @@ on:
           - renegade-rk3328
           - rk3318-box
           - rock5b
+          - rock5c
           - s905
           - s905-beelink-mini
           - s905-mxqpro-plus
