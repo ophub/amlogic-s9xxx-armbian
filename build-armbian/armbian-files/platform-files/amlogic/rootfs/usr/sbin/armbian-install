@@ -361,7 +361,7 @@ create_partition() {
         BOOT="512"
         BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s912" && "${boxid}" -eq "213" ]]; then
-        BLANK1="700"
+        BLANK1="700" # OneCloudPro-V1.2
         BOOT="512"
         BLANK2="220"
     elif [[ "${AMLOGIC_SOC}" == "s912" || "${AMLOGIC_SOC}" == "s905d" ]]; then
