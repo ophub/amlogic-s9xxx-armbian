@@ -74,6 +74,7 @@ on:
           - s905l3
           - s905l3-cm211
           - s905l3-unt400g1
+          - s905l3-unt402a
           - s905l3a
           - s905l3a-cm311
           - s905l3a-m401a
