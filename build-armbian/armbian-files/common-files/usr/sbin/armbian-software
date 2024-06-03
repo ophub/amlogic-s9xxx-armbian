@@ -112,6 +112,7 @@ check_software_status() {
         dpkg) [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] && check_status="1" ;;
         docker) [[ -n "$(docker ps -q -f name=${package} 2>/dev/null)" ]] && check_status="1" ;;
         which) [[ -n "$(which "${package}" 2>/dev/null)" ]] && check_status="1" ;;
+        find) [[ -s "${package}" ]] && check_status="1" ;;
         *) check_status="0" ;;
         esac
         # Adjust software installation status
