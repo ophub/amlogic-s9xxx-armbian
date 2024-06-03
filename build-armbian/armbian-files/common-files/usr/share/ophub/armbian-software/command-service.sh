@@ -26,6 +26,7 @@
 # software_307  : For kvm
 # software_308  : For pve
 # software_309  : For casaos
+# software_310  : For arozos
 #
 #============================================================================
 
@@ -499,6 +500,35 @@ software_309() {
     remove)
         sudo casaos-uninstall
         echo -e "${SUCCESS} CasaOS uninstallation successful."
+        ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For arozos
+software_310() {
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing ArozOS..."
+        wget -O install.sh https://raw.githubusercontent.com/tobychui/arozos/master/installer/install.sh && bash install.sh
+
+        sync && sleep 3
+
+        echo -e "${SUCCESS} ArozOS installation successful."
+        ;;
+    update) software_update ;;
+    remove)
+        # Stop and disable the ArozOS service
+        sudo systemctl stop arozos.service 2>/dev/null
+        sudo systemctl disable arozos.service 2>/dev/null
+        sudo rm -f /etc/systemd/system/arozos.service 2>/dev/null
+        sudo systemctl daemon-reload
+
+        # Uninstall ArozOS
+        sudo rm -rf ~/arozos
+
+        sync && sleep 3
+        echo -e "${SUCCESS} ArozOS uninstallation successful."
         ;;
     *) error_msg "Invalid input parameter: [ ${@} ]" ;;
     esac
