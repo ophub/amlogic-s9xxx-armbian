@@ -56,6 +56,7 @@ According to user feedback and demands in the [Issue](https://github.com/ophub/a
 | 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM (for Kernel-Based Virtual Machines) is a complete virtualization solution for Linux with virtualization extensions. The virt-manager application is a desktop user interface for managing virtual machines through libvirt. It primarily targets KVM VMs, but also manages Xen and LXC (linux containers). KVM virtual machine can install [OpenWrt](https://github.com/unifreq/openwrt_packit), Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc. |
 | 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox Virtual Environment is an open source server virtualization management solution based on QEMU/KVM and LXC. You can manage virtual machines, containers, highly available clusters, storage and networks with an integrated, easy-to-use web interface or via CLI. |
 | 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS is a simple, easy-to-use, elegant open-source Personal Cloud system. |
+| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS is a web-based desktop operating system suitable for low-power platforms. It features file/disk management, network statistics, a web server, and more. |
 
 ## Software Center Usage Guide
 
@@ -102,7 +103,8 @@ The scripts/commands of the software center are stored in the [/usr/share/ophub/
 - `AuthMethod@Package`: The `check method` for the installation status of the software and the corresponding `software package`, separated by the `@` symbol.
   - For software installed with the `docker` container, check with the `docker` method, such as checking whether the `portainer` image is installed, check with `docker@portainer`.
   - For software installed with the `apt` method, check with the `dpkg` method, such as checking whether the `firefox` software package is installed, check with `dpkg@firefox`.
-  - For binary executable files installed by downloading with methods such as `curl`, check with the `which` method, such as checking whether the `frpc` service is installed, check with `which@frpc`.
+  - When there are executable files in the system's command directories (bin, sbin), use the `which` command to check for the existence of the binary command files. For instance, to verify the installation of the `frpc` service, use `which@frpc` to check.
+  - When there are no executable files in the system's command directories (bin, sbin), use the `find` command to check if a specific path exists. For example, to determine if the `ArozOS` system is installed, use `find@/root/arozos` to perform the check.
 - `Execute Selection`: Set the software to use a `unified instruction file` or an `independent script` for management.
   - For `more streamlined` operation commands, they are collectively written in `command-docker.sh / command-desktop.sh / command-service.sh` files according to software classification, and named by software number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`.
   - For operations that are `more complex and long in instructions`, they are managed by independent script files. For example, the independent script for installing `frpc` is named `302-frpc.sh` with the number as the prefix.
@@ -170,6 +172,7 @@ We welcome everyone to contribute more software. Feel free to submit support req
 | 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（用于基于内核的虚拟机）是包含虚拟化扩展适用于 Linux 的完整虚拟化解决方案。virt-manager 应用程序是一个桌面用户界面，用于通过 libvirt 管理虚拟机。它主要针对 KVM VM，但也管理 Xen 和 LXC（Linux 容器）。KVM 虚拟机可以安装 [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS 等等。 |
 | 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 虚拟环境是一个基于 QEMU/KVM 和 LXC 的开源服务器虚拟化管理解决方案。您可以使用集成的、易于使用的 web 界面或通过 CLI 管理虚拟机、容器、高可用集群、存储和网络。 |
 | 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS 是一个简单、易于使用、优雅的开源个人云系统。 |
+| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS 是一个适用于低功耗平台的 Web 桌面操作系统。有文件/磁盘管理，网络统计，WEB服务器等功能。 |
 
 ## 软件中心使用说明
 
@@ -216,7 +219,8 @@ ID    NAME                STATE           MANAGE
 - `AuthMethod@Package`：软件安装状态的`检查方法`，与对应的`软件包`，使用 `@` 符号分割。
   - 使用 `docker` 容器安装的镜像，采用 `docker` 方式检查，如检查是否安装了 `portainer` 镜像，使用 `docker@portainer` 进行检查；
   - 使用 `apt` 方式安装的软件包采用 `dpkg` 方式检查，如检查是否安装了 `firefox` 软件包，使用 `dpkg@firefox` 进行检查；
-  - 使用 `curl` 等方式下载安装的二进制执行文件，采用 `which` 方式检查，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
+  - 在系统命令目录 (bin,sbin) 有可执行文件时，采用 `which` 方式检查二进制命令文件是否存在，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
+  - 在系统命令目录 (bin,sbin) 没有可执行文件时，采用 `find` 方式检查指定路径是否存在，如检查是否安装了 `arozos` 系统，使用 `find@/root/arozos` 进行检查。
 - `Execute Selection`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
   - 对于 `比较精简` 的操作命令，按照软件分类，集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
   - 对于 `比较复杂、指令内容较长` 的操作，进行独立脚本文件管理。如安装 `frpc` 的独立脚本，以序号开头，命名为 `302-frpc.sh` 。
