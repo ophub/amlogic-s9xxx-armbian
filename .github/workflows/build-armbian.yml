@@ -180,11 +180,12 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "dy008/kernel"
         type: choice
         options:
           - ophub/kernel
           - dy008/kernel
+          - dy008/amlogic-s9xxx-armbian
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
