@@ -587,6 +587,11 @@ confirm_version() {
     support_platform=("amlogic" "rockchip" "allwinner")
     [[ -n "$(echo "${support_platform[@]}" | grep -w "${PLATFORM}")" ]] || error_msg "[ ${PLATFORM} ] not supported."
 
+    # Add u-boot files record information
+    [[ -n "${MAINLINE_UBOOT}" ]] && RECORD_MAINLINE_UBOOT="/usr/lib/u-boot/${MAINLINE_UBOOT}" || RECORD_MAINLINE_UBOOT=""
+    [[ -n "${BOOTLOADER_IMG}" ]] && RECORD_BOOTLOADER_IMG="/usr/lib/u-boot/${BOOTLOADER_IMG}" || RECORD_BOOTLOADER_IMG=""
+    [[ -n "${TRUST_IMG}" ]] && RECORD_TRUST_IMG="/usr/lib/u-boot/${TRUST_IMG}" || RECORD_TRUST_IMG=""
+
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${default_tags}" ]] && KERNEL_TAGS="${kernel_usage}"
     [[ "${KERNEL_TAGS}" =~ ^[1-9]+ ]] && KERNEL_DOWN_TAGS="stable" || KERNEL_DOWN_TAGS="${KERNEL_TAGS}"
@@ -1093,10 +1098,10 @@ refactor_rootfs() {
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
     echo "AMPART_STATUS='no'" >>${ophub_release_file}
     echo "MLUBOOT_STATUS='no'" >>${ophub_release_file}
-    echo "MAINLINE_UBOOT='/usr/lib/u-boot/${MAINLINE_UBOOT}'" >>${ophub_release_file}
-    echo "BOOTLOADER_IMG='/usr/lib/u-boot/${BOOTLOADER_IMG}'" >>${ophub_release_file}
+    echo "MAINLINE_UBOOT='${RECORD_MAINLINE_UBOOT}'" >>${ophub_release_file}
+    echo "BOOTLOADER_IMG='${RECORD_BOOTLOADER_IMG}'" >>${ophub_release_file}
     if [[ "${PLATFORM}" == "rockchip" ]]; then
-        echo "TRUST_IMG='/usr/lib/${TRUST_IMG}'" >>${ophub_release_file}
+        echo "TRUST_IMG='${RECORD_TRUST_IMG}'" >>${ophub_release_file}
     elif [[ "${PLATFORM}" == "amlogic" ]]; then
         echo "UBOOT_OVERLOAD='${UBOOT_OVERLOAD}'" >>${ophub_release_file}
     fi
