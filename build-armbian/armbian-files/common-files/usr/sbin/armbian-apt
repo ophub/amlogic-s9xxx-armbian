@@ -79,9 +79,6 @@ change_source_list() {
         deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
         #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
 
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
-
         deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
         #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
 EOF
@@ -121,7 +118,7 @@ EOF
 EOF
         ;;
 
-    focal | jammy | kinetic | lunar | mantic | noble)
+    focal | jammy | noble | oracular)
         cat >${armbian_source_file} <<EOF
         deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
         #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
@@ -137,14 +134,11 @@ EOF
 EOF
         ;;
 
-    sid)
+    sid | unstable)
         # sid is permanent unstable development and has no such thing as updates or security
         cat >${armbian_source_file} <<EOF
         deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
         #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
-
-        deb http://${MIRROR_URL}/debian unstable main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian unstable main contrib non-free non-free-firmware
 EOF
         ;;
 
