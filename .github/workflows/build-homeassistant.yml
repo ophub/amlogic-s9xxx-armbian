@@ -281,9 +281,14 @@ jobs:
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
           df -hT ${PWD}
-          git clone -q --single-branch --depth=1 --branch=main https://github.com/dy008/build.git build
+          git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/dy008/amlogic-s9xxx-armbian/main/build
+          # 下载扩展的安装homeasssistant脚本
+          wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/docker-ce.sh
+          wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/ha.sh
+          # 修改ha.sh脚本中的命令以停止internet host IP地址检测
+          sed -i "/sed -i \"\/update-grub\/d\"/a\sed -i \"s\/while ! ping\/while   ping\/\" homeassistant-supervised/DEBIAN/postinst" ./build/extensions/ha.sh
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile Armbian [ ${{ inputs.set_release }} ]
@@ -308,7 +313,7 @@ jobs:
 
           # Output cleaning result information
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_hass${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
