@@ -283,10 +283,10 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/dy008/amlogic-s9xxx-armbian/main/build
-          echo "下载扩展的安装homeasssistant脚本 " >> ${GITHUB_OUTPUT}
+          # 下载扩展的安装homeasssistant脚本
           wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/docker-ce.sh
           wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/ha.sh
-          echo "修改ha.sh脚本中的命令以停止internet host IP地址检测 " >> ${GITHUB_OUTPUT}
+          # 修改ha.sh脚本中的命令以停止internet host IP地址检测
           sed -i "/sed -i \"\/update-grub\/d\"/a\sed -i \"s\/while ! ping\/while   ping\/\" homeassistant-supervised/DEBIAN/postinst" ./build/extensions/ha.sh
           echo "status=success" >> ${GITHUB_OUTPUT}
 
