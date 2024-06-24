@@ -12,6 +12,7 @@ use File::Glob qw(bsd_glob);
 #慢抽走我家云内热风就行,没有必要强制降低cpu温度,当cpu突破75度,风扇全速运行,强制散热.
 #由于cpu重负载情况不多,所以风扇很少全速开启.
 #这套逻辑使用下来非常满意;
+#20240624 增加没有内置机械硬盘的情况,可供设置,详细请看my @disks 相关几行;
 #20240618 由于无法在不影响硬盘进入待机状态前提下读取硬盘温度,所以只能简单判断硬盘工作状态,调整风扇启停温度;
 #         增加硬盘待机状态检测,如果硬盘待机,风扇可在cpu温度较高时停转(50度),较高温度起转(65度);如果硬盘未待机,风扇可在cpu温度较低时停转(38度),较低温度起转(55度);
 #         如果你有多块硬盘,并且知道内置硬盘设备名,请修改 #@disks 行代码;         
@@ -26,7 +27,8 @@ use File::Glob qw(bsd_glob);
 # 获取所有硬盘设备名称
 my @disks = bsd_glob("/dev/sd[a-z]");#如果你使用的硬盘比较多,由于我无法判断那块硬盘是内置硬盘,所以视所有硬盘为内置硬盘;两块以上硬盘无法判断内置硬盘带来问题是,风扇无法在cpu较高温度停转;
    #@disks = ("/dev/sda");  #如果你能确定内置硬盘设备名,请去掉本行代码前面的井号,并修改为硬盘设备名  /dev/sda  或  /dev/sdb  或  /dev/sdc   ...
-
+   #@disks = ("0");	#如果你没有内置机械硬盘请去掉前面的#号,风扇会比较安静;
+														
 # 速度最小值(满速是99),如果太小可能进入死区,风扇不转,需配合下面提示调整
 my $speed_min = 8;
 
@@ -151,15 +153,17 @@ sub set_fixed_speed {
 
 sub auto_speed {
 
-    my $non_standby_disks = 0;
-    foreach my $disk (@disks) {
-    # 检查每个硬盘的电源状态
-            my $state = `hdparm -C $disk`;
-            if ($state !~ /standby/) {
-            #print "Disk $disk is not in standby mode.\n";
-            $non_standby_disks++;
-            }
-     }
+  my $non_standby_disks = 0;
+    if($disks[0] != "0"){
+      foreach my $disk (@disks) {
+      # 检查每个硬盘的电源状态
+      my $state = `hdparm -C $disk`;
+      if ($state !~ /standby/) {
+        #print "Disk $disk is not in standby mode.\n";
+        $non_standby_disks++;
+        }
+      }
+    }
      #根据硬盘状态调整风扇启停温度
      if($non_standby_disks == 0){
         $temp_low = $temp_low_high;
