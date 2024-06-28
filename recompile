@@ -83,7 +83,7 @@ gun_file_aarch64="arm-gnu-toolchain-13.2.rel1-aarch64-aarch64-none-elf.tar.xz"
 armbian_rootfs_file="armbian.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
-# Set the default cross-compilation toolchain: [ gcc / clang ]
+# Set the default cross-compilation toolchain: [ clang / gcc / gcc-13.2, etc. ]
 toolchain_name="gcc"
 
 # QEMU BINARY
@@ -217,6 +217,13 @@ init_var() {
     #
     [[ -n "${code_owner}" ]] || error_msg "The [ -r ] parameter is invalid."
     [[ -n "${code_branch}" ]] || code_branch="${repo_branch}"
+
+    # Set the gcc version code
+    [[ "${toolchain_name}" =~ ^gcc-[0-9]+.[0-9]+ ]] && {
+        gcc_version_code="${toolchain_name#*-}"
+        gun_file_x86_64="arm-gnu-toolchain-${gcc_version_code}.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
+        gun_file_aarch64="arm-gnu-toolchain-${gcc_version_code}.rel1-aarch64-aarch64-none-elf.tar.xz"
+    }
 
     # Set cross compilation parameters
     export SRC_ARCH="arm64"
