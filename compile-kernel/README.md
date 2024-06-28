@@ -44,7 +44,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -m        | MakePackage | Sets the package list for making the kernel. When set to `all`, it will make all the files of `Image, modules, dtbs`. When the setting value is `dtbs`, only 3 dtbs files will be produced. Default value: `all` |
 | -p        | AutoPatch   | Sets whether to use custom kernel patches. When set to `true`, it will use the kernel patches in the [tools/patch](tools/patch) directory. For detailed instructions, refer to [how to add kernel patches](../documents/README.md#9-compiling-armbian-kernel). Default value: `false` |
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name is `5.15.100-ophub`. Please do not include spaces when setting custom signatures. Default value: `-ophub` |
-| -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc`. Default value: `gcc` |
+| -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc / gcc-<version>`. Default value: `gcc` |
 | -c        | Compress    | Set the compression format used for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default value: `xz` |
 
 
