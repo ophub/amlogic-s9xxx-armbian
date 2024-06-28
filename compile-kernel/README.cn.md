@@ -43,7 +43,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -m     | MakePackage | 设置制作内核的包列表。当设置为 `all` ，将制作 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅制作 3 个 dtbs 文件。默认值：`all` |
 | -p     | AutoPatch   | 设置是否使用自定义内核补丁。当设置为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
 | -n     | CustomName  | 设置内核自定义签名。当设置为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。默认值：`-ophub` |
-| -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc`。默认值：`gcc` |
+| -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
 | -c     | Compress    | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
 
 - `sudo ./recompile` : 使用默认配置编译内核。
