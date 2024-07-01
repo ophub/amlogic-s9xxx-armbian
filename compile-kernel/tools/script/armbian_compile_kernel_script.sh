@@ -710,6 +710,16 @@ loop_recompile() {
             local_kernel_path="${code_repo}-${code_branch}"
         fi
 
+        # Check disk space size
+        echo -ne "(${j}) Start compiling the kernel [\033[92m ${kernel_version} \033[0m]. "
+        now_remaining_space="$(df -Tk ${kernel_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+        if [[ "${now_remaining_space}" -le "15" ]]; then
+            echo -e "${WARNING} Remaining space is less than 15G, exit the compilation."
+            break
+        else
+            echo "Remaining space is ${now_remaining_space}G."
+        fi
+
         # Execute the following functions in sequence
         get_kernel_source
         compile_env
