@@ -51,6 +51,7 @@ on:
           - h88k-v3
           - hs530r
           - hugsun-x99
+          - hejiaqin
           - ipc-r
           - king3399
           - kylin3399
@@ -169,6 +170,7 @@ on:
           - 5.15.y
           - 6.1.y
           - 6.6.y
+          - 6.6.36
           - 6.1.y_6.6.y
           - 5.15.y_5.10.y
       auto_kernel:
