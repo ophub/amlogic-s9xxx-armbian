@@ -123,7 +123,7 @@ install_chinese_fonts() {
     # Install the Chinese language packages for the desktop system
     sudo apt-get update
     case "${VERSION_CODENAME}" in
-    jammy | lunar | mantic)
+    jammy | noble | oracular)
         echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${ubuntu_packages[*]}
         sudo apt-get install -y ${jammy_packages[*]}
