@@ -153,6 +153,7 @@ on:
           - tanix-tx6
           - tb-ls3399
           - tn3399
+          - tpm312
           - tqc-a01
           - tvi3315a
           - vplus
