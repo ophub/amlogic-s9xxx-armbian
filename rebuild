@@ -1189,7 +1189,7 @@ loop_rebuild() {
 
                     # Check disk space size
                     echo -ne "(${j}.${i}) Start building Armbian [\033[92m ${board} - ${KERNEL_TAGS}/${kernel} \033[0m]. "
-                    now_remaining_space="$(df -Tk ${armbian_outputpath} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+                    now_remaining_space="$(df -Tk ${armbian_outputpath} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
                         echo -e "${WARNING} Remaining space is less than 6G, exit this build."
                         break
