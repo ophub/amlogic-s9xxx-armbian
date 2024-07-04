@@ -83,7 +83,6 @@ software_201() {
         [[ "${get_rd}" == "yes" ]] && {
             # Install xrdp
             software_install "xrdp xorgxrdp"
-            sudo service xrdp start
 
             # Configure xrdp
             sudo cat <<EOF >>/etc/xrdp/xrdp.ini
@@ -98,6 +97,12 @@ port=-1
 code=20
 
 EOF
+
+            # Restart xrdp
+            sudo mkdir -p /var/run/xrdp
+            sudo chmod 775 /var/run/xrdp
+            sudo systemctl enable xrdp
+            sudo systemctl restart xrdp
         }
 
         # Install Chinese desktop support
