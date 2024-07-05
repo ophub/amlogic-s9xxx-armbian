@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build armbian
+name: Build Homeassistant
 
 on:
   repository_dispatch:
@@ -12,7 +12,7 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "jammy"
+        default: "bookworm"
         type: choice
         options:
           - jammy
@@ -22,7 +22,7 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "swan1-w28"
         type: choice
         options:
           - all
@@ -60,7 +60,6 @@ on:
           - mrkaio-m68s
           - nanopi-r5c
           - nanopi-r5s
-          - orangepi-5-plus
           - panther-x2
           - r66s
           - r68s
@@ -154,7 +153,6 @@ on:
           - tanix-tx6
           - tb-ls3399
           - tn3399
-          - tpm312
           - tqc-a01
           - tvi3315a
           - vplus
@@ -217,11 +215,10 @@ on:
       builder_name:
         description: "Set Armbian builder signature."
         required: false
-        default: "ophub"
+        default: "dy008"
         type: choice
         options:
           - ophub
-          - angel
           - dy008
 
 env:
@@ -286,6 +283,11 @@ jobs:
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/dy008/amlogic-s9xxx-armbian/main/build
+          # 下载扩展的安装homeasssistant脚本
+          wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/docker-ce.sh
+          wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/ha.sh
+          # 修改ha.sh脚本中的命令以停止internet host IP地址检测
+          sed -i "/sed -i \"\/update-grub\/d\"/a\sed -i \"s\/while ! ping\/while   ping\/\" homeassistant-supervised/DEBIAN/postinst" ./build/extensions/ha.sh
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile Armbian [ ${{ inputs.set_release }} ]
@@ -295,7 +297,7 @@ jobs:
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current ENABLE_EXTENSIONS="ha" BUILD_MINIMAL=no \
                            BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -310,7 +312,7 @@ jobs:
 
           # Output cleaning result information
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian_HassIoSupervisor_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
@@ -347,7 +349,7 @@ jobs:
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ### Armbian Image information
+            ### Armbian For Homeassistant Supervisor Image information
             - Default username: root
             - Default password: 1234
             - Install command: armbian-install
