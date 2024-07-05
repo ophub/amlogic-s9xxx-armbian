@@ -1,6 +1,7 @@
 #==========================================================================
 # Description: Build Armbian
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
+# Copyright (C) 2024 https://github.com/dy008/amlogic-s9xxx-armbian
 #==========================================================================
 
 name: Build Homeassistant
@@ -22,11 +23,10 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "swan1-w28"
+        default: "all"
         type: choice
         options:
           - all
-          - swan1-w28
           - s905w_s905x_s905mb_s905l3a_s905l3b_s905x2_s905x3_s912_s922x_s922x-ct2000_s922x-reva
           - s905x3-x88-pro-x3_s912-m8s-pro_s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905lb-r3300l
           - seewo-sv21_smart-am40_station-m1_sw799_tn3399_zysj_tvi3315a_xiaobao_zcube1-max
@@ -60,6 +60,7 @@ on:
           - mrkaio-m68s
           - nanopi-r5c
           - nanopi-r5s
+          - orangepi-5-plus
           - panther-x2
           - r66s
           - r68s
@@ -149,10 +150,12 @@ on:
           - seewo-sv21
           - smart-am40
           - station-m1
+          - swan1-w28
           - sw799
           - tanix-tx6
           - tb-ls3399
           - tn3399
+          - tpm312
           - tqc-a01
           - tvi3315a
           - vplus
@@ -180,12 +183,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "dy008/kernel"
+        default: "ophub/kernel"
         type: choice
         options:
           - ophub/kernel
-          - dy008/kernel
-          - dy008/amlogic-s9xxx-armbian
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
@@ -282,7 +283,7 @@ jobs:
           df -hT ${PWD}
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/dy008/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           # 下载扩展的安装homeasssistant脚本
           wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/docker-ce.sh
           wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/ha.sh
@@ -325,7 +326,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rebuild Armbian
-        uses: dy008/amlogic-s9xxx-armbian@main
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
