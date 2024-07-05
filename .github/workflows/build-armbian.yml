@@ -26,7 +26,6 @@ on:
         type: choice
         options:
           - all
-          - swan1-w28
           - s905w_s905x_s905mb_s905l3a_s905l3b_s905x2_s905x3_s912_s922x_s922x-ct2000_s922x-reva
           - s905x3-x88-pro-x3_s912-m8s-pro_s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905lb-r3300l
           - seewo-sv21_smart-am40_station-m1_sw799_tn3399_zysj_tvi3315a_xiaobao_zcube1-max
@@ -150,6 +149,7 @@ on:
           - seewo-sv21
           - smart-am40
           - station-m1
+          - swan1-w28
           - sw799
           - tanix-tx6
           - tb-ls3399
@@ -182,12 +182,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "dy008/kernel"
+        default: "ophub/kernel"
         type: choice
         options:
           - ophub/kernel
-          - dy008/kernel
-          - dy008/amlogic-s9xxx-armbian
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
@@ -222,7 +220,7 @@ on:
         options:
           - ophub
           - angel
-          - dy008
+          - yourname
 
 env:
   TZ: America/New_York
@@ -285,7 +283,7 @@ jobs:
           df -hT ${PWD}
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/dy008/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile Armbian [ ${{ inputs.set_release }} ]
@@ -323,7 +321,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Rebuild Armbian
-        uses: dy008/amlogic-s9xxx-armbian@main
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
