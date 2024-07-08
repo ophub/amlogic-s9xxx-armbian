@@ -305,7 +305,7 @@ query_version() {
         latest_version="$(
             curl -fsSL \
                 ${kernel_api}/releases/expanded_assets/kernel_${KERNEL_TAGS} |
-                grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
+                grep -oE "${kernel_verpatch}.[0-9]+.*.tar.gz" | sed 's/.tar.gz//' |
                 sort -urV | head -n 1
         )"
         [[ -n "${latest_version}" ]] || error_msg "Failed to query kernel version from [ ${kernel_api} ]."
@@ -686,9 +686,9 @@ sos_kernel() {
     echo -e "${INFO} The current Armbian is running on [ /dev/${DISK_NAME} ], and the target disk for restoration is [ ${rescue_disk} ]."
 
     # Create a temporary mount directory
-    umount ${rescue_path}/bootfs 2>/dev/null
-    umount ${rescue_path}/rootfs 2>/dev/null
-    rm -rf ${rescue_path}
+    umount -f ${rescue_path}/bootfs 2>/dev/null
+    umount -f ${rescue_path}/rootfs 2>/dev/null
+    rm -rf ${rescue_path} 2>/dev/null
     mkdir -p ${rescue_path}/{bootfs/,rootfs/} && sync
     [[ "${?}" -ne "0" ]] && error_msg "Failed to create temporary mount directory [ ${rescue_path} ]"
 
@@ -703,7 +703,7 @@ sos_kernel() {
     kernel_signature="$(uname -r)"
 
     # 01. For /boot files
-    [[ -d "${rescue_path}/bootfs" ]] && {
+    if [[ -d "${rescue_path}/bootfs" ]]; then
         cd ${rescue_path}/bootfs
         rm -rf config-* initrd.img-* System.map-* vmlinuz-* uInitrd* *Image dtb* u-boot.ext u-boot.emmc
         [[ -f "/boot/u-boot.ext" ]] && {
@@ -736,32 +736,36 @@ sos_kernel() {
         # Adjust the initrd_addr value to 0x15000000
         [[ -f "boot.ini" ]] && sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" boot.ini
         [[ -f "boot-emmc.ini" ]] && sed -i "s|^setenv initrd_addr.*|setenv initrd_addr 0x15000000|g" boot-emmc.ini
-    } || error_msg "(1/3) The [ ${rescue_path}/bootfs ] folder does not exist, stop rescuing."
+    else
+        error_msg "(1/3) The [ ${rescue_path}/bootfs ] folder does not exist, stop rescuing."
+    fi
 
     # 02. For /usr/lib/modules/${kernel_signature}
-    [[ -d "${rescue_path}/rootfs/usr/lib/modules" ]] && {
+    if [[ -d "${rescue_path}/rootfs/usr/lib/modules" ]]; then
         cd ${rescue_path}/rootfs/usr/lib/modules
         rm -rf *
         cp -rf /usr/lib/modules/${kernel_signature} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
         echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
-    } || error_msg "(2/3) The [ ${rescue_path}/rootfs/usr/lib/modules ] folder does not exist, stop rescuing."
+    else
+        error_msg "(2/3) The [ ${rescue_path}/rootfs/usr/lib/modules ] folder does not exist, stop rescuing."
+    fi
 
     # 03. For /usr/src/linux-headers-${kernel_signature}
-    [[ -d "/usr/src/linux-headers-${kernel_signature}" ]] && {
+    if [[ -d "/usr/src/linux-headers-${kernel_signature}" ]]; then
         cd ${rescue_path}/rootfs/usr/src
         rm -rf linux-headers-*
         cp -rf /usr/src/linux-headers-${kernel_signature} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
         echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
-    } || echo -e "${PROMPT} (3/3) [ /usr/src/linux-headers-${kernel_signature} ] folder does not exist, skip rescue."
+    else
+        echo -e "${PROMPT} (3/3) [ /usr/src/linux-headers-${kernel_signature} ] folder does not exist, skip rescue."
+    fi
 
     # Unmount the emmc partition
     cd ${rescue_path}
-    umount -f ${rescue_path}/bootfs
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/bootfs ]"
-    umount -f ${rescue_path}/rootfs
-    [[ "${?}" -ne "0" ]] && error_msg "Failed to umount [ ${rescue_path}/rootfs ]"
+    umount -f ${rescue_path}/bootfs 2>/dev/null
+    umount -f ${rescue_path}/rootfs 2>/dev/null
 
     sync && echo ""
 }
