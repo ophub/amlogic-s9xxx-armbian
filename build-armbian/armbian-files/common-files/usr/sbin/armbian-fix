@@ -20,6 +20,7 @@
 armbian_release_file="/etc/armbian-release"
 armbian_image_file="/etc/armbian-image-release"
 armbian_os_status="/etc/armbian-distribution-status"
+os_release_file="/etc/os-release"
 # Set the ophub release check file
 ophub_release_file="/etc/ophub-release"
 # Custom armbian-fix Log
@@ -38,7 +39,7 @@ echo "" >${fix_log} && tolog "Start fixing..."
 
 # Get the system release version, such as: jammy, noble, bookworm, bullseye, etc.
 [[ -f "/etc/lsb-release" ]] && DISTRIBUTION_CODENAME="$(grep CODENAME /etc/lsb-release | cut -d'=' -f2)"
-[[ -z "${DISTRIBUTION_CODENAME}" && -f "/etc/os-release" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2)"
+[[ -z "${DISTRIBUTION_CODENAME}" && -f "${os_release_file}" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME "${os_release_file}" | cut -d'=' -f2)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -x "/usr/bin/lsb_release" ]] && DISTRIBUTION_CODENAME="$(/usr/bin/lsb_release -c | cut -d':' -f2 | tr -d '\t')"
 
 # ===== A. Start repairing system permissions =====
@@ -239,11 +240,19 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         tolog "86. Adjust custom board name: ${armbian_image_file}"
     }
 
+    # Adjust custom image information
+    [[ -f "${os_release_file}" ]] && {
+        short_version="$(cat ${os_release_file} | grep -E '^PRETTY_NAME=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+        sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"Armbian OS ${short_version} ${DISTRIBUTION_CODENAME}\"|g" ${os_release_file}
+        sed -i "s|^ARMBIAN_PRETTY_NAME=.*|ARMBIAN_PRETTY_NAME=\"Armbian OS ${short_version} ${DISTRIBUTION_CODENAME}\"|g" ${os_release_file}
+        tolog "87. Adjust custom board name: ${os_release_file}"
+    }
+
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" != "amlogic" ]] && {
         sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
-        tolog "87. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
+        tolog "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 }
 
