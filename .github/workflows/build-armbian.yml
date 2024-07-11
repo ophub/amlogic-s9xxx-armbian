@@ -181,10 +181,11 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "pjw66/kernel"
         type: choice
         options:
           - ophub/kernel
+          - pjw66/kernel
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
