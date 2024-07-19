@@ -33,6 +33,7 @@
 # update_kernel      : Update the kernel
 # update_uboot       : Update the uboot
 # update_initrd_addr : Adjust vmlinuz for Amlogic devices
+# update_os_version  : Update the Armbian OS version
 #
 # sos_kernel         : Restore the kernel
 #
@@ -48,6 +49,8 @@ backup_path="/ddbr/backup"
 rescue_path="/ddbr/rescue"
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
+armbian_release_file="/etc/armbian-release"
+armbian_image_file="/etc/armbian-image-release"
 # Set default installation mainline u-boot (-m)
 auto_mainline_uboot="no"
 
@@ -652,6 +655,31 @@ update_initrd_addr() {
     sync && echo ""
 }
 
+# Update the Armbian OS version
+update_os_version() {
+    echo -e "${STEPS} Start updating Armbian OS version..."
+
+    # Get the latest Armbian OS version
+    os_version="$(
+        curl -fsSL -m 15 \
+            https://github.com/armbian/build/tags |
+            grep -oE 'Link\">v.*</a>' |
+            grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' |
+            sort -urV | head -n 1
+    )"
+
+    # Update the Armbian OS version
+    if [[ ${?} -eq 0 && -n "${os_version}" ]]; then
+        echo -e "${INFO} The latest Armbian OS version: [ ${os_version} ]"
+        sed -i "s|^VERSION=.*|VERSION=\"${os_version}\"|g" ${armbian_image_file} ${armbian_release_file}
+        sed -i "s|^REVISION=.*|REVISION=\"${os_version}\"|g" ${armbian_image_file} ${armbian_release_file}
+    else
+        echo -e "${PROMPT} Failed to query the latest Armbian OS version, skip updating."
+    fi
+
+    sync && echo ""
+}
+
 # Rescue the kernel
 sos_kernel() {
     echo -e "${STEPS} Start rescuing kernel..."
@@ -828,6 +856,7 @@ else
         update_uboot
         update_initrd_addr
     }
+    update_os_version
 
     # Kernel update successful
     sync && sleep 3
