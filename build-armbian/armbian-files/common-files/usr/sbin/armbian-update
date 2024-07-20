@@ -506,23 +506,23 @@ update_kernel() {
     [[ "$(ls /boot/dtb/${PLATFORM} -l 2>/dev/null | grep "^-" | wc -l)" -ge "2" ]] || error_msg "/boot/dtb/${PLATFORM} files is missing."
     echo -e "${INFO} (2/4) Unpacking [ dtb-${PLATFORM}-${kernel_name}.tar.gz ] succeeded."
 
-    # 03. For /usr/lib/modules/${kernel_name}
-    rm -rf /usr/lib/modules/*
-    tar -mxzf modules-${kernel_name}.tar.gz -C /usr/lib/modules
-    (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build)
-    [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
-    echo -e "${INFO} (3/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
-
-    # 04. For /usr/src/linux-headers-${kernel_name}, header file is optional
+    # 03. For /usr/src/linux-headers-${kernel_name}, header file is optional
     if [[ -f "header-${kernel_name}.tar.gz" ]]; then
         header_path="linux-headers-${kernel_name}"
         rm -rf /usr/src/linux-headers-* && mkdir -p "/usr/src/${header_path}"
         tar -mxzf header-${kernel_name}.tar.gz -C /usr/src/${header_path}
         [[ -d "/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
-        echo -e "${INFO} (4/4) Unpacking [ header-${kernel_name}.tar.gz ] succeeded."
+        echo -e "${INFO} (3/4) Unpacking [ header-${kernel_name}.tar.gz ] succeeded."
     else
-        echo -e "${PROMPT} (4/4) [ header-${kernel_name}.tar.gz ] file does not exist, skip unpacking."
+        echo -e "${PROMPT} (3/4) [ header-${kernel_name}.tar.gz ] file does not exist, skip unpacking."
     fi
+
+    # 04. For /usr/lib/modules/${kernel_name}
+    rm -rf /usr/lib/modules/*
+    tar -mxzf modules-${kernel_name}.tar.gz -C /usr/lib/modules
+    [[ -n "${header_path}" ]] && (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build)
+    [[ -d "/usr/lib/modules/${kernel_name}" ]] || error_msg "/usr/lib/modules/${kernel_name} kernel folder is missing."
+    echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
 
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
