@@ -420,8 +420,11 @@ headers_install() {
     tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${output_path}/header
     tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${output_path}/header
 
-    # copy .config manually to be where it's expected to be
-    cp -f .config ${output_path}/header/.config
+    # Copy the necessary files to the specified directory
+    cp -af include/config "${output_path}/header/include"
+    cp -af include/generated "${output_path}/header/include"
+    cp -af arch/arm64/include/generated "${output_path}/header/arch/arm64/include"
+    cp -af .config Module.symvers ${output_path}/header
 
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
