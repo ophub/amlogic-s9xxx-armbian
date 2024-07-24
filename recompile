@@ -490,7 +490,10 @@ chroot_armbian() {
     # Set the git configuration and copy the kernel source tree
     git config --global --add safe.directory ${PWD}
     git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
-    cp -f .config Module.symvers ${armbian_kernel_path}
+    cp -af include/config "${armbian_kernel_path}/include"
+    cp -af include/generated "${armbian_kernel_path}/include"
+    cp -af arch/arm64/include/generated "${armbian_kernel_path}/arch/arm64/include"
+    cp -af .config Module.symvers ${armbian_kernel_path}
     [[ "${?}" -eq "0" ]] || error_msg "Copy the kernel source tree to the armbian system failed."
 
     cd ${current_path}
