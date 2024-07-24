@@ -185,8 +185,11 @@ packit_header() {
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
 
-    # copy .config manually to be where it's expected to be
-    cp -f .config ${header_output_path}/.config
+    # Copy the necessary files to the specified directory
+    cp -af include/config "${header_output_path}/include"
+    cp -af include/generated "${header_output_path}/include"
+    cp -af arch/arm64/include/generated "${header_output_path}/arch/arm64/include"
+    cp -af .config Module.symvers ${header_output_path}
 
     # Compress the header files
     cd ${header_output_path}
