@@ -467,7 +467,7 @@ chroot_armbian() {
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
     if [[ "${ARMBIAN_PLATFORM}" == "rockchip" || "${ARMBIAN_PLATFORM}" == "allwinner" ]]; then
         cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/Image
     else
@@ -492,7 +492,7 @@ chroot_armbian() {
     git archive --format=tar ${code_branch} | tar xf - -C ${armbian_kernel_path}
     cp -af include/config "${armbian_kernel_path}/include"
     cp -af include/generated "${armbian_kernel_path}/include"
-    cp -af arch/arm64/include/generated "${armbian_kernel_path}/arch/arm64/include"
+    cp -af arch/${SRC_ARCH}/include/generated "${armbian_kernel_path}/arch/${SRC_ARCH}/include"
     cp -af .config Module.symvers ${armbian_kernel_path}
     [[ "${?}" -eq "0" ]] || error_msg "Copy the kernel source tree to the armbian system failed."
 
@@ -647,11 +647,11 @@ packit_dtbs() {
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] dtbs packages..."
 
     cd ${output_path}/dtb/allwinner
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-allwinner-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
@@ -659,11 +659,11 @@ packit_dtbs() {
     }
 
     cd ${output_path}/dtb/amlogic
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-amlogic-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
@@ -671,11 +671,11 @@ packit_dtbs() {
     }
 
     cd ${output_path}/dtb/rockchip
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-rockchip-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
