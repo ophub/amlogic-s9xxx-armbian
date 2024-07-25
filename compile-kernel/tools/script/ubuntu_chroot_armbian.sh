@@ -152,7 +152,7 @@ make_kernel_scripts() {
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 
-    make ${MAKE_SET_STRING} scripts -j${PROCESS}
+    make ${MAKE_SET_STRING} modules_prepare scripts -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
 }
 
@@ -188,7 +188,7 @@ packit_header() {
     # Copy the necessary files to the specified directory
     cp -af include/config "${header_output_path}/include"
     cp -af include/generated "${header_output_path}/include"
-    cp -af arch/arm64/include/generated "${header_output_path}/arch/arm64/include"
+    cp -af arch/${SRC_ARCH}/include/generated "${header_output_path}/arch/${SRC_ARCH}/include"
     cp -af .config Module.symvers ${header_output_path}
 
     # Compress the header files
