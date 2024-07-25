@@ -124,6 +124,10 @@ Compiling Armbian firmware supports localization operations, and it also support
 
 You can use the `armbian-update` command to install the compiled kernel into an existing Armbian system. For specific operation methods, please refer to: [Update Armbian Kernel](../README.md#update-armbian-kernel).
 
+- #### Custom Compile Driver Module
+
+In the Linux mainline kernel, some drivers are not yet supported, so you can customize and compile driver modules. For specific instructions, please refer to: [Compile Driver Module](../documents/README.md#93-how-to-customize-compilation-of-driver-modules)
+
 ### Use in OpenWrt System
 
 The following describes separately how to integrate it when compiling firmware in the OpenWrt system and how to install it for use in an existing system.
