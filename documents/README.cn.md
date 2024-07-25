@@ -415,6 +415,8 @@ cd /usr/local/toolchain
 wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
 # 解压
 tar -Jxf arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+# 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
+armbian-kernel -u
 
 
 # 第三步，下载驱动，编译
@@ -453,15 +455,15 @@ cfg80211              917504  2 8189es,brcmfmac
 图示如下：
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/1a89cbe6-df38-4862-8d11-9d977e0f4191">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a89cbe6-df38-4862-8d11-9d977e0f4191">
 </div>
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/1a1d0bb9-44d4-4de5-9907-47e5f20747a7">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a1d0bb9-44d4-4de5-9907-47e5f20747a7">
 </div>
 
 <div style="width:100%;margin-top:40px;margin:5px;">
-<img width="600" alt="image" src="https://github.com/user-attachments/assets/d1bd2eff-4c57-4e91-a870-08b0f8b1fe16">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/d1bd2eff-4c57-4e91-a870-08b0f8b1fe16">
 </div>
 
 ## 10. 更新 Armbian 内核
