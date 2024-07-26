@@ -156,6 +156,7 @@ on:
           - vplus
           - xiaobao
           - zcube1-max
+          - zk-r39a
           - zysj
       armbian_kernel:
         description: "Select kernel version."
