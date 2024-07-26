@@ -152,7 +152,7 @@ make_kernel_scripts() {
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 
-    make ${MAKE_SET_STRING} modules_prepare scripts -j${PROCESS}
+    make ${MAKE_SET_STRING} modules_prepare -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
 }
 
