@@ -88,6 +88,7 @@ on:
           - s905l3a-cm311
           - s905l3a-m401a
           - s905l3b
+          - s905l3b-e900v21d
           - s905l3b-e900v22d
           - s905l3b-e900v22e
           - s905l3b-ip103h
@@ -162,6 +163,7 @@ on:
           - vplus
           - xiaobao
           - zcube1-max
+          - zk-r39a
           - zysj
       armbian_kernel:
         description: "Select kernel version."
