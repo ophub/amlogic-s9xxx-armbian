@@ -87,6 +87,7 @@ on:
           - s905l3a-cm311
           - s905l3a-m401a
           - s905l3b
+          - s905l3b-e900v21d
           - s905l3b-e900v22d
           - s905l3b-e900v22e
           - s905l3b-ip103h
