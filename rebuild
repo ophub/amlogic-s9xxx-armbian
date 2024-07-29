@@ -83,22 +83,21 @@ firmware_repo="https://github.com/ophub/firmware"
 kernel_repo="https://github.com/ophub/kernel"
 # Set the tags(kernel_xxx) of the default kernel that can be replaced via the [ -u ] parameter
 default_tags="stable"
-# Set the tags(kernel_xxx) of the specific kernel, such as 5.15.y, 6.1.y, etc.
-specific_tags="${default_tags}"
-# Set the list of kernels used by default(Fixed version)
-rk3588_kernel=("5.10.y")
-rk35xx_kernel=("5.10.y")
-h6_kernel=("6.6.y")
-specific_6xy=("6.6.y" "6.1.y")
-specific_5xy=("5.15.y" "5.10.y" "5.4.y")
-specific_kernel=()
+kernel_usage=""
 # Set the list of kernels used by default(Selectable version)
 stable_kernel=("6.6.y" "6.1.y")
 flippy_kernel=(${stable_kernel[@]})
 dev_kernel=(${stable_kernel[@]})
 beta_kernel=(${stable_kernel[@]})
+rk3588_kernel=("5.10.y")
+rk35xx_kernel=("5.10.y")
+h6_kernel=("6.6.y")
+specific_6xy=("6.6.y" "6.1.y")
+specific_5xy=("5.15.y" "5.10.y" "5.4.y")
 # Set to automatically use the latest kernel
 auto_kernel="true"
+# Initialize the kernel array
+declare -A tags_list
 
 # Initialize the build device
 build_board="all"
@@ -152,7 +151,7 @@ mount_try() {
         fi
 
         # Mount failed and continue trying
-        if [[ "${?}" -eq "0" ]]; then
+        if [[ "${?}" -eq 0 ]]; then
             break
         else
             sync && sleep 3
@@ -210,7 +209,6 @@ init_var() {
                 stable_kernel=(${2})
                 dev_kernel=(${2})
                 beta_kernel=(${2})
-                specific_kernel=(${2})
                 IFS="${oldIFS}"
                 shift
             else
@@ -286,39 +284,66 @@ check_data() {
         board_list=":($(echo ${build_board} | sed -e 's/_/\|/g')):(yes|no)"
         build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
     fi
-    [[ "${#build_armbian[@]}" -eq "0" ]] && error_msg "The [ BOARD ] is missing, stop building."
+    [[ "${#build_armbian[@]}" -eq 0 ]] && error_msg "The [ BOARD ] is missing, stop building."
 
-    # Get a list of kernel
+    # Get the kernel array
     kernel_from=($(
         cat ${model_conf} |
             sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
             grep -E "^[^#].*${board_list}$" | awk -F':' '{print $9}' |
             sort -u | xargs
     ))
-    [[ "${#kernel_from[@]}" -eq "0" ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
+    [[ "${#kernel_from[@]}" -eq 0 ]] && error_msg "Missing [ KERNEL_TAGS ] settings, stop building."
     # Replace custom kernel tags
     [[ -n "${kernel_usage}" ]] && {
-        specific_tags="${kernel_usage}"
-        kernel_from=(${kernel_from[@]//${default_tags}/${kernel_usage}})
+        for ((i = 0; i < ${#kernel_from[@]}; i++)); do
+            if [[ ${kernel_from[${i}]} == "${default_tags}/"* ]]; then
+                kernel_from[${i}]="${kernel_from[${i}]//${default_tags}/${kernel_usage}}"
+            fi
+        done
     }
 
-    # The [ specific kernel ], Use the [ kernel version number ], such as 5.15.y, 6.1.y, etc. default download from [ kernel_stable ].
-    [[ "${auto_kernel}" == "true" || "${#specific_kernel[@]}" -eq "0" ]] && {
-        specific_kernel=($(
-            echo ${kernel_from[@]} |
-                sed -e 's/[ ][ ]*/\n/g' -e 's/_/\n/g' |
-                grep -E "^[1-9].[0-9]+" |
-                sort -u | xargs
-        ))
-    }
+    for item in "${kernel_from[@]}"; do
+        # Split the key and value
+        IFS='/' read -r key value <<<"${item}"
 
-    # The [ suffix ] of KERNEL_TAGS starts with a [ letter ], such as kernel_stable, kernel_rk3588, etc.
-    tags_list=($(echo ${kernel_from[@]} | sed -e 's/[ ][ ]*/\n/g' | grep -E "^[a-z]|(.x.)" | sort -u | xargs))
-    # Add the specific kernel to the list
-    [[ "${#specific_kernel[@]}" -ne "0" ]] && tags_list=(${tags_list[@]} "specific")
-    # Check the kernel list
-    [[ "${#tags_list[@]}" -eq "0" ]] && error_msg "The [ tags_list ] is missing, stop building."
-    echo -e "${INFO} The kernel tags list: [ ${tags_list[@]} ]"
+        # Check if the value is "all".
+        if [[ "${value}" == "all" ]]; then
+            # If the value is "all", assign the value of ${key}_kernel. such as [ stable_kernel, rk3588_kernel, etc. ]
+            eval "value=\"\${${key}_kernel[@]}\""
+        elif [[ "${value}" =~ ^[1-9]+ ]]; then
+            if [[ "${value}" == "5.x.y" ]]; then
+                value="${specific_5xy[@]}"
+            elif [[ "${value}" == "6.x.y" ]]; then
+                value="${specific_6xy[@]}"
+            else
+                IFS='_' read -ra value <<<"${value}"
+                value="${value[@]}"
+            fi
+        fi
+
+        # Merge the same key values
+        if [[ -n "${tags_list[${key}]}" ]]; then
+            tags_list[${key}]+=" ${value}"
+        else
+            tags_list[${key}]="${value}"
+        fi
+    done
+    # Convert the tags_list array to the kernel array (remove duplicates)
+    for key in "${!tags_list[@]}"; do
+        # Convert the space-separated string to an array and remove duplicates
+        read -ra unique_values <<<"$(echo "${tags_list[${key}]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+
+        # Assign the unique values back to the tags_list
+        tags_list[${key}]="${unique_values[@]}"
+
+        # Assign the unique values back to the array
+        eval "${key}_kernel=(\"${unique_values[@]}\")"
+    done
+
+    # Check the kernel tags list
+    [[ "${#tags_list[@]}" -eq 0 ]] && error_msg "The [ tags_list ] is missing, stop building."
+    echo -e "${INFO} The kernel tags list: [ ${!tags_list[@]} ]"
 
     # Convert kernel repository address to api format
     [[ "${kernel_repo}" =~ ^https: ]] && kernel_repo="$(echo ${kernel_repo} | awk -F'/' '{print $4"/"$5}')"
@@ -359,14 +384,14 @@ git_pull_dir() {
     git_tmp_path="$(mktemp -d)"
     for i in {1..10}; do
         git clone --quiet --single-branch --depth=1 --branch=${git_branch} ${git_repo} ${git_tmp_path}
-        [[ "${?}" -eq "0" ]] && break || sleep 60
+        [[ "${?}" -eq 0 ]] && break || sleep 60
     done
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to clone the [ ${git_repo} ] repository."
+    [[ "${?}" -eq 0 ]] || error_msg "Failed to clone the [ ${git_repo} ] repository."
 
     # Copy the files to the storage directory
     mkdir -p ${git_path}
     cp -af --no-preserve=ownership ${git_tmp_path}/${git_dir}/* ${git_path}
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to move the [ ${git_dir} ] files to the [ ${git_path} ] directory."
+    [[ "${?}" -eq 0 ]] || error_msg "Failed to move the [ ${git_dir} ] files to the [ ${git_path} ] directory."
 
     # Delete temporary files
     rm -rf ${git_tmp_path} 2>/dev/null
@@ -377,11 +402,11 @@ download_depends() {
 
     # Download Armbian u-boot files
     git_pull_dir ${uboot_repo} main u-boot ${uboot_path}
-    [[ "${?}" -eq "0" ]] && echo -e "${INFO} u-boot download completed." || error_msg "u-boot download failed."
+    [[ "${?}" -eq 0 ]] && echo -e "${INFO} u-boot download completed." || error_msg "u-boot download failed."
 
     # Download Armbian firmware files
     git_pull_dir ${firmware_repo} main firmware ${firmware_path}
-    [[ "${?}" -eq "0" ]] && echo -e "${INFO} firmware download completed." || error_msg "firmware download failed."
+    [[ "${?}" -eq 0 ]] && echo -e "${INFO} firmware download completed." || error_msg "firmware download failed."
 }
 
 query_kernel() {
@@ -389,38 +414,14 @@ query_kernel() {
 
     # Check the version on the kernel repository
     x="1"
-    for k in "${tags_list[@]}"; do
+    for key in "${!tags_list[@]}"; do
         {
-            # Select the kernel list
-            kd="${k}"
-            case "${k}" in
-            stable) down_kernel_list=(${stable_kernel[@]}) ;;
-            flippy) down_kernel_list=(${flippy_kernel[@]}) ;;
-            dev) down_kernel_list=(${dev_kernel[@]}) ;;
-            beta) down_kernel_list=(${beta_kernel[@]}) ;;
-            rk3588) down_kernel_list=(${rk3588_kernel[@]}) ;;
-            rk35xx) down_kernel_list=(${rk35xx_kernel[@]}) ;;
-            h6) down_kernel_list=(${h6_kernel[@]}) ;;
-            5.x.y)
-                down_kernel_list=(${specific_5xy[@]})
-                kd="${specific_tags}"
-                ;;
-            6.x.y)
-                down_kernel_list=(${specific_6xy[@]})
-                kd="${specific_tags}"
-                ;;
-            specific)
-                down_kernel_list=(${specific_kernel[@]})
-                kd="${specific_tags}"
-                ;;
-            *) error_msg "Invalid tags." ;;
-            esac
-
             # Query the name of the latest kernel version
             tmp_arr_kernels=()
+            down_kernel_list=(${tags_list[${key}]})
             i=1
             for kernel_var in "${down_kernel_list[@]}"; do
-                echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${k} - ${kernel_var} ]"
+                echo -e "${INFO} (${x}.${i}) Auto query the latest kernel version for [ ${key} - ${kernel_var} ]"
 
                 # Identify the kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
                 kernel_verpatch="$(echo ${kernel_var} | awk -F '.' '{print $1"."$2}')"
@@ -428,36 +429,24 @@ query_kernel() {
                 # Query the latest kernel version
                 latest_version="$(
                     curl -fsSL \
-                        ${kernel_api}/releases/expanded_assets/kernel_${kd} |
+                        ${kernel_api}/releases/expanded_assets/kernel_${key} |
                         grep -oE "${kernel_verpatch}.[0-9]+.tar.gz" | sed 's/.tar.gz//' |
                         sort -urV | head -n 1
                 )"
 
-                if [[ "${?}" -eq "0" && -n "${latest_version}" ]]; then
+                if [[ "${?}" -eq 0 && -n "${latest_version}" ]]; then
                     tmp_arr_kernels[${i}]="${latest_version}"
                 else
                     tmp_arr_kernels[${i}]="${kernel_var}"
                 fi
 
-                echo -e "${INFO} (${x}.${i}) [ ${k} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
+                echo -e "${INFO} (${x}.${i}) [ ${key} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
                 let i++
             done
 
-            # Reset the kernel array to the latest kernel version
-            case "${k}" in
-            stable) stable_kernel=(${tmp_arr_kernels[@]}) ;;
-            flippy) flippy_kernel=(${tmp_arr_kernels[@]}) ;;
-            dev) dev_kernel=(${tmp_arr_kernels[@]}) ;;
-            beta) beta_kernel=(${tmp_arr_kernels[@]}) ;;
-            rk3588) rk3588_kernel=(${tmp_arr_kernels[@]}) ;;
-            rk35xx) rk35xx_kernel=(${tmp_arr_kernels[@]}) ;;
-            h6) h6_kernel=(${tmp_arr_kernels[@]}) ;;
-            5.x.y) specific_5xy=(${tmp_arr_kernels[@]}) ;;
-            6.x.y) specific_6xy=(${tmp_arr_kernels[@]}) ;;
-            specific) specific_kernel=(${tmp_arr_kernels[@]}) ;;
-            *) error_msg "Invalid tags." ;;
-            esac
+            # Assign the latest kernel version to the array
+            tags_list[${key}]="${tmp_arr_kernels[@]}"
 
             let x++
         }
@@ -485,63 +474,39 @@ download_kernel() {
     echo -e "${STEPS} Start downloading the kernel files..."
 
     x="1"
-    for k in "${tags_list[@]}"; do
+    for key in "${!tags_list[@]}"; do
         {
-            # Set the kernel download list
-            kd="${k}"
-            case "${k}" in
-            stable) down_kernel_list=(${stable_kernel[@]}) ;;
-            flippy) down_kernel_list=(${flippy_kernel[@]}) ;;
-            dev) down_kernel_list=(${dev_kernel[@]}) ;;
-            beta) down_kernel_list=(${beta_kernel[@]}) ;;
-            rk3588) down_kernel_list=(${rk3588_kernel[@]}) ;;
-            rk35xx) down_kernel_list=(${rk35xx_kernel[@]}) ;;
-            h6) down_kernel_list=(${h6_kernel[@]}) ;;
-            5.x.y)
-                down_kernel_list=(${specific_5xy[@]})
-                kd="${specific_tags}"
-                ;;
-            6.x.y)
-                down_kernel_list=(${specific_6xy[@]})
-                kd="${specific_tags}"
-                ;;
-            specific)
-                down_kernel_list=(${specific_kernel[@]})
-                kd="${specific_tags}"
-                ;;
-            *) error_msg "Invalid tags." ;;
-            esac
-
+            down_kernel_list=(${tags_list[${key}]})
             # Download the kernel to the storage directory
             i="1"
             for kernel_var in "${down_kernel_list[@]}"; do
-                if [[ ! -d "${kernel_path}/${kd}/${kernel_var}" ]]; then
-                    kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_${kd}/${kernel_var}.tar.gz"
-                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
+                if [[ ! -d "${kernel_path}/${key}/${kernel_var}" ]]; then
+                    kernel_down_from="https://github.com/${kernel_repo}/releases/download/kernel_${key}/${kernel_var}.tar.gz"
+                    echo -e "${INFO} (${x}.${i}) [ ${key} - ${kernel_var} ] Kernel download from [ ${kernel_down_from} ]"
 
                     # Download the kernel files. If the download fails, try again 10 times.
-                    [[ -d "${kernel_path}/${kd}" ]] || mkdir -p ${kernel_path}/${kd}
+                    [[ -d "${kernel_path}/${key}" ]] || mkdir -p ${kernel_path}/${key}
                     for t in {1..10}; do
-                        curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${kd}/${kernel_var}.tar.gz"
-                        [[ "${?}" -eq "0" ]] && break || sleep 60
+                        curl -fsSL "${kernel_down_from}" -o "${kernel_path}/${key}/${kernel_var}.tar.gz"
+                        [[ "${?}" -eq 0 ]] && break || sleep 60
                     done
-                    [[ "${?}" -eq "0" ]] || error_msg "Failed to download the kernel files from the server."
+                    [[ "${?}" -eq 0 ]] || error_msg "Failed to download the kernel files from the server."
 
                     # Decompress the kernel files
-                    tar -mxzf "${kernel_path}/${kd}/${kernel_var}.tar.gz" -C "${kernel_path}/${kd}"
-                    [[ "${?}" -eq "0" ]] || error_msg "[ ${kernel_var} ] kernel decompression failed."
+                    tar -mxzf "${kernel_path}/${key}/${kernel_var}.tar.gz" -C "${kernel_path}/${key}"
+                    [[ "${?}" -eq 0 ]] || error_msg "[ ${kernel_var} ] kernel decompression failed."
                 else
-                    echo -e "${INFO} (${x}.${i}) [ ${k} - ${kernel_var} ] Kernel is in the local directory."
+                    echo -e "${INFO} (${x}.${i}) [ ${key} - ${kernel_var} ] Kernel is in the local directory."
                 fi
 
                 # If the kernel contains the sha256sums file, check the files integrity
-                [[ -f "${kernel_path}/${kd}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${kd}/${kernel_var}"
+                [[ -f "${kernel_path}/${key}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${key}/${kernel_var}"
 
                 let i++
             done
 
             # Delete downloaded kernel temporary files
-            rm -f ${kernel_path}/${kd}/*.tar.gz
+            rm -f ${kernel_path}/${key}/*.tar.gz
             sync
 
             let x++
@@ -592,9 +557,33 @@ confirm_version() {
     [[ -n "${BOOTLOADER_IMG}" ]] && RECORD_BOOTLOADER_IMG="/usr/lib/u-boot/${BOOTLOADER_IMG}" || RECORD_BOOTLOADER_IMG=""
     [[ -n "${TRUST_IMG}" ]] && RECORD_TRUST_IMG="/usr/lib/u-boot/${TRUST_IMG}" || RECORD_TRUST_IMG=""
 
-    # Replace custom kernel tags
-    [[ -n "${kernel_usage}" && "${KERNEL_TAGS}" == "${default_tags}" ]] && KERNEL_TAGS="${kernel_usage}"
-    [[ "${KERNEL_TAGS}" =~ ^[1-9]+ ]] && KERNEL_DOWN_TAGS="stable" || KERNEL_DOWN_TAGS="${KERNEL_TAGS}"
+    # Get the kernel tags and version
+    conf_kernel_tags="${KERNEL_TAGS%%/*}"
+    conf_kernel_list="${KERNEL_TAGS##*/}"
+    # Replace the default kernel tags with the custom kernel tags
+    [[ -n "${kernel_usage}" && "${conf_kernel_tags}" == "${default_tags}" ]] && conf_kernel_tags="${kernel_usage}"
+
+    # Set the kernel version array
+    build_kernel=()
+    if [[ "${conf_kernel_list}" == "all" ]]; then
+        build_kernel=(${tags_list[${conf_kernel_tags}]})
+    else
+        conf_kernel_list="${conf_kernel_list//[a-z]/[0-9]+}"
+        # Convert the string into an array, using "_" as the delimiter.
+        IFS='_' read -ra conf_kernel_list <<<"${conf_kernel_list}"
+        model_kernel=(${conf_kernel_list[@]})
+        latest_kernel=(${tags_list[${conf_kernel_tags}]})
+        # Find the kernel version that matches the custom version
+        for ck in "${model_kernel[@]}"; do
+            for lk in "${latest_kernel[@]}"; do
+                [[ "${lk}" =~ ^${ck}$ ]] && build_kernel+=("${lk}")
+            done
+        done
+    fi
+
+    # Check the kernel tags and version
+    [[ -n "${conf_kernel_tags}" || "${#conf_kernel_list[@]}" -eq 0 ]] || error_msg "The [ KERNEL_TAGS ] is invalid: [ ${KERNEL_TAGS} ]."
+    [[ "${#build_kernel[@]}" -eq 0 ]] && error_msg "The [ KERNEL_TAGS ] is invalid: [ ${KERNEL_TAGS} ]."
 }
 
 extract_armbian() {
@@ -799,12 +788,12 @@ replace_kernel() {
     cd ${current_path}
 
     # Determine custom kernel filename
-    kernel_boot="$(ls ${kernel_path}/${kd}/${kernel}/boot-${kernel}*.tar.gz 2>/dev/null | head -n 1)"
+    kernel_boot="$(ls ${kernel_path}/${conf_kernel_tags}/${kernel}/boot-${kernel}*.tar.gz 2>/dev/null | head -n 1)"
     kernel_name="${kernel_boot##*/}" && kernel_name="${kernel_name:5:-7}"
     [[ -n "${kernel_name}" ]] || error_msg "Missing kernel files for [ ${kernel} ]"
-    kernel_dtb="${kernel_path}/${kd}/${kernel}/dtb-${PLATFORM}-${kernel_name}.tar.gz"
-    kernel_modules="${kernel_path}/${kd}/${kernel}/modules-${kernel_name}.tar.gz"
-    kernel_header="${kernel_path}/${kd}/${kernel}/header-${kernel_name}.tar.gz"
+    kernel_dtb="${kernel_path}/${conf_kernel_tags}/${kernel}/dtb-${PLATFORM}-${kernel_name}.tar.gz"
+    kernel_modules="${kernel_path}/${conf_kernel_tags}/${kernel}/modules-${kernel_name}.tar.gz"
+    kernel_header="${kernel_path}/${conf_kernel_tags}/${kernel}/header-${kernel_name}.tar.gz"
     [[ -s "${kernel_boot}" && -s "${kernel_dtb}" && -s "${kernel_modules}" && -s "${kernel_header}" ]] || error_msg "The 4 kernel missing."
 
     # 01. For /boot five files
@@ -1086,7 +1075,7 @@ refactor_rootfs() {
     echo "FAMILY='${FAMILY}'" >>${ophub_release_file}
     echo "BOARD='${board}'" >>${ophub_release_file}
     echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
-    echo "KERNEL_TAGS='${KERNEL_DOWN_TAGS}'" >>${ophub_release_file}
+    echo "KERNEL_TAGS='${conf_kernel_tags}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
@@ -1144,47 +1133,14 @@ loop_rebuild() {
             board="${b}"
             confirm_version
 
-            # Determine kernel tags
-            kd="${KERNEL_TAGS}"
-            case "${KERNEL_TAGS}" in
-            stable) kernel_list=(${stable_kernel[@]}) ;;
-            flippy) kernel_list=(${flippy_kernel[@]}) ;;
-            dev) kernel_list=(${dev_kernel[@]}) ;;
-            beta) kernel_list=(${beta_kernel[@]}) ;;
-            rk3588) kernel_list=(${rk3588_kernel[@]}) ;;
-            rk35xx) kernel_list=(${rk35xx_kernel[@]}) ;;
-            h6) kernel_list=(${h6_kernel[@]}) ;;
-            5.x.y)
-                kernel_list=(${specific_5xy[@]})
-                kd="${specific_tags}"
-                ;;
-            6.x.y)
-                kernel_list=(${specific_6xy[@]})
-                kd="${specific_tags}"
-                ;;
-            [1-9].[0-9]*)
-                kernel_list=(${specific_kernel[@]})
-                kd="${specific_tags}"
-                ;;
-            *) error_msg "Invalid tags." ;;
-            esac
-
             i="1"
-            for k in "${kernel_list[@]}"; do
+            for k in "${build_kernel[@]}"; do
                 {
+                    # Set the kernel version
                     kernel="${k}"
 
-                    # Skip inapplicable kernels
-                    if [[ "${KERNEL_TAGS}" =~ ^[1-9].[0-9]+ ]]; then
-                        [[ "${kernel}" != "$(echo ${KERNEL_TAGS} | awk -F'.' '{print $1"."$2"."}')"* ]] && {
-                            echo -e "(${j}.${i}) Based on model_database.conf, skip the [ ${board} - ${kd}/${kernel} ] build."
-                            let i++
-                            continue
-                        }
-                    fi
-
                     # Check disk space size
-                    echo -ne "(${j}.${i}) Start building Armbian [\033[92m ${board} - ${KERNEL_TAGS}/${kernel} \033[0m]. "
+                    echo -ne "(${j}.${i}) Start building Armbian [\033[92m ${board} - ${conf_kernel_tags}/${kernel} \033[0m]. "
                     now_remaining_space="$(df -Tk ${armbian_outputpath} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
                         echo -e "${WARNING} Remaining space is less than 6G, exit this build."
@@ -1216,7 +1172,7 @@ loop_rebuild() {
 echo -e "${STEPS} Welcome to Rebuild Armbian!"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
+[[ "$(id -u)" == 0 ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 
 # Initialize variables
 init_var "${@}"
