@@ -303,6 +303,7 @@ check_data() {
         done
     }
 
+    # Convert the kernel_from to the kernel array
     for item in "${kernel_from[@]}"; do
         # Split the key and value
         IFS='/' read -r key value <<<"${item}"
@@ -329,16 +330,13 @@ check_data() {
             tags_list[${key}]="${value}"
         fi
     done
+
     # Convert the tags_list array to the kernel array (remove duplicates)
     for key in "${!tags_list[@]}"; do
         # Convert the space-separated string to an array and remove duplicates
         read -ra unique_values <<<"$(echo "${tags_list[${key}]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
-
         # Assign the unique values back to the tags_list
         tags_list[${key}]="${unique_values[@]}"
-
-        # Assign the unique values back to the array
-        eval "${key}_kernel=(\"${unique_values[@]}\")"
     done
 
     # Check the kernel tags list
