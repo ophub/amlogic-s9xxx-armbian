@@ -1368,6 +1368,8 @@ In Amlogic devices, you can add/modify/delete settings in the `/boot/uEnv.txt` f
 
 - By adding `usbcore.usb3_disable=1` in cmdline, you can disable all USB 3.0 devices.
 
+- By adding `extraargs=video=HDMI-A-1:1920x1080@60` in cmdline, you can force the video display mode to 1080p.
+
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">
 </div>
