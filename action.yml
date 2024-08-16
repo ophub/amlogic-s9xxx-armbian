@@ -27,11 +27,11 @@ inputs:
   armbian_kernel:
     description: "Set kernel version."
     required: false
-    default: "6.1.y_5.15.y"
+    default: "5.10.y"
   auto_kernel:
     description: "Auto use the latest kernel."
     required: false
-    default: "true"
+    default: "false"
   armbian_fstype:
     description: "Set armbian rootfs type: ext4 / btrfs"
     required: false
@@ -48,15 +48,15 @@ inputs:
   kernel_source:
     description: "Select the kernel source code"
     required: false
-    default: "unifreq"
+    default: "danteliu119"
   kernel_version:
     description: "Select kernel version"
     required: false
-    default: "6.1.y_5.15.y"
+    default: "5.10.y"
   kernel_auto:
     description: "Auto use the latest kernel"
     required: false
-    default: "true"
+    default: "false"
   kernel_package:
     description: "Select compile package list"
     required: false
