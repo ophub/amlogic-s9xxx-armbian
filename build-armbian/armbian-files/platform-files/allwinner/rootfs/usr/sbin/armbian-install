@@ -109,8 +109,8 @@ init_var() {
     echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
-    [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/*
     DIR_INSTALL="${tmp_path}/install"
+    [[ -d "${DIR_INSTALL}" ]] && rm -rf ${DIR_INSTALL}
     mkdir -p ${DIR_INSTALL} && chmod 777 ${tmp_path}
 
     # Regenerate new machine-id
