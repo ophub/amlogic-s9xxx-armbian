@@ -63,6 +63,7 @@ on:
           - rk3318-box
           - rock5b
           - rock5c
+          - ruisen-box
           - s905
           - s905-beelink-mini
           - s905-mxqpro-plus
