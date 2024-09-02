@@ -266,7 +266,19 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
 todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf 2>/dev/null &&
-        tolog "91. Root partition resized successfully..."
+        tolog "91. Root partition resized successfully"
+}
+
+# Update the MAC address for the wireless network card
+[[ -d "/lib/firmware" ]] && {
+    find "/lib/firmware" \
+        -type f -name "*.txt" ! -xtype l \
+        -exec grep -q '^macaddr=.*' {} \; \
+        -exec sh -c '
+        new_mac=$(openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//; s/^./2/")
+        sed -i "s/^macaddr=.*/macaddr=${new_mac}/" "${1}"
+    ' _ {} \; 2>/dev/null
+    tolog "92. Update the MAC address for the wireless network card"
 }
 
 # Show end message
