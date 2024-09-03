@@ -122,6 +122,9 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 
 可以使用 `armbian-update` 命令将编译好的内核安装到已有的 Armbian 系统中，具体操作方法详见：[更新 Armbian 内核](../README.cn.md#更新-armbian-内核)
 
+- #### 自定义编译驱动模块
+
+在 linux 主线内核里，有些驱动尚未支持，可以自定义编译驱动模块。具体操作方法详见：[编译驱动模块](../documents/README.cn.md#93-如何自定义编译驱动模块)
 
 ### 在 OpenWrt 系统中使用
 

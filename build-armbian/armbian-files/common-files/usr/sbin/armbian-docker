@@ -91,7 +91,7 @@ docker_install() {
 
     # Install the docker package
     sudo apt-get update
-    sudo apt-get remove -y docker docker-engine docker.io containerd runc
+    sudo apt-get remove -y docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc
     sudo apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
 
     # Install GPG certificate
@@ -106,7 +106,7 @@ docker_install() {
 
     echo -e "${STEPS} Install docker related packages..."
     sudo apt-get update
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     echo -e "${STEPS} Install docker accelerator..."
     [[ -d "/etc/docker" ]] || mkdir -p /etc/docker
@@ -194,7 +194,7 @@ echo -e "${INFO} Welcome to the docker management tool."
 
 # Execute script assist functions
 case "${1}" in
-    update) docker_update ;;
-    remove) docker_remove ;;
-    *)      docker_install ;;
+update) docker_update ;;
+remove) docker_remove ;;
+*) docker_install ;;
 esac

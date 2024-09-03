@@ -23,10 +23,23 @@ echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Start the custom service..." >${custom_log}
 # Set the release check file
 ophub_release_file="/etc/ophub-release"
 [[ -f "${ophub_release_file}" ]] && FDT_FILE="$(cat ${ophub_release_file} | grep -oE 'meson.*dtb')" || FDT_FILE=""
+
 # For Tencent Aurora 3Pro (s905x3-b) box [ /etc/modprobe.d/blacklist.conf : blacklist btmtksdio ]
 [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && {
     modprobe btmtksdio 2>/dev/null &&
         echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The Tencent-Aurora-3Pro's btmtksdio module loaded successfully." >>${custom_log}
+}
+
+# For swan1-w28(rk3568) board USB power and switch contrl
+[[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]] && {
+    # USB 5V Power buick ON
+    gpioset 0 21=1 2>/dev/null
+    # USB3.0 Port ON
+    gpioset 3 20=1 2>/dev/null
+    # USB2.0 Port ON
+    gpioset 4 21=1 2>/dev/null
+    gpioset 4 22=1 2>/dev/null
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] USB successfully enabled on Swan1-w28(rk3568)." >>${custom_log}
 }
 
 # Restart ssh service
