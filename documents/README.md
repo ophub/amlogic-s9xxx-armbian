@@ -34,6 +34,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
   - [9. Compiling Armbian Kernel](#9-compiling-armbian-kernel)
     - [9.1 How to Add Custom Kernel Patches](#91-how-to-add-custom-kernel-patches)
     - [9.2 How to Make Kernel Patches](#92-how-to-make-kernel-patches)
+    - [9.3 How to Customize Compilation of Driver Modules](#93-how-to-customize-compilation-of-driver-modules)
   - [10. Updating Armbian Kernel](#10-updating-armbian-kernel)
   - [11. Installing Common Software](#11-installing-common-software)
   - [12. Frequently Asked Questions](#12-frequently-asked-questions)
@@ -394,6 +395,77 @@ When using the `kernel_patch` parameter to specify a custom kernel patch, please
 - Obtained from commits in github.com repositories: Adding a `.patch` suffix to the corresponding `commit` address can generate the corresponding patch.
 
 Before adding a custom kernel patch, it needs to be compared with the upstream kernel source repository [unifreq/linux-k.x.y](https://github.com/unifreq) to confirm whether this patch has been added to avoid conflicts. Kernel patches that pass the test are recommended to be submitted to the series of kernel repositories maintained by unifreq. Each small step for a person is a big step for the world. Your contribution will make our use of Armbian and OpenWrt systems in the box more stable and interesting.
+
+
+### 9.3 How to Customize Compilation of Driver Modules
+
+In the mainline Linux kernel, some drivers are not yet supported, and you can customize the compilation of driver modules. Select drivers that are supported for use in the mainline kernel; Android drivers are generally not supported in the mainline kernel and cannot be compiled. For example:
+
+```shell
+# Step 1: Update to the latest kernel
+# Due to incomplete header files in earlier versions, it is necessary to update to the latest kernel version.
+# The requirement for each kernel version is not lower than 5.4.280, 5.10.222, 5.15.163, 6.1.100, 6.6.41.
+armbian-sync
+armbian-update -k 6.1
+
+
+# Step 2: Install compilation tools
+mkdir -p /usr/local/toolchain
+cd /usr/local/toolchain
+# Download the compilation tools
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+# Extract
+tar -Jxf arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+# Install additional compilation dependencies (optional; you can manually install missing components based on errors).
+armbian-kernel -u
+
+
+# Step 3: Download and compile the driver
+# Download driver source code
+cd ~/
+git clone https://github.com/jwrdegoede/rtl8189ES_linux
+cd rtl8189ES_linux
+# Set up the compilation environment
+gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
+toolchain_path="/usr/local/toolchain"
+toolchain_name="gcc"
+export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-"
+export CC="${CROSS_COMPILE}gcc"
+export LD="${CROSS_COMPILE}ld.bfd"
+export ARCH="arm64"
+export KSRC=/usr/lib/modules/$(uname -r)/build
+# Set the M variable according to the actual path of the source code
+export M="/root/rtl8189ES_linux"
+# Compile the driver
+make
+
+
+# Step 4: Install the driver
+sudo cp -f 8189es.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
+# Update module dependencies
+sudo depmod -a
+# Load the driver module
+sudo modprobe 8189es
+# Check if the driver is successfully loaded
+lsmod | grep 8189es
+# You should see the driver successfully loaded
+8189es               1843200  0
+cfg80211              917504  2 8189es,brcmfmac
+```
+
+The illustration is as follows:
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a89cbe6-df38-4862-8d11-9d977e0f4191">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a1d0bb9-44d4-4de5-9907-47e5f20747a7">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/d1bd2eff-4c57-4e91-a870-08b0f8b1fe16">
+</div>
 
 ## 10. Updating Armbian Kernel
 
@@ -1295,6 +1367,8 @@ In Amlogic devices, you can add/modify/delete settings in the `/boot/uEnv.txt` f
 - By adding `usbcore.usbfs_memory_mb=1024` in cmdline, you can permanently change the USBFS memory buffer from the default `16 mb` to larger (`cat /sys/module/usbcore/parameters/usbfs_memory_mb`), improving the ability to transfer large files over USB.
 
 - By adding `usbcore.usb3_disable=1` in cmdline, you can disable all USB 3.0 devices.
+
+- By adding `extraargs=video=HDMI-A-1:1920x1080@60` in cmdline, you can force the video display mode to 1080p.
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">

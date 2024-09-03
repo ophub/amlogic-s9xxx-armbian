@@ -80,7 +80,7 @@ compress_format="xz"
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-13.2.rel1-aarch64-aarch64-none-elf.tar.xz"
+gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
 # Set the default cross-compilation toolchain: [ clang / gcc / gcc-13.2, etc. ]
@@ -420,8 +420,11 @@ headers_install() {
     tar --exclude '*.orig' -c -f - -C ${kernel_path}/${local_kernel_path} -T ${head_list} | tar -xf - -C ${output_path}/header
     tar --exclude '*.orig' -c -f - -T ${obj_list} | tar -xf - -C ${output_path}/header
 
-    # copy .config manually to be where it's expected to be
-    cp -f .config ${output_path}/header/.config
+    # Copy the necessary files to the specified directory
+    cp -af include/config "${output_path}/header/include"
+    cp -af include/generated "${output_path}/header/include"
+    cp -af arch/${SRC_ARCH}/include/generated "${output_path}/header/arch/${SRC_ARCH}/include"
+    cp -af .config Module.symvers ${output_path}/header
 
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
@@ -530,7 +533,7 @@ generate_uinitrd() {
     # Copy /boot related files into armbian system
     cp -f ${kernel_path}/${local_kernel_path}/System.map /boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config /boot/config-${kernel_outname}
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/Image /boot/vmlinuz-${kernel_outname}
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/Image /boot/vmlinuz-${kernel_outname}
     if [[ "${PLATFORM}" == "rockchip" || "${PLATFORM}" == "allwinner" ]]; then
         cp -f /boot/vmlinuz-${kernel_outname} /boot/Image
     else
@@ -597,11 +600,11 @@ packit_dtbs() {
     echo -e "${STEPS} Packing the [ ${kernel_outname} ] dtbs packages..."
 
     cd ${output_path}/dtb/allwinner
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/allwinner/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/allwinner/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-allwinner-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
@@ -609,11 +612,11 @@ packit_dtbs() {
     }
 
     cd ${output_path}/dtb/amlogic
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/amlogic/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/amlogic/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-amlogic-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
@@ -621,11 +624,11 @@ packit_dtbs() {
     }
 
     cd ${output_path}/dtb/rockchip
-    cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/*.dtb . 2>/dev/null
+    cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/*.dtb . 2>/dev/null
     [[ "${?}" -eq "0" ]] && {
-        [[ -d "${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay" ]] && {
+        [[ -d "${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/overlay" ]] && {
             mkdir -p overlay
-            cp -f ${kernel_path}/${local_kernel_path}/arch/arm64/boot/dts/rockchip/overlay/*.dtbo overlay/ 2>/dev/null
+            cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/dts/rockchip/overlay/*.dtbo overlay/ 2>/dev/null
         }
         tar -czf dtb-rockchip-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
