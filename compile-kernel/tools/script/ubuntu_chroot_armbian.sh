@@ -43,7 +43,7 @@ armbian_kernel_path="/opt/linux-kernel"
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-13.2.rel1-aarch64-aarch64-none-elf.tar.xz"
+gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
 # Set the kernel arch
@@ -152,7 +152,7 @@ make_kernel_scripts() {
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 
-    make ${MAKE_SET_STRING} scripts -j${PROCESS}
+    make ${MAKE_SET_STRING} modules_prepare -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
 }
 
@@ -185,8 +185,11 @@ packit_header() {
     # Delete temporary files
     rm -f ${head_list} ${obj_list}
 
-    # copy .config manually to be where it's expected to be
-    cp -f .config ${header_output_path}/.config
+    # Copy the necessary files to the specified directory
+    cp -af include/config "${header_output_path}/include"
+    cp -af include/generated "${header_output_path}/include"
+    cp -af arch/${SRC_ARCH}/include/generated "${header_output_path}/arch/${SRC_ARCH}/include"
+    cp -af .config Module.symvers ${header_output_path}
 
     # Compress the header files
     cd ${header_output_path}

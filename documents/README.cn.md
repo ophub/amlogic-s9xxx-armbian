@@ -34,6 +34,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
     - [9.1 如何添加自定义内核补丁](#91-如何添加自定义内核补丁)
     - [9.2 如何制作内核补丁](#92-如何制作内核补丁)
+    - [9.3 如何自定义编译驱动模块](#93-如何自定义编译驱动模块)
   - [10. 更新 Armbian 内核](#10-更新-armbian-内核)
   - [11. 安装常用软件](#11-安装常用软件)
   - [12. 常见问题](#12-常见问题)
@@ -394,6 +395,76 @@ armbian-install
 - 从 github.com 仓库的 commits 中获得：在相应的 `commit` 地址后添加 `.patch` 后缀即可生成对应的补丁。
 
 在添加自定义内核补丁前，需要先和上游的内核源码仓库 [unifreq/linux-k.x.y](https://github.com/unifreq) 进行比较，确认此补丁是否已经添加，避免造成冲突。通过测试的内核补丁，建议向 unifreq 大佬维护的系列内核仓库进行提交。每人一小步，世界一大步，大家的贡献会让我们在盒子里使用 Armbian 和 OpenWrt 系统时更加稳定和有趣。
+
+### 9.3 如何自定义编译驱动模块
+
+在 linux 主线内核里，有些驱动尚未支持，可以自定义编译驱动模块。请选择支持在主线内核里使用的驱动，安卓驱动一般不支持主线内核，无法编译。举例如下：
+
+```shell
+# 第一步，更新最新内核
+# 由于早期的 header 文件不全，所以需要更新到最新的内核。
+# 各内核版本要求不低于 5.4.280, 5.10.222, 5.15.163, 6.1.100, 6.6.41。
+armbian-sync
+armbian-update -k 6.1
+
+
+# 第二步，安装编译工具
+mkdir -p /usr/local/toolchain
+cd /usr/local/toolchain
+# 下载编译工具
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+# 解压
+tar -Jxf arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+# 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
+armbian-kernel -u
+
+
+# 第三步，下载驱动，编译
+# 下载驱动源码
+cd ~/
+git clone https://github.com/jwrdegoede/rtl8189ES_linux
+cd rtl8189ES_linux
+# 设置编译环境
+gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
+toolchain_path="/usr/local/toolchain"
+toolchain_name="gcc"
+export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-"
+export CC="${CROSS_COMPILE}gcc"
+export LD="${CROSS_COMPILE}ld.bfd"
+export ARCH="arm64"
+export KSRC=/usr/lib/modules/$(uname -r)/build
+# 根据源码的实际路径设置 M 变量
+export M="/root/rtl8189ES_linux"
+# 编译驱动
+make
+
+
+# 第四步，安装驱动
+sudo cp -f 8189es.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
+# 更新模块依赖关系
+sudo depmod -a
+# 加载驱动模块
+sudo modprobe 8189es
+# 检查驱动是否加载成功
+lsmod | grep 8189es
+# 可以看到成功加载驱动
+8189es               1843200  0
+cfg80211              917504  2 8189es,brcmfmac
+```
+
+图示如下：
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a89cbe6-df38-4862-8d11-9d977e0f4191">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/1a1d0bb9-44d4-4de5-9907-47e5f20747a7">
+</div>
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img width="700" alt="image" src="https://github.com/user-attachments/assets/d1bd2eff-4c57-4e91-a870-08b0f8b1fe16">
+</div>
 
 ## 10. 更新 Armbian 内核
 
@@ -1289,6 +1360,8 @@ armbian-install
 - 通过在 cmdline 中添加 `usbcore.usbfs_memory_mb=1024` 设置，可以永久将 USBFS 内存缓冲区从默认的 `16 mb` 改为更大（`cat /sys/module/usbcore/parameters/usbfs_memory_mb`），提升 USB 传输大文件的能力。
 
 - 通过在 cmdline 中添加 `usbcore.usb3_disable=1` 设置，可以禁用 USB 3.0 的所有设备。
+
+- 通过在 cmdline 中添加 `extraargs=video=HDMI-A-1:1920x1080@60` 设置，可以将视频显示模式强制为 1080p。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img width="700" alt="image" src="https://user-images.githubusercontent.com/68696949/216220941-47db0183-7b26-4768-81cf-2ee73d59d23e.png">

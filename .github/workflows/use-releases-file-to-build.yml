@@ -28,7 +28,7 @@ on:
           - all
           - s905w_s905x_s905mb_s905l3a_s905l3b_s905x2_s905x3_s912_s922x_s922x-ct2000_s922x-reva
           - s905x3-x88-pro-x3_s912-m8s-pro_s905x-t95_s912-t95z-plus_s905l3-unt400g1_s905lb-r3300l
-          - seewo-sv21_smart-am40_station-m1_sw799_tn3399_zysj_tvi3315a_xiaobao_zcube1-max
+          - tanix-tx6_tb-ls3399_tn3399_tpm312_tqc-a01_tvi3315a_vplus_xiaobao_zcube1-max_zk-r39a_zysj
           - vplus_tanix-tx6_tqc-a01
           - a311d
           - beikeyun
@@ -49,6 +49,7 @@ on:
           - h69k
           - h88k
           - h88k-v3
+          - h96-max-m2
           - hs530r
           - hugsun-x99
           - ipc-r
@@ -57,6 +58,7 @@ on:
           - leez
           - lx-r3s
           - mrkaio-m68s
+          - nanopc-t6
           - nanopi-r5c
           - nanopi-r5s
           - orangepi-5-plus
@@ -67,6 +69,7 @@ on:
           - rk3318-box
           - rock5b
           - rock5c
+          - ruisen-box
           - s905
           - s905-beelink-mini
           - s905-mxqpro-plus
@@ -74,6 +77,7 @@ on:
           - s905d-ki-pro
           - s905d-sml5442tw
           - s905l
+          - s905l-aurora-1s
           - s905l-mg101
           - s905l2
           - s905l2-e900v21e
@@ -86,11 +90,13 @@ on:
           - s905l3a-cm311
           - s905l3a-m401a
           - s905l3b
+          - s905l3b-e900v21d
           - s905l3b-e900v22d
           - s905l3b-e900v22e
           - s905l3b-ip103h
           - s905l3b-rg020et-ca
           - s905l3b-unt403a
+          - s905lb-ipbs9505
           - s905lb-q96-mini
           - s905lb-r3300l
           - s905mb
@@ -160,6 +166,7 @@ on:
           - vplus
           - xiaobao
           - zcube1-max
+          - zk-r39a
           - zysj
       armbian_kernel:
         description: "Select kernel version."
