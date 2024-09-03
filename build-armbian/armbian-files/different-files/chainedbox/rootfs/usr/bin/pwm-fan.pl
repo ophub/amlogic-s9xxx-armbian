@@ -12,6 +12,7 @@ use File::Glob qw(bsd_glob);
 #慢抽走我家云内热风就行,没有必要强制降低cpu温度,当cpu突破75度,风扇全速运行,强制散热.
 #由于cpu重负载情况不多,所以风扇很少全速开启.
 #这套逻辑使用下来非常满意;
+#20240903 再次修复硬盘未待机低温切换未生效bug;
 #20240708 修复硬盘未待机低温切换未生效bug;
 #         调整未待机时的风扇启动停温度;
 #         修改部分无需变动的变量为未常量;
@@ -166,7 +167,7 @@ sub set_fixed_speed {
 sub auto_speed {
 
     my $non_standby_disks = 0;
-    if($disks[0] !~ m#0#){
+    if($disks[0] !~ /0/){
       foreach my $disk (@disks) {
       # 检查每个硬盘的电源状态
       my $state = `hdparm -C $disk`;
