@@ -109,8 +109,8 @@ init_var() {
     echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
-    [[ -d "${tmp_path}" ]] && rm -rf ${tmp_path}/*
     DIR_INSTALL="${tmp_path}/install"
+    [[ -d "${DIR_INSTALL}" ]] && rm -rf ${DIR_INSTALL}
     mkdir -p ${DIR_INSTALL} && chmod 777 ${tmp_path}
 
     # Regenerate new machine-id
@@ -316,11 +316,21 @@ tmpfs                  /tmp     tmpfs                  defaults,nosuid          
 
 EOF
 
-    echo -e "${INFO} Update the relevant parameters."
+    echo -e "${INFO} Update parameters related to the releases file."
     ophub_release_file="${DIR_INSTALL}${ophub_release_file}"
     sed -i "s|^ROOTFS_TYPE=.*|ROOTFS_TYPE='${file_system_type}'|g" ${ophub_release_file}
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}
+
+    # Update the MAC address for the wireless network card
+    echo -e "${INFO} Update the MAC address for the wireless network card."
+    find "${DIR_INSTALL}/lib/firmware" \
+        -type f -name "*.txt" ! -xtype l \
+        -exec grep -q '^macaddr=.*' {} \; \
+        -exec sh -c '
+        new_mac=$(openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//; s/^./2/")
+        sed -i "s/^macaddr=.*/macaddr=${new_mac}/" "${1}"
+    ' _ {} \; 2>/dev/null
 
     # Remove useless scripts
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
