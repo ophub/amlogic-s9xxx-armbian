@@ -281,5 +281,12 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
     tolog "92. Update the MAC address for the wireless network card"
 }
 
+# Hidd the IP address of WAN
+[[ -f "/etc/update-motd.d/30-armbian-sysinfo" ]] && {
+    sed -i 's|^curl.*akamai.*|curl -s http://whatismyip.akamai.com/ \| sed -r '\''s/(\.[0-9]+){2}$/.\*\*\*\.\*\*\*/'\''|' \
+        /etc/update-motd.d/30-armbian-sysinfo
+    tolog "93. Hide the IP address of WAN"
+}
+
 # Show end message
 tolog "successfully fixed."
