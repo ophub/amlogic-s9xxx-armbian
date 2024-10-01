@@ -282,9 +282,9 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
 }
 
 # Hidd the IP address of WAN
-[[ -f "/etc/update-motd.d/30-armbian-sysinfo" ]] && {
-    sed -i 's|^curl.*akamai.*|curl -s http://whatismyip.akamai.com/ \| sed -r '\''s/(\.[0-9]+){2}$/.\*\*\*\.\*\*\*/'\''|' \
-        /etc/update-motd.d/30-armbian-sysinfo
+[[ -f "/etc/update-motd.d/10-armbian-header" ]] && {
+    sed -i 's|^curl.*akamai.*|curl --connect-timeout 2 -s http://whatismyip.akamai.com/ \| sed -r '\''s/(\.[0-9]+){2}$/.\*\*\*\.\*\*\*/'\''|' \
+        /etc/update-motd.d/10-armbian-header
     tolog "93. Hide the IP address of WAN"
 }
 
