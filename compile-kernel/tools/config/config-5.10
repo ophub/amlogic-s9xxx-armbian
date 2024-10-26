@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 5.10.226 Kernel Configuration
+# Linux/arm64 5.10.228 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 13.3.Rel1 (Build arm-13.24)) 13.3.1 20240614"
 CONFIG_CC_IS_GCC=y
@@ -7676,6 +7676,9 @@ CONFIG_KEYS=y
 # CONFIG_ENCRYPTED_KEYS is not set
 # CONFIG_KEY_DH_OPERATIONS is not set
 # CONFIG_SECURITY_DMESG_RESTRICT is not set
+CONFIG_PROC_MEM_ALWAYS_FORCE=y
+# CONFIG_PROC_MEM_FORCE_PTRACE is not set
+# CONFIG_PROC_MEM_NO_FORCE is not set
 CONFIG_SECURITY=y
 CONFIG_SECURITYFS=y
 CONFIG_SECURITY_NETWORK=y
