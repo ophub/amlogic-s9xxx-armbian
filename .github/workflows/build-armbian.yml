@@ -230,10 +230,10 @@ on:
         options:
           - ophub
           - angel
-          - yourname
+          - matori.net
 
 env:
-  TZ: America/New_York
+  TZ: Asia/Jakarta
   ROOTFS_SCRIPT: compile-kernel/tools/script/armbian_rootfs.sh
 
 jobs:
@@ -303,9 +303,9 @@ jobs:
         run: |
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
-                           BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
-                           COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
+              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=HG680P BRANCH=current BUILD_MINIMAL=no \
+                           BUILD_ONLY=default HOST=matori-net BUILD_DESKTOP=no EXPERT=yes INSTALL_HEADERS=yes ROOTFS_TYPE=btrfs BTRFS_COMPRESSION=zstd EXTRAWIFI=yes CONSOLE_AUTOLOGIN=yes KERNEL_CONFIGURE=no \
+                           COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes BUILD_ALL=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Organize files and clear space
