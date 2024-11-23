@@ -30,6 +30,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [8.2.3 电犀牛 R68S 的安装方法](#823-电犀牛-r68s-的安装方法)
       - [8.2.4 贝壳云的安装方法](#824-贝壳云的安装方法)
       - [8.2.5 我家云的安装方法](#825-我家云的安装方法)
+      - [8.2.6 泰山派的安装方法](#826-泰山派的安装方法)
     - [8.3 Allwinner 系列安装方法](#83-allwinner-系列安装方法)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
     - [9.1 如何添加自定义内核补丁](#91-如何添加自定义内核补丁)
@@ -344,6 +345,13 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 <img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a6d2d8c0-35c5-44ba-be35-fd2e2758729b width="600" /><br />
 <img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/13aab016-1b93-4ff1-b1ef-c202bd357068 width="600" />
 </div>
+
+#### 8.2.6 泰山派的安装方法
+- 下载 [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) 工具及驱动，解压并安装 DriverAssitant 驱动程序，打开 RKDevTool 工具。(注意，请使用2.86版本工具而不是2.92，2.92版本刷入时会闪退)
+- 泰山派关机状态下按住 Recovery 键后插入type-c数据线，待 RKDevTool 提示`发现一个 LOADER 设备`后松开 Recovery 键。右键添加项。
+- 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
+- 点击执行，等待进度条完成即可
+
 
 ### 8.3 Allwinner 系列安装方法
 
