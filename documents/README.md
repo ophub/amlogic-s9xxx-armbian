@@ -30,6 +30,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [8.2.3 Installation method for FastRhino R68S](#823-installation-method-for-fastrhino-r68s)
       - [8.2.4 Installation method for Beikeyun](#824-installation-method-for-beikeyun)
       - [8.2.5 Installation method for Chainedbox-L1-Pro](#825-installation-method-for-chainedbox-l1-pro)
+      - [8.2.6 Installation method for lckfb-tspi](#826-Installation-method-for-lckfb-tspi)
     - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
   - [9. Compiling Armbian Kernel](#9-compiling-armbian-kernel)
     - [9.1 How to Add Custom Kernel Patches](#91-how-to-add-custom-kernel-patches)
@@ -344,6 +345,13 @@ The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tuto
 <img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/a6d2d8c0-35c5-44ba-be35-fd2e2758729b width="600" /><br />
 <img src=https://github.com/ophub/amlogic-s9xxx-armbian/assets/68696949/13aab016-1b93-4ff1-b1ef-c202bd357068 width="600" />
 </div>
+
+#### 8.2.6 Installation method for lckfb-tspi
+- Download the [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) tool and driver, unzip and install the DriverAssistant driver program, and open the RKDevTool tool .(Note, please use version 2.86 tool instead of 2.92, version 2.92 will crash when flashing)
+- tspi in the shutdown state, press and hold the Recovery key and insert the type-c data cable. Release the Recovery key after RKDevTool prompts `A LOADER device was found'. Right click to add item.
+- Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
+- Click Execute and wait for the progress to complete.
+
 
 ### 8.3 Allwinner Series Installation Method
 
