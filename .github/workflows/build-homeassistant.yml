@@ -18,7 +18,6 @@ on:
         options:
           - jammy
           - noble
-          - bullseye
           - bookworm
       armbian_board:
         description: "Select device board."
