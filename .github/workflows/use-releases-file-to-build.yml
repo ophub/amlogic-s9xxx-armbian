@@ -71,6 +71,7 @@ on:
           - r68s
           - renegade-rk3328
           - rk3318-box
+          - rock-3a
           - rock5b
           - rock5c
           - ruisen-box
