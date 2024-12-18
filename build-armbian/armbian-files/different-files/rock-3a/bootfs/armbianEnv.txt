@@ -1,8 +1,9 @@
 verbosity=1
 bootlogo=false
 console=both
-extraargs=cma=256M
-overlay_prefix=rk35xx
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk3568
 fdtfile=rockchip/rk3568-rock-3a.dtb
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
