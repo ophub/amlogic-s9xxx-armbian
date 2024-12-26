@@ -178,7 +178,7 @@ runs:
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${armbian_filepath}"
             echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
-            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${armbian_filepath} 2>/dev/null)"
+            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${armbian_filepath}/ 2>/dev/null)"
 
         elif [[ "${build_target}" == "kernel" ]]; then
 
@@ -238,7 +238,7 @@ runs:
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${kernel_outpath}"
             echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
-            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${kernel_outpath} 2>/dev/null)"
+            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${kernel_outpath}/ 2>/dev/null)"
 
         else
             echo -e "Please select a build target: armbian / kernel"
