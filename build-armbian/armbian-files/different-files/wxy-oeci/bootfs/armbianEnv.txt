@@ -1,0 +1,17 @@
+verbosity=7
+bootlogo=true
+fdtfile=rockchip/test.dtb
+rootdev=UUID=7d044e58-81e8-4f3b-8ffb-3540fd10730d
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+console=serial
+consoleargs=console=ttyS2,1500000
+docker_optimizations=on
+earlycon=on
+earlyconargs=earlycon=uart8250,mmio32,0xfe660000
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk3566
+overlays=
+user_overlays=
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
