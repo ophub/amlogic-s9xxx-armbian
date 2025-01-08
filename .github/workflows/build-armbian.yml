@@ -173,6 +173,7 @@ on:
           - zcube1-max
           - zk-r39a
           - zysj
+          - wxy
       armbian_kernel:
         description: "Select kernel version."
         required: false
