@@ -37,6 +37,7 @@ on:
           - crrc
           - dg3399
           - dg-tn3568
+          - rk3568-bendian-bd-one
           - dlfr100
           - e20c
           - e25
