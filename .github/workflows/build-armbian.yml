@@ -6,6 +6,8 @@
 name: Build armbian
 
 on:
+  schedule:
+      - cron: '0 0 * * *'  # 每天午夜12点（00:00）
   repository_dispatch:
   workflow_dispatch:
     inputs:
