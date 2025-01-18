@@ -1,7 +1,7 @@
-verbosity=7
+verbosity=1
 bootlogo=true
-fdtfile=rockchip/test.dtb
-rootdev=UUID=7d044e58-81e8-4f3b-8ffb-3540fd10730d
+fdtfile=rockchip/rk3566-wxy-oec-turbo-4g.dtb
+rootdev=/dev/mmcblk0p2
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
 console=serial

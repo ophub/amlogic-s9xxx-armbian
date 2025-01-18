@@ -162,12 +162,12 @@ on:
           - tqc-a01
           - tvi3315a
           - vplus
+          - wxy-oec
           - xiaobao
           - yskj
           - zcube1-max
           - zk-r39a
           - zysj
-          - wxy-oec
       armbian_kernel:
         description: "Select kernel version."
         required: false
