@@ -209,6 +209,7 @@ init_var() {
                 stable_kernel=(${2})
                 dev_kernel=(${2})
                 beta_kernel=(${2})
+                specific_kernel=(${2})
                 IFS="${oldIFS}"
                 shift
             else
@@ -320,6 +321,15 @@ check_data() {
             else
                 IFS='_' read -ra value <<<"${value}"
                 value="${value[@]}"
+            fi
+        fi
+
+        # If auto_kernel is false, use the value from -k parameter
+        if [[ "${auto_kernel}" != "true" ]]; then
+            if [[ "${#specific_kernel[@]}" -eq 0 ]]; then
+                error_msg "Plase use the -k parameter to specify the kernel version."
+            else
+                value="${specific_kernel[@]}"
             fi
         fi
 
