@@ -3,7 +3,7 @@
 # Please edit /boot/armbianEnv.txt to set supported parameters
 #
 
-setenv load_addr "0x39000000"
+setenv load_addr "0x9000000"
 setenv overlay_error "false"
 # default values
 setenv rootdev "/dev/mmcblk0p1"
@@ -24,15 +24,17 @@ fi
 
 if test "${logo}" = "disabled"; then setenv logo "logo.nologo"; fi
 
-if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=tty1"; fi
-if test "${console}" = "serial" || test "${console}" = "both"; then setenv consoleargs "${consoleargs} console=tty1"; fi
-if test "${earlycon}" = "on"; then setenv consoleargs "${earlyconargs} ${consoleargs}"; fi
+if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=tty0"; fi
+if test "${console}" = "serial" || test "${console}" = "both"; then setenv consoleargs "console=ttyS02,1500000 ${consoleargs}"; fi
+if test "${earlycon}" = "on"; then setenv consoleargs "earlycon ${consoleargs}"; fi
 if test "${bootlogo}" = "true"; then setenv consoleargs "bootsplash.bootfile=bootsplash.armbian ${consoleargs}"; fi
 
 # get PARTUUID of first partition on SD/eMMC the boot script was loaded from
-if test "${devtype}" = "mmc"; then part uuid mmc ${devnum}:1 partuuid; fi
+# if test "${devtype}" = "mmc"; then part uuid mmc ${devnum}:1 partuuid; fi
+# get PARTUUID of first partition on current boot device the boot script was loaded from
+part uuid ${devtype} ${devnum}:1 partuuid
 
-setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} rootflags=${rootflags} ${consoleargs} consoleblank=0 loglevel=${verbosity} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs}"
+setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} rootflags=${rootflags} ${consoleargs} consoleblank=0 loglevel=${verbosity} ubootpart=${partuuid} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs}"
 
 if test "${docker_optimizations}" = "on"; then setenv bootargs "${bootargs} cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1"; fi
 
@@ -71,4 +73,4 @@ fi
 booti ${kernel_addr_r} ${ramdisk_addr_r} ${fdt_addr_r}
 
 # Recompile with:
-# mkimage -C none -A arm -T script -n 'flatmax load script' -d /boot/boot.cmd /boot/boot.scr
+# mkimage -C none -A arm -T script -d /boot/boot.cmd /boot/boot.scr
