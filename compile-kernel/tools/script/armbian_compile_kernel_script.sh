@@ -65,7 +65,7 @@ ophub_release_file="/etc/ophub-release"
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
 repo_branch="main"
-build_kernel=("6.1.y" "6.6.y")
+build_kernel=("6.1.y" "6.12.y")
 # Set whether to use the latest kernel, options: [ true / false ]
 auto_kernel="true"
 # Set whether to apply custom kernel patches, options: [ true / false ]
