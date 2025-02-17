@@ -1,0 +1,11 @@
+verbosity=9
+bootlogo=false
+fdtfile=rockchip/rk3588-smart-am60.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=rk3588
+overlays=
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+docker_optimizations=on
