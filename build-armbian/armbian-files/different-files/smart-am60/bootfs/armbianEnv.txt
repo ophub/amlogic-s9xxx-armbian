@@ -2,7 +2,7 @@ verbosity=9
 bootlogo=true
 fdtfile=rockchip/rk3588-smart-am60.dtb
 rootdev=/dev/mmcblk0p2
-rootfstype=btrfs
+rootfstype=ext4
 rootflags=compress=zstd:6
 earlycon=on
 console=serial
