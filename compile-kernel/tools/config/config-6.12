@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.12.13 Kernel Configuration
+# Linux/arm64 6.12.15 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 14.2.Rel1 (Build arm-14.52)) 14.2.1 20241119"
 CONFIG_CC_IS_GCC=y
@@ -2697,6 +2697,7 @@ CONFIG_PATA_SIS=m
 CONFIG_MD=y
 CONFIG_BLK_DEV_MD=m
 CONFIG_MD_BITMAP_FILE=y
+# CONFIG_MD_LINEAR is not set
 CONFIG_MD_RAID0=m
 CONFIG_MD_RAID1=m
 CONFIG_MD_RAID10=m
@@ -8479,7 +8480,6 @@ CONFIG_ARM_GIC_V3=y
 CONFIG_ARM_GIC_V3_ITS=y
 CONFIG_IRQ_MSI_LIB=y
 # CONFIG_AL_FIC is not set
-# CONFIG_LAN966X_OIC is not set
 CONFIG_SUN6I_R_INTC=y
 CONFIG_SUNXI_NMI_INTC=y
 # CONFIG_XILINX_INTC is not set
