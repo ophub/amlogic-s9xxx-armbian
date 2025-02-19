@@ -47,8 +47,12 @@ ophub_release_file="/etc/ophub-release"
 
 # For smart-am60(rk3588) board Bluetooth contrl
 [[ "${BOARD_FDT}" == "rk3588-smart-am60.dtb" ]] && {
+    rfkill block all
+    chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1
+    sleep .5
     rfkill unblock all
-    bash /lib/firmware/ap6276p/ap6276p_bt.sh 
+    /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6276p/ /dev/ttyS9 &
+
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Bluetooth firmware successfully download on Smart-am60(rk3588)." >>${custom_log}
 }
 
