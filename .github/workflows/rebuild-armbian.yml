@@ -208,7 +208,6 @@ on:
           - flippy
           - dev
           - beta
-          - rk3588
       armbian_fstype:
         description: "Set armbian rootfs type."
         required: false
