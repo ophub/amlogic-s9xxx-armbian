@@ -1,0 +1,16 @@
+verbosity=9
+bootlogo=true
+fdtfile=rockchip/rk3588-smart-am60.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=compress=zstd:6
+earlycon=on
+console=serial
+consoleargs=console=ttyFIQ0 console=tty1
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+docker_optimizations=on
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk3588
+overlays=
+user_overlays=
