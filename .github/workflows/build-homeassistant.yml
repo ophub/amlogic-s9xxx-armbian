@@ -159,6 +159,7 @@ on:
           - s922x-ugoos-am6
           - seewo-sv21
           - smart-am40
+          - smart-am60
           - station-m1
           - swan1-w28
           - sw799
@@ -214,6 +215,7 @@ on:
           - flippy
           - dev
           - beta
+          - rk3588
       armbian_fstype:
         description: "Select armbian rootfs type."
         required: false
