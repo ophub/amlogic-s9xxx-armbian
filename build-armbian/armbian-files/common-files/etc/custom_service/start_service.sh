@@ -21,11 +21,10 @@ custom_log="/tmp/ophub_start_service.log"
 echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Start the custom service..." >${custom_log}
 
 # Set the release check file
-board_fdt_file="/boot/armbianEnv.txt"
-[[ -f "${board_fdt_file}" ]] && BOARD_FDT="$(cat ${board_fdt_file} | grep -oE 'rk3.*dtb')" || BOARD_FDT=""
-
 ophub_release_file="/etc/ophub-release"
 [[ -f "${ophub_release_file}" ]] && FDT_FILE="$(cat ${ophub_release_file} | grep -oE 'meson.*dtb')" || FDT_FILE=""
+[[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##')" || FDT_FILE=""
+[[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##')" || FDT_FILE=""
 
 # For Tencent Aurora 3Pro (s905x3-b) box [ /etc/modprobe.d/blacklist.conf : blacklist btmtksdio ]
 [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && {
@@ -34,7 +33,7 @@ ophub_release_file="/etc/ophub-release"
 }
 
 # For swan1-w28(rk3568) board USB power and switch contrl
-[[ "${BOARD_FDT}" == "rk3568-swan1-w28.dtb" ]] && {
+[[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]] && {
     # USB 5V Power buick ON
     gpioset 0 21=1 2>/dev/null
     # USB3.0 Port ON
@@ -46,7 +45,7 @@ ophub_release_file="/etc/ophub-release"
 }
 
 # For smart-am60(rk3588) board Bluetooth contrl
-[[ "${BOARD_FDT}" == "rk3588-smart-am60.dtb" ]] && {
+[[ "${FDT_FILE}" == "rk3588-smart-am60.dtb" ]] && {
     rfkill block all
     chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1
     sleep .5
