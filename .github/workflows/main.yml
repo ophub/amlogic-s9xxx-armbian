@@ -232,11 +232,12 @@ on:
       builder_name:
         description: "Set Armbian builder signature."
         required: false
-        default: "ophub"
+        default: "xxlovex"
         type: choice
         options:
           - ophub
           - angel
+          - xxlovex
 
 env:
   TZ: America/New_York
