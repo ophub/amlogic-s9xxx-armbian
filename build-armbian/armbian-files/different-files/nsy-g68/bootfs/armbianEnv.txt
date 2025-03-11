@@ -1,0 +1,11 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3568-nsy.dtb
+rootdev=UUID=f56999b5-db33-4be6-98f5-1104963c429c
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=rk3568
+overlays=
+extraargs=
+extraboardargs=net.ifnames=0 max_loop=128
+docker_optimizations=on
