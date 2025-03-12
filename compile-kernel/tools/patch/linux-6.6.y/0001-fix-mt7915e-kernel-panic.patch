@@ -1,0 +1,37 @@
+From 06040be2954d436f0bc460c8a655d2fc95b5d45a Mon Sep 17 00:00:00 2001
+From: alex <alex@home.a.my>
+Date: Wed, 12 Mar 2025 11:26:42 +0800
+Subject: [PATCH] fix mt7915e kernel panic
+
+---
+ drivers/pci/controller/pcie-mt7621.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/pci/controller/pcie-mt7621.c b/drivers/pci/controller/pcie-mt7621.c
+index 79e225edb..0e6490ebf 100644
+--- a/drivers/pci/controller/pcie-mt7621.c
++++ b/drivers/pci/controller/pcie-mt7621.c
+@@ -60,7 +60,7 @@
+ #define PCIE_PORT_LINKUP		BIT(0)
+ #define PCIE_PORT_CNT			3
+ 
+-#define INIT_PORTS_DELAY_MS		100
++#define INIT_PORTS_DELAY_MS		500
+ #define PERST_DELAY_MS			100
+ 
+ /**
+@@ -319,7 +319,11 @@ static void mt7621_pcie_reset_assert(struct mt7621_pcie *pcie)
+ 	list_for_each_entry(port, &pcie->ports, list) {
+ 		/* PCIe RC reset assert */
+ 		mt7621_control_assert(port);
++	}
++
++	mdelay(PERST_DELAY_MS);
+ 
++	list_for_each_entry(port, &pcie->ports, list) {
+ 		/* PCIe EP reset assert */
+ 		mt7621_rst_gpio_pcie_assert(port);
+ 	}
+-- 
+2.34.1.windows.1
+
