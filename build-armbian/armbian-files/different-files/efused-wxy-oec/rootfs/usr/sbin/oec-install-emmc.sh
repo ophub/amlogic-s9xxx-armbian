@@ -139,6 +139,7 @@ repartition() {
 		echo "Deleting partition $i..."
 		sgdisk -d "$i" "$DEV_EMMC"
 		[[ "${?}" -eq "0" ]] || error_msg "Failed to erase partition."
+  		done
 	else
 		echo "No existing partitions after $PARTITION_BEGUN , contiuning..."
     fi
@@ -157,7 +158,6 @@ repartition() {
 	ROOTFS_PARTITION_START=$((BOOT_PARTITION_END + 1))
 	sgdisk -n ${ROOTFS_PARTITION_NUM}:${ROOTFS_PARTITION_START}:0 $DEV_EMMC
 	[[ "${?}" -eq "0" ]] || error_msg "Failed to create rootfs partition."
-  done
 }
 
 # Copy bootfs partition files
