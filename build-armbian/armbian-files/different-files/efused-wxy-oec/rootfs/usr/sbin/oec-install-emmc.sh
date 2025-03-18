@@ -74,18 +74,6 @@ check_depends() {
 init_var() {
     echo -e "${STEPS} Initializing the environment..."
 
-    # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "m:a:l:" "${@}")"
-
-    while [[ -n "${1}" ]]; do
-        case "${1}" in
-        *)
-            error_msg "Invalid option [ ${1} ]!"
-            ;;
-        esac
-        shift
-    done
-
     # Check if current system is booted from eMMC
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
     if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
@@ -116,7 +104,7 @@ init_var() {
 	ROOT_DEVICE=$(findmnt -n -o SOURCE /)
 	ROOTFS_UUID=$(blkid -s UUID -o value "$ROOT_DEVICE")
 	BOOTSIZE="512"
-
+}
 
 # Set the type of file system
 # Not recommend to use other file system types since the SoC is efused.
@@ -138,7 +126,7 @@ repartition() {
 			echo "Deleting partition $i..."
 			sgdisk -d "$i" "$DEV_EMMC"
 			[[ "${?}" -eq "0" ]] || error_msg "Failed to erase partition."
-  		done
+		done
 	else
 		echo "No existing partitions after $PARTITION_BEGUN , contiuning..."
 	fi
@@ -164,7 +152,7 @@ copy_bootfs() {
     cd /
     echo -e "${STEPS} Processing BOOTFS partition..."
 # For example, OEC'S DEFAULT PARTITION IS 6.
-    PART_BOOT="${DEV_EMMC}p${ROOTFS_PARTITION_NUM}"
+    PART_BOOT="${DEV_EMMC}p${BOOT_PARTITION_NUM}"
 
     if grep -q ${PART_BOOT} /proc/mounts; then
         echo -e "${INFO} Unmounting BOOT partiton."
