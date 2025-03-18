@@ -124,7 +124,6 @@ set_rootfs_type() {
         file_system_type="ext4"
         uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootwait rootfstype=ext4"
         fstab_mount_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
-    fi
 }
 
 # We use sgdisk to partition disk instead of ampart_tool in rockchip platform. :D
