@@ -360,7 +360,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 - 下载 [OEC/OEC-Turbo Base]并解压。
 ##### 8.2.7.1 能够进入SSH后台
 - OEC/OEC-Turbo 如果能够进入原厂SSH镜像后台，可以免拆刷入。
-- 在进入SSH后台后,使用fw_setenv xl_softmode "factory" 设置bootloader模式。
+- 在进入SSH后台后,使用fw_setenv xl_softmode "factory" 设置bootloader模式。重启盒子一次
 - 断开电源，长按RESET键，用Type-C线连接电脑，工具提示`发现一个 LOADER 设备`。
 - 右键表格栏，选择添加项，地址输入0x00000000,路径选择解压出来的[OEC/OEC-Turbo Base]。刷入镜像，等待完成。
 
