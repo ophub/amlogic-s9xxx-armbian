@@ -191,7 +191,7 @@ copy_bootfs() {
     boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
     echo -e "${INFO} Update the [ extlinux.conf ] file."
     BOOT_CONF="extlinux.conf"
-    sed -i "s|root=.*console=ttyS2,1500000|root=${uenv_mount_string}|g" ${boot_extlinux_file}
+    sed -i "s|root=.*console=ttyS2,1500000|root=${uenv_mount_string}console=ttyS2,1500000|g" ${boot_extlinux_file}
 }
 
 # Copy rootfs partition files
