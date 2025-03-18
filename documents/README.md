@@ -31,7 +31,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [8.2.4 Installation method for Beikeyun](#824-installation-method-for-beikeyun)
       - [8.2.5 Installation method for Chainedbox-L1-Pro](#825-installation-method-for-chainedbox-l1-pro)
       - [8.2.6 Installation method for lckfb-tspi](#826-Installation-method-for-lckfb-tspi)
-      - [8.2.7 Installation method for OEC/OEC-Turbo](#827installation-method-for-oec/oec-turbo)
+      - [8.2.7 Installation method for OEC/OEC-Turbo](#827-installation-method-for-oecoec-turbo)
     	- [8.2.7.1 Have access to root via ssh](#8271-have-access-to-root-via-ssh)
       	- [8.2.7.2 Have no access to root via ssh](#8272-have-no-access-to-root-via-ssh)
     - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
