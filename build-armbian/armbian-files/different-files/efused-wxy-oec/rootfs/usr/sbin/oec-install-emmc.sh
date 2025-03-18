@@ -136,13 +136,13 @@ repartition() {
 		echo "Checking if partition starts with $PARTITION_BEGUN exist in mmc device..."
 # Delete partitions with sgdisk.
 		for ((i=${PARTITION_BEGUN}; i<=PARTITION_COUNT; i++)); do
-		echo "Deleting partition $i..."
-		sgdisk -d "$i" "$DEV_EMMC"
-		[[ "${?}" -eq "0" ]] || error_msg "Failed to erase partition."
+			echo "Deleting partition $i..."
+			sgdisk -d "$i" "$DEV_EMMC"
+			[[ "${?}" -eq "0" ]] || error_msg "Failed to erase partition."
   		done
 	else
 		echo "No existing partitions after $PARTITION_BEGUN , contiuning..."
-    fi
+    	fi
 
     echo "Creating partitions ..."
 	LAST_PARTITION_NUM=$(sgdisk -p $DEV_EMMC | grep -oP '^\s*\K\d+(?=\s+)' | tail -n 1)
