@@ -122,7 +122,7 @@ init_var() {
 # Not recommend to use other file system types since the SoC is efused.
 set_rootfs_type() {
         file_system_type="ext4"
-        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
+        uenv_mount_string="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootwait rootfstype=ext4"
         fstab_mount_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
 }
@@ -187,6 +187,11 @@ copy_bootfs() {
     sync && sleep 3
     umount -f ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${DIR_INSTALL} ]."
+    # Update [ /boot/extlinux/extlinux.conf ] settings
+    boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
+    echo -e "${INFO} Update the [ extlinux.conf ] file."
+    BOOT_CONF="extlinux.conf"
+    sed -i "s|root=.*console=ttyS2,1500000|root=${uenv_mount_string}|g" ${boot_extlinux_file}
 }
 
 # Copy rootfs partition files
