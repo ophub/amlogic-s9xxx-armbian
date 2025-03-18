@@ -356,6 +356,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 - 点击执行，等待进度条完成即可
 
 #### 8.2.7 OEC/OEC-Turbo 的安装方法
+- 可能需要多次尝试才能刷入镜像。 很多次!
 - 下载 [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) 工具及驱动，解压并安装 DriverAssitant 驱动程序，打开 RKDevTool 工具。(注意，请使用2.84版本工具而不是2.86，2.86版本无法写入全盘镜像)
 - 下载 [OEC/OEC-Turbo Base]并解压。
 ##### 8.2.7.1 能够进入SSH后台
