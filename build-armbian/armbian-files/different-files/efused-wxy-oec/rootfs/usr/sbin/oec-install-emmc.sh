@@ -141,7 +141,7 @@ repartition() {
   		done
 	else
 		echo "No existing partitions after $PARTITION_BEGUN , contiuning..."
-    	fi
+	fi
 
     echo "Creating partitions ..."
 	LAST_PARTITION_NUM=$(sgdisk -p $DEV_EMMC | grep -oP '^\s*\K\d+(?=\s+)' | tail -n 1)
