@@ -31,6 +31,9 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [8.2.4 Installation method for Beikeyun](#824-installation-method-for-beikeyun)
       - [8.2.5 Installation method for Chainedbox-L1-Pro](#825-installation-method-for-chainedbox-l1-pro)
       - [8.2.6 Installation method for lckfb-tspi](#826-Installation-method-for-lckfb-tspi)
+      - [8.2.7 Installation method for OEC/OEC-Turbo](#827installation-method-for-oec/oec-turbo)
+    	- [8.2.7.1 Have access to root via ssh](#8271-have-access-to-root-via-ssh)
+      	- [8.2.7.2 Have no access to root via ssh](#8272-have-no-access-to-root-via-ssh)
     - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
   - [9. Compiling Armbian Kernel](#9-compiling-armbian-kernel)
     - [9.1 How to Add Custom Kernel Patches](#91-how-to-add-custom-kernel-patches)
@@ -351,7 +354,39 @@ The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tuto
 - tspi in the shutdown state, press and hold the Recovery key and insert the type-c data cable. Release the Recovery key after RKDevTool prompts `A LOADER device was found'. Right click to add item.
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
 - Click Execute and wait for the progress to complete.
+#### 8.2.7 Installation method for OEC/OEC-Turbo
+- You may have to do this for times in order to flash it. MANY TIMES!
+- Download [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) Tools and its drivers，unarchive DriverAssitant driver software.Run RKDevTool Tool.(Please be aware that 2.86 cannot be used since it can't write full-disk image，use 2.84 instead.)
+- Download [OEC/OEC-Turbo Base] and unarchive it.
+##### 8.2.7.1 Have access to root via ssh
+- If you have the root access to OEC/OEC-Turbo,then you can flash it without teardown.
+- When you enter the root, run `fw_setenv xl_softmode "factory"` . This will put the device into rescue mode, you'll need to reboot your device for the settings make effect.
+- Power off your device，Hold RESET Button，Connect your device with Type-C，and the tools will show you that `A LOADER device was found`.
+- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base] from the archive into "Path".
 
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://github.com/user-attachments/assets/2ff25684-7a71-4c5d-8b2d-59c9d118194d width="600" /><br />
+</div>
+
+- Flash the image into your USB device，insert it into your device, then it would be boot into armbian directly.
+- You can use `oec-install-emmc` to install it to your eMMC.
+##### 8.2.7.2 Have no access to root via ssh
+- If you have no access to root, then you have to tear it down and a short circuit is needed for flashing.
+- Tear your device and short circuit the touchpoint, turn on your device. You'll have to wait for 2-3 sec and stop curcuiting it. Then the software will show you that `A MASKROM device was found`。
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://github.com/user-attachments/assets/2381520a-cb2a-4599-8d21-5b0bad7ec93f width="600" /><br />
+</div>
+
+- Mondify the first column's address to `0xCCCCCCCC`, and Path to `MiniLoaderAll.bin`。
+- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base] from the archive into "Path".
+
+<div style="width:100%;margin-top:40px;margin:5px;">
+<img src=https://github.com/user-attachments/assets/33bc678e-c858-42e4-a85a-a1af9310dd20 width="600" /><br />
+</div>
+
+- Flash the image into your USB device，insert it into your device, then it would be boot into armbian directly.
+- You can use `oec-install-emmc` to install it to your eMMC.
 
 ### 8.3 Allwinner Series Installation Method
 
