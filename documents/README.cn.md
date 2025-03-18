@@ -371,7 +371,7 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 - 将镜像写入U盘，插入OEC/OEC-Turbo，开机会自动启动到armbian。
 - 使用`oec-install-emmc`命令安装进eMMC.
 ##### 8.2.7.2 不能进入SSH后台
--如果不能进入SSH后台，则需要拆机短接.
+- 如果不能进入SSH后台，则需要拆机短接.
 - 拆机短接图示触点,上电，等待约2-3秒，电脑提示`发现一个 MASKROM 设备`。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
