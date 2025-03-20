@@ -138,10 +138,11 @@ repartition() {
 	BOOT_PARTITION_NUM=$((LAST_PARTITION_NUM + 1))
 	BOOT_PARTITION_START=$((LAST_PARTITION_END + 1))
 	#-n x:y:z Create a new partition which num is x，begin with y，end with z .
-    sgdisk -n ${BOOT_PARTITION_NUM}:${BOOT_PARTITION_START}:+${BOOTSIZE}M $DEV_EMMC
+        sgdisk -n ${BOOT_PARTITION_NUM}:${BOOT_PARTITION_START}:+${BOOTSIZE}M $DEV_EMMC
+
     [[ "${?}" -eq "0" ]] || error_msg "Failed to create boot partition."
-	BOOT_PARTITION_END=$(sgdisk -i $PARTITION_BEGUN $DEV_EMMC | grep "Last sector" | awk '{print $3}')
-	ROOTFS_PARTITION_NUM=$((PARTITION_BEGUN + 1))
+	BOOT_PARTITION_END=$(sgdisk -i $BOOT_PARTITION_NUM $DEV_EMMC | grep "Last sector" | awk '{print $3}')
+	ROOTFS_PARTITION_NUM=$((BOOT_PARTITION_NUM + 1))
 	ROOTFS_PARTITION_START=$((BOOT_PARTITION_END + 1))
 	sgdisk -n ${ROOTFS_PARTITION_NUM}:${ROOTFS_PARTITION_START}:0 $DEV_EMMC
 	[[ "${?}" -eq "0" ]] || error_msg "Failed to create rootfs partition."
@@ -161,7 +162,7 @@ copy_bootfs() {
     fi
 
     echo -e "${INFO} Formatting BOOTFS partition..."
-    mkfs.vfat -F 32 -n "BOOT_EMMC" ${PART_BOOT}
+    mkfs.ext4 -F -q -b 4k -L "BOOT_EMMC" ${PART_BOOT}
 
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to mount BOOTFS partition."
@@ -171,14 +172,14 @@ copy_bootfs() {
     # Remove useless files
     rm -rf ${DIR_INSTALL}/'System Volume Information'
 
-    sync && sleep 3
-    umount -f ${DIR_INSTALL}
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${DIR_INSTALL} ]."
     # Update [ /boot/extlinux/extlinux.conf ] settings
     boot_extlinux_file="${DIR_INSTALL}/extlinux/extlinux.conf"
     echo -e "${INFO} Update the [ extlinux.conf ] file."
     BOOT_CONF="extlinux.conf"
     sed -i "s|root=.*console=ttyS2,1500000|root=${uenv_mount_string} console=ttyS2,1500000|g" ${boot_extlinux_file}
+    sync && sleep 3
+    umount -f ${DIR_INSTALL}
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${DIR_INSTALL} ]."
 }
 
 # Copy rootfs partition files
@@ -223,7 +224,7 @@ copy_rootfs() {
     rm -f ${DIR_INSTALL}/etc/fstab
     cat >${DIR_INSTALL}/etc/fstab <<EOF
 UUID=${ROOTFS_UUID}    /        ${file_system_type}    ${fstab_mount_string}      0 1
-LABEL=BOOT_EMMC        /boot    vfat                   defaults                   0 2
+LABEL=BOOT_EMMC        /boot    ext4                   defaults                   0 2
 tmpfs                  /tmp     tmpfs                  defaults,nosuid            0 0
 
 EOF
