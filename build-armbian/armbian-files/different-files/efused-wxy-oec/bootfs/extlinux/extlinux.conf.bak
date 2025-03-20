@@ -1,5 +1,0 @@
-LABEL Armbian
-  LINUX /Image
-  INITRD /uInitrd
-  FDT /dtb/rockchip/rk3566-onething-oec-box.dtb
-  APPEND root=/dev/sda2 rootflags=data=writeback rw rootwait rootfstype=ext4 console=ttyS2,1500000 console=tty1 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 bootsplash.bootfile=bootsplash.armbian
