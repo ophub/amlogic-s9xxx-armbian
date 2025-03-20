@@ -357,18 +357,18 @@ The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tuto
 #### 8.2.7 Installation method for OEC/OEC-Turbo
 - You may have to do this for times in order to flash it. MANY TIMES!
 - Download [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) Tools and its drivers，unarchive DriverAssitant driver software.Run RKDevTool Tool.(Please be aware that 2.86 cannot be used since it can't write full-disk image，use 2.84 instead.)
-- Download [OEC/OEC-Turbo Base] and unarchive it.
+- Download [OEC/OEC-Turbo Base](https://github.com/hoiw/ophub-armbian-for-efused-oec/releases/download/Tools/oec_base.img).
 ##### 8.2.7.1 Have access to root via ssh
 - If you have the root access to OEC/OEC-Turbo,then you can flash it without teardown.
 - When you enter the root, run `fw_setenv xl_softmode "factory"` . This will put the device into rescue mode, you'll need to reboot your device for the settings make effect.
 - Power off your device，Hold RESET Button，Connect your device with Type-C，and the tools will show you that `A LOADER device was found`.
-- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base] from the archive into "Path".
+- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base](https://github.com/hoiw/ophub-armbian-for-efused-oec/releases/download/Tools/oec_base.img) into "Path".
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://github.com/user-attachments/assets/2ff25684-7a71-4c5d-8b2d-59c9d118194d width="600" /><br />
 </div>
 
-- Flash the image into your USB device，insert it into your device, then it would be boot into armbian directly.
+- Flash the image into your USB device，insert it into your device, then it would put you into armbian directly.
 - You can use `oec-install-emmc` to install it to your eMMC.
 ##### 8.2.7.2 Have no access to root via ssh
 - If you have no access to root, then you have to tear it down and a short circuit is needed for flashing.
@@ -379,7 +379,7 @@ The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tuto
 </div>
 
 - Mondify the first column's address to `0xCCCCCCCC`, and Path to `MiniLoaderAll.bin`。
-- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base] from the archive into "Path".
+- Right click the sheet，click "add item" ，put `0x00000000` into "address", and the image [OEC/OEC-Turbo Base](https://github.com/hoiw/ophub-armbian-for-efused-oec/releases/download/Tools/oec_base.img) into "Path".
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://github.com/user-attachments/assets/33bc678e-c858-42e4-a85a-a1af9310dd20 width="600" /><br />
