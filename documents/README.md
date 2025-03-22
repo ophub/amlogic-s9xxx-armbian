@@ -356,7 +356,7 @@ The method is reproduced from [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tuto
 - Click Execute and wait for the progress to complete.
 #### 8.2.7 Installation method for OEC/OEC-Turbo
 - You may have to do this for times in order to flash it. MANY TIMES!
-- Download [RKDevTool](https://github.com/ophub/kernel/releases/download/tools/FastRhino_r68s_RKDevTool_Release_v2.86___DriverAssitant_v5.1.1.tar.gz) Tools and its drivers，unarchive DriverAssitant driver software.Run RKDevTool Tool.(Please be aware that 2.86 cannot be used since it can't write full-disk image，use 2.84 instead.)
+- Download [RKDevTool](https://github.com/hoiw/ophub-armbian-for-efused-oec/releases/download/Tools/RKDevTool_Release_v2.84.7z) Tools and its drivers，unarchive DriverAssitant driver software.Run RKDevTool Tool.(Please be aware that 2.86 cannot be used since it can't write full-disk image，use 2.84 instead.)
 - Download [OEC/OEC-Turbo Base](https://github.com/hoiw/ophub-armbian-for-efused-oec/releases/download/Tools/oec_base.img).
 ##### 8.2.7.1 Have access to root via ssh
 - If you have the root access to OEC/OEC-Turbo,then you can flash it without teardown.
