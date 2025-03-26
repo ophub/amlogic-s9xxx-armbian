@@ -91,14 +91,14 @@ runs:
   steps:
     - shell: bash
       run: |
-        cd ${GITHUB_ACTION_PATH}
+        cd ${{ github.action_path }}
         echo -e "Current running path: [ ${PWD} ]"
         build_target="${{ inputs.build_target }}"
         [[ -z "${build_target}" ]] && build_target="armbian"
 
         if [[ "${build_target}" == "armbian" ]]; then
 
-            cd ${GITHUB_ACTION_PATH}
+            cd ${{ github.action_path }}
             echo -e "Start rebuilding Armbian..."
 
             armbian_file="${{ inputs.armbian_path }}"
@@ -149,7 +149,7 @@ runs:
                 echo -e "Renamed Armbian file: [ ${image_save_name} ]"
             fi
 
-            cd ${GITHUB_ACTION_PATH}
+            cd ${{ github.action_path }}
             echo -e "Start to rebuild armbian..."
             make_command=""
             [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
@@ -162,7 +162,7 @@ runs:
             [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
             sudo ./rebuild ${make_command}
 
-            cd ${GITHUB_ACTION_PATH}/${armbian_filepath}
+            cd ${{ github.action_path }}/${armbian_filepath}
             # Compress Armbian image file
             pigz -qf *.img || gzip -qf *.img
             # Generate a sha256sum verification file for each Armbian image file
@@ -170,7 +170,7 @@ runs:
             rm -f *.sha.sha 2>/dev/null
             sync && sleep 3
 
-            cd ${GITHUB_ACTION_PATH}
+            cd ${{ github.action_path }}
             echo -e "Output environment variables."
             echo "PACKAGED_OUTPUTPATH=${PWD}/${armbian_filepath}" >> ${GITHUB_ENV}
             echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> ${GITHUB_ENV}
@@ -182,7 +182,7 @@ runs:
 
         elif [[ "${build_target}" == "kernel" ]]; then
 
-            cd ${GITHUB_ACTION_PATH}
+            cd ${{ github.action_path }}
             echo -e "Start compile kernel..."
 
             config_filepath="compile-kernel/tools/config"
@@ -227,7 +227,7 @@ runs:
             [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -c ${{ inputs.compress_format }}"
             sudo ./recompile ${make_command}
 
-            cd ${GITHUB_ACTION_PATH}
+            cd ${{ github.action_path }}
             output_tags="$(ls -l ${PWD}/${kernel_outpath}/*.tar.gz | awk '{print $9}' | grep -oE '[1-9][0-9]{0,2}\.[0-9]{1,3}\.[0-9]+' | xargs | tr "[ ]" "_")"
             echo -e "Output environment variables."
             echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> ${GITHUB_ENV}
