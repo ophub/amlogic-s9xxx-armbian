@@ -79,7 +79,7 @@ inputs:
     default: "false"
   auto_patch:
     description: "Set whether to use kernel patches"
-    required: false
+    required: true
     default: "false"
   compress_format:
     description: "Set the initrd compression format"
