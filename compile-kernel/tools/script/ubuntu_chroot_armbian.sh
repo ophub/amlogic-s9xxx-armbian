@@ -18,8 +18,6 @@
 # the required compilation dependencies, including the gcc toolchain,
 # have been pre-installed in the Armbian system.
 # https://github.com/ophub/kernel/releases/download/dev/armbian.tar.xz
-# Include the following contents:
-# ~/compile-kernel/tools/script/armbian-compile-kernel-depends
 # https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-x.tar.xz
 #
 #================================== Functions list ==================================
