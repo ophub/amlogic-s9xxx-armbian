@@ -239,7 +239,7 @@ toolchain_check() {
     if [[ "${arch_info}" == "x86_64" ]]; then
         apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
     else
-        apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
+        bash compile-kernel/tools/script/armbian_compile_kernel_install_depends.sh
     fi
 
     # Download armbian

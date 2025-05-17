@@ -224,7 +224,7 @@ toolchain_check() {
 
     # Install dependencies
     sudo apt-get -qq update
-    sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
+    bash compile-kernel/tools/script/armbian_compile_kernel_install_depends.sh
 
     # Set the default path
     path_os_variable="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"

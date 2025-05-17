@@ -84,7 +84,7 @@ update_script() {
 
     # Install dependencies
     echo -e "${INFO} Start installing compilation dependencies..."
-    sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
+    bash ${script_path}/armbian_compile_kernel_install_depends.sh
     [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
 
     sync && sleep 3
