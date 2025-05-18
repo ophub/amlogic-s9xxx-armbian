@@ -16,7 +16,7 @@
 
 1. 克隆仓库到本地 `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. 安装必要的软件包（脚本仅在 x86_64 Ubuntu-20.04/22.04 下做过测试）
+2. 安装必要的软件包（脚本仅在 Ubuntu-20.04/22.04(X86 和 Arm 均支持) 下做过测试）
 
 ```yaml
 sudo apt-get update -y

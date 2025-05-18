@@ -16,7 +16,7 @@ Pre-compiled kernels are available in the [Releases](https://github.com/ophub/ke
 
 1. Clone the repository to local `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. Install necessary software packages (the script has only been tested under x86_64 Ubuntu-20.04/22.04)
+2. Install necessary software packages (the script has only been tested under Ubuntu-20.04/22.04(Supported by both X86 and Arm)):
 
 ```yaml
 sudo apt-get update -y
