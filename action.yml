@@ -85,6 +85,10 @@ inputs:
     description: "Set the initrd compression format"
     required: false
     default: "xz"
+  delete_source:
+    description: "Set whether to delete the kernel source"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -225,6 +229,7 @@ runs:
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
             [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
             [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -c ${{ inputs.compress_format }}"
+            [[ -n "${{ inputs.delete_source }}" ]] && make_command="${make_command} -d ${{ inputs.delete_source }}"
             sudo ./recompile ${make_command}
 
             cd ${{ github.action_path }}
