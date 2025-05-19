@@ -46,6 +46,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -n        | CustomName  | Sets the custom signature of the kernel. When set to `-ophub`, the generated kernel name is `5.15.100-ophub`. Please do not include spaces when setting custom signatures. Default value: `-ophub` |
 | -t        | Toolchain   | Sets the toolchain for compiling the kernel. Options: `clang / gcc / gcc-<version>`. Default value: `gcc` |
 | -c        | Compress    | Set the compression format used for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default value: `xz` |
+| -d        | DeleteSource | Set whether to delete the kernel source code after the kernel compilation is completed. Options: `true / false`. Default value: `false` |
 
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.
@@ -96,6 +97,8 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | kernel_patch     | false         | Sets the directory for custom kernel patches. |
 | auto_patch       | false         | Sets whether to use custom kernel patches. Default value is `false`. Refer to `-p` for functionality. |
 | compress_format  | xz            | Set the compression format used for initrd in the kernel. Default value is `xz`. Refer to `-c` for functionality. |
+| delete_source    | false         | Set whether to delete the kernel source code after the kernel compilation is completed. Default value is `false`. Refer to `-d` for functionality. |
+
 
 - ### GitHub Action Output Variables
 
