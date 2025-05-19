@@ -743,7 +743,7 @@ clean_tmp() {
 
     sync && sleep 3
     rm -rf ${output_path}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
-    [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}
+    [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}/* 2>/dev/null
 
     update-grub 2>/dev/null
 
