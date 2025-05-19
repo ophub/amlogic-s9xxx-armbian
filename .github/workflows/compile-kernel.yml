@@ -38,6 +38,11 @@ on:
         required: false
         default: true
         type: boolean
+      delete_source:
+        description: "Delete the source after compilation"
+        required: false
+        default: true
+        type: boolean
       kernel_package:
         description: "Select compile package list"
         required: false
@@ -129,7 +134,12 @@ jobs:
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
           sudo chown -R runner.runner /builder
-          df -Th
+          [[ -d "/home/runner/runners" ]] && {
+              sudo cp -a /home/runner/runners /builder/runners
+              sudo rm -rf /home/runner/runners
+              sudo ln -s /builder/runners /home/runner/runners
+          }
+          df -hT
 
       - name: Create a mapped directory
         id: mapped
@@ -149,6 +159,7 @@ jobs:
           kernel_source: ${{ inputs.kernel_source }}
           kernel_version: ${{ inputs.kernel_version }}
           kernel_auto: ${{ inputs.kernel_auto }}
+          delete_source: ${{ inputs.delete_source }}
           kernel_package: ${{ inputs.kernel_package }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
