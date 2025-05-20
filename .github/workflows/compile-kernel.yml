@@ -134,11 +134,6 @@ jobs:
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
           sudo chown -R runner.runner /builder
-          [[ -d "/home/runner/runners" ]] && {
-              sudo cp -a /home/runner/runners /builder/runners
-              sudo rm -rf /home/runner/runners
-              sudo ln -s /builder/runners /home/runner/runners
-          }
           df -hT
 
       - name: Create a mapped directory
