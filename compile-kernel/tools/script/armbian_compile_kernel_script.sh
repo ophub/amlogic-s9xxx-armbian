@@ -343,6 +343,7 @@ apply_patch() {
     # Apply the common kernel patches
     if [[ -d "${kernel_patch_path}/common-kernel-patches" ]]; then
         echo -e "${INFO} Copy common kernel patches..."
+        rm -f ${kernel_path}/${local_kernel_path}/*.patch
         cp -vf ${kernel_patch_path}/common-kernel-patches/*.patch -t ${kernel_path}/${local_kernel_path}
 
         cd ${kernel_path}/${local_kernel_path}
@@ -358,6 +359,7 @@ apply_patch() {
     # Apply the dedicated kernel patches
     if [[ -d "${kernel_patch_path}/${local_kernel_path}" ]]; then
         echo -e "${INFO} Copy [ ${local_kernel_path} ] version dedicated kernel patches..."
+        rm -f ${kernel_path}/${local_kernel_path}/*.patch
         cp -vf ${kernel_patch_path}/${local_kernel_path}/*.patch -t ${kernel_path}/${local_kernel_path}
 
         cd ${kernel_path}/${local_kernel_path}
