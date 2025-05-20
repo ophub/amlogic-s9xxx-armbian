@@ -75,6 +75,8 @@ package_list="all"
 compress_format="xz"
 # Set whether to automatically delete the source code after the kernel is compiled
 delete_source="false"
+# Set make log silent output (recommended to use 'true' when github runner has insufficient space)
+silent_log="false"
 
 # Cross compile toolchain download mirror
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -132,7 +134,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:d:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:d:s:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -210,6 +212,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -d parameter [ ${2} ]!"
+            fi
+            ;;
+        -s | --SilentLog)
+            if [[ -n "${2}" ]]; then
+                silent_log="${2}"
+                shift
+            else
+                error_msg "Invalid -s parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -633,14 +643,17 @@ compile_dtbs() {
 compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
 
+    # Set the make log silent output
+    [[ "${silent_log}" == "true" || "${silent_log}" == "yes" ]] && silent_print="-s" || silent_print=""
+
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
-    make -s ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
+    make ${silent_print} ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
     echo -e "${STEPS} Install modules..."
-    make -s ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
+    make ${silent_print} ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Strip debug information

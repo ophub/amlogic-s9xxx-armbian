@@ -89,6 +89,10 @@ inputs:
     description: "Set whether to delete the kernel source"
     required: false
     default: "false"
+  silent_log:
+    description: "Set whether to use silent log output"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -230,6 +234,7 @@ runs:
             [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
             [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -c ${{ inputs.compress_format }}"
             [[ -n "${{ inputs.delete_source }}" ]] && make_command="${make_command} -d ${{ inputs.delete_source }}"
+            [[ -n "${{ inputs.silent_log }}" ]] && make_command="${make_command} -s ${{ inputs.silent_log }}"
             sudo ./recompile ${make_command}
 
             cd ${{ github.action_path }}
