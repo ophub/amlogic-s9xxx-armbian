@@ -46,6 +46,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
 | -c     | Compress    | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
 | -d     | DeleteSource | 设置内核编译结束后是否删除内核源码。可选项：`true / false`。默认值：`false` |
+| -s     | SilentLog   | 设置内核编译时是否使用静默模式减少日志输出。可选项：`true / false`。默认值：`false` |
 
 
 - `sudo ./recompile` : 使用默认配置编译内核。
@@ -97,6 +98,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | auto_patch        | false            | 设置是否使用自定义内核补丁。默认值为 `false`。功能参考 `-p` |
 | compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值为 `xz`。功能参考 `-c` |
 | delete_source     | false            | 设置内核编译结束后是否删除内核源码。默认值为 `false`。功能参考 `-d` |
+| silent_log        | false            | 设置内核编译时是否使用静默模式减少日志输出。默认值为 `false`。功能参考 `-s` |
 
 
 - ### GitHub Action 输出变量说明
