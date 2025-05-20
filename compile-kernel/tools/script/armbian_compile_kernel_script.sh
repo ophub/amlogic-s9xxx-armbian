@@ -76,6 +76,8 @@ custom_name="-ophub"
 package_list="all"
 # Set the compression format, options: [ gzip / lzma / xz / zstd ]
 compress_format="xz"
+# Set whether to automatically delete the source code after the kernel is compiled
+delete_source="false"
 
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -104,7 +106,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:" "${@}")"
+    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:d:" "${@}")"
 
     while [[ -n "${1}" ]]; do
         case "${1}" in
@@ -174,6 +176,14 @@ init_var() {
                 shift
             else
                 error_msg "Invalid -c parameter [ ${2} ]!"
+            fi
+            ;;
+        -d | --DeleteSource)
+            if [[ -n "${2}" ]]; then
+                delete_source="${2}"
+                shift
+            else
+                error_msg "Invalid -d parameter [ ${2} ]!"
             fi
             ;;
         *)
@@ -502,13 +512,13 @@ compile_kernel() {
 
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
-    make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
+    make -s ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
     #make ${MAKE_SET_STRING} bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
-    make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
+    make -s ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Strip debug information
@@ -687,6 +697,7 @@ clean_tmp() {
 
     sync && sleep 3
     rm -rf ${output_path}/{boot/,dtb/,modules/,header/,${kernel_version}/}
+    [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}/* 2>/dev/null
     rm -rf ${tmp_backup_path}
 
     echo -e "${SUCCESS} All processes have been completed."

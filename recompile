@@ -635,12 +635,12 @@ compile_kernel() {
 
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
-    make ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
+    make -s ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
     echo -e "${STEPS} Install modules..."
-    make ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
+    make -s ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Strip debug information
