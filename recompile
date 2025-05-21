@@ -467,6 +467,7 @@ get_kernel_source() {
 chroot_armbian() {
     cd ${current_path}
     echo -e "${STEPS} Create chroot..."
+    echo -e "${INFO} Current space usage: \n$(df -hT ${chroot_path}) \n"
 
     rm -f ${chroot_file}
     cp -f ${armbian_file} ${chroot_file}
