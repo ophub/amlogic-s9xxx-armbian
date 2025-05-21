@@ -66,6 +66,7 @@ ophub_release_file="/etc/ophub-release"
 repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("6.1.y" "6.12.y")
+all_kernel=("5.4.y" "5.10.y" "5.15.y" "6.1.y" "6.6.y" "6.12.y")
 # Set whether to use the latest kernel, options: [ true / false ]
 auto_kernel="true"
 # Set whether to apply custom kernel patches, options: [ true / false ]
@@ -114,10 +115,14 @@ init_var() {
         case "${1}" in
         -k | --kernel)
             if [[ -n "${2}" ]]; then
-                oldIFS="${IFS}"
-                IFS="_"
-                build_kernel=(${2})
-                IFS="${oldIFS}"
+                if [[ "${2}" == "all" ]]; then
+                    build_kernel=(${all_kernel[@]})
+                else
+                    oldIFS="${IFS}"
+                    IFS="_"
+                    build_kernel=(${2})
+                    IFS="${oldIFS}"
+                fi
                 shift
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
@@ -311,7 +316,7 @@ query_version() {
 
     # Query the latest kernel in a loop
     i=1
-    for KERNEL_VAR in ${build_kernel[*]}; do
+    for KERNEL_VAR in ${build_kernel[@]}; do
         echo -e "${INFO} (${i}) Auto query the latest kernel version of the same series for [ ${KERNEL_VAR} ]"
         # Identify the kernel mainline
         MAIN_LINE="$(echo ${KERNEL_VAR} | awk -F '.' '{print $1"."$2}')"
@@ -333,7 +338,7 @@ query_version() {
 
     # Reset the kernel array to the latest kernel version
     unset build_kernel
-    build_kernel="${tmp_arr_kernels[*]}"
+    build_kernel="${tmp_arr_kernels[@]}"
 }
 
 apply_patch() {
@@ -723,7 +728,7 @@ loop_recompile() {
     cd ${current_path}
 
     j="1"
-    for k in ${build_kernel[*]}; do
+    for k in ${build_kernel[@]}; do
         # kernel_version, such as [ 6.1.15 ]
         kernel_version="${k}"
         # kernel <VERSION> and <PATCHLEVEL>, such as [ 6.1 ]
@@ -786,7 +791,7 @@ echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
-echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[*]} | xargs) ] \n"
+echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 
 # Loop to compile the kernel
 loop_recompile
