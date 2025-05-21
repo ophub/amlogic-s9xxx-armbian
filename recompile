@@ -83,7 +83,7 @@ silent_log="false"
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
 gun_file_x86_64="arm-gnu-toolchain-14.2.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-gun_file_aarch64="arm-gnu-toolchain-14.2.rel1-aarch64-aarch64-none-elf.tar.xz"
+gun_file_aarch64="arm-gnu-toolchain-14.2.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 # Armenian file source: https://github.com/ophub/amlogic-s9xxx-armbian/releases
 armbian_rootfs_file="armbian.tar.xz"
 # Set the toolchain path
@@ -247,7 +247,7 @@ init_var() {
     [[ "${toolchain_name}" =~ ^gcc-[0-9]+.[0-9]+ ]] && {
         gcc_version_code="${toolchain_name#*-}"
         gun_file_x86_64="arm-gnu-toolchain-${gcc_version_code}.rel1-x86_64-aarch64-none-linux-gnu.tar.xz"
-        gun_file_aarch64="arm-gnu-toolchain-${gcc_version_code}.rel1-aarch64-aarch64-none-elf.tar.xz"
+        gun_file_aarch64="arm-gnu-toolchain-${gcc_version_code}.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
     }
 
     # Set cross compilation parameters
@@ -315,7 +315,7 @@ toolchain_check() {
             gun_bin="aarch64-none-linux-gnu-"
         else
             gun_file="${gun_file_aarch64}"
-            gun_bin="aarch64-none-elf-"
+            gun_bin="aarch64-none-linux-gnu-"
         fi
 
         # Download Arm GNU Toolchain

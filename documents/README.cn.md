@@ -436,7 +436,7 @@ cd rtl8189ES_linux
 gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
 toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
-export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-elf-"
+export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
 export CC="${CROSS_COMPILE}gcc"
 export LD="${CROSS_COMPILE}ld.bfd"
 export ARCH="arm64"
