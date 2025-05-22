@@ -88,7 +88,7 @@ dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 gun_file="arm-gnu-toolchain-14.2.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
-# Set the default cross-compilation toolchain: [ clang / gcc / gcc-13.2, etc. ]
+# Set the default cross-compilation toolchain: [ clang / gcc / gcc-14.2, etc. ]
 toolchain_name="gcc"
 
 # Set font color
