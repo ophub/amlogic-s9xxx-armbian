@@ -28,6 +28,7 @@
 # get_kernel_source  : Get the kernel source code
 #
 # chroot_armbian     : Chroot into Armbian to generate initrd.img, uInitrd and make scripts
+# unmount_armbian    : Helper function that unmounts the armbian system
 # compile_env        : Set up the compile kernel environment
 # compile_dtbs       : Compile the dtbs
 # compile_kernel     : Compile the kernel
@@ -554,9 +555,13 @@ chroot_armbian() {
     mount --bind /dev/pts ${tag_rootfs}/dev/pts
     mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
     chmod 0666 ${tag_rootfs}/dev/null
-    chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
-    [[ "${?}" -eq "0" && -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]] || error_msg "Create chroot uInitrd-${kernel_outname} file failed."
 
+    trap unmount_armbian SIGINT # Always unmount armbian on exit
+    chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
+    if [[ "${?}" -ne "0" || ! -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]]; then
+        unmount_armbian
+        error_msg "Create chroot uInitrd-${kernel_outname} file failed."
+    fi
     cd ${current_path}
 
     echo -e "${STEPS} Start copying files from Armbian system..."
@@ -569,7 +574,16 @@ chroot_armbian() {
     echo -e "${INFO} Copy the header files from armbian [ /opt/header ]"
     cp -f ${tag_rootfs}/opt/header/header-${kernel_outname}.tar.gz ${output_path}/${kernel_version}
 
+    trap - SIGINT
     # Unmount the armbian system
+    unmount_armbian
+}
+
+unmount_armbian() {
+    echo -e "${STEPS} Unmounting Armbian chroot"
+    tag_rootfs="${chroot_path}/root"
+    cd ${current_path}
+
     sync && sleep 3
     umount ${tag_rootfs}/dev/fd 2>/dev/null
     umount ${tag_rootfs}/dev/pts 2>/dev/null
