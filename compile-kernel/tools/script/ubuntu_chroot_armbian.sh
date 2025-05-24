@@ -66,7 +66,8 @@ error_msg() {
 
 # Install the required dependencies
 check_dependencies() {
-    echo -e "${STEPS} Start checking dependencies..."
+    trap 'error_msg "Failed to check dependencies."' ERR
+    echo -e "${STEPS} Checking dependencies..."
     # Check the compression algorithm
     if [[ -f "${compress_initrd_file}" ]]; then
         compress_settings="$(cat ${compress_initrd_file} | grep -E ^COMPRESS= | awk -F'=' '{print $2}')"
@@ -81,19 +82,22 @@ check_dependencies() {
     zstd) necessary_packages="zstd" ;;
     gzip | *) necessary_packages="gzip" ;;
     esac
-
-    # Check the necessary packages
+    
+    # Install the necessary packages
+    trap 'error_msg "Failed to install required dependencies."' ERR
     [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${necessary_packages}$")" ]] || {
-        echo -e "${INFO} Install the required dependencies..."
+        echo -e "${INFO} Installing required dependencies..."
         apt-get update -y
         apt-get install -y ${necessary_packages}
     }
+    trap - ERR
 }
 
 # Generate uInitrd
 generate_uinitrd() {
+    trap 'error_msg "Failed to generate the uInitrd file."' ERR
     cd /boot
-    echo -e "${STEPS} Generate uInitrd file..."
+    echo -e "${STEPS} Generating uInitrd file..."
 
     # Enable update_initramfs
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
@@ -102,25 +106,27 @@ generate_uinitrd() {
     update-initramfs -c -k ${chroot_kernel_version}
 
     if [[ -f "uInitrd" ]]; then
-        echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
+        echo -e "${SUCCESS} The initrd.img and uInitrd file were successfully generated."
         [[ ! -L "uInitrd" ]] && mv -vf uInitrd uInitrd-${chroot_kernel_version}
         sync && sleep 3
     else
-        echo -e "${WARNING} The initrd.img and uInitrd file not updated."
+        echo -e "${WARNING} The initrd.img and uInitrd files were not updated."
     fi
 
-    echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -hl *${chroot_kernel_version})"
+    echo -e "${INFO} /boot directory after update: \n$(ls -hl *${chroot_kernel_version})"
+    trap - ERR
 }
 
 # Make kernel scripts
 make_kernel_scripts() {
+    trap 'error_msg "Failed to generate the kernel scripts."' ERR
     cd ${armbian_kernel_path}
-    echo -e "${STEPS} Make kernel scripts..."
+    echo -e "${STEPS} Making kernel scripts..."
 
     # Download Arm GNU Toolchain
     [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
     if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
-        echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
+        echo -e "${INFO} Downloading the ARM GNU toolchain [ ${gun_file} ]..."
         curl -fsSL "${dev_repo}/${gun_file}" -o "${toolchain_path}/${gun_file}"
         [[ "${?}" -eq "0" ]] || error_msg "GNU toolchain file download failed."
         tar -xJf ${toolchain_path}/${gun_file} -C ${toolchain_path}
@@ -151,12 +157,14 @@ make_kernel_scripts() {
     # Set max process
     PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
-
+    echo -e "${INFO} Compiling kernel scripts..."
     make ${MAKE_SET_STRING} modules_prepare -j${PROCESS}
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel scripts are successfully generated."
+    echo -e "${SUCCESS} The kernel scripts were successfully generated."
+    trap - ERR
 }
 
 packit_header() {
+    trap 'error_msg "Failed to generate the kernel header files."' ERR
     cd ${armbian_kernel_path}
     echo -e "${STEPS} Packit header files..."
 
@@ -194,7 +202,8 @@ packit_header() {
     # Compress the header files
     cd ${header_output_path}
     tar -czf header-${chroot_kernel_version}.tar.gz *
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel header files are successfully generated."
+    echo -e "${SUCCESS} The kernel header files are successfully generated."
+    trap - ERR
 }
 
 # Show welcome message
