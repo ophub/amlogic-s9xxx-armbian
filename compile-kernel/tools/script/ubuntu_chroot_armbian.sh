@@ -32,6 +32,8 @@
 #
 #========================== Set make environment variables ==========================
 #
+set -euo pipefail
+
 # Set environment variables
 chroot_arch_info="$(arch)"
 chroot_kernel_version="${1}"
@@ -78,11 +80,11 @@ check_dependencies() {
 
     # Set the necessary packages
     case "${compress_settings}" in
-    xz | lzma) necessary_packages="xz-utils" ;;
-    zstd) necessary_packages="zstd" ;;
-    gzip | *) necessary_packages="gzip" ;;
+        xz | lzma) necessary_packages="xz-utils" ;;
+        zstd) necessary_packages="zstd" ;;
+        gzip | *) necessary_packages="gzip" ;;
     esac
-    
+
     # Install the necessary packages
     trap 'error_msg "Failed to install required dependencies."' ERR
     [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${necessary_packages}$")" ]] || {
