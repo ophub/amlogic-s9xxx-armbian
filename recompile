@@ -489,7 +489,6 @@ chroot_armbian() {
 
     # Extract the armbian rootfs file
     rm -f ${chroot_file}
-    [[ -d "${chroot_path}/root" ]] || mkdir -p ${chroot_path}/root
     tar -xJf ${armbian_path}/${armbian_rootfs_file} -O >"${chroot_file}"
     [[ "${?}" -eq "0" && -s "${chroot_file}" ]] || error_msg "Armbian rootfs file extraction failed."
 
