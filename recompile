@@ -49,7 +49,6 @@ config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 kernel_patch_path="${compile_path}/tools/patch"
 armbian_path="${compile_path}/tools/armbian"
-armbian_file="${armbian_path}/armbian.img"
 output_path="${compile_path}/output"
 chroot_path="${output_path}/chroot"
 chroot_file="${chroot_path}/chroot_armbian.img"
@@ -269,7 +268,7 @@ toolchain_check() {
     fi
 
     # Download armbian
-    if [[ ! -f "${armbian_file}" ]]; then
+    if [[ ! -s "${armbian_path}/${armbian_rootfs_file}" ]]; then
         echo -e "${INFO} Start downloading Armbian rootfs file [ ${armbian_rootfs_file} ]..."
         rm -rf ${armbian_path} && mkdir -p ${armbian_path}
 
@@ -278,17 +277,7 @@ toolchain_check() {
             curl -fsSL "${dev_repo}/${armbian_rootfs_file}" -o "${armbian_path}/${armbian_rootfs_file}"
             [[ "${?}" -eq "0" ]] && break || sleep 60
         done
-        [[ "${?}" -eq "0" ]] || error_msg "Armbian file download failed"
-
-        # Decompress the Armbian rootfs file
-        tar -xJf ${armbian_path}/${armbian_rootfs_file} -C ${armbian_path}
-
-        # Change other names to armbian.img
-        [[ -f "${armbian_file}" ]] || mv -f ${armbian_path}/*.img ${armbian_file}
-
-        # Delete download file
-        rm -f ${armbian_path}/${armbian_rootfs_file}
-        [[ -f "${armbian_file}" ]] || error_msg "There is no Armbian rootfs file: [ ${armbian_file} ]"
+        [[ -s "${armbian_path}/${armbian_rootfs_file}" ]] || error_msg "Armbian file download failed"
     fi
 
     # Set the default path
@@ -470,13 +459,31 @@ get_kernel_source() {
     [[ "${auto_patch}" == "true" || "${auto_patch}" == "yes" ]] && apply_patch
 }
 
+unmount_armbian() {
+    echo -e "${STEPS} Unmounting Armbian chroot"
+    tag_rootfs="${chroot_path}/root"
+    cd ${current_path}
+
+    sync && sleep 3
+    umount ${tag_rootfs}/dev/fd 2>/dev/null
+    umount ${tag_rootfs}/dev/pts 2>/dev/null
+    umount ${tag_rootfs}/dev 2>/dev/null
+    umount ${tag_rootfs}/proc 2>/dev/null
+    umount ${tag_rootfs}/boot 2>/dev/null
+    umount ${tag_rootfs} 2>/dev/null
+    losetup -D 2>/dev/null
+}
+
 chroot_armbian() {
     cd ${current_path}
     echo -e "${STEPS} Create chroot..."
     echo -e "${INFO} Current space usage: \n$(df -hT ${chroot_path}) \n"
 
+    # Extract the armbian rootfs file
     rm -f ${chroot_file}
-    cp -f ${armbian_file} ${chroot_file}
+    [[ -d "${chroot_path}/root" ]] || mkdir -p ${chroot_path}/root
+    tar -xJf ${armbian_path}/${armbian_rootfs_file} -O >"${chroot_file}"
+    [[ "${?}" -eq "0" && -s "${chroot_file}" ]] || error_msg "Armbian rootfs file extraction failed."
 
     # Mount the armbian system
     tag_rootfs="${chroot_path}/root"
@@ -545,7 +552,6 @@ chroot_armbian() {
     echo -e "${INFO} Copy the [ ubuntu_chroot_armbian.sh ] script to the armbian system..."
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
     chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
-    sync && sleep 3
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
@@ -555,8 +561,10 @@ chroot_armbian() {
     mount --bind /dev/pts ${tag_rootfs}/dev/pts
     mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
     chmod 0666 ${tag_rootfs}/dev/null
+    sync && sleep 3
 
-    trap unmount_armbian SIGINT # Always unmount armbian on exit
+    # Always unmount armbian on exit
+    trap unmount_armbian SIGINT
     chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
     if [[ "${?}" -ne "0" || ! -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]]; then
         unmount_armbian
@@ -577,21 +585,6 @@ chroot_armbian() {
     trap - SIGINT
     # Unmount the armbian system
     unmount_armbian
-}
-
-unmount_armbian() {
-    echo -e "${STEPS} Unmounting Armbian chroot"
-    tag_rootfs="${chroot_path}/root"
-    cd ${current_path}
-
-    sync && sleep 3
-    umount ${tag_rootfs}/dev/fd 2>/dev/null
-    umount ${tag_rootfs}/dev/pts 2>/dev/null
-    umount ${tag_rootfs}/dev 2>/dev/null
-    umount ${tag_rootfs}/proc 2>/dev/null
-    umount ${tag_rootfs}/boot 2>/dev/null
-    umount ${tag_rootfs} 2>/dev/null
-    losetup -D 2>/dev/null
 }
 
 compile_env() {
