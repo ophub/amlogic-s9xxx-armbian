@@ -32,8 +32,6 @@
 #
 #========================== Set make environment variables ==========================
 #
-set -euo pipefail
-
 # Set environment variables
 chroot_arch_info="$(arch)"
 chroot_kernel_version="${1}"
