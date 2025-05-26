@@ -40,6 +40,8 @@
 #
 #========================= Set make environment variables =========================
 #
+set -euo pipefail
+
 # Related file storage path
 current_path="${PWD}"
 compile_path="${current_path}/compile-kernel"
