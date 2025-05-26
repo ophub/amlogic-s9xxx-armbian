@@ -109,11 +109,14 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "k:a:n:m:p:r:t:c:d:s:" "${@}")"
+    local options="k:a:n:m:p:r:t:c:d:s:"
+    parsed_args=$(getopt -o "${options}" -- "${@}")
+    [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
+    eval set -- "${parsed_args}"
 
-    while [[ -n "${1}" ]]; do
+    while true; do
         case "${1}" in
-        -k | --kernel)
+        -k | --Kernel)
             if [[ -n "${2}" ]]; then
                 if [[ "${2}" == "all" ]]; then
                     build_kernel=(${all_kernel[@]})
@@ -123,15 +126,15 @@ init_var() {
                     build_kernel=(${2})
                     IFS="${oldIFS}"
                 fi
-                shift
+                shift 2
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
-        -a | --autoKernel)
+        -a | --AutoKernel)
             if [[ -n "${2}" ]]; then
                 auto_kernel="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -a parameter [ ${2} ]!"
             fi
@@ -140,7 +143,7 @@ init_var() {
             if [[ -n "${2}" ]]; then
                 custom_name="${2// /}"
                 [[ "${custom_name:0:1}" != "-" ]] && custom_name="-${custom_name}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -n parameter [ ${2} ]!"
             fi
@@ -148,7 +151,7 @@ init_var() {
         -m | --MakePackage)
             if [[ -n "${2}" ]]; then
                 package_list="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -m parameter [ ${2} ]!"
             fi
@@ -156,15 +159,15 @@ init_var() {
         -p | --AutoPatch)
             if [[ -n "${2}" ]]; then
                 auto_patch="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -p parameter [ ${2} ]!"
             fi
             ;;
-        -r | --repo)
+        -r | --Repository)
             if [[ -n "${2}" ]]; then
                 repo_owner="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -r parameter [ ${2} ]!"
             fi
@@ -172,7 +175,7 @@ init_var() {
         -t | --Toolchain)
             if [[ -n "${2}" ]]; then
                 toolchain_name="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -t parameter [ ${2} ]!"
             fi
@@ -180,7 +183,7 @@ init_var() {
         -c | --Compress)
             if [[ -n "${2}" ]]; then
                 compress_format="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -c parameter [ ${2} ]!"
             fi
@@ -188,7 +191,7 @@ init_var() {
         -d | --DeleteSource)
             if [[ -n "${2}" ]]; then
                 delete_source="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -d parameter [ ${2} ]!"
             fi
@@ -196,16 +199,20 @@ init_var() {
         -s | --SilentLog)
             if [[ -n "${2}" ]]; then
                 silent_log="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
             fi
             ;;
+        --)
+            shift
+            break
+            ;;
         *)
-            error_msg "Invalid option [ ${1} ]!"
+            [[ -n "${1}" ]] && error_msg "Invalid option [ ${1} ]!"
+            break
             ;;
         esac
-        shift
     done
 
     # Receive the value entered by the [ -r ] parameter
