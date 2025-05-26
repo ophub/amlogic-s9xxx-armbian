@@ -41,6 +41,8 @@
 #
 #=============================== Set make environment variables ===============================
 #
+set -euo pipefail
+
 # Related file storage path
 current_path="${PWD}"
 compile_path="${current_path}/compile-kernel"
@@ -263,6 +265,7 @@ toolchain_check() {
     apt-get -qq update
     if [[ "${arch_info}" == "x86_64" ]]; then
         apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+        systemctl restart systemd-binfmt
     else
         apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
     fi
@@ -545,9 +548,11 @@ chroot_armbian() {
         error_msg "The [ ${compress_initrd_file} ] file does not exist."
     fi
 
-    echo -e "${INFO} Copy the [ ${qemu_binary_arm64} ] file to the armbian system..."
-    [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
-    #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
+    if [[ "${arch_info}" == "x86_64" ]]; then
+        echo -e "${INFO} Copy the [ ${qemu_binary_arm64} ] file to the armbian system..."
+        [[ -f "/usr/bin/${qemu_binary_arm64}" ]] && cp -f /usr/bin/${qemu_binary_arm64} ${tag_rootfs}/usr/bin/
+        #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
+    fi
 
     echo -e "${INFO} Copy the [ ubuntu_chroot_armbian.sh ] script to the armbian system..."
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
@@ -767,13 +772,11 @@ compile_selection() {
 
 clean_tmp() {
     cd ${current_path}
-    echo -e "${STEPS} Clear the space and update-grub..."
+    echo -e "${STEPS} Clear the space..."
 
     sync && sleep 3
     rm -rf ${output_path}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
     [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}/* 2>/dev/null
-
-    update-grub 2>/dev/null
 
     echo -e "${SUCCESS} All processes have been completed."
 }
