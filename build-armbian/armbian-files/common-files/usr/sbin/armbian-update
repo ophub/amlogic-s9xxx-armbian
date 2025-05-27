@@ -164,14 +164,17 @@ init_var() {
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "r:u:k:b:m:" "${@}")"
+    local options="r:u:k:b:m:"
+    parsed_args=$(getopt -o "${options}" -- "${@}")
+    [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
+    eval set -- "${parsed_args}"
 
-    while [[ -n "${1}" ]]; do
+    while true; do
         case "${1}" in
         -r | --kernelRepository)
             if [[ -n "${2}" ]]; then
                 KERNEL_REPO="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -r parameter [ ${2} ]!"
             fi
@@ -179,7 +182,7 @@ init_var() {
         -u | --kernel_Usage)
             if [[ -n "${2}" ]]; then
                 kernel_usage="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -u parameter [ ${2} ]!"
             fi
@@ -187,7 +190,7 @@ init_var() {
         -k | --Kernel)
             if [[ -n "${2}" ]]; then
                 inputs_kernel="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
@@ -195,7 +198,7 @@ init_var() {
         -b | --Backup_kenlel)
             if [[ -n "${2}" ]]; then
                 [[ "${2}" == "no" ]] && KERNEL_BACKUP="no" || KERNEL_BACKUP="yes"
-                shift
+                shift 2
             else
                 error_msg "Invalid -b parameter [ ${2} ]!"
             fi
@@ -203,16 +206,20 @@ init_var() {
         -m | --Mainline_u-boot)
             if [[ -n "${2}" ]]; then
                 [[ "${2}" == "yes" ]] && auto_mainline_uboot="yes" || auto_mainline_uboot="no"
-                shift
+                shift 2
             else
                 error_msg "Invalid -m parameter [ ${2} ]!"
             fi
             ;;
+        --)
+            shift
+            break
+            ;;
         *)
-            error_msg "Invalid option [ ${1} ]!"
+            [[ -n "${1}" ]] && error_msg "Invalid option [ ${1} ]!"
+            break
             ;;
         esac
-        shift
     done
 
     # Query the current version
