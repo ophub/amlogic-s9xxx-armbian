@@ -194,7 +194,7 @@ echo -e "${INFO} Welcome to the docker management tool."
 
 # Execute script assist functions
 case "${1}" in
-update) docker_update ;;
-remove) docker_remove ;;
-*) docker_install ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *)      docker_install ;;
 esac
