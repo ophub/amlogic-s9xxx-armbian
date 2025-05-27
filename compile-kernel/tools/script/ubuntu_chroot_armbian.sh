@@ -83,6 +83,11 @@ check_dependencies() {
         gzip | *) necessary_packages="gzip" ;;
     esac
 
+    if  grep -q '^CONFIG_GCC_PLUGINS.*=y' "${armbian_kernel_path}/.config" && # Check if plugins are enabled
+        grep -q '^CONFIG_GCC_PLUGIN_.*=y' "${armbian_kernel_path}/.config"; then # Check if at least one plugin is enabled
+        necessary_packages+=" libmpc-dev libgmp3-dev"
+    fi
+
     # Install the necessary packages
     trap 'error_msg "Failed to install required dependencies."' ERR
     [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${necessary_packages}$")" ]] || {
