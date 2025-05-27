@@ -179,15 +179,17 @@ docker_remove() {
 # Initialize variables
 init_var() {
     # If it is followed by [ : ], it means that the option requires a parameter value
-    get_all_ver="$(getopt "s:m:" "${@}")"
+    local options="s:m:"
+    parsed_args=$(getopt -o "${options}" -- "${@}")
+    [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
+    eval set -- "${parsed_args}"
 
-    # Check the input parameters
-    while [[ -n "${1}" ]]; do
+    while true; do
         case "${1}" in
         -s | --SoftwareID)
             if [[ -n "${2}" ]]; then
                 software_id="${2}"
-                shift
+                shift 2
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
             fi
@@ -199,16 +201,20 @@ init_var() {
                 else
                     error_msg "Invalid -m parameter [ ${2} ]!"
                 fi
-                shift
+                shift 2
             else
                 error_msg "Invalid -m parameter [ ${2} ]!"
             fi
             ;;
+        --)
+            shift
+            break
+            ;;
         *)
-            error_msg "Invalid option [ ${1} ]!"
+            [[ -n "${1}" ]] && error_msg "Invalid option [ ${1} ]!"
+            break
             ;;
         esac
-        shift
     done
 
     # Get related variables

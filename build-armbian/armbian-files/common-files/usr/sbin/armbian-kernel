@@ -136,11 +136,11 @@ remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo 
 
 # Execute script assist functions
 case "${1}" in
--u | --update) update_script ;;
--c | --clean) clean_tmp ;;
--h | --help) help_info ;;
-*)
-    [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
-    cd ${make_path} && sudo ${compile_script} "${@}"
-    ;;
+    -u | --update) update_script ;;
+    -c | --clean)  clean_tmp ;;
+    -h | --help)   help_info ;;
+    *)
+        [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
+        cd ${make_path} && sudo ${compile_script} "${@}"
+        ;;
 esac

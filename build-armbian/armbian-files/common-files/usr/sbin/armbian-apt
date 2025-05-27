@@ -159,36 +159,36 @@ select_mirror_site() {
     echo -e "${INFO} Your selected source ID is: [ ${source_id} ]"
 
     case "${source_id}" in
-    0)
-        # Restore the default source
-        if [[ -f "${armbian_source_backup_file}" ]]; then
-            cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
-            echo -e "${SUCCESS} Restore the default source successfully." && exit 0
-        else
-            error_msg "The default source file does not exist."
-        fi
-        ;;
-    1) MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
-    2) MIRROR_URL="mirrors.bfsu.edu.cn" ;;
-    3) MIRROR_URL="mirrors.aliyun.com" ;;
-    4) MIRROR_URL="mirrors.xtom.hk" ;;
-    5) MIRROR_URL="opensource.nchc.org.tw" ;;
-    6) MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
-    7) MIRROR_URL="mirrors.xtom.com" ;;
-    8) MIRROR_URL="mirrors.mit.edu" ;;
-    9) MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
-    10) MIRROR_URL="muug.ca/mirror" ;;
-    11) MIRROR_URL="mirror.kumi.systems" ;;
-    12) MIRROR_URL="mirrors.xtom.nl" ;;
-    13) MIRROR_URL="mirrors.xtom.de" ;;
-    14) MIRROR_URL="mirror.yandex.ru" ;;
-    15) MIRROR_URL="in.mirror.coganng.com" ;;
-    16) MIRROR_URL="mirrors.xtom.ee" ;;
-    17) MIRROR_URL="mirrors.xtom.au" ;;
-    18) MIRROR_URL="mirror.yuki.net.uk" ;;
-    19) MIRROR_URL="mirror.sg.gs" ;;
-    20) MIRROR_URL="mirrors.xtom.jp" ;;
-    *) error_msg "The source ID is not detected." ;;
+        0)
+            # Restore the default source
+            if [[ -f "${armbian_source_backup_file}" ]]; then
+                cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
+                echo -e "${SUCCESS} Restore the default source successfully." && exit 0
+            else
+                error_msg "The default source file does not exist."
+            fi
+            ;;
+        1)  MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
+        2)  MIRROR_URL="mirrors.bfsu.edu.cn" ;;
+        3)  MIRROR_URL="mirrors.aliyun.com" ;;
+        4)  MIRROR_URL="mirrors.xtom.hk" ;;
+        5)  MIRROR_URL="opensource.nchc.org.tw" ;;
+        6)  MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
+        7)  MIRROR_URL="mirrors.xtom.com" ;;
+        8)  MIRROR_URL="mirrors.mit.edu" ;;
+        9)  MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
+        10) MIRROR_URL="muug.ca/mirror" ;;
+        11) MIRROR_URL="mirror.kumi.systems" ;;
+        12) MIRROR_URL="mirrors.xtom.nl" ;;
+        13) MIRROR_URL="mirrors.xtom.de" ;;
+        14) MIRROR_URL="mirror.yandex.ru" ;;
+        15) MIRROR_URL="in.mirror.coganng.com" ;;
+        16) MIRROR_URL="mirrors.xtom.ee" ;;
+        17) MIRROR_URL="mirrors.xtom.au" ;;
+        18) MIRROR_URL="mirror.yuki.net.uk" ;;
+        19) MIRROR_URL="mirror.sg.gs" ;;
+        20) MIRROR_URL="mirrors.xtom.jp" ;;
+        *) error_msg "The source ID is not detected." ;;
     esac
 
     # Change the source list
