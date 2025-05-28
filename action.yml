@@ -127,7 +127,7 @@ runs:
                 fi
             fi
             sync
-            echo -e "About the [ ${armbian_filepath} ] directory: \n$(ls -l ${armbian_filepath} 2>/dev/null)"
+            echo -e "About the [ ${armbian_filepath} ] directory: \n$(ls -lh ${armbian_filepath} 2>/dev/null)"
 
             cd ${armbian_filepath}
             echo -e "Check the Armbian file format..."
@@ -141,7 +141,7 @@ runs:
             [[ "${down_file:0-7}" == ".img.gz" ]] && gzip -df ${down_file} 2>/dev/null && sync
             [[ "${down_file:0-7}" == ".img.xz" ]] && xz -d ${down_file} 2>/dev/null && sync
             [[ "${down_file:0-4}" == ".zip" ]] && unzip -o ${down_file} 2>/dev/null && sync
-            echo -e "Armbian file: \n$(ls -l *.img 2>/dev/null)"
+            echo -e "Armbian file: \n$(ls -lh *.img 2>/dev/null)"
 
             echo -e "Check the armbian file name (-trunk_)..."
             image_file="$(ls *.img 2>/dev/null | head -n 1)"
@@ -186,7 +186,7 @@ runs:
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${armbian_filepath}"
             echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
-            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${armbian_filepath}/ 2>/dev/null)"
+            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -lh ${PWD}/${armbian_filepath}/ 2>/dev/null)"
 
         elif [[ "${build_target}" == "kernel" ]]; then
 
@@ -201,7 +201,7 @@ runs:
                     echo -e "Use a custom kernel compilation template..."
                     rm -f ${config_filepath}/* 2>/dev/null && sync
                     cp -vf ${GITHUB_WORKSPACE}/${{ inputs.kernel_config }}/config-* ${config_filepath}/ 2>/dev/null && sync
-                    echo -e "List of Kernel Custom Compilation Configuration Templates: \n$(ls -l ${config_filepath})"
+                    echo -e "List of Kernel Custom Compilation Configuration Templates: \n$(ls -lh ${config_filepath})"
                 else
                     echo -e "The custom kernel compilation template path is invalid, continue to use the default template."
                 fi
@@ -216,7 +216,7 @@ runs:
                     echo -e "Use custom kernel patches..."
                     rm -rf ${custom_kernel_patch}/* 2>/dev/null && sync
                     cp -vrf ${GITHUB_WORKSPACE}/${{ inputs.kernel_patch }}/* -t ${custom_kernel_patch} && sync
-                    echo -e "Directory of custom kernel patches: \n$(ls -l ${custom_kernel_patch})"
+                    echo -e "Directory of custom kernel patches: \n$(ls -lh ${custom_kernel_patch})"
                 else
                     echo -e "Invalid custom kernel patch directory, skipping."
                 fi
@@ -248,7 +248,7 @@ runs:
             echo -e "PACKAGED_OUTPUTPATH: ${PWD}/${kernel_outpath}"
             echo -e "PACKAGED_OUTPUTDATE: $(date +"%m.%d.%H%M")"
             echo -e "PACKAGED_STATUS: success"
-            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -l ${PWD}/${kernel_outpath}/ 2>/dev/null)"
+            echo -e "PACKAGED_OUTPUTPATH files list: \n$(ls -lh ${PWD}/${kernel_outpath}/ 2>/dev/null)"
 
         else
             echo -e "Please select a build target: armbian / kernel"
