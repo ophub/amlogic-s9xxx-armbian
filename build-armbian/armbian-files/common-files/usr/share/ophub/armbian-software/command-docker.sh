@@ -671,7 +671,7 @@ EOF
 software_118() {
     # Set basic information
     container_name="openwrt"
-    image_name="ophub/openwrt-aarch64:latest"
+    image_name="ophub/openwrt-armv8:latest"
     install_path="${docker_path}/${container_name}"
 
     echo -ne "${OPTIONS} Please input the docker image, the default is [ ${image_name} ]: "
@@ -700,7 +700,7 @@ software_118() {
             docker network create -d macvlan --subnet=${my_subnet}/24 --gateway=${my_gateway} -o parent=${parent_lan} macnet
         }
 
-        # Instructions: https://hub.docker.com/r/ophub/openwrt-aarch64
+        # Instructions: https://hub.docker.com/r/ophub/openwrt-armv8
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
             -e PGID=${docker_pgid} \
@@ -712,7 +712,7 @@ software_118() {
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} enter the OpenWrt system [ docker exec -it openwrt bash ]"
-        echo -e "${NOTE} The ${container_name} instructions [ https://hub.docker.com/r/ophub/openwrt-aarch64 ]"
+        echo -e "${NOTE} The ${container_name} instructions [ https://hub.docker.com/r/ophub/openwrt-armv8 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
