@@ -242,7 +242,7 @@ on:
 
 env:
   TZ: America/New_York
-  ROOTFS_SCRIPT: compile-kernel/tools/script/armbian_rootfs.sh
+  ROOTFS_SCRIPT: compile-kernel/tools/script/docker/armbian_rootfs.sh
 
 jobs:
   build:
