@@ -1006,6 +1006,7 @@ refactor_rootfs() {
     [[ -f "${ssh_config}" ]] && {
         sed -i "s|^#*Port .*|Port 22|g" ${ssh_config}
         sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
+        sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
     }
 
     # Adjust the default timeout for service start/stop
