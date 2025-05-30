@@ -73,7 +73,7 @@ do_checkemmc() {
 # Check the remaining space
 do_checkspace() {
     # Check the remaining space capacity
-    remaining_space="$(df -Tk ${out_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+    remaining_space="$(df -Tk ${out_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
     if [[ -z "$(echo "${remaining_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
         error_msg "The path is not available, the remaining space cannot be obtained."
     fi

@@ -65,7 +65,7 @@ do_checkdisk() {
     fi
 
     # Check if there is enough free space
-    available_space="$(df -Tk ${PARTITION_PATH} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+    available_space="$(df -Tk ${PARTITION_PATH} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
     if [[ -z "$(echo "${available_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
         error_msg "The path is not available, the remaining space cannot be obtained."
     fi
