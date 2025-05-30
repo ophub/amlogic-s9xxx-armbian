@@ -8,11 +8,11 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Redo the Armbian rootfs file.
+# Description: Build Armbian rootfs file.
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: ./compile-kernel/tools/script/docker/armbian_rootfs.sh -v <VERSION_CODENAME>
-#          ./compile-kernel/tools/script/docker/armbian_rootfs.sh -v bookworm
+# Command: ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v <VERSION_CODENAME>
+#          ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm
 #
 #===================== Set make environment variables =====================
 #

@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Use Releases file to rebuild armbian
+name: Use Releases file to rebuild Armbian
 
 on:
   repository_dispatch:
