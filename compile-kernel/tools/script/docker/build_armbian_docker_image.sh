@@ -8,17 +8,17 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Make a docker version of Armbian.
+# Description: Build Armbian docker image.
 # Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
 #
 #
-# Command: ./compile-kernel/tools/script/docker/armbian_docker.sh
+# Command: ./compile-kernel/tools/script/docker/build_armbian_docker_image.sh
 #
 #======================================== Functions list ========================================
 #
-# error_msg         : Output error message
-# find_armbian      : Find Armbian file (armbian/*rootfs.tar.gz)
-# make_dockerimg    : Make docker image
+# error_msg    : Output error message
+# find_armbian : Find Armbian file (armbian/*rootfs.tar.gz)
+# build_docker : Build Armbian docker image
 #
 #================================ Set make environment variables ================================
 #
@@ -60,9 +60,9 @@ find_armbian() {
     [[ -f "${docker_path}/Dockerfile" ]] || error_msg "Missing Dockerfile."
 }
 
-make_dockerimg() {
+build_docker() {
     cd ${current_path}
-    echo -e "${STEPS} Start making docker image..."
+    echo -e "${STEPS} Start building Armbian docker image..."
 
     # Move the docker image to the output directory
     rm -rf ${out_path} && mkdir -p ${out_path}
@@ -84,11 +84,11 @@ make_dockerimg() {
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to the Docker Image Maker Tool."
+echo -e "${STEPS} Welcome to the Armbian Docker Image Builder."
 echo -e "${INFO} Make path: [ ${PWD} ]"
 #
 find_armbian
-make_dockerimg
+build_docker
 #
 # All process completed
 wait
