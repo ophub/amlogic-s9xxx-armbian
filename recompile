@@ -501,17 +501,19 @@ chroot_armbian() {
     mount_try ${loop_armbian}p2 ${tag_rootfs}
     mount_try ${loop_armbian}p1 ${tag_rootfs}/boot
 
+    # Get Armbian PLATFORM value
     ARMBIAN_PLATFORM="$(cat ${tag_rootfs}/etc/ophub-release 2>/dev/null | grep -E "^PLATFORM=.*" | cut -d"'" -f2)"
-    echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
+    [[ -n "${ARMBIAN_PLATFORM}" ]] && echo -e "${INFO} Armbian PLATFORM: [ ${ARMBIAN_PLATFORM} ]"
 
     echo -e "${INFO} Copy the kernel files to the armbian system..."
     # Remove current system files for /boot
     rm -f ${tag_rootfs}/boot/{config-*,initrd.img-*,System.map-*,vmlinuz-*,uInitrd*,*Image}
     # Copy /boot related files into armbian system
+    [[ -d "${tag_rootfs}/boot" ]] || mkdir -p ${tag_rootfs}/boot
     cp -f ${kernel_path}/${local_kernel_path}/System.map ${tag_rootfs}/boot/System.map-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/.config ${tag_rootfs}/boot/config-${kernel_outname}
     cp -f ${kernel_path}/${local_kernel_path}/arch/${SRC_ARCH}/boot/Image ${tag_rootfs}/boot/vmlinuz-${kernel_outname}
-    if [[ "${ARMBIAN_PLATFORM}" == "rockchip" || "${ARMBIAN_PLATFORM}" == "allwinner" ]]; then
+    if [[ -z "${ARMBIAN_PLATFORM}" || "${ARMBIAN_PLATFORM}" =~ ^(rockchip|allwinner)$ ]]; then
         cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/Image
     else
         cp -f ${tag_rootfs}/boot/vmlinuz-${kernel_outname} ${tag_rootfs}/boot/zImage
@@ -521,6 +523,7 @@ chroot_armbian() {
     # Remove current system files for /usr/lib/modules
     rm -rf ${tag_rootfs}/usr/lib/modules/*
     # Copy /usr/lib/modules related files into armbian system
+    [[ -d "${tag_rootfs}/usr/lib/modules" ]] && mkdir -p ${tag_rootfs}/usr/lib/modules
     cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t ${tag_rootfs}/usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/usr/lib/modules ] directory: \n$(ls -l ${tag_rootfs}/usr/lib/modules) \n"
 
