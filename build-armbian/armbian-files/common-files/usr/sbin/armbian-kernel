@@ -131,7 +131,7 @@ EOF
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
 # 10Gb free space required
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
-remaining_space="$(df -Tk ${make_path} | grep '/dev/' | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
+remaining_space="$(df -Tk ${make_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
 [[ "${remaining_space}" -ge "5" ]] || error_msg "The minimum space required to compile the kernel is 5GiB."
 
 # Execute script assist functions
