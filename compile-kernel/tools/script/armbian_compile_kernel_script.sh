@@ -789,6 +789,8 @@ echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
+echo -e "${INFO} Delete source: [ ${delete_source} ]"
+echo -e "${INFO} Silent log: [ ${silent_log} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 
 # Loop to compile the kernel
