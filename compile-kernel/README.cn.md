@@ -29,6 +29,8 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 - ### 在 Armbian 系统下运行
 
+可以在 [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 原版系统中编译内核，也可以在 Arm64 架构的 Ubuntu/Debian 等系统中通过 [Docker](https://hub.docker.com/u/ophub) 容器运行 Armbian 系统编译内核，编译方法相同。Armbian 系统 Docker 镜像的制作方法可以参考 [armbian_docker](./tools/script/docker) 制作脚本。
+
 1. 更新本地编译环境和配置文件：`armbian-kernel -u`
 
 2. 编译内核：运行 `armbian-kernel -k 5.15.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `/opt/kernel/compile-kernel/output` 目录里。
