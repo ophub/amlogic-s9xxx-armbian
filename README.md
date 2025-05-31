@@ -254,6 +254,10 @@ To upload to `Releases`, you need to set `Workflow read/write permissions` for r
 | ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058    | Packaging date (month.day.hourminute) |
 | ${{ env.PACKAGED_STATUS }}       | success       | Packaging status: success / failure   |
 
+## Build Armbian Docker image
+
+The method for creating the [Docker](https://hub.docker.com/u/ophub) image of the Armbian system can refer to the [armbian_docker](./compile-kernel/tools/script/docker) build script.
+
 ## Default Information for Armbian System
 
 | Name | Value |
