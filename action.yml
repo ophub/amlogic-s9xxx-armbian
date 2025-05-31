@@ -193,6 +193,7 @@ runs:
             cd ${{ github.action_path }}
             echo -e "Start compile kernel..."
 
+            # Custom kernel config files
             config_filepath="compile-kernel/tools/config"
             kernel_outpath="compile-kernel/output"
             [[ -d "${config_filepath}" ]] || mkdir -p ${config_filepath}
@@ -209,6 +210,7 @@ runs:
                 echo -e "Use the default kernel compilation template."
             fi
 
+            # Custom kernel patch files
             custom_kernel_patch="compile-kernel/tools/patch"
             [[ -d "${custom_kernel_patch}" ]] || mkdir -p ${custom_kernel_patch}
             if [[ -n "${{ inputs.kernel_patch }}" && "${{ inputs.kernel_patch }}" != "false" ]]; then
@@ -224,6 +226,15 @@ runs:
                 echo -e "No custom kernel patches available."
             fi
 
+            # You can use a Docker container on an arm64 server to compile the kernel natively with Armbian.
+            # Recommended Docker repository: https://hub.docker.com/u/ophub
+            # Set the Docker container name and script path
+            docker_container="armbian-ophub"
+            docker_script="/usr/sbin/armbian-kernel"
+            # Check if the docker container is running
+            docker_compile="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -x "${docker_container}")"
+
+            # Build kernel compilation command
             make_command=""
             [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
@@ -235,7 +246,15 @@ runs:
             [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -c ${{ inputs.compress_format }}"
             [[ -n "${{ inputs.delete_source }}" ]] && make_command="${make_command} -d ${{ inputs.delete_source }}"
             [[ -n "${{ inputs.silent_log }}" ]] && make_command="${make_command} -s ${{ inputs.silent_log }}"
-            sudo ./recompile ${make_command}
+            read -r -a make_args <<< "${make_command}"
+
+            # Choose Ubuntu or a Docker container to compile the kernel.
+            if [[ "${arch_info}" == "aarch64" && -n "${docker_compile}" ]]; then
+                echo -e "The docker container [ ${docker_container} ] is running, using the Armbian system to compile the kernel."
+                docker exec -i "${docker_container}" bash -c 'bash "$0" -u && bash "$0" "$@"' "${docker_script}" "${make_args[@]}"
+            else
+                sudo ./recompile "${make_args[@]}"
+            fi
 
             cd ${{ github.action_path }}
             output_tags="$(ls -l ${PWD}/${kernel_outpath}/*.tar.gz 2>/dev/null | awk '{print $9}' | grep -oE '[1-9][0-9]{0,2}\.[0-9]{1,3}\.[0-9]+' | xargs | tr "[ ]" "_")"
