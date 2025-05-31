@@ -15,9 +15,9 @@
 # -v, --VERSION_CODENAME: Set the version codename of Armbian rootfs file, e.g., bookworm, jammy, etc.
 # -s, --SSHD_CONFIG:      Enable or disable sshd_config file, default is false.
 # -c, --COMMAND_COLORS:   Enable or disable command colors, default is false.
-# -u, --UBOOT_CONVERSION: Enable or disable u-boot conversion script, default is false.
+# -k, --COMPILE_KERNEL:   Add armbian-kernel and uInitrd generation script, default none.
 #
-# Usage: ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm -s true -c true -u true
+# Usage: ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm -s true -c true -k true
 #        ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm
 #
 #===================== Set make environment variables =====================
@@ -49,7 +49,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="v:s:c:u:"
+    local options="v:s:c:k:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -80,12 +80,12 @@ init_var() {
                 error_msg "Invalid -c parameter [ ${2} ]!"
             fi
             ;;
-        -u | --UBOOT_CONVERSION)
+        -k | --COMPILE_KERNEL)
             if [[ -n "${2}" ]]; then
-                uboot_conversion="${2}"
+                compile_kernel="${2}"
                 shift 2
             else
-                error_msg "Invalid -u parameter [ ${2} ]!"
+                error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
         --)
@@ -127,7 +127,7 @@ redo_rootfs() {
 
         cd ${tmp_rootfs}/
 
-        # Set sshd_config
+        # 03. Set sshd_config
         if [[ -n "${sshd_config_enable}" && "${sshd_config_enable}" =~ ^(true|yes)$ ]]; then
             # SSH access is enabled by default
             ssh_config="etc/ssh/sshd_config"
@@ -149,7 +149,7 @@ redo_rootfs() {
             echo -e "${NOTE} 03. Skipping sshd_config adjustment."
         fi
 
-        # Set command colors
+        # 04. Set command colors
         if [[ -n "${command_colors}" && "${command_colors}" =~ ^(true|yes)$ ]]; then
             # Set terminal colors
             [[ -f "usr/bin/dircolors" ]] && {
@@ -186,8 +186,19 @@ EOF
             echo -e "${NOTE} 04. Skipping sshd_config adjustment."
         fi
 
-        # Adjust u-boot conversion script
-        if [[ -n "${uboot_conversion}" && "${uboot_conversion}" =~ ^(true|yes)$ ]]; then
+        # 05. Add armbian-kernel script
+        if [[ -n "${compile_kernel}" && "${compile_kernel}" =~ ^(true|yes)$ ]]; then
+            down_script="https://raw.githubusercontent.com/ophub/amlogic-s9xxx-armbian/refs/heads/main/build-armbian/armbian-files/common-files/usr/sbin/armbian-kernel"
+            add_script="usr/sbin/armbian-kernel"
+            sudo mkdir -p usr/sbin/
+            sudo wget -q --show-progress --no-check-certificate -O ${add_script} ${down_script}
+            [[ "${?}" == "0" ]] && {
+                sudo chmod +x ${add_script}
+                sudo chown root:root ${add_script}
+                echo -e "${INFO} 05.01. Adding armbian-kernel script completed."
+            } || error_msg "05.01. Failed to add armbian-kernel script!"
+
+            # Add uInitrd generation script
             sudo mkdir -p etc/initramfs/post-update.d/
             sudo chown root:root etc/initramfs/post-update.d/
             sudo tee etc/initramfs/post-update.d/99-uboot >/dev/null <<'EOF'
@@ -209,9 +220,9 @@ exit 0
 
 EOF
             sudo chmod +x etc/initramfs/post-update.d/99-uboot
-            [[ "${?}" == "0" ]] && echo -e "${INFO} 05. Adding uInitrd generation script completed." || error_msg "06. Failed to adjust uInitrd!"
+            [[ "${?}" == "0" ]] && echo -e "${INFO} 05.02. Adding uInitrd generation script completed." || error_msg "05.02. Failed to adjust uInitrd!"
         else
-            echo -e "${NOTE} 05. Skipping uInitrd adjustment."
+            echo -e "${NOTE} 05. Skipping armbian-kernel script addition."
         fi
 
         # Compress the rootfs file
