@@ -58,7 +58,8 @@ update_script() {
 
     # Install git
     echo -e "${INFO} Start installing update dependencies..."
-    [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get update && sudo apt-get install -y git
+    sudo apt-get -qq update
+    [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get install -y git
 
     # Get the latest scripts
     echo -e "${INFO} Start syncing latest scripts..."
