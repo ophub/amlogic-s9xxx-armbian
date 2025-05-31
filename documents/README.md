@@ -17,6 +17,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
     - [5.2 Scheduled Compilation](#52-scheduled-compilation)
     - [5.3 Customizing Default System Configuration](#53-customizing-default-system-configuration)
     - [5.4 Expanding Github Actions Compilation Space Using Logical Volumes](#54-expanding-github-actions-compilation-space-using-logical-volumes)
+    - [5.5 Build Armbian Docker image](#55-build-armbian-docker-image)
   - [6. Saving the System](#6-saving-the-system)
   - [7. Downloading the System](#7-downloading-the-system)
   - [8. Installing Armbian to EMMC](#8-installing-armbian-to-emmc)
@@ -183,6 +184,10 @@ The default compile space for Github Actions is 84G, with about 50G available af
     sudo chown -R runner.runner /builder
     df -Th
 ```
+
+### 5.5 Build Armbian Docker image
+
+The method for creating the [Docker](https://hub.docker.com/u/ophub) image of the Armbian system can refer to the [armbian_docker](../compile-kernel/tools/script/docker) build script.
 
 ## 6. Saving the System
 
