@@ -322,7 +322,7 @@ jobs:
         run: |
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
-          ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }}
+          ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }} -s true -c true -u true
 
           # Output cleaning result information
           df -hT ${PWD}
