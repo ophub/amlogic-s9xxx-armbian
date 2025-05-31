@@ -249,7 +249,7 @@ runs:
             read -r -a make_args <<< "${make_command}"
 
             # Choose Ubuntu or a Docker container to compile the kernel.
-            if [[ "${arch_info}" == "aarch64" && -n "${docker_compile}" ]]; then
+            if [[ "$(uname -m)" == "aarch64" && -n "${docker_compile}" ]]; then
                 echo -e "The docker container [ ${docker_container} ] is running, using the Armbian system to compile the kernel."
                 docker exec -i "${docker_container}" bash -c 'bash "$0" -u && bash "$0" "$@"' "${docker_script}" "${make_args[@]}"
             else
