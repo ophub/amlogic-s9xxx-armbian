@@ -839,6 +839,7 @@ echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "x86_64 aarch64" == *"${arch_info}"* ]] || error_msg "This script is only supported on the x86_64 and aarch64 platforms."
 
+echo -e "${INFO} Using the current system to compile the kernel."
 # Initialize variables
 init_var "${@}"
 # Check and install the toolchain
@@ -855,6 +856,8 @@ echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
+echo -e "${INFO} Delete source: [ ${delete_source} ]"
+echo -e "${INFO} Silent log: [ ${silent_log} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 
 # Loop to compile the kernel
