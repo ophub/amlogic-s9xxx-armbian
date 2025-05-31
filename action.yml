@@ -231,10 +231,15 @@ runs:
             # Set the Docker container name and script path
             docker_container="armbian-ophub"
             docker_script="/usr/sbin/armbian-kernel"
-            # Check if the docker container is running
-            docker_compile="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -x "${docker_container}")"
+            echo -e "Check the system runtime environment."
+            if command -v docker >/dev/null 2>&1; then
+                docker_compile="$(docker ps --format '{{.Names}}' 2>/dev/null | grep -x "${docker_container}" || true)"
+            else
+                docker_compile=""
+            fi
+            [[ -n "${docker_compile}" ]] && echo -e "The docker container [ ${docker_container} ] is running."
 
-            # Build kernel compilation command
+            echo -e "Build kernel compilation command."
             make_command=""
             [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
@@ -250,9 +255,10 @@ runs:
 
             # Choose Ubuntu or a Docker container to compile the kernel.
             if [[ "$(uname -m)" == "aarch64" && -n "${docker_compile}" ]]; then
-                echo -e "The docker container [ ${docker_container} ] is running, using the Armbian system to compile the kernel."
+                echo -e "Using the Armbian Docker image to compile the kernel."
                 docker exec -i "${docker_container}" bash -c 'bash "$0" -u && bash "$0" "$@"' "${docker_script}" "${make_args[@]}"
             else
+                echo -e "Using the original system to compile the kernel."
                 sudo ./recompile "${make_args[@]}"
             fi
 
