@@ -254,6 +254,10 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 | ${{ env.PACKAGED_OUTPUTDATE }}      | 04.13.1058    | 打包日期（月.日.时分）         |
 | ${{ env.PACKAGED_STATUS }}          | success       | 打包状态：success / failure  |
 
+## 制作 Armbian Docker 镜像
+
+Armbian 系统 [Docker](https://hub.docker.com/u/ophub) 镜像的制作方法可以参考 [armbian_docker](./compile-kernel/tools/script/docker) 制作脚本。
+
 ## Armbian 系统默认信息
 
 | 名称 | 值 |
