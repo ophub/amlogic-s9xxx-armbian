@@ -11,8 +11,14 @@
 # Description: Build Armbian rootfs file.
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Command: ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v <VERSION_CODENAME>
-#          ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm
+# Optional parameters:
+# -v, --VERSION_CODENAME: Set the version codename of Armbian rootfs file, e.g., bookworm, jammy, etc.
+# -s, --SSHD_CONFIG:      Enable or disable sshd_config file, default is false.
+# -c, --COMMAND_COLORS:   Enable or disable command colors, default is false.
+# -u, --UBOOT_CONVERSION: Enable or disable u-boot conversion script, default is false.
+#
+# Usage: ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm -s true -c true -u true
+#        ./compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh -v bookworm
 #
 #===================== Set make environment variables =====================
 #
@@ -29,6 +35,7 @@ STEPS="[\033[95m STEPS \033[0m]"
 INFO="[\033[94m INFO \033[0m]"
 SUCCESS="[\033[92m SUCCESS \033[0m]"
 WARNING="[\033[93m WARNING \033[0m]"
+NOTE="[\033[93m NOTE \033[0m]"
 ERROR="[\033[91m ERROR \033[0m]"
 #
 #==========================================================================
@@ -42,7 +49,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="v:"
+    local options="v:s:c:u:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -55,6 +62,30 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -v parameter [ ${2} ]!"
+            fi
+            ;;
+        -s | --SSHD_CONFIG)
+            if [[ -n "${2}" ]]; then
+                sshd_config_enable="${2}"
+                shift 2
+            else
+                error_msg "Invalid -s parameter [ ${2} ]!"
+            fi
+            ;;
+        -c | --COMMAND_COLORS)
+            if [[ -n "${2}" ]]; then
+                command_colors="${2}"
+                shift 2
+            else
+                error_msg "Invalid -c parameter [ ${2} ]!"
+            fi
+            ;;
+        -u | --UBOOT_CONVERSION)
+            if [[ -n "${2}" ]]; then
+                uboot_conversion="${2}"
+                shift 2
+            else
+                error_msg "Invalid -u parameter [ ${2} ]!"
             fi
             ;;
         --)
@@ -96,30 +127,37 @@ redo_rootfs() {
 
         cd ${tmp_rootfs}/
 
-        # SSH access is enabled by default
-        ssh_config="etc/ssh/sshd_config"
-        [[ -f "${ssh_config}" ]] && {
-            sudo sed -i "s|^#*Port .*|Port 22|g" ${ssh_config}
-            sudo sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
-            sudo sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
-            [[ -d "var/run/sshd" ]] || mkdir -p -m0755 var/run/sshd
-            echo -e "${INFO} 03. Adjusting sshd_config completed."
-        } || error_msg "03. Failed to adjust sshd_config!"
+        # Set sshd_config
+        if [[ -n "${sshd_config_enable}" && "${sshd_config_enable}" =~ ^(true|yes)$ ]]; then
+            # SSH access is enabled by default
+            ssh_config="etc/ssh/sshd_config"
+            [[ -f "${ssh_config}" ]] && {
+                sudo sed -i "s|^#*Port .*|Port 22|g" ${ssh_config}
+                sudo sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
+                sudo sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
+                [[ -d "var/run/sshd" ]] || mkdir -p -m0755 var/run/sshd
+                echo -e "${INFO} 03.01 Adjusting sshd_config completed."
+            } || error_msg "03.01 Failed to adjust sshd_config!"
 
-        # Set root password to 1234
-        [[ -f "etc/shadow" ]] && {
-            rootnewpasswd="$(openssl passwd -6 "1234")"
-            sudo sed -i "s|^root:\*|root:${rootnewpasswd}|" etc/shadow
-            echo -e "${INFO} 04. Adjusting the default account completed."
-        } || error_msg "04. Failed to adjust root password!"
+            # Set root password to 1234
+            [[ -f "etc/shadow" ]] && {
+                rootnewpasswd="$(openssl passwd -6 "1234")"
+                sudo sed -i "s|^root:\*|root:${rootnewpasswd}|" etc/shadow
+                echo -e "${INFO} 03.02 Adjusting the default account completed."
+            } || error_msg "03.02 Failed to adjust root password!"
+        else
+            echo -e "${NOTE} 03. Skipping sshd_config adjustment."
+        fi
 
-        # Set terminal colors
-        [[ -f "usr/bin/dircolors" ]] && {
-            # Set the default color for command
-            sudo chmod +x usr/bin/dircolors
+        # Set command colors
+        if [[ -n "${command_colors}" && "${command_colors}" =~ ^(true|yes)$ ]]; then
+            # Set terminal colors
+            [[ -f "usr/bin/dircolors" ]] && {
+                # Set the default color for command
+                sudo chmod +x usr/bin/dircolors
 
-            # Add color support for command and set the default prompt
-            sudo tee -a root/.bashrc > /dev/null <<'EOF'
+                # Add color support for command and set the default prompt
+                sudo tee -a root/.bashrc >/dev/null <<'EOF'
 
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
@@ -134,16 +172,47 @@ fi
 PS1='\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\w\[\e[0m\]\$ '
 
 EOF
-            # Add the bashrc file to the root profile
-            sudo tee -a root/.profile > /dev/null <<'EOF'
+                # Add the bashrc file to the root profile
+                sudo tee -a root/.profile >/dev/null <<'EOF'
 
 if [ -f "$HOME/.bashrc" ]; then
     . "$HOME/.bashrc"
 fi
 
 EOF
-            echo -e "${INFO} 05. Adjusting the default color completed."
-        } || error_msg "05. Failed to adjust dircolors!"
+                echo -e "${INFO} 04. Adjusting the default color completed."
+            } || error_msg "04. Failed to adjust dircolors!"
+        else
+            echo -e "${NOTE} 04. Skipping sshd_config adjustment."
+        fi
+
+        # Adjust u-boot conversion script
+        if [[ -n "${uboot_conversion}" && "${uboot_conversion}" =~ ^(true|yes)$ ]]; then
+            sudo mkdir -p etc/initramfs/post-update.d/
+            sudo chown root:root etc/initramfs/post-update.d/
+            sudo tee etc/initramfs/post-update.d/99-uboot >/dev/null <<'EOF'
+#!/bin/bash -e
+
+tempname="/boot/uInitrd-$1"
+echo "update-initramfs: Armbian: Converting to u-boot format: ${tempname}" >&2
+mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d $2 $tempname
+
+echo "update-initramfs: Armbian: Symlinking ${tempname} to /boot/uInitrd" >&2
+ln -sfv $(basename $tempname) /boot/uInitrd || {
+        echo "update-initramfs: Symlink failed, moving ${tempname} to /boot/uInitrd" >&2
+        mv -v $tempname /boot/uInitrd
+}
+
+echo "update-initramfs: Armbian: done." >&2
+
+exit 0
+
+EOF
+            sudo chmod +x etc/initramfs/post-update.d/99-uboot
+            [[ "${?}" == "0" ]] && echo -e "${INFO} 05. Adding uInitrd generation script completed." || error_msg "06. Failed to adjust uInitrd!"
+        else
+            echo -e "${NOTE} 05. Skipping uInitrd adjustment."
+        fi
 
         # Compress the rootfs file
         sudo tar -czf ${rootfs_save_name}.tar.gz *
