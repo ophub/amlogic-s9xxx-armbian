@@ -260,11 +260,10 @@ The method for creating the [Docker](https://hub.docker.com/u/ophub) image of th
 
 ## Default Information for Armbian System
 
-| Name | Value |
-| ---- | ---- |
-| Default IP | Obtain IP from router |
-| Default account | root |
-| Default password | 1234 |
+| System Name    | Default Username | Default Password  | SSH Port  | IP Address  |
+| -------------- | ---------------- | ----------------- | --------- | ----------- |
+| [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | Obtain IP from router |
+| [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Use host machine’s IP |
 
 ## Compiling Kernel using GitHub Actions
 
