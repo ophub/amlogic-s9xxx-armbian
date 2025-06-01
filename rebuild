@@ -104,7 +104,7 @@ build_board="all"
 
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
 boot_mb="512"
-root_mb="2560"
+root_mb="3000"
 # Set ROOTFS partition file system type, options: [ ext4 / btrfs ]
 rootfs_type="ext4"
 # Set Armbian OS type (server / desktop)
