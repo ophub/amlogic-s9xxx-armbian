@@ -28,6 +28,7 @@ on:
         options:
           - all
           - s928x-k
+          - s905w
       armbian_kernel:
         description: "Select kernel version."
         required: false
