@@ -1,18 +1,24 @@
 #==========================================================================
-# Description: Build Armbian
+# Description: Build Armbian using releases files
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Rebuild Armbian
+name: Build Armbian using releases files
 
 on:
   repository_dispatch:
   workflow_dispatch:
     inputs:
-      armbian_url:
-        description: "Set Armbian file path."
+      set_release:
+        description: "Select OS Release."
         required: false
-        default: ""
+        default: "jammy"
+        type: choice
+        options:
+          - jammy
+          - noble
+          - bookworm
+          - bullseye
       armbian_board:
         description: "Select device board."
         required: false
@@ -210,7 +216,7 @@ on:
           - dev
           - beta
       armbian_fstype:
-        description: "Set armbian rootfs type."
+        description: "Select armbian rootfs type."
         required: false
         default: "ext4"
         type: choice
@@ -233,7 +239,6 @@ on:
         options:
           - ophub
           - angel
-          - yourname
 
 env:
   TZ: America/New_York
@@ -287,51 +292,47 @@ jobs:
           sudo chown -R runner.runner /builder
           df -Th
 
-      - name: Set download address
+      - name: Download Armbian from Releases
         id: down
         working-directory: /builder
+        if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
-          # Get the url of the rebuild armbian file
-          armbian_url="${{ inputs.armbian_url }}"
-          if  [[ -z "${armbian_url}" ]]; then
-              armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
-              armbian_name="Armbian.*jammy.*.img.xz"
-              armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
-              if [[ -n "${armbian_file}" ]]; then
-                  armbian_url="${armbian_site}${armbian_file}"
-              else
-                  echo -e "Invalid download path: [ ${armbian_site} ]"
-                  exit 1
-              fi
-          fi
-          echo "ARMBIAN_URL=${armbian_url}" >> ${GITHUB_ENV}
-
-          # Get the release name of the rebuild armbian file
-          set_release=""
-          ARR_RELEASE=("jammy" "focal" "bullseye" "buster" "sid")
-          i=1
-          for r in ${ARR_RELEASE[*]}; do
-              if [[ "${armbian_url}" == *"${r}"* ]]; then
-                  set_release="_${r}"
-                  break
-              fi
-              let i++
-          done
-
-          mkdir -p /builder/build
+          armbian_buildpath="build/output/images"
+          [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
 
-          sudo timedatectl set-timezone "${TZ}"
-          echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
+          latest_version=$(curl -s \
+                -H "Accept: application/vnd.github+json" \
+                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=100 | \
+                jq -r --arg RTK "Armbian_${{ inputs.set_release }}_" \
+                --arg BOARD "-trunk_" \
+                '[.[] | select(.tag_name | contains($RTK))] |
+                map(.assets[] | select(.browser_download_url | contains($BOARD) and endswith(".img.gz"))) |
+                sort_by(.updated_at) |
+                reverse |
+                .[0] |
+                {data: .updated_at, url: .browser_download_url}')
+
+          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && echo "Invalid Armbian image download address." && exit 1
+          latest_updated_at="$(echo ${latest_version} | jq -r '.data')"
+          latest_url="$(echo ${latest_version} | jq -r '.url')"
+
+          armbian_filename="${latest_url##*/}"
+          curl -fsSL "${latest_url}" -o "${armbian_buildpath}/${armbian_filename}"
+          [[ "${?}" -ne "0" ]] && echo "Invalid Armbian image download address." && exit 1
+          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
+
+          echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Rebuild Armbian
+      - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
-          armbian_path: ${{ env.ARMBIAN_URL }}
+          armbian_path: build/output/images/*.img
           armbian_board: ${{ inputs.armbian_board }}
           armbian_kernel: ${{ inputs.armbian_kernel }}
           auto_kernel: ${{ inputs.auto_kernel }}
