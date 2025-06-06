@@ -210,16 +210,16 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 ## Use GitHub Actions for Compilation
 
-1. The configuration of the Workflows file can be found in the [build-armbian-server-image.yml](.github/workflows/build-armbian-server-image.yml) file.
+1. The configuration of the Workflows file can be found in the [.github/workflows/](.github/workflows/) files.
 
-2. Full compile: On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Build armbian`***. According to the OS versions supported by Armbian official, you can choose the Ubuntu series: `jammy`, or the Debian series: `bullseye` etc. Click the ***`Run workflow`*** button to compile. More parameter setting methods can be found in the [Armbian official documentation](https://docs.armbian.com/Developer-Guide_Build-Options/).
+2. Fresh Build: On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Build Armbian server image`*** to start the build using the [build-armbian-server-image.yml](.github/workflows/build-armbian-server-image.yml) workflow. You can choose from the Ubuntu series such as `jammy`, or the Debian series such as `bullseye`, etc. Click the ***`Run workflow`*** button to begin the build.
 
-3. Recompile: If there are already compiled `Armbian_.*-trunk_.*.img.gz` files in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), and you just want to make another box of different boards, you can skip compiling the Armbian source files and directly use [build-armbian-using-releases-files.yml](.github/workflows/build-armbian-using-releases-files.yml) for secondary build.
+3. Rebuild: If there are already compiled `Armbian_.*-trunk_.*.img.gz` files in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), and you just want to make another box of different boards, you can skip compiling the Armbian source files and directly use [build-armbian-using-releases-files.yml](.github/workflows/build-armbian-using-releases-files.yml) for secondary build.
 
 4. Use other Armbian systems, such as the [odroidn2](https://armbian.tnahosting.net/dl/odroidn2/archive/) system provided by the Armbian official system download website [armbian.tnahosting.net](https://armbian.tnahosting.net/dl/), and only introduce the script of this repository in the process control file [build-armbian-using-official-image.yml](.github/workflows/build-armbian-using-official-image.yml) to restructure Armbian. The code is as follows:
 
 ```yaml
-- name: Rebuild Armbian
+- name: Build Armbian
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: armbian
