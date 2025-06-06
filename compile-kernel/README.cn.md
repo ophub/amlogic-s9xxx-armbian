@@ -64,7 +64,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbi
 
 1. 在 [Action](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Compile the kernel`*** ，点击 ***`Run workflow`*** 按钮即可编译。
 
-2. 详见使用模板 [compile-kernel.yml](../.github/workflows/compile-kernel.yml) 。代码如下:
+2. 详见使用模板 [compile-kernel-on-a-server.yml](../.github/workflows/compile-kernel-on-a-server.yml) 。代码如下:
 
 ```yaml
 - name: Compile the kernel

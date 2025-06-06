@@ -1,9 +1,9 @@
 #==========================================================================
-# Description: Build Armbian
+# Description: Build Armbian server image
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build Armbian
+name: Build Armbian server image
 
 on:
   repository_dispatch:
