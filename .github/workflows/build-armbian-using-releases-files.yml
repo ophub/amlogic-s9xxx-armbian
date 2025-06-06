@@ -160,6 +160,7 @@ on:
           - smart-am40
           - smart-am60
           - station-m1
+          - station-m2
           - sv-33a6x
           - swan1-w28
           - sw799
