@@ -1,8 +1,12 @@
 verbosity=1
 bootlogo=true
-console=both
-extraargs=cma=256M
-overlay_prefix=rk35xx
 fdtfile=rockchip/rk3566-roc-pc.dtb
-rootdev=UUID=c718bf86-5c01-4a12-8206-c0233ac23d5a
+rootdev=/dev/mmcblk0p2
 rootfstype=ext4
+rootflags=compress=zstd:6
+earlycon=on
+console=serial
+consoleargs=console=ttyS2,1500000
+extraargs=cma=256M
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk35xx
