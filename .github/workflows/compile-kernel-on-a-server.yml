@@ -1,10 +1,10 @@
 #==========================================================================
-# Description: Compile the Kernel
+# Description: Compile the kernel on a server
 # Copyright (C) 2021 https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Compile the Kernel
+name: Compile the kernel on a server
 
 on:
   repository_dispatch:

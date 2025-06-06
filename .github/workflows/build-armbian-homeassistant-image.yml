@@ -1,10 +1,10 @@
 #==========================================================================
-# Description: Build Armbian
+# Description: Build Armbian Home Assistant image
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 # Copyright (C) 2024 https://github.com/dy008/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build Homeassistant
+name: Build Armbian Home Assistant image
 
 on:
   repository_dispatch:
