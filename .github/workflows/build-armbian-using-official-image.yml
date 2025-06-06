@@ -295,7 +295,7 @@ jobs:
           armbian_url="${{ inputs.armbian_url }}"
           if  [[ -z "${armbian_url}" ]]; then
               armbian_site="https://armbian.tnahosting.net/dl/odroidn2/archive/"
-              armbian_name="Armbian.*jammy.*.img.xz"
+              armbian_name="Armbian.*noble.*.img.xz"
               armbian_file=$(curl -s "${armbian_site}" | grep -oE "${armbian_name}" | head -n 1)
               if [[ -n "${armbian_file}" ]]; then
                   armbian_url="${armbian_site}${armbian_file}"
@@ -308,7 +308,7 @@ jobs:
 
           # Get the release name of the rebuild armbian file
           set_release=""
-          ARR_RELEASE=("jammy" "focal" "bullseye" "buster" "sid")
+          ARR_RELEASE=("jammy" "noble" "bookworm" "bullseye")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${armbian_url}" == *"${r}"* ]]; then
