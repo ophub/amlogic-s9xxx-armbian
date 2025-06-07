@@ -305,6 +305,22 @@ jobs:
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
+      # 自定义部分-2025-马哈木
+      - name: Create Userpatches Directory
+        id: mhm-custom
+        working-directory: /builder
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        run: |
+          mkdir -p build/userpatches; mkdir -p build/userpatches/overlay
+          #curl -s -o build/userpatches/overlay/armbian-install-lt.sh https://byy-ops-lt.oss-rg-china-mainland.aliyuncs.com/armbian-install-lt.sh
+          curl -s -o build/userpatches/customize-image.sh https://byy-ops-lt.oss-rg-china-mainland.aliyuncs.com/armbian_customize_image-lt.sh
+          
+          #curl -s -o build/userpatches/overlay/auto_write_emmc.sh https://byy-ops-lt.oss-rg-china-mainland.aliyuncs.com/auto_write_emmc.sh
+          #curl -s -o build/userpatches/customize-image.sh https://byy-ops-lt.oss-rg-china-mainland.aliyuncs.com/armbian_customize_image.sh
+          #https://byy-ops-lt.oss-rg-china-mainland.aliyuncs.com/armbian_customize_image.sh https://gkktg.oss-cn-hangzhou.aliyuncs.com/customize-image.sh
+          #chmod +x build/userpatches/customize-image.sh
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
       - name: Compile Armbian [ ${{ inputs.set_release }} ]
         id: compile
         working-directory: /builder
