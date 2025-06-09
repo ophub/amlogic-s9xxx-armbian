@@ -1,0 +1,17 @@
+verbosity=7
+bootlogo=true
+fdtfile=rockchip/rk3588-dc-a588.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+console=serial
+consoleargs=console=ttyFIQ0 console=tty1
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+earlycon=on
+docker_optimizations=on
+extraargs=
+extraboardargs=net.ifnames=0
+overlay_prefix=rk3588
+overlays=
+user_overlays=
+
