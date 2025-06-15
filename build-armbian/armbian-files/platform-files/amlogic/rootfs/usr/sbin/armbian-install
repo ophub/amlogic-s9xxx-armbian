@@ -392,6 +392,10 @@ create_partition() {
         BLANK1="108" # Whale(S905X3): Must skip [ 108 MiB ]
         BOOT="512"   # A total of [ 1024 MiB ] can be used in this block, gave up [ 1024-512=512 MiB ]
         BLANK2="650" # Rootfs partition could be set after [ 1270 MiB ] of the total disk, [ 1270-108-512=650 MiB ]
+    elif [[ "${boxid}" -eq "409" ]]; then
+        BLANK1="700" # WXY-OES(A311D): Must skip [ 700 MiB ]
+        BOOT="512"
+        BLANK2="0"
     else
         BLANK1="68"
         BOOT="512"   # S905x3: A total of [ 1120 MiB ] can be used in this block, and the remaining [ 608 MiB ] can be used.
