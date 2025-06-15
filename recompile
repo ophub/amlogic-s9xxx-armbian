@@ -473,9 +473,10 @@ unmount_armbian() {
     cd ${current_path}
 
     sync && sleep 3
-    umount ${tag_rootfs}/dev/fd 2>/dev/null
     umount ${tag_rootfs}/dev/pts 2>/dev/null
-    umount ${tag_rootfs}/dev 2>/dev/null
+    umount -R ${tag_rootfs}/dev 2>/dev/null
+    umount ${tag_rootfs}/run 2>/dev/null
+    umount ${tag_rootfs}/sys 2>/dev/null
     umount ${tag_rootfs}/proc 2>/dev/null
     umount ${tag_rootfs}/boot 2>/dev/null
     umount ${tag_rootfs} 2>/dev/null
@@ -561,6 +562,12 @@ chroot_armbian() {
         #echo -e "${INFO} The [ ${qemu_binary_arm64} ] file copy results: \n$(ls -l ${tag_rootfs}/usr/bin/${qemu_binary_arm64}) \n"
     fi
 
+    # Copy the /etc/resolv.conf file to the armbian system
+    [[ -f "/etc/resolv.conf" ]] && {
+        echo -e "${INFO} Copy the [ /etc/resolv.conf ] file to the armbian system..."
+        cp -f /etc/resolv.conf ${tag_rootfs}/etc/resolv.conf
+    }
+
     echo -e "${INFO} Copy the [ ubuntu_chroot_armbian.sh ] script to the armbian system..."
     cp -f ${script_path}/ubuntu_chroot_armbian.sh ${tag_rootfs}/root
     chmod +x ${tag_rootfs}/root/ubuntu_chroot_armbian.sh
@@ -569,9 +576,10 @@ chroot_armbian() {
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
     echo -e "${STEPS} Enter the chroot Armbian system..."
     mount -t proc /proc ${tag_rootfs}/proc
+    mount -t sysfs /sys ${tag_rootfs}/sys
+    mount -t devpts /dev/pts ${tag_rootfs}/dev/pts
     mount --bind /dev ${tag_rootfs}/dev
-    mount --bind /dev/pts ${tag_rootfs}/dev/pts
-    mount --bind /proc/$$/fd ${tag_rootfs}/dev/fd
+    mount --bind /run ${tag_rootfs}/run
     chmod 0666 ${tag_rootfs}/dev/null
     sync && sleep 3
 
