@@ -1,0 +1,810 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+/dts-v1/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/rockchip.h>
+#include <dt-bindings/pwm/pwm.h>
+#include "rk322x.dtsi"
+
+/ {
+
+	model = "Generic RK322x Tv Box board";
+	compatible = "rockchip,rk3229";
+
+	/*
+	 * No need to reserve memory manually as long as u-boot v2020.10 and
+	 * OPTEE autoconfigure the reserved zones
+	*/
+	/delete-node/ reserved-memory;
+
+	/*
+	 * We rebuild the cpu-opp-table by ourselves
+	 */
+	/delete-node/ opp-table-0;
+
+	/*
+	 * Rebuild the thermal zones and cooling maps ourselves
+	 */
+	/delete-node/ thermal-zones;
+
+	/*
+	 * 	Include the mmc devices into aliases table
+	 */
+	aliases {
+		mmc0 = &sdmmc;
+		mmc1 = &sdio;
+		mmc2 = &emmc;
+	};
+
+	chosen {
+		bootargs = "earlyprintk=uart8250,mmio32,0x11030000";
+	};
+
+	cpu0_opp_table: opp-table-0 {
+		compatible = "operating-points-v2";
+		opp-shared;
+
+		opp-600000000 {
+			opp-hz = /bits/ 64 <600000000>;
+			opp-microvolt = <975000>;
+			clock-latency-ns = <40000>;
+			opp-suspend;
+		};
+
+		opp-816000000 {
+			opp-hz = /bits/ 64 <816000000>;
+			opp-microvolt = <1000000>;
+		};
+
+		opp-1008000000 {
+			opp-hz = /bits/ 64 <1008000000>;
+			opp-microvolt = <1175000>;
+		};
+
+		opp-1200000000 {
+			opp-hz = /bits/ 64 <1200000000>;
+			opp-microvolt = <1275000>;
+		};
+
+	};
+
+	gpio_leds: gpio-leds {
+
+		compatible = "gpio-leds";
+
+		/*
+		* Working led, available on all boards
+		*/
+		working {
+			gpios = <&gpio3 RK_PC5 GPIO_ACTIVE_HIGH>;
+			label = "working";
+			default-state = "on";
+			linux,default-trigger = "timer";
+			pinctrl-names = "default";
+			pinctrl-0 = <&gpio_led_working>;
+		};
+
+	};
+
+	gpio_keys: gpio-keys {
+
+		compatible = "gpio-keys";
+
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+	};
+
+	ir_receiver: ir-receiver {
+		compatible = "gpio-ir-receiver";
+		gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
+		pinctrl-0 = <&ir_int>;
+		pinctrl-names = "default";
+		status = "okay";
+		linux,rc-map-name = "rc-rk322x-tvbox";
+	};
+
+	rockchip_ir_receiver: rockchip-ir-receiver {
+		compatible = "rockchip-ir-receiver";
+		reg = <0x110b0030 0x10>;
+		gpios = <&gpio1 RK_PB3 GPIO_ACTIVE_LOW>;
+		clocks = <&cru PCLK_PWM>;
+		interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+		linux,rc-map-name = "rc-rk322x-tvbox";
+		pinctrl-names = "default", "suspend";
+		pinctrl-0 = <&ir_int>;
+		pinctrl-1 = <&pwm3_pin>;
+		pwm-id = <3>;
+		shutdown-is-virtual-poweroff;
+		wakeup-source;
+		status = "disabled";
+	};
+
+	sdio_pwrseq: sdio-pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		pinctrl-names = "default";
+		pinctrl-0 = <&wifi_enable_h>;
+		reset-gpios = <&gpio2 RK_PD2 GPIO_ACTIVE_LOW>;
+	};
+
+	vcc_sys: vcc-sys-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "vcc_sys";
+		regulator-always-on;
+		regulator-boot-on;
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+	};
+
+	vcc_host: vcc-host-regulator {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio3 RK_PC4 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&host_vbus_drv>;
+		regulator-name = "vcc_host";
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vcc_sys>;
+	};
+
+	vccio_1v8: vccio-1v8-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "vccio_1v8";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+		vin-supply = <&vcc_sys>;
+	};
+
+	vccio_3v3: vccio-3v3-regulator {
+		compatible = "regulator-fixed";
+		regulator-name = "vccio_3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
+		vin-supply = <&vcc_sys>;
+	};
+
+	vcc_otg: vcc-otg-regulator {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio3 RK_PC6 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&otg_vbus_drv>;
+		regulator-name = "vcc_otg_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vcc_sys>;
+	};
+
+	vcc_phy: vcc-phy-regulator {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		regulator-name = "vcc_phy";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <1800000>;
+		regulator-always-on;
+		regulator-boot-on;
+		vin-supply = <&vccio_1v8>;
+	};
+
+	vdd_arm: vdd-arm-regulator {
+		compatible = "pwm-regulator";
+		pwms = <&pwm1 0 5000 PWM_POLARITY_INVERTED>;
+		pwm-supply = <&vcc_sys>;
+		regulator-name = "vdd_arm";
+		regulator-min-microvolt = <950000>;
+		regulator-max-microvolt = <1400000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	vdd_log: vdd-log-regulator {
+		compatible = "pwm-regulator";
+		pwms = <&pwm2 0 5000 PWM_POLARITY_INVERTED>;
+		pwm-supply = <&vcc_sys>;
+		regulator-name = "vdd_log";
+		regulator-min-microvolt = <1000000>;
+		regulator-max-microvolt = <1300000>;
+		regulator-always-on;
+		regulator-boot-on;
+	};
+
+	thermal-zones {
+		cpu_thermal: cpu-thermal {
+			polling-delay-passive = <1000>; /* milliseconds */
+			polling-delay = <5000>; /* milliseconds */
+
+			thermal-sensors = <&tsadc 0>;
+
+			trips {
+				cpu_alert0: cpu_alert0 {
+					temperature = <90000>; /* millicelsius */
+					hysteresis = <2000>; /* millicelsius */
+					type = "passive";
+				};
+				cpu_alert1: cpu_alert1 {
+					temperature = <95000>; /* millicelsius */
+					hysteresis = <2000>; /* millicelsius */
+					type = "passive";
+				};
+				cpu_crit: cpu_crit {
+					temperature = <105000>; /* millicelsius */
+					hysteresis = <2000>; /* millicelsius */
+					type = "critical";
+				};
+			};
+
+			cooling-maps {
+
+				cpu_throttle_low: map-cpu-throttle-low {
+					trip = <&cpu_alert0>;
+					cooling-device =
+						<&cpu0 THERMAL_NO_LIMIT 1>,
+						<&cpu1 THERMAL_NO_LIMIT 1>,
+						<&cpu2 THERMAL_NO_LIMIT 1>,
+						<&cpu3 THERMAL_NO_LIMIT 1>;
+				};
+
+				cpu_throttle_high: map-cpu-throttle-high {
+					trip = <&cpu_alert1>;
+					cooling-device =
+						<&cpu0 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&cpu1 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&cpu2 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>,
+						<&cpu3 THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+				};
+
+				gpu_throttle_low: map-gpu-throttle-low {
+					trip = <&cpu_alert0>;
+					cooling-device =
+						<&gpu THERMAL_NO_LIMIT 1>;
+				};
+
+				gpu_throttle_high: map-gpu-throttle-high {
+					trip = <&cpu_alert1>;
+					cooling-device =
+						<&gpu THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+				};
+
+				dmc_throttle_low: map-dmc-throttle-low {
+					trip = <&cpu_alert0>;
+					cooling-device = <&dmc THERMAL_NO_LIMIT 1>;
+				};
+
+				dmc_throttle_high: map-dmc-throttle-high {
+					trip = <&cpu_alert1>;
+					cooling-device = <&dmc THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
+				};
+
+			};
+		};
+	};
+
+	hdmi-sound {
+		compatible = "audio-graph-card2";
+		label = "HDMI";
+		links = <&i2s0_port>;
+	};
+
+	analog-sound {
+		compatible = "audio-graph-card2";
+		label = "analog";
+		links = <&i2s1_port>;
+	};
+
+	spdif-sound {
+		compatible = "audio-graph-card2";
+		label = "SPDIF";
+		links = <&spdif_port>;
+	};
+
+	spdif_out: spdif-out {
+		status = "okay";
+		compatible = "linux,spdif-dit";
+		#sound-dai-cells = <0>;
+		spdif_out_port: port {
+			spdif_out_ep: endpoint {
+				remote-endpoint = <&spdif_ep>;
+			};
+		};
+	};
+
+};
+
+&cpu0 {
+	cpu-supply = <&vdd_arm>;
+};
+
+&cpu1 {
+	cpu-supply = <&vdd_arm>;
+};
+
+&cpu2 {
+	cpu-supply = <&vdd_arm>;
+};
+
+&cpu3 {
+	cpu-supply = <&vdd_arm>;
+};
+
+&cru {
+	assigned-clocks = <&cru PLL_GPLL>, <&cru ARMCLK>,
+			  <&cru PLL_CPLL>, <&cru ACLK_PERI>,
+			  <&cru HCLK_PERI>, <&cru PCLK_PERI>,
+			  <&cru ACLK_CPU>, <&cru HCLK_CPU>,
+			  <&cru PCLK_CPU>, <&cru ACLK_VOP>;
+
+	assigned-clock-rates = <1200000000>, <816000000>,
+				<500000000>, <150000000>,
+				<150000000>, <75000000>,
+				<150000000>, <150000000>,
+				<75000000>, <400000000>;
+};
+
+&dmc {
+	logic-supply = <&vdd_log>;
+};
+
+&emmc {
+	cap-mmc-highspeed;
+	keep-power-in-suspend;
+	non-removable;
+	status = "okay";
+	/delete-property/ mmc-ddr-1_8v;
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+	/delete-property/ rockchip,default-sample-phase;
+	rockchip,default-sample-phase = <90>;
+};
+
+&gmac {
+	assigned-clocks = <&cru SCLK_MAC_SRC>;
+	assigned-clock-rates = <50000000>;
+	clock_in_out = "output";
+	phy-handle = <&phy>;
+	phy-mode = "rmii";
+	phy-supply = <&vcc_phy>;
+	tx_delay = <0x26>;
+	rx_delay = <0x11>;
+	status = "okay";
+
+	mdio {
+		compatible = "snps,dwmac-mdio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		phy: phy@0 {
+			compatible = "ethernet-phy-id1234.d400",
+			             "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+			clocks = <&cru SCLK_MAC_PHY>;
+			phy-is-integrated;
+			resets = <&cru SRST_MACPHY>;
+		};
+	};
+};
+
+&gpu {
+	assigned-clocks = <&cru ACLK_GPU>;
+	assigned-clock-rates = <300000000>;
+	mali-supply = <&vdd_log>;
+};
+
+&gpu_opp_table {
+	opp-400000000 {
+		opp-hz = /bits/ 64 <400000000>;
+		opp-microvolt = <1100000 1000000 1200000>;
+	};
+};
+
+&io_domains {
+	vccio1-supply = <&vccio_3v3>;
+	vccio2-supply = <&vccio_1v8>;
+	vccio4-supply = <&vccio_3v3>;
+	status = "okay";
+};
+
+&nfc {
+
+	status = "disabled";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+
+	nand@0 {
+		reg = <0>;
+		label = "rk-nand";
+		nand-bus-width = <8>;
+		nand-ecc-mode = "hw";
+		nand-ecc-step-size = <1024>;
+		nand-ecc-strength = <60>;
+		nand-is-boot-medium;
+		rockchip,boot-blks = <8>;
+		rockchip,boot-ecc-strength = <60>;
+	};
+
+};
+
+&iep {
+	status = "okay";
+};
+
+&iep_mmu {
+	status = "okay";
+};
+
+&pwm1 {
+	status = "okay";
+};
+
+&pwm2 {
+	status = "okay";
+};
+
+&hdmi {
+	status = "okay";
+	hdmi_port: port@2 {
+		reg = <2>;
+		hdmi_ep: endpoint {
+			remote-endpoint = <&i2s0_ep>;
+		};
+	};
+};
+
+&hdmi_phy {
+	status = "okay";
+};
+
+&codec {
+	#sound-dai-cells = <0>;
+	status = "okay";
+	codec_port: port {
+		codec_ep: endpoint {
+			remote-endpoint = <&i2s1_ep>;
+		};
+	};
+};
+
+&spdif {
+	status = "okay";
+	spdif_port: port {
+		spdif_ep: endpoint {
+			remote-endpoint = <&spdif_out_ep>;
+		};
+	};
+};
+
+&i2s0 {
+	status = "okay";
+	i2s0_port: port {
+		i2s0_ep: endpoint {
+			system-clock-direction-out;
+			frame-master;
+			bitclock-master;
+			mclk-fs = <256>;
+			dai-format = "i2s";
+			remote-endpoint = <&hdmi_ep>;
+		};
+	};
+};
+
+&i2s1 {
+	#sound-dai-cells = <0>;
+	status = "okay";
+	i2s1_port: port {
+		i2s1_ep: endpoint {
+			system-clock-direction-out;
+			frame-master;
+			bitclock-master;
+			mclk-fs = <256>;
+			dai-format = "i2s";
+			remote-endpoint = <&codec_ep>;
+		};
+	};
+};
+
+/** Integration to pin controller */
+&pinctrl {
+
+	pcfg_pull_up_12ma: pcfg-pull-up-12ma {
+		drive-strength = <12>;
+		bias-pull-up;
+	};
+
+	pcfg_pull_down_12ma: pcfg-pull-down-12ma {
+		drive-strength = <12>;
+		bias-pull-down;
+	};
+
+	pcfg_pull_none_12ma: pcfg-pull-none-12ma {
+		drive-strength = <12>;
+		bias-disable;
+	};
+
+	pcfg_pull_up_8ma: pcfg-pull-up-8ma {
+		drive-strength = <8>;
+		bias-pull-up;
+	};
+
+	pcfg_pull_down_8ma: pcfg-pull-down-8ma {
+		drive-strength = <8>;
+		bias-pull-down;
+	};
+
+	pcfg_pull_none_8ma: pcfg-pull-none-8ma {
+		drive-strength = <8>;
+		bias-disable;
+	};
+
+	pcfg_pull_up_2ma: pcfg-pull-up-2ma {
+		drive-strength = <2>;
+		bias-pull-up;
+	};
+
+	pcfg_pull_down_2ma: pcfg-pull-down-2ma {
+		drive-strength = <2>;
+		bias-pull-down;
+	};
+
+	pcfg_pull_none_2ma: pcfg-pull-none-2ma {
+		drive-strength = <2>;
+		bias-disable;
+	};
+
+	/*
+	* Some rk322x electrical schemes report this kind of pull-up/down
+	* pin configurations. We set them here, but we don't use it in this
+	* device tree. These instead are useful for overlays, because they seem
+	* to increase stability on at least one board I got here
+	*/
+	sdmmc {
+		sdmmc_clk: sdmmc-clk {
+			rockchip,pins = <1 16 1 &pcfg_pull_down>;
+		};
+
+		sdmmc_cmd: sdmmc-cmd {
+			rockchip,pins = <1 15 1 &pcfg_pull_up>;
+		};
+
+		sdmmc_bus4: sdmmc-bus4 {
+			rockchip,pins = <1 18 1 &pcfg_pull_up>,
+					<1 19 1 &pcfg_pull_up>,
+					<1 20 1 &pcfg_pull_up>,
+					<1 21 1 &pcfg_pull_up>;
+		};
+	};
+
+	/*
+	* Same as above, decreasing strength of SDIO pins seems to be benefical
+	* to stability
+	*/
+	sdio {
+		sdio_clk: sdio-clk {
+			rockchip,pins = <3 0 1 &pcfg_pull_down_2ma>;
+		};
+
+		sdio_cmd: sdio-cmd {
+			rockchip,pins = <3 1 1 &pcfg_pull_up_2ma>;
+		};
+
+		sdio_bus4: sdio-bus4 {
+			rockchip,pins = <3 2 1 &pcfg_pull_up_2ma>,
+					<3 3 1 &pcfg_pull_up_2ma>,
+					<3 4 1 &pcfg_pull_up_2ma>,
+					<3 5 1 &pcfg_pull_up_2ma>;
+		};
+	};
+
+	/*
+	* Same drill as above, electrical schemes also report this pull-up/down
+	* configurations.
+	*/
+	emmc {
+		emmc_clk: emmc-clk {
+			rockchip,pins = <2 7 2 &pcfg_pull_up>;
+		};
+
+		emmc_cmd: emmc-cmd {
+			rockchip,pins = <1 22 2 &pcfg_pull_up>;
+		};
+
+		emmc_bus8: emmc-bus8 {
+			rockchip,pins = <1 24 2 &pcfg_pull_up>,
+					<1 25 2 &pcfg_pull_up>,
+					<1 26 2 &pcfg_pull_up>,
+					<1 27 2 &pcfg_pull_up>,
+					<1 28 2 &pcfg_pull_up>,
+					<1 29 2 &pcfg_pull_up>,
+					<1 30 2 &pcfg_pull_up>,
+					<1 31 2 &pcfg_pull_up>;
+		};
+
+		emmc_pwr: emmc-pwr {
+			rockchip,pins = <2 RK_PA5 2 &pcfg_pull_down>;
+		};
+
+		emmc_rst: emmc-rst {
+			rockchip,pins = <1 RK_PC7 2 &pcfg_pull_up>;
+		};
+
+	};
+
+	gpio-items {
+		gpio_led_working: gpio-led-working {
+			rockchip,pins =  <3 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	ir {
+		ir_int: ir-int {
+			rockchip,pins = <1 RK_PB3 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	pwm1 {
+		pwm1_pin_pull_down: pwm1-pin-pull-down {
+			rockchip,pins = <0 RK_PD6 2 &pcfg_pull_down>;
+		};
+	};
+
+	pwm2 {
+		pwm2_pin_pull_up: pwm2-pin-pull-up {
+			rockchip,pins = <1 RK_PB4 2 &pcfg_pull_up>;
+		};
+	};
+
+	usb {
+		host_vbus_drv: host-vbus-drv {
+			rockchip,pins = <3 RK_PC4 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		otg_vbus_drv: otg-vbus-drv {
+			rockchip,pins = <3 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	sdio-pwrseq {
+		wifi_enable_h: wifi-enable-h {
+			rockchip,pins = <2 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart11_xfer &uart11_rts &uart11_cts>;
+};
+
+&uart2 {
+	status = "okay";
+};
+
+&u2phy0 {
+	status = "okay";
+	u2phy0_host: host-port {
+		phy-supply = <&vcc_host>;
+	};
+
+	u2phy0_otg: otg-port {
+		phy-supply = <&vcc_otg>;
+	};
+};
+
+&u2phy0_otg {
+	status = "okay";
+};
+
+&u2phy0_host {
+	status = "okay";
+};
+
+&u2phy1 {
+	status = "okay";
+	u2phy1_host: host-port {
+		phy-supply = <&vcc_host>;
+	};
+
+	u2phy1_otg: otg-port {
+		phy-supply = <&vcc_otg>;
+	};
+};
+
+&u2phy1_otg {
+	status = "okay";
+};
+
+&u2phy1_host {
+	status = "okay";
+};
+
+&usb_host0_ehci {
+	status = "okay";
+};
+
+&usb_host0_ohci {
+	status = "okay";
+};
+
+&usb_host1_ehci {
+	status = "okay";
+};
+
+&usb_host1_ohci {
+	status = "okay";
+};
+
+&usb_host2_ehci {
+	status = "okay";
+};
+
+&usb_host2_ohci {
+	status = "okay";
+};
+
+&usb_otg {
+	dr_mode = "host";
+	status = "okay";
+};
+
+&sdio {
+	mmc-pwrseq = <&sdio_pwrseq>;
+	cap-sd-highspeed;
+	cap-sdio-irq;
+	keep-power-in-suspend;
+	non-removable;
+	no-sd;
+	status = "okay";
+};
+
+&sdmmc {
+	cd-gpios = <&gpio1 RK_PC1 GPIO_ACTIVE_LOW>;
+	cd-debounce-delay-ms = <500>;
+	cap-sd-highspeed;
+	keep-power-in-suspend;
+	no-sdio;
+	status = "okay";
+};
+
+&tsadc {
+	rockchip,grf = <&grf>;
+	rockchip,hw-tshut-mode = <0>;
+	rockchip,hw-tshut-polarity = <1>;
+	rockchip,hw-tshut-temp = <110000>;
+
+	/* delete the pinctrl-* properties because, on mainline kernel, they (in particular "default")
+	   change the GPIO configuration of the associated PIN. On most boards that pin is not connected
+	   so it does not do anything, but some other boards (X96-Mini) have that pin connected to
+	   a reset pin of the soc or whatever, thus changing the configuration of the pin at boot
+	   causes them to bootloop.
+	   We don't really need these ones though, because since hw-tshut-mode is set to 0, the CRU
+	   unit of the SoC does the reboot*/
+	/delete-property/ pinctrl-names;
+	/delete-property/ pinctrl-0;
+	/delete-property/ pinctrl-1;
+	/delete-property/ pinctrl-2;
+
+	status = "okay";
+};
+
+&vop {
+	assigned-clocks = <&cru DCLK_VOP>;
+	assigned-clock-parents = <&cru SCLK_HDMI_PHY>;
+	status = "okay";
+};
+
+&vop_mmu {
+	status = "okay";
+};
+
+&wdt {
+	status = "okay";
+};
