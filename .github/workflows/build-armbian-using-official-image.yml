@@ -64,6 +64,7 @@ on:
           - r66s
           - r68s
           - renegade-rk3328
+          - rk322x-box
           - rk3318-box
           - rock5b
           - rock5c
