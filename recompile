@@ -574,7 +574,8 @@ chroot_armbian() {
     #echo -e "${INFO} Kernel copy results in the [ ${tag_rootfs}/root ] directory: \n$(ls -l ${tag_rootfs}/root) \n"
 
     # Enter the armbian system to generate /boot/uInitrd-${kernel_outname} file
-    echo -e "${STEPS} Enter the chroot Armbian system..."
+    echo -e "${STEPS} Start mounting the armbian system..."
+    [[ -d "${tag_rootfs}/dev/pts" ]] || mkdir -p ${tag_rootfs}/dev/pts
     mount -t proc /proc ${tag_rootfs}/proc
     mount -t sysfs /sys ${tag_rootfs}/sys
     mount -t devpts /dev/pts ${tag_rootfs}/dev/pts
@@ -585,6 +586,7 @@ chroot_armbian() {
 
     # Always unmount armbian on exit
     trap unmount_armbian SIGINT
+    echo -e "${INFO} Entering the chroot environment, please wait..."
     chroot ${tag_rootfs} /bin/bash -c "/root/ubuntu_chroot_armbian.sh ${kernel_outname}"
     if [[ "${?}" -ne "0" || ! -f "${tag_rootfs}/boot/uInitrd-${kernel_outname}" ]]; then
         unmount_armbian
