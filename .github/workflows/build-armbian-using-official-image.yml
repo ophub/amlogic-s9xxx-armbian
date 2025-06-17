@@ -198,10 +198,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "ophub/kernel"
+        default: "pitekkate/kernel-rk322x"
         type: choice
         options:
-          - ophub/kernel
+          - pitekkate/kernel-rk322x
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
@@ -236,7 +236,7 @@ on:
         options:
           - ophub
           - angel
-          - yourname
+          - kangris
 
 env:
   TZ: America/New_York
@@ -323,14 +323,14 @@ jobs:
 
           mkdir -p /builder/build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build /home/runner/work/_actions/pitekkate/amlogic-s9xxx-armbian/main/build
 
           sudo timedatectl set-timezone "${TZ}"
           echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: pitekkate/amlogic-s9xxx-armbian@main
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
