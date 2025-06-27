@@ -473,13 +473,13 @@ unmount_armbian() {
     cd ${current_path}
 
     sync && sleep 3
-    umount ${tag_rootfs}/dev/pts 2>/dev/null
-    umount -R ${tag_rootfs}/dev 2>/dev/null
-    umount ${tag_rootfs}/run 2>/dev/null
-    umount ${tag_rootfs}/sys 2>/dev/null
-    umount ${tag_rootfs}/proc 2>/dev/null
-    umount ${tag_rootfs}/boot 2>/dev/null
-    umount ${tag_rootfs} 2>/dev/null
+    umount -l ${tag_rootfs}/dev/pts 2>/dev/null
+    umount -R -l ${tag_rootfs}/dev 2>/dev/null
+    umount -l ${tag_rootfs}/run 2>/dev/null
+    umount -l ${tag_rootfs}/sys 2>/dev/null
+    umount -l ${tag_rootfs}/proc 2>/dev/null
+    umount -l ${tag_rootfs}/boot 2>/dev/null
+    umount -l ${tag_rootfs} 2>/dev/null
     losetup -D 2>/dev/null
 }
 
