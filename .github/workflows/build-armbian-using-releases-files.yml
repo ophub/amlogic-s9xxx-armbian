@@ -27,8 +27,8 @@ on:
         options:
           - all
           - s905w_s905x_s905x-b860h_s905x-t95_s905x2_s905x3_s905x3-x88-pro-x3_s912_s912-m8s-pro_s912-phicomm-t1_s912-t95z-plus
-          - s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28
-          - tanix-tx6_tb-ls3399_tn3399_tpm312_tqc-a01_tvi3315a_vplus_wxy-oec_xiaobao_yskj_zcube1-max_zk-r39a_zysj
+          - s912-x92_s922x_s922x-ct2000_s922x-reva_seewo-sv21_smart-am40_smart-am60_station-m1_sw799_swan1-w28_tanix-tx6
+          - tb-ls3399_tn3399_tpm312_tqc-a01_tvi3315a_vplus_wxy-oect_wxy-oec-replaced_xiaobao_yskj_zcube1-max_zk-r39a_zysj
           - a311d
           - a311d-oes
           - alark35-3500
@@ -174,7 +174,8 @@ on:
           - tqc-a01
           - tvi3315a
           - vplus
-          - wxy-oec
+          - wxy-oect
+          - wxy-oec-replaced
           - xiaobao
           - yskj
           - zcube1-max
