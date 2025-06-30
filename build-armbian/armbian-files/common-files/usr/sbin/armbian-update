@@ -116,13 +116,13 @@ check_disk() {
 
     # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
     case "${ROOT_PTNAME}" in
-    mmcblk?p[1-4])
+    mmcblk?p[1-9])
         DISK_NAME="${ROOT_PTNAME:0:-2}"
         ;;
-    [hsv]d[a-z][1-4])
+    [hsv]d[a-z][1-9])
         DISK_NAME="${ROOT_PTNAME:0:-1}"
         ;;
-    nvme?n?p[1-4])
+    nvme?n?p[1-9])
         DISK_NAME="${ROOT_PTNAME:0:-2}"
         ;;
     *)
@@ -156,6 +156,7 @@ init_var() {
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
+    MODEL_ID="${MODEL_ID}"
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_REPO="${KERNEL_REPO}"
@@ -503,6 +504,8 @@ update_kernel() {
     [[ "${PLATFORM}" == "amlogic" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} zImage)
     [[ "${PLATFORM}" == "rockchip" ]] && (cd /boot && ln -sf uInitrd-${kernel_name} uInitrd && ln -sf vmlinuz-${kernel_name} Image)
     [[ "${PLATFORM}" == "allwinner" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} Image)
+    # wxy-oect: MODEL_ID numbers r304 and r306, require special handling of uInitrd
+    [[ "${MODEL_ID}" == "r304" || "${MODEL_ID}" == "r306" ]] && (cd /boot && rm -f uInitrd && ln -sf initrd.img-${kernel_name} uInitrd)
     [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     echo -e "${INFO} (1/4) Unpacking [ boot-${kernel_name}.tar.gz ] succeeded."
 
