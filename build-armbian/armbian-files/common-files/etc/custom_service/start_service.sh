@@ -9,96 +9,112 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Function: Customize the startup script, adding content as needed.
-# Dependent script: /etc/rc.local
+# Dependent script: /etc/rc.local (which runs with 'set -e')
 # File path: /etc/custom_service/start_service.sh
+#
+# Version: v1.1
 #
 #========================================================================================
 
-# Custom Service Log
+# Custom Service Log - all script output will be logged here.
 custom_log="/tmp/ophub_start_service.log"
 
-# Add custom log
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Start the custom service..." >${custom_log}
-
-# Set the release check file
-ophub_release_file="/etc/ophub-release"
-[[ -f "${ophub_release_file}" ]] && FDT_FILE="$(cat ${ophub_release_file} | grep -oE 'meson.*dtb')" || FDT_FILE=""
-[[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##')" || FDT_FILE=""
-[[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##')" || FDT_FILE=""
-
-# For Tencent Aurora 3Pro (s905x3-b) box [ /etc/modprobe.d/blacklist.conf : blacklist btmtksdio ]
-[[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]] && {
-    modprobe btmtksdio 2>/dev/null &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The Tencent-Aurora-3Pro's btmtksdio module loaded successfully." >>${custom_log}
+# A helper function for logging with a timestamp.
+log_message() {
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] $1" >>"${custom_log}"
 }
 
-# For swan1-w28(rk3568) board USB power and switch contrl
-[[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]] && {
-    # USB 5V Power buick ON
+# Start of the script.
+log_message "Start the custom service..."
+
+# System Identification
+# Set the release check file to identify the device type.
+ophub_release_file="/etc/ophub-release"
+FDT_FILE="" # Initialize FDT_FILE to be empty.
+
+[[ -f "${ophub_release_file}" ]] && { FDT_FILE="$(grep -oE 'meson.*dtb' "${ophub_release_file}")"; }
+[[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && { FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##')"; }
+[[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && { FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##')"; }
+log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
+
+# Device-Specific Services
+
+# For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
+if [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
+    modprobe btmtksdio 2>/dev/null || true
+    log_message "Attempted to load btmtksdio module for Tencent-Aurora-3Pro."
+fi
+
+# For swan1-w28(rk3568) board: USB power and switch control
+if [[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]]; then
+    # GPIO operations are critical, but we also add error suppression.
     gpioset 0 21=1 2>/dev/null
-    # USB3.0 Port ON
     gpioset 3 20=1 2>/dev/null
-    # USB2.0 Port ON
     gpioset 4 21=1 2>/dev/null
     gpioset 4 22=1 2>/dev/null
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] USB successfully enabled on Swan1-w28(rk3568)." >>${custom_log}
-}
+    log_message "USB power control GPIOs set for Swan1-w28."
+fi
 
-# For smart-am60(rk3588) board Bluetooth contrl
-[[ "${FDT_FILE}" == "rk3588-smart-am60.dtb" ]] && {
+# For smart-am60(rk3588) board: Bluetooth control
+if [[ "${FDT_FILE}" == "rk3588-smart-am60.dtb" ]]; then
+    # This is a sequence of commands, with the last one running in the background.
+    # The background command (&) won't affect the script's exit code.
     rfkill block all
-    chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1
+    chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 2>/dev/null || true
     sleep .5
     rfkill unblock all
     /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6276p/ /dev/ttyS9 &
+    log_message "Bluetooth firmware download process started for Smart-am60."
+fi
 
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] Bluetooth firmware successfully download on Smart-am60(rk3588)." >>${custom_log}
-}
+# General System Services
 
 # Restart ssh service
-[[ -d "/var/run/sshd" ]] || mkdir -p -m0755 /var/run/sshd 2>/dev/null
-[[ -f "/etc/init.d/ssh" ]] && {
-    sleep 5 && /etc/init.d/ssh restart 2>/dev/null &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The ssh service restarted successfully." >>${custom_log}
-}
+mkdir -p -m0755 /var/run/sshd 2>/dev/null
+if [[ -f "/etc/init.d/ssh" ]]; then
+    (sleep 5 && /etc/init.d/ssh restart 2>/dev/null) || true
+    log_message "SSH service restart attempted."
+fi
 
 # Add network performance optimization
-[[ -x "/usr/sbin/balethirq.pl" ]] && {
-    perl /usr/sbin/balethirq.pl 2>/dev/null &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The network optimization service started successfully." >>${custom_log}
-}
+if [[ -x "/usr/sbin/balethirq.pl" ]]; then
+    (perl /usr/sbin/balethirq.pl 2>/dev/null) || true
+    log_message "Network optimization service (balethirq.pl) execution attempted."
+fi
 
 # Led display control
 openvfd_enable="no"
 openvfd_boxid="15"
-[[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -x "/usr/sbin/armbian-openvfd" ]] && {
-    armbian-openvfd ${openvfd_boxid} &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The openvfd service started successfully." >>${custom_log}
-}
+if [[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -x "/usr/sbin/armbian-openvfd" ]]; then
+    (armbian-openvfd "${openvfd_boxid}") || true
+    log_message "OpenVFD service execution attempted."
+fi
 
 # For vplus(Allwinner h6) led color lights
-[[ -x "/usr/bin/rgb-vplus" ]] && {
+if [[ -x "/usr/bin/rgb-vplus" ]]; then
     rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE 2>/dev/null &
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The LED of Vplus is enabled successfully." >>${custom_log}
-}
+    log_message "Vplus RGB LED service started in background."
+fi
 
 # For fan control service
-[[ -x "/usr/bin/pwm-fan.pl" ]] && {
+if [[ -x "/usr/bin/pwm-fan.pl" ]]; then
     perl /usr/bin/pwm-fan.pl 2>/dev/null &
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The fan control service enabled successfully." >>${custom_log}
-}
+    log_message "Fan control service (pwm-fan.pl) started in background."
+fi
 
-# For oes(A311d) led color lights
-[[ -x "/usr/bin/oes_sata_leds.sh" ]] && {
+# For oes(A311d) SATA LED status monitoring
+if [[ -x "/usr/bin/oes_sata_leds.sh" ]]; then
     /usr/bin/oes_sata_leds.sh >/var/log/oes-sata-leds.log 2>&1 &
-    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The SATA status check on WXY-OES(A311D) enabled successfully." >>${custom_log}
-}
+    log_message "SATA status check service (oes_sata_leds.sh) started in background."
+fi
 
 # For pveproxy startup service
-[[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]] && {
-    sudo systemctl restart pveproxy &&
-        echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The pveproxy service started successfully." >>${custom_log}
-}
+if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]]; then
+    # Restarting systemd services can sometimes fail during early boot.
+    # Using '|| true' makes this step fault-tolerant.
+    (sudo systemctl restart pveproxy) || true
+    log_message "PVE proxy service restart attempted."
+fi
 
-# Add custom log
-echo "[$(date +"%Y.%m.%d.%H:%M:%S")] All custom services executed successfully!" >>${custom_log}
+# Finalization
+log_message "All custom services have been processed."
