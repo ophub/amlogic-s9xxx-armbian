@@ -91,7 +91,7 @@ on:
         type: choice
         options:
           - -ophub
-          - -yourname
+          - -lighthx
 
 env:
   TZ: America/New_York
@@ -165,8 +165,8 @@ jobs:
         run: |
           # Create a docker mapping directory
           mkdir -p /builder/compile-kernel/{kernel,output}
-          ln -sf /builder/compile-kernel/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
-          ln -sf /builder/compile-kernel/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
+          ln -sf /builder/compile-kernel/kernel /home/runner/work/_actions/lighthx/amlogic-s9xxx-armbian/main/compile-kernel/kernel
+          ln -sf /builder/compile-kernel/output /home/runner/work/_actions/lighthx/amlogic-s9xxx-armbian/main/compile-kernel/output
 
           # Pull the Armbian Docker image
           docker run -d --privileged \
