@@ -88,6 +88,12 @@ openvfd_boxid="15"
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The fan control service enabled successfully." >>${custom_log}
 }
 
+# For oes(A311d) led color lights
+[[ -x "/usr/bin/oes_sata_leds.sh" ]] && {
+    /usr/bin/oes_sata_leds.sh >/var/log/oes-sata-leds.log 2>&1 &
+    echo "[$(date +"%Y.%m.%d.%H:%M:%S")] The SATA status check on WXY-OES(A311D) enabled successfully." >>${custom_log}
+}
+
 # For pveproxy startup service
 [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]] && {
     sudo systemctl restart pveproxy &&
