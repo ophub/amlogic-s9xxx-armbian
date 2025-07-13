@@ -145,9 +145,9 @@ mount_try() {
     while [[ "${t}" -le "${max_try}" ]]; do
         # Mount according to the image partition format
         if [[ "${m_type}" == "btrfs" ]]; then
-            mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target}
+            mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target} 2>/dev/null
         else
-            mount -t ${m_type} -o discard ${m_dev} ${m_target}
+            mount -t ${m_type} -o discard ${m_dev} ${m_target} 2>/dev/null
         fi
 
         # Mount failed and continue trying
