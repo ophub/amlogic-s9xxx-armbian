@@ -151,6 +151,7 @@ on:
           - s922x-gtking
           - s922x-gtkingpro-h
           - s922x-odroid-n2
+          - s922x-oes-plus
           - s922x-reva
           - s922x-ugoos-am6
           - seewo-sv21
