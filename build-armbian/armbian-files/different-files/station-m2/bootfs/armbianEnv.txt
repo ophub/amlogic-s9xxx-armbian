@@ -7,6 +7,6 @@ rootflags=compress=zstd:6
 earlycon=on
 console=serial
 consoleargs=console=ttyS2,1500000
-extraargs=cma=256M
+extraargs=cma=256M rw rootwait
 extraboardargs=net.ifnames=0 max_loop=128
 overlay_prefix=rk35xx
