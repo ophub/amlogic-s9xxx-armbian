@@ -894,13 +894,13 @@ refactor_bootfs() {
     # Set configuration file mount parameters
     if [[ "${rootfs_type}" == "btrfs" ]]; then
         # For uEnv.txt
-        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
+        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rw rootwait rootfstype=btrfs"
         # For armbianEnv.txt
         armbianenv_rootdev="UUID=${ROOTFS_UUID}"
         armbianenv_rootflags="compress=zstd:6"
     else
         # For uEnv.txt
-        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
+        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootwait rootfstype=ext4"
         # For armbianEnv.txt
         armbianenv_rootdev="UUID=${ROOTFS_UUID}"
         armbianenv_rootflags="rw,errors=remount-ro"

@@ -3,5 +3,6 @@ bootlogo=false
 overlay_prefix=rk3588
 fdtfile=rockchip/rk3588s-rock-5c.dtb
 rootdev=/dev/mmcblk0p2
+extraargs=rw rootwait
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
