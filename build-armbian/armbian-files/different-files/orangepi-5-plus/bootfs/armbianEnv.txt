@@ -9,7 +9,7 @@ console=serial
 consoleargs=console=ttyFIQ0 console=tty1
 usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
 docker_optimizations=on
-extraargs=
+extraargs=rw rootwait
 extraboardargs=net.ifnames=0 max_loop=128
 overlay_prefix=rk3588
 overlays=uart7-m2

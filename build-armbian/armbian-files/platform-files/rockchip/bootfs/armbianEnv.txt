@@ -6,6 +6,6 @@ rootfstype=ext4
 rootflags=rw,errors=remount-ro
 overlay_prefix=rk3399
 overlays=
-extraargs=
+extraargs=rw rootwait
 extraboardargs=net.ifnames=0 max_loop=128
 docker_optimizations=on
