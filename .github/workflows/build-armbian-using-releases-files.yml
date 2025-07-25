@@ -68,6 +68,7 @@ on:
           - nanopi-r5c
           - nanopi-r5s
           - orangepi-5-plus
+          - orangepi-5b
           - panther-x2
           - r66s
           - r68s
