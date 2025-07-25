@@ -3,7 +3,7 @@ overlay_prefix=rockchip
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
-extraargs=usbcore.autosuspend=-1
+extraargs=usbcore.autosuspend=-1 rw rootwait
 extraboardargs=
 fdtfile=/dtb/rockchip/rk3328-beikeyun-1296mhz.dtb
 kernel_addr_r=0x02000000

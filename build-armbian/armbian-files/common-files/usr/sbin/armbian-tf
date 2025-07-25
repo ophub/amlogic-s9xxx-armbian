@@ -37,25 +37,22 @@ do_checkdisk() {
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
     [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
 
-    # Find the disk where the partition is located, only supports mmcblk?p? sd?? hd?? vd?? and other formats
+    # Find the disk where the partition is located, supporting multi-digit partition numbers
     case "${ROOT_PTNAME}" in
-    mmcblk?p[1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-2}"
-        PT_PRE="${DISK_NAME}p"
-        LB_PRE="MMC_"
+    mmcblk?p[0-9]*)
+        # For example, mmcblk0p1 -> mmcblk0
+        DISK_NAME=$(echo "${ROOT_PTNAME}" | sed -E 's/p[0-9]+$//')
         ;;
-    [hsv]d[a-z][1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-1}"
-        PT_PRE="${DISK_NAME}"
-        LB_PRE="USB_"
+    [hsv]d[a-z][0-9]*)
+        # For example, sda1 -> sda
+        DISK_NAME=$(echo "${ROOT_PTNAME}" | sed -E 's/[0-9]+$//')
         ;;
-    nvme?n?p[1-4])
-        DISK_NAME="${ROOT_PTNAME:0:-2}"
-        PT_PRE="${DISK_NAME}p"
-        LB_PRE="NVME_"
+    nvme?n?p[0-9]*)
+        # For example, nvme0n1p1 -> nvme0n1
+        DISK_NAME=$(echo "${ROOT_PTNAME}" | sed -E 's/p[0-9]+$//')
         ;;
     *)
-        error_msg "${ERROR} Unable to recognize the disk type of ${ROOT_PTNAME}!"
+        error_msg "Unrecognized disk type ${ROOT_PTNAME}!"
         ;;
     esac
 
