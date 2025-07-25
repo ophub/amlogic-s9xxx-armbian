@@ -145,9 +145,9 @@ mount_try() {
     while [[ "${t}" -le "${max_try}" ]]; do
         # Mount according to the image partition format
         if [[ "${m_type}" == "btrfs" ]]; then
-            mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target}
+            mount -t ${m_type} -o discard,compress=zstd:6 ${m_dev} ${m_target} 2>/dev/null
         else
-            mount -t ${m_type} -o discard ${m_dev} ${m_target}
+            mount -t ${m_type} -o discard ${m_dev} ${m_target} 2>/dev/null
         fi
 
         # Mount failed and continue trying
@@ -280,7 +280,7 @@ check_data() {
     [[ -f "${model_conf}" ]] || error_msg "Missing model config file: [ ${model_conf} ]"
 
     # Get a list of build devices
-    if [[ "${build_board}" == "all" ]]; then
+    if [[ "${build_board}" =~ ^(all|top50|rest50)$ ]]; then
         board_list=":(yes)"
         build_armbian=($(
             cat ${model_conf} |
@@ -293,6 +293,17 @@ check_data() {
         build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
     fi
     [[ "${#build_armbian[@]}" -eq 0 ]] && error_msg "The [ BOARD ] is missing, stop building."
+
+    # Get the list of the first 50 boards
+    [[ "${build_board}" == "top50" ]] && {
+        build_armbian=("${build_armbian[@]:0:50}")
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
+    }
+    # Get the list of boards after the first 50
+    [[ "${build_board}" == "rest50" ]] && {
+        build_armbian=("${build_armbian[@]:50}")
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
+    }
 
     # Get the kernel array
     kernel_from=($(
@@ -577,28 +588,34 @@ confirm_version() {
     conf_kernel_list="${KERNEL_TAGS##*/}"
     # Replace the default kernel tags with the custom kernel tags
     [[ -n "${kernel_usage}" && "${conf_kernel_tags}" == "${default_tags}" ]] && conf_kernel_tags="${kernel_usage}"
+    # Check the kernel tags and version
+    [[ -z "${conf_kernel_tags}" ]] && error_msg "The [ ${KERNEL_TAGS} ] is missing tags part."
+    [[ -z "${conf_kernel_list}" ]] && error_msg "The [ ${KERNEL_TAGS} ] is missing list part."
 
-    # Set the kernel version array
-    build_kernel=()
+    # Find the kernel list defined in the model database
+    model_kernel=()
     if [[ "${conf_kernel_list}" == "all" ]]; then
-        build_kernel=(${tags_list[${conf_kernel_tags}]})
+        eval "model_kernel=(\"\${${conf_kernel_tags}_kernel[@]}\")"
+        model_kernel=($(echo "${model_kernel[@]}" | sed -E 's/[a-z]+/[0-9]+/g'))
     else
         conf_kernel_list="${conf_kernel_list//[a-z]/[0-9]+}"
-        # Convert the string into an array, using "_" as the delimiter.
+        # Convert the string into an array, using "_" as the delimiter
         IFS='_' read -ra conf_kernel_list <<<"${conf_kernel_list}"
         model_kernel=(${conf_kernel_list[@]})
-        latest_kernel=(${tags_list[${conf_kernel_tags}]})
-        # Find the kernel version that matches the custom version
-        for ck in "${model_kernel[@]}"; do
-            for lk in "${latest_kernel[@]}"; do
-                [[ "${lk}" =~ ^${ck}$ ]] && build_kernel+=("${lk}")
-            done
-        done
     fi
+    # Check the kernel list
+    [[ "${#model_kernel[@]}" -eq 0 ]] && error_msg "The kernel list is empty for [ ${board} ]"
 
-    # Check the kernel tags and version
-    [[ -n "${conf_kernel_tags}" || "${#conf_kernel_list[@]}" -eq 0 ]] || error_msg "The [ KERNEL_TAGS ] is invalid: [ ${KERNEL_TAGS} ]."
-    [[ "${#build_kernel[@]}" -eq 0 ]] && error_msg "The [ KERNEL_TAGS ] is invalid: [ ${KERNEL_TAGS} ]."
+    # Find the kernel version that matches the custom version
+    build_kernel=()
+    latest_kernel=(${tags_list[${conf_kernel_tags}]})
+    for ck in "${model_kernel[@]}"; do
+        for lk in "${latest_kernel[@]}"; do
+            [[ "${lk}" =~ ^${ck}$ ]] && build_kernel+=("${lk}")
+        done
+    done
+    # Check the kernel version
+    [[ "${#build_kernel[@]}" -eq 0 ]] && error_msg "The kernel list is invalid for [ ${board} ]"
 }
 
 extract_armbian() {
@@ -877,13 +894,13 @@ refactor_bootfs() {
     # Set configuration file mount parameters
     if [[ "${rootfs_type}" == "btrfs" ]]; then
         # For uEnv.txt
-        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rootfstype=btrfs"
+        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=compress=zstd:6 rw rootwait rootfstype=btrfs"
         # For armbianEnv.txt
         armbianenv_rootdev="UUID=${ROOTFS_UUID}"
         armbianenv_rootflags="compress=zstd:6"
     else
         # For uEnv.txt
-        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootfstype=ext4"
+        uenv_rootdev="UUID=${ROOTFS_UUID} rootflags=data=writeback rw rootwait rootfstype=ext4"
         # For armbianEnv.txt
         armbianenv_rootdev="UUID=${ROOTFS_UUID}"
         armbianenv_rootflags="rw,errors=remount-ro"
