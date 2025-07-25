@@ -1,7 +1,7 @@
 verbosity=1
 bootlogo=false
 console=both
-extraargs=cma=256M
+extraargs=cma=256M rw rootwait
 overlay_prefix=rk35xx
 fdtfile=rockchip/rk3568-mmbox-anas3035.dtb
 rootdev=/dev/mmcblk0p2

@@ -5,7 +5,7 @@ fdtfile=/dtb/rockchip/rk3328-l1pro-1296mhz.dtb
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
-extraargs=usbcore.autosuspend=-1
+extraargs=usbcore.autosuspend=-1 rw rootwait
 extraboardargs=
 usbstoragequirks=0x05e3:0x0612:u,0x1d6b:0x0003:u,0x05e3:0x0610:u
 console=serial

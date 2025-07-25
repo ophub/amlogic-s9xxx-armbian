@@ -10,7 +10,7 @@ usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
 docker_optimizations=on
 earlycon=on
 earlyconargs=earlycon=uart8250,mmio32,0xff9f0000
-extraargs=
+extraargs=rw rootwait
 extraboardargs=net.ifnames=0
 overlay_prefix=rk3528
 overlays=
