@@ -75,7 +75,7 @@ armbian_release_file="etc/armbian-release"
 ophub_release_file="etc/ophub-release"
 
 # U-BOOT files download repository
-uboot_repo="https://github.com/ophub/u-boot"
+uboot_repo="https://github.com/lighthx/u-boot"
 # Firmware files download repository
 firmware_repo="https://github.com/ophub/firmware"
 
