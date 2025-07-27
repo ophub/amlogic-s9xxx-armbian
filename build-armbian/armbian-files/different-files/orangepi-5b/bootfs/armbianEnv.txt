@@ -1,0 +1,16 @@
+verbosity=7
+bootlogo=true
+fdtfile=rockchip/rk3588s-orangepi-5b.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=btrfs
+rootflags=compress=zstd:6
+earlycon=on
+console=serial
+consoleargs=console=ttyFIQ0 console=tty1
+usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
+docker_optimizations=on
+extraargs=rw rootwait
+extraboardargs=net.ifnames=0 max_loop=128
+overlay_prefix=rk3588
+overlays=uart7-m2
+user_overlays=
