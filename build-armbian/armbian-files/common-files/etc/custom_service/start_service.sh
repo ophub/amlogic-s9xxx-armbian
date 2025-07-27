@@ -55,28 +55,16 @@ if [[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]]; then
     log_message "USB power control GPIOs set for Swan1-w28."
 fi
 
-# For smart-am60(rk3588) board: Bluetooth control
-if [[ "${FDT_FILE}" == "rk3588-smart-am60.dtb" ]]; then
+# For smart-am60(rk3588)/orangepi-5b(rk3588s) board: Bluetooth control
+if [[ "${FDT_FILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
     # This is a sequence of commands, with the last one running in the background.
     # The background command (&) won't affect the script's exit code.
     rfkill block all
     chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 2>/dev/null || true
-    sleep .5
-    rfkill unblock all
-    /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6276p/ /dev/ttyS9 &
-    log_message "Bluetooth firmware download process started for Smart-am60."
-fi
-
-# For orangepi-5b(rk3588s) board: Bluetooth control
-if [[ "${FDT_FILE}" == "rk3588s-orangepi-5b.dtb" ]]; then
-    # This is a sequence of commands, with the last one running in the background.
-    # The background command (&) won't affect the script's exit code.
-    rfkill block all
-    chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 2>/dev/null || true
-    sleep .5
+    sleep 2
     rfkill unblock all
     /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6275p/BCM4362A2.hcd /dev/ttyS9 &
-    log_message "Bluetooth firmware download process started for Orangepi-5b."
+    log_message "Bluetooth firmware download process started for Smart-am60/orangepi-5b."
 fi
 
 # General System Services
