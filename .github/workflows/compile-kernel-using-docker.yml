@@ -80,10 +80,11 @@ on:
         default: "bookworm"
         type: choice
         options:
-          - jammy
-          - noble
+          - trixie
           - bookworm
           - bullseye
+          - noble
+          - jammy
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
