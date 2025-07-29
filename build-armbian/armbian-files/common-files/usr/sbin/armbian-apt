@@ -23,10 +23,6 @@
 #
 #========================= Set default parameters ==========================
 #
-# Set the default source of the system
-armbian_source_file="/etc/apt/sources.list"
-armbian_source_backup_file="/etc/apt/sources.list.d/sources.list.bak"
-armbian_list_file="/etc/apt/sources.list.d/armbian.list"
 # Get custom firmware information
 ophub_release_file="/etc/ophub-release"
 
@@ -53,6 +49,11 @@ check_release() {
         VERSION_CODENAME="${VERSION_CODENAME}"
         [[ -z "${VERSION_CODEID}" ]] && error_msg "The system VERSION_CODEID is not detected!"
         [[ -z "${VERSION_CODENAME}" ]] && error_msg "The system VERSION_CODENAME is not detected!"
+
+        # Set the source files
+        armbian_source_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources"
+        armbian_source_backup_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources.bak"
+
     else
         error_msg "The system release file is not detected!"
     fi
@@ -66,79 +67,63 @@ backup_source_list() {
 }
 
 # Change the source of the system
+# Reference source: https://github.com/armbian/build/blob/main/lib/functions/rootfs/distro-specific.sh
 change_source_list() {
     echo -e "${STEPS} Start to change the source of the system: [ ${MIRROR_URL} ]"
     echo -e "${INFO} The system release is: [ ${VERSION_CODENAME} ]"
 
     case "${VERSION_CODENAME}" in
-    buster)
+    buster | bullseye | bookworm | trixie)
+        declare -a suites=("${VERSION_CODENAME}" "${VERSION_CODENAME}-updates")
+        declare -a security_suites=("${VERSION_CODENAME}-security")
+        declare -a components=(main contrib non-free)
+
+        if [[ "${VERSION_CODENAME}" == "buster" || "${VERSION_CODENAME}" == "bullseye" ]]; then
+            security_suites=("${VERSION_CODENAME}/updates")
+        else
+            suites+=("${VERSION_CODENAME}-backports")
+        fi
+
+        if [[ "${VERSION_CODENAME}" != "buster" && "${VERSION_CODENAME}" != "bullseye" ]]; then
+            components+=("non-free-firmware")
+        fi
+
         cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+            Types: deb
+            URIs: http://${MIRROR_URL}/debian
+            Suites: ${suites[@]}
+            Components: ${components[@]}
+            Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
+            Types: deb
+            URIs: http://${MIRROR_URL}/debian-security
+            Suites: ${security_suites[@]}
+            Components: ${components[@]}
+            Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
-        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}/updates main contrib non-free
 EOF
         ;;
 
-    bullseye)
+    focal | jammy | noble | oracular | plucky)
         cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free
+            Types: deb
+            URIs: http://${MIRROR_URL}/ubuntu/
+            Suites: ${VERSION_CODENAME} ${VERSION_CODENAME}-security ${VERSION_CODENAME}-updates ${VERSION_CODENAME}-backports
+            Components: main restricted universe multiverse
+            Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
 
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free
-
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free
-
-        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free
-        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free
-EOF
-        ;;
-
-    bookworm | trixie)
-        # non-free firmware in bookworm and later has moved from the non-free archive component to a new non-free-firmware component (alongside main/contrib/non-free).
-        # This was implemented on 2023-01-27, see also https://lists.debian.org/debian-boot/2023/01/msg00235.html
-        cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
-
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-updates main contrib non-free non-free-firmware
-
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME}-backports main contrib non-free non-free-firmware
-
-        deb http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian-security ${VERSION_CODENAME}-security main contrib non-free non-free-firmware
-EOF
-        ;;
-
-    focal | jammy | noble | oracular)
-        cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME} main restricted universe multiverse
-
-        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-security main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-security main restricted universe multiverse
-
-        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-updates main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-updates main restricted universe multiverse
-
-        deb http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-backports main restricted universe multiverse
-        #deb-src http://${MIRROR_URL}/ubuntu-ports ${VERSION_CODENAME}-backports main restricted universe multiverse
 EOF
         ;;
 
     sid | unstable)
-        # sid is permanent unstable development and has no such thing as updates or security
         cat >${armbian_source_file} <<EOF
-        deb http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
-        #deb-src http://${MIRROR_URL}/debian ${VERSION_CODENAME} main contrib non-free non-free-firmware
+            Types: deb
+            URIs: http://${MIRROR_URL}/debian
+            Suites: ${VERSION_CODENAME}
+            Components: main
+            Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+            Architectures: riscv64
+
 EOF
         ;;
 
@@ -175,14 +160,14 @@ select_mirror_site() {
         5)  MIRROR_URL="opensource.nchc.org.tw" ;;
         6)  MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
         7)  MIRROR_URL="mirrors.xtom.com" ;;
-        8)  MIRROR_URL="mirrors.mit.edu" ;;
+        8)  MIRROR_URL="mirror.steadfast.net" ;;
         9)  MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
-        10) MIRROR_URL="muug.ca/mirror" ;;
-        11) MIRROR_URL="mirror.kumi.systems" ;;
+        10) MIRROR_URL="mirror.it.ubc.ca" ;;
+        11) MIRROR_URL="ftp.lysator.liu.se" ;;
         12) MIRROR_URL="mirrors.xtom.nl" ;;
         13) MIRROR_URL="mirrors.xtom.de" ;;
         14) MIRROR_URL="mirror.yandex.ru" ;;
-        15) MIRROR_URL="in.mirror.coganng.com" ;;
+        15) MIRROR_URL="mirror.cse.iitk.ac.in" ;;
         16) MIRROR_URL="mirrors.xtom.ee" ;;
         17) MIRROR_URL="mirrors.xtom.au" ;;
         18) MIRROR_URL="mirror.yuki.net.uk" ;;
@@ -216,15 +201,15 @@ cat <<EOF
   ├──────┼───────────────────┼────────────────────────────────┤
   │   6  │  United States    │  mirrors.ocf.berkeley.edu      │
   │   7  │  United States    │  mirrors.xtom.com              │
-  │   8  │  United States    │  mirrors.mit.edu               │
+  │   8  │  United States    │  mirror.steadfast.net          │
   │   9  │  Canada           │  mirror.csclub.uwaterloo.ca    │
-  │  10  │  Canada           │  muug.ca/mirror                │
+  │  10  │  Canada           │  mirror.it.ubc.ca              │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  11  │  Finland          │  mirror.kumi.systems           │
+  │  11  │  Sweden           │  ftp.lysator.liu.se            │
   │  12  │  Netherlands      │  mirrors.xtom.nl               │
   │  13  │  Germany          │  mirrors.xtom.de               │
   │  14  │  Russia           │  mirror.yandex.ru              │
-  │  15  │  India            │  in.mirror.coganng.com         │
+  │  15  │  India            │  mirror.cse.iitk.ac.in         │
   ├──────┼───────────────────┼────────────────────────────────┤
   │  16  │  Estonia          │  mirrors.xtom.ee               │
   │  17  │  Australia        │  mirrors.xtom.au               │
