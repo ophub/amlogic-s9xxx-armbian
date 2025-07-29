@@ -14,13 +14,14 @@ on:
       source_branch:
         description: "Select the source branch"
         required: false
-        default: "official"
+        default: "bookworm"
         type: choice
         options:
-          - jammy
-          - noble
+          - trixie
           - bookworm
           - bullseye
+          - noble
+          - jammy
       docker_img:
         description: "Set the docker image"
         required: false
