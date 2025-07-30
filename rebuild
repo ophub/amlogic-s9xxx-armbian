@@ -596,12 +596,11 @@ confirm_version() {
     model_kernel=()
     if [[ "${conf_kernel_list}" == "all" ]]; then
         eval "model_kernel=(\"\${${conf_kernel_tags}_kernel[@]}\")"
-        model_kernel=($(echo "${model_kernel[@]}" | sed -E 's/[a-z]+/[0-9]+/g'))
+        model_kernel=($(echo "${model_kernel[@]}" | xargs -n1 | sed -E 's/^([0-9]+\.[0-9]+)(\.[a-z0-9]+)?$/\1.[0-9]+/'))
     else
-        conf_kernel_list="${conf_kernel_list//[a-z]/[0-9]+}"
         # Convert the string into an array, using "_" as the delimiter
         IFS='_' read -ra conf_kernel_list <<<"${conf_kernel_list}"
-        model_kernel=(${conf_kernel_list[@]})
+        model_kernel=($(echo "${conf_kernel_list[@]}" | xargs -n1 | sed -E 's/^([0-9]+\.[0-9]+)(\.[a-z0-9]+)?$/\1.[0-9]+/'))
     fi
     # Check the kernel list
     [[ "${#model_kernel[@]}" -eq 0 ]] && error_msg "The kernel list is empty for [ ${board} ]"
