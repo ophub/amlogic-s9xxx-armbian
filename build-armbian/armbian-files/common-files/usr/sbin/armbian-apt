@@ -75,16 +75,12 @@ change_source_list() {
     case "${VERSION_CODENAME}" in
     buster | bullseye | bookworm | trixie)
         declare -a suites=("${VERSION_CODENAME}" "${VERSION_CODENAME}-updates")
-        declare -a security_suites=("${VERSION_CODENAME}-security")
         declare -a components=(main contrib non-free)
 
-        if [[ "${VERSION_CODENAME}" == "buster" || "${VERSION_CODENAME}" == "bullseye" ]]; then
-            security_suites=("${VERSION_CODENAME}/updates")
-        else
-            suites+=("${VERSION_CODENAME}-backports")
-        fi
-
         if [[ "${VERSION_CODENAME}" != "buster" && "${VERSION_CODENAME}" != "bullseye" ]]; then
+            # EOS releases doesn't get security updates
+            declare -a security_suites=("${VERSION_CODENAME}-security")
+            suites+=("${VERSION_CODENAME}-backports")
             components+=("non-free-firmware")
         fi
 
@@ -95,6 +91,9 @@ change_source_list() {
             Components: ${components[@]}
             Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
+EOF
+        if [[ ${#security_suites[@]} -gt 0 ]]; then
+            cat >>${armbian_source_file} <<EOF
             Types: deb
             URIs: http://${MIRROR_URL}/debian-security
             Suites: ${security_suites[@]}
@@ -102,6 +101,7 @@ change_source_list() {
             Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 
 EOF
+        fi
         ;;
 
     focal | jammy | noble | oracular | plucky)
@@ -120,7 +120,7 @@ EOF
             Types: deb
             URIs: http://${MIRROR_URL}/debian
             Suites: ${VERSION_CODENAME}
-            Components: main
+            Components: main contrib non-free non-free-firmware
             Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
             Architectures: riscv64
 
