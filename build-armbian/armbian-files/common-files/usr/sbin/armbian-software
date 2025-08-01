@@ -69,9 +69,14 @@ check_release() {
 check_depends() {
     # List of required dependencies
     dpkg_packages=(
-        "curl" "tar" "software-properties-common" "apt-transport-https" "ca-certificates"
-        "git" "coreutils" "systemd" "net-tools" "cpu-checker" "dnsmasq-base" "dmidecode"
+        "apt-transport-https" "ca-certificates" "coreutils" "cpu-checker" "curl"
+        "dmidecode" "dnsmasq-base" "git" "net-tools" "systemd" "tar"
     )
+    # Add additional dependencies for non-trixie versions
+    if [[ "${VERSION_CODENAME}" != "trixie" ]]; then
+        dpkg_packages+=("software-properties-common")
+    fi
+
     # Cyclic check all dependencies
     is_dpkg="0"
     i="1"
