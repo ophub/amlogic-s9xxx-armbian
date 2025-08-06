@@ -346,7 +346,7 @@ jobs:
           pwd && ls -l
 
       - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
-        uses: ./../action.yml
+        uses: ./action.yml
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
