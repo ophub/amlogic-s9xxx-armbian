@@ -251,6 +251,7 @@ on:
 
 env:
   TZ: America/New_York
+  KERNEL_TAGS: "stable/6.1.147"
 
 jobs:
   build:
