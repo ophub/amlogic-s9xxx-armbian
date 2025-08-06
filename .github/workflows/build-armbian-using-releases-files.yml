@@ -302,6 +302,7 @@ jobs:
           sudo mount /dev/github/runner /builder
           sudo chown -R runner.runner /builder
           df -Th
+          cd 
 
       - name: Download Armbian from Releases
         id: down
@@ -338,6 +339,8 @@ jobs:
           echo "build_tag=Armbian_${{ inputs.set_release }}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
           echo $pwd && ls -l
+          echo "cd ${GITHUB_WORKSPACE}"
+          cd ${GITHUB_WORKSPACE}
 
       - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
         uses: ./../action.yml
