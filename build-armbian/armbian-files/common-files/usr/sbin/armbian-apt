@@ -122,7 +122,6 @@ EOF
             Suites: ${VERSION_CODENAME}
             Components: main contrib non-free non-free-firmware
             Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
-            Architectures: riscv64
 
 EOF
         ;;
