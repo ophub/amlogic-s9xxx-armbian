@@ -12,13 +12,14 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "noble"
+        default: "trixie"
         type: choice
         options:
           - jammy
           - noble
           - bullseye
           - bookworm
+          - trixie
       armbian_board:
         description: "Select device board."
         required: false
