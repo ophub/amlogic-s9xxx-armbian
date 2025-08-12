@@ -68,6 +68,7 @@ on:
           - clang
           - gcc
           - gcc-14.2
+          - gcc-14.3
       compress_format:
         description: "Set the initrd compression format"
         required: false
