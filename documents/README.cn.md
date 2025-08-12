@@ -425,9 +425,9 @@ armbian-update -k 6.1
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
 # 下载编译工具
-wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 解压
-tar -Jxf arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz
+tar -Jxf arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
 armbian-kernel -u
 
@@ -438,7 +438,7 @@ cd ~/
 git clone https://github.com/jwrdegoede/rtl8189ES_linux
 cd rtl8189ES_linux
 # 设置编译环境
-gun_file="arm-gnu-toolchain-13.3.rel1-aarch64-aarch64-none-elf.tar.xz"
+gun_file="arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
 export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
