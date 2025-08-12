@@ -923,21 +923,29 @@ ip -c -br address
 
 ##### 12.7.2.4 Modify Network Connection MAC Address
 
-Modify (clone) the `MAC Address` on the network connection `ether1` and take effect immediately to solve the problem of LAN MAC address conflict.
+Modify (clone) the `MAC Address` on the network connection `eth0` and take effect immediately to solve the problem of LAN MAC address conflict.
 
 *Applicable to wired connections / wireless connections
 
 ```shell
+# Use the `nmcli connection show` command to view the network interface name
+nmcli connection show
+# The returned result contains the network interface name, such as 'Wired connection 1'
+NAME                UUID                                  TYPE      DEVICE
+Wired connection 1  24d63dc7-c46f-3bf1-912f-1c33eb94338b  ethernet  eth0
+lo                  35ca24e5-bdc0-4658-8ac8-435ee22e07f3  loopback  lo
+Wired connection 2  59660b21-b460-30e0-8cb3-89b886556955  ethernet  --
+
 # Set ENV
-MYCON=ether1                  # Network connection name, note to match the network interface type
-MYTYPE=ethernet               # Network interface type = Wired network card / Wireless network card = ethernet / wifi
-MYMAC=12:34:56:78:9A:BC       # New MAC address
+MYCON='Wired connection 1'    # Network connection name, note to match the network interface type
+MYTYPE='802-3-ethernet'       # Network interface type = Wired network card / Wireless network card
+                              #                        = 802-3-ethernet     / 802-11-wireless
+MYMAC='12:34:56:78:9A:BC'     # Set new MAC address
 
 # Chg CON
-nmcli connection modify ${MYCON} \
-${MYTYPE}.cloned-mac-address ${MYMAC}
-nmcli connection up ${MYETH}
-ip -c -br address
+nmcli connection modify "${MYCON}" ${MYTYPE}.cloned-mac-address ${MYMAC}
+nmcli connection up "${MYCON}"
+ip -c a show "${MYCON}"
 ```
 
 * When creating or modifying some network parameters, the network connection may be disconnected and reconnected to the network.
