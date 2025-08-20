@@ -693,6 +693,22 @@ compile_kernel() {
     make ${silent_print} ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
+    # Build and install RTL8821AU driver as out-of-tree module
+    echo -e "${INFO} Compiling RTL8821AU driver..."
+    git clone https://github.com/morrownr/8821au-20210708 /tmp/rtl8821au
+    cd /tmp/rtl8821au
+    chmod +x install-driver.sh
+    KERNEL_VERSION="${kernel_version}" ./install-driver.sh NoPrompt
+    cd -
+    # Copy the compiled 8821au.ko to the modules output directory
+    mkdir -p ${output_path}/lib/modules/${kernel_version}/kernel/drivers/net/wireless
+    cp /tmp/rtl8821au/8821au.ko ${output_path}/lib/modules/${kernel_version}/kernel/drivers/net/wireless/
+    # Ensure module auto-loads for plug-and-play
+    mkdir -p ${output_path}/lib/modules/${kernel_version}/modules.d
+    echo "8821au" > ${output_path}/lib/modules/${kernel_version}/modules.d/rtl8821au.conf
+    rm -rf /tmp/rtl8821au
+    echo -e "${SUCCESS} RTL8821AU driver compiled and included."
+
     # Strip debug information
     STRIP="${CROSS_COMPILE}strip"
     find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
