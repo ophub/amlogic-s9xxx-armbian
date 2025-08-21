@@ -508,7 +508,7 @@ update_kernel() {
     [[ "${PLATFORM}" == "rockchip" ]] && (cd /boot && ln -sf uInitrd-${kernel_name} uInitrd && ln -sf vmlinuz-${kernel_name} Image)
     [[ "${PLATFORM}" == "allwinner" ]] && (cd /boot && cp -f uInitrd-${kernel_name} uInitrd && cp -f vmlinuz-${kernel_name} Image)
     # wxy-oect: MODEL_ID numbers r304 and r306, require special handling of uInitrd
-    [[ "${MODEL_ID}" == "r304" || "${MODEL_ID}" == "r306" ]] && (cd /boot && rm -f uInitrd && ln -sf initrd.img-${kernel_name} uInitrd)
+    [[ "${MODEL_ID}" =~ ^(r304|r306)$ ]] && (cd /boot && ln -sf initrd.img-${kernel_name} uInitrd)
     [[ "$(ls /boot/*${kernel_name}* -l 2>/dev/null | grep "^-" | wc -l)" -ge "4" ]] || error_msg "The /boot files is missing."
     echo -e "${INFO} (1/4) Unpacking [ boot-${kernel_name}.tar.gz ] succeeded."
 
