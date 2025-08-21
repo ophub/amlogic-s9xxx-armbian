@@ -974,9 +974,9 @@ refactor_rootfs() {
     rm -f etc/update-motd.d/50-motd-news
 
     # Rebuild symbolic link files (ln -sf ${target} ${symbolic_link_file})
-    ln -sf /usr/bin bin
-    ln -sf /usr/lib lib
-    ln -sf /usr/sbin sbin
+    ln -sf usr/bin bin
+    ln -sf usr/lib lib
+    ln -sf usr/sbin sbin
     ln -sf /run/lock var/lock
     ln -sf /run var/run
     ln -sf /usr/share/zoneinfo/Asia/Shanghai etc/localtime
