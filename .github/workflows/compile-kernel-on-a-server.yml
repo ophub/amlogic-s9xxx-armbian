@@ -86,7 +86,7 @@ on:
         type: choice
         options:
           - -ophub
-          - -yourname
+          - -lleans
 
 env:
   TZ: Etc/UTC
@@ -154,7 +154,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Compile the kernel [ ${{ inputs.kernel_version }} ]
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: lleans/amlogic-s9xxx-armbian@main
         if: ${{ steps.mapped.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: kernel
