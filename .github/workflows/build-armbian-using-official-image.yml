@@ -243,7 +243,7 @@ on:
         options:
           - ophub
           - angel
-          - yourname
+          - lleans
 
 env:
   TZ: Etc/UTC
@@ -334,14 +334,14 @@ jobs:
 
           mkdir -p /builder/build
           ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build /home/runner/work/_actions/lleans/amlogic-s9xxx-armbian/main/build
 
           sudo timedatectl set-timezone "${TZ}"
           echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
-        uses: ophub/amlogic-s9xxx-armbian@main
+        uses: lleans/amlogic-s9xxx-armbian@main
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
