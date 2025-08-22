@@ -303,9 +303,9 @@ copy_rootfs() {
         )
     done
     # Create relevant symbolic link
-    ln -sf /usr/bin ${DIR_INSTALL}/bin
-    ln -sf /usr/lib ${DIR_INSTALL}/lib
-    ln -sf /usr/sbin ${DIR_INSTALL}/sbin
+    ln -sf usr/bin ${DIR_INSTALL}/bin
+    ln -sf usr/lib ${DIR_INSTALL}/lib
+    ln -sf usr/sbin ${DIR_INSTALL}/sbin
 
     echo -e "${INFO} Generate the new fstab file."
     rm -f ${DIR_INSTALL}/etc/fstab
