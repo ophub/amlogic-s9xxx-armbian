@@ -185,6 +185,7 @@ on:
           - zcube1-max
           - zk-r39a
           - zysj
+          - yzd
       armbian_kernel:
         description: "Select kernel version."
         required: false
@@ -243,7 +244,7 @@ on:
       builder_name:
         description: "Set Armbian builder signature."
         required: false
-        default: "ophub"
+        default: "angel"
         type: choice
         options:
           - ophub
