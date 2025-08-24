@@ -1,6 +1,6 @@
 verbosity=1
 bootlogo=false
-fdtfile=rockchip/rk3399-king3399.dtb
+fdtfile=rockchip/rk3399-yzd3399.dtb
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
