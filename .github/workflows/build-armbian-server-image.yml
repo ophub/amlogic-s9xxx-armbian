@@ -23,7 +23,7 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "yzd3399"
+        default: "all"
         type: choice
         options:
           - all
