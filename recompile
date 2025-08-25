@@ -578,7 +578,7 @@ chroot_armbian() {
     [[ -d "${tag_rootfs}/dev/pts" ]] || mkdir -p ${tag_rootfs}/dev/pts
     mount -t proc /proc ${tag_rootfs}/proc
     mount -t sysfs /sys ${tag_rootfs}/sys
-    mount -t devpts /dev/pts ${tag_rootfs}/dev/pts
+    mount -t devpts devpts ${tag_rootfs}/dev/pts
     mount --bind /dev ${tag_rootfs}/dev
     mount --bind /run ${tag_rootfs}/run
     chmod 0666 ${tag_rootfs}/dev/null
