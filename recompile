@@ -565,7 +565,7 @@ chroot_armbian() {
     # Copy the /etc/resolv.conf file to the armbian system
     [[ -f "/etc/resolv.conf" ]] && {
         echo -e "${INFO} Copy the [ /etc/resolv.conf ] file to the armbian system..."
-        cp -f /etc/resolv.conf ${tag_rootfs}/etc/resolv.conf
+        cp -f /etc/resolv.conf ${tag_rootfs}/etc/resolv.conf 2>/dev/null
     }
 
     echo -e "${INFO} Copy the [ ubuntu_chroot_armbian.sh ] script to the armbian system..."
