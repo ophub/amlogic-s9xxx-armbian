@@ -250,7 +250,7 @@ on:
           - angel
 
 env:
-  TZ: America/New_York
+  TZ: Etc/UTC
   ROOTFS_SCRIPT: compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh
 
 jobs:

@@ -31,7 +31,7 @@ on:
           - ophub/armbian
 
 env:
-  TZ: America/New_York
+  TZ: Etc/UTC
   MAKE_DOCKER_SH: compile-kernel/tools/script/docker/build_armbian_docker_image.sh
   DOCKER_OUTPATH: out
 
