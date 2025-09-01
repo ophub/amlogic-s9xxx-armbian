@@ -178,6 +178,8 @@ jobs:
           docker run -d --privileged \
               --name armbian-ophub \
               -v /builder/compile-kernel:/opt/kernel/compile-kernel \
+              -v /etc/localtime:/etc/localtime:ro \
+              -v /etc/timezone:/etc/timezone:ro \
               --restart=always \
               ophub/armbian-${{ inputs.docker_image }}:latest
 
