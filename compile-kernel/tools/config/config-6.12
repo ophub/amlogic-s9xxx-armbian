@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/arm64 6.12.42 Kernel Configuration
+# Linux/arm64 6.12.44 Kernel Configuration
 #
 CONFIG_CC_VERSION_TEXT="aarch64-none-linux-gnu-gcc (Arm GNU Toolchain 14.3.Rel1 (Build arm-14.174)) 14.3.1 20250623"
 CONFIG_CC_IS_GCC=y
@@ -5648,6 +5648,7 @@ CONFIG_DRM_MIPI_DBI=m
 CONFIG_DRM_MIPI_DSI=y
 # CONFIG_DRM_DEBUG_MM is not set
 CONFIG_DRM_KMS_HELPER=y
+CONFIG_DRM_DRAW=y
 CONFIG_DRM_PANIC=y
 CONFIG_DRM_PANIC_FOREGROUND_COLOR=0xffffff
 CONFIG_DRM_PANIC_BACKGROUND_COLOR=0x000000
