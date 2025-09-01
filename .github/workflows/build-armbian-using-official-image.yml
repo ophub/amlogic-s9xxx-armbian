@@ -243,7 +243,7 @@ on:
           - yourname
 
 env:
-  TZ: America/New_York
+  TZ: Etc/UTC
 
 jobs:
   build:
