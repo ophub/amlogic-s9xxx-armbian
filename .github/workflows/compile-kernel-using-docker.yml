@@ -133,6 +133,9 @@ jobs:
           sudo -E timedatectl set-timezone "${TZ}"
           sudo -E apt-get install -y ntpdate
           sudo -E ntpdate pool.ntp.org
+          sudo -E timedatectl set-ntp true
+          date -u
+          timedatectl status
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Create simulated physical disk
