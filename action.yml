@@ -255,7 +255,10 @@ runs:
 
             # Choose Ubuntu or a Docker container to compile the kernel.
             if [[ "$(uname -m)" == "aarch64" && -n "${docker_compile}" ]]; then
+                echo -e "Synchronize server time."
+                sudo ntpdate pool.ntp.org 2>/dev/null || true
                 echo -e "Using the Armbian Docker image to compile the kernel."
+                sudo docker restart ${docker_container} >/dev/null && sleep 3
                 docker exec -i "${docker_container}" bash -c 'bash "$0" -u && bash "$0" "$@"' "${docker_script}" "${make_args[@]}"
             else
                 echo -e "Using the original system to compile the kernel."
