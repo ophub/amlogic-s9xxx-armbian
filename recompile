@@ -699,12 +699,12 @@ compile_kernel() {
     echo -e "${INFO} CC=${CC}"
     echo -e "${INFO} LD=${LD}"
     ls -l ${CROSS_COMPILE}gcc || echo -e "${ERROR} Compiler not found!"
-    echo -e "${INFO} Target kernel version: ${kernel_version}"
-    echo -e "${INFO} Target kernel headers: ${output_path}/lib/modules/${kernel_version}/build"
-    ls -ld ${output_path}/lib/modules/${kernel_version}/build || echo -e "${ERROR} Target kernel headers not found!"
+    echo -e "${INFO} Target kernel version: ${kernel_outname}"
+    echo -e "${INFO} Target kernel headers: ${output_path}/lib/modules/${kernel_outname}/build"
+    ls -ld ${output_path}/lib/modules/${kernel_outname}/build || echo -e "${ERROR} Target kernel headers not found!"
 
     # Build and install RTL8821AU driver as out-of-tree module for the target kernel
-    echo -e "${INFO} Compiling RTL8821AU driver for target kernel ${kernel_version}..."
+    echo -e "${INFO} Compiling RTL8821AU driver for target kernel ${kernel_outname}..."
     git clone https://github.com/morrownr/8821au-20210708 /tmp/rtl8821au
     cd /tmp/rtl8821au
     make clean >/dev/null 2>&1
@@ -720,7 +720,7 @@ compile_kernel() {
     fi
 
     # Install to target kernel's modules dir (adapt from install-driver.sh non-DKMS path)
-    export MODDESTDIR=${output_path}/modules/lib/modules/${kernel_version}/kernel/drivers/net/wireless/
+    export MODDESTDIR=${output_path}/modules/lib/modules/${kernel_outname}/kernel/drivers/net/wireless/
     mkdir -p ${MODDESTDIR}
     make install MODDESTDIR=${MODDESTDIR}
     if [ $? -ne 0 ]; then
@@ -730,30 +730,30 @@ compile_kernel() {
     cd -
     # Verify
     echo -e "${INFO} Verifying RTL8821AU driver installation..."
-    ls -l ${output_path}/modules/lib/modules/${kernel_version}/kernel/drivers/net/wireless/8821au.ko || echo -e "${ERROR} 8821au.ko not found in target directory!"
+    ls -l ${output_path}/modules/lib/modules/${kernel_outname}/kernel/drivers/net/wireless/8821au.ko || echo -e "${ERROR} 8821au.ko not found in target directory!"
 
     # Auto-load config (use standard modules-load.d for target compatibility)
-    mkdir -p ${output_path}/modules/lib/modules/${kernel_version}/modules-load.d
-    echo "8821au" > ${output_path}/modules/lib/modules/${kernel_version}/modules-load.d/rtl8821au.conf
-    ls -l ${output_path}/modules/lib/modules/${kernel_version}/modules-load.d/rtl8821au.conf || echo -e "${ERROR} Auto-load config not found!"
+    mkdir -p ${output_path}/modules/lib/modules/${kernel_outname}/modules-load.d
+    echo "8821au" > ${output_path}/modules/lib/modules/${kernel_outname}/modules-load.d/rtl8821au.conf
+    ls -l ${output_path}/modules/lib/modules/${kernel_outname}/modules-load.d/rtl8821au.conf || echo -e "${ERROR} Auto-load config not found!"
 
     # Modprobe options (place in a dir that can be copied to /etc on target; adjust if Armbian has post-install hooks)
-    mkdir -p ${output_path}/modules/lib/modules/${kernel_version}/etc/modprobe.d
-    cp /tmp/rtl8821au/8821au.conf ${output_path}/modules/lib/modules/${kernel_version}/etc/modprobe.d/8821au.conf
-    ls -l ${output_path}/modules/lib/modules/${kernel_version}/etc/modprobe.d/8821au.conf || echo -e "${ERROR} Modprobe config not found!"
+    mkdir -p ${output_path}/modules/lib/modules/${kernel_outname}/etc/modprobe.d
+    cp /tmp/rtl8821au/8821au.conf ${output_path}/modules/lib/modules/${kernel_outname}/etc/modprobe.d/8821au.conf
+    ls -l ${output_path}/modules/lib/modules/${kernel_outname}/etc/modprobe.d/8821au.conf || echo -e "${ERROR} Modprobe config not found!"
 
     # Update deps with correct base
-    depmod -b ${output_path}/modules ${kernel_version}
+    depmod -b ${output_path}/modules ${kernel_outname}
     if [ $? -ne 0 ]; then
-        echo -e "${ERROR} depmod failed for target kernel ${kernel_version}!"
+        echo -e "${ERROR} depmod failed for target kernel ${kernel_outname}!"
         exit 1
     fi
 
     # Verify deps
-    grep 8821au ${output_path}/modules/lib/modules/${kernel_version}/modules.dep || echo -e "${ERROR} 8821au not found in modules.dep!"
+    grep 8821au ${output_path}/modules/lib/modules/${kernel_outname}/modules.dep || echo -e "${ERROR} 8821au not found in modules.dep!"
 
     rm -rf /tmp/rtl8821au
-    echo -e "${SUCCESS} RTL8821AU driver compiled and included for target kernel ${kernel_version}."
+    echo -e "${SUCCESS} RTL8821AU driver compiled and included for target kernel ${kernel_outname}."
 
     # Strip debug information
     STRIP="${CROSS_COMPILE}strip"
