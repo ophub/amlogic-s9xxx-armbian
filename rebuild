@@ -870,7 +870,23 @@ replace_kernel() {
     [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/${kernel_name}
+    # Check if kernel modules file exists
+    if [[ -f "${kernel_modules}" ]]; then
+        echo "Kernel modules file exists: ${kernel_modules}"
+    else
+        echo "Kernel modules file does not exist: ${kernel_modules}"
+    fi
+
+   
+
     tar -mxzf ${kernel_modules} -C ${tag_rootfs}/usr/lib/modules
+     # Check if /usr/lib/modules directory exists
+    if [[ -d "${tag_rootfs}/usr/lib/modules" ]]; then
+        echo "Lib modules directory exists: ${tag_rootfs}/usr/lib/modules"
+        ls -la ${tag_rootfs}/usr/lib/modules
+    else
+        echo "Lib modules directory does not exist: ${tag_rootfs}/usr/lib/modules"
+    fi
     (cd ${tag_rootfs}/usr/lib/modules/${kernel_name}/ && rm -f build source 2>/dev/null && ln -sf /usr/src/${header_path} build)
     [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel_name} -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 
