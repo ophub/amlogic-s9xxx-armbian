@@ -870,23 +870,23 @@ replace_kernel() {
     [[ -d "${tag_rootfs}/usr/src/${header_path}/include" ]] || error_msg "/usr/src/${header_path}/include folder is missing."
 
     # 04. For /usr/lib/modules/${kernel_name}
-    # Check if kernel modules file exists
-    if [[ -f "${kernel_modules}" ]]; then
-        echo "Kernel modules file exists: ${kernel_modules}"
-    else
-        echo "Kernel modules file does not exist: ${kernel_modules}"
-    fi
-
-   
-
     tar -mxzf ${kernel_modules} -C ${tag_rootfs}/usr/lib/modules
-     # Check if /usr/lib/modules directory exists
-    if [[ -d "${tag_rootfs}/usr/lib/modules" ]]; then
-        echo "Lib modules directory exists: ${tag_rootfs}/usr/lib/modules"
-        ls -la ${tag_rootfs}/usr/lib/modules
-    else
-        echo "Lib modules directory does not exist: ${tag_rootfs}/usr/lib/modules"
+    
+    # RTL Driver mover
+    # Move modules-load.d to /etc/modules-load.d/
+    if [[ -d "${tag_rootfs}/usr/lib/modules/${kernel_name}/modules-load.d" ]]; then
+        mkdir -p ${tag_rootfs}/etc/modules-load.d
+        rsync -a --remove-source-files ${tag_rootfs}/usr/lib/modules/${kernel_name}/modules-load.d/ ${tag_rootfs}/etc/modules-load.d/
+        rm -rf ${tag_rootfs}/usr/lib/modules/${kernel_name}/modules-load.d 2>/dev/null
     fi
+
+    # Move etc/modprobe.d to /etc/modprobe.d/
+    if [[ -d "${tag_rootfs}/usr/lib/modules/${kernel_name}/etc/modprobe.d" ]]; then
+        mkdir -p ${tag_rootfs}/etc/modprobe.d
+        rsync -a --remove-source-files ${tag_rootfs}/usr/lib/modules/${kernel_name}/etc/modprobe.d/ ${tag_rootfs}/etc/modprobe.d/
+        rm -rf ${tag_rootfs}/usr/lib/modules/${kernel_name}/etc 2>/dev/null
+    fi
+
     (cd ${tag_rootfs}/usr/lib/modules/${kernel_name}/ && rm -f build source 2>/dev/null && ln -sf /usr/src/${header_path} build)
     [[ "$(ls ${tag_rootfs}/usr/lib/modules/${kernel_name} -l 2>/dev/null | grep "^d" | wc -l)" -eq "1" ]] || error_msg "/usr/lib/modules kernel folder is missing."
 
