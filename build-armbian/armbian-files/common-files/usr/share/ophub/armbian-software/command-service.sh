@@ -349,9 +349,9 @@ software_308() {
         # Add PVE software source
         echo -e "${STEPS} Start adding [ ${VERSION_CODENAME} ] software source..."
         if [[ "${VERSION_CODENAME}" == "bookworm" ]]; then
-            # Reference documentation: Cooip JM
-            echo "deb https://mirrors.apqa.cn/proxmox/debian/pve ${VERSION_CODENAME} port" >/etc/apt/sources.list.d/pveport.list
-            curl https://mirrors.apqa.cn/proxmox/debian/pveport.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg
+            # Reference documentation: Cooip JM # Update: accordding to https://mirrors.apqa.cn/
+            echo "deb https://mirrors.lierfang.com/pxcloud/pxvirt ${VERSION_CODENAME} main" >/etc/apt/sources.list.d/pveport.list
+            curl  https://download.lierfang.com/pxcloud/lierfang.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg
         elif [[ "${VERSION_CODENAME}" == "bullseye" ]]; then
             # Reference documentation: https://www.zhou.pp.ua/2023/08/08/n1/
             echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
