@@ -348,14 +348,16 @@ software_308() {
 
         # Add PVE software source
         echo -e "${STEPS} Start adding [ ${VERSION_CODENAME} ] software source..."
+        [[ -d "/etc/apt/sources.list.d" ]] || sudo mkdir -p /etc/apt/sources.list.d
         if [[ "${VERSION_CODENAME}" == "bookworm" ]]; then
             # Reference documentation: Cooip JM
-            echo "deb https://mirrors.apqa.cn/proxmox/debian/pve ${VERSION_CODENAME} port" >/etc/apt/sources.list.d/pveport.list
-            curl https://mirrors.apqa.cn/proxmox/debian/pveport.gpg -o /etc/apt/trusted.gpg.d/pveport.gpg
+            # Update: accordding to https://docs.pxvirt.lierfang.com/zh/installfromdebian.html
+            echo "deb https://mirrors.lierfang.com/pxcloud/pxvirt ${VERSION_CODENAME} main" >/etc/apt/sources.list.d/pxvirt-sources.list
+            curl -fsSL https://mirrors.lierfang.com/pxcloud/lierfang.gpg -o /etc/apt/trusted.gpg.d/bookworm-lierfang.gpg
         elif [[ "${VERSION_CODENAME}" == "bullseye" ]]; then
             # Reference documentation: https://www.zhou.pp.ua/2023/08/08/n1/
             echo "deb https://raw.githubusercontent.com/pimox/pimox7/master/ dev/" >/etc/apt/sources.list.d/pimox.list
-            curl https://raw.githubusercontent.com/pimox/pimox7/master/KEY.gpg | apt-key add -
+            curl -fsSL https://raw.githubusercontent.com/pimox/pimox7/master/KEY.gpg -o /etc/apt/trusted.gpg.d/bullseye-pimox7.gpg
         else
             error_msg "This version is not supported: [ ${VERSION_CODENAME} ]"
         fi
