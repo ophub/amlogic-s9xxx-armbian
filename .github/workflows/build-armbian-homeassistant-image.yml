@@ -77,6 +77,7 @@ on:
           - rk3318-box
           - rock5b
           - rock5c
+          - rp-rk3568
           - ruisen-box
           - s905
           - s905-beelink-mini
