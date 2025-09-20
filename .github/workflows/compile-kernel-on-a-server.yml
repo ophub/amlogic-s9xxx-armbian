@@ -8,6 +8,8 @@ name: Compile the kernel on a server
 
 on:
   repository_dispatch:
+  schedule:
+    - cron: "0 3 * * 1"
   workflow_dispatch:
     inputs:
       kernel_source:
@@ -82,7 +84,7 @@ on:
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
-        default: "-ophub"
+        default: "-lleans"
         type: choice
         options:
           - -ophub
