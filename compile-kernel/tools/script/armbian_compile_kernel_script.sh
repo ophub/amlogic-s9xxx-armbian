@@ -507,7 +507,7 @@ compile_env() {
     #make ${MAKE_SET_STRING} menuconfig
 
     # Set max process
-    PROCESS="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
+    PROCESS="$(( $(nproc 2>/dev/null || echo 2) - 1 ))"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 }
 
