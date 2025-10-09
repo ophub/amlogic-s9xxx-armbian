@@ -1,0 +1,11 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3568-photonicat.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=rk3568
+overlays=
+extraargs=rw rootwait
+extraboardargs=net.ifnames=0 max_loop=128
+docker_optimizations=on
