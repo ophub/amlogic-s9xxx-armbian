@@ -71,6 +71,7 @@ on:
           - orangepi-5-plus
           - orangepi-5b
           - panther-x2
+          - photonicat
           - r66s
           - r68s
           - renegade-rk3328
