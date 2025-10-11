@@ -44,6 +44,7 @@
 # software_123  : For openlist:5244
 # software_124  : For qinglong:5700
 # software_125  : For chatgpt-next-web:3000
+# software_126  : For n8n:5678
 #
 #============================================================================
 
@@ -976,6 +977,44 @@ software_125() {
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3000 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For n8n
+software_126() {
+    # Set basic information
+    container_name="n8n"
+    image_name="n8nio/n8n:nightly-arm64"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/n8nio/n8n
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -e GENERIC_TIMEZONE=${docker_tz} \
+            -p 5678:5678 \
+            -e N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true \
+            -e N8N_RUNNERS_ENABLED=true \
+            -e N8N_SECURE_COOKIE=false \
+            -v ${install_path}/n8n_data:/home/node/.n8n \
+            --restart unless-stopped \
+            ${image_name}
+
+        echo -e "${NOTE} Please wait 20 seconds..."
+        sync && sudo chown -R ${docker_puid}:${docker_pgid} ${docker_path}
+        sudo docker restart ${container_name}
+        sync && sleep 20
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5678 ]"
         exit 0
         ;;
     update) docker_update ;;

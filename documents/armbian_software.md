@@ -31,6 +31,7 @@ According to user feedback and demands in the [Issue](https://github.com/ophub/a
 | 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | A file list program that supports multiple storage, powered by Gin and Solidjs. |
 | 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | A timed task management panel that supports typescript, javaScript, python3, and shell. |
 | 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | A well-designed cross-platform ChatGPT UI (Web / PWA / Linux / Win / MacOS). |
+| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n is a workflow automation platform that gives technical teams the flexibility of code with the speed of no-code. With 400+ integrations, native AI capabilities, and a fair-code license, n8n lets you build powerful automations while maintaining full control over your data and deployments. |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. `Desktop` can be connected to a monitor for use, or they can be used with [remote desktop](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients) software. |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
@@ -147,6 +148,7 @@ We welcome everyone to contribute more software. Feel free to submit support req
 | 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | 一个支持多种存储的文件列表程序，使用 Gin 和 Solidjs。 |
 | 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | 支持 python3、javaScript、shell、typescript 的定时任务管理面板。 |
 | 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | 一键免费部署你的跨平台私人 ChatGPT 应用。 |
+| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n 是一个工作流自动化平台，为技术团队提供了无代码的高效开发速度。它内置了超过 400 种集成、原生的 AI 能力，并采用公平代码许可，让你在构建强大自动化流程的同时，仍然能完全掌控自己的数据和部署。 |
 | 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。`桌面`可以连接显示器使用，也可以使用[远程桌面](https://learn.microsoft.com/zh-cn/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)软件连接使用。 |
 | 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
 | 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
