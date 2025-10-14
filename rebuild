@@ -71,6 +71,8 @@ host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f
 os_release_file="etc/os-release"
 # Set banner's ${BOARD_NAME}: such as [ s905x3 ]
 armbian_release_file="etc/armbian-release"
+# Add personalized settings for special devices, such as [ s922x-oes-plus ]
+board_release_file="etc/armbian-board-release.conf"
 # Add custom armbian information
 ophub_release_file="etc/ophub-release"
 
@@ -680,7 +682,7 @@ make_image() {
     write_board_file="no"
     adjust_kernel_files="no"
     # Check the personalization settings of this board
-    board_release="${different_files}/${board}/rootfs/etc/armbian-board-release.conf"
+    board_release="${different_files}/${board}/rootfs/${board_release_file}"
     [[ -f "${board_release}" ]] && source ${board_release}
 
     # echo -e "${INFO} The [ ${board} ] Armbian image partition status: [ skip:${skip_mb} / boot:${boot_mb} / rootfs:${root_mb} ] MiB."
