@@ -93,7 +93,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04-arm
+    runs-on: ubuntu-24.04-arm
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
@@ -105,7 +105,7 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          docker rmi $(docker images -q) 2>/dev/null
+          docker rmi -f $(docker images -q) 2>/dev/null || true
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null
           sudo swapoff -a
