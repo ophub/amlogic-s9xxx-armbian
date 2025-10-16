@@ -14,7 +14,7 @@ on:
       source_branch:
         description: "Select the source branch"
         required: false
-        default: "bookworm"
+        default: "trixie"
         type: choice
         options:
           - trixie

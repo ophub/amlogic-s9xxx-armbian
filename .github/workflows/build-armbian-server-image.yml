@@ -12,7 +12,7 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "bookworm"
+        default: "trixie"
         type: choice
         options:
           - trixie
