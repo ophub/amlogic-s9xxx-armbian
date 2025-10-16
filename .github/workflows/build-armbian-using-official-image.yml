@@ -275,9 +275,11 @@ jobs:
           sudo -E apt-get clean
           sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
           sudo rm -rf ~/{.cargo,.dotnet,.rustup}
-          sudo -E timedatectl set-timezone "${TZ}"
-          sudo -E apt-get install -y ntpdate
-          sudo -E ntpdate pool.ntp.org
+          sudo -E timedatectl set-timezone "${TZ:-Etc/UTC}"
+          sudo -E ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
+          sudo -E timedatectl set-ntp true
+          date -u
+          timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Create simulated physical disk
