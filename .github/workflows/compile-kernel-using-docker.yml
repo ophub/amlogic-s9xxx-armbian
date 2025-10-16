@@ -82,7 +82,7 @@ on:
       docker_image:
         description: "Select Armbian docker image"
         required: false
-        default: "bookworm"
+        default: "trixie"
         type: choice
         options:
           - trixie
