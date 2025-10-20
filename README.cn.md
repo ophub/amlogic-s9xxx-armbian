@@ -177,8 +177,8 @@ armbian-sync
 ```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-# For Ubuntu-22.04
-sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+# For Ubuntu-24.04
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbian-depends)
 ```
 
 3. 进入 `~/amlogic-s9xxx-armbian` 根目录，在根目录下创建文件夹 `build/output/images` ，并上传 Armbian 镜像文件 ( 如：`Armbian_21.11.0-trunk_Odroidn2_current_5.15.50.img` ) 到 `~/amlogic-s9xxx-armbian/build/output/images` 目录里。原版 Armbian 镜像文件名称中的发行版本号（如：`21.11.0`）和内核版本号（如：`5.15.50`）请保留，它将在重构后用作 Armbian 系统的名称。
