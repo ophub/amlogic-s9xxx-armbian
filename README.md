@@ -172,7 +172,7 @@ In the use of Armbian, some common problems that may be encountered can be found
 
 1. Clone the repository to local `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. Install the necessary software packages (scripts have only been tested under x86_64 Ubuntu-20.04/22.04)
+2. Install the necessary software packages (for Ubuntu 24.04)
 
 ```shell
 sudo apt-get update -y

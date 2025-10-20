@@ -371,7 +371,7 @@ armbian-install
 
 ## 9. Compiling Armbian Kernel
 
-Kernel compilation is supported in Ubuntu20.04/22.04, Debian11 or Armbian systems. Both local compilation and GitHub Actions cloud compilation are supported. For specific methods, please refer to the [Kernel Compilation Instructions](../../compile-kernel).
+Kernel compilation is supported in Ubuntu, Debian or Armbian systems. Both local compilation and GitHub Actions cloud compilation are supported. For specific methods, please refer to the [Kernel Compilation Instructions](../../compile-kernel).
 
 ### 9.1 How to Add Custom Kernel Patches
 
