@@ -58,6 +58,8 @@ chroot_file="${chroot_path}/chroot_armbian.img"
 # Set the system file path to be used
 arch_info="$(uname -m)"
 host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
+host_version_id="$(cat /etc/os-release | grep '^VERSION_ID=.*' | cut -d'=' -f2 | tr -d '".')"
+[[ -z "${host_version_id}" ]] && host_version_id="2404"
 
 # Set the default for downloading kernel sources from github.com
 repo_owner="unifreq"
@@ -269,7 +271,7 @@ toolchain_check() {
     # Install dependencies for jammy
     apt-get -qq update
     if [[ "${arch_info}" == "x86_64" ]]; then
-        apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+        apt-get -qq install -y $(cat compile-kernel/tools/script/ubuntu${host_version_id}-build-armbian-depends)
         systemctl restart systemd-binfmt
     else
         apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
