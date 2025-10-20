@@ -16,13 +16,13 @@ Pre-compiled kernels are available in the [Releases](https://github.com/ophub/ke
 
 1. Clone the repository to local `git clone --depth 1 https://github.com/ophub/amlogic-s9xxx-armbian.git`
 
-2. Install necessary software packages (the script has only been tested under Ubuntu-20.04/22.04(Supported by both X86 and Arm)):
+2. Install necessary software packages (for Ubuntu 24.04):
 
 ```yaml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
-# For Ubuntu-22.04
-sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2204-build-armbian-depends)
+# For Ubuntu-24.04
+sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbian-depends)
 ```
 
 3. Go to the `~/amlogic-s9xxx-armbian` root directory, and then run `sudo ./recompile -k 5.15.100` or other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code, and make all settings. The packaged kernel files are saved in the `compile-kernel/output` directory.

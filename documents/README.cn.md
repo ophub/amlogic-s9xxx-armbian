@@ -371,7 +371,7 @@ armbian-install
 
 ## 9. 编译 Armbian 内核
 
-支持在 Ubuntu20.04/22.04，debian11 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
+支持在 Ubuntu，debian 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
 
 ### 9.1 如何添加自定义内核补丁
 
