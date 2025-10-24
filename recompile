@@ -660,13 +660,36 @@ compile_env() {
         else
             scripts/config -d LTO_CLANG_THIN
         fi
+
+        # Add RUST support for version 6.1.y and later versions
+        if [[ "${kernel_x}" -gt 6 ]] || [[ "${kernel_x}" -eq 6 && "${kernel_y}" -ge 1 ]]; then
+            echo -e "${INFO} Kernel version [ ${kernel_version} ] requires RUST. Preparing the environment..."
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+            export PATH="${HOME}/.cargo/bin:${PATH}"
+
+            echo -e "${INFO} Setting Rust toolchain to version required by the kernel..."
+            rustup override set $(scripts/min-tool-version.sh rustc)
+
+            echo -e "${INFO} Adding rust-src component..."
+            rustup component add rust-src
+
+            echo -e "${INFO} Installing correct bindgen version..."
+            cargo uninstall bindgen-cli bindgen >/dev/null 2>&1 || true
+            cargo install --locked --version "${BINDGEN_VERSION}" bindgen-cli 2>/dev/null || cargo install --locked --version "${BINDGEN_VERSION}" bindgen
+
+            echo -e "${INFO} Rust environment is ready. Enabling RUST support in kernel config..."
+            scripts/config -e RUST
+            scripts/config -e RUST_IS_AVAILABLE
+        else
+            echo -e "${INFO} Skip Rust environment configuration for kernel version [ ${kernel_version} ]"
+        fi
     }
 
     # Make menuconfig
     #make ${MAKE_SET_STRING} menuconfig
 
     # Set max process
-    PROCESS="$(( $(nproc 2>/dev/null || echo 2) - 1 ))"
+    PROCESS="$(($(nproc 2>/dev/null || echo 2) - 1))"
     [[ -z "${PROCESS}" || "${PROCESS}" -lt "1" ]] && PROCESS="1" && echo "PROCESS: 1"
 }
 
