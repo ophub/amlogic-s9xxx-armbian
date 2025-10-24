@@ -675,6 +675,7 @@ compile_env() {
 
             echo -e "${INFO} Installing correct bindgen version..."
             cargo uninstall bindgen-cli bindgen >/dev/null 2>&1 || true
+            BINDGEN_VERSION="$(scripts/min-tool-version.sh bindgen 2>/dev/null || echo "0.65.1")"
             cargo install --locked --version "${BINDGEN_VERSION}" bindgen-cli 2>/dev/null || cargo install --locked --version "${BINDGEN_VERSION}" bindgen
 
             echo -e "${INFO} Rust environment is ready. Enabling RUST support in kernel config..."
