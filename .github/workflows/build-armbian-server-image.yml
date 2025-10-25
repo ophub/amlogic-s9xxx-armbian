@@ -7,8 +7,8 @@ name: Build Armbian server image
 
 on:
   repository_dispatch:
-  schedule:
-    - cron: "0 3 * * 2"
+  # schedule:
+  #   - cron: "0 3 * * 2"
   workflow_dispatch:
     inputs:
       set_release:
