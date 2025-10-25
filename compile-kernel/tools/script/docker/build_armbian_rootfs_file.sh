@@ -135,7 +135,7 @@ redo_rootfs() {
                 sudo sed -i "s|^#*Port .*|Port 22|g" ${ssh_config}
                 sudo sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
                 sudo sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
-                [[ -d "var/run/sshd" ]] || mkdir -p -m0755 var/run/sshd
+                [[ -d "var/run/sshd" ]] || sudo mkdir -p -m0755 var/run/sshd
                 echo -e "${INFO} 03.01 Adjusting sshd_config completed."
             } || error_msg "03.01 Failed to adjust sshd_config!"
 
