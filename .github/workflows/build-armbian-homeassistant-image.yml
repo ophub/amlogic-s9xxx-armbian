@@ -35,6 +35,7 @@ on:
           - a311d-oes
           - alark35-3500
           - anas3035
+          - aio-3399b
           - beikeyun
           - chainedbox
           - crrc
@@ -71,6 +72,7 @@ on:
           - nanopi-r5s
           - orangepi-5-plus
           - panther-x2
+          - photonicat
           - r66s
           - r68s
           - renegade-rk3328
@@ -257,7 +259,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
@@ -269,23 +271,25 @@ jobs:
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
-          docker rmi $(docker images -q) 2>/dev/null
+          docker rmi -f $(docker images -q) 2>/dev/null || true
           [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null
           sudo swapoff -a
           sudo rm -f /swapfile /mnt/swapfile
           sudo -E apt-get -y update
           sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
-          sudo -E apt-get -y install $(curl -fsSL https://tinyurl.com/ubuntu2204-build-armbian)
+          sudo -E apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-build-armbian-depends)
           sudo -E systemctl daemon-reload
           #sudo -E apt-get -y full-upgrade
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
           sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
           sudo rm -rf ~/{.cargo,.dotnet,.rustup}
-          sudo -E timedatectl set-timezone "${TZ}"
-          sudo -E apt-get install -y ntpdate
-          sudo -E ntpdate pool.ntp.org
+          sudo -E timedatectl set-timezone "${TZ:-Etc/UTC}"
+          sudo -E ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
+          sudo -E timedatectl set-ntp true
+          date -u
+          timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Create simulated physical disk

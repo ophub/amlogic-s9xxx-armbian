@@ -41,9 +41,10 @@
 # software_120  : For xunlei:2345
 # software_121  : For docker-headless:10081/10089
 # software_122  : For navidrome:4533
-# software_123  : For alist:5244
+# software_123  : For openlist:5244
 # software_124  : For qinglong:5700
 # software_125  : For chatgpt-next-web:3000
+# software_126  : For n8n:5678
 #
 #============================================================================
 
@@ -869,11 +870,11 @@ software_122() {
     esac
 }
 
-# For alist
+# For openlist
 software_123() {
     # Set basic information
-    container_name="alist"
-    image_name="xhofe/alist:latest"
+    container_name="openlist"
+    image_name="openlistteam/openlist:latest"
     install_path="${docker_path}/${container_name}"
 
     case "${software_manage}" in
@@ -881,24 +882,24 @@ software_123() {
         echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
 
         echo -ne "${OPTIONS} Set your login password: "
-        read alist_pass
-        [[ -z "${alist_pass}" ]] && alist_pass="$(docker exec -it alist ./alist admin random | grep 'password:' | awk '{print $4}')"
+        read openlist_pass
+        [[ -z "${openlist_pass}" ]] && openlist_pass="$(docker exec -it openlist ./openlist admin random | grep 'password:' | awk '{print $4}')"
 
-        # Instructions: https://hub.docker.com/r/xhofe/alist
+        # Instructions: https://hub.docker.com/r/openlistteam/openlist
         docker run -d --name=${container_name} \
             -e PUID=0 \
             -e PGID=0 \
             -e UMASK=022 \
             -p 5244:5244 \
-            -v ${install_path}/alist:/opt/alist/data \
+            -v ${install_path}/openlist:/opt/openlist/data \
             --restart=always \
             ${image_name}
 
-        docker exec -it alist ./alist admin set ${alist_pass}
+        docker exec -it openlist ./openlist admin set ${openlist_pass}
 
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5244 ]"
-        echo -e "${NOTE} Login name: [ admin ], password [ ${alist_pass} ]"
+        echo -e "${NOTE} Login name: [ admin ], password [ ${openlist_pass} ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
         exit 0
         ;;
@@ -976,6 +977,44 @@ software_125() {
         sync && sleep 3
         echo -e "${NOTE} The ${container_name} address [ http://${my_address}:3000 ]"
         echo -e "${SUCCESS} ${container_name} installed successfully."
+        exit 0
+        ;;
+    update) docker_update ;;
+    remove) docker_remove ;;
+    *) error_msg "Invalid input parameter: [ ${@} ]" ;;
+    esac
+}
+
+# For n8n
+software_126() {
+    # Set basic information
+    container_name="n8n"
+    image_name="n8nio/n8n:nightly-arm64"
+    install_path="${docker_path}/${container_name}"
+
+    case "${software_manage}" in
+    install)
+        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        # Instructions: https://hub.docker.com/r/n8nio/n8n
+        docker run -d --name=${container_name} \
+            -e PUID=${docker_puid} \
+            -e PGID=${docker_pgid} \
+            -e TZ=${docker_tz} \
+            -e GENERIC_TIMEZONE=${docker_tz} \
+            -p 5678:5678 \
+            -e N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true \
+            -e N8N_RUNNERS_ENABLED=true \
+            -e N8N_SECURE_COOKIE=false \
+            -v ${install_path}/n8n_data:/home/node/.n8n \
+            --restart unless-stopped \
+            ${image_name}
+
+        echo -e "${NOTE} Please wait 20 seconds..."
+        sync && sudo chown -R ${docker_puid}:${docker_pgid} ${docker_path}
+        sudo docker restart ${container_name}
+        sync && sleep 20
+        echo -e "${SUCCESS} ${container_name} installed successfully."
+        echo -e "${NOTE} The ${container_name} address [ http://${my_address}:5678 ]"
         exit 0
         ;;
     update) docker_update ;;
