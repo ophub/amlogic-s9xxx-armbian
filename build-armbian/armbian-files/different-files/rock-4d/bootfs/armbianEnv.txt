@@ -1,0 +1,8 @@
+verbosity=1
+bootlogo=false
+console=both
+overlay_prefix=rk35xx
+fdtfile=rockchip/rk3576-rock-4d-spi.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
