@@ -243,11 +243,11 @@ EOF
         error_msg "07. Failed to find Armbian image!"
     fi
 
-    # Add sha256sum verification files
+    # Clean up files in the image directory
     cd ${image_path}/
     sudo rm -rf $(ls . | grep -vE ".img.gz|.tar.gz" | xargs) 2>/dev/null
-    for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
-    [[ "${?}" == "0" ]] && echo -e "${INFO} 08. The files in the current directory:\n$(ls -lh .)" || error_msg "08. Failed to add sha256sum!"
+    #for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
+    [[ "${?}" == "0" ]] && echo -e "${INFO} 08. The files in the current directory:\n$(ls -lh .)" || error_msg "08. Failed to clean up!"
 
     # Delete Armbian build source codes and temporary files
     cd ${build_path}/
