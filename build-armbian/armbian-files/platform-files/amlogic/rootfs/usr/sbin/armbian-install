@@ -146,7 +146,13 @@ init_var() {
     # Check if the ${model_conf} file exists
     [[ -s "${model_conf}" ]] || error_msg "[ ${model_conf} ] file is missing!"
     model_database="$(cat ${model_conf} | sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' | grep -E "^[0-9]{1,3}:.*${SEARCH_FAMILY}.*")"
-    [[ -n "${model_database}" ]] || error_msg "The [ ${SEARCH_FAMILY} ] series in the [ ${model_conf} ] file is empty and does not support write to eMMC!"
+    if [[ -z "${model_database}" ]]; then
+        if [[ "${SEARCH_FAMILY}" == ":meson-gxbb:" ]]; then
+            error_msg "The [ s905 ] series do not support writing to eMMC. Please use it via USB."
+        else
+            error_msg "The [ ${SEARCH_FAMILY} ] series in the [ ${model_conf} ] file is empty and does not support write to eMMC!"
+        fi
+    fi
 
     # Check if current system is booted from eMMC
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
