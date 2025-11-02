@@ -107,13 +107,16 @@ redo_rootfs() {
 
     # Searching for Armbian image
     image_file="$(basename $(ls ${image_path}/*.img 2>/dev/null | head -n 1))"
-    image_version="$(echo ${image_file} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-    image_kernel="$(echo ${image_file} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
-    image_save_name="Armbian_${image_version}-trunk_${image_kernel}.img"
+    # Get image version, such as 25.11.0
+    image_version="$(echo "${image_file}" | grep -oE '[0-9]{2}\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+    # Get image kernel version, such as 6.12.56
+    image_kernel="$(echo "${image_file}" | grep -oE '[0-9]+\.[0-9]{1,2}\.[0-9]{1,3}' | grep -v "${image_version}" | head -n 1)"
+    # Set image save name
+    image_save_name="Armbian_v${image_version}-trunk_k${image_kernel}.img"
 
     # Searching for rootfs file
     rootfs_file="$(ls ${cache_path}/rootfs-*.tar.zst 2>/dev/null | head -n 1)"
-    rootfs_save_name="Armbian_${image_version}-${version_codename}_rootfs"
+    rootfs_save_name="Armbian_v${image_version}-${version_codename}_k${image_kernel}_rootfs"
 
     # Create temporary directory
     mkdir -p ${tmp_rootfs}
