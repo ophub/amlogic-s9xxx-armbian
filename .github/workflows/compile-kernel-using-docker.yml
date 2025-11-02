@@ -150,10 +150,21 @@ jobs:
           sudo pvcreate /dev/loop7
           sudo vgcreate github /dev/loop6 /dev/loop7
           sudo lvcreate -n runner -l 100%FREE github
-          sudo mkfs.xfs /dev/github/runner
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
-          sudo chown -R runner.runner /builder
+          sudo chown -R runner:runner /builder
+          # Prepare cached directory
+          echo "Preparing cached directory..."
+          sudo cp -af /home/runner/actions-runner/cached /builder/cached
+          rm -rf /home/runner/actions-runner/cached
+          sudo ln -sf /builder/cached /home/runner/actions-runner/cached
+          echo "_diag directory content:"
+          ls -lh /home/runner/actions-runner/cached/_diag/ 2>/dev/null
+          echo "Verifying the symbolic link..."
+          ls -ld /home/runner/actions-runner/cached
+          df -Th /home/runner/actions-runner/cached
+          echo "Server disk layout:"
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
