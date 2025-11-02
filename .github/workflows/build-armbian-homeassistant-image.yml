@@ -259,7 +259,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
 
     steps:
@@ -304,11 +304,23 @@ jobs:
           sudo pvcreate /dev/loop7
           sudo vgcreate github /dev/loop6 /dev/loop7
           sudo lvcreate -n runner -l 100%FREE github
-          sudo mkfs.xfs /dev/github/runner
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
-          sudo chown -R runner.runner /builder
+          sudo chown -R runner:runner /builder
+          # Prepare cached directory
+          echo "Preparing cached directory..."
+          sudo cp -af /home/runner/actions-runner/cached /builder/cached
+          rm -rf /home/runner/actions-runner/cached
+          sudo ln -sf /builder/cached /home/runner/actions-runner/cached
+          echo "_diag directory content:"
+          ls -lh /home/runner/actions-runner/cached/_diag/ 2>/dev/null
+          echo "Verifying the symbolic link..."
+          ls -ld /home/runner/actions-runner/cached
+          df -Th /home/runner/actions-runner/cached
+          echo "Server disk layout:"
           df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Download source code
         id: down
@@ -317,7 +329,7 @@ jobs:
         run: |
           df -hT ${PWD}
           git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
-          ln -sf /builder/build ${GITHUB_WORKSPACE}/build
+          ln -sf /builder/build ${{ github.workspace }}/build
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
           # 下载扩展的安装homeasssistant脚本
           wget -P ./build/extensions https://raw.githubusercontent.com/armbian/os/main/userpatches/extensions/docker-ce.sh
@@ -348,6 +360,10 @@ jobs:
           # Organize and keep essential files, delete unnecessary files
           chmod +x ${ROOTFS_SCRIPT}
           ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }} -s true -c true -k true
+
+          # Clean build directory except output folder
+          cd build/
+          rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
 
           # Output cleaning result information
           df -hT ${PWD}
