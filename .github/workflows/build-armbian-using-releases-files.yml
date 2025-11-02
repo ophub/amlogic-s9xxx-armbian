@@ -27,8 +27,8 @@ on:
         type: choice
         options:
           - all
-          - top50
-          - rest50
+          - top55
+          - after55
           - a311d-oes_s905d_s905x3_s922x-ct2000_wxy-oect
           - a311d
           - a311d-oes
