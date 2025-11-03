@@ -91,7 +91,7 @@ armbian_rootfs_file="armbian.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
 # Set the default cross-compilation toolchain: [ clang / gcc / gcc-14.2, etc. ]
-toolchain_name="clang"
+toolchain_name="gcc"
 
 # QEMU BINARY
 qemu_binary_arm64="qemu-aarch64-static"
