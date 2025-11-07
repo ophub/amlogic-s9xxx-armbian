@@ -91,8 +91,8 @@ stable_kernel=("5.15.y" "6.1.y")
 flippy_kernel=(${stable_kernel[@]})
 dev_kernel=(${stable_kernel[@]})
 beta_kernel=(${stable_kernel[@]})
-rk3588_kernel=("5.10.y")
-rk35xx_kernel=("5.10.y")
+rk3588_kernel=("6.1.y")
+rk35xx_kernel=("6.1.y")
 h6_kernel=("6.6.y")
 specific_6xy=("6.1.y" "6.6.y" "6.12.y")
 specific_5xy=("5.4.y" "5.10.y" "5.15.y")
@@ -103,7 +103,6 @@ declare -A tags_list
 
 # Initialize the build device
 build_board="all"
-
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
 boot_mb="512"
 root_mb="3000"
