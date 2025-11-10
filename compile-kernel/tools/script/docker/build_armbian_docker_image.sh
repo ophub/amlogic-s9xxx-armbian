@@ -80,15 +80,15 @@ build_docker() {
     # Display the output directory
     sync && sleep 3
     echo -e "${INFO} Docker files list: \n$(ls -lh ${out_path})"
-    echo -e "${SUCCESS} Docker image created successfully."
 }
 
 # Show welcome message
 echo -e "${STEPS} Welcome to the Armbian Docker Image Builder."
-echo -e "${INFO} Make path: [ ${PWD} ]"
+echo -e "${INFO} Current path: [ ${current_path} ]"
 #
 find_armbian
 build_docker
 #
 # All process completed
 wait
+echo -e "${SUCCESS} Docker image created successfully."
