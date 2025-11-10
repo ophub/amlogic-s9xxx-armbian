@@ -212,7 +212,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 1. 关于 Workflows 文件的配置在 [.github/workflows/](.github/workflows/) 文件里。
 
-2. 全新编译：在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build Armbian server image`*** 即可使用 [build-armbian-server-image.yml](.github/workflows/build-armbian-server-image.yml) 进行编译。可以选择 Ubuntu 系列：`jammy`，或者 Debian 系列：`bullseye` 等。点击 ***`Run workflow`*** 按钮即可编译。
+2. 全新编译：在 [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) 页面里选择 ***`Build Armbian server image`*** 即可使用 [build-armbian-arm64-server-image.yml](.github/workflows/build-armbian-arm64-server-image.yml) 进行编译。可以选择 Ubuntu 系列：`jammy`，或者 Debian 系列：`bullseye` 等。点击 ***`Run workflow`*** 按钮即可编译。
 
 3. 再次编译：如果 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中有已经编译好的 `Armbian_.*-trunk_.*.img.gz` 文件，你只是想再次制作其他不同 board 的盒子，可以跳过 Armbian 源文件的编译，直接使用 [build-armbian-using-releases-files.yml](.github/workflows/build-armbian-using-releases-files.yml) 进行二次制作。
 

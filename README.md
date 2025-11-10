@@ -212,7 +212,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 1. The configuration of the Workflows file can be found in the [.github/workflows/](.github/workflows/) files.
 
-2. Fresh Build: On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Build Armbian server image`*** to start the build using the [build-armbian-server-image.yml](.github/workflows/build-armbian-server-image.yml) workflow. You can choose from the Ubuntu series such as `jammy`, or the Debian series such as `bullseye`, etc. Click the ***`Run workflow`*** button to begin the build.
+2. Fresh Build: On the [Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions) page, select ***`Build Armbian server image`*** to start the build using the [build-armbian-arm64-server-image.yml](.github/workflows/build-armbian-arm64-server-image.yml) workflow. You can choose from the Ubuntu series such as `jammy`, or the Debian series such as `bullseye`, etc. Click the ***`Run workflow`*** button to begin the build.
 
 3. Rebuild: If there are already compiled `Armbian_.*-trunk_.*.img.gz` files in [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases), and you just want to make another box of different boards, you can skip compiling the Armbian source files and directly use [build-armbian-using-releases-files.yml](.github/workflows/build-armbian-using-releases-files.yml) for secondary build.
 
