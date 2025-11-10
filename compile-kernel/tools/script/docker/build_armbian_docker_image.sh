@@ -50,8 +50,7 @@ find_armbian() {
     # Find whether the Armbian file exists
     armbian_file_name="$(ls ${armbian_path}/${armbian_rootfs_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')"
     if [[ -n "${armbian_file_name}" ]]; then
-        version_codename="$(echo "${armbian_file_name}" | awk -F'[_-]' '{print $3}')"
-        echo -e "${INFO} Armbian file: [ ${armbian_file_name} ], version codename: [ ${version_codename} ]"
+        echo -e "${INFO} Armbian docker image file: [ ${armbian_file_name} ]."
     else
         error_msg "There is no [ ${armbian_rootfs_file} ] file in the [ ${armbian_path} ] directory."
     fi
@@ -66,14 +65,14 @@ build_docker() {
 
     # Move the docker image to the output directory
     rm -rf ${out_path} && mkdir -p ${out_path}
-    mv -f ${armbian_path}/${armbian_file_name} ${out_path}/armbian-${version_codename}-rootfs.tar.gz
+    cp -f ${armbian_path}/${armbian_file_name} ${out_path}/${armbian_file_name}
     [[ "${?}" -eq "0" ]] || error_msg "Docker image move failed."
     echo -e "${INFO} Docker rootfs file added successfully."
 
     # Add Dockerfile
     cp -f ${docker_path}/Dockerfile ${out_path}
     [[ "${?}" -eq "0" ]] || error_msg "Dockerfile addition failed."
-    sed -i "s|^ADD armbian-.*.tar.gz|ADD armbian-${version_codename}-rootfs.tar.gz|g" ${out_path}/Dockerfile
+    sed -i "s|^ADD armbian-.*.tar.gz|ADD ${armbian_file_name}|g" ${out_path}/Dockerfile
     [[ "${?}" -eq "0" ]] || error_msg "Dockerfile version codename replacement failed."
     echo -e "${INFO} Dockerfile added successfully."
 

@@ -52,7 +52,7 @@ jobs:
           armbian_url="$(curl \
                             --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                             -s "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" |
-                            grep -o "Armbian_${{ inputs.source_branch }}_arm64_server.*/.*rootfs.tar.gz" |
+                            grep -o "Armbian_${{ inputs.source_branch }}_arm64_.*/.*rootfs.tar.gz" |
                             sort -urV |
                             head -n 1
                         )"
