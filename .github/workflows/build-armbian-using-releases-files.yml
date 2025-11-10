@@ -335,7 +335,7 @@ jobs:
                 -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                 https://api.github.com/repos/${{ github.repository }}/releases?per_page=100 | \
-                jq -r --arg RTK "Armbian_${{ inputs.set_release }}_" \
+                jq -r --arg RTK "Armbian_${{ inputs.set_release }}_arm64_" \
                 --arg BOARD "-trunk_" \
                 '[.[] | select(.tag_name | contains($RTK))] |
                 map(.assets[] | select(.browser_download_url | contains($BOARD) and endswith(".img.gz"))) |

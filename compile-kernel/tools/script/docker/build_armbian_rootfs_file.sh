@@ -49,7 +49,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="v:s:c:k:"
+    local options="v:s:c:k:p:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -88,6 +88,14 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
+        -p | --PLATFORM_TYPE)
+            if [[ -n "${2}" ]]; then
+                platform_type="${2}"
+                shift 2
+            else
+                error_msg "Invalid -p parameter [ ${2} ]!"
+            fi
+            ;;
         --)
             shift
             break
@@ -112,11 +120,11 @@ redo_rootfs() {
     # Get image kernel version, such as 6.12.56
     image_kernel="$(echo "${image_file}" | grep -oE '[0-9]+\.[0-9]{1,2}\.[0-9]{1,3}' | grep -v "${image_version}" | head -n 1)"
     # Set image save name
-    image_save_name="Armbian_v${image_version}-trunk_k${image_kernel}.img"
+    image_save_name="Armbian_v${image_version}-trunk_${version_codename}_${platform_type:-arm64}_k${image_kernel}.img"
 
     # Searching for rootfs file
     rootfs_file="$(ls ${cache_path}/rootfs-*.tar.zst 2>/dev/null | head -n 1)"
-    rootfs_save_name="Armbian_v${image_version}-${version_codename}_k${image_kernel}_rootfs"
+    rootfs_save_name="Armbian_v${image_version}-${version_codename}_${platform_type:-arm64}_k${image_kernel}_rootfs"
 
     # Create temporary directory
     mkdir -p ${tmp_rootfs}

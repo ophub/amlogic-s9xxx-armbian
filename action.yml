@@ -151,7 +151,7 @@ runs:
                 echo -e "Modify Armbian filename..."
                 image_version="$(echo ${image_file} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
                 image_kernel="$(echo ${image_file} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
-                image_save_name="Armbian_${image_version}-trunk_${image_kernel}.img"
+                image_save_name="Armbian_v${image_version}-trunk_k${image_kernel}.img"
                 rm -f ${image_save_name}
                 mv -f ${image_file} ${image_save_name}
                 echo -e "Renamed Armbian file: [ ${image_save_name} ]"
