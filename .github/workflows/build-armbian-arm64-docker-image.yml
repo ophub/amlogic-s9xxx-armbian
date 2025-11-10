@@ -1,0 +1,97 @@
+#=====================================================================================
+# https://github.com/ophub/amlogic-s9xxx-armbian
+# Description: Build Armbian arm64 Docker image
+# Instructions: https://github.com/docker/build-push-action
+# Build and Push to: https://hub.docker.com/
+#=====================================================================================
+
+name: Build Armbian arm64 Docker image
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+    inputs:
+      source_branch:
+        description: "Select the source branch"
+        required: false
+        default: "trixie"
+        type: choice
+        options:
+          - trixie
+          - bookworm
+          - bullseye
+          - noble
+          - jammy
+      docker_img:
+        description: "Set the docker image"
+        required: false
+        default: "ophub/armbian"
+        type: choice
+        options:
+          - ophub/armbian
+
+env:
+  TZ: Etc/UTC
+  MAKE_DOCKER_SH: compile-kernel/tools/script/docker/build_armbian_docker_image.sh
+  DOCKER_OUTPATH: out
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    if: ${{ github.event.repository.owner.id }} == ${{ github.event.sender.id }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Armbian rootfs file [ ${{ inputs.source_branch }} ]
+        id: down
+        if: (!cancelled())
+        run: |
+          # Get Armbian file
+          armbian_url="$(curl \
+                            --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                            -s "https://api.github.com/repos/${{ github.repository }}/releases?per_page=100" |
+                            grep -o "Armbian_${{ inputs.source_branch }}_arm64_server.*/.*rootfs.tar.gz" |
+                            sort -urV |
+                            head -n 1
+                        )"
+          [[ -z "${armbian_url}" ]] && echo -e "Armbian file not found!" && exit 1
+
+          [[ -d "armbian" ]] || mkdir -p armbian
+          curl -fsSL "https://github.com/${{ github.repository }}/releases/download/${armbian_url}" -o "armbian/$(basename ${armbian_url})"
+          [[ "${?}" -ne "0" ]] && echo "Armbian file download failed." && exit 1
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Build the Docker image
+        id: make
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        run: |
+          chmod +x ${MAKE_DOCKER_SH}
+          ${MAKE_DOCKER_SH}
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Set up Docker Buildx
+        id: buildx
+        if: (!cancelled())
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        id: login
+        if: (!cancelled())
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Push to Docker Hub
+        id: push
+        if: (!cancelled())
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          platforms: linux/arm64
+          context: ${{ env.DOCKER_OUTPATH }}
+          tags: |
+            "${{ inputs.docker_img }}-${{ inputs.source_branch }}:arm64"
+            "${{ inputs.docker_img }}-${{ inputs.source_branch }}:latest"
