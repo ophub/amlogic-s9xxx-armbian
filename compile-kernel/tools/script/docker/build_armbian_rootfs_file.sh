@@ -257,12 +257,18 @@ EOF
     sudo rm -rf $(ls . | grep -v "^output$" | xargs)
     [[ "${?}" == "0" ]] && echo -e "${INFO} 09. Armbian source code cleanup completed." || error_msg "09. Failed to clean up!"
 
+    cd ${current_path}/
     sync && sleep 3
 }
 
 echo -e "${STEPS} Start to redo the Armbian rootfs file."
+echo -e "${INFO} Current path: [ ${current_path} ]"
 
 # Initialize variables
 init_var "${@}"
 # Redo Armbian rootfs
 redo_rootfs
+# All process completed
+wait
+
+echo -e "${SUCCESS} Armbian rootfs file redo completed."
