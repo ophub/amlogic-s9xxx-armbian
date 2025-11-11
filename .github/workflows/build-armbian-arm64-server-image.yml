@@ -17,7 +17,6 @@ on:
         options:
           - trixie
           - bookworm
-          - bullseye
           - noble
           - jammy
       armbian_board:

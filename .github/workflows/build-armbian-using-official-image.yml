@@ -336,7 +336,7 @@ jobs:
 
           # Get the release name of the rebuild armbian file
           set_release=""
-          ARR_RELEASE=("noble" "jammy" "trixie" "bookworm" "bullseye")
+          ARR_RELEASE=("noble" "jammy" "trixie" "bookworm")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${armbian_url}" == *"${r}"* ]]; then
