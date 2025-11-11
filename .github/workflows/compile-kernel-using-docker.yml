@@ -195,7 +195,7 @@ jobs:
               -v /etc/localtime:/etc/localtime:ro \
               -v /etc/timezone:/etc/timezone:ro \
               --restart=always \
-              ophub/armbian-${{ inputs.docker_image }}:latest
+              ophub/armbian-${{ inputs.docker_image }}:arm64
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
