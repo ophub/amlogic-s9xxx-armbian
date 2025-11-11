@@ -72,6 +72,8 @@ build_docker() {
     # Add Dockerfile
     cp -f ${docker_path}/Dockerfile ${out_path}
     [[ "${?}" -eq "0" ]] || error_msg "Dockerfile addition failed."
+    cp -f ${docker_path}/docker_startup.sh ${out_path}
+    [[ "${?}" -eq "0" ]] || error_msg "Custom startup script addition failed."
     sed -i "s|^ADD armbian-.*.tar.gz|ADD ${armbian_file_name}|g" ${out_path}/Dockerfile
     [[ "${?}" -eq "0" ]] || error_msg "Dockerfile version codename replacement failed."
     echo -e "${INFO} Dockerfile added successfully."
