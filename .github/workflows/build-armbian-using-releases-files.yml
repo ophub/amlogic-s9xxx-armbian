@@ -387,5 +387,5 @@ jobs:
             - Default password: 1234
             - Install command: armbian-install
             - Update command: armbian-update
-            ### Armbian Image Verification
-            - sha256sum
+            ### Applicable platform
+            - arm64
