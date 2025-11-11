@@ -144,14 +144,15 @@ jobs:
           tag: ${{ steps.clean.outputs.build_tag }}
           artifacts: armbian/*
           allowUpdates: true
-          makeLatest: true
+          makeLatest: false
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image information
-            - Default username: root
-            - Default password: 1234
+            - Default username: `root`
+            - Default password: `1234`
             ### Applicable platform
-            - amd64(uefi-x86)
+            - 💻 `amd64(uefi-x86)`
+            - 🐋 Docker image: https://hub.docker.com/u/ophub
 
       - name: Build the Docker image
         id: makedocker
