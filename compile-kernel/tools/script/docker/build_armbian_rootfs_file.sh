@@ -120,11 +120,11 @@ redo_rootfs() {
     # Get image kernel version, such as 6.12.56
     image_kernel="$(echo "${image_file}" | grep -oE '[0-9]+\.[0-9]{1,2}\.[0-9]{1,3}' | grep -v "${image_version}" | head -n 1)"
     # Set image save name
-    image_save_name="Armbian_v${image_version}-trunk_${version_codename}_${platform_type:-arm64}_k${image_kernel}.img"
+    image_save_name="Armbian_${image_version}-trunk_${version_codename}_${platform_type:-arm64}_${image_kernel}.img"
 
     # Searching for rootfs file
     rootfs_file="$(ls ${cache_path}/rootfs-*.tar.zst 2>/dev/null | head -n 1)"
-    rootfs_save_name="Armbian_v${image_version}-${version_codename}_${platform_type:-arm64}_k${image_kernel}_rootfs"
+    rootfs_save_name="Armbian_${image_version}-${version_codename}_${platform_type:-arm64}_${image_kernel}_rootfs.tar.gz"
 
     # Create temporary directory
     mkdir -p ${tmp_rootfs}
@@ -237,8 +237,8 @@ EOF
         fi
 
         # Compress the rootfs file
-        sudo tar -czf ${rootfs_save_name}.tar.gz *
-        sudo mv -f ${rootfs_save_name}.tar.gz ../
+        sudo tar -czf ${rootfs_save_name} *
+        sudo mv -f ${rootfs_save_name} ../
         [[ "${?}" == "0" ]] && echo -e "${INFO} 06. Making Armbian rootfs completed." || error_msg "06. Failed to redo rootfs!"
     else
         error_msg "02. Failed to find rootfs file!"
