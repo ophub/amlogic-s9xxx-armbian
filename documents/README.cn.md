@@ -9,7 +9,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 - [Armbian 构建及使用方法](#armbian-构建及使用方法)
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
-  - [2. 设置隐私变量 GITHUB\_TOKEN](#2-设置隐私变量-github_token)
+  - [2. 设置隐私变量 GITHUB\_TOKEN 等](#2-设置隐私变量-github_token-等)
   - [3. Fork 仓库并设置工作流权限](#3-fork-仓库并设置工作流权限)
   - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
   - [5. 编译系统](#5-编译系统)
@@ -104,9 +104,14 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 注册自己的账户，以便进行系统个性化定制的继续操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
 
-## 2. 设置隐私变量 GITHUB_TOKEN
+## 2. 设置隐私变量 GITHUB_TOKEN 等
 
-根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 GITHUB_TOKEN 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
+根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 `GITHUB_TOKEN` 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
+
+在 Actions 中制作 [Armbian Docker](../.github/workflows/build-armbian-arm64-docker-image.yml) 镜像并推送到 Docker Hub 时，需要设置 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 两个隐私变量。在自己的仓库页面，点击右上角的 `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` > `New repository secret` 按钮，添加如下两个隐私变量：
+
+- 变量名 `DOCKERHUB_USERNAME`：值是登录 Docker Hub 的用户名
+- 变量名 `DOCKERHUB_PASSWORD`：值是登录 Docker Hub 的密码
 
 ## 3. Fork 仓库并设置工作流权限
 

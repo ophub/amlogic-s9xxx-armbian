@@ -9,7 +9,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
 - [Armbian Build and Usage Guide](#armbian-build-and-usage-guide)
 - [Table of Contents](#table-of-contents)
   - [1. Register your own Github account](#1-register-your-own-github-account)
-  - [2. Set up private variable GITHUB\_TOKEN](#2-set-up-private-variable-github_token)
+  - [2. Set up private variable GITHUB\_TOKEN etc](#2-set-up-private-variable-github_token-etc)
   - [3. Fork the repository and set Workflow permissions](#3-fork-the-repository-and-set-workflow-permissions)
   - [4. Customization instructions for personalized Armbian system files](#4-customization-instructions-for-personalized-armbian-system-files)
   - [5. Compile the system](#5-compile-the-system)
@@ -104,9 +104,14 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
 
 Register your own account in order to continue with the customized operation of the system. Click the `Sign up` button in the upper right corner of the github.com website and follow the instructions to register your account.
 
-## 2. Set up private variable GITHUB_TOKEN
+## 2. Set up private variable GITHUB_TOKEN etc
 
-According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique GITHUB_TOKEN secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
+According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique `GITHUB_TOKEN` secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
+
+When building a [Armbian Docker](../.github/workflows/build-armbian-arm64-docker-image.yml) image in Actions and pushing it to Docker Hub, you need to set two secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD`. On your repository's page, click Settings in the top right corner, then navigate to `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` > `New repository secret`, add the following two secrets:
+
+- Secret name `DOCKERHUB_USERNAME`: The value is your username for logging into Docker Hub.
+- Secret name `DOCKERHUB_PASSWORD`: The value is your password for logging into Docker Hub.
 
 ## 3. Fork the repository and set Workflow permissions
 
