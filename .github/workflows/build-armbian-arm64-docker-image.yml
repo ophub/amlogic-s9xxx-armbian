@@ -19,7 +19,6 @@ on:
         options:
           - trixie
           - bookworm
-          - bullseye
           - noble
           - jammy
       docker_img:
