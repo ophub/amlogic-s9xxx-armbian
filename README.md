@@ -6,6 +6,13 @@ Armbian is a lightweight Linux system specially built for ARM chips based on Deb
 
 This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` boxes, supports writing to eMMC for use, supports updating the kernel and other features. Detailed usage can be found in the [Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and personalize. If it's useful to you, you can click `Star` in the upper right corner of the repository to show support.
 
+## Default Information for Armbian System
+
+| System Name    | Default Username | Default Password  | SSH Port  | IP Address  |
+| -------------- | ---------------- | ----------------- | --------- | ----------- |
+| 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | Obtain IP from router |
+| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Use host machine’s IP |
+
 ## Armbian System Description
 
 | SoC | Device | [Kernel](https://github.com/ophub/kernel) | [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) |
@@ -257,13 +264,6 @@ To upload to `Releases`, you need to set `Workflow read/write permissions` for r
 ## Build Armbian Docker image
 
 The method for creating the [Docker](https://hub.docker.com/u/ophub) image of the Armbian system can refer to the [armbian_docker](./compile-kernel/tools/script/docker) build script.
-
-## Default Information for Armbian System
-
-| System Name    | Default Username | Default Password  | SSH Port  | IP Address  |
-| -------------- | ---------------- | ----------------- | --------- | ----------- |
-| 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | Obtain IP from router |
-| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Use host machine’s IP |
 
 ## Compiling Kernel using GitHub Actions
 

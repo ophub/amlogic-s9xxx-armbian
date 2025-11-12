@@ -6,6 +6,13 @@ Armbian（中文名：岸边）系统是基于 Debian/Ubuntu 而构建的专门�
 
 本项目依托众多的[贡献者](CONTRIBUTORS.md)，为 `Amlogic`，`Rockchip` 和 `Allwinner` 盒子构建 Armbian 系统，支持写入 eMMC 中使用，支持更新内核等功能，使用方法详见 [Armbian 使用文档](./documents/README.cn.md)。最新的 Armbian 系统可以在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有用，可以点仓库右上角的 `Star` 表示支持。
 
+## Armbian 系统默认信息
+
+| 系统名称        | 默认账号 | 默认密码  | SSH 端口 | IP 地址 |
+| -------------- | ------- | ------- | ------- | ------- |
+| 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | 从路由器获取 IP |
+| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | 使用宿主机 IP |
+
 ## Armbian 系统说明
 
 | 芯片  | 设备 | [内核](https://github.com/ophub/kernel) | [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) |
@@ -257,13 +264,6 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 ## 制作 Armbian Docker 镜像
 
 Armbian 系统 [Docker](https://hub.docker.com/u/ophub) 镜像的制作方法可以参考 [armbian_docker](./compile-kernel/tools/script/docker) 制作脚本。
-
-## Armbian 系统默认信息
-
-| 系统名称        | 默认账号 | 默认密码  | SSH 端口 | IP 地址 |
-| -------------- | ------- | ------- | ------- | ------- |
-| 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | 从路由器获取 IP |
-| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | 使用宿主机 IP |
 
 ## 使用 GitHub Actions 编译内核
 
