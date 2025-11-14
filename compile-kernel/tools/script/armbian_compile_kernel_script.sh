@@ -262,7 +262,7 @@ toolchain_check() {
         # Set cross compilation parameters
         export PATH="${path_os_variable}"
         export CROSS_COMPILE="aarch64-linux-gnu-"
-        export CC="clang"
+        export CC="ccache clang"
         export LD="ld.lld"
         export MFLAGS=" LLVM=1 LLVM_IAS=1 "
     else
@@ -297,7 +297,7 @@ toolchain_check() {
 
         # Set cross compilation parameters
         export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
-        export CC="${CROSS_COMPILE}gcc"
+        export CC="ccache ${CROSS_COMPILE}gcc"
         export LD="${CROSS_COMPILE}ld.bfd"
         export MFLAGS=""
     fi
@@ -476,10 +476,10 @@ compile_env() {
     echo -e "${INFO} LD: [ ${LD} ]"
 
     # Set generic make string
-    MAKE_SET_STRING=" ARCH=${SRC_ARCH} CROSS_COMPILE=${CROSS_COMPILE} CC=${CC} LD=${LD} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
+    MAKE_SET_STRING=" ARCH=${SRC_ARCH} CROSS_COMPILE=${CROSS_COMPILE} ${MFLAGS} LOCALVERSION=${LOCALVERSION} "
 
     # Make clean/mrproper
-    make ${MAKE_SET_STRING} mrproper
+    make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" mrproper
 
     # Check .config file
     if [[ ! -s ".config" ]]; then
@@ -528,7 +528,7 @@ compile_env() {
     }
 
     # Make menuconfig
-    #make ${MAKE_SET_STRING} menuconfig
+    #make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" menuconfig
 
     # Set max process
     PROCESS="$(($(nproc 2>/dev/null || echo 2) - 1))"
@@ -540,7 +540,7 @@ compile_dtbs() {
 
     # Make dtbs
     echo -e "${STEPS} Start compilation dtbs [ ${local_kernel_path} ]..."
-    make ${MAKE_SET_STRING} dtbs -j${PROCESS}
+    make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" dtbs -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The dtbs is compiled successfully."
 }
 
@@ -552,13 +552,13 @@ compile_kernel() {
 
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
-    make ${silent_print} ${MAKE_SET_STRING} Image modules dtbs -j${PROCESS}
-    #make ${MAKE_SET_STRING} bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
+    make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" Image modules dtbs -j${PROCESS}
+    #make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
-    make ${silent_print} ${MAKE_SET_STRING} INSTALL_MOD_PATH=${output_path}/modules modules_install
+    make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" INSTALL_MOD_PATH=${output_path}/modules modules_install
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
 
     # Strip debug information
