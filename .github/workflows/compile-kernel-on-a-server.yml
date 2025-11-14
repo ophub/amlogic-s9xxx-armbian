@@ -90,6 +90,7 @@ on:
 
 env:
   TZ: Etc/UTC
+  CCACHE_DIR: /builder/ccache
 
 jobs:
   build:
@@ -162,10 +163,24 @@ jobs:
         working-directory: /builder
         run: |
           df -hT ${PWD}
-          mkdir -p /builder/{kernel,output}
+          mkdir -p /builder/{kernel,output,ccache}
           ln -sf /builder/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
           ln -sf /builder/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
+          ln -sf /builder/ccache /home/runner/.ccache
+
+          # Setup ccache
+          ccache -M 10G
+          ccache -z
+
           echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: /builder/ccache
+          key: kernel-${{ inputs.kernel_version }}-${{ inputs.kernel_toolchain }}-${{ github.sha }}
+          restore-keys: |
+            kernel-${{ inputs.kernel_version }}-${{ inputs.kernel_toolchain }}-
 
       - name: Compile the kernel [ ${{ inputs.kernel_version }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
@@ -182,6 +197,10 @@ jobs:
           compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
 
+      - name: Show ccache statistics
+        run: |
+          ccache -s
+
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
@@ -191,6 +210,7 @@ jobs:
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
+          makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             The kernel can be used to compile Armbian and OpenWrt.
