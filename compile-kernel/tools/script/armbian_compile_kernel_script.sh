@@ -301,6 +301,11 @@ toolchain_check() {
         export LD="${CROSS_COMPILE}ld.bfd"
         export MFLAGS=""
     fi
+
+    # Setup ccache
+    echo -e "${INFO} Setting up ccache..."
+    ccache -M 10G 2>/dev/null
+    ccache -z 2>/dev/null
 }
 
 query_version() {
@@ -742,6 +747,10 @@ clean_tmp() {
     rm -rf ${output_path}/{boot/,dtb/,modules/,header/,${kernel_version}/}
     [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}/* 2>/dev/null
     rm -rf ${tmp_backup_path}
+
+    # Show ccache statistics
+    echo -e "${INFO} ccache statistics:"
+    ccache -s 2>/dev/null
 
     echo -e "${SUCCESS} All processes have been completed."
 }
