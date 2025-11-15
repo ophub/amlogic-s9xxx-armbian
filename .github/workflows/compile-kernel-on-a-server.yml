@@ -167,11 +167,6 @@ jobs:
           ln -sf /builder/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
           ln -sf /builder/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
           ln -sf /builder/ccache /home/runner/.ccache
-
-          # Setup ccache
-          ccache -M 10G
-          ccache -z
-
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Cache ccache
@@ -196,10 +191,6 @@ jobs:
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
-
-      - name: Show ccache statistics
-        run: |
-          ccache -s
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main

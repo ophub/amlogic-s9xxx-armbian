@@ -100,7 +100,6 @@ on:
 
 env:
   TZ: Etc/UTC
-  CCACHE_DIR: /builder/ccache
 
 jobs:
   build:
@@ -189,10 +188,6 @@ jobs:
           ln -sf /builder/compile-kernel/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
           ln -sf /builder/compile-kernel/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
 
-          # Setup ccache
-          ccache -M 10G
-          ccache -z
-
           # Pull the Armbian Docker image
           docker run -d --privileged \
               --name armbian-ophub \
@@ -228,10 +223,6 @@ jobs:
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
           compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
-
-      - name: Show ccache statistics
-        run: |
-          ccache -s
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
