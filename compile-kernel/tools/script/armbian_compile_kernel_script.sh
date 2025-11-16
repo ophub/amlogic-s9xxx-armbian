@@ -622,9 +622,12 @@ generate_uinitrd() {
     cp -rf ${output_path}/modules/lib/modules/${kernel_outname} -t /usr/lib/modules
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
-    # COMPRESS: [ gzip | lzma | xz | zstd ]
-    echo -e "${INFO} Set the [ ${compress_format} ] compression format for the initrd.img file."
+    # COMPRESS: [ gzip | lzma | xz | zstd | lz4 ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
+    [[ "${compress_format}" =~ ^(gzip|lzma|xz|zstd|lz4)$ ]] || {
+        echo -e "${WARNING} The compression format [ ${compress_format} ] is invalid, reset to [ xz ] format."
+        compress_format="xz"
+    }
     compress_initrd_file="/etc/initramfs-tools/initramfs.conf"
     if [[ -f "${compress_initrd_file}" ]]; then
         sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
