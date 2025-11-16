@@ -46,9 +46,10 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -p     | AutoPatch   | 设置是否使用自定义内核补丁。当设置为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
 | -n     | CustomName  | 设置内核自定义签名。当设置为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。默认值：`-ophub` |
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
-| -c     | Compress    | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
+| -z     | CompressFormat | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
 | -d     | DeleteSource | 设置内核编译结束后是否删除内核源码。可选项：`true / false`。默认值：`false` |
 | -s     | SilentLog   | 设置内核编译时是否使用静默模式减少日志输出。可选项：`true / false`。默认值：`false` |
+| -c     | CcacheClear | 设置是否在编译前清除 ccache。可选项：`true / false`。默认值：`false` |
 
 
 - `sudo ./recompile` : 使用默认配置编译内核。
@@ -98,9 +99,10 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_config     | false            | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。该目录下存储的配置模板必须以内核的主版本命名，如`config-5.10`、`config-5.15`等。 |
 | kernel_patch      | false            | 设置自定义内核补丁目录。 |
 | auto_patch        | false            | 设置是否使用自定义内核补丁。默认值为 `false`。功能参考 `-p` |
-| compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值为 `xz`。功能参考 `-c` |
+| compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值为 `xz`。功能参考 `-z` |
 | delete_source     | false            | 设置内核编译结束后是否删除内核源码。默认值为 `false`。功能参考 `-d` |
 | silent_log        | false            | 设置内核编译时是否使用静默模式减少日志输出。默认值为 `false`。功能参考 `-s` |
+| ccache_clear      | false            | 设置是否在编译前清除 ccache。默认值为 `false`。功能参考 `-c` |
 
 
 - ### GitHub Action 输出变量说明
