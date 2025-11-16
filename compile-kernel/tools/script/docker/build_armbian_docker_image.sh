@@ -90,6 +90,4 @@ echo -e "${INFO} Current path: [ ${current_path} ]"
 find_armbian
 build_docker
 #
-# All process completed
-wait
 echo -e "${SUCCESS} Docker image created successfully."

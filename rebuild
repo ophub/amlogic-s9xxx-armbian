@@ -1256,5 +1256,3 @@ loop_rebuild
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${armbian_outputpath}) \n"
 echo -e "${SUCCESS} All process completed successfully."
-# All process completed
-wait

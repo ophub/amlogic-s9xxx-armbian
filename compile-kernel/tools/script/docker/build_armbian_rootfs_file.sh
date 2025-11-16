@@ -276,7 +276,5 @@ echo -e "${INFO} Current path: [ ${current_path} ]"
 init_var "${@}"
 # Redo Armbian rootfs
 redo_rootfs
-# All process completed
-wait
 
 echo -e "${SUCCESS} Armbian rootfs file redo completed."

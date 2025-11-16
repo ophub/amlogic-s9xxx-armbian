@@ -865,5 +865,3 @@ loop_recompile
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${kernel_path}) \n"
 echo -e "${SUCCESS} All process completed successfully."
-# All process completed
-wait
