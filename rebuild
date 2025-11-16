@@ -344,7 +344,7 @@ check_data() {
         fi
 
         # If auto_kernel is false, use the value from -k parameter
-        if [[ "${auto_kernel}" != "true" ]]; then
+        if [[ ! "${auto_kernel}" =~ ^(true|yes)$ ]]; then
             if [[ "${#specific_kernel[@]}" -eq 0 ]]; then
                 error_msg "Plase use the -k parameter to specify the kernel version."
             else
@@ -1239,7 +1239,7 @@ find_armbian
 # Download the dependency files
 download_depends
 # Query the latest kernel version
-[[ "${auto_kernel}" == "true" ]] && query_kernel
+[[ "${auto_kernel}" =~ ^(true|yes)$ ]] && query_kernel
 # Download the kernel files
 download_kernel
 
