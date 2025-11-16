@@ -20,7 +20,7 @@
 #
 # error_msg          : Output error message
 # mount_try          : Mount the image file, fail again
-# compile_log        : Set up the compile kernel log file
+# log_to_file        : Log kernel compilation output to a file
 #
 # init_var           : Initialize all variables
 # toolchain_check    : Check and install the cross-compilation toolchain
@@ -58,8 +58,9 @@ chroot_file="${chroot_path}/chroot_armbian.img"
 
 # Set the system file path to be used
 arch_info="$(uname -m)"
-host_release="$(cat /etc/os-release | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
-host_version_id="$(cat /etc/os-release | grep '^VERSION_ID=.*' | cut -d'=' -f2 | tr -d '".')"
+host_id="$(cat /etc/os-release 2>/dev/null | grep '^ID=.*' | cut -d'=' -f2)"
+host_release="$(cat /etc/os-release 2>/dev/null | grep '^VERSION_CODENAME=.*' | cut -d'=' -f2)"
+host_version_id="$(cat /etc/os-release 2>/dev/null | grep '^VERSION_ID=.*' | cut -d'=' -f2 | tr -d '".')"
 [[ -z "${host_version_id}" ]] && host_version_id="2404"
 
 # Set the default for downloading kernel sources from github.com
@@ -77,12 +78,15 @@ custom_name="-ophub"
 package_list="all"
 # Set the compression format, options: [ gzip / lzma / xz / zstd ]
 compress_format="xz"
-# Set whether to automatically delete the source code after the kernel is compiled
-delete_source="false"
-# Set make log silent output (recommended to use 'true' when github runner has insufficient space)
-silent_log="false"
 # Set whether to clear ccache before compiling the kernel, options: [ true / false ]
 ccache_clear="false"
+# Set whether to automatically delete the source code after the kernel is compiled
+delete_source="false"
+# Set make log silent output, options: [ true / false ]
+silent_log="false"
+# Set whether to log compilation output to file, options: [ true / false ]
+enable_log="false"
+output_logfile="/var/log/kernel_compile_$(date +%Y-%m-%d_%H-%M-%S).log"
 
 # Cross compile toolchain download mirror
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -113,14 +117,14 @@ error_msg() {
     exit 1
 }
 
-compile_log() {
+log_to_file() {
     echo -e "${STEPS} Initializing kernel compilation log..."
-    compile_logfile="/var/log/kernel_compile_$(date +%Y-%m-%d_%H-%M-%S).log"
-    if touch "${compile_logfile}" 2>/dev/null; then
-        echo -e "${INFO} Kernel compilation log will be saved to: [ ${compile_logfile} ]"
-        exec &> >(tee -a "${compile_logfile}")
+
+    if touch "${output_logfile}" 2>/dev/null; then
+        echo -e "${INFO} Kernel compilation log will be saved to: [ ${output_logfile} ]"
+        exec &> >(tee -a "${output_logfile}")
     else
-        echo -e "${WARNING} Failed to create log file [ ${compile_logfile} ]. Logging to console only."
+        echo -e "${WARNING} Failed to create log file [ ${output_logfile} ]. Logging to console only."
     fi
 }
 
@@ -151,7 +155,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:z:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:l:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -252,6 +256,14 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -c parameter [ ${2} ]!"
+            fi
+            ;;
+        -l | --EnableLog)
+            if [[ -n "${2}" ]]; then
+                enable_log="${2}"
+                shift 2
+            else
+                error_msg "Invalid -l parameter [ ${2} ]!"
             fi
             ;;
         --)
@@ -909,18 +921,17 @@ loop_recompile() {
     done
 }
 
-# Output compile log
-compile_log
 # Show welcome message
 echo -e "${STEPS} Welcome to compile kernel! \n"
-echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "${INFO} Server running on ${host_id}: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 # Check script permission, supports running on the x86_64 and aarch64 platforms (ubuntu/debian)
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "x86_64 aarch64" == *"${arch_info}"* ]] || error_msg "This script is only supported on the x86_64 and aarch64 platforms."
 
-echo -e "${INFO} Using the current system to compile the kernel."
 # Initialize variables
 init_var "${@}"
+# Output log to file
+[[ "${enable_log}" =~ ^(true|yes)$ ]] && log_to_file
 # Check and install the toolchain
 toolchain_check
 # Query the latest kernel version

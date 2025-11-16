@@ -49,6 +49,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -z     | CompressFormat | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
 | -d     | DeleteSource | 设置内核编译结束后是否删除内核源码。可选项：`true / false`。默认值：`false` |
 | -s     | SilentLog   | 设置内核编译时是否使用静默模式减少日志输出。可选项：`true / false`。默认值：`false` |
+| -l     | EnableLog   | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。可选项：`true / false`。默认值：`false` |
 | -c     | CcacheClear | 设置是否在编译前清除 ccache。可选项：`true / false`。默认值：`false` |
 
 
@@ -102,6 +103,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值为 `xz`。功能参考 `-z` |
 | delete_source     | false            | 设置内核编译结束后是否删除内核源码。默认值为 `false`。功能参考 `-d` |
 | silent_log        | false            | 设置内核编译时是否使用静默模式减少日志输出。默认值为 `false`。功能参考 `-s` |
+| enable_log        | false            | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。默认值：`false`，功能参考 `-l` |
 | ccache_clear      | false            | 设置是否在编译前清除 ccache。默认值为 `false`。功能参考 `-c` |
 
 

@@ -49,6 +49,7 @@ You can compile the kernel in the official [Armbian](https://github.com/ophub/am
 | -z        | CompressFormat | Set the compression format used for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default value: `xz` |
 | -d        | DeleteSource | Set whether to delete the kernel source code after the kernel compilation is completed. Options: `true / false`. Default value: `false` |
 | -s        | SilentLog   | Set whether to use silent mode to reduce log output when compiling the kernel. Options: `true / false`. Default value: `false` |
+| -l        | EnableLog   | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Options: `true / false`. Default value: `false` |
 | -c        | CcacheClear | Set whether to clear the cache before compiling the kernel. Options: `true / false`. Default value: `false` |
 
 
@@ -102,6 +103,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | compress_format  | xz            | Set the compression format used for initrd in the kernel. Default value is `xz`. Refer to `-z` for functionality. |
 | delete_source    | false         | Set whether to delete the kernel source code after the kernel compilation is completed. Default value is `false`. Refer to `-d` for functionality. |
 | silent_log       | false         | Set whether to use silent mode to reduce log output when compiling the kernel. Default value is `false`. Refer to `-s` for functionality. |
+| enable_log       | false         | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Default value: `false`. Refer to `-l` for functionality. |
 | ccache_clear     | false         | Set whether to clear the cache before compiling the kernel. Default value is `false`. Refer to `-c` for functionality. |
 
 
