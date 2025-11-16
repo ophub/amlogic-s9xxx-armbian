@@ -476,7 +476,7 @@ get_kernel_source() {
         local_makefile_sublevel="$(cat ${local_makefile} | grep -oE "SUBLEVEL =.*" | head -n 1 | grep -oE '[0-9]{1,3}')"
 
         # Local version and server version comparison
-        if [[ "${auto_kernel}" == "true" || "${auto_kernel}" == "yes" ]] && [[ "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
+        if [[ "${auto_kernel}" =~ ^(true|yes)$ ]] && [[ "${kernel_sub}" -gt "${local_makefile_sublevel}" ]]; then
             # Pull the latest source code of the server
             cd ${kernel_path}/${local_kernel_path}
             git checkout ${code_branch} && git reset --hard origin/${code_branch} && git pull
@@ -493,7 +493,7 @@ get_kernel_source() {
     rm -f ${kernel_path}/${local_kernel_path}/localversion
 
     # Apply custom kernel patches
-    [[ "${auto_patch}" == "true" || "${auto_patch}" == "yes" ]] && apply_patch
+    [[ "${auto_patch}" =~ ^(true|yes)$ ]] && apply_patch
 }
 
 unmount_armbian() {
@@ -744,7 +744,7 @@ compile_kernel() {
     cd ${kernel_path}/${local_kernel_path}
 
     # Set the make log silent output
-    [[ "${silent_log}" == "true" || "${silent_log}" == "yes" ]] && silent_print="-s" || silent_print=""
+    [[ "${silent_log}" =~ ^(true|yes)$ ]] && silent_print="-s" || silent_print=""
 
     # Make kernel
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
@@ -856,7 +856,7 @@ clean_tmp() {
 
     sync && sleep 3
     rm -rf ${output_path}/{chroot/,boot/,dtb/,modules/,header/,${kernel_version}/}
-    [[ "${delete_source}" == "true" ]] && rm -rf ${kernel_path}/* 2>/dev/null
+    [[ "${delete_source}" =~ ^(true|yes)$ ]] && rm -rf ${kernel_path}/* 2>/dev/null
 
     # Show ccache statistics
     echo -e "${INFO} ccache statistics:"
@@ -924,7 +924,7 @@ init_var "${@}"
 # Check and install the toolchain
 toolchain_check
 # Query the latest kernel version
-[[ "${auto_kernel}" == "true" || "${auto_kernel}" == "yes" ]] && query_version
+[[ "${auto_kernel}" =~ ^(true|yes)$ ]] && query_version
 
 # Show compile settings
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
