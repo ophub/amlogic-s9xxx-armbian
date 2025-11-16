@@ -81,6 +81,8 @@ compress_format="xz"
 delete_source="false"
 # Set make log silent output (recommended to use 'true' when github runner has insufficient space)
 silent_log="false"
+# Set whether to clear ccache before compiling the kernel, options: [ true / false ]
+ccache_clear="false"
 
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -109,7 +111,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -180,12 +182,12 @@ init_var() {
                 error_msg "Invalid -t parameter [ ${2} ]!"
             fi
             ;;
-        -c | --Compress)
+        -z | --CompressFormat)
             if [[ -n "${2}" ]]; then
                 compress_format="${2}"
                 shift 2
             else
-                error_msg "Invalid -c parameter [ ${2} ]!"
+                error_msg "Invalid -z parameter [ ${2} ]!"
             fi
             ;;
         -d | --DeleteSource)
@@ -202,6 +204,14 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -s parameter [ ${2} ]!"
+            fi
+            ;;
+        -c | --CcacheClear)
+            if [[ -n "${2}" ]]; then
+                ccache_clear="${2}"
+                shift 2
+            else
+                error_msg "Invalid -c parameter [ ${2} ]!"
             fi
             ;;
         --)
@@ -485,6 +495,12 @@ compile_env() {
 
     # Make clean/mrproper
     make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" mrproper
+
+    # Clear ccache if enabled
+    [[ "${ccache_clear}" =~ ^(true|yes)$ ]] && {
+        echo -e "${INFO} Clear ccache before compiling the kernel..."
+        ccache -C 2>/dev/null
+    }
 
     # Check .config file
     if [[ ! -s ".config" ]]; then

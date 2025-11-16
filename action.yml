@@ -93,6 +93,10 @@ inputs:
     description: "Set whether to use silent log output"
     required: false
     default: "false"
+  ccache_clear:
+    description: "Set whether to clear the cache"
+    required: false
+    default: "false"
 
 runs:
   using: "composite"
@@ -253,9 +257,10 @@ runs:
             [[ -n "${{ inputs.auto_patch }}" ]] && make_command="${make_command} -p ${{ inputs.auto_patch }}"
             [[ -n "${{ inputs.kernel_sign }}" ]] && make_command="${make_command} -n ${{ inputs.kernel_sign }}"
             [[ -n "${{ inputs.kernel_toolchain }}" ]] && make_command="${make_command} -t ${{ inputs.kernel_toolchain }}"
-            [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -c ${{ inputs.compress_format }}"
+            [[ -n "${{ inputs.compress_format }}" ]] && make_command="${make_command} -z ${{ inputs.compress_format }}"
             [[ -n "${{ inputs.delete_source }}" ]] && make_command="${make_command} -d ${{ inputs.delete_source }}"
             [[ -n "${{ inputs.silent_log }}" ]] && make_command="${make_command} -s ${{ inputs.silent_log }}"
+            [[ -n "${{ inputs.ccache_clear }}" ]] && make_command="${make_command} -c ${{ inputs.ccache_clear }}"
             read -r -a make_args <<< "${make_command}"
 
             # Choose Ubuntu or a Docker container to compile the kernel.
