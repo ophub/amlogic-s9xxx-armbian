@@ -19,6 +19,7 @@
 #================================= Functions list =================================
 #
 # error_msg          : Output error message
+# compile_log        : Set up the compile kernel log file
 #
 # init_var           : Initialize all variables
 # toolchain_check    : Check and install the toolchain
@@ -105,6 +106,17 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e " ${ERROR} ${1}"
     exit 1
+}
+
+compile_log() {
+    echo -e "${STEPS} Initializing kernel compilation log..."
+    compile_logfile="/var/log/kernel_compile_$(date +%Y-%m-%d_%H-%M-%S).log"
+    if touch "${compile_logfile}" 2>/dev/null; then
+        echo -e "${INFO} Kernel compilation log will be saved to: [ ${compile_logfile} ]"
+        exec &> >(tee -a "${compile_logfile}")
+    else
+        echo -e "${WARNING} Failed to create log file [ ${compile_logfile} ]. Logging to console only."
+    fi
 }
 
 init_var() {
@@ -818,6 +830,8 @@ loop_recompile() {
     done
 }
 
+# Output compile log
+compile_log
 # Show welcome message
 echo -e "${STEPS} Welcome to compile kernel! \n"
 echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
