@@ -562,8 +562,12 @@ chroot_armbian() {
 
     cd ${current_path}
 
-    # COMPRESS: [ gzip | lzma | xz | zstd ]
+    # COMPRESS: [ gzip | lzma | xz | zstd | lz4 ]
     [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
+    [[ "${compress_format}" =~ ^(gzip|lzma|xz|zstd|lz4)$ ]] || {
+        echo -e "${WARNING} The compression format [ ${compress_format} ] is invalid, reset to [ xz ] format."
+        compress_format="xz"
+    }
     compress_initrd_file="${tag_rootfs}/etc/initramfs-tools/initramfs.conf"
     if [[ -f "${compress_initrd_file}" ]]; then
         sed -i "s|^COMPRESS=.*|COMPRESS=${compress_format}|g" ${compress_initrd_file}
