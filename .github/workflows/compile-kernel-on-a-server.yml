@@ -69,16 +69,11 @@ on:
           - gcc
           - gcc-14.2
           - gcc-14.3
-      compress_format:
-        description: "Set the initrd compression format"
+      ccache_clear:
+        description: "Set whether to clear the cache"
         required: false
-        default: "xz"
-        type: choice
-        options:
-          - xz
-          - gzip
-          - zstd
-          - lzma
+        default: false
+        type: boolean
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false
@@ -189,8 +184,8 @@ jobs:
           kernel_package: ${{ inputs.kernel_package }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
-          compress_format: ${{ inputs.compress_format }}
           silent_log: ${{ inputs.silent_log }}
+          ccache_clear: ${{ inputs.ccache_clear }}
 
       - name: Upload Kernel to Release
         uses: ncipollo/release-action@main
