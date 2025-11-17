@@ -80,14 +80,14 @@ armbian-update
 | Optional | Default      | Options       | Description                      |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
-| -u       | Automation   | stable/flippy/dev/beta/rk3588/rk35xx/h6 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel in use |
+| -u       | Automation   | stable/flippy/beta/rk3588/rk35xx/h6 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel in use |
 | -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b       | yes          | yes/no        | Automatically back up the current system's kernel when updating the kernel |
 | -m       | no           | yes/no        | Use mainline u-boot |
 | -s       | None         | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h       | None         | None          | View help |
 
-Example: `armbian-update -k 5.15.50 -u dev`
+Example: `armbian-update -k 5.15.50 -u stable`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 
@@ -198,8 +198,8 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | ----      | ----------  | ----------  |
 | -b        | Board      | Specifies the device code(s) to build. For example, `-b s905x3` builds the device with code s905x3. Multiple device codes can be connected using underscores, such as `-b s905x3_s905d`. Special values: `all` builds all devices; `top55` builds the top 55 devices in the device list; `after55` builds from the 56th device to the end. The full list of device codes can be found in the `BOARD` entries of [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf). Default: `all` |
 | -r        | KernelRepo | Specify the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/kernel` |
-| -u        | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [dev](https://github.com/ophub/kernel/releases/tag/kernel_dev), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
-| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/dev/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) can only use specific kernels. |
+| -u        | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
+| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) / [h6](https://github.com/ophub/kernel/releases/tag/kernel_h6) can only use specific kernels. |
 | -a        | AutoKernel | Set whether to automatically adopt the latest version of the same series of kernels. When it is `true`, it will automatically look for whether there is a newer version of the same series in the kernel library in the kernel specified in `-k`, such as 6.6.12. If there is a latest version after 6.6.12, it will be automatically changed to the latest version. When set to `false`, it will compile the specified version of the kernel. Default value: `true` |
 | -t        | RootfsType | Set the file system type of the system's ROOTFS partition, the options are `ext4` or `btrfs` type. For example: `-t btrfs`. Default value: `ext4` |
 | -s        | Size       | Set the size of the system's image partitions. When setting only the ROOTFS partition size, you can specify a single value, for example: `-s 2560`. When setting both BOOTFS and ROOTFS partition sizes, use / to connect the two values, for example: `-s 512/2560`. The default value is `512/2560` |

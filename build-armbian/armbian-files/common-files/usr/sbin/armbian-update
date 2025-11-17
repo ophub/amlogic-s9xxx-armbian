@@ -239,7 +239,7 @@ init_var() {
     # Set kernel download tags
     [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|dev|beta|rk3588|rk35xx|h6)")" ]] && KERNEL_TAGS="stable"
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|h6)")" ]] && KERNEL_TAGS="stable"
 
     # Check if the mainline u-boot exists
     [[ "${auto_mainline_uboot}" == "yes" ]] && {
@@ -816,19 +816,19 @@ sos_kernel() {
 help_info() {
     clear
     cat <<EOF
-  ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
-  │  Example: armbian-update -k 5.15.50 -u dev                                                                                  │
-  ├───────────┬──────────────┬──────────────────────────────────┬───────────────────────────────────────────────────────────────┤
-  │  Optional │ Default      │ Value                            │ Description                                                   │
-  ├───────────┼──────────────┼──────────────────────────────────┼───────────────────────────────────────────────────────────────┤
-  │  -r       │ ophub/kernel │ <owner>/<repo>                   │ Set the repository for downloading kernels from github.com    │
-  │  -u       │ automate     │ stable/flippy/dev/beta/rk3588/h6 │ Set the tags suffix of the kernel used                        │
-  │  -k       │ latest       │ kernel-version                   │ Set the kernel version                                        │
-  │  -c       │ None         │ domain-name                      │ Set the cdn domain name for accelerated access to github.com  │
-  │  -b       │ yes          │ yes/no                           │ Automatically backup the current system kernel                │
-  │  -m       │ no           │ yes/no                           │ Use Mainline u-boot                                           │
-  │  -s       │ None         │ None/mmcblkX/nvmeXnX/sdX         │ [SOS] Restore the system kernel of eMMC/NVMe/sdX disk         │
-  └───────────┴──────────────┴──────────────────────────────────┴───────────────────────────────────────────────────────────────┘
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │  Example: armbian-update -k 5.15.50 -u stable                                                                                  │
+  ├───────────┬──────────────┬─────────────────────────────────────┬───────────────────────────────────────────────────────────────┤
+  │  Optional │ Default      │ Value                               │ Description                                                   │
+  ├───────────┼──────────────┼─────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
+  │  -r       │ ophub/kernel │ <owner>/<repo>                      │ Set the repository for downloading kernels from github.com    │
+  │  -u       │ automate     │ stable/flippy/beta/rk3588/rk35xx/h6 │ Set the tags suffix of the kernel used                        │
+  │  -k       │ latest       │ kernel-version                      │ Set the kernel version                                        │
+  │  -c       │ None         │ domain-name                         │ Set the cdn domain name for accelerated access to github.com  │
+  │  -b       │ yes          │ yes/no                              │ Automatically backup the current system kernel                │
+  │  -m       │ no           │ yes/no                              │ Use Mainline u-boot                                           │
+  │  -s       │ None         │ None/mmcblkX/nvmeXnX/sdX            │ [SOS] Restore the system kernel of eMMC/NVMe/sdX disk         │
+  └───────────┴──────────────┴─────────────────────────────────────┴───────────────────────────────────────────────────────────────┘
 EOF
     exit 0
 }
