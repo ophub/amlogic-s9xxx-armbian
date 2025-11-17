@@ -89,7 +89,6 @@ kernel_usage=""
 # Set the list of kernels used by default(Selectable version)
 stable_kernel=("5.15.y" "6.1.y")
 flippy_kernel=(${stable_kernel[@]})
-dev_kernel=(${stable_kernel[@]})
 beta_kernel=(${stable_kernel[@]})
 rk3588_kernel=("6.1.y")
 rk35xx_kernel=("6.1.y")
@@ -209,9 +208,8 @@ init_var() {
             if [[ -n "${2}" ]]; then
                 oldIFS="${IFS}"
                 IFS="_"
-                flippy_kernel=(${2})
                 stable_kernel=(${2})
-                dev_kernel=(${2})
+                flippy_kernel=(${2})
                 beta_kernel=(${2})
                 specific_kernel=(${2})
                 IFS="${oldIFS}"

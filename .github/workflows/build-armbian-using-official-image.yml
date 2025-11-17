@@ -218,7 +218,6 @@ on:
         options:
           - stable
           - flippy
-          - dev
           - beta
       armbian_fstype:
         description: "Set armbian rootfs type."

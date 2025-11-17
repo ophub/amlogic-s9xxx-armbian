@@ -501,14 +501,14 @@ armbian-update
 | Optional Parameters | Default Value | Options | Description |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
-| -u | Automatic | stable/flippy/dev/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
+| -u | Automatic | stable/flippy/beta/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
 | -m | no | yes/no | Use the mainline u-boot |
 | -s | None | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h | None | None | View the usage help |
 
-Example: `armbian-update -k 5.15.50 -u dev`
+Example: `armbian-update -k 5.15.50 -u stable`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify the specific version number, such as: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, such as: `armbian-update -k 5.15`, when vaguely specifying, it will automatically use the latest version of the specified series.
 
