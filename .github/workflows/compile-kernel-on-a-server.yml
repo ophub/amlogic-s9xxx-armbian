@@ -30,19 +30,8 @@ on:
           - 6.1.y
           - 6.6.y
           - 6.12.y
-          - 5.4.y_5.10.y
-          - 5.15.y_6.1.y
-          - 6.6.y_6.12.y
-          - 5.4.y_5.10.y_5.15.y
-          - 6.1.y_6.6.y_6.12.y
-          - all
       kernel_auto:
         description: "Auto use the latest kernel"
-        required: false
-        default: true
-        type: boolean
-      silent_log:
-        description: "Use silent logging"
         required: false
         default: true
         type: boolean
@@ -139,17 +128,6 @@ jobs:
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
           sudo chown -R runner:runner /builder
-          # Prepare cached directory
-          echo "Preparing cached directory..."
-          sudo cp -af /home/runner/actions-runner/cached /builder/cached
-          rm -rf /home/runner/actions-runner/cached
-          sudo ln -sf /builder/cached /home/runner/actions-runner/cached
-          echo "_diag directory content:"
-          ls -lh /home/runner/actions-runner/cached/_diag/ 2>/dev/null
-          echo "Verifying the symbolic link..."
-          ls -ld /home/runner/actions-runner/cached
-          df -Th /home/runner/actions-runner/cached
-          echo "Server disk layout:"
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
@@ -161,14 +139,31 @@ jobs:
           mkdir -p /builder/{kernel,output,ccache}
           ln -sf /builder/kernel /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/kernel
           ln -sf /builder/output /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/compile-kernel/output
-          ln -sf /builder/ccache /home/runner/.ccache
+          sudo rm -rf /root/.ccache
+          sudo ln -sf /builder/ccache /root/.ccache
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Get kernel source hash
+        id: kernelhash
+        if: ${{ steps.mapped.outputs.status }} == 'success' && !cancelled()
+        run: |
+          # Get the latest source hash from the kernel repository
+          api_url="https://api.github.com/repos/${{ inputs.kernel_source }}/linux-${{ inputs.kernel_version }}/git/ref/heads/main"
+          source_hash=$(curl -fsSL -m 20 \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              ${api_url} |
+              jq -r '.object.sha'
+          )
+          [[ -z "${source_hash}" || "${source_hash}" == "null" ]] && source_hash="${{ github.sha }}"
+          echo "source_hash=${source_hash}" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Cache ccache
         uses: actions/cache@v4
         with:
           path: /builder/ccache
-          key: kernel-${{ inputs.kernel_toolchain }}-${{ inputs.kernel_version }}-${{ github.sha }}
+          key: kernel-${{ inputs.kernel_toolchain }}-${{ inputs.kernel_version }}-${{ env.source_hash }}
           restore-keys: |
             kernel-${{ inputs.kernel_toolchain }}-${{ inputs.kernel_version }}-
 
@@ -184,7 +179,6 @@ jobs:
           kernel_package: ${{ inputs.kernel_package }}
           kernel_sign: ${{ inputs.kernel_sign }}
           kernel_toolchain: ${{ inputs.kernel_toolchain }}
-          silent_log: ${{ inputs.silent_log }}
           ccache_clear: ${{ inputs.ccache_clear }}
 
       - name: Upload Kernel to Release
