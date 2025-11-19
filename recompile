@@ -99,9 +99,18 @@ armbian_rootfs_file="armbian.tar.xz"
 toolchain_path="/usr/local/toolchain"
 # Set the default cross-compilation toolchain: [ clang / gcc / gcc-14.2, etc. ]
 toolchain_name="gcc"
-
 # QEMU BINARY
 qemu_binary_arm64="qemu-aarch64-static"
+
+# CCACHE Configuration
+# Force specific cache directory (Override defaults)
+export CCACHE_DIR="/root/.ccache"
+# Rewrite absolute paths to relative (Enable Host/Docker sharing)
+export CCACHE_BASEDIR="${compile_path}"
+export CCACHE_NOHASHDIR="true"
+# Check compiler by content hash, not modification time
+export CCACHE_SLOPPINESS="time_macros,file_macro,include_file_ctime,include_file_mtime,system_headers,locale"
+export CCACHE_COMPILERCHECK="content"
 
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
