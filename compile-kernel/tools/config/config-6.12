@@ -9951,3 +9951,7 @@ CONFIG_MEMTEST=y
 #
 # end of Rust hacking
 # end of Kernel hacking
+
+# enable oaf
+CONFIG_OPENAPPFILTER=y
+# end

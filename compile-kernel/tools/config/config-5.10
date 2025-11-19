@@ -8392,3 +8392,7 @@ CONFIG_RUNTIME_TESTING_MENU=y
 CONFIG_MEMTEST=y
 # end of Kernel Testing and Coverage
 # end of Kernel hacking
+
+# enable oaf
+CONFIG_OPENAPPFILTER=y
+# end
