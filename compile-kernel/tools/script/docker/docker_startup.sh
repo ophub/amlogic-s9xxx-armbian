@@ -1,5 +1,5 @@
 #!/bin/bash
-#=================================================================================
+#============================== [License Information] ===============================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -11,10 +11,9 @@
 # Description: Custom startup script for Armbian Docker container.
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-#=================================================================================
-
 #======================== [Container Initialization Section] ========================
-# Function 1: Try to start Nginx service in the background if it exists.
+#
+# Try to start Nginx service in the background if it exists.
 start_nginx_service() {
     echo "[SETUP] Checking for and attempting to start Nginx service..."
     if ! command -v nginx >/dev/null 2>&1; then
@@ -33,7 +32,7 @@ start_nginx_service() {
     fi
 }
 
-# Function 2: Placeholder for other tasks.
+# Placeholder for other tasks.
 other_initialization() {
     echo "[SETUP] Performing other initialization tasks..."
     # Add any other necessary commands here, for example:
@@ -41,12 +40,13 @@ other_initialization() {
 }
 
 echo "Container Initialization Started..."
-# Step 1: Start background services like Nginx.
+# Start Nginx services.
 start_nginx_service
-# Step 2: Perform other setup tasks.
+# Perform other setup tasks.
 other_initialization
 
 #======================== [Start the Main Foreground Process] ========================
+#
 # This command keeps the container alive. Its lifecycle is the container's lifecycle.
 # We choose sshd as the primary foreground process.
 echo "Initialization Complete. Starting Main Process..."
