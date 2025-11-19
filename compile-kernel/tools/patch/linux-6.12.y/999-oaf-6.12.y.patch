@@ -1,6 +1,6 @@
-From 5a53b746b6e3d55956d59f76a8372b05dfaa7321 Mon Sep 17 00:00:00 2001
+From 683c1cfed23136bd9ca13000c1f9ffa5f5037926 Mon Sep 17 00:00:00 2001
 From: laiyj <laiyujun@vip.qq.com>
-Date: Wed, 5 Nov 2025 15:17:16 +0800
+Date: Wed, 19 Nov 2025 18:01:55 +0800
 Subject: [PATCH] Add OpenAppFilter (OAF) driver
 
 ---
@@ -5941,5 +5941,5 @@ index 000000000..6d42d5319
 +	TEST_reg_func(".*baidu.com$", "www.baidu.com223", 0);
 +}
 --
-2.51.0
+2.51.2
 
