@@ -83,7 +83,7 @@ check_depends() {
     for package in ${dpkg_packages[*]}; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$")" ]] || is_dpkg="1"
         #echo -e "${INFO} ${package}: ${is_dpkg}"
-        let i++
+        ((i++))
     done
     # Install missing packages
     if [[ "${is_dpkg}" -eq "1" ]]; then
