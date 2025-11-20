@@ -156,7 +156,7 @@ mount_try() {
         else
             sync && sleep 3
             umount -f ${m_target} 2>/dev/null
-            t="$((t + 1))"
+            ((t++))
         fi
     done
     [[ "${t}" -gt "${max_try}" ]] && error_msg "[ ${t} ] attempts to mount failed."
@@ -467,13 +467,13 @@ query_kernel() {
 
                 echo -e "${INFO} (${x}.${i}) [ ${key} - ${tmp_arr_kernels[$i]} ] is latest kernel. \n"
 
-                let i++
+                ((i++))
             done
 
             # Assign the latest kernel version to the array
             tags_list[${key}]="${tmp_arr_kernels[@]}"
 
-            let x++
+            ((x++))
         }
     done
 }
@@ -527,14 +527,14 @@ download_kernel() {
                 # If the kernel contains the sha256sums file, check the files integrity
                 [[ -f "${kernel_path}/${key}/${kernel_var}/sha256sums" ]] && check_kernel "${kernel_path}/${key}/${kernel_var}"
 
-                let i++
+                ((i++))
             done
 
             # Delete downloaded kernel temporary files
             rm -f ${kernel_path}/${key}/*.tar.gz
             sync
 
-            let x++
+            ((x++))
         }
     done
 }
@@ -1214,11 +1214,11 @@ loop_rebuild() {
                     clean_tmp
 
                     echo -e "(${j}.${i}) Armbian build successfully. \n"
-                    let i++
+                    ((i++))
                 }
             done
 
-            let j++
+            ((j++))
         }
     done
 }

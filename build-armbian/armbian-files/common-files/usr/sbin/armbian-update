@@ -79,7 +79,7 @@ check_depends() {
     i="1"
     for package in "${necessary_packages[@]}"; do
         [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^${package}$" 2>/dev/null)" ]] || is_missing="1"
-        let i++
+        ((i++))
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
@@ -404,7 +404,7 @@ check_kernel() {
                 # Header file is optional
                 if [[ "${kernel_file}" == "header" ]]; then
                     echo -e "${PROMPT} (${i}/4) [ ${tmp_file} ] file is missing, skip verification."
-                    let i++
+                    ((i++))
                     continue
                 else
                     error_msg "The [ ${tmp_file} ] file is missing."
@@ -415,7 +415,7 @@ check_kernel() {
             tmp_checkcode="$(cat ${sha256sums_file} | grep ${tmp_file} | awk '{print $1}')"
             [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
             echo -e "${INFO} (${i}/4) Verification of [ ${tmp_file} ] succeeded."
-            let i++
+            ((i++))
         done
     }
 
