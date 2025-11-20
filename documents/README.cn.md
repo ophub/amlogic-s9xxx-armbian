@@ -33,6 +33,10 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [8.2.5 我家云的安装方法](#825-我家云的安装方法)
       - [8.2.6 泰山派的安装方法](#826-泰山派的安装方法)
     - [8.3 Allwinner 系列安装方法](#83-allwinner-系列安装方法)
+    - [8.4 Docker 版本的 Armbian 安装方法](#84-docker-版本的-armbian-安装方法)
+      - [8.4.1 安装 Docker 运行环境](#841-安装-docker-运行环境)
+      - [8.4.2 设置 macvlan 网络](#842-设置-macvlan-网络)
+      - [8.4.3 运行 Armbian Docker 容器](#843-运行-armbian-docker-容器)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
     - [9.1 如何添加自定义内核补丁](#91-如何添加自定义内核补丁)
     - [9.2 如何制作内核补丁](#92-如何制作内核补丁)
@@ -372,6 +376,68 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 
 ```shell
 armbian-install
+```
+
+### 8.4 Docker 版本的 Armbian 安装方法
+
+可以在 Ubuntu/Debian/Armbian 系统中使用 Docker 版本的 Armbian 镜像。这些镜像托管在 [Docker Hub](https://hub.docker.com/r/ophub) 上，可以直接下载使用。
+
+提供了四个不同内核版本的 Armbian Docker 镜像：`armbian-trixie`，`armbian-bookworm`，`armbian-noble`，`armbian-jammy`。每个版本都有 `arm64` 和 `amd64` 版本，可以根据需要选择不同的内核版本。
+
+其中 armbian-trixie 基于 debian13，armbian-bookworm 基于 debian12，armbian-noble 基于 ubuntu24.04，armbian-jammy 基于 ubuntu22.04。
+
+arm64 版本适用于 Amlogic/Rockchip/Allwinner 等平台架构的设备，amd64 版本适用于 x86_64 架构的电脑和服务器。
+
+#### 8.4.1 安装 Docker 运行环境
+
+```shell
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+sudo newgrp docker
+```
+
+#### 8.4.2 设置 macvlan 网络
+
+```shell
+# 查看已有的 docker 网络是否包含 macvlan 网络
+docker network ls
+
+# 如果没有 macvlan 网络，则创建 macvlan 网络
+# 其中的网段、网关和网卡名称根据自己的实际网络修改
+docker network create -d macvlan \
+    --subnet=10.1.1.0/24 \
+    --gateway=10.1.1.1 \
+    -o parent=eth0 \
+    macvlan
+```
+
+#### 8.4.3 运行 Armbian Docker 容器
+
+这里以 `armbian-trixie:arm64` 镜像为例，介绍如何运行 Armbian 容器。
+
+```shell
+# 以后台方式运行 Armbian 容器
+# 其中的容器名称，IP 地址，镜像版本等根据自己的实际情况修改
+docker run -itd --name=armbian-trixie \
+    --privileged \
+    --network macvlan \
+    --ip 10.1.1.15 \
+    --hostname=armbian-trixie \
+    -e TZ=Asia/Shanghai \
+    --restart unless-stopped \
+    ophub/armbian-trixie:arm64
+
+# 查看 Armbian 容器日志
+docker logs -f armbian-trixie
+
+# 进入 Armbian 容器
+docker exec -it armbian-trixie bash
+
+# 退出 Armbian 容器
+exit
+
+# 停止并删除 Armbian 容器
+docker rm -f armbian-trixie
 ```
 
 ## 9. 编译 Armbian 内核
