@@ -1,6 +1,6 @@
-From 683c1cfed23136bd9ca13000c1f9ffa5f5037926 Mon Sep 17 00:00:00 2001
+From f8335c761f3e8d0c659e1c884629eea16f3d73d0 Mon Sep 17 00:00:00 2001
 From: laiyj <laiyujun@vip.qq.com>
-Date: Wed, 19 Nov 2025 18:01:55 +0800
+Date: Thu, 20 Nov 2025 09:01:29 +0800
 Subject: [PATCH] Add OpenAppFilter (OAF) driver
 
 ---
@@ -104,7 +104,7 @@ index 000000000..e94213e8a
 +	  will be called openappfilter.
 diff --git a/drivers/net/oaf/Makefile b/drivers/net/oaf/Makefile
 new file mode 100644
-index 000000000..9fa072b9f
+index 000000000..20c4962ec
 --- /dev/null
 +++ b/drivers/net/oaf/Makefile
 @@ -0,0 +1,7 @@
@@ -114,7 +114,7 @@ index 000000000..9fa072b9f
 +
 +obj-$(CONFIG_OPENAPPFILTER) += oaf.o
 +
-+oaf-objs := oaf-objs := app_filter.o af_utils.o  af_config.o regexp.o cJSON.o af_log.o af_client.o af_client_fs.o af_conntrack.o af_rule_config.o af_user_config.o af_whitelist_config.o
++oaf-objs := app_filter.o af_utils.o  af_config.o regexp.o cJSON.o af_log.o af_client.o af_client_fs.o af_conntrack.o af_rule_config.o af_user_config.o af_whitelist_config.o
 diff --git a/drivers/net/oaf/af_client.c b/drivers/net/oaf/af_client.c
 new file mode 100644
 index 000000000..f8f5565cb
