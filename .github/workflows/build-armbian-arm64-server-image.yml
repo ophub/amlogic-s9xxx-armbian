@@ -1,14 +1,12 @@
 #==========================================================================
-# Description: Build Armbian using releases files
+# Description: Build Armbian arm64 server image
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build Armbian using releases files
+name: Build Armbian arm64 server image
 
 on:
   repository_dispatch:
-  schedule:
-    - cron: "0 3 * * 2"
   workflow_dispatch:
     inputs:
       set_release:
@@ -24,7 +22,7 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "s905x"
+        default: "all"
         type: choice
         options:
           - all
@@ -193,7 +191,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "6.12.y"
+        default: "5.15.y_6.1.y"
         type: choice
         options:
           - 5.4.y
@@ -215,11 +213,10 @@ on:
       kernel_repo:
         description: "Set the kernel repository."
         required: false
-        default: "lleans/amlogic-s9xxx-armbian"
+        default: "ophub/kernel"
         type: choice
         options:
           - ophub/kernel
-          - lleans/amlogic-s9xxx-armbian
       kernel_usage:
         description: "Set the tags of the stable kernel."
         required: false
@@ -249,15 +246,15 @@ on:
       builder_name:
         description: "Set Armbian builder signature."
         required: false
-        default: "lleans"
+        default: "ophub"
         type: choice
         options:
           - ophub
           - angel
-          - lleans
 
 env:
   TZ: Etc/UTC
+  ROOTFS_SCRIPT: compile-kernel/tools/script/docker/build_armbian_rootfs_file.sh
 
 jobs:
   build:
@@ -313,47 +310,62 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Download Armbian from Releases
+      - name: Download source code
         id: down
         working-directory: /builder
         if: ${{ steps.init.outputs.status }} == 'success' && !cancelled()
         run: |
-          armbian_buildpath="build/output/images"
-          [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
+          df -hT ${PWD}
+          git clone -q --single-branch --depth=1 --branch=main https://github.com/armbian/build.git build
           ln -sf /builder/build ${{ github.workspace }}/build
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
-          latest_version=$(curl -s \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
-                jq -r --arg RTK "Armbian_${{ inputs.set_release }}_arm64_" \
-                --arg BOARD "-trunk_" \
-                '[.[] | select(.tag_name | contains($RTK))] |
-                map(.assets[] | select(.browser_download_url | contains($BOARD) and endswith(".img.gz"))) |
-                sort_by(.updated_at) |
-                reverse |
-                .[0] |
-                {data: .updated_at, url: .browser_download_url}')
+      - name: Compile Armbian [ ${{ inputs.set_release }} ]
+        id: compile
+        working-directory: /builder
+        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        run: |
+          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
+          cd build/
+              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
+                           BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
+                           COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
-          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && echo "Invalid Armbian image download address." && exit 1
-          latest_updated_at="$(echo ${latest_version} | jq -r '.data')"
-          latest_url="$(echo ${latest_version} | jq -r '.url')"
+      - name: Organize files and clear space
+        id: clean
+        if: ${{ steps.compile.outputs.status }} == 'success' && !cancelled()
+        run: |
+          # Organize and keep essential files, delete unnecessary files
+          chmod +x ${ROOTFS_SCRIPT}
+          ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }} -s true -c true -k true -p arm64
 
-          armbian_filename="${latest_url##*/}"
-          curl -fsSL "${latest_url}" -o "${armbian_buildpath}/${armbian_filename}"
-          [[ "${?}" -ne "0" ]] && echo "Invalid Armbian image download address." && exit 1
-          cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
+          # Clean build directory except output folder
+          cd build/
+          rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
 
+          # Output cleaning result information
+          df -hT ${PWD}
           echo "build_tag=Armbian_${{ inputs.set_release }}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
+      - name: Upload Armbian image to Release
+        uses: ncipollo/release-action@main
+        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
+        with:
+          tag: ${{ env.build_tag }}
+          artifacts: build/output/images/*
+          allowUpdates: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Rebuild Armbian
         uses: ophub/amlogic-s9xxx-armbian@main
-        if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
+        if: ${{ steps.clean.outputs.status }} == 'success' && !cancelled()
         with:
           build_target: armbian
-          armbian_path: build/output/images/*.img
+          armbian_path: build/output/images/*.img.gz
           armbian_board: ${{ inputs.armbian_board }}
           armbian_kernel: ${{ inputs.armbian_kernel }}
           auto_kernel: ${{ inputs.auto_kernel }}
@@ -362,7 +374,7 @@ jobs:
           armbian_fstype: ${{ inputs.armbian_fstype }}
           builder_name: ${{ inputs.builder_name }}
 
-      - name: Upload Armbian image to Release
+      - name: Upload Rebuild image to Release
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:

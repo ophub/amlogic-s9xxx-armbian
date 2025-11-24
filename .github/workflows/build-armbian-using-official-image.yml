@@ -20,9 +20,10 @@ on:
         type: choice
         options:
           - all
-          - top50
-          - rest50
-          - a311d-oes_s905d_s905x3_s922x-ct2000_wxy-oect
+          - top55
+          - after55
+          - a311d-oes_s922x-oes-plus_wxy-oect
+          - s905d_s905x3_s912_s922x-ct2000
           - a311d
           - a311d-oes
           - alark35-3500
@@ -71,7 +72,6 @@ on:
           - rk3318-box
           - rock5b
           - rock5c
-          - rp-rk3568
           - ruisen-box
           - s905
           - s905-beelink-mini
@@ -218,7 +218,6 @@ on:
         options:
           - stable
           - flippy
-          - dev
           - beta
       armbian_fstype:
         description: "Set armbian rootfs type."
@@ -228,14 +227,15 @@ on:
         options:
           - ext4
           - btrfs
-      armbian_storage:
-        description: "Select image storage type."
+      armbian_edition:
+        description: "Select image edition type."
         required: false
-        default: "save"
+        default: "server"
         type: choice
         options:
-          - save
-          - temp
+          - server
+          - desktop
+          - beta
       builder_name:
         description: "Set Armbian builder signature."
         required: false
@@ -256,7 +256,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialization environment
         id: init
@@ -296,11 +296,12 @@ jobs:
           sudo pvcreate /dev/loop7
           sudo vgcreate github /dev/loop6 /dev/loop7
           sudo lvcreate -n runner -l 100%FREE github
-          sudo mkfs.xfs /dev/github/runner
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner
           sudo mkdir -p /builder
           sudo mount /dev/github/runner /builder
-          sudo chown -R runner.runner /builder
+          sudo chown -R runner:runner /builder
           df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Set download address
         id: down
@@ -323,7 +324,7 @@ jobs:
 
           # Get the release name of the rebuild armbian file
           set_release=""
-          ARR_RELEASE=("noble" "jammy" "trixie" "bookworm" "bullseye")
+          ARR_RELEASE=("noble" "jammy" "trixie" "bookworm")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${armbian_url}" == *"${r}"* ]]; then
@@ -334,15 +335,15 @@ jobs:
           done
 
           mkdir -p /builder/build
-          ln -sf /builder/build ${GITHUB_WORKSPACE}/build
-          ln -sf /builder/build /home/runner/work/_actions/lleans/amlogic-s9xxx-armbian/main/build
+          ln -sf /builder/build ${{ github.workspace }}/build
+          ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
 
           sudo timedatectl set-timezone "${TZ}"
-          echo "build_tag=Armbian${set_release}_${{ inputs.armbian_storage }}_$(date +"%Y.%m")" >> ${GITHUB_OUTPUT}
+          echo "build_tag=Armbian${set_release}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Rebuild Armbian
-        uses: lleans/amlogic-s9xxx-armbian@main
+        uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ env.ARMBIAN_URL }} != '' && !cancelled()
         with:
           build_target: armbian
@@ -359,17 +360,19 @@ jobs:
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
         with:
-          tag: ${{ steps.down.outputs.build_tag }}
+          tag: ${{ env.build_tag }}
           artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
           allowUpdates: true
           removeArtifacts: false
           replacesArtifacts: true
+          makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image information
-            - Default username: root
-            - Default password: 1234
-            - Install command: armbian-install
-            - Update command: armbian-update
-            ### Armbian Image Verification
-            - sha256sum
+            - Default username: `root`
+            - Default password: `1234`
+            - Install command: `armbian-install`
+            - Update command: `armbian-update`
+            ### Applicable platform
+            - 🐧 `arm64`
+            - 🐋 Docker image: https://hub.docker.com/u/ophub

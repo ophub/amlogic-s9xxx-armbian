@@ -9,7 +9,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
 - [Armbian Build and Usage Guide](#armbian-build-and-usage-guide)
 - [Table of Contents](#table-of-contents)
   - [1. Register your own Github account](#1-register-your-own-github-account)
-  - [2. Set up private variable GITHUB\_TOKEN](#2-set-up-private-variable-github_token)
+  - [2. Set up private variable GITHUB\_TOKEN etc](#2-set-up-private-variable-github_token-etc)
   - [3. Fork the repository and set Workflow permissions](#3-fork-the-repository-and-set-workflow-permissions)
   - [4. Customization instructions for personalized Armbian system files](#4-customization-instructions-for-personalized-armbian-system-files)
   - [5. Compile the system](#5-compile-the-system)
@@ -33,6 +33,10 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
       - [8.2.5 Installation method for Chainedbox-L1-Pro](#825-installation-method-for-chainedbox-l1-pro)
       - [8.2.6 Installation method for lckfb-tspi](#826-installation-method-for-lckfb-tspi)
     - [8.3 Allwinner Series Installation Method](#83-allwinner-series-installation-method)
+    - [8.4 Installation Method for the Docker Version of Armbian](#84-installation-method-for-the-docker-version-of-armbian)
+      - [8.4.1 Install Docker Runtime Environment](#841-install-docker-runtime-environment)
+      - [8.4.2 Configure macvlan Network](#842-configure-macvlan-network)
+      - [8.4.3 Run Armbian Docker Container](#843-run-armbian-docker-container)
   - [9. Compiling Armbian Kernel](#9-compiling-armbian-kernel)
     - [9.1 How to Add Custom Kernel Patches](#91-how-to-add-custom-kernel-patches)
     - [9.2 How to Make Kernel Patches](#92-how-to-make-kernel-patches)
@@ -104,9 +108,14 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
 
 Register your own account in order to continue with the customized operation of the system. Click the `Sign up` button in the upper right corner of the github.com website and follow the instructions to register your account.
 
-## 2. Set up private variable GITHUB_TOKEN
+## 2. Set up private variable GITHUB_TOKEN etc
 
-According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique GITHUB_TOKEN secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
+According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique `GITHUB_TOKEN` secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
+
+When building a [Armbian Docker](../.github/workflows/build-armbian-arm64-docker-image.yml) image in Actions and pushing it to Docker Hub, you need to set two secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD`. On your repository's page, click Settings in the top right corner, then navigate to `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` > `New repository secret`, add the following two secrets:
+
+- Secret name `DOCKERHUB_USERNAME`: The value is your username for logging into Docker Hub.
+- Secret name `DOCKERHUB_PASSWORD`: The value is your password for logging into Docker Hub.
 
 ## 3. Fork the repository and set Workflow permissions
 
@@ -118,7 +127,7 @@ Now you can Fork the repository. Open the repository https://github.com/ophub/am
 
 ## 4. Customization instructions for personalized Armbian system files
 
-The system compilation process is controlled in the [.github/workflows/build-armbian-server-image.yml](../.github/workflows/build-armbian-server-image.yml) file. There are other .yml files in the workflows directory that implement different functions. The system is compiled in real time using Armbian's current official code, and related parameters can be referred to the official documentation.
+The system compilation process is controlled in the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file. There are other .yml files in the workflows directory that implement different functions. The system is compiled in real time using Armbian's current official code, and related parameters can be referred to the official documentation.
 
 ```yaml
 - name: Compile Armbian [ ${{ inputs.set_release }} ]
@@ -149,7 +158,7 @@ In your repository's navigation bar, click the Actions button, then sequentially
 
 ### 5.2 Scheduled Compilation
 
-In the [.github/workflows/build-armbian-server-image.yml](../../.github/workflows/build-armbian-server-image.yml) file, use Cron to set scheduled compilation. The five different positions respectively represent minutes (0 - 59) / hours (0 - 23) / date (1 - 31) / month (1 - 12) / day of the week (0 - 6)(Sunday - Saturday). Set the time by modifying the value at different positions. The system uses UTC standard time by default, please convert according to the time zone of your country.
+In the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file, use Cron to set scheduled compilation. The five different positions respectively represent minutes (0 - 59) / hours (0 - 23) / date (1 - 31) / month (1 - 12) / day of the week (0 - 6)(Sunday - Saturday). Set the time by modifying the value at different positions. The system uses UTC standard time by default, please convert according to the time zone of your country.
 
 ```yaml
 schedule:
@@ -166,7 +175,7 @@ When compiling locally, specify with the `-b` parameter. When compiling in Actio
 
 ### 5.4 Expanding Github Actions Compilation Space Using Logical Volumes
 
-The default compile space for Github Actions is 84G, with about 50G available after considering the system and necessary software packages. When compiling all firmware, you may encounter an issue with insufficient space, which can be addressed by using logical volumes to expand the compile space to approximately 110G. Refer to the method in the [.github/workflows/build-armbian-server-image.yml](../.github/workflows/build-armbian-server-image.yml) file, and use the commands below to create a logical volume. Then, use the path of the logical volume during the compilation process.
+The default compile space for Github Actions is 84G, with about 50G available after considering the system and necessary software packages. When compiling all firmware, you may encounter an issue with insufficient space, which can be addressed by using logical volumes to expand the compile space to approximately 110G. Refer to the method in the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file, and use the commands below to create a logical volume. Then, use the path of the logical volume during the compilation process.
 
 ```yaml
 - name: Create simulated physical disk
@@ -194,7 +203,7 @@ The method for creating the [Docker](https://hub.docker.com/u/ophub) image of th
 
 ## 6. Saving the System
 
-The system save setting is also controlled in the [.github/workflows/build-armbian-server-image.yml](../../.github/workflows/build-armbian-server-image.yml) file. We upload the compiled system to the Releases provided by the official GitHub via script automatically.
+The system save setting is also controlled in the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file. We upload the compiled system to the Releases provided by the official GitHub via script automatically.
 
 ```yaml
 - name: Upload Armbian image to Release
@@ -369,6 +378,68 @@ Log in to the Armbian system (default user: root, default password: 1234) → En
 armbian-install
 ```
 
+### 8.4 Installation Method for the Docker Version of Armbian
+
+You can use Docker versions of Armbian images on Ubuntu/Debian/Armbian systems. These images are hosted on [Docker Hub](https://hub.docker.com/r/ophub) and can be downloaded directly for use.
+
+Four Armbian Docker images with different base versions are provided: `armbian-trixie`, `armbian-bookworm`, `armbian-noble`, and `armbian-jammy`. Each version has both `arm64` and `amd64` builds, allowing you to choose the appropriate version based on your needs.
+
+Among them, armbian-trixie is based on Debian 13, armbian-bookworm is based on Debian 12, armbian-noble is based on Ubuntu 24.04, and armbian-jammy is based on Ubuntu 22.04.
+
+The arm64 version is suitable for devices with platform architectures such as Amlogic/Rockchip/Allwinner, while the amd64 version is suitable for computers and servers with x86_64 architecture.
+
+#### 8.4.1 Install Docker Runtime Environment
+
+```shell
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+sudo newgrp docker
+```
+
+#### 8.4.2 Configure macvlan Network
+
+```shell
+# Check if existing docker networks include a macvlan network
+docker network ls
+
+# If there is no macvlan network, create one
+# Modify the subnet, gateway, and interface name according to your actual network
+docker network create -d macvlan \
+    --subnet=10.1.1.0/24 \
+    --gateway=10.1.1.1 \
+    -o parent=eth0 \
+    macvlan
+```
+
+#### 8.4.3 Run Armbian Docker Container
+
+Here, the `armbian-trixie:arm64` image is used as an example to demonstrate how to run an Armbian container.
+
+```shell
+# Run the Armbian container in detached mode
+# Modify the container name, IP address, image version, etc., according to your actual situation
+docker run -itd --name=armbian-trixie \
+    --privileged \
+    --network macvlan \
+    --ip 10.1.1.15 \
+    --hostname=armbian-trixie \
+    -e TZ=Asia/Shanghai \
+    --restart unless-stopped \
+    ophub/armbian-trixie:arm64
+
+# View Armbian container logs
+docker logs -f armbian-trixie
+
+# Enter the Armbian container
+docker exec -it armbian-trixie bash
+
+# Exit the Armbian container
+exit
+
+# Stop and remove the Armbian container
+docker rm -f armbian-trixie
+```
+
 ## 9. Compiling Armbian Kernel
 
 Kernel compilation is supported in Ubuntu, Debian or Armbian systems. Both local compilation and GitHub Actions cloud compilation are supported. For specific methods, please refer to the [Kernel Compilation Instructions](../../compile-kernel).
@@ -496,14 +567,14 @@ armbian-update
 | Optional Parameters | Default Value | Options | Description |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
-| -u | Automatic | stable/flippy/dev/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
+| -u | Automatic | stable/flippy/beta/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
 | -m | no | yes/no | Use the mainline u-boot |
 | -s | None | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h | None | None | View the usage help |
 
-Example: `armbian-update -k 5.15.50 -u dev`
+Example: `armbian-update -k 5.15.50 -u stable`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify the specific version number, such as: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, such as: `armbian-update -k 5.15`, when vaguely specifying, it will automatically use the latest version of the specified series.
 
@@ -1496,7 +1567,7 @@ For specific implementation details, refer to the `write_board_bootloader` funct
 
 #### 12.15.4 Add Process Control Files
 
-Add the corresponding `BOARD` option to `armbian_board` in the [yml workflow control file](../../.github/workflows/build-armbian-server-image.yml), which supports use in `Actions` on github.com.
+Add the corresponding `BOARD` option to `armbian_board` in the [yml workflow control file](../.github/workflows/build-armbian-arm64-server-image.yml), which supports use in `Actions` on github.com.
 
 ### 12.16 How to Resolve the Issue of I/O Errors While Writing to eMMC
 

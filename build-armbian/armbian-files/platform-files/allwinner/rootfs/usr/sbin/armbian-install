@@ -57,7 +57,7 @@ check_depends() {
     i="1"
     for package in ${necessary_packages[*]}; do
         [[ -n "$(which "${package}" 2>/dev/null)" ]] || is_missing="1"
-        let i++
+        ((i++))
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
@@ -168,7 +168,7 @@ create_partition() {
             umount -f ${DEV_EMMC}p${i} 2>/dev/null
             parted -s ${DEV_EMMC} rm ${i}
             [[ "${?}" -eq "0" ]] || error_msg "Failed to delete the [ ${i} ] partition. Please try again."
-            let i++
+            ((i++))
         done
     fi
     dd if=/dev/zero of=${DEV_EMMC} bs=1M count=16 conv=fsync

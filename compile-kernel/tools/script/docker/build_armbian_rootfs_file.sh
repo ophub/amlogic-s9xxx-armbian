@@ -49,7 +49,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="v:s:c:k:"
+    local options="v:s:c:k:p:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -88,6 +88,14 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
+        -p | --PLATFORM_TYPE)
+            if [[ -n "${2}" ]]; then
+                platform_type="${2}"
+                shift 2
+            else
+                error_msg "Invalid -p parameter [ ${2} ]!"
+            fi
+            ;;
         --)
             shift
             break
@@ -107,13 +115,16 @@ redo_rootfs() {
 
     # Searching for Armbian image
     image_file="$(basename $(ls ${image_path}/*.img 2>/dev/null | head -n 1))"
-    image_version="$(echo ${image_file} | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
-    image_kernel="$(echo ${image_file} | grep -oE '[5-9]\.[0-9]{1,2}\.[0-9]{1,3}' | head -n 1)"
-    image_save_name="Armbian_${image_version}-trunk_${image_kernel}.img"
+    # Get image version, such as 25.11.0
+    image_version="$(echo "${image_file}" | grep -oE '[0-9]{2}\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
+    # Get image kernel version, such as 6.12.56
+    image_kernel="$(echo "${image_file}" | grep -oE '[0-9]+\.[0-9]{1,2}\.[0-9]{1,3}' | grep -v "${image_version}" | head -n 1)"
+    # Set image save name
+    image_save_name="Armbian_${image_version}-trunk_${version_codename}_${platform_type:-arm64}_${image_kernel}.img"
 
     # Searching for rootfs file
     rootfs_file="$(ls ${cache_path}/rootfs-*.tar.zst 2>/dev/null | head -n 1)"
-    rootfs_save_name="Armbian_${image_version}-${version_codename}_rootfs"
+    rootfs_save_name="Armbian_${image_version}-${version_codename}_${platform_type:-arm64}_${image_kernel}_rootfs.tar.gz"
 
     # Create temporary directory
     mkdir -p ${tmp_rootfs}
@@ -135,7 +146,7 @@ redo_rootfs() {
                 sudo sed -i "s|^#*Port .*|Port 22|g" ${ssh_config}
                 sudo sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
                 sudo sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
-                [[ -d "var/run/sshd" ]] || mkdir -p -m0755 var/run/sshd
+                [[ -d "var/run/sshd" ]] || sudo mkdir -p -m0755 var/run/sshd
                 echo -e "${INFO} 03.01 Adjusting sshd_config completed."
             } || error_msg "03.01 Failed to adjust sshd_config!"
 
@@ -226,8 +237,8 @@ EOF
         fi
 
         # Compress the rootfs file
-        sudo tar -czf ${rootfs_save_name}.tar.gz *
-        sudo mv -f ${rootfs_save_name}.tar.gz ../
+        sudo tar -czf ${rootfs_save_name} *
+        sudo mv -f ${rootfs_save_name} ../
         [[ "${?}" == "0" ]] && echo -e "${INFO} 06. Making Armbian rootfs completed." || error_msg "06. Failed to redo rootfs!"
     else
         error_msg "02. Failed to find rootfs file!"
@@ -243,23 +254,27 @@ EOF
         error_msg "07. Failed to find Armbian image!"
     fi
 
-    # Add sha256sum verification files
+    # Clean up files in the image directory
     cd ${image_path}/
     sudo rm -rf $(ls . | grep -vE ".img.gz|.tar.gz" | xargs) 2>/dev/null
-    for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
-    [[ "${?}" == "0" ]] && echo -e "${INFO} 08. The files in the current directory:\n$(ls -lh .)" || error_msg "08. Failed to add sha256sum!"
+    #for file in *; do [[ ! -d "${file}" ]] && sha256sum "${file}" >"${file}.sha"; done
+    [[ "${?}" == "0" ]] && echo -e "${INFO} 08. The files in the current directory:\n$(ls -lh .)" || error_msg "08. Failed to clean up!"
 
     # Delete Armbian build source codes and temporary files
     cd ${build_path}/
     sudo rm -rf $(ls . | grep -v "^output$" | xargs)
     [[ "${?}" == "0" ]] && echo -e "${INFO} 09. Armbian source code cleanup completed." || error_msg "09. Failed to clean up!"
 
+    cd ${current_path}/
     sync && sleep 3
 }
 
 echo -e "${STEPS} Start to redo the Armbian rootfs file."
+echo -e "${INFO} Current path: [ ${current_path} ]"
 
 # Initialize variables
 init_var "${@}"
 # Redo Armbian rootfs
 redo_rootfs
+
+echo -e "${SUCCESS} Armbian rootfs file redo completed."

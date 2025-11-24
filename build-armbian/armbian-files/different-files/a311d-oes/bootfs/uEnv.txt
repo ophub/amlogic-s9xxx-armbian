@@ -1,4 +1,4 @@
 LINUX=/zImage
 INITRD=/uInitrd
 FDT=/dtb/amlogic/meson-g12b-a311d-oes.dtb
-APPEND=root=LABEL=ROOTFS console=ttyAML0,115200 console=tty1 consoleblank=0 coherent_pool=2M loglevel=1 splash=verbose ubootpart= libata.force=noncq usb-storage.quirks=0x2537:0x1066:u,0x2537:0x1068:u cgroup_enable=memory
+APPEND=root=LABEL=ROOTFS console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 coherent_pool=2M libata.force=noncq ubootpart= fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1

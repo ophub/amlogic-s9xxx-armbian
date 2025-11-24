@@ -50,7 +50,7 @@ on:
       releases_keep_keyword:
         description: "Keyword of the keep releases."
         required: false
-        default: "v0/_save_/kernel_"
+        default: "v0/server_/kernel_"
       delete_workflows:
         description: "Delete workflows records?"
         required: true
@@ -95,7 +95,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Initialization environment
         id: init

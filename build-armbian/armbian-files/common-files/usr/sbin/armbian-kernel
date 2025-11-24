@@ -32,7 +32,7 @@ out_kernel="${compile_path}/output"
 config_path="${compile_path}/tools/config"
 script_path="${compile_path}/tools/script"
 compile_script="${make_path}/recompile"
-script_name="${script_path}/armbian_compile_kernel_script.sh"
+script_name="${script_path}/armbian_compile_kernel.sh"
 arch_info="$(arch)"
 
 # The compile kernel scripts download repository
@@ -109,13 +109,19 @@ help_info() {
 ==============================================================================================================================
 
 01. Detailed instructions for compiling the kernel, list of optional parameters:
-    Command: armbian-kernel -k 5.10.100 -p dtbs -t gcc
-    -k : Kernel       Set the kernel name, such as [ -k 5.10.100 ]
-    -p : PackageList  Set the package list for compiling the kernel, such as [ -p dtbs ], Optional: [ dtbs/all ]
-    -t : Toolchain    Set the compilation toolchain, such as [ -t gcc ], Optional: [ gcc/clang ]
-    -n : CustomName   Set the kernel custom signature, such as [ -n -ophub ]
+    Command: armbian-kernel -k 6.1.y -a true -m dtbs -t gcc
+    -k : Kernel       Set the kernel version, such as [ -k 6.1.y ]
     -a : AutoKernel   Set whether to automatically compile the latest version, such as [ -a true ], Optional: [ true/false ]
+    -m : MakePackage  Set the package list for compiling the kernel, such as [ -m dtbs ], Optional: [ dtbs/all ]
+    -t : Toolchain    Set the compilation toolchain, such as [ -t gcc ], Optional: [ gcc/clang ]
+    -n : customName   Set the kernel custom signature, such as [ -n -ophub ]
     -r : Repository   Set the kernel source code repository, such as [ -r owner/repo@branch ]
+    -p : AutoPatch    Sets whether to use custom kernel patches, such as [ -p true ], Optional: [ true/false ]
+    -z : Compress     Set the compression format used for initrd in the kernel, such as [ -z xz ], Optional: [ xz/gzip/zstd/lzma ]
+    -d : DeleteSource Set whether to delete the kernel source code after compilation, such as [ -d true ], Optional: [ true/false ]
+    -s : SilentLog    Set whether to use silent mode to reduce log output, such as [ -s true ], Optional: [ true/false ]
+    -l : EnableLog    Set whether to output logs to a file, such as [ -l true ], Optional: [ true/false ]
+    -c : CcacheClear  Set whether to clear ccache before compiling, such as [ -c true ], Optional: [ true/false ]
 
 02. Script assist functions:
     Command: armbian-kernel -u

@@ -9,7 +9,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 - [Armbian 构建及使用方法](#armbian-构建及使用方法)
 - [目录](#目录)
   - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
-  - [2. 设置隐私变量 GITHUB\_TOKEN](#2-设置隐私变量-github_token)
+  - [2. 设置隐私变量 GITHUB\_TOKEN 等](#2-设置隐私变量-github_token-等)
   - [3. Fork 仓库并设置工作流权限](#3-fork-仓库并设置工作流权限)
   - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
   - [5. 编译系统](#5-编译系统)
@@ -33,6 +33,10 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
       - [8.2.5 我家云的安装方法](#825-我家云的安装方法)
       - [8.2.6 泰山派的安装方法](#826-泰山派的安装方法)
     - [8.3 Allwinner 系列安装方法](#83-allwinner-系列安装方法)
+    - [8.4 Docker 版本的 Armbian 安装方法](#84-docker-版本的-armbian-安装方法)
+      - [8.4.1 安装 Docker 运行环境](#841-安装-docker-运行环境)
+      - [8.4.2 设置 macvlan 网络](#842-设置-macvlan-网络)
+      - [8.4.3 运行 Armbian Docker 容器](#843-运行-armbian-docker-容器)
   - [9. 编译 Armbian 内核](#9-编译-armbian-内核)
     - [9.1 如何添加自定义内核补丁](#91-如何添加自定义内核补丁)
     - [9.2 如何制作内核补丁](#92-如何制作内核补丁)
@@ -104,9 +108,14 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 注册自己的账户，以便进行系统个性化定制的继续操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示注册自己的账户。
 
-## 2. 设置隐私变量 GITHUB_TOKEN
+## 2. 设置隐私变量 GITHUB_TOKEN 等
 
-根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 GITHUB_TOKEN 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
+根据 [GitHub 文档](https://docs.github.com/zh/actions/security-guides/automatic-token-authentication#about-the-github_token-secret)，在每个工作流作业开始时，GitHub 会自动创建唯一的 `GITHUB_TOKEN` 机密以在工作流中使用。可以使用 `${{ secrets.GITHUB_TOKEN }}` 在工作流作业中进行身份验证。
+
+在 Actions 中制作 [Armbian Docker](../.github/workflows/build-armbian-arm64-docker-image.yml) 镜像并推送到 Docker Hub 时，需要设置 `DOCKERHUB_USERNAME` 和 `DOCKERHUB_PASSWORD` 两个隐私变量。在自己的仓库页面，点击右上角的 `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` > `New repository secret` 按钮，添加如下两个隐私变量：
+
+- 变量名 `DOCKERHUB_USERNAME`：值是登录 Docker Hub 的用户名
+- 变量名 `DOCKERHUB_PASSWORD`：值是登录 Docker Hub 的密码
 
 ## 3. Fork 仓库并设置工作流权限
 
@@ -118,7 +127,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ## 4. 个性化 Armbian 系统定制文件说明
 
-系统编译的流程在 [.github/workflows/build-armbian-server-image.yml](../.github/workflows/build-armbian-server-image.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译系统时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
+系统编译的流程在 [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) 文件里控制，在 workflows 目录下还有其他 .yml 文件，实现其他不同的功能。编译系统时采用了 Armbian 官方的当前代码进行实时编译，相关参数可以查阅官方文档。
 
 ```yaml
 - name: Compile Armbian [ ${{ inputs.set_release }} ]
@@ -149,7 +158,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
 
 ### 5.2 定时编译
 
-在 [.github/workflows/build-armbian-server-image.yml](../../.github/workflows/build-armbian-server-image.yml) 文件里，使用 Cron 设置定时编译，5 个不同位置分别代表的意思为 分钟 (0 - 59) / 小时 (0 - 23) / 日期 (1 - 31) / 月份 (1 - 12) / 星期几 (0 - 6)(星期日 - 星期六)。通过修改不同位置的数值来设定时间。系统默认使用 UTC 标准时间，请根据你所在国家时区的不同进行换算。
+在 [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) 文件里，使用 Cron 设置定时编译，5 个不同位置分别代表的意思为 分钟 (0 - 59) / 小时 (0 - 23) / 日期 (1 - 31) / 月份 (1 - 12) / 星期几 (0 - 6)(星期日 - 星期六)。通过修改不同位置的数值来设定时间。系统默认使用 UTC 标准时间，请根据你所在国家时区的不同进行换算。
 
 ```yaml
 schedule:
@@ -166,7 +175,7 @@ schedule:
 
 ### 5.4 使用逻辑卷扩大 Github Actions 编译空间
 
-Github Actions 编译空间默认是 84G，除去系统和必要软件包外，可用空间在 50G 左右，当编译全部固件时会遇到空间不足的问题，可以使用逻辑卷扩大编译空间至 110G 左右。参考 [.github/workflows/build-armbian-server-image.yml](../.github/workflows/build-armbian-server-image.yml) 文件里的方法，使用下面的命令创建逻辑卷。并在编译时使用逻辑卷的路径。
+Github Actions 编译空间默认是 84G，除去系统和必要软件包外，可用空间在 50G 左右，当编译全部固件时会遇到空间不足的问题，可以使用逻辑卷扩大编译空间至 110G 左右。参考 [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) 文件里的方法，使用下面的命令创建逻辑卷。并在编译时使用逻辑卷的路径。
 
 ```yaml
 - name: Create simulated physical disk
@@ -194,7 +203,7 @@ Armbian 系统 [Docker](https://hub.docker.com/u/ophub) 镜像的制作方法可
 
 ## 6. 保存系统
 
-系统保存的设置也在 [.github/workflows/build-armbian-server-image.yml](../../.github/workflows/build-armbian-server-image.yml) 文件里控制。我们将编译好的系统通过脚本自动上传到 github 官方提供的 Releases 里面。
+系统保存的设置也在 [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) 文件里控制。我们将编译好的系统通过脚本自动上传到 github 官方提供的 Releases 里面。
 
 ```yaml
 - name: Upload Armbian image to Release
@@ -369,6 +378,68 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 armbian-install
 ```
 
+### 8.4 Docker 版本的 Armbian 安装方法
+
+可以在 Ubuntu/Debian/Armbian 系统中使用 Docker 版本的 Armbian 镜像。这些镜像托管在 [Docker Hub](https://hub.docker.com/r/ophub) 上，可以直接下载使用。
+
+提供了四个不同内核版本的 Armbian Docker 镜像：`armbian-trixie`，`armbian-bookworm`，`armbian-noble`，`armbian-jammy`。每个版本都有 `arm64` 和 `amd64` 版本，可以根据需要选择不同的内核版本。
+
+其中 armbian-trixie 基于 debian13，armbian-bookworm 基于 debian12，armbian-noble 基于 ubuntu24.04，armbian-jammy 基于 ubuntu22.04。
+
+arm64 版本适用于 Amlogic/Rockchip/Allwinner 等平台架构的设备，amd64 版本适用于 x86_64 架构的电脑和服务器。
+
+#### 8.4.1 安装 Docker 运行环境
+
+```shell
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+sudo newgrp docker
+```
+
+#### 8.4.2 设置 macvlan 网络
+
+```shell
+# 查看已有的 docker 网络是否包含 macvlan 网络
+docker network ls
+
+# 如果没有 macvlan 网络，则创建 macvlan 网络
+# 其中的网段、网关和网卡名称根据自己的实际网络修改
+docker network create -d macvlan \
+    --subnet=10.1.1.0/24 \
+    --gateway=10.1.1.1 \
+    -o parent=eth0 \
+    macvlan
+```
+
+#### 8.4.3 运行 Armbian Docker 容器
+
+这里以 `armbian-trixie:arm64` 镜像为例，介绍如何运行 Armbian 容器。
+
+```shell
+# 以后台方式运行 Armbian 容器
+# 其中的容器名称，IP 地址，镜像版本等根据自己的实际情况修改
+docker run -itd --name=armbian-trixie \
+    --privileged \
+    --network macvlan \
+    --ip 10.1.1.15 \
+    --hostname=armbian-trixie \
+    -e TZ=Asia/Shanghai \
+    --restart unless-stopped \
+    ophub/armbian-trixie:arm64
+
+# 查看 Armbian 容器日志
+docker logs -f armbian-trixie
+
+# 进入 Armbian 容器
+docker exec -it armbian-trixie bash
+
+# 退出 Armbian 容器
+exit
+
+# 停止并删除 Armbian 容器
+docker rm -f armbian-trixie
+```
+
 ## 9. 编译 Armbian 内核
 
 支持在 Ubuntu，debian 或 Armbian 系统中编译内核。支持本地编译，也支持使用 GitHub Actions 云编译，具体方法详见 [内核编译说明](../../compile-kernel/README.cn.md)。
@@ -495,14 +566,14 @@ armbian-update
 | 可选参数  | 默认值        | 选项           | 说明                              |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
-| -u       | 自动化        | stable/flippy/dev/rk3588/rk35xx/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
+| -u       | 自动化        | stable/flippy/beta/rk3588/rk35xx/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
 | -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |
 
-举例: `armbian-update -k 5.15.50 -u dev`
+举例: `armbian-update -k 5.15.50 -u stable`
 
 通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
 
@@ -1490,7 +1561,7 @@ hexdump -C reserved_first_8M.bin | less
 
 #### 12.15.4 添加流程控制文件
 
-在 [yml 工作流控制文件](../../.github/workflows/build-armbian-server-image.yml) 的 `armbian_board` 中添加对应的 `BOARD` 选项，支持在 github.com 的 `Actions` 中进行使用。
+在 [yml 工作流控制文件](../.github/workflows/build-armbian-arm64-server-image.yml) 的 `armbian_board` 中添加对应的 `BOARD` 选项，支持在 github.com 的 `Actions` 中进行使用。
 
 ### 12.16 如何解决写入 eMMC 时 I/O 错误的问题
 
