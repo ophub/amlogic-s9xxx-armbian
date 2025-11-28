@@ -11,7 +11,7 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian
 | System Name    | Default Username | Default Password  | SSH Port  | IP Address  |
 | -------------- | ---------------- | ----------------- | --------- | ----------- |
 | 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | Obtain IP from router |
-| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Use host machine’s IP |
+| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Static MacVLAN IP |
 
 ## Armbian System Description
 

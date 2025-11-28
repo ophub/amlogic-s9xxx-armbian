@@ -11,7 +11,7 @@ Armbian（中文名：岸边）系统是基于 Debian/Ubuntu 而构建的专门�
 | 系统名称        | 默认账号 | 默认密码  | SSH 端口 | IP 地址 |
 | -------------- | ------- | ------- | ------- | ------- |
 | 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | 从路由器获取 IP |
-| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | 使用宿主机 IP |
+| 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | 静态 MacVLAN IP |
 
 ## Armbian 系统说明
 
