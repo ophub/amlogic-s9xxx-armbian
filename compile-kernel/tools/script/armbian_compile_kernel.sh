@@ -377,7 +377,7 @@ query_version() {
         fi
         echo -e "${INFO} (${i}) [ ${tmp_arr_kernels[$i]} ] is github.com/${github_kernel_repo} latest kernel. \n"
 
-        let i++
+        ((i++))
     done
 
     # Reset the kernel array to the latest kernel version
@@ -847,7 +847,7 @@ loop_recompile() {
         compile_selection
         clean_tmp
 
-        let j++
+        ((j++))
     done
 }
 

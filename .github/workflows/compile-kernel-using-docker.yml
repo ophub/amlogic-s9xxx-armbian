@@ -224,6 +224,9 @@ jobs:
           makeLatest: false
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            The kernel can be used to compile Armbian and OpenWrt.
-            The kernel source code comes from: ${{ inputs.kernel_source }}
-            The kernel compilation toolchain: ${{ inputs.kernel_toolchain }}
+            - These are Mainline LTS(Long Term Support) kernels that provide `stable` support for Armbian.
+            - It works with most `Amlogic`, `Rockchip`, and `Allwinner` devices. For specific details, please refer to the instructions on the homepage of repository.
+            - Dedicated BSP kernels for other Rockchip and Allwinner devices can be downloaded from the [ophub/kernel](https://github.com/ophub/kernel) repository.
+            - 这些是主线 LTS（长期支持）内核，为 Armbian 提供`稳定`的支持。
+            - 适用于 `amlogic`，`rockchip`，`allwinner` 的大部分设备，具体可以参考仓库首页的说明。
+            - 其他的 Rockchip 和 Allwinner 设备专用 BSP 内核可以在 [ophub/kernel](https://github.com/ophub/kernel) 仓库里下载使用。
