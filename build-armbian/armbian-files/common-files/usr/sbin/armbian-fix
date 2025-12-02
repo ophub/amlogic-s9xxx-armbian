@@ -46,7 +46,7 @@ echo "" >${fix_log} && tolog "Start fixing..."
 
 # Fix common releases permissions
 [[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp && tolog "01. Fix tmp permissions"
-[[ -d "/etc/update-motd.d" ]] && sudo chmod -x /etc/update-motd.d/* && sudo chmod +x /etc/update-motd.d/{10-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
+[[ -d "/etc/update-motd.d" ]] && sudo chmod -x /etc/update-motd.d/* && sudo chmod +x /etc/update-motd.d/{10-*,20-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
 [[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R && tolog "03. Fix man permissions"
 [[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R && tolog "04. Fix man permissions"
 [[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers && tolog "05. Fix man permissions"
@@ -100,7 +100,7 @@ motd_tips="/etc/default/armbian-motd"
     sed -i 's|^MOTD_DISABLE=""|MOTD_DISABLE="tips"|g' ${motd_tips}
     tolog "54. Disable tips of the day"
 }
-quotes_cron="/etc/cron.weekly/armbian-quotes"
+quotes_cron="/etc/cron.daily/armbian-quotes"
 [[ -f "${quotes_cron}" ]] && {
     sed -i "s|^curl |#curl |g" ${quotes_cron}
     tolog "55. Disable quotes cron plan"
@@ -124,7 +124,6 @@ motd_service="/usr/lib/systemd/system/motd-news.service"
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer
 sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also
 sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer
-sudo rm -f /etc/update-motd.d/50-motd-news
 
 # Disable the system's partition adjustment service
 sudo systemctl stop armbian-resize-filesystem.service 2>/dev/null
@@ -207,6 +206,7 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
             sed -i "s|^REVISION=.*|REVISION=\"${short_version}\"|g" ${armbian_release_file}
         }
 
+        sed -i "s|^BOOT_SOC=.*|BOOT_SOC=\"${soc_name}\"|g" ${armbian_release_file}
         sed -i "s|^BOARDFAMILY=.*|BOARDFAMILY=\"${family_name}\"|g" ${armbian_release_file}
         sed -i "s|^LINUXFAMILY=.*|LINUXFAMILY=\"${platform_name}\"|g" ${armbian_release_file}
         sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_release_file}
@@ -214,6 +214,7 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_release_file}
         sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
         sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|BOOTSCRIPT_FORCE_UPDATE=\"no\"|g" ${armbian_release_file}
+        sed -i "s|^FORCE_UBOOT_UPDATE=.*|FORCE_UBOOT_UPDATE=\"no\"|g" ${armbian_release_file}
         tolog "85. Adjust custom board name: ${armbian_release_file}"
     }
 
@@ -282,12 +283,10 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
 }
 
 # Hidd the IP address of WAN & IPv6
-[[ -f "/etc/update-motd.d/10-armbian-header" ]] && {
-    # Hide the IP address of WAN
-    sed -i 's|curl.*akamai.*|curl --connect-timeout 2 -s http://whatismyip.akamai.com/ \| sed -E '\''s/(\.[0-9]+){2}$/.\*\*\*\.\*\*\*/'\''|' \
-        /etc/update-motd.d/10-armbian-header 2>/dev/null
-    # Hide the IPv6 address
-    sed -i '/echo -e "${all_ip6_address}"/s/^/#/' /etc/update-motd.d/10-armbian-header 2>/dev/null
+ip_info_file="/etc/update-motd.d/20-ip-info"
+[[ -f "${ip_info_file}" ]] && {
+    sed -i '/^get_wan.*_address/s/{.*/{ true; }/' ${ip_info_file}
+    sed -i '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' ${ip_info_file}
     tolog "93. Hide the IP address of WAN & IPv6"
 }
 

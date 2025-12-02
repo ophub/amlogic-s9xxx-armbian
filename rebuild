@@ -1022,13 +1022,17 @@ refactor_rootfs() {
         # Custom banner name
         sed -i "s|^BOARD=.*|BOARD=\"${board}\"|g" ${armbian_release_file}
         sed -i "s|^BOARD_NAME=.*|BOARD_NAME=\"${board}\"|g" ${armbian_release_file}
+        sed -i "s|^BOARDFAMILY=.*|BOARDFAMILY=\"${FAMILY}\"|g" ${armbian_release_file}
         # Use custom type to remove [ No end-user support ] prompt in [ /etc/update-motd.d/10-armbian-header ]
+        sed -i "s|^BOOT_SOC=.*|BOOT_SOC=\"${SOC}\"|g" ${armbian_release_file}
         sed -i "s|^IMAGE_TYPE=.*|IMAGE_TYPE=rebuild|g" ${armbian_release_file}
         sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_release_file}
         sed -i "s|^VENDOR=.*|VENDOR=\"Armbian OS\"|g" ${armbian_release_file}
         # Disable the update of the boot script
         sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
         sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
+        # Disable the update of the u-boot
+        sed -i "s|^FORCE_UBOOT_UPDATE=.*|FORCE_UBOOT_UPDATE=\"no\"|g" ${armbian_release_file}
     }
 
     # Add custom startup script
@@ -1055,7 +1059,7 @@ refactor_rootfs() {
     # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
     motd_tips="etc/default/armbian-motd"
     [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
-    quotes_cron="etc/cron.weekly/armbian-quotes"
+    quotes_cron="etc/cron.daily/armbian-quotes"
     [[ -f "${quotes_cron}" ]] && sed -i "s|^curl |#curl |g" ${quotes_cron}
 
     # Add custom disabled alias extension load modules
@@ -1071,6 +1075,19 @@ refactor_rootfs() {
 
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
+
+    # Disable motd scripts
+    [[ -d "etc/update-motd.d" ]] && {
+        chmod -x etc/update-motd.d/*
+        chmod +x etc/update-motd.d/{10-*,20-*,30-*}
+    }
+
+    # Disable IP information display
+    ip_info_file="etc/update-motd.d/20-ip-info"
+    [[ -f "${ip_info_file}" ]] && {
+        sed -i '/^get_wan.*_address/s/{.*/{ true; }/' ${ip_info_file}
+        sed -i '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' ${ip_info_file}
+    }
 
     # Explicitly disable resizing for Amlogic device [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
     echo "yes" >root/.no_rootfs_resize
