@@ -69,6 +69,7 @@ on:
           - nanopc-t6
           - nanopi-r5c
           - nanopi-r5s
+          - nsy-g68-plus
           - orangepi-5-plus
           - orangepi-5b
           - panther-x2
