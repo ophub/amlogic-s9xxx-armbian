@@ -34,6 +34,7 @@ FDT_FILE="" # Initialize FDT_FILE to be empty.
 
 [[ -f "${ophub_release_file}" ]] && { FDT_FILE="$(grep -oE 'meson.*dtb' "${ophub_release_file}")"; }
 [[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && { FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##')"; }
+[[ -z "${FDT_FILE}" && -f "/boot/extlinux/extlinux.conf" ]] && { FDT_FILE="$(grep -E '/dtb/.*\.dtb$' /boot/extlinux/extlinux.conf | sed -E 's#.*/##')"; }
 [[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && { FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##')"; }
 log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
 
@@ -112,8 +113,14 @@ fi
 if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]]; then
     # Restarting systemd services can sometimes fail during early boot.
     # Using '|| true' makes this step fault-tolerant.
-    (sudo systemctl restart pveproxy) || true
+    (systemctl restart pveproxy) || true
     log_message "PVE proxy service restart attempted."
+fi
+
+# For wxy-oec-turbo-4g board: Enable and restart getty on ttyS2
+if [[ "${FDT_FILE}" == "rk3566-wxy-oec-turbo-4g.dtb" ]]; then
+    (sudo systemctl enable getty@ttyS2 && sudo systemctl restart getty@ttyS2) || true
+    log_message "Getty service on ttyS2 restart attempted for wxy-oec-turbo-4g board."
 fi
 
 # Finalization
