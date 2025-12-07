@@ -94,7 +94,7 @@ rk3588_kernel=("6.1.y")
 rk35xx_kernel=("6.1.y")
 h6_kernel=("6.6.y")
 specific_6xy=("6.1.y" "6.6.y" "6.12.y")
-specific_5xy=("5.4.y" "5.10.y" "5.15.y")
+specific_5xy=("5.10.y" "5.15.y")
 # Set to automatically use the latest kernel
 auto_kernel="true"
 # Initialize the kernel array

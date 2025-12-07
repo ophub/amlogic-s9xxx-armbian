@@ -67,7 +67,7 @@ ophub_release_file="/etc/ophub-release"
 repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("6.1.y" "6.12.y")
-all_kernel=("5.4.y" "5.10.y" "5.15.y" "6.1.y" "6.6.y" "6.12.y")
+all_kernel=("5.10.y" "5.15.y" "6.1.y" "6.6.y" "6.12.y")
 # Set whether to use the latest kernel, options: [ true / false ]
 auto_kernel="true"
 # Set whether to apply custom kernel patches, options: [ true / false ]
@@ -656,7 +656,6 @@ generate_uinitrd() {
     #echo -e "${INFO} Kernel copy results in the [ /usr/lib/modules ] directory: \n$(ls -l /usr/lib/modules) \n"
 
     # COMPRESS: [ gzip | lzma | xz | zstd | lz4 ]
-    [[ "${kernel_outname}" =~ ^5.4.[0-9]+ ]] && compress_format="xz"
     [[ "${compress_format}" =~ ^(gzip|lzma|xz|zstd|lz4)$ ]] || {
         echo -e "${WARNING} The compression format [ ${compress_format} ] is invalid, reset to [ xz ] format."
         compress_format="xz"

@@ -169,7 +169,7 @@ schedule:
 
 The default system configuration information is recorded in the [model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) file, in which the `BOARD` name must be unique.
 
-For those with `BUILD` value as `yes`, they are part of the default packaged systems for the box, these boxes can be used directly. Those with the default value as `no` are not packaged. To use the unpackaged boxes, you need to download the same `FAMILY` packaged system (recommend downloading `5.15/5.4` kernel system), after writing to `USB`, you can open `USB's boot partition` on the computer, modify `FDT's dtb name` in `/boot/uEnv.txt` file, to adapt to other boxes in the list.
+For those with `BUILD` value as `yes`, they are part of the default packaged systems for the box, these boxes can be used directly. Those with the default value as `no` are not packaged. To use the unpackaged boxes, you need to download the same `FAMILY` packaged system, after writing to `USB`, you can open `USB's boot partition` on the computer, modify `FDT's dtb name` in `/boot/uEnv.txt` file, to adapt to other boxes in the list.
 
 When compiling locally, specify with the `-b` parameter. When compiling in Actions on github.com, specify with the `armbian_board` parameter. Using `-b all` means to package all devices where `BUILD` is `yes`. When packaging with a specified `BOARD` parameter, it can be packaged whether `BUILD` is `yes` or `no`. For example: `-b r68s_s905x3-tx3_s905l3a-cm311`.
 
@@ -491,7 +491,7 @@ In the mainline Linux kernel, some drivers are not yet supported, and you can cu
 ```shell
 # Step 1: Update to the latest kernel
 # Due to incomplete header files in earlier versions, it is necessary to update to the latest kernel version.
-# The requirement for each kernel version is not lower than 5.4.280, 5.10.222, 5.15.163, 6.1.100, 6.6.41.
+# The requirement for each kernel version is not lower than 5.10.222, 5.15.163, 6.1.100, 6.6.41.
 armbian-sync
 armbian-update -k 6.1
 

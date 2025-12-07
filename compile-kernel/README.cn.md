@@ -40,7 +40,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | 参数    | 含义        | 说明                             |
 | ------ | ----------- | ------------------------------- |
 | -r     | Repository  | 指定编译内核的源代码仓库。可选择 `github.com` 的内核源代码仓库。例如 `-r unifreq` 等。可设置参数格式为 `owner/repo@branch` 三项组合，参数中的所有者名称 `owner` 为必选参数，内核源代码仓库名称 `/repo` 和 仓库的分支名称 `@branch` 为可选参数。当仅指定所有者名称 `owner` 参数时，将自动匹配所有者的名称为 `linux-5.x.y` 格式且分支为 `main` 的内核源代码仓库。如果仓库名称或分支名称不同，请使用组合方式指定，如 `owner@branch` 或 `owner/repo` 或 `owner/repo@branch`。默认值：`unifreq` |
-| -k     | Kernel      | 指定 kernel 名称，如 `-k 5.15.100`。多个内核使用 `_` 进行连接，如 `-k 5.15.100_5.15.50`。使用 `-k all` 代表编译全部主线内核，当前等价于 `-k 5.4.y_5.10.y_5.15.y_6.1.y_6.6.y_6.12.y`，内核列表会随着上游内核源码仓库 [unifreq](https://github.com/unifreq) 的维护情况动态调整。 |
+| -k     | Kernel      | 指定 kernel 名称，如 `-k 5.15.100`。多个内核使用 `_` 进行连接，如 `-k 5.15.100_5.15.50`。使用 `-k all` 代表编译全部主线内核，当前等价于 `-k 5.10.y_5.15.y_6.1.y_6.6.y_6.12.y`，内核列表会随着上游内核源码仓库 [unifreq](https://github.com/unifreq) 的维护情况动态调整。 |
 | -a     | AutoKernel  | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.15.100` 的同系列是否有更新的版本，如有 `5.15.100` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -m     | MakePackage | 设置制作内核的包列表。当设置为 `all` ，将制作 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅制作 3 个 dtbs 文件。默认值：`all` |
 | -p     | AutoPatch   | 设置是否使用自定义内核补丁。当设置为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
@@ -60,7 +60,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 - `sudo ./recompile -k 5.15.100 -m dtbs` : 使用默认配置，并通过 `-m` 参数指定仅制作 dtbs 文件。
 - `sudo ./recompile -k 5.15.100_6.1.10 -a true -n -ophub` : 使用默认配置，并通过多个参数进行设置。
 
-💡提示：推荐使用 `unifreq` 的 [linux-6.1.y](https://github.com/unifreq/linux-6.1.y), [linux-5.15.y](https://github.com/unifreq/linux-5.15.y), [linux-5.10.y](https://github.com/unifreq/linux-5.10.y) 和 [linux-5.4.y](https://github.com/unifreq/linux-5.4.y) 等仓库的内核源代码进行编译，他针对相关盒子添加了驱动和补丁。推荐使用 [tools/config](tools/config) 中的模板，已经根据相关盒子进行了预配置，可以在此基础上进行个性化定制。
+💡提示：推荐使用 `unifreq` 的 [linux-6.1.y](https://github.com/unifreq/linux-6.1.y), [linux-5.15.y](https://github.com/unifreq/linux-5.15.y), [linux-5.10.y](https://github.com/unifreq/linux-5.10.y) 等仓库的内核源代码进行编译，他针对相关盒子添加了驱动和补丁。推荐使用 [tools/config](tools/config) 中的模板，已经根据相关盒子进行了预配置，可以在此基础上进行个性化定制。
 
 ## 使用 GitHub Actions 编译内核
 

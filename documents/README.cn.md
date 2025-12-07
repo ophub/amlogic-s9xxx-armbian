@@ -169,7 +169,7 @@ schedule:
 
 默认系统的配置信息记录在 [model_database.conf](../build-armbian/armbian-files/common-files/etc/model_database.conf) 文件里，其中的 `BOARD` 名字要求唯一。
 
-其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统（推荐下载 `5.15/5.4` 内核的系统），在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
+其中 `BUILD` 的值是 `yes` 的是默认打包的部分盒子的系统，这些盒子可以直接使用。默认值是 `no` 的没有打包，这些没有打包的盒子使用时需要下载相同 `FAMILY` 的打包好的系统，在写入 `USB` 后，可以在电脑上打开 `USB 中的 boot 分区`，修改 `/boot/uEnv.txt` 文件中 `FDT 的 dtb 名称`，适配列表中的其他盒子。
 
 在本地编译时通过 `-b` 参数指定，在 github.com 的 Actions 里编译时通过 `armbian_board` 参数指定。使用 `-b all` 代表打包 `BUILD` 是 `yes` 的全部设备。使用指定 `BOARD` 参数打包时，无论 `BUILD` 是 `yes` 或者 `no` 均可打包，例如：`-b r68s_s905x3-tx3_s905l3a-cm311`
 
@@ -490,7 +490,7 @@ docker rm -f armbian-trixie
 ```shell
 # 第一步，更新最新内核
 # 由于早期的 header 文件不全，所以需要更新到最新的内核。
-# 各内核版本要求不低于 5.4.280, 5.10.222, 5.15.163, 6.1.100, 6.6.41。
+# 各内核版本要求不低于 5.10.222, 5.15.163, 6.1.100, 6.6.41。
 armbian-sync
 armbian-update -k 6.1
 
