@@ -193,7 +193,7 @@ init_var() {
             ;;
         -k | --Kernel)
             if [[ -n "${2}" ]]; then
-                inputs_kernel="${2}"
+                inputs_kernel="${2//.tar.gz/}"
                 shift 2
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
