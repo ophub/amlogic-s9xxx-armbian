@@ -68,6 +68,19 @@ set_chinese_env() {
     echo 'export LANGUAGE' >>${etc_env}
     echo -e "${INFO} [ ${etc_env} ] content information: \n$(cat ${etc_env})"
 
+    local locale_conf="/etc/default/locale"
+    [[ -f "${locale_conf}" ]] || touch ${locale_conf} 2>/dev/null
+    sed -i '/^LANG=/d' ${locale_conf}
+    sed -i '/^LANGUAGE=/d' ${locale_conf}
+    sed -i '/^LC_MESSAGES=/d' ${locale_conf}
+    sed -i '/^LC_ALL=/d' ${locale_conf}
+    sed -i '/^export LANG/d' ${locale_conf}
+    echo 'LANG=zh_CN.UTF-8' >>${locale_conf}
+    echo 'LANGUAGE=zh_CN:zh:en_US:en' >>${locale_conf}
+    echo 'LC_MESSAGES=zh_CN.UTF-8' >>${locale_conf}
+    echo 'LC_ALL=zh_CN.UTF-8' >>${locale_conf}
+    echo -e "${INFO} [ ${locale_conf} ] content information: \n$(cat ${locale_conf})"
+
     # Add local support settings
     echo -e "${STEPS} Add Chinese local settings..."
     local local_set="/var/lib/locales/supported.d/local"
