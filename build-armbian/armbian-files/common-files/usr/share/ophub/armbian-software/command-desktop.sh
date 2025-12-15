@@ -69,12 +69,17 @@ software_201() {
         fi
         echo -e "${INFO} Remote desktop enable option: [ ${get_rd} ]"
 
+        # Define display manager
+        local display_manager="lightdm"
+        # Define input drivers and display managers
+        local input_drivers="xserver-xorg-input-libinput xserver-xorg-input-evdev"
+
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
-            # Install ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
-            software_install "ubuntu-desktop gdm3"
+            # Install ubuntu-desktop on Ubuntu (focal/jammy/lunar/mantic)
+            software_install "ubuntu-desktop ${display_manager} ${input_drivers}"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Install gnome(gdm3) on Debian (bullseye/bookworm/trixie)
-            software_install "gnome gdm3"
+            # Install gnome on Debian (bullseye/bookworm/trixie)
+            software_install "gnome ${display_manager} ${input_drivers}"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
         fi
