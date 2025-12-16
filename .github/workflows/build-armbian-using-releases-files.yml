@@ -322,26 +322,39 @@ jobs:
           ln -sf /builder/build ${{ github.workspace }}/build
           ln -sf /builder/build /home/runner/work/_actions/ophub/amlogic-s9xxx-armbian/main/build
 
+          # Get name (file name) and url (API asset URL)
           latest_version=$(curl -s \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
-                jq -r --arg RTK "Armbian_${{ inputs.set_release }}_arm64_" \
-                --arg BOARD "-trunk_" \
-                '[.[] | select(.tag_name | contains($RTK))] |
-                map(.assets[] | select(.browser_download_url | contains($BOARD) and endswith(".img.gz"))) |
-                sort_by(.updated_at) |
-                reverse |
-                .[0] |
-                {data: .updated_at, url: .browser_download_url}')
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
+              jq -r --arg RTK "Armbian_${{ inputs.set_release }}_arm64_" \
+              --arg BOARD "-trunk_" \
+              '[.[] | select(.tag_name | contains($RTK))] |
+              map(.assets[] | select(.name | contains($BOARD) and endswith(".img.gz"))) |
+              sort_by(.updated_at) |
+              reverse |
+              .[0] |
+              {data: .updated_at, url: .url, name: .name}')
 
-          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && echo "Invalid Armbian image download address." && exit 1
-          latest_updated_at="$(echo ${latest_version} | jq -r '.data')"
+          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
+              echo "Invalid Armbian image download address."
+              exit 1
+          }
+
+          # Get URL and filename separately
           latest_url="$(echo ${latest_version} | jq -r '.url')"
+          armbian_filename="$(echo ${latest_version} | jq -r '.name')"
 
-          armbian_filename="${latest_url##*/}"
-          curl -fsSL "${latest_url}" -o "${armbian_buildpath}/${armbian_filename}"
-          [[ "${?}" -ne "0" ]] && echo "Invalid Armbian image download address." && exit 1
+          # Download using API method (add octet-stream header)
+          echo "Downloading: ${armbian_filename}"
+          curl -fsSL \
+               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/octet-stream" \
+               "${latest_url}" \
+               -o "${armbian_buildpath}/${armbian_filename}"
+          [[ "${?}" -ne "0" ]] && echo "Download failed." && exit 1
+
+          # Decompress the image
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
           echo "build_tag=Armbian_${{ inputs.set_release }}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
