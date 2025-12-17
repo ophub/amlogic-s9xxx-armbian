@@ -119,13 +119,17 @@ runs:
             echo -e "Get armbian file input parameters: [ ${armbian_file} ]"
             [[ -z "${armbian_file}" ]] && echo -e "The [ armbian_path ] variable must be specified." && exit 1
             [[ -d "${armbian_filepath}" ]] || mkdir -p ${armbian_filepath}
-            if [[ "${armbian_file}" == http* ]]; then
+            if [[ "${armbian_file}" =~ ^http ]]; then
                 echo -e "Download file: [ ${armbian_file} ]"
                 curl -fsSL "${armbian_file}" -o "${armbian_filepath}/${armbian_filename}"
             else
                 if [[ -z "$(ls ${armbian_filepath}/${armbian_filename} 2>/dev/null)" ]]; then
                     echo -e "Copy files: [ ${armbian_file} ]"
-                    cp -vf ${{ github.workspace }}/${armbian_file} ${armbian_filepath} 2>/dev/null
+                    if [[ "${armbian_file}" =~ ^/ ]]; then
+                        cp -vf ${armbian_file} ${armbian_filepath}/ || true
+                    else
+                        cp -vf ${{ github.workspace }}/${armbian_file} ${armbian_filepath}/ || true
+                    fi
                 else
                     echo -e "The [ ${armbian_filepath}/${armbian_filename} ] file already exists, skipping."
                 fi
