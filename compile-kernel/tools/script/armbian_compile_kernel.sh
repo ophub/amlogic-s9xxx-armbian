@@ -503,8 +503,9 @@ get_kernel_config() {
     [[ "${?}" -eq 0 ]] || error_msg "Failed to clone the [ ${kernel_config_repo} ] repository."
 
     rm -rf ${config_path}/*
-    cp -vf ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
+    cp -f ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
     [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
+    echo -e "${INFO} Kernel config files downloaded to [ ${config_path} ] directory."
 }
 
 headers_install() {
