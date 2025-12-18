@@ -43,7 +43,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -k     | Kernel      | 指定 kernel 名称，如 `-k 5.15.100`。多个内核使用 `_` 进行连接，如 `-k 5.15.100_5.15.50`。使用 `-k all` 代表编译全部主线内核，当前等价于 `-k 5.10.y_5.15.y_6.1.y_6.6.y_6.12.y`，内核列表会随着上游内核源码仓库 [unifreq](https://github.com/unifreq) 的维护情况动态调整。 |
 | -a     | AutoKernel  | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.15.100` 的同系列是否有更新的版本，如有 `5.15.100` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -m     | MakePackage | 设置制作内核的包列表。当设置为 `all` ，将制作 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅制作 3 个 dtbs 文件。默认值：`all` |
-| -g     | config      | 设置从内核仓库下载指定标签的[config-*](https://github.com/ophub/kernel/tree/main/kernel-config/release)文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件并且未设置下载时将忽略。可选项：[ `stable / rk3588 / rk35xx / h6` ]。默认值：`stable` |
+| -g     | config      | 设置从内核仓库下载指定标签的 `config-*` 文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件并且未设置下载时将忽略。可选项是内核仓库里存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：[ `stable / rk3588 / rk35xx / h6` ]。默认值：`stable` |
 | -p     | AutoPatch   | 设置是否使用自定义内核补丁。当设置为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
 | -n     | CustomName  | 设置内核自定义签名。当设置为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。默认值：`-ophub` |
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
