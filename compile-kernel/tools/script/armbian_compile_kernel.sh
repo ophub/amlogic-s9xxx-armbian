@@ -26,6 +26,7 @@
 # query_version      : Query the latest kernel version
 # apply_patch        : Apply custom kernel patches
 # get_kernel_source  : Get the kernel source code
+# get_kernel_config  : Get the kernel config files
 #
 # headers_install    : Deploy the kernel headers file
 # compile_env        : Set up the compile kernel environment
@@ -88,6 +89,14 @@ silent_log="false"
 enable_log="false"
 output_logfile="/var/log/kernel_compile_$(date +%Y-%m-%d_%H-%M-%S).log"
 
+# Set the kernel configuration download repository, branch and path
+kernel_config_repo="https://github.com/ophub/kernel"
+kernel_config_repo_branch="main"
+kernel_config_path="kernel-config/release"
+# Set the kernel config tag directory, options: [ stable / rk3588 / rk35xx / h6 ]
+kernel_config_tags="stable"
+kernel_config_download="false"
+
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
 # Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
@@ -136,7 +145,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:z:l:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:l:g:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -156,6 +165,15 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -k parameter [ ${2} ]!"
+            fi
+            ;;
+        -g | --config)
+            if [[ -n "${2}" ]]; then
+                kernel_config_tags="${2}"
+                kernel_config_download="true"
+                shift 2
+            else
+                error_msg "Invalid -g parameter [ ${2} ]!"
             fi
             ;;
         -a | --AutoKernel)
@@ -465,6 +483,28 @@ get_kernel_source() {
 
     # Apply custom kernel patches
     [[ "${auto_patch}" =~ ^(true|yes)$ ]] && apply_patch
+}
+
+get_kernel_config() {
+    echo -e "${STEPS} Start downloading the kernel config files..."
+
+    # Check if the kernel config file already exists
+    if [[ -s "${config_path}/config-${kernel_verpatch}" && "${kernel_config_download}" =~ ^(false|no)$ ]]; then
+        echo -e "${INFO} The kernel config file [ config-${kernel_verpatch} ] already exists, skipping download."
+        return
+    fi
+
+    # Download the kernel config files
+    tmp_path="$(mktemp -d)"
+    for i in {1..10}; do
+        git clone --quiet --single-branch --depth=1 --branch=${kernel_config_repo_branch} ${kernel_config_repo} ${tmp_path}
+        [[ "${?}" -eq 0 ]] && break || sleep 60
+    done
+    [[ "${?}" -eq 0 ]] || error_msg "Failed to clone the [ ${kernel_config_repo} ] repository."
+
+    rm -rf ${config_path}/*
+    cp -vf ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
+    [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
 }
 
 headers_install() {
@@ -842,6 +882,7 @@ loop_recompile() {
 
         # Execute the following functions in sequence
         get_kernel_source
+        get_kernel_config
         compile_env
         compile_selection
         clean_tmp
