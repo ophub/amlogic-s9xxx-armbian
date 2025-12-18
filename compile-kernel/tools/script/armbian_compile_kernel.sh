@@ -491,6 +491,7 @@ get_kernel_config() {
     # Check if the kernel config file already exists
     if [[ -s "${config_path}/config-${kernel_verpatch}" && "${kernel_config_download}" =~ ^(false|no)$ ]]; then
         echo -e "${INFO} The kernel config file [ config-${kernel_verpatch} ] already exists, skipping download."
+        echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
         return
     fi
 
@@ -506,6 +507,7 @@ get_kernel_config() {
     cp -f ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
     [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
     echo -e "${INFO} Kernel config files downloaded to [ ${config_path} ] directory."
+    echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
 }
 
 headers_install() {
