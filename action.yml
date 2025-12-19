@@ -288,10 +288,10 @@ runs:
                 [[ -d "${custom_kernel_patch}" ]] && docker cp ${custom_kernel_patch}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
                 docker exec -i "${docker_container}" ls -Alh /opt/kernel/compile-kernel/tools/patch/ || true
 
-                echo -e "🐳 Starting compile kernel in Docker container..."
+                echo -e "🐳 Starting native kernel compilation in Docker container..."
                 docker exec -i "${docker_container}" bash "${docker_script}" "${make_args[@]}"
             else
-                echo -e "💻 Using the original system to compile the kernel."
+                echo -e "🖥️ Starting kernel cross-compilation on host system..."
                 sudo ./recompile "${make_args[@]}"
             fi
 
