@@ -269,7 +269,7 @@ runs:
 
             # Choose Ubuntu or a Docker container to compile the kernel.
             if [[ "$(uname -m)" == "aarch64" && -n "${docker_compile}" ]]; then
-                echo -e "🐳 Using the Armbian Docker image to compile the kernel."
+                echo -e "🐋 Using the Armbian Docker image to compile the kernel."
 
                 echo -e "🌐 Synchronize server time."
                 sudo ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
@@ -277,18 +277,18 @@ runs:
                 echo -e "🐬 Restarting Docker container..."
                 sudo docker restart ${docker_container} >/dev/null && sleep 5
 
-                echo -e "♻️ Updating scripts in Docker container..."
+                echo -e "♻️ Syncing scripts in Docker container..."
                 docker exec -i "${docker_container}" bash "${docker_script}" -u
 
-                echo -e "✅ Injecting custom configs and patches into Docker container..."
+                echo -e "✅ Injecting custom configs into Docker container..."
                 [[ -d "${config_filepath}" ]] && docker cp ${config_filepath}/. "${docker_container}":/opt/kernel/compile-kernel/tools/config/
-                [[ -d "${custom_kernel_patch}" ]] && docker cp ${custom_kernel_patch}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
-                echo -e "📂 Check Docker container configs files:"
                 docker exec -i "${docker_container}" ls -Alh /opt/kernel/compile-kernel/tools/config/ || true
-                echo -e "📂 Check Docker container patches files:"
+
+                echo -e "✳️ Injecting custom patches into Docker container..."
+                [[ -d "${custom_kernel_patch}" ]] && docker cp ${custom_kernel_patch}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
                 docker exec -i "${docker_container}" ls -Alh /opt/kernel/compile-kernel/tools/patch/ || true
 
-                echo -e "💎 Starting compile kernel in Docker container..."
+                echo -e "🐳 Starting compile kernel in Docker container..."
                 docker exec -i "${docker_container}" bash "${docker_script}" "${make_args[@]}"
             else
                 echo -e "💻 Using the original system to compile the kernel."
