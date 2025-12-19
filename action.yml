@@ -271,9 +271,19 @@ runs:
             if [[ "$(uname -m)" == "aarch64" && -n "${docker_compile}" ]]; then
                 echo -e "Synchronize server time."
                 sudo ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
+
                 echo -e "Using the Armbian Docker image to compile the kernel."
                 sudo docker restart ${docker_container} >/dev/null && sleep 3
-                docker exec -i "${docker_container}" bash -c 'bash "$0" -u && bash "$0" "$@"' "${docker_script}" "${make_args[@]}"
+
+                echo -e "Updating scripts in Docker container..."
+                docker exec -i "${docker_container}" bash "${docker_script}" -u
+
+                echo -e "Injecting custom configs and patches into Docker container..."
+                [[ -d "${config_filepath}" ]] && docker cp ${config_filepath}/. "${docker_container}":/opt/kernel/compile-kernel/tools/config/
+                [[ -d "${custom_kernel_patch}" ]] && docker cp ${custom_kernel_patch}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
+
+                echo -e "Starting compile kernel in Docker container..."
+                docker exec -i "${docker_container}" bash "${docker_script}" "${make_args[@]}"
             else
                 echo -e "Using the original system to compile the kernel."
                 sudo ./recompile "${make_args[@]}"
