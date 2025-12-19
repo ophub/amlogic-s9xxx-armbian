@@ -506,7 +506,7 @@ get_kernel_config() {
     rm -rf ${config_path}/*
     cp -f ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
     [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
-    echo -e "${INFO} Kernel config files downloaded to [ ${config_path} ] directory."
+    echo -e "${INFO} Kernel config files [ ${kernel_config_tags} ] downloaded to [ ${config_path} ] directory."
     echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
 }
 
@@ -919,7 +919,6 @@ echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
-echo -e "${INFO} kernel config download : [ ${kernel_config_tags} / ${kernel_config_download} ]"
 echo -e "${INFO} Ccache clear: [ ${ccache_clear} ]"
 echo -e "${INFO} Delete source: [ ${delete_source} ]"
 echo -e "${INFO} Silent log: [ ${silent_log} ]"
