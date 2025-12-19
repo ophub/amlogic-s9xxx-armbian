@@ -281,6 +281,8 @@ runs:
                 echo -e "Injecting custom configs and patches into Docker container..."
                 [[ -d "${config_filepath}" ]] && docker cp ${config_filepath}/. "${docker_container}":/opt/kernel/compile-kernel/tools/config/
                 [[ -d "${custom_kernel_patch}" ]] && docker cp ${custom_kernel_patch}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
+                echo -e "Check Docker container files:"
+                docker exec -i "${docker_container}" ls -lh /opt/kernel/compile-kernel/tools/config/ || true
 
                 echo -e "Starting compile kernel in Docker container..."
                 docker exec -i "${docker_container}" bash "${docker_script}" "${make_args[@]}"

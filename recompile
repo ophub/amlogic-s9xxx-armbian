@@ -195,7 +195,7 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
-        -g | --config)
+        -g | --KernelConfig)
             if [[ -n "${2}" ]]; then
                 kernel_config_tags="${2}"
                 kernel_config_download="true"
@@ -539,7 +539,7 @@ get_kernel_config() {
     echo -e "${STEPS} Start downloading the kernel config files..."
 
     # Check if the kernel config file already exists
-    if [[ -s "${config_path}/config-${kernel_verpatch}" && "${kernel_config_download}" =~ ^(false|no)$ ]]; then
+    if [[ -s "${config_path}/config-${kernel_verpatch}" && "${kernel_config_download}" == "false" ]]; then
         echo -e "${INFO} The kernel config file [ config-${kernel_verpatch} ] already exists, skipping download."
         echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
         return
@@ -998,6 +998,8 @@ echo -e "${INFO} Kernel Package: [ ${package_list} ]"
 echo -e "${INFO} kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
 echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
+echo -e "${INFO} kernel config download : [ ${kernel_config_tags} / ${kernel_config_download} ]"
+echo -e "${INFO} Ccache clear: [ ${ccache_clear} ]"
 echo -e "${INFO} Delete source: [ ${delete_source} ]"
 echo -e "${INFO} Silent log: [ ${silent_log} ]"
 echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
