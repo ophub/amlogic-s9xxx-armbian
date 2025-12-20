@@ -1038,7 +1038,7 @@ refactor_rootfs() {
     # Add custom startup script
     custom_startup_script="etc/custom_service/start_service.sh"
     [[ -x "${custom_startup_script}" && -f "etc/rc.local" ]] && {
-        sed -i '/^exit 0/i\bash /etc/custom_service/start_service.sh' etc/rc.local
+        sed -i '/^exit 0/i\bash /etc/custom_service/start_service.sh &' etc/rc.local
     }
 
     # Enable ssh service
@@ -1099,6 +1099,10 @@ refactor_rootfs() {
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
     [[ -f "${armbian_firstrun}" ]] && sed -i '/\/etc\/armbian-release/i\[[ -x "/usr/sbin/armbian-fix" ]] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
+
+    # Improve systemd startup speed, avoid timeout waiting
+    armbian_firstlogin="usr/lib/armbian/armbian-firstlogin"
+    [[ -f "${armbian_firstlogin}" ]] && sed -i "s#.*systemctl is-system-running.*#	timeout 120s systemctl is-system-running --wait > /dev/null 2>\&1 || true#g" "${armbian_firstlogin}"
 
     # Fix abnormal CPU temperature
     temp_file="usr/lib/armbian/armbian-allwinner-battery"

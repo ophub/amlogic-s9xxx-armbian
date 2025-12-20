@@ -12,7 +12,7 @@
 # Dependent script: /etc/rc.local (which runs with 'set -e')
 # File path: /etc/custom_service/start_service.sh
 #
-# Version: v1.1
+# Version: v1.2
 #
 #========================================================================================
 
@@ -42,17 +42,17 @@ log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
 
 # For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
 if [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
-    modprobe btmtksdio 2>/dev/null || true
+    modprobe btmtksdio >/dev/null 2>&1 &
     log_message "Attempted to load btmtksdio module for Tencent-Aurora-3Pro."
 fi
 
 # For swan1-w28(rk3568) board: USB power and switch control
 if [[ "${FDT_FILE}" == "rk3568-swan1-w28.dtb" ]]; then
     # GPIO operations are critical, but we also add error suppression.
-    gpioset 0 21=1 2>/dev/null
-    gpioset 3 20=1 2>/dev/null
-    gpioset 4 21=1 2>/dev/null
-    gpioset 4 22=1 2>/dev/null
+    gpioset 0 21=1 >/dev/null 2>&1
+    gpioset 3 20=1 >/dev/null 2>&1
+    gpioset 4 21=1 >/dev/null 2>&1
+    gpioset 4 22=1 >/dev/null 2>&1
     log_message "USB power control GPIOs set for Swan1-w28."
 fi
 
@@ -60,26 +60,28 @@ fi
 if [[ "${FDT_FILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
     # This is a sequence of commands, with the last one running in the background.
     # The background command (&) won't affect the script's exit code.
-    rfkill block all
-    chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 2>/dev/null || true
-    sleep 2
-    rfkill unblock all
-    /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6275p/BCM4362A2.hcd /dev/ttyS9 &
+    (
+        rfkill block all
+        chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 >/dev/null 2>&1 &
+        sleep 2
+        rfkill unblock all
+        /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6275p/BCM4362A2.hcd /dev/ttyS9 &
+    ) &
     log_message "Bluetooth firmware download process started for Smart-am60/orangepi-5b."
 fi
 
 # General System Services
 
 # Restart ssh service
-mkdir -p -m0755 /var/run/sshd 2>/dev/null
+mkdir -p -m0755 /var/run/sshd >/dev/null 2>&1
 if [[ -f "/etc/init.d/ssh" ]]; then
-    (sleep 5 && /etc/init.d/ssh restart 2>/dev/null) || true
+    (sleep 5 && /etc/init.d/ssh restart >/dev/null 2>&1) &
     log_message "SSH service restart attempted."
 fi
 
 # Add network performance optimization
 if [[ -x "/usr/sbin/balethirq.pl" ]]; then
-    (perl /usr/sbin/balethirq.pl 2>/dev/null) || true
+    (perl /usr/sbin/balethirq.pl >/dev/null 2>&1) &
     log_message "Network optimization service (balethirq.pl) execution attempted."
 fi
 
@@ -87,19 +89,19 @@ fi
 openvfd_enable="no"
 openvfd_boxid="15"
 if [[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -x "/usr/sbin/armbian-openvfd" ]]; then
-    (armbian-openvfd "${openvfd_boxid}") || true
+    (armbian-openvfd "${openvfd_boxid}") &
     log_message "OpenVFD service execution attempted."
 fi
 
 # For vplus(Allwinner h6) led color lights
 if [[ -x "/usr/bin/rgb-vplus" ]]; then
-    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE 2>/dev/null &
+    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE >/dev/null 2>&1 &
     log_message "Vplus RGB LED service started in background."
 fi
 
 # For fan control service
 if [[ -x "/usr/bin/pwm-fan.pl" ]]; then
-    perl /usr/bin/pwm-fan.pl 2>/dev/null &
+    perl /usr/bin/pwm-fan.pl >/dev/null 2>&1 &
     log_message "Fan control service (pwm-fan.pl) started in background."
 fi
 
@@ -112,15 +114,8 @@ fi
 # For pveproxy startup service
 if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$")" ]]; then
     # Restarting systemd services can sometimes fail during early boot.
-    # Using '|| true' makes this step fault-tolerant.
-    (systemctl restart pveproxy) || true
+    (systemctl restart pveproxy) &
     log_message "PVE proxy service restart attempted."
-fi
-
-# For wxy-oec-turbo-4g board: Enable and restart getty on ttyS2
-if [[ "${FDT_FILE}" == "rk3566-wxy-oec-turbo-4g.dtb" ]]; then
-    (sudo systemctl enable getty@ttyS2 && sudo systemctl restart getty@ttyS2) || true
-    log_message "Getty service on ttyS2 restart attempted for wxy-oec-turbo-4g board."
 fi
 
 # Finalization
