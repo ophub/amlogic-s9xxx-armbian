@@ -177,8 +177,11 @@ runs:
             # Custom Armbian rebuild files
             if [[ -n "${{ inputs.armbian_files }}" && "${{ inputs.armbian_files }}" != "false" ]]; then
                 echo -e "Add my custom Armbian rebuild files..."
+                copy_from_path="${{ inputs.armbian_files }}"
+                copy_from_path="${copy_from_path%/}"
+                [[ "${copy_from_path}" != /* ]] && copy_from_path="${{ github.workspace }}/${copy_from_path}"
                 copy_to_path="build-armbian/armbian-files/common-files"
-                cp -avf --no-preserve=ownership ${{ github.workspace }}/${{ inputs.armbian_files }}/. ${copy_to_path}/
+                cp -avf --no-preserve=ownership "${copy_from_path}/." "${copy_to_path}/" || true
             else
                 echo -e "Use the default Armbian rebuild files."
             fi
