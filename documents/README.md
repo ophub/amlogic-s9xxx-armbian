@@ -142,6 +142,18 @@ The system compilation process is controlled in the [.github/workflows/build-arm
     echo "status=success" >> ${GITHUB_OUTPUT}
 ```
 
+When building Armbian with `ophub`, the `armbian_files` parameter allows you to add or overwrite custom files in the [common-files](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files/common-files) directory. The directory structure must strictly mirror the Armbian root filesystem to ensure files are correctly overlaid into the firmware (e.g., default configuration files should be placed under the `etc/default/` subdirectory). Example configuration:
+
+```yaml
+- name: Rebuild Armbian
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: armbian
+    armbian_path: build/output/images/*.img.gz
+    armbian_files: files
+    ...
+```
+
 ## 5. Compile the system
 
 There are many ways to compile the system. You can set up timed compilation, manual compilation, or set some specific events to trigger the compilation. Let's start with simple operations.

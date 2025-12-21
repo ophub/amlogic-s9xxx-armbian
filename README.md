@@ -241,17 +241,18 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 The related parameters correspond to the `local packaging command`, please refer to the above description.
 
-| Parameter              | Default                  | Description                                             |
-|------------------------|--------------------------|---------------------------------------------------------|
-| armbian_path           | None                     | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
-| armbian_board          | all                      | Set the `board` of the package box, refer to `-b`                 |
-| kernel_repo            | ophub/kernel             | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
-| kernel_usage           | stable                   | Set the `tags suffix` of the used kernel. Refer to `-u` |
-| armbian_kernel         | 6.1.y_5.15.y             | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
-| auto_kernel            | true                     | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
-| armbian_fstype         | ext4                     | Set the file system type of the system's ROOTFS partition, refer to `-t`     |
-| armbian_size           | 512/2560                 | Set the size of the system BOOTFS and ROOTFS partitions, function reference `-s`  |
-| builder_name           | None                     | Set the Armbian system builder signature, refer to `-n`           |
+| Parameter       | Default       | Description                                             |
+|-----------------|---------------|---------------------------------------------------------|
+| armbian_path    | None          | Set the path of the original Armbian file, support the file path in the current workflow such as `build/output/images/*.img`, and also support the network download address such as: `https://dl.armbian.com/*/Armbian_*.img.xz` |
+| armbian_board   | all           | Set the `board` of the package box, refer to `-b`       |
+| kernel_repo     | ophub/kernel  | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
+| kernel_usage    | stable        | Set the `tags suffix` of the used kernel. Refer to `-u` |
+| armbian_kernel  | 6.1.y_5.15.y  | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
+| auto_kernel     | true          | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
+| armbian_fstype  | ext4          | Set the file system type of the system's ROOTFS partition, refer to `-t`  |
+| armbian_size    | 512/2560      | Set the size of the system BOOTFS and ROOTFS partitions, function reference `-s`  |
+| armbian_files   | false         | Adds custom Armbian files. If set, all files in this directory will be copied to [common-files](build-armbian/armbian-files/common-files). The directory structure must mirror the Armbian root directory to ensure files are correctly overlaid(e.g., default configuration files should be placed under `etc/default/`). |
+| builder_name    | None          | Set the Armbian system builder signature, refer to `-n` |
 
 - ### GitHub Actions Output Variable Description
 

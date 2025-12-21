@@ -142,6 +142,18 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     echo "status=success" >> ${GITHUB_OUTPUT}
 ```
 
+使用 `ophub` 打包 Armbian 时，使用 `armbian_files` 参数可以添加或覆盖自定义文件到 ophub 的 [common-files](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/build-armbian/armbian-files/common-files) 目录。目录结构必须与 Armbian 根目录保持一致，以确保文件被正确覆盖到固件中（例如：默认配置文件应存放于 `etc/default/` 子目录下）。设置方法举例：
+
+```yaml
+- name: Rebuild Armbian
+  uses: ophub/amlogic-s9xxx-armbian@main
+  with:
+    build_target: armbian
+    armbian_path: build/output/images/*.img.gz
+    armbian_files: files
+    ...
+```
+
 ## 5. 编译系统
 
 系统编译的方式很多，可以设置定时编译，手动编译，或者设置一些特定事件来触发编译。我们先从简单的操作开始。
