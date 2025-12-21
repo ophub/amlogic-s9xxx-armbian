@@ -415,7 +415,7 @@ git_pull_dir() {
 
     # Copy the files to the storage directory
     mkdir -p ${git_path}
-    cp -af --no-preserve=ownership ${git_tmp_path}/${git_dir}/* ${git_path}
+    cp -af --no-preserve=ownership ${git_tmp_path}/${git_dir}/. ${git_path}
     [[ "${?}" -eq 0 ]] || error_msg "Failed to move the [ ${git_dir} ] files to the [ ${git_path} ] directory."
 
     # Delete temporary files
@@ -806,30 +806,30 @@ copy_files() {
     fi
 
     # Copy the full Armbian image
-    cp -af ${tmp_armbian}/* ${tag_rootfs}
+    cp -af ${tmp_armbian}/. ${tag_rootfs}
 
     # Copy the common files
-    [[ -d "${common_files}" ]] && cp -af --no-preserve=ownership ${common_files}/* ${tag_rootfs}
+    [[ -d "${common_files}" ]] && cp -af --no-preserve=ownership ${common_files}/. ${tag_rootfs}
 
     # Copy the platform files
     platform_bootfs="${platform_files}/${PLATFORM}/bootfs"
     platform_rootfs="${platform_files}/${PLATFORM}/rootfs"
-    [[ -d "${platform_bootfs}" ]] && cp -rf ${platform_bootfs}/* ${tag_bootfs}
-    [[ -d "${platform_rootfs}" ]] && cp -af --no-preserve=ownership ${platform_rootfs}/* ${tag_rootfs}
+    [[ -d "${platform_bootfs}" ]] && cp -rf ${platform_bootfs}/. ${tag_bootfs}
+    [[ -d "${platform_rootfs}" ]] && cp -af --no-preserve=ownership ${platform_rootfs}/. ${tag_rootfs}
 
     # Copy the different files
     different_bootfs="${different_files}/${board}/bootfs"
     different_rootfs="${different_files}/${board}/rootfs"
-    [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/* ${tag_bootfs}
-    [[ -d "${different_rootfs}" ]] && cp -af --no-preserve=ownership ${different_rootfs}/* ${tag_rootfs}
+    [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/. ${tag_bootfs}
+    [[ -d "${different_rootfs}" ]] && cp -af --no-preserve=ownership ${different_rootfs}/. ${tag_rootfs}
 
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p ${tag_rootfs}/usr/lib/u-boot
     rm -rf ${tag_rootfs}/usr/lib/u-boot/*
-    [[ -d "${bootloader_path}" ]] && cp -af --no-preserve=ownership ${bootloader_path}/* ${tag_rootfs}/usr/lib/u-boot
+    [[ -d "${bootloader_path}" ]] && cp -af --no-preserve=ownership ${bootloader_path}/. ${tag_rootfs}/usr/lib/u-boot
 
     # Copy the overload files
-    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/${PLATFORM}/overload/* ${tag_bootfs}
+    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/${PLATFORM}/overload/. ${tag_bootfs}
 
     # Remove the .git directories
     rm -rf $(find ${tmp_build} -type d -name '.git')
