@@ -1,3 +1,7 @@
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/513783c4-9d70-4d04-ba3a-75828239defd" alt="Armbian" />
+</div>
+
 # Armbian
 
 View Chinese description | [查看中文说明](README.cn.md)
