@@ -70,6 +70,27 @@ if [[ "${FDT_FILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; t
     log_message "Bluetooth firmware download process started for Smart-am60/orangepi-5b."
 fi
 
+# For nsy-g16-plus/nsy-g68-plus/bdy-g18-pro board
+if [[ "${FDT_FILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568-bdy-g18-pro\.dtb)$ ]]; then
+    (
+        # Wait for network to be up
+        sleep 10
+
+        # Set MTU to 1500 for eth0 and br0
+        set_mtu() {
+            [[ -d "/sys/class/net/${1}" ]] && ip link set "${1}" mtu 1500 >/dev/null 2>&1
+        }
+        set_mtu eth0
+        set_mtu br0
+
+        # Close offloading features to improve stability
+        if [[ -d "/sys/class/net/eth0" ]] && command -v ethtool >/dev/null 2>&1; then
+            ethtool -K eth0 tso off gso off gro off tx off rx off >/dev/null 2>&1
+        fi
+    ) &
+    log_message "Network optimizations for ${FDT_FILE} applied."
+fi
+
 # General System Services
 
 # Restart ssh service
