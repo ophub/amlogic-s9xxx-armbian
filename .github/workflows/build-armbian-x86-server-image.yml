@@ -103,6 +103,9 @@ jobs:
         working-directory: /builder
         if: ${{ steps.down.outputs.status }} == 'success' && !cancelled()
         run: |
+          run: |
+          # Enable QEMU emulation for ARM architecture
+          docker run --rm --privileged multiarch/qemu-user-static --reset -p yes 2>/dev/null || true
           # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
               ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=uefi-x86 BRANCH=current BUILD_MINIMAL=no \
