@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://github.com/user-attachments/assets/513783c4-9d70-4d04-ba3a-75828239defd" alt="Armbian" />
+    <img alt="Armbian" src="https://github.com/user-attachments/assets/74e55052-031b-48f8-9aca-e5f1dd9e256a" />
 </div>
 
 # Armbian / 岸边
