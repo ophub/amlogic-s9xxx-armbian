@@ -308,6 +308,12 @@ toolchain_check() {
     sudo apt-get -qq update
     sudo apt-get -qq install -y $(cat compile-kernel/tools/script/armbian-compile-kernel-depends)
 
+    echo -e "${INFO} Configuring Git for large file downloads..."
+    git config --global http.postBuffer 524288000
+    git config --global core.compression 0
+    git config --global http.version HTTP/1.1
+
+    echo -e "${INFO} Checking and installing the [ ${toolchain_name} ] toolchain..."
     # Set the default path
     path_os_variable="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
 
