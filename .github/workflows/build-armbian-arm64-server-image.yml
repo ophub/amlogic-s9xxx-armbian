@@ -51,7 +51,7 @@ on:
           - fine3399
           - firefly-rk3399
           - fmx1-pro
-          - jp-tvbox
+          - gzpeite-p01
           - h28k
           - h66k
           - h68k
@@ -62,6 +62,7 @@ on:
           - hs530r
           - hugsun-x99
           - ipc-r
+          - jp-tvbox
           - king3399
           - kylin3399
           - lckfb-tspi
