@@ -145,7 +145,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:z:l:g:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:l:g:h:i:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -263,6 +263,22 @@ init_var() {
                 shift 2
             else
                 error_msg "Invalid -l parameter [ ${2} ]!"
+            fi
+            ;;
+        -h | --DockerHostpath)
+            if [[ -n "${2}" ]]; then
+                docker_hostpath="${2}"
+                shift 2
+            else
+                error_msg "Invalid -h parameter [ ${2} ]!"
+            fi
+            ;;
+        -i | --DockerImage)
+            if [[ -n "${2}" ]]; then
+                docker_image="${2}"
+                shift 2
+            else
+                error_msg "Invalid -i parameter [ ${2} ]!"
             fi
             ;;
         --)
