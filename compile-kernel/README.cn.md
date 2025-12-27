@@ -52,9 +52,12 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -s     | SilentLog   | 设置内核编译时是否使用静默模式减少日志输出。可选项：`true / false`。默认值：`false` |
 | -l     | EnableLog   | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。可选项：`true / false`。默认值：`false` |
 | -c     | CcacheClear | 设置是否在编译前清除 ccache。可选项：`true / false`。默认值：`false` |
+| -h     | DockerHostpath | 设置内核编译时 Docker 容器在宿主机的绝对挂载路径。默认值：`/opt/kernel` |
+| -i     | DockerImage | 设置编译内核的 Docker 容器镜像。默认值：`ophub/armbian-trixie:arm64` |
 
 - `sudo ./recompile` : 使用默认配置编译内核。
 - `sudo ./recompile -k 5.15.100` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
+- `sudo ./recompile -k 5.15.100 -g stable` : 使用默认配置，并通过 `-k 5.15.100` 参数指定需要编译的内核版本，通过 `-g stable` 参数指定从内核仓库下载 `stable` 目录下的配置文件。
 - `sudo ./recompile -k 5.15.100 -a true` : 使用默认配置，并通过 `-a` 参数设置编译内核时，是否自动升级到同系列最新内核。
 - `sudo ./recompile -k 5.15.100 -n -ophub` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
 - `sudo ./recompile -k 5.15.100 -m dtbs` : 使用默认配置，并通过 `-m` 参数指定仅制作 dtbs 文件。
@@ -105,6 +108,8 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | silent_log        | false            | 设置内核编译时是否使用静默模式减少日志输出。默认值为 `false`。功能参考 `-s` |
 | enable_log        | false            | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。默认值：`false`，功能参考 `-l` |
 | ccache_clear      | false            | 设置是否在编译前清除 ccache。默认值为 `false`。功能参考 `-c` |
+| docker_hostpath   | /opt/kernel      | 设置内核编译时 Docker 容器在宿主机的绝对挂载路径。功能参考 `-h` |
+| docker_image      | ophub/armbian-trixie:arm64 | 设置编译内核的 Docker 容器镜像。功能参考 `-i` |
 
 - ### GitHub Action 输出变量说明
 

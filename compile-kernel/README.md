@@ -52,9 +52,12 @@ You can compile the kernel in the official [Armbian](https://github.com/ophub/am
 | -s        | SilentLog   | Set whether to use silent mode to reduce log output when compiling the kernel. Options: `true / false`. Default value: `false` |
 | -l        | EnableLog   | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Options: `true / false`. Default value: `false` |
 | -c        | CcacheClear | Set whether to clear the cache before compiling the kernel. Options: `true / false`. Default value: `false` |
+| -h     | DockerHostpath | Set the absolute host mount path for kernel compilation. Default: `/opt/kernel` |
+| -i     | DockerImage | Set the Docker container image for kernel compilation. Default: `ophub/armbian-trixie:arm64` |
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.
 - `sudo ./recompile -k 5.15.100`: Use the default configuration and specify the kernel version to be compiled through `-k`. Multiple versions are connected using `_` for simultaneous compilation.
+- `sudo ./recompile -k 5.15.100 -g stable` : Use the default configuration and specify the kernel version to be compiled through `-k 5.15.100`, and specify the configuration files to be downloaded from the `stable` directory of the kernel repository through `-g stable`.
 - `sudo ./recompile -k 5.15.100 -a true`: Use the default configuration and set whether to automatically upgrade to the latest kernel of the same series during kernel compilation through the `-a` parameter.
 - `sudo ./recompile -k 5.15.100 -n -ophub`: Use the default configuration and set the kernel custom signature through the `-n` parameter.
 - `sudo ./recompile -k 5.15.100 -m dtbs`: Use the default configuration and specify only the creation of dtbs files through the `-m` parameter.
@@ -104,6 +107,8 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | silent_log       | false         | Set whether to use silent mode to reduce log output when compiling the kernel. Default value is `false`. Refer to `-s` for functionality. |
 | enable_log       | false         | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Default value: `false`. Refer to `-l` for functionality. |
 | ccache_clear     | false         | Set whether to clear the cache before compiling the kernel. Default value is `false`. Refer to `-c` for functionality. |
+| docker_hostpath   | /opt/kernel      | Set the absolute host mount path for kernel compilation. Refer to `-h` for functionality. |
+| docker_image      | ophub/armbian-trixie:arm64 | Set the Docker container image for kernel compilation. Refer to `-i` for functionality. |
 
 - ### GitHub Action Output Variables
 
