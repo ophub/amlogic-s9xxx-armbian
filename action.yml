@@ -229,7 +229,6 @@ runs:
 
             # Custom kernel config files
             config_filepath="compile-kernel/tools/config"
-            kernel_outpath="compile-kernel/output"
             [[ -d "${config_filepath}" ]] || mkdir -p ${config_filepath}
             if [[ -n "${{ inputs.kernel_config }}" && "${{ inputs.kernel_config }}" != "false" ]]; then
                 if [[ "$(ls ${{ github.workspace }}/${{ inputs.kernel_config }}/config-* -l 2>/dev/null | grep "^-" | wc -l)" -ne "0" ]]; then
@@ -278,8 +277,9 @@ runs:
             read -r -a make_args <<< "${make_command}"
             sudo ./recompile "${make_args[@]}"
 
-            cd ${{ github.action_path }}
-            output_tags="$(ls -l ${PWD}/${kernel_outpath}/*.tar.gz 2>/dev/null | awk '{print $9}' | grep -oE '[1-9][0-9]{0,2}\.[0-9]{1,3}\.[0-9]+' | xargs | tr "[ ]" "_")"
+            cd ${{ inputs.docker_hostpath }}
+            kernel_outpath="compile-kernel/output"
+            output_tags="$(ls -l ${kernel_outpath}/*.tar.gz 2>/dev/null | awk '{print $9}' | grep -oE '[1-9][0-9]{0,2}\.[0-9]{1,3}\.[0-9]+' | xargs | tr "[ ]" "_")"
             echo -e "Output environment variables."
             echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> ${GITHUB_ENV}
             echo "PACKAGED_OUTPUTPATH=${PWD}/${kernel_outpath}" >> ${GITHUB_ENV}
