@@ -104,7 +104,7 @@ inputs:
   docker_hostpath:
     description: "Set Docker working directory"
     required: false
-    default: "/opt"
+    default: "/opt/kernel"
   docker_image:
     description: "Select Armbian docker image"
     required: false

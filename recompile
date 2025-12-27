@@ -28,7 +28,7 @@
 #=============================== Set make environment variables ===============================
 #
 # Set Docker host mount directory and image
-docker_hostpath="/opt"
+docker_hostpath="/opt/kernel"
 docker_image="ophub/armbian-trixie:arm64"
 docker_container="armbian-ophub"
 docker_script="/usr/sbin/armbian-kernel"
