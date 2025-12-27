@@ -27,6 +27,11 @@
 #
 #=============================== Set make environment variables ===============================
 #
+# Set current path and compile path
+current_path="${PWD}/compile-kernel"
+config_path="${current_path}/tools/config"
+kernel_patch_path="${current_path}/tools/patch"
+
 # Set Docker host mount directory and image
 docker_hostpath="/opt/kernel"
 docker_image="ophub/armbian-trixie:arm64"
@@ -66,7 +71,7 @@ init_var() {
         case "${current_arg}" in
         -h | --DockerHostpath)
             if [[ -n "${next_arg}" && "${next_arg}" != -* ]]; then
-                docker_hostpath="${next_arg}"
+                docker_hostpath="${next_arg%/}"
             fi
             ;;
         -i | --DockerImage)
@@ -78,16 +83,9 @@ init_var() {
     done
 
     # Set Docker related paths
-    ccache_path="${docker_hostpath}/ccache"
     compile_path="${docker_hostpath}/compile-kernel"
-    kernel_path="${compile_path}/kernel"
-    config_path="${compile_path}/tools/config"
-    kernel_patch_path="${compile_path}/tools/patch"
-    output_path="${compile_path}/output"
-
-    # Create necessary directories if they do not exist
-    [[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
-    [[ -d "${output_path}" ]] || mkdir -p ${output_path}
+    ccache_path="${docker_hostpath}/ccache"
+    [[ -d "${compile_path}" ]] || mkdir -p ${compile_path}
     [[ -d "${ccache_path}" ]] || mkdir -p ${ccache_path}
 }
 
@@ -150,7 +148,7 @@ set_docker_env() {
     [[ -d "${kernel_patch_path}" ]] && docker cp ${kernel_patch_path}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
     docker exec -i "${docker_container}" ls -Alh /opt/kernel/compile-kernel/tools/patch/ || true
 
-    echo -e "${INFO} Starting native kernel compilation in Docker container..."
+    echo -e "${INFO} Start compiling the kernel inside the Docker container..."
     docker exec -i "${docker_container}" bash "${docker_script}" "$@"
 }
 
