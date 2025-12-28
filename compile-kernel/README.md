@@ -25,7 +25,7 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbian-depends)
 ```
 
-3. Go to the `~/amlogic-s9xxx-armbian` root directory, and then run `sudo ./recompile -k 5.15.100` or other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code, and make all settings. The packaged kernel files are saved in the `compile-kernel/output` directory.
+3. Go to the `~/amlogic-s9xxx-armbian` root directory, and then run `sudo ./recompile -k 5.15.100` or other specified parameter commands to compile the kernel. The script will automatically download and install the compilation environment and kernel source code, and make all settings. The compiled kernel files are saved in the `compile-kernel/output` directory of the current source tree, or in the directory specified using the `-h` option.
 
 - ### Running on the Armbian system
 
@@ -52,7 +52,7 @@ You can compile the kernel in the official [Armbian](https://github.com/ophub/am
 | -s        | SilentLog   | Set whether to use silent mode to reduce log output when compiling the kernel. Options: `true / false`. Default value: `false` |
 | -l        | EnableLog   | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Options: `true / false`. Default value: `false` |
 | -c        | CcacheClear | Set whether to clear the cache before compiling the kernel. Options: `true / false`. Default value: `false` |
-| -h     | DockerHostpath | Set the absolute host mount path for kernel compilation. Default: `/opt/kernel` |
+| -h     | DockerHostpath | Set the host mount path for kernel compilation. Default is the current directory. |
 | -i     | DockerImage | Set the Docker container image for kernel compilation. Default: `ophub/armbian-trixie:arm64` |
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.

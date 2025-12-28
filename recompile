@@ -28,12 +28,12 @@
 #=============================== Set make environment variables ===============================
 #
 # Set config and patch paths
-current_path="${PWD}/compile-kernel"
-config_path="${current_path}/tools/config"
-kernel_patch_path="${current_path}/tools/patch"
+current_path="${PWD}"
+config_path="${current_path}/compile-kernel/tools/config"
+kernel_patch_path="${current_path}/compile-kernel/tools/patch"
 
 # Set Docker host mount directory and image
-docker_hostpath="/opt/kernel"
+docker_hostpath="${PWD}"
 docker_image="ophub/armbian-trixie:arm64"
 docker_container="armbian-ophub"
 docker_script="/usr/sbin/armbian-kernel"

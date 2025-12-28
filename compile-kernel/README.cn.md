@@ -25,7 +25,7 @@ sudo apt-get full-upgrade -y
 sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbian-depends)
 ```
 
-3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.15.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。打包好的内核文件保存在 `compile-kernel/output` 目录里。
+3. 进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行 `sudo ./recompile -k 5.15.100` 等指定参数命令即可编译内核。脚本会自动下载安装编译环境和内核源码并做好全部设置。编译好的内核文件保存在当前源码的 `compile-kernel/output` 目录，或使用 `-h` 参数设置的目录里。
 
 - ### 在 Armbian 系统下运行
 
@@ -52,7 +52,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -s     | SilentLog   | 设置内核编译时是否使用静默模式减少日志输出。可选项：`true / false`。默认值：`false` |
 | -l     | EnableLog   | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。可选项：`true / false`。默认值：`false` |
 | -c     | CcacheClear | 设置是否在编译前清除 ccache。可选项：`true / false`。默认值：`false` |
-| -h     | DockerHostpath | 设置内核编译时 Docker 容器在宿主机的绝对挂载路径。默认值：`/opt/kernel` |
+| -h     | DockerHostpath | 设置内核编译时 Docker 容器在宿主机的挂载路径。默认使用当前目录。 |
 | -i     | DockerImage | 设置编译内核的 Docker 容器镜像。默认值：`ophub/armbian-trixie:arm64` |
 
 - `sudo ./recompile` : 使用默认配置编译内核。
@@ -108,7 +108,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | silent_log        | false            | 设置内核编译时是否使用静默模式减少日志输出。默认值为 `false`。功能参考 `-s` |
 | enable_log        | false            | 设置是否将内核编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。默认值：`false`，功能参考 `-l` |
 | ccache_clear      | false            | 设置是否在编译前清除 ccache。默认值为 `false`。功能参考 `-c` |
-| docker_hostpath   | /opt/kernel      | 设置内核编译时 Docker 容器在宿主机的绝对挂载路径。功能参考 `-h` |
+| docker_hostpath   | /opt/kernel      | 设置内核编译时 Docker 容器在宿主机的挂载路径。功能参考 `-h` |
 | docker_image      | ophub/armbian-trixie:arm64 | 设置编译内核的 Docker 容器镜像。功能参考 `-i` |
 
 - ### GitHub Action 输出变量说明

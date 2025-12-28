@@ -104,11 +104,11 @@ inputs:
   docker_hostpath:
     description: "Set Docker working directory"
     required: false
-    default: "/opt/kernel"
+    default: ""
   docker_image:
     description: "Select Armbian docker image"
     required: false
-    default: "ophub/armbian-trixie:arm64"
+    default: ""
 
 runs:
   using: "composite"
