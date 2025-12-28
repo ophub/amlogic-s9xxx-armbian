@@ -205,7 +205,8 @@ runs:
             [[ -n "${{ inputs.armbian_fstype }}" ]] && make_command="${make_command} -t ${{ inputs.armbian_fstype }}"
             [[ -n "${{ inputs.armbian_size }}" ]] && make_command="${make_command} -s ${{ inputs.armbian_size }}"
             [[ -n "${{ inputs.builder_name }}" ]] && make_command="${make_command} -n ${{ inputs.builder_name }}"
-            sudo ./rebuild ${make_command}
+            read -r -a make_args <<< "${make_command}"
+            sudo ./rebuild "${make_args[@]}"
 
             cd ${{ github.action_path }}/${armbian_filepath}
             # Compress Armbian image file

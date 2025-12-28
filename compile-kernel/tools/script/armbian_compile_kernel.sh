@@ -265,20 +265,12 @@ init_var() {
                 error_msg "Invalid -l parameter [ ${2} ]!"
             fi
             ;;
-        -h | --DockerHostpath)
+        # Ignore parameters used by the host system
+        -h | -i)
             if [[ -n "${2}" ]]; then
-                docker_hostpath="${2}"
                 shift 2
             else
-                error_msg "Invalid -h parameter [ ${2} ]!"
-            fi
-            ;;
-        -i | --DockerImage)
-            if [[ -n "${2}" ]]; then
-                docker_image="${2}"
-                shift 2
-            else
-                error_msg "Invalid -i parameter [ ${2} ]!"
+                error_msg "Invalid ${1} parameter [ ${2} ]!"
             fi
             ;;
         --)
@@ -893,7 +885,7 @@ loop_recompile() {
         fi
 
         # Show server start information
-        echo -e "${INFO} Server space usage before starting to compile: \n$(df -hT ${kernel_path}) \n"
+        echo -e "${INFO} Armbian space usage before starting to compile: \n$(df -hT ${kernel_path}) \n"
 
         # Check disk space size
         echo -ne "(${j}) Start compiling the kernel [\033[92m ${kernel_version} \033[0m]. "
@@ -917,8 +909,9 @@ loop_recompile() {
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to compile kernel! \n"
-echo -e "${INFO} Server running on Armbian: [ Release: ${host_release} / Host: ${arch_info} ] \n"
+echo -e "${STEPS} Start compiling the kernel with Armbian..."
+echo -e "${INFO} The Armbian environment [ ${host_release} / ${arch_info} ]"
+
 # Check script permission, supports running on Armbian system.
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
@@ -950,5 +943,5 @@ echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 loop_recompile
 
 # Show server end information
-echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${kernel_path}) \n"
-echo -e "${SUCCESS} All process completed successfully."
+echo -e "${STEPS} Armbian space usage after compilation: \n$(df -hT ${kernel_path}) \n"
+echo -e "${SUCCESS} Kernel compiled successfully"
