@@ -61,7 +61,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:z:l:g:h:i:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:l:f:h:i:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -77,7 +77,7 @@ init_var() {
             shift 2
             ;;
         # Ignore parameters used by the Armbian Docker container
-        -k | -a | -n | -m | -p | -r | -t | -c | -d | -s | -z | -l | -g)
+        -k | -a | -n | -m | -p | -r | -t | -c | -d | -s | -z | -l | -f)
             shift 2
             ;;
         --)

@@ -94,8 +94,8 @@ kernel_config_repo="https://github.com/ophub/kernel"
 kernel_config_repo_branch="main"
 kernel_config_path="kernel-config/release"
 # Set the kernel config tag directory, options: [ stable / rk3588 / rk35xx / h6 ]
-kernel_config_tags="stable"
-kernel_config_download="false"
+config_flavor="stable"
+config_download="false"
 
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/dev"
@@ -145,7 +145,7 @@ init_var() {
     echo -e "${STEPS} Start Initializing Variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
-    local options="k:a:n:m:p:r:t:c:d:s:z:l:g:h:i:"
+    local options="k:a:n:m:p:r:t:c:d:s:z:l:f:h:i:"
     parsed_args=$(getopt -o "${options}" -- "${@}")
     [[ ${?} -ne 0 ]] && error_msg "Parameter parsing failed."
     eval set -- "${parsed_args}"
@@ -167,10 +167,10 @@ init_var() {
                 error_msg "Invalid -k parameter [ ${2} ]!"
             fi
             ;;
-        -g | --KernelConfig)
+        -f | --configFlavor)
             if [[ -n "${2}" ]]; then
-                kernel_config_tags="${2}"
-                kernel_config_download="true"
+                config_flavor="${2}"
+                config_download="true"
                 shift 2
             else
                 error_msg "Invalid -g parameter [ ${2} ]!"
@@ -503,7 +503,7 @@ get_kernel_config() {
     echo -e "${STEPS} Start downloading the kernel config files..."
 
     # Check if the kernel config file already exists
-    if [[ -s "${config_path}/config-${kernel_verpatch}" && "${kernel_config_download}" == "false" ]]; then
+    if [[ -s "${config_path}/config-${kernel_verpatch}" && "${config_download}" == "false" ]]; then
         echo -e "${INFO} The kernel config file [ config-${kernel_verpatch} ] already exists, skipping download."
         echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
         return
@@ -518,9 +518,9 @@ get_kernel_config() {
     [[ "${?}" -eq 0 ]] || error_msg "Failed to clone the [ ${kernel_config_repo} ] repository."
 
     rm -rf ${config_path}/*
-    cp -f ${tmp_path}/${kernel_config_path}/${kernel_config_tags}/config-* ${config_path}/
+    cp -f ${tmp_path}/${kernel_config_path}/${config_flavor}/config-* ${config_path}/
     [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
-    echo -e "${INFO} Kernel config files [ ${kernel_config_tags} ] downloaded to [ ${config_path} ] directory."
+    echo -e "${INFO} Kernel config files [ ${config_flavor} ] downloaded to [ ${config_path} ] directory."
     echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
 }
 
