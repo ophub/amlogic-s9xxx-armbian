@@ -29,7 +29,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 - ### Running on the Armbian system
 
-You can compile the kernel in the official [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) system, or run the Armbian system in a [Docker](https://hub.docker.com/u/ophub) container on an Arm64-based Ubuntu/Debian system to compile the kernel—the compilation method is the same. The method for creating the Docker image of the Armbian system can refer to the [armbian_docker](./tools/script/docker) build script.
+You can compile the kernel in the [Armbian](https://github.com/ophub/amlogic-s9xxx-armbian/releases) system, or run the Armbian system in a [Docker](https://hub.docker.com/u/ophub) container on Ubuntu/Debian system to compile the kernel. The method of making the Armbian system Docker image can refer to the [armbian_docker](./tools/script/docker) production script.
 
 1. Update local compilation environment and configuration files: `armbian-kernel -u`
 
@@ -95,7 +95,7 @@ These parameters correspond to the `local compilation commands`. Please refer to
 |------------------|---------------|-----------------------------------------------------------------|
 | build_target     | kernel        | Fixed parameter `kernel`, set the compilation target to the kernel.|
 | kernel_source    | unifreq       | Specifies the source code repository for compiling the kernel. Default value is `unifreq`. Refer to `-r` for functionality. |
-| kernel_version   | 6.1.y_5.15.y  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
+| kernel_version   | 6.1.y_6.12.y  | Specifies the kernel name, such as `5.15.100`. Refer to `-k` for functionality. |
 | kernel_auto      | true          | Sets whether to automatically adopt the latest version of the same series kernel. Default value is `true`. Refer to `-a` for functionality. |
 | kernel_package   | all           | Sets the package list for making the kernel. Default value is `all`. Refer to `-m` for functionality. |
 | kernel_sign      | -ophub        | Sets the kernel custom signature. Default value is `-ophub`. Refer to `-n` for functionality. |
@@ -107,8 +107,8 @@ These parameters correspond to the `local compilation commands`. Please refer to
 | silent_log       | false         | Set whether to use silent mode to reduce log output when compiling the kernel. Default value is `false`. Refer to `-s` for functionality. |
 | enable_log       | false         | Set whether to log the kernel compilation process to a log file: `/var/log/kernel_compile_*.log`. Default value: `false`. Refer to `-l` for functionality. |
 | ccache_clear     | false         | Set whether to clear the cache before compiling the kernel. Default value is `false`. Refer to `-c` for functionality. |
-| docker_hostpath   | /opt/kernel      | Set the absolute host mount path for kernel compilation. Refer to `-h` for functionality. |
-| docker_image      | ophub/armbian-trixie:arm64 | Set the Docker container image for kernel compilation. Refer to `-i` for functionality. |
+| docker_hostpath  | .             | Set the host mount path for kernel compilation. Defaults to the current working directory. Refer to `-h` for functionality. |
+| docker_image     | ophub/armbian-trixie:arm64 | Set the Docker container image for kernel compilation. Refer to `-i` for functionality. |
 
 - ### GitHub Action Output Variables
 
