@@ -43,7 +43,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -k     | Kernel      | 指定 kernel 名称，如 `-k 5.15.100`。多个内核使用 `_` 进行连接，如 `-k 5.15.100_5.15.50`。使用 `-k all` 代表编译全部主线内核，当前等价于 `-k 5.10.y_5.15.y_6.1.y_6.6.y_6.12.y`，内核列表会随着上游内核源码仓库 [unifreq](https://github.com/unifreq) 的维护情况动态调整。 |
 | -a     | AutoKernel  | 设置是否自动采用同系列最新版本内核。当为 `true` 时，将自动查找在 `-k` 中指定的内核如 `5.15.100` 的同系列是否有更新的版本，如有 `5.15.100` 之后的最新版本时，将自动更换为最新版。设置为 `false` 时将编译指定版本内核。默认值：`true` |
 | -m     | MakePackage | 设置制作内核的包列表。当设置为 `all` ，将制作 `Image, modules, dtbs` 的全部文件。当设置值为 `dtbs` 时仅制作 3 个 dtbs 文件。默认值：`all` |
-| -f     | configFlavor | 设置从内核仓库下载指定配置文件 `config-*` 文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件并且未设置下载时将忽略。可选项是内核仓库里存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：[ `stable / rk3588 / rk35xx / h6` ]。默认值：`stable` |
+| -f     | configFlavor | 设置从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 里下载指定配置文件 `config-*` 文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件并且未设置下载时将忽略。可选项是内核仓库里存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：[ `stable` / `rk3588` / `rk35xx` / `h6` ]。默认值：`stable` |
 | -p     | AutoPatch   | 设置是否使用自定义内核补丁。当设置为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
 | -n     | CustomName  | 设置内核自定义签名。当设置为 `-ophub` ，生成的内核名称为 `5.15.100-ophub` 。设置自定义签名时请勿包含空格。默认值：`-ophub` |
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
@@ -57,7 +57,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 - `sudo ./recompile` : 使用默认配置编译内核。
 - `sudo ./recompile -k 5.15.100` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
-- `sudo ./recompile -k 5.15.100 -g stable` : 使用默认配置，并通过 `-k 5.15.100` 参数指定需要编译的内核版本，通过 `-g stable` 参数指定从内核仓库下载 `stable` 目录下的配置文件。
+- `sudo ./recompile -k 5.15.100 -f stable` : 使用默认配置，并通过 `-k 5.15.100` 参数指定需要编译的内核版本，通过 `-f stable` 参数指定从内核仓库下载 `stable` 目录下的配置文件。
 - `sudo ./recompile -k 5.15.100 -a true` : 使用默认配置，并通过 `-a` 参数设置编译内核时，是否自动升级到同系列最新内核。
 - `sudo ./recompile -k 5.15.100 -n -ophub` : 使用默认配置，并通过 `-n` 参数设置内核自定义签名。
 - `sudo ./recompile -k 5.15.100 -m dtbs` : 使用默认配置，并通过 `-m` 参数指定仅制作 dtbs 文件。
@@ -100,9 +100,9 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_package    | all              | 设置制作内核的包列表。默认值为 `all`。功能参考 `-m`             |
 | kernel_sign       | -ophub           | 设置内核自定义签名。默认值为 `-ophub`。功能参考 `-n`             |
 | kernel_toolchain  | gcc              | 设置编译内核的工具链。默认值为 `gcc`。功能参考 `-t`             |
-| config_flavor     | stable           | 设置从内核仓库下载指定配置文件 `config-*` 文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件并且未设置下载时将忽略。可选项是内核仓库里存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：[ `stable / rk3588 / rk35xx / h6` ]。默认值：`stable`。优先级大于 `kernel_config` 设置。 |
+| config_flavor     | stable           | 设置从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 里下载指定配置文件 `config-*` 文件到本地 [tools/config](tools/config) 目录。当本地已经有内核版本对应的配置文件，并且未设置此参数进行指定配置文件下载时将忽略下载。可选项是内核仓库里存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：[ `stable` / `rk3588` / `rk35xx` / `h6` ]。默认值：`stable`。如果同时设置了 `kernel_config` 参数时，最终采用的是 `config_flavor` 的配置文件。这 2 个参数是二选一，你可以通过不同参数选择使用 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 的内核配置文件，或者使用你仓库的配置文件。功能参考 `-f` |
 | kernel_config     | false            | 默认使用 [tools/config](tools/config) 目录下的配置模板。你可以设置编译内核的配置文件在你仓库中的存放目录，如 `kernel/config_path` 。该目录下存储的配置模板必须以内核的主版本命名，如`config-5.10`、`config-5.15`等。 |
-| kernel_patch      | false            | 设置自定义内核补丁目录。 |
+| kernel_patch      | false            | 设置自定义内核补丁文件在你仓库中的目录。如果设置此参数，在编译前会自动从你仓库指定的目录下载内核补丁文件。未设置则忽略。 |
 | auto_patch        | false            | 设置是否使用自定义内核补丁。默认值为 `false`。功能参考 `-p` |
 | compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值为 `xz`。功能参考 `-z` |
 | delete_source     | false            | 设置内核编译结束后是否删除内核源码。默认值为 `false`。功能参考 `-d` |
