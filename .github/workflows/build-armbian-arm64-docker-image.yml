@@ -47,19 +47,39 @@ jobs:
         id: down
         if: (!cancelled())
         run: |
-          # Get Armbian file
-          armbian_url="$(curl \
-                            --header "authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                            -s "https://api.github.com/repos/${{ github.repository }}/releases?per_page=20" |
-                            grep -o "Armbian_${{ inputs.source_branch }}_arm64_.*/.*rootfs.tar.gz" |
-                            sort -urV |
-                            head -n 1
-                        )"
-          [[ -z "${armbian_url}" ]] && echo -e "Armbian file not found!" && exit 1
+          # Get Armbian rootfs file
+          latest_version=$(curl -s \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
+              jq -r --arg RTK "Armbian_${{ inputs.source_branch }}_arm64_" \
+              --arg BOARD "rootfs" \
+              '[.[] | select(.tag_name | contains($RTK))] |
+              map(.assets[] | select(.name | contains($BOARD) and endswith(".tar.gz"))) |
+              sort_by(.updated_at) |
+              reverse |
+              .[0] |
+              {data: .updated_at, url: .url, name: .name}')
 
+          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
+              echo "Invalid Armbian rootfs file download address."
+              exit 1
+          }
+
+          # Get URL and filename separately
+          latest_url="$(echo ${latest_version} | jq -r '.url')"
+          armbian_filename="$(echo ${latest_version} | jq -r '.name')"
+
+          # Download using API method (add octet-stream header)
+          echo "Downloading: ${armbian_filename}"
           [[ -d "armbian" ]] || mkdir -p armbian
-          curl -fsSL "https://github.com/${{ github.repository }}/releases/download/${armbian_url}" -o "armbian/$(basename ${armbian_url})"
-          [[ "${?}" -ne "0" ]] && echo "Armbian file download failed." && exit 1
+          curl -fsSL \
+               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/octet-stream" \
+               "${latest_url}" \
+               -o "armbian/${armbian_filename}"
+          [[ "${?}" -ne "0" ]] && echo "Download failed." && exit 1
+
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Build the Docker image
