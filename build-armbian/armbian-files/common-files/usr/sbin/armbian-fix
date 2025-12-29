@@ -16,6 +16,8 @@
 #
 #=============================== Set default parameters ===============================
 #
+export DEBIAN_FRONTEND=noninteractive
+
 # Set the armbian release check file
 armbian_release_file="/etc/armbian-release"
 armbian_image_file="/etc/armbian-image-release"
@@ -66,13 +68,28 @@ echo "" >${fix_log} && tolog "Start fixing..."
 
 # Remove packages
 sudo apt-get clean -y && sudo rm -rf /var/cache/apt/* && sudo rm -rf /var/lib/apt/* && tolog "20. Clean up local installation packages"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-image-*)" ]] && sudo apt-get remove -qq --purge -y linux-image-* && tolog "21. Remove linux-image-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-dtb-*)" ]] && sudo apt-get remove -qq --purge -y linux-dtb-* && tolog "22. Remove linux-dtb-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep linux-u-boot-*)" ]] && sudo apt-get remove -qq --purge -y linux-u-boot-* && tolog "23. Remove linux-u-boot-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli-*)" ]] && sudo apt-mark hold armbian-bsp-cli-* && tolog "24. Hold armbian-bsp-cli-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools)" ]] && sudo apt-mark hold u-boot-tools && tolog "25. Hold u-boot-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools)" ]] && sudo apt-mark hold sunxi-tools && tolog "26. Hold sunxi-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools*)" ]] && sudo apt-mark hold initramfs-tools* && tolog "27. Hold initramfs-tools*"
+
+# 21. Remove linux-image-*
+pkg_linux_image=$(dpkg -l | awk '{print $2}' | grep "^linux-image-" || true)
+if [[ -n "${pkg_linux_image}" ]]; then
+    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_image} 2>/dev/null && tolog "21. Remove linux-image-*"
+fi
+# 22. Remove linux-dtb-*
+pkg_linux_dtb=$(dpkg -l | awk '{print $2}' | grep "^linux-dtb-" || true)
+if [[ -n "${pkg_linux_dtb}" ]]; then
+    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_dtb} 2>/dev/null && tolog "22. Remove linux-dtb-*"
+fi
+# 23. Remove linux-u-boot-*
+pkg_linux_uboot=$(dpkg -l | awk '{print $2}' | grep "^linux-u-boot-" || true)
+if [[ -n "${pkg_linux_uboot}" ]]; then
+    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_uboot} 2>/dev/null && tolog "23. Remove linux-u-boot-*"
+fi
+
+# Hold packages
+[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli-)" ]] && sudo apt-mark hold armbian-bsp-cli-* 2>/dev/null && tolog "24. Hold armbian-bsp-cli-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools)" ]] && sudo apt-mark hold u-boot-tools 2>/dev/null && tolog "25. Hold u-boot-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools)" ]] && sudo apt-mark hold sunxi-tools 2>/dev/null && tolog "26. Hold sunxi-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools)" ]] && sudo apt-mark hold initramfs-tools* 2>/dev/null && tolog "27. Hold initramfs-tools*"
 
 # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
@@ -109,15 +126,15 @@ quotes_cron="/etc/cron.daily/armbian-quotes"
 # Remove motd-news service
 motd_timer="/usr/lib/systemd/system/motd-news.timer"
 [[ -f "${motd_timer}" ]] && {
-    sudo systemctl stop motd-news.timer
-    sudo systemctl disable motd-news.timer
+    sudo systemctl stop motd-news.timer 2>/dev/null
+    sudo systemctl disable motd-news.timer 2>/dev/null
     sudo rm -f ${motd_timer}
     tolog "56. Disable motd-news.timer"
 }
 motd_service="/usr/lib/systemd/system/motd-news.service"
 [[ -f "${motd_service}" ]] && {
-    sudo systemctl stop motd-news.service
-    sudo systemctl disable motd-news.service
+    sudo systemctl stop motd-news.service 2>/dev/null
+    sudo systemctl disable motd-news.service 2>/dev/null
     sudo rm -f ${motd_service}
     tolog "57. Disable motd-news.service"
 }
@@ -150,10 +167,10 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
 # Confirm device information
 [[ -f "${ophub_release_file}" ]] && {
     # Get welcome banner value
-    family_name="$(cat ${ophub_release_file} | grep -E "^FAMILY=" | cut -d"'" -f2)"
-    platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2)"
-    soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
-    board_name="$(cat ${ophub_release_file} | grep -E "^BOARD=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g")"
+    family_name="$(cat ${ophub_release_file} | grep -E "^FAMILY=" | cut -d"'" -f2 || true)"
+    platform_name="$(cat ${ophub_release_file} | grep -E "^PLATFORM=" | cut -d"'" -f2 || true)"
+    soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g" || true)"
+    board_name="$(cat ${ophub_release_file} | grep -E "^BOARD=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g" || true)"
 
     # Adjustment parameter name for ANDROID_UBOOT
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && {
@@ -270,24 +287,12 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
         tolog "91. Root partition resized successfully"
 }
 
-# Update the MAC address for the wireless network card
-[[ -d "/lib/firmware" ]] && {
-    find "/lib/firmware" \
-        -type f -name "*.txt" ! -xtype l \
-        -exec grep -q '^macaddr=.*' {} \; \
-        -exec sh -c '
-        new_mac=$(openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//; s/^./2/")
-        sed -i "s/^macaddr=.*/macaddr=${new_mac}/" "${1}"
-    ' _ {} \; 2>/dev/null
-    tolog "92. Update the MAC address for the wireless network card"
-}
-
 # Hidd the IP address of WAN & IPv6
 ip_info_file="/etc/update-motd.d/20-ip-info"
 [[ -f "${ip_info_file}" ]] && {
     sed -i '/^get_wan.*_address/s/{.*/{ true; }/' ${ip_info_file}
     sed -i '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' ${ip_info_file}
-    tolog "93. Hide the IP address of WAN & IPv6"
+    tolog "92. Hide the IP address of WAN & IPv6"
 }
 
 # Show end message
