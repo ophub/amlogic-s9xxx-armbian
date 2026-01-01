@@ -20,8 +20,9 @@ on:
         type: choice
         options:
           - all
-          - top55
-          - after55
+          - first55
+          - from55
+          - last20
           - a311d-oes_s922x-oes-plus_wxy-oect
           - nsy-g16-plus_nsy-g68-plus_bdy-g18-pro
           - s905d_s905x3_s912_s922x-ct2000

@@ -279,7 +279,7 @@ check_data() {
     [[ -f "${model_conf}" ]] || error_msg "Missing model config file: [ ${model_conf} ]"
 
     # Get a list of build devices
-    if [[ "${build_board}" =~ ^(all|top55|after55)$ ]]; then
+    if [[ "${build_board}" =~ ^(all|first55|from55|last20)$ ]]; then
         board_list=":(yes)"
         build_armbian=($(
             cat ${model_conf} |
@@ -294,13 +294,18 @@ check_data() {
     [[ "${#build_armbian[@]}" -eq 0 ]] && error_msg "The [ BOARD ] is missing, stop building."
 
     # Get the list of boards before the first 55
-    [[ "${build_board}" == "top55" ]] && {
+    [[ "${build_board}" == "first55" ]] && {
         build_armbian=("${build_armbian[@]:0:55}")
         board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
     }
     # Get the list of boards after the first 55
-    [[ "${build_board}" == "after55" ]] && {
+    [[ "${build_board}" == "from55" ]] && {
         build_armbian=("${build_armbian[@]:55}")
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
+    }
+    # Get the list of boards after the last 20
+    [[ "${build_board}" == "last20" ]] && {
+        build_armbian=("${build_armbian[@]: -20}")
         board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
     }
 
