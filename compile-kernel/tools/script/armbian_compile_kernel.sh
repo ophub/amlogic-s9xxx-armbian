@@ -665,22 +665,22 @@ compile_kernel() {
     echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
     make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" Image modules dtbs -j${PROCESS}
     #make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully." || error_msg "Kernel compilation failed."
 
     # Install modules
     echo -e "${STEPS} Install modules ..."
     make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" INSTALL_MOD_PATH=${output_path}/modules modules_install
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully." || error_msg "Modules installation failed."
 
     # Strip debug information
     STRIP="${CROSS_COMPILE}strip"
     find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully." || echo -e "${WARNING} The modules stripping failed."
 
     # Install headers
     echo -e "${STEPS} Install headers ..."
     headers_install
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The headers is installed successfully."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The headers is installed successfully." || error_msg "Headers installation failed."
 }
 
 generate_uinitrd() {
