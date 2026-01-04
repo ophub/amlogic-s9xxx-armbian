@@ -322,16 +322,6 @@ EOF
     sed -i "s|^BOOT_CONF=.*|BOOT_CONF='${BOOT_CONF}'|g" ${ophub_release_file}
     sed -i "s|^DISK_TYPE=.*|DISK_TYPE='emmc'|g" ${ophub_release_file}
 
-    # Update the MAC address for the wireless network card
-    echo -e "${INFO} Update the MAC address for the wireless network card."
-    find "${DIR_INSTALL}/lib/firmware" \
-        -type f -name "*.txt" ! -xtype l \
-        -exec grep -q '^macaddr=.*' {} \; \
-        -exec sh -c '
-        new_mac=$(openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//; s/^./2/")
-        sed -i "s/^macaddr=.*/macaddr=${new_mac}/" "${1}"
-    ' _ {} \; 2>/dev/null
-
     # Remove useless scripts
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
     rm -f ${DIR_INSTALL}/root/.no_rootfs_resize

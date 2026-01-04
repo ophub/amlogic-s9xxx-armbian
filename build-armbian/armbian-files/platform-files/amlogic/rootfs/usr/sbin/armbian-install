@@ -576,16 +576,6 @@ EOF
     sed -i "s|^MLUBOOT_STATUS=.*|MLUBOOT_STATUS='${auto_mainline_uboot}'|g" ${ophub_release_file}
     sed -i "s|^AMPART_STATUS=.*|AMPART_STATUS='${AMPART_STATUS}'|g" ${ophub_release_file}
 
-    # Update the MAC address for the wireless network card
-    echo -e "${INFO} Update the MAC address for the wireless network card."
-    find "${DIR_INSTALL}/lib/firmware" \
-        -type f -name "*.txt" ! -xtype l \
-        -exec grep -q '^macaddr=.*' {} \; \
-        -exec sh -c '
-        new_mac=$(openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//; s/^./2/")
-        sed -i "s/^macaddr=.*/macaddr=${new_mac}/" "${1}"
-    ' _ {} \; 2>/dev/null
-
     # Remove useless scripts
     rm -f ${DIR_INSTALL}/usr/sbin/armbian-tf
     rm -f ${DIR_INSTALL}/root/.no_rootfs_resize
