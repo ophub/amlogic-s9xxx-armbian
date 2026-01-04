@@ -70,6 +70,8 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
           - [12.7.2.3.1 Static IP address - IPv4](#127231-static-ip-address---ipv4)
           - [12.7.2.3.2 DHCP Obtains Dynamic IP Address - IPv4 / IPv6](#127232-dhcp-obtains-dynamic-ip-address---ipv4--ipv6)
         - [12.7.2.4 Modify Network Connection MAC Address](#12724-modify-network-connection-mac-address)
+          - [12.7.2.4.1 Method 1: Use the `nmcli` command to change the MAC address](#127241-method-1-use-the-nmcli-command-to-change-the-mac-address)
+          - [12.7.2.4.2 Method 2: Modify the MAC address via a configuration file](#127242-method-2-modify-the-mac-address-via-a-configuration-file)
         - [12.7.2.5 How to Disable IPv6](#12725-how-to-disable-ipv6)
       - [12.7.3 How to Enable Wireless](#1273-how-to-enable-wireless)
       - [12.7.4 How to Enable Bluetooth](#1274-how-to-enable-bluetooth)
@@ -1009,9 +1011,9 @@ ip -c -br address
 
 ##### 12.7.2.4 Modify Network Connection MAC Address
 
-Modify (clone) the `MAC Address` on the network connection `eth0` and take effect immediately to solve the problem of LAN MAC address conflict.
+Modify the MAC address on the network connection to resolve MAC address conflicts on the local network.
 
-*Applicable to wired connections / wireless connections
+###### 12.7.2.4.1 Method 1: Use the `nmcli` command to change the MAC address
 
 ```shell
 # Use the `nmcli connection show` command to view the network interface name
@@ -1036,6 +1038,29 @@ ip -c a show "${MYCON}"
 
 * When creating or modifying some network parameters, the network connection may be disconnected and reconnected to the network.
 * Due to different software and hardware environments (box, system, network equipment, etc.), it takes about `1-15` seconds to take effect. If it does not take effect for a longer time, it is recommended to check the software and hardware environment.
+
+###### 12.7.2.4.2 Method 2: Modify the MAC address via a configuration file
+
+Add a MAC address override configuration file.
+
+```shell
+sudo mkdir -p /etc/systemd/network/
+sudo nano /etc/systemd/network/10-mac-override.link
+```
+
+Add the following content:
+
+```shell
+[Match]
+# Specify the network interface name whose MAC address needs to be changed
+OriginalName=eth0
+
+[Link]
+# Set a valid MAC address
+MACAddress=02:55:66:77:88:99
+```
+
+The changes take effect after `reboot`.
 
 ##### 12.7.2.5 How to Disable IPv6
 
