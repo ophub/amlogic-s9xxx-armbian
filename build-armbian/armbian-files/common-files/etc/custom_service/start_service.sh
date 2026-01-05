@@ -109,9 +109,11 @@ fi
 # Led display control
 openvfd_enable="no"
 openvfd_boxid="15"
-openvfd_config="15"
-if [[ "${openvfd_enable}" == "yes" && -n "${openvfd_boxid}" && -n "${openvfd_config}" && -x "/usr/sbin/armbian-openvfd" ]]; then
-    (armbian-openvfd "${openvfd_boxid}" && armbian-openvfd "${openvfd_config}") &
+if [[ -n "${openvfd_boxid}" && "${openvfd_boxid}" != 0 && -x "/usr/sbin/armbian-openvfd" ]]; then
+    (armbian-openvfd "${openvfd_boxid}") &
+    if [[ "${openvfd_enable}" == "no" ]]; then
+        (armbian-openvfd 0) &
+    fi
     log_message "OpenVFD service execution attempted."
 fi
 

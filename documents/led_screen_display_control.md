@@ -31,7 +31,6 @@ vfd_gpio_dat='0,69,0'
 # Execute the following command in the terminal to enable the openvfd service
 sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
 sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
-sed -i 's|^#*openvfd_config=.*|openvfd_config="15"|g' /etc/custom_service/start_service.sh
 ```
 
 - Everyone is welcome to test and share their device's configuration file (diy.conf) to benefit more people.
