@@ -145,5 +145,12 @@ if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$" || true)" ]]; t
     log_message "PVE proxy service restart attempted."
 fi
 
+# Maximize root partition size
+todo_rootfs_resize="/root/.no_rootfs_resize"
+[[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
+    armbian-tf >/dev/null 2>&1 &
+    log_message "Root partition resized successfully."
+}
+
 # Finalization
 log_message "All custom services have been processed."
