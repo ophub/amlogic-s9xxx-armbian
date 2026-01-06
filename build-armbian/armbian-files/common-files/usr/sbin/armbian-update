@@ -239,7 +239,10 @@ init_var() {
     # Set kernel download tags
     [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|h6)")" ]] && KERNEL_TAGS="stable"
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|h6)")" ]] && {
+        echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ], reset to default [ stable ]."
+        KERNEL_TAGS="stable"
+    }
 
     # Check if the mainline u-boot exists
     [[ "${auto_mainline_uboot}" == "yes" ]] && {
@@ -280,14 +283,6 @@ query_version() {
         local_kernel_version="$(echo ${try_boot} | sed 's/boot-\(.*\)\.tar\.gz/\1/')"
         echo -e "${INFO} Found the kernel in the current directory: [ ${local_kernel_version} ]"
 
-        echo -e "${INFO} Current version: [ ${current_kernel_signature} ], Local version: [ ${local_kernel_version} ]."
-        if [[ "${current_kernel_signature}" == "${local_kernel_version}" ]]; then
-            echo -e "${FINISH} This is the same version, no update is needed."
-            exit 0
-        else
-            echo -e "${INFO} The update will be performed using the local kernel."
-        fi
-
         # Use local kernel
         inputs_kernel="$(echo ${try_boot} | grep -oE '[1-9].[0-9]{1,3}.[0-9]+')"
 
@@ -326,13 +321,6 @@ query_version() {
 
         # Use the latest version
         inputs_kernel="${latest_version}"
-
-        # Online kernel version comparison
-        echo -e "${INFO} Current version: [ ${current_kernel} ], Latest version: [ ${inputs_kernel} ]."
-        [[ "${current_kernel}" == "${inputs_kernel}" ]] && {
-            echo -e "${FINISH} The latest version is already installed, no update is needed."
-            exit 0
-        }
     }
 
     sync && echo ""
@@ -369,8 +357,18 @@ check_kernel() {
 
     # Check if the kernel is already installed
     [[ "${current_kernel_signature}" == "${kernel_name}" ]] && {
-        echo -e "${FINISH} This kernel is the same as the current one, no update is needed."
-        exit 0
+        echo -e "${INFO} Current kernel (${current_kernel_signature}) is already the latest version."
+        echo -ne "${PROMPT} Do you want to force update? [y/n]: "
+        read force_update
+        case "${force_update,,}" in
+        y*)
+            echo -e "${INFO} Start force updating..."
+            ;;
+        *)
+            echo -e "${FINISH} Update cancelled."
+            exit 0
+            ;;
+        esac
     }
 
     # Identify Kernel Version
