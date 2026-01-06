@@ -2,7 +2,7 @@
 
 - The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The command file for the `Armbian` system is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the command file for the `OpenWrt` system is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If they are not currently in the system, they can be manually uploaded, and file execution permissions can be assigned: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
 
-- Upgrade the system kernel to the latest version. The `Armbian` system uses the `armbian-update` command for upgrades. The `OpenWrt` system upgrades using `System Menu` → `Amlogic Service` → `Online Download Update`.
+- Upgrade the system kernel to the latest version. The `Armbian` system uses the `armbian-sync` command for upgrades. The `OpenWrt` system upgrades using `System Menu` → `Amlogic Service` → `Online Download Update`.
 
 - Currently, `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, `tx3.conf`, `x96air.conf`, `x88pro-x3.conf` and other devices have been tested. Configurations for other devices can be modified by checking: [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf). The second field value in the corresponding content in the configuration files from these two websites needs to be reduced by `1`. For example:
 
@@ -31,6 +31,8 @@ vfd_gpio_dat='0,69,0'
 # Execute the following command in the terminal to enable the openvfd service
 sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
 sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
+# Some devices require a restart to clear 'BOOT' and related messages
+sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/start_service.sh
 ```
 
 - Everyone is welcome to test and share their device's configuration file (diy.conf) to benefit more people.
@@ -59,7 +61,7 @@ sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_se
 
 - 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd)。如果当前系统中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`
 
-- 将系统的内核升级到最新版本。`Armbian` 系统使用 `armbian-update` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
+- 将系统的内核升级到最新版本。`Armbian` 系统使用 `armbian-sync` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
 
 - 目前有 `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf`、`x96air.conf` 和 `x88pro-x3.conf` 等设备经过测试，其他设备的配置可以查看：[arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) 和 [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) 进行修改，需要把这两个网站中配置文件里对应内容中进行调整，把第二个字段的值减 `1` 后使用，如：
 
@@ -88,6 +90,8 @@ vfd_gpio_dat='0,69,0'
 # 在终端执行以下命令启用 openvfd 服务
 sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
 sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
+# 有些设备需要重启 OpenVFD 服务以清除 'BOOT' 等相关信息
+sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/start_service.sh
 ```
 
 - 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
