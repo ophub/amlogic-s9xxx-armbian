@@ -23,6 +23,8 @@ vfd_gpio_dat='0,69,0'
 
 - The command `armbian-openvfd 0` can disable the LED display and clear the system process. Before each new configuration test, please first execute this disable command, and then execute `armbian-openvfd 99` to test the modified configuration.
 
+- However, some boxes may set a message on boot before Linux (e.g. displaying `BOOT`). To clear this message, execute `armbian-openvfd 0` to stop existing services, then `armbian-openvfd <boxid>` to take control of the LED display. If you want to disable the display, execute `armbian-openvfd 0` again.
+
 - After the screen display is normal, you can add it to the boot autostart task, change the `15` in the following command to your `box number`:
 
 ```yaml
@@ -77,6 +79,8 @@ vfd_gpio_dat='0,69,0'
 - 将配置文件命名为 `diy.conf` 并上传至 `/usr/share/openvfd/conf` 目录下，输入命令 `armbian-openvfd 99` 进行测试。
 
 - 通过命令 `armbian-openvfd 0` 可以禁用 LED 显示并清除系统进程，在每次测试新的配置前，请先执行此禁用命令，再执行 `armbian-openvfd 99` 进行更改后的配置测试。
+
+- 有些设备可能会在 Linux 启动之前在开机时显示一条信息（例如显示 `BOOT`）。要清除这条信息，请先执行 `armbian-openvfd 0` 以停止现有服务，然后执行 `armbian-openvfd <boxid>` 来接管 LED 显示。如果你想禁用显示屏，再次执行 `armbian-openvfd 0` 即可。
 
 - 屏幕显示正常后，可以添加至开机自启动任务，下面命令中的 `15` 改为你的 `盒子编号` ：
 
