@@ -537,15 +537,17 @@ copy_rootfs() {
     echo -e "${INFO} Copying ROOTFS ..."
     # Create relevant directories
     mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
-    chmod 777 ${DIR_INSTALL}/tmp
+    chmod 1777 ${DIR_INSTALL}/tmp
     # Copy the relevant directory
     COPY_SRC="etc home opt root selinux srv usr var"
     for src in ${COPY_SRC}; do
-        echo -e "${INFO} Copying [ ${src} ] ..."
-        tar -cf - ${src} | (
-            cd ${DIR_INSTALL}
-            tar -mxf -
-        )
+        if [[ -d "${src}" ]]; then
+            echo -e "${INFO} Copying [ ${src} ] ..."
+            tar -cf - ${src} | (
+                cd ${DIR_INSTALL}
+                tar -xpf -
+            )
+        fi
     done
     # Create relevant symbolic link
     ln -sf usr/bin ${DIR_INSTALL}/bin
