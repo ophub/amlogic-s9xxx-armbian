@@ -1096,6 +1096,15 @@ ip address show eth0
 1
 ```
 
+也可以通过修改 `/etc/sysctl.conf` 文件来禁用 IPv6：
+
+```shell
+# Disable IPv6 by default
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+```
+
 #### 12.7.3 如何启用无线
 
 有的设备支持使用无线，启用方法如下：

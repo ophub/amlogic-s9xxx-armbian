@@ -1099,6 +1099,15 @@ Step 5, verify whether the `/proc/sys/net/ipv6/conf/eth0/disable_ipv6` file now 
 1
 ```
 
+Alternatively, you can disable IPv6 by default by adding the following lines to the `/etc/sysctl.conf` file:
+
+```shell
+# Disable IPv6 by default
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+```
+
 #### 12.7.3 How to Enable Wireless
 
 Some devices support using wireless, the enablement method is as follows:
