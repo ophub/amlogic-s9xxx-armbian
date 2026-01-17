@@ -73,12 +73,14 @@ on:
           - lz-k3568
           - mrkaio-m68s
           - nanopc-t6
+          - nanopi-m5
           - nanopi-r5c
           - nanopi-r5s
           - nsy-g16-plus
           - nsy-g68-plus
           - orangepi-5-plus
           - orangepi-5b
+          - orangepi-zero3
           - panther-x2
           - photonicat
           - r66s
