@@ -413,7 +413,7 @@ create_partition() {
     fi
 
     # Format emmc disk
-    echo -e "${INFO} Start create MBR and partittion."
+    echo -e "${INFO} Start create MBR and partition."
     parted -s "${DEV_EMMC}" mklabel msdos
     parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB
     parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100%
@@ -444,7 +444,7 @@ copy_bootfs() {
     PART_BOOT="${DEV_EMMC}p1"
 
     if grep -q ${PART_BOOT} /proc/mounts; then
-        echo -e "${INFO} Unmounting BOOT partiton."
+        echo -e "${INFO} Unmounting BOOT partition."
         umount -f ${PART_BOOT}
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_BOOT} ]."
     fi
@@ -514,7 +514,7 @@ copy_rootfs() {
     PART_ROOT="${DEV_EMMC}p2"
 
     if grep -q ${PART_ROOT} /proc/mounts; then
-        echo -e "${INFO} Unmounting ROOT partiton."
+        echo -e "${INFO} Unmounting ROOT partition."
         umount -f ${PART_ROOT}
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_ROOT} ]."
     fi
