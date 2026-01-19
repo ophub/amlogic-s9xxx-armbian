@@ -27,6 +27,10 @@ log_message() {
 # Start of the script.
 log_message "Start the custom service..."
 
+# Disabled verbose kernel messages on console
+dmesg -n 1 >/dev/null 2>&1 || true
+log_message "Kernel console logging level set to 1 (Panic only)."
+
 # System Identification
 # Set the release check file to identify the device type.
 ophub_release_file="/etc/ophub-release"
