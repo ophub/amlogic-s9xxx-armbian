@@ -80,6 +80,7 @@ on:
           - nanopi-r5s
           - nsy-g16-plus
           - nsy-g68-plus
+          - orangepi-3b
           - orangepi-5-plus
           - orangepi-5b
           - orangepi-zero3
