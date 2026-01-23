@@ -436,13 +436,15 @@ download_depends() {
     echo -e "${STEPS} Start downloading dependency files..."
 
     # Download Armbian u-boot files
-    [[ "$(find "${uboot_path}/rockchip" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)" -le "5" ]] && {
+    uboot_num="$(find "${uboot_path}/rockchip" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    [[ -n "${uboot_num}" && "${uboot_num}" -le "5" ]] && {
         git_pull_dir ${uboot_repo} main u-boot ${uboot_path}
         [[ "${?}" -eq 0 ]] && echo -e "${INFO} u-boot download completed." || error_msg "u-boot download failed."
     } || echo -e "${INFO} u-boot files exist, skip downloading."
 
     # Download Armbian firmware files
-    [[ "$(find "${firmware_path}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)" -le "5" ]] && {
+    firmware_num="$(find "${firmware_path}" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
+    [[ -n "${firmware_num}" && "${firmware_num}" -le "5" ]] && {
         git_pull_dir ${firmware_repo} main firmware ${firmware_path}
         [[ "${?}" -eq 0 ]] && echo -e "${INFO} firmware download completed." || error_msg "firmware download failed."
     } || echo -e "${INFO} firmware files exist, skip downloading."
