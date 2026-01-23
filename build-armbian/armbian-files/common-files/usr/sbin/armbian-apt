@@ -107,7 +107,7 @@ EOF
     focal | jammy | noble | oracular | plucky)
         cat >${armbian_source_file} <<EOF
             Types: deb
-            URIs: http://${MIRROR_URL}/ubuntu/
+            URIs: http://${MIRROR_URL}/ubuntu-ports/
             Suites: ${VERSION_CODENAME} ${VERSION_CODENAME}-security ${VERSION_CODENAME}-updates ${VERSION_CODENAME}-backports
             Components: main restricted universe multiverse
             Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
@@ -159,14 +159,14 @@ select_mirror_site() {
         5)  MIRROR_URL="opensource.nchc.org.tw" ;;
         6)  MIRROR_URL="mirrors.ocf.berkeley.edu" ;;
         7)  MIRROR_URL="mirrors.xtom.com" ;;
-        8)  MIRROR_URL="mirror.steadfast.net" ;;
+        8)  MIRROR_URL="mirrors.mit.edu" ;;
         9)  MIRROR_URL="mirror.csclub.uwaterloo.ca" ;;
-        10) MIRROR_URL="mirror.it.ubc.ca" ;;
-        11) MIRROR_URL="ftp.lysator.liu.se" ;;
+        10) MIRROR_URL="muug.ca/mirror" ;;
+        11) MIRROR_URL="ftp.openbsd.dk/mirrors" ;;
         12) MIRROR_URL="mirrors.xtom.nl" ;;
         13) MIRROR_URL="mirrors.xtom.de" ;;
         14) MIRROR_URL="mirror.yandex.ru" ;;
-        15) MIRROR_URL="mirror.cse.iitk.ac.in" ;;
+        15) MIRROR_URL="in.mirror.coganng.com" ;;
         16) MIRROR_URL="mirrors.xtom.ee" ;;
         17) MIRROR_URL="mirrors.xtom.au" ;;
         18) MIRROR_URL="mirror.yuki.net.uk" ;;
@@ -200,15 +200,15 @@ cat <<EOF
   ├──────┼───────────────────┼────────────────────────────────┤
   │   6  │  United States    │  mirrors.ocf.berkeley.edu      │
   │   7  │  United States    │  mirrors.xtom.com              │
-  │   8  │  United States    │  mirror.steadfast.net          │
+  │   8  │  United States    │  mirrors.mit.edu               │
   │   9  │  Canada           │  mirror.csclub.uwaterloo.ca    │
-  │  10  │  Canada           │  mirror.it.ubc.ca              │
+  │  10  │  Canada           │  muug.ca/mirror                │
   ├──────┼───────────────────┼────────────────────────────────┤
-  │  11  │  Sweden           │  ftp.lysator.liu.se            │
+  │  11  │  Denmark          │  ftp.openbsd.dk/mirrors        │
   │  12  │  Netherlands      │  mirrors.xtom.nl               │
   │  13  │  Germany          │  mirrors.xtom.de               │
   │  14  │  Russia           │  mirror.yandex.ru              │
-  │  15  │  India            │  mirror.cse.iitk.ac.in         │
+  │  15  │  India            │  in.mirror.coganng.com         │
   ├──────┼───────────────────┼────────────────────────────────┤
   │  16  │  Estonia          │  mirrors.xtom.ee               │
   │  17  │  Australia        │  mirrors.xtom.au               │
