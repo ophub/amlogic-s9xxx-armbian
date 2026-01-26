@@ -159,6 +159,24 @@ create_partition() {
     cd /
     echo -e "${STEPS} Start creating eMMC partition..."
 
+    # Backup the bootloader, necessary for system recovery
+    [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
+    MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
+    if [[ ! -f "${MYBOX_UBOOT}" ]]; then
+        echo -e "${INFO} Start backing up the default bootloader."
+        dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
+        [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
+    else
+        MAGIC_SIG="$(head -c 512 "${MYBOX_UBOOT}" 2>/dev/null | tail -c 2 | hexdump -e '1/1 "%02x"' 2>/dev/null || true)"
+        if [[ "${MAGIC_SIG}" != "55aa" ]]; then
+            echo -e "${INFO} Existing backup is invalid (No 55aa signature). Re-backing up..."
+            dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
+            [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
+        else
+            echo -e "${INFO} Bootloader backup file [ ${MYBOX_UBOOT} ] already exists."
+        fi
+    fi
+
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
     if [[ "${exists_pts}" -gt "0" ]]; then
@@ -171,7 +189,6 @@ create_partition() {
             ((i++))
         done
     fi
-    dd if=/dev/zero of=${DEV_EMMC} bs=1M count=16 conv=fsync
 
     # Set partition size (Unit: MiB)
     BLANK1="16"
@@ -194,6 +211,9 @@ create_partition() {
     elif [[ -n "${BOOTLOADER_IMG}" && -f "${BOOTLOADER_IMG}" ]]; then
         echo -e "${INFO} 02. Write bootloader: [ ${BOOTLOADER_IMG} ]"
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=1
+    elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
+        echo -e "${INFO} 03. Restore original bootloader from backup: [ ${MYBOX_UBOOT} ]"
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 }

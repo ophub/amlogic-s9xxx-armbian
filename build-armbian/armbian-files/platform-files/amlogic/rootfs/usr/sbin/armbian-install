@@ -335,10 +335,20 @@ create_partition() {
     # Backup the bootloader, necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
     MYBOX_UBOOT="/usr/lib/u-boot/mybox-bootloader.img"
-    [[ -f "${MYBOX_UBOOT}" ]] && rm -f ${MYBOX_UBOOT}
-    echo -e "${INFO} Start backing up the default bootloader."
-    dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
-    [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
+    if [[ ! -f "${MYBOX_UBOOT}" ]]; then
+        echo -e "${INFO} Start backing up the default bootloader."
+        dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
+        [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
+    else
+        MAGIC_SIG="$(head -c 512 "${MYBOX_UBOOT}" 2>/dev/null | tail -c 2 | hexdump -e '1/1 "%02x"' 2>/dev/null || true)"
+        if [[ "${MAGIC_SIG}" != "55aa" ]]; then
+            echo -e "${INFO} Existing backup is invalid (No 55aa signature). Re-backing up..."
+            dd if="${DEV_EMMC}" of="${MYBOX_UBOOT}" bs=1M count=4 conv=fsync
+            [[ "${?}" -eq "0" ]] || error_msg "Using dd to backup [ ${MYBOX_UBOOT} ] failed."
+        else
+            echo -e "${INFO} Bootloader backup file [ ${MYBOX_UBOOT} ] already exists."
+        fi
+    fi
 
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
@@ -352,7 +362,6 @@ create_partition() {
             ((i++))
         done
     fi
-    #dd if=/dev/zero of=${DEV_EMMC} bs=512 count=1 conv=fsync
 
     # Use the ampart partition tool
     AMPART_STATUS="no"
