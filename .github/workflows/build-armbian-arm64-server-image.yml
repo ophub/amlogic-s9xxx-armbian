@@ -76,6 +76,7 @@ on:
           - mrkaio-m68s
           - nanopc-t6
           - nanopi-m5
+          - nanopi-r3s
           - nanopi-r5c
           - nanopi-r5s
           - nsy-g16-plus
