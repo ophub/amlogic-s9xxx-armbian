@@ -1,7 +1,7 @@
 verbosity=1
 bootlogo=false
 console=both
-extraargs=cma=256M
+extraargs=cma=256M video=HDMI-A-1:1920x1080@60e
 overlay_prefix=rk3588
 fdtfile=rockchip/rk3588-friendlyelec-cm3588-nas.dtb
 rootdev=/dev/mmcblk0p2
