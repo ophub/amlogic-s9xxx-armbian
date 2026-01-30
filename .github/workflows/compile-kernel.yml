@@ -29,6 +29,7 @@ on:
           - 6.1.y
           - 6.6.y
           - 6.12.y
+          - 6.18.y
       kernel_auto:
         description: "Auto use the latest kernel"
         required: false
