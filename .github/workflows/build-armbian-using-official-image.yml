@@ -69,6 +69,7 @@ on:
           - lx-r3s
           - lz-k3568
           - mrkaio-m68s
+          - nanopc-t4
           - nanopc-t6
           - nanopi-m5
           - nanopi-r3s
