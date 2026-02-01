@@ -88,7 +88,7 @@ env:
 
 jobs:
   build:
-    runs-on: ophub/armbian-trixie:arm64
+    runs-on: ophub/armbian-trixie
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
 
     steps:
