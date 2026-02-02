@@ -105,6 +105,7 @@ Github Actions 是 Microsoft 推出的一项服务，它提供了性能配置非
     - [12.17 如何解决 Bullseye 版本没有声音的问题](#1217-如何解决-bullseye-版本没有声音的问题)
     - [12.18 如何编译 boot.scr 文件](#1218-如何编译-bootscr-文件)
     - [12.19 如何开启远程桌面和修改默认端口](#1219-如何开启远程桌面和修改默认端口)
+    - [12.20 TCP 拥塞控制优化方案](#1220-tcp-拥塞控制优化方案)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -1722,3 +1723,18 @@ sudo nano /etc/xrdp/xrdp.ini
 port=5000
 ```
 
+### 12.20 TCP 拥塞控制优化方案
+
+针对不同性能的设备，建议采用差异化的网络栈配置以获得最佳体验。请根据您的设备实际情况，编辑配置文件 `/etc/sysctl.conf` 并修改以下两行：
+- 千兆设备（高性能/现代架构）：建议使用 `fq + bbr` 组合，以最大化吞吐量并提升抗丢包能力。
+- 百兆设备（低性能/老旧架构）：建议使用 `fq_codel + cubic` 组合，以降低 CPU 负载并确保低延迟稳定性。
+
+```shell
+# 方案 A：千兆设备/高性能推荐 (Gigabit/High Performance)
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+# 方案 B：百兆设备/低性能推荐 (100M/Low Performance)
+# net.core.default_qdisc = fq_codel
+# net.ipv4.tcp_congestion_control = cubic
+```

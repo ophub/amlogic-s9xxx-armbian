@@ -105,6 +105,7 @@ GitHub Actions is a service launched by Microsoft that provides a virtual server
     - [12.17 How to Solve the Issue of No Sound in the Bullseye Version](#1217-how-to-solve-the-issue-of-no-sound-in-the-bullseye-version)
     - [12.18 How to build the boot.scr file](#1218-how-to-build-the-bootscr-file)
     - [12.19 How to Enable Remote Desktop and Modify the Default Port](#1219-how-to-enable-remote-desktop-and-modify-the-default-port)
+    - [12.20 TCP Congestion Control Optimization Guide](#1220-tcp-congestion-control-optimization-guide)
 
 ## 1. Register your own Github account
 
@@ -1728,3 +1729,19 @@ sudo nano /etc/xrdp/xrdp.ini
 port=5000
 ```
 
+### 12.20 TCP Congestion Control Optimization Guide
+
+Different network stack configurations are recommended based on device performance to ensure the best user experience. Please configure your device according to its hardware capabilities by editing `/etc/sysctl.conf` and modifying (or adding) the following lines:
+
+- Gigabit Devices (High Performance/Modern Arch): The `fq + bbr` combination is recommended to maximize throughput and improve packet loss resilience.
+- 100Mbps Devices (Low Performance/Legacy Arch): The `fq_codel + cubic` combination is suggested to minimize CPU load and maintain low-latency stability.
+
+```shell
+# Option A: Recommended for Gigabit/High Performance Devices
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+
+# Option B: Recommended for 100Mbps/Low Performance Devices
+# net.core.default_qdisc = fq_codel
+# net.ipv4.tcp_congestion_control = cubic
+```
