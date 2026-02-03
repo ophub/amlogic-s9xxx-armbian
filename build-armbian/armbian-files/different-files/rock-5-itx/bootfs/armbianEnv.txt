@@ -1,0 +1,8 @@
+verbosity=1
+bootlogo=true
+console=both
+extraargs=cma=256M
+overlay_prefix=rockchip-rk3588
+fdtfile=rockchip/rk3588-rock-5-itx.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
