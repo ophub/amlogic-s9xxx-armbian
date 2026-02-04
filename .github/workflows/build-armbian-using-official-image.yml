@@ -47,6 +47,7 @@ on:
           - eaidk-610
           - emb3531
           - fine3399
+          - firefly-jd4
           - firefly-rk3399
           - fmx1-pro
           - fmx1-pro-b
