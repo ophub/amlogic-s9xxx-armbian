@@ -213,7 +213,7 @@ create_partition() {
         dd if="${BOOTLOADER_IMG}" of="${DEV_EMMC}" conv=fsync,notrunc bs=8k seek=1
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} 03. Restore original bootloader from backup: [ ${MYBOX_UBOOT} ]"
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 count=8191
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 }

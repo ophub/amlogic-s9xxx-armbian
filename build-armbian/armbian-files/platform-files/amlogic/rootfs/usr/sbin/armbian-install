@@ -440,7 +440,7 @@ create_partition() {
     elif [[ -n "${MYBOX_UBOOT}" && -f "${MYBOX_UBOOT}" ]]; then
         echo -e "${INFO} 03. Write the mybox bootloader: [ ${MYBOX_UBOOT} ]"
         dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=1 count=444
-        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1
+        dd if="${MYBOX_UBOOT}" of="${DEV_EMMC}" conv=fsync bs=512 skip=1 seek=1 count=8191
     fi
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 }
