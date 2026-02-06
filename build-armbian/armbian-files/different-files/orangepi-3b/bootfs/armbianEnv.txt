@@ -1,7 +1,7 @@
 verbosity=1
 bootlogo=false
 console=both
-extraargs=cma=256M video=HDMI-A-1:1920x1080@60e
+extraargs=cma=256M
 overlay_prefix=rk3566
 fdtfile=rockchip/rk3566-orangepi-3b.dtb
 rootdev=/dev/mmcblk0p2
