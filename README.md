@@ -91,11 +91,12 @@ armbian-update
 | -u       | Automation   | stable/flippy/beta/rk3588/rk35xx/h6 | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel in use |
 | -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b       | yes          | yes/no        | Automatically back up the current system's kernel when updating the kernel |
+| -d       | tar          | tar/deb       | Set the type of kernel to download. If you need to compile custom drivers, it is recommended to install the `deb` package. |
 | -m       | no           | yes/no        | Use mainline u-boot |
 | -s       | None         | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h       | None         | None          | View help |
 
-Example: `armbian-update -k 5.15.50 -u stable`
+Example: `armbian-update -k 5.15 -u stable -d deb`
 
 When specifying the kernel version number through the `-k` parameter, you can accurately specify a specific version number, for example: `armbian-update -k 5.15.50`, or you can specify the kernel series vaguely, for example: `armbian-update -k 5.15`. When vaguely specified, the latest version of the specified series will be automatically used.
 

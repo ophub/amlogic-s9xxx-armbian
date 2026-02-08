@@ -584,11 +584,12 @@ armbian-update
 | -u       | 自动化        | stable/flippy/beta/rk3588/rk35xx/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
+| -d       | tar          | tar/deb       | 设置下载内核的类型。需要编译自定义驱动的推荐安装 `deb` 包。 |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
 | -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |
 
-举例: `armbian-update -k 5.15.50 -u stable`
+举例: `armbian-update -k 5.15 -u stable -d deb`
 
 通过 `-k` 参数指定内核版本号时，可以准确指定具体版本号，例如：`armbian-update -k 5.15.50`，也可以模糊指定到内核系列，例如：`armbian-update -k 5.15`，当模糊指定时将自动使用指定系列的最新版本。
 
@@ -615,15 +616,20 @@ armbian-update -s /dev/sda
 armbian-update -s
 ```
 
-如果你访问 github.com 的网络不通畅，无法在线下载更新时，可以手动下载内核，上传至 Armbian 系统的任意目录，并进入内核目录，执行 `armbian-update` 进行本地安装。如果当前目录下有成套的内核文件，将使用当前目录的内核进行更新（更新需要的 4 个内核文件是 `header-xxx.tar.gz`, `boot-xxx.tar.gz`, `dtb-xxx.tar.gz`, `modules-xxx.tar.gz`。其他内核文件不需要，如果同时存在也不影响更新，系统可以准确识别需要的内核文件）。在设备支持的可选内核里可以自由更新，如从 6.6.12 内核更新为 5.15.50 内核。
+如果您因网络问题无法访问 github.com 进行在线更新，可以手动下载内核文件并上传至 Armbian 系统的任意目录。随后进入该目录，运行 `armbian-update` 命令即可执行本地安装。若当前目录下存在完整的内核文件集，系统将优先使用本地文件进行更新。内核支持 `tar` 和 `deb` 两种格式，各自所需的 4 个核心文件如下：
 
-通过 `-r`/`-u`/`-b` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
+- `tar` 格式更新所需的 4 个文件为：`header-xxx.tar.gz`，`boot-xxx.tar.gz`，`dtb-xxx.tar.gz`，`modules-xxx.tar.gz`。
+- `deb` 格式更新所需的 4 个文件为：`linux-image-xxx.deb`，`linux-dtb-xxx.deb`，`linux-headers-xxx.deb`，`linux-libc-dev-xxx.deb`。
+- 无需移除其他无关的内核文件，即使它们同时存在也不会影响更新，系统能够精准识别所需文件。在设备支持的内核范围内，您可以自由切换版本，例如从 6.6.12 内核变更为 5.15.50 内核。
+
+通过 `-r`/`-u`/`-b`/`-d` 等参数设置的自定义选项，可以固定填写到个性化配置文件 `/etc/ophub-release` 的相关参数里，避免每次输入。对应设置为：
 
 ```shell
 # 自定义修改参数的赋值
 -r  :  KERNEL_REPO='ophub/kernel'
 -u  :  KERNEL_TAGS='stable'
 -b  :  KERNEL_BACKUP='yes'
+-d  :  DOWNLOAD_TYPE='deb'
 ```
 
 ## 11. 安装常用软件

@@ -1170,6 +1170,7 @@ refactor_rootfs() {
     echo "KERNEL_TAGS='${conf_kernel_tags}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
     echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
+    echo "DOWNLOAD_TYPE='tar'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
     echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
     echo "DISK_TYPE='usb'" >>${ophub_release_file}
