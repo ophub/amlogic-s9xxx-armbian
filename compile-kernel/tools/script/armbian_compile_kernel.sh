@@ -69,7 +69,7 @@ ophub_release_file="/etc/ophub-release"
 repo_owner="unifreq"
 repo_branch="main"
 build_kernel=("6.1.y" "6.12.y")
-all_kernel=("5.10.y" "5.15.y" "6.1.y" "6.6.y" "6.12.y")
+all_kernel=("5.10.y" "5.15.y" "6.1.y" "6.6.y" "6.12.y" "6.18.y")
 # Set whether to use the latest kernel, options: [ true / false ]
 auto_kernel="true"
 # Set whether to apply custom kernel patches, options: [ true / false ]
@@ -1227,11 +1227,7 @@ POSTINST
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${headers_deb} ] file is packaged."
 
     # 04. Create linux-dtb deb packages for each platform
-    declare -A platform_family=(
-        ["amlogic"]="meson64"
-        ["rockchip"]="rockchip64"
-        ["allwinner"]="sunxi64"
-    )
+    declare -A platform_family=(["amlogic"]="meson64" ["rockchip"]="rockchip64" ["allwinner"]="sunxi64")
     platform_list=("amlogic" "rockchip" "allwinner")
     for platform in "${platform_list[@]}"; do
         dtb_source="${output_path}/dtb/${platform}"
