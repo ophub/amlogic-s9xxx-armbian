@@ -1051,6 +1051,10 @@ refactor_rootfs() {
         sed -i "s|^FORCE_UBOOT_UPDATE=.*|FORCE_UBOOT_UPDATE=\"no\"|g" ${armbian_release_file}
     }
 
+    # Write module name into the system module load list
+    mkdir -p etc/modules-load.d
+    echo "tcp_bbr" >>etc/modules-load.d/ophub-load-list.conf
+
     # Add custom startup script
     custom_startup_script="etc/custom_service/start_service.sh"
     [[ -x "${custom_startup_script}" && -f "etc/rc.local" ]] && {
