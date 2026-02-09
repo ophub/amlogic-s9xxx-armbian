@@ -270,6 +270,7 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
+    echo -e "${INFO} Current kernel: [ ${current_kernel_signature} ]"
     echo -e "${INFO} Kernel download repository: [ ${KERNEL_REPO} ]"
     echo -e "${INFO} Kernel tags: [ ${KERNEL_TAGS} ]"
     echo -e "${INFO} Kernel download type: [ ${download_type} ]"
@@ -314,7 +315,7 @@ query_version() {
 
     # Handle Local Files
     if [[ "${local_found}" == "yes" ]]; then
-        kernel_download_required="no"
+        download_required="no"
         echo -e "${INFO} Found local kernel. Version: [ ${inputs_kernel} ] Type: [ ${download_type} ]"
 
         [[ -f "sha256sums" ]] && mv -f sha256sums -t "${kernel_path}"
@@ -419,8 +420,16 @@ check_kernel() {
         target_file="$(ls linux-image-*.deb 2>/dev/null | head -n 1)"
         [[ -z "${target_file}" ]] && error_msg "Kernel .deb file not found in [ ${kernel_path} ]"
 
-        # Extract name: linux-image-ophub_6.12.69-1_arm64.deb -> ophub_6.12.69-1_arm64
+        # Extract kernel name: linux-image-ophub_6.12.69-1_arm64.deb -> ophub_6.12.69-1_arm64
         kernel_name="$(echo "${target_file}" | grep -oP '(?<=linux-image-).*?(?=\.deb)')"
+        # Extract verify name: linux-image-ophub_6.12.69-1_arm64.deb -> 6.12.69-ophub
+        verify_name="$(
+            echo "${target_file}" |
+                grep -oP '(?<=linux-image-).*?(?=-\d+_arm64\.deb)' | {
+                read name
+                echo "${name#*_}-${name%%_*}"
+            }
+        )"
 
         # Set file list for verification
         check_list=(${kernel_deb_list[@]})
@@ -430,8 +439,9 @@ check_kernel() {
         target_file="$(ls boot-*.tar.gz 2>/dev/null | head -n 1)"
         [[ -z "${target_file}" ]] && error_msg "Kernel .tar.gz file not found in [ ${kernel_path} ]"
 
-        # Extract name: boot-6.6.123-ophub.tar.gz -> 6.6.123-ophub
+        # Extract kernel name: boot-6.6.123-ophub.tar.gz -> 6.6.123-ophub
         kernel_name="$(echo "${target_file}" | grep -oP '(?<=boot-).*?(?=\.tar\.gz)')"
+        verify_name="${kernel_name}"
 
         # Set file list for verification
         check_list=(${kernel_tar_list[@]})
@@ -440,8 +450,8 @@ check_kernel() {
     echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
 
     # Check if the kernel is already installed
-    if [[ "${current_kernel_signature}" == "${kernel_name}" ]]; then
-        echo -e "${INFO} Current kernel (${current_kernel_signature}) is already the latest version."
+    if [[ "${current_kernel_signature}" == "${verify_name}" ]]; then
+        echo -e "${INFO} Current kernel [ ${current_kernel_signature} ] is already the latest version."
         echo -ne "${PROMPT} Do you want to force update? [y/n]: "
         read force_update
         case "${force_update,,}" in
@@ -566,30 +576,44 @@ backup_kernel() {
 # Update the .deb kernel
 update_deb_kernel() {
     cd ${kernel_path}
-    echo -e "${STEPS} Start unpacking kernel..."
+    echo -e "${STEPS} Start updating deb kernel..."
 
     # Identify the .deb files that need to be installed
+    local n="0"
     local install_files=""
     for prefix in "${kernel_deb_list[@]}"; do
         local f="$(ls ${prefix}-*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${f}" ]]; then
+            ((n++))
             install_files="${install_files} ${f}"
         else
-            echo -e "${PROMPT} Warning: ${prefix} deb package not found."
+            error_msg "Kernel deb package not found: [ ${prefix}-*.deb ]"
         fi
     done
 
     # Install the .deb kernel packages
     if [[ -n "${install_files}" ]]; then
-        echo -e "${INFO} Installing deb packages..."
+        # Install packages one by one
+        local i="1"
+        install_failed=0
+        for pkg in ${install_files}; do
+            dpkg -i "${pkg}" >/dev/null 2>&1
+            if [[ "${?}" -eq "0" ]]; then
+                echo -e "${INFO} (${i}/${n}) Installation of [ ${pkg} ] succeeded."
+            else
+                echo -e "${PROMPT} (${i}/${n}) Installation of [ ${pkg} ] failed."
+                install_failed=1
+            fi
+            ((i++))
+        done
 
-        # Use dpkg to install the kernel packages
-        dpkg -i ${install_files} >/dev/null 2>&1
-        [[ "${?}" -eq "0" ]] && echo -e "${INFO} Kernel deb packages installed successfully." || {
+        # If any package installation failed, attempt to fix broken dependencies
+        if [[ "${install_failed}" -ne "0" ]]; then
+            echo -e "${INFO} Fix packages installation status..."
             apt-get install -f -y >/dev/null 2>&1
-        }
+        fi
     else
-        error_msg "No kernel deb packages found to install."
+        error_msg "Missing kernel deb installation packages."
     fi
 
     # Update release file
@@ -604,7 +628,7 @@ update_deb_kernel() {
 # Update the .tar.gz kernel
 update_tar_kernel() {
     cd ${kernel_path}
-    echo -e "${STEPS} Start unpacking kernel..."
+    echo -e "${STEPS} Start updating tar kernel..."
 
     # Delete the current kernel files
     rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-*
@@ -977,7 +1001,7 @@ else
     check_depends
     init_var "${@}"
     query_version
-    [[ "${kernel_download_required:="yes"}" != "no" ]] && download_kernel
+    [[ "${download_required:="yes"}" != "no" ]] && download_kernel
     check_kernel
     [[ "${KERNEL_BACKUP}" != "no" ]] && backup_kernel
     [[ "${download_type}" == "deb" ]] && update_deb_kernel || update_tar_kernel
