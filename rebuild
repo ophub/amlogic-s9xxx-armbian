@@ -857,8 +857,13 @@ replace_kernel() {
 
     # Determine custom kernel filename
     kernel_boot="$(ls ${kernel_path}/${conf_kernel_tags}/${kernel}/boot-${kernel}*.tar.gz 2>/dev/null | head -n 1)"
+    # Extract kernel name: boot-6.12.69-ophub.tar.gz -> 6.12.69-ophub
     kernel_name="${kernel_boot##*/}" && kernel_name="${kernel_name:5:-7}"
     [[ -n "${kernel_name}" ]] || error_msg "Missing kernel files for [ ${kernel} ]"
+    # Extract kernel signature: 6.12.69-ophub -> ophub
+    kernel_signature="${kernel_name#*-}"
+    [[ -n "${kernel_signature}" ]] || error_msg "Missing kernel signature: [ ${kernel_name} ]"
+    # Determine the kernel dtb, modules and header files based on the kernel name
     kernel_dtb="${kernel_path}/${conf_kernel_tags}/${kernel}/dtb-${PLATFORM}-${kernel_name}.tar.gz"
     kernel_modules="${kernel_path}/${conf_kernel_tags}/${kernel}/modules-${kernel_name}.tar.gz"
     kernel_header="${kernel_path}/${conf_kernel_tags}/${kernel}/header-${kernel_name}.tar.gz"
@@ -1173,8 +1178,9 @@ refactor_rootfs() {
     echo "KERNEL_REPO='${kernel_repo}'" >>${ophub_release_file}
     echo "KERNEL_TAGS='${conf_kernel_tags}'" >>${ophub_release_file}
     echo "KERNEL_VERSION='${kernel}'" >>${ophub_release_file}
-    echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
+    echo "KERNEL_SIGNATURE='${kernel_signature}'" >>${ophub_release_file}
     echo "DOWNLOAD_TYPE='tar'" >>${ophub_release_file}
+    echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
     echo "BOOT_CONF='${BOOT_CONF}'" >>${ophub_release_file}
     echo "ROOTFS_TYPE='${rootfs_type}'" >>${ophub_release_file}
     echo "DISK_TYPE='usb'" >>${ophub_release_file}

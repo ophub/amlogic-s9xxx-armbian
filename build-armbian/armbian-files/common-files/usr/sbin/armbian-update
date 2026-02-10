@@ -140,6 +140,11 @@ check_disk() {
 init_var() {
     echo -e "${STEPS} Start initializing parameters..."
 
+    # Query the current version
+    kernel_uname="$(uname -r)"
+    current_kernel="$(echo "${kernel_uname}" | grep -oP '\d+\.\d+\.\d+')"
+    [[ -z "${current_kernel}" ]] && error_msg "Failed to query the current kernel version."
+
     # Check release file
     [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
     # Adjust parameter name
@@ -152,8 +157,9 @@ init_var() {
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_REPO="${KERNEL_REPO}"
     KERNEL_TAGS="${KERNEL_TAGS}"
-    KERNEL_BACKUP="${KERNEL_BACKUP}"
+    KERNEL_SIGNATURE="${KERNEL_SIGNATURE}"
     DOWNLOAD_TYPE="${DOWNLOAD_TYPE}"
+    KERNEL_BACKUP="${KERNEL_BACKUP}"
 
     # Check the platform variable
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
@@ -164,6 +170,10 @@ init_var() {
         download_type="tar"
         echo "DOWNLOAD_TYPE='tar'" >>${ophub_release_file}
     fi
+    # Check kernel signature
+    [[ -n "${KERNEL_SIGNATURE}" ]] || {
+        echo "KERNEL_SIGNATURE='${kernel_uname#*-}'" >>${ophub_release_file}
+    }
 
     # Set the kernel packages
     declare -A platform_family=(["amlogic"]="meson64" ["rockchip"]="rockchip64" ["allwinner"]="sunxi64")
@@ -238,11 +248,6 @@ init_var() {
         esac
     done
 
-    # Query the current version
-    current_kernel_signature="$(uname -r)"
-    current_kernel="$(echo "$(uname -r)" | grep -oP '\d+\.\d+\.\d+')"
-    [[ -z "${current_kernel}" ]] && error_msg "Failed to query the current kernel version."
-
     # Adjust the custom kernel repository url format
     [[ -z "${KERNEL_REPO}" ]] && KERNEL_REPO="ophub/kernel"
     [[ "${KERNEL_REPO}" =~ ^https: ]] && KERNEL_REPO="$(echo ${KERNEL_REPO} | awk -F'/' '{print $4"/"$5}')"
@@ -270,10 +275,11 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
-    echo -e "${INFO} Current kernel: [ ${current_kernel_signature} ]"
+    echo -e "${INFO} Current kernel: [ ${kernel_uname} ]"
+    echo -e "${INFO} Kernel signature: [ ${KERNEL_SIGNATURE} ]"
+    echo -e "${INFO} Kernel download type: [ ${download_type} ]"
     echo -e "${INFO} Kernel download repository: [ ${KERNEL_REPO} ]"
     echo -e "${INFO} Kernel tags: [ ${KERNEL_TAGS} ]"
-    echo -e "${INFO} Kernel download type: [ ${download_type} ]"
     echo -e "${INFO} Specify kernel: [ ${inputs_kernel} ]"
     echo -e "${INFO} Backup kernel: [ ${KERNEL_BACKUP} ]"
     echo -e "${INFO} Armbian is running on: [ /dev/${DISK_NAME} ]"
@@ -294,7 +300,6 @@ query_version() {
     if [[ "$(find . -maxdepth 1 -type f -name "*.deb" 2>/dev/null | wc -l)" -ge "3" ]]; then
         target_file="$(ls linux-image-*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${target_file}" ]]; then
-            local_kernel_version="$(echo "${target_file}" | grep -oP '(?<=linux-image-).*?(?=-)')"
             inputs_kernel="$(echo "${target_file}" | grep -oP '(?<=_)\d+\.\d+\.\d+(?=-)' || echo "${target_file}" | grep -oP '\d+\.\d+\.\d+')"
             file_ext=".deb"
             download_type="deb"
@@ -305,7 +310,6 @@ query_version() {
     elif [[ "$(find . -maxdepth 1 -type f -name "*.tar.gz" 2>/dev/null | wc -l)" -ge "3" ]]; then
         target_file="$(ls boot-*.tar.gz 2>/dev/null | head -n 1)"
         if [[ -n "${target_file}" ]]; then
-            local_kernel_version="$(echo "${target_file}" | grep -oP '(?<=boot-).*?(?=\.tar\.gz)')"
             inputs_kernel="$(echo "${target_file}" | grep -oP '(?<=boot-)\d+\.\d+\.\d+')"
             file_ext=".tar.gz"
             download_type="tar"
@@ -422,6 +426,8 @@ check_kernel() {
 
         # Extract kernel name: linux-image-ophub_6.12.69-1_arm64.deb -> ophub_6.12.69-1_arm64
         kernel_name="$(echo "${target_file}" | grep -oP '(?<=linux-image-).*?(?=\.deb)')"
+        # Extract kernel signature: ophub_6.12.69-1_arm64 -> ophub
+        kernel_signature="${kernel_name%%_*}"
         # Extract verify name: linux-image-ophub_6.12.69-1_arm64.deb -> 6.12.69-ophub
         verify_name="$(
             echo "${target_file}" |
@@ -441,6 +447,8 @@ check_kernel() {
 
         # Extract kernel name: boot-6.6.123-ophub.tar.gz -> 6.6.123-ophub
         kernel_name="$(echo "${target_file}" | grep -oP '(?<=boot-).*?(?=\.tar\.gz)')"
+        # Extract kernel signature: 6.6.123-ophub -> ophub
+        kernel_signature="${kernel_name#*-}"
         verify_name="${kernel_name}"
 
         # Set file list for verification
@@ -450,8 +458,8 @@ check_kernel() {
     echo -e "${INFO} Kernel name: [ ${kernel_name} ]"
 
     # Check if the kernel is already installed
-    if [[ "${current_kernel_signature}" == "${verify_name}" ]]; then
-        echo -e "${INFO} Current kernel [ ${current_kernel_signature} ] is already the latest version."
+    if [[ "${kernel_uname}" == "${verify_name}" ]]; then
+        echo -e "${INFO} Current kernel [ ${kernel_uname} ] is already the latest version."
         echo -ne "${PROMPT} Do you want to force update? [y/n]: "
         read force_update
         case "${force_update,,}" in
@@ -464,8 +472,8 @@ check_kernel() {
     fi
 
     # Identify Kernel Version
-    KERNEL_VERSION="$(echo ${kernel_name} | grep -oP '\d+\.\d+\.\d+')"
-    [[ -z "${KERNEL_VERSION}" ]] && error_msg "Invalid kernel version detected."
+    kernel_base="$(echo ${kernel_name} | grep -oP '\d+\.\d+\.\d+')"
+    [[ -z "${kernel_base}" ]] && error_msg "Invalid kernel version detected."
 
     # Check the sha256sums file
     sha256sums_file="sha256sums"
@@ -524,44 +532,44 @@ backup_kernel() {
 
     # 1. Pack the boot-*.tar.gz file
     rm -rf *
-    cp -rf /boot/*-${current_kernel_signature} -t .
-    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to copy [ /boot/*-${current_kernel_signature} ] files."
+    cp -rf /boot/*-${kernel_uname} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to copy [ /boot/*-${kernel_uname} ] files."
     rm -rf dtb*
     chmod +x *
-    tar -czf boot-${current_kernel_signature}.tar.gz *
+    tar -czf boot-${kernel_uname}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
-    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to move [ boot-${current_kernel_signature}.tar.gz ] files."
-    echo -e "${INFO} (1/4) Backup of [ boot-${current_kernel_signature}.tar.gz ] succeeded."
+    [[ "${?}" -ne "0" ]] && error_msg "(1/4) Failed to move [ boot-${kernel_uname}.tar.gz ] files."
+    echo -e "${INFO} (1/4) Backup of [ boot-${kernel_uname}.tar.gz ] succeeded."
 
     # 2. Pack the dtb-*.tar.gz file
     rm -rf *
     cp -rf /boot/dtb/${PLATFORM}/* -t .
     [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to copy [ /boot/dtb/${PLATFORM}/* ] files."
-    tar -czf dtb-${PLATFORM}-${current_kernel_signature}.tar.gz *
+    tar -czf dtb-${PLATFORM}-${kernel_uname}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
-    [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to move [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] files."
-    echo -e "${INFO} (2/4) Backup of [ dtb-${PLATFORM}-${current_kernel_signature}.tar.gz ] succeeded."
+    [[ "${?}" -ne "0" ]] && error_msg "(2/4) Failed to move [ dtb-${PLATFORM}-${kernel_uname}.tar.gz ] files."
+    echo -e "${INFO} (2/4) Backup of [ dtb-${PLATFORM}-${kernel_uname}.tar.gz ] succeeded."
 
     # 3. Pack the modules-*.tar.gz file
     rm -rf *
-    cp -rf /usr/lib/modules/${current_kernel_signature} -t .
-    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to copy [ /usr/lib/modules/${current_kernel_signature} ] files."
-    tar -czf modules-${current_kernel_signature}.tar.gz *
+    cp -rf /usr/lib/modules/${kernel_uname} -t .
+    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to copy [ /usr/lib/modules/${kernel_uname} ] files."
+    tar -czf modules-${kernel_uname}.tar.gz *
     mv -f *.tar.gz ${backup_path}/${current_kernel}
-    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to move [ modules-${current_kernel_signature}.tar.gz ] files."
-    echo -e "${INFO} (3/4) Backup of [ modules-${current_kernel_signature}.tar.gz ] succeeded."
+    [[ "${?}" -ne "0" ]] && error_msg "(3/4) Failed to move [ modules-${kernel_uname}.tar.gz ] files."
+    echo -e "${INFO} (3/4) Backup of [ modules-${kernel_uname}.tar.gz ] succeeded."
 
     # 4. Pack the header-*.tar.gz file, header file is optional
-    if [[ -d "/usr/src/linux-headers-${current_kernel_signature}" ]]; then
+    if [[ -d "/usr/src/linux-headers-${kernel_uname}" ]]; then
         rm -rf *
-        cp -rf /usr/src/linux-headers-${current_kernel_signature}/* -t .
-        [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to copy [ /usr/src/linux-headers-${current_kernel_signature}/* ] files."
-        tar -czf header-${current_kernel_signature}.tar.gz *
+        cp -rf /usr/src/linux-headers-${kernel_uname}/* -t .
+        [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to copy [ /usr/src/linux-headers-${kernel_uname}/* ] files."
+        tar -czf header-${kernel_uname}.tar.gz *
         mv -f *.tar.gz ${backup_path}/${current_kernel}
-        [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to move [ header-${current_kernel_signature}.tar.gz ] files."
-        echo -e "${INFO} (4/4) Backup of [ header-${current_kernel_signature}.tar.gz ] succeeded."
+        [[ "${?}" -ne "0" ]] && error_msg "(4/4) Failed to move [ header-${kernel_uname}.tar.gz ] files."
+        echo -e "${INFO} (4/4) Backup of [ header-${kernel_uname}.tar.gz ] succeeded."
     else
-        echo -e "${PROMPT} (4/4) [ /usr/src/linux-headers-${current_kernel_signature} ] folder does not exist, skip backup."
+        echo -e "${PROMPT} (4/4) [ /usr/src/linux-headers-${kernel_uname} ] folder does not exist, skip backup."
     fi
 
     # Add sha256sum integrity verification file
@@ -617,7 +625,9 @@ update_deb_kernel() {
     fi
 
     # Update release file
-    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
+    sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.deb sha256sums
@@ -670,7 +680,9 @@ update_tar_kernel() {
     echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
 
     # Update release file
-    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${KERNEL_VERSION}'|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
+    sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
+    sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
     rm -f *${kernel_name}*.tar.gz sha256sums
@@ -879,8 +891,8 @@ sos_kernel() {
     mount ${rescue_disk}${PARTITION_NAME}2 ${rescue_path}/rootfs
     [[ "${?}" -ne "0" ]] && error_msg "mount ${rescue_disk}${PARTITION_NAME}2 failed!"
 
-    # Identify the current kernel files
-    kernel_signature="$(uname -r)"
+    # Identify the current system kernel files
+    system_kernel="$(uname -r)"
 
     # 01. For /boot files
     if [[ -d "${rescue_path}/bootfs" ]]; then
@@ -891,7 +903,7 @@ sos_kernel() {
             cp -f /boot/u-boot.ext u-boot.emmc
             chmod +x u-boot.ext u-boot.emmc
         }
-        cp -rf /boot/{*-${kernel_signature},uInitrd,*Image,dtb} -t .
+        cp -rf /boot/{*-${system_kernel},uInitrd,*Image,dtb} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(1/3) [ boot ] kernel files rescue failed."
         echo -e "${INFO} (1/3) [ boot ] kernel files rescue succeeded."
 
@@ -920,26 +932,26 @@ sos_kernel() {
         error_msg "(1/3) The [ ${rescue_path}/bootfs ] folder does not exist, stop rescuing."
     fi
 
-    # 02. For /usr/lib/modules/${kernel_signature}
+    # 02. For /usr/lib/modules/${system_kernel}
     if [[ -d "${rescue_path}/rootfs/usr/lib/modules" ]]; then
         cd ${rescue_path}/rootfs/usr/lib/modules
         rm -rf *
-        cp -rf /usr/lib/modules/${kernel_signature} -t .
+        cp -rf /usr/lib/modules/${system_kernel} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(2/3) [ modules ] kernel files rescue failed."
         echo -e "${INFO} (2/3) [ modules ] kernel files rescue succeeded."
     else
         error_msg "(2/3) The [ ${rescue_path}/rootfs/usr/lib/modules ] folder does not exist, stop rescuing."
     fi
 
-    # 03. For /usr/src/linux-headers-${kernel_signature}
-    if [[ -d "/usr/src/linux-headers-${kernel_signature}" ]]; then
+    # 03. For /usr/src/linux-headers-${system_kernel}
+    if [[ -d "/usr/src/linux-headers-${system_kernel}" ]]; then
         cd ${rescue_path}/rootfs/usr/src
         rm -rf linux-headers-*
-        cp -rf /usr/src/linux-headers-${kernel_signature} -t .
+        cp -rf /usr/src/linux-headers-${system_kernel} -t .
         [[ "${?}" -ne "0" ]] && error_msg "(3/3) [ headers ] kernel files rescue failed."
         echo -e "${INFO} (3/3) [ headers ] kernel files rescue succeeded."
     else
-        echo -e "${PROMPT} (3/3) [ /usr/src/linux-headers-${kernel_signature} ] folder does not exist, skip rescue."
+        echo -e "${PROMPT} (3/3) [ /usr/src/linux-headers-${system_kernel} ] folder does not exist, skip rescue."
     fi
 
     # Unmount the emmc partition

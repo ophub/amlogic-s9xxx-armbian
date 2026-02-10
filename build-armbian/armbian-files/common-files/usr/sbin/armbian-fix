@@ -47,49 +47,62 @@ echo "" >${fix_log} && tolog "Start fixing..."
 # ===== A. Start repairing system permissions =====
 
 # Fix common releases permissions
-[[ -d "/var/tmp" ]] && sudo chmod 777 /var/tmp 2>/dev/null && tolog "01. Fix tmp permissions"
-[[ -d "/etc/update-motd.d" ]] && sudo chmod -x /etc/update-motd.d/* 2>/dev/null && sudo chmod +x /etc/update-motd.d/{10-*,20-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
-[[ -d "/var/cache/man" ]] && sudo chown man:root /var/cache/man -R 2>/dev/null && tolog "03. Fix man permissions"
-[[ -d "/var/cache/man" ]] && sudo chmod g+s /var/cache/man -R 2>/dev/null && tolog "04. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && sudo chown root:root /etc/sudoers 2>/dev/null && tolog "05. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && sudo chmod 440 /etc/sudoers 2>/dev/null && tolog "06. Fix man permissions"
-[[ -f "/usr/bin/sudo" ]] && sudo chown root:root /usr/bin/sudo 2>/dev/null && tolog "07. Fix sudo permissions"
-[[ -f "/usr/bin/sudo" ]] && sudo chmod 4755 /usr/bin/sudo 2>/dev/null && tolog "08. Fix sudo permissions"
+[[ -d "/var/tmp" ]] && chmod 777 /var/tmp 2>/dev/null && tolog "01. Fix tmp permissions"
+[[ -d "/etc/update-motd.d" ]] && chmod -x /etc/update-motd.d/* 2>/dev/null && chmod +x /etc/update-motd.d/{10-*,20-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
+[[ -d "/var/cache/man" ]] && chown man:root /var/cache/man -R 2>/dev/null && tolog "03. Fix man permissions"
+[[ -d "/var/cache/man" ]] && chmod g+s /var/cache/man -R 2>/dev/null && tolog "04. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && chown root:root /etc/sudoers 2>/dev/null && tolog "05. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && chmod 440 /etc/sudoers 2>/dev/null && tolog "06. Fix man permissions"
+[[ -f "/usr/bin/sudo" ]] && chown root:root /usr/bin/sudo 2>/dev/null && tolog "07. Fix sudo permissions"
+[[ -f "/usr/bin/sudo" ]] && chmod 4755 /usr/bin/sudo 2>/dev/null && tolog "08. Fix sudo permissions"
 # Fix focal permissions
-[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chown 0 /usr/lib/sudo/sudoers.so 2>/dev/null && tolog "09. Fix sudoers.so permissions"
-[[ -f "/usr/lib/sudo/sudoers.so" ]] && sudo chmod 644 /usr/lib/sudo/sudoers.so 2>/dev/null && tolog "10. Fix sudoers.so permissions"
-[[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null && tolog "11. Fix polkit-agent-helper-1 permissions"
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && chown 0 /usr/lib/sudo/sudoers.so 2>/dev/null && tolog "09. Fix sudoers.so permissions"
+[[ -f "/usr/lib/sudo/sudoers.so" ]] && chmod 644 /usr/lib/sudo/sudoers.so 2>/dev/null && tolog "10. Fix sudoers.so permissions"
+[[ -f "/usr/lib/policykit-1/polkit-agent-helper-1" ]] && chmod 4755 /usr/lib/policykit-1/polkit-agent-helper-1 2>/dev/null && tolog "11. Fix polkit-agent-helper-1 permissions"
 # Fix jammy permissions
-[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chown 0 /usr/libexec/sudo/sudoers.so 2>/dev/null && tolog "12. Fix sudoers.so permissions"
-[[ -f "/usr/libexec/sudo/sudoers.so" ]] && sudo chmod 644 /usr/libexec/sudo/sudoers.so 2>/dev/null && tolog "13. Fix sudoers.so permissions"
-[[ -f "/usr/libexec/polkit-agent-helper-1" ]] && sudo chmod 4755 /usr/libexec/polkit-agent-helper-1 2>/dev/null && tolog "14. Fix polkit-agent-helper-1 permissions"
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && chown 0 /usr/libexec/sudo/sudoers.so 2>/dev/null && tolog "12. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/sudo/sudoers.so" ]] && chmod 644 /usr/libexec/sudo/sudoers.so 2>/dev/null && tolog "13. Fix sudoers.so permissions"
+[[ -f "/usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 /usr/libexec/polkit-agent-helper-1 2>/dev/null && tolog "14. Fix polkit-agent-helper-1 permissions"
 
 # ===== B. Start removing useless packages and scripts =====
 
 # Remove packages
-sudo apt-get clean -y 2>/dev/null && sudo rm -rf /var/cache/apt/* 2>/dev/null && sudo rm -rf /var/lib/apt/* 2>/dev/null && tolog "20. Clean up local installation packages"
+apt-get clean -y 2>/dev/null && rm -rf /var/cache/apt/* 2>/dev/null && rm -rf /var/lib/apt/* 2>/dev/null && tolog "20. Clean up local installation packages"
 
+# Get kernel signature
+[[ -f "${ophub_release_file}" ]] && {
+    kernel_signature="$(cat ${ophub_release_file} | grep -E "^KERNEL_SIGNATURE=" | cut -d"'" -f2 || true)"
+}
 # 21. Remove linux-image-*
-pkg_linux_image=$(dpkg -l | awk '{print $2}' | grep "^linux-image-" || true)
-if [[ -n "${pkg_linux_image}" ]]; then
-    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_image} 2>/dev/null && tolog "21. Remove linux-image-*"
-fi
+pkg_linux_image="$(dpkg -l | awk '{print $2}' | grep "^linux-image-" || true)"
+for pkg in ${pkg_linux_image}; do
+    if [[ -n "${pkg}" ]] && [[ -z "${kernel_signature}" || ! "${pkg}" =~ ${kernel_signature} ]]; then
+        apt-get remove -qq --purge -y --allow-change-held-packages ${pkg} 2>/dev/null && tolog "21. Remove ${pkg}"
+    elif [[ "${pkg}" =~ ${kernel_signature} ]]; then
+        tolog "21. Keep ${pkg}"
+    fi
+done
 # 22. Remove linux-dtb-*
-pkg_linux_dtb=$(dpkg -l | awk '{print $2}' | grep "^linux-dtb-" || true)
-if [[ -n "${pkg_linux_dtb}" ]]; then
-    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_dtb} 2>/dev/null && tolog "22. Remove linux-dtb-*"
-fi
+pkg_linux_dtb="$(dpkg -l | awk '{print $2}' | grep "^linux-dtb-" || true)"
+for pkg in ${pkg_linux_dtb}; do
+    if [[ -n "${pkg}" ]] && [[ -z "${kernel_signature}" || ! "${pkg}" =~ ${kernel_signature} ]]; then
+        apt-get remove -qq --purge -y --allow-change-held-packages ${pkg} 2>/dev/null && tolog "22. Remove ${pkg}"
+    elif [[ "${pkg}" =~ ${kernel_signature} ]]; then
+        tolog "22. Keep ${pkg}"
+    fi
+done
+
 # 23. Remove linux-u-boot-*
-pkg_linux_uboot=$(dpkg -l | awk '{print $2}' | grep "^linux-u-boot-" || true)
+pkg_linux_uboot="$(dpkg -l | awk '{print $2}' | grep "^linux-u-boot-" || true)"
 if [[ -n "${pkg_linux_uboot}" ]]; then
-    sudo apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_uboot} 2>/dev/null && tolog "23. Remove linux-u-boot-*"
+    apt-get remove -qq --purge -y --allow-change-held-packages ${pkg_linux_uboot} 2>/dev/null && tolog "23. Remove ${pkg_linux_uboot}"
 fi
 
 # Hold packages
-[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli- || true)" ]] && sudo apt-mark hold armbian-bsp-cli-* 2>/dev/null && tolog "24. Hold armbian-bsp-cli-*"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools || true)" ]] && sudo apt-mark hold u-boot-tools 2>/dev/null && tolog "25. Hold u-boot-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools || true)" ]] && sudo apt-mark hold sunxi-tools 2>/dev/null && tolog "26. Hold sunxi-tools"
-[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools || true)" ]] && sudo apt-mark hold initramfs-tools* 2>/dev/null && tolog "27. Hold initramfs-tools*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep armbian-bsp-cli- || true)" ]] && apt-mark hold armbian-bsp-cli-* 2>/dev/null && tolog "24. Hold armbian-bsp-cli-*"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep u-boot-tools || true)" ]] && apt-mark hold u-boot-tools 2>/dev/null && tolog "25. Hold u-boot-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools || true)" ]] && apt-mark hold sunxi-tools 2>/dev/null && tolog "26. Hold sunxi-tools"
+[[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools || true)" ]] && apt-mark hold initramfs-tools* 2>/dev/null && tolog "27. Hold initramfs-tools*"
 
 # Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
@@ -104,12 +117,12 @@ initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
 # ===== C. Start disabling system services =====
 
 # Regenerate new machine-id
-sudo rm -f /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null && tolog "50. Delete machine-id"
-sudo dbus-uuidgen --ensure=/etc/machine-id 2>/dev/null && tolog "51. Generate /etc/machine-id"
-sudo dbus-uuidgen --ensure 2>/dev/null && tolog "52. Generate /var/lib/dbus/machine-id"
+rm -f /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null && tolog "50. Delete machine-id"
+dbus-uuidgen --ensure=/etc/machine-id 2>/dev/null && tolog "51. Generate /etc/machine-id"
+dbus-uuidgen --ensure 2>/dev/null && tolog "52. Generate /var/lib/dbus/machine-id"
 
 # Turn off automatic hibernation to prevent hard drives from hanging
-sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target 2>/dev/null && tolog "53. Turn off automatic sleep mode"
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target 2>/dev/null && tolog "53. Turn off automatic sleep mode"
 
 # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
 motd_tips="/etc/default/armbian-motd"
@@ -126,30 +139,30 @@ quotes_cron="/etc/cron.daily/armbian-quotes"
 # Remove motd-news service
 motd_timer="/usr/lib/systemd/system/motd-news.timer"
 [[ -f "${motd_timer}" ]] && {
-    sudo systemctl stop motd-news.timer 2>/dev/null
-    sudo systemctl disable motd-news.timer 2>/dev/null
-    sudo rm -f "${motd_timer}"
+    systemctl stop motd-news.timer 2>/dev/null
+    systemctl disable motd-news.timer 2>/dev/null
+    rm -f "${motd_timer}"
     tolog "56. Disable motd-news.timer"
 } || true
 motd_service="/usr/lib/systemd/system/motd-news.service"
 [[ -f "${motd_service}" ]] && {
-    sudo systemctl stop motd-news.service 2>/dev/null
-    sudo systemctl disable motd-news.service 2>/dev/null
-    sudo rm -f "${motd_service}"
+    systemctl stop motd-news.service 2>/dev/null
+    systemctl disable motd-news.service 2>/dev/null
+    rm -f "${motd_service}"
     tolog "57. Disable motd-news.service"
 } || true
-sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer 2>/dev/null
-sudo rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also 2>/dev/null
-sudo rm -f /etc/systemd/system/timers.target.wants/motd-news.timer 2>/dev/null
+rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.timer 2>/dev/null
+rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also 2>/dev/null
+rm -f /etc/systemd/system/timers.target.wants/motd-news.timer 2>/dev/null
 
 # Disable the system's partition adjustment service
-sudo systemctl stop armbian-resize-filesystem.service 2>/dev/null
-sudo systemctl disable armbian-resize-filesystem.service 2>/dev/null
+systemctl stop armbian-resize-filesystem.service 2>/dev/null
+systemctl disable armbian-resize-filesystem.service 2>/dev/null
 tolog "58. Disable the armbian-resize-filesystem.service"
 
 # Disable the ssh.socket: https://github.com/ophub/amlogic-s9xxx-armbian/discussions/1476
-sudo systemctl disable --now ssh.socket 2>/dev/null
-sudo systemctl enable --now ssh.service 2>/dev/null
+systemctl disable --now ssh.socket 2>/dev/null
+systemctl enable --now ssh.service 2>/dev/null
 tolog "59. Disable the ssh.socket and enable ssh.service"
 
 # ===== D. Start adjusting custom settings =====
@@ -269,8 +282,8 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
 
     # Disable ttyFIQ0 & ttyAML0 (ttyS2)
     [[ "${platform_name}" != "amlogic" ]] && {
-        sudo systemctl disable serial-getty@ttyFIQ0 2>/dev/null
-        sudo systemctl disable serial-getty@ttyAML0 2>/dev/null
+        systemctl disable serial-getty@ttyFIQ0 2>/dev/null
+        systemctl disable serial-getty@ttyAML0 2>/dev/null
         tolog "88. Disable ttyFIQ0 & ttyAML0 (ttyS2)"
     }
 } || true
