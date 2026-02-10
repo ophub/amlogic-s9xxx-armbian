@@ -212,7 +212,7 @@ on:
       armbian_kernel:
         description: "Select kernel version."
         required: false
-        default: "6.1.y_6.12.y"
+        default: "6.12.y_6.18.y"
         type: choice
         options:
           - 5.10.y
