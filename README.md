@@ -241,7 +241,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
     build_target: armbian
     armbian_path: build/output/images/*.img
     armbian_board: s905d_s905x3_s922x_s905x
-    armbian_kernel: 6.1.y_5.15.y
+    armbian_kernel: 6.12.y_6.18.y
 ```
 
 - ### GitHub Actions Input Parameter Description
@@ -254,7 +254,7 @@ The related parameters correspond to the `local packaging command`, please refer
 | armbian_board   | all           | Set the `board` of the package box, refer to `-b`       |
 | kernel_repo     | ophub/kernel  | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
 | kernel_usage    | stable        | Set the `tags suffix` of the used kernel. Refer to `-u` |
-| armbian_kernel  | 6.1.y_5.15.y  | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
+| armbian_kernel  | 6.12.y_6.18.y | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
 | auto_kernel     | true          | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
 | armbian_fstype  | ext4          | Set the file system type of the system's ROOTFS partition, refer to `-t`  |
 | armbian_size    | 512/2560      | Set the size of the system BOOTFS and ROOTFS partitions, function reference `-s`  |
@@ -284,7 +284,7 @@ For the method of compiling the kernel, refer to [compile-kernel](compile-kernel
   uses: ophub/amlogic-s9xxx-armbian@main
   with:
     build_target: kernel
-    kernel_version: 6.1.y_5.15.y
+    kernel_version: 6.12.y_6.18.y
     kernel_auto: true
     kernel_sign: -yourname
 ```
