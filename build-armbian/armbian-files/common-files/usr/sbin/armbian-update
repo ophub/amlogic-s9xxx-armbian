@@ -353,46 +353,34 @@ search_kernel() {
         [[ -n "${inputs_kernel}" && "$(grep -o "\." <<<"${inputs_kernel}" | wc -l)" -eq "1" ]] && inputs_kernel="${inputs_kernel}.y"
 
         # Automatically retrieve the latest version of the current kernel series and the specified kernel series (e.g: 6.1.y)
-        # However, when the specified kernel parameter contains a "-" character, the specified version will be used (e.g: 5.10.160-rk3588)
+        # However, when the specified kernel parameter contains a "-" character, the specified version will be used (e.g: 6.1.141-rk3588)
         [[ -z "${inputs_kernel}" ]] || [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ && "${inputs_kernel}" != *"-"* ]] && {
-            # kernel_verpatch, such as [ 5.10 ]
+            # kernel_verpatch, such as [ 6.1 ]
             kernel_verpatch="$(echo ${current_kernel} | awk -F '.' '{print $1"."$2}')"
 
-            # Setting the kernel series for the query (e.g: armbian-update -k 6.1.y)
+            # Setting the kernel series for the query (6.1.y -> 6.1)
             [[ "${inputs_kernel}" =~ ^[0-9].*[a-z]$ ]] && kernel_verpatch="${inputs_kernel%.*}"
 
-            # Define search pattern based on type to find correct assets
-            # If deb: search for 'deb-6.1.' to extract kernel version
-            # If tar: search for '6.1.' to extract kernel version
-            if [[ "${download_type}" == "deb" ]]; then
-                # The correct prefix corresponding to the deb format
-                search_prefix="deb-${kernel_verpatch}"
-                file_ext=".deb"
+            # Define the search order of kernel types based on priority
+            [[ "${download_type}" == "deb" ]] && search_types=("deb" "tar") || search_types=("tar" "deb")
+            # Traverse kernel types to query the latest kernel version
+            for type in "${search_types[@]}"; do
+                # If deb: search for 'deb-6.1' to extract kernel version
+                # If tar: search for '6.1' to extract kernel version
+                [[ "${type}" == "deb" ]] && prefix="deb-${kernel_verpatch}" || prefix="${kernel_verpatch}"
 
-                # If no suitable match is found, try searching for tar optional prefix
-                optional_prefix="${kernel_verpatch}"
-                optional_type="tar"
-                optional_ext=".tar.gz"
+                # Query the latest kernel version
+                query_version "${prefix}"
 
-            else
-                # The correct prefix corresponding to the tar format
-                search_prefix="${kernel_verpatch}"
-                file_ext=".tar.gz"
+                # If found, update global variables and stop searching
+                if [[ -n "${latest_kernel}" ]]; then
+                    download_type="${type}"
+                    # Set the file extension for later verification
+                    [[ "${type}" == "deb" ]] && file_ext=".deb" || file_ext=".tar.gz"
+                    break
+                fi
+            done
 
-                # If no suitable match is found, try searching for deb optional prefix
-                optional_prefix="deb-${kernel_verpatch}"
-                optional_type="deb"
-                optional_ext=".deb"
-            fi
-
-            # First, try to query the latest kernel version using the primary search prefix
-            query_version "${search_prefix}"
-            # If no suitable match is found, try to query the latest kernel version using the optional search prefix
-            [[ -z "${latest_kernel}" ]] && {
-                download_type="${optional_type}"
-                file_ext="${optional_ext}"
-                query_version "${optional_prefix}"
-            }
             # If the latest kernel version is still not found, it means that there is no suitable kernel version in the GitHub releases
             [[ -z "${latest_kernel}" ]] && error_msg "Failed to query the latest kernel version from GitHub releases."
 
