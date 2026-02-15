@@ -584,7 +584,7 @@ armbian-update
 | -u       | 自动化        | stable/flippy/beta/rk3588/rk35xx/h6 | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
 | -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
 | -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
-| -d       | tar          | tar/deb       | 设置下载内核的类型。需要编译自定义驱动的推荐安装 `deb` 包。 |
+| -d       | deb          | tar/deb       | 设置优先使用的内核包格式。若指定格式不存在，脚本将自动尝试另一种格式。如需编译自定义驱动推荐选择 `deb` 格式。 |
 | -m       | no           | yes/no        | 使用主线 u-boot                    |
 | -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
 | -h       | 无           | 无             | 查看使用帮助                       |

@@ -585,7 +585,7 @@ armbian-update
 | -u | Automatic | stable/flippy/beta/rk3588/rk35xx/h6 | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
 | -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
-| -d | tar | tar/deb | Set the type of kernel to download. If you need to compile custom drivers, it is recommended to install the `deb` package. |
+| -d | deb | tar/deb | Set the preferred kernel package format. If unavailable, the script will automatically try the alternative. `deb` is recommended for compiling custom drivers. |
 | -m | no | yes/no | Use the mainline u-boot |
 | -s | None | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
 | -h | None | None | View the usage help |
