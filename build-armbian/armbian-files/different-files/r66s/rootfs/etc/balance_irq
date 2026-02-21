@@ -15,19 +15,19 @@
 #  配置文件改好，运行 balethirq.pl 即时生效
 
 # pcie-lan rx
-eth0-0	3
+eth0-0  3
 # pcie-lan tx-0
 eth0-16 2
 # pcie-lan tx-1
-eth0-18 2
+eth0-18 1
 
 # pcie-wan rx
-eth1-0	4
+eth1-0  2
 # pcie wan tx-0
-eth1-16	1
+eth1-16 3
 # pcie wan tx-1
-eth1-18	1
+eth1-18 4
 
 # usb 3.0
-xhci-hcd:usb1	1
-xhci-hcd:usb3	2
+xhci-hcd:usb1   1
+xhci-hcd:usb3   4
