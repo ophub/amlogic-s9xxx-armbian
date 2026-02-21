@@ -401,7 +401,7 @@ create_partition() {
         BLANK2="778" # Rootfs partition could be set after [ 1398 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1398-108-512=778 MiB ]
     elif [[ "${AMLOGIC_SOC}" == "s905l3b" ]]; then
         BLANK1="128" # https://github.com/janko888/MBH-M30xA
-        BOOT="513"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
+        BOOT="512"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
         BLANK2="720"
     elif [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
         BLANK1="108" # Tencent Aurora 3Pro: Must skip [ 108 MiB ]
