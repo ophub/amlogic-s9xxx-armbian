@@ -44,9 +44,19 @@ log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
 
 # Device-Specific Services
 
+# Add rknpu module to the system module load list
+ophub_load_conf="/etc/modules-load.d/ophub-load-list.conf"
+[[ -f "${ophub_load_conf}" ]] || touch "${ophub_load_conf}"
+if modinfo rknpu >/dev/null 2>&1; then
+    grep -q -x "rknpu" "${ophub_load_conf}" 2>/dev/null || echo "rknpu" >>"${ophub_load_conf}"
+else
+    grep -q -x "rknpu" "${ophub_load_conf}" 2>/dev/null && sed -i '/^rknpu$/d' "${ophub_load_conf}"
+fi
+log_message "Adjust the rknpu module in the system module load list"
+
 # For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
 if [[ "${FDT_FILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
-    modprobe btmtksdio >/dev/null 2>&1 &
+    grep -q -x "btmtksdio" "${ophub_load_conf}" 2>/dev/null || echo "btmtksdio" >>"${ophub_load_conf}"
     log_message "Attempted to load btmtksdio module for Tencent-Aurora-3Pro."
 fi
 
