@@ -18,28 +18,32 @@
 #
 #================================= Functions list =================================
 #
-# error_msg          : Output error message
-# log_to_file        : Log kernel compilation output to a file
+# error_msg           : Output error message
+# log_to_file         : Log kernel compilation output to a file
 #
-# init_var           : Initialize all variables
-# toolchain_check    : Check and install the toolchain
-# query_version      : Query the latest kernel version
-# apply_patch        : Apply custom kernel patches
-# get_kernel_source  : Get the kernel source code
-# get_kernel_config  : Get the kernel config files
+# init_var            : Initialize all variables
+# toolchain_check     : Check and install the toolchain
+# query_version       : Query the latest kernel version
+# apply_patch         : Apply custom kernel patches
+# get_kernel_source   : Get the kernel source code
+# get_kernel_config   : Get the kernel config files
 #
-# collect_headers    : Collect the kernel headers file for modules
-# compile_env        : Set up the compile kernel environment
-# compile_dtbs       : Compile the dtbs
-# compile_kernel     : Compile the kernel
-# generate_uinitrd   : Generate initrd.img and uInitrd
-# packit_dtbs        : Packit dtbs files
-# packit_kernel      : Packit boot, modules and header files
-# packit_debs        : Packit deb packages for kernel
-# compile_selection  : Choose to compile dtbs or all kernels
-# clean_tmp          : Clear temporary files
+# collect_headers     : Collect the kernel headers file for modules
+# compile_env         : Set up the compile kernel environment
+# compile_dtbs        : Compile the dtbs
+# compile_kernel      : Compile the kernel
+# generate_uinitrd    : Generate initrd.img and uInitrd
+# packit_dtbs         : Packit dtbs files
+# packit_kernel       : Packit boot, modules and header files
+# create_debs_image   : Create deb packages for linux-image
+# create_debs_libc    : Create deb packages for linux-libc-dev
+# create_debs_headers : Create deb packages for linux-headers
+# create_debs_dtb     : Create deb packages for linux-dtb
+# create_debs         : Create deb packages
+# compile_selection   : Choose to compile dtbs or all kernels
+# clean_tmp           : Clear temporary files
 #
-# loop_recompile     : Loop to compile kernel
+# loop_recompile      : Loop to compile kernel
 #
 #========================= Set make environment variables =========================
 #
@@ -569,9 +573,15 @@ compile_env() {
     kernel_outname="${kernel_version}${custom_name}"
     echo -e "${INFO} Compile kernel output name [ ${kernel_outname} ]. \n"
 
+    # Set package version and architecture
+    pkg_version="${kernel_version}"
+    pkg_arch="arm64"
+    pkg_revision="1"
+    deb_path="${output_path}/deb-${kernel_version}"
+
     # Create a temp directory
-    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,libc_headers/,${kernel_version}/}
-    mkdir -p ${output_path}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,libc_headers/,${kernel_version}/}
+    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,libc_headers/,${kernel_version}/,deb-${kernel_version}/}
+    mkdir -p ${output_path}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,libc_headers/,${kernel_version}/,deb-${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
     echo -e "${STEPS} Set compilation parameters."
@@ -831,24 +841,12 @@ packit_kernel() {
     echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
 }
 
-packit_debs() {
+create_debs_image() {
     cd ${output_path}
 
-    # Pack deb packages for kernel installation
-    echo -e "${STEPS} Packing the [ ${kernel_outname} ] deb packages..."
-
-    # Set package version and architecture
-    pkg_version="${kernel_version}"
-    pkg_arch="arm64"
-    pkg_revision="1"
-    deb_path="${output_path}/deb-${kernel_version}"
-
-    # Create deb output directory
-    rm -rf ${deb_path}
-    mkdir -p ${deb_path}
-
     # 01. Create linux-image deb package (includes boot files and modules)
-    #echo -e "${INFO} Creating linux-image deb package..."
+    echo -e "${STEPS} Creating the [ linux-image ] deb packages..."
+
     image_pkg="linux-image${custom_name}"
     image_dir="${deb_path}/${image_pkg}"
     mkdir -p ${image_dir}/{DEBIAN,boot,usr/lib/modules}
@@ -879,34 +877,22 @@ EOF
     # Calculate installed size (in KB)
     image_size=$(du -sk ${image_dir} | cut -f1)
 
-    # Detect old linux-image packages for Conflicts/Replaces
-    image_replace_list=""
-    for old_pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-image-' | sed 's/:arm64$//' | sort -u); do
-        [[ "${old_pkg}" == "${image_pkg}" ]] && continue
-        [[ -n "${image_replace_list}" ]] && image_replace_list="${image_replace_list}, ${old_pkg}" || image_replace_list="${old_pkg}"
-    done
-
     # Create control file for linux-image package
-    {
-        cat <<EOF
+    cat >${image_dir}/DEBIAN/control <<EOF
 Package: ${image_pkg}
-Version: ${pkg_version}-${pkg_revision}
+Version: ${pkg_version}-${pkg_revision}${custom_name}
 Architecture: ${pkg_arch}
 Maintainer: ${pkg_maintainer}
 Installed-Size: ${image_size}
-EOF
-        [[ -n "${image_replace_list}" ]] && {
-            echo "Conflicts: ${image_replace_list}"
-            echo "Replaces: ${image_replace_list}"
-        }
-        cat <<EOF
+Provides: linux-image
+Conflicts: linux-image
+Replaces: linux-image
 Section: kernel
 Priority: optional
 Description: Linux kernel image ${kernel_outname}
  Kernel image and modules for ${kernel_outname}
  This package contains vmlinuz, config, System.map, uInitrd and kernel modules.
 EOF
-    } >${image_dir}/DEBIAN/control
 
     # Create preinst script to remove boot files and modules before install
     cat >${image_dir}/DEBIAN/preinst <<EOF
@@ -920,12 +906,40 @@ done <<'BOOT_LIST'
 ${boot_file_list}
 BOOT_LIST
 
+# Remove old modules files that will be overwritten by this package
+for d in /usr/lib/modules/*; do
+    if [[ -d "\${d}" ]]; then
+        rm -f "\${d}/build" "\${d}/source" 2>/dev/null || true
+        rm -f "\${d}"/modules.* 2>/dev/null || true
+    fi
+done
+
 # Cleaning up beforehand ensures a fresh unpack with no leftover files.
 rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null || true
 
 exit 0
 EOF
     chmod 755 ${image_dir}/DEBIAN/preinst
+
+    # Create prerm script to remove modules before uninstall
+    cat >${image_dir}/DEBIAN/prerm <<EOF
+#!/bin/bash
+set -e
+
+rm -rf /usr/lib/modules/${kernel_outname}/modules.* 2>/dev/null || true
+exit 0
+EOF
+    chmod 755 ${image_dir}/DEBIAN/prerm
+
+    # Create postrm script to remove modules after uninstall
+    cat >${image_dir}/DEBIAN/postrm <<EOF
+#!/bin/bash
+set -e
+
+rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null || true
+exit 0
+EOF
+    chmod 755 ${image_dir}/DEBIAN/postrm
 
     # Create postinst script for linux-image- package
     cat >${image_dir}/DEBIAN/postinst <<'POSTINST'
@@ -1001,19 +1015,6 @@ for f in /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /b
     rm -f "${f}" 2>/dev/null || true
 done
 
-# Clean old dtb symlinks (e.g., /boot/dtb-xxx)
-for l in /boot/dtb-*; do
-    [[ -L "${l}" || -d "${l}" ]] || continue
-    [[ "${l}" == *"${CURRENT_KERNEL}"* ]] && continue
-    rm -rf "${l}" 2>/dev/null || true
-done
-
-# Create dtb symlink for rockchip platform (matches armbian-update behavior)
-if [[ "${PLATFORM}" == "rockchip" ]]; then
-    cd /boot
-    [[ -d dtb ]] && ln -sf dtb dtb-${CURRENT_KERNEL}
-fi
-
 # Clean old modules directories
 for d in /usr/lib/modules/*; do
     [[ -d "${d}" ]] || continue
@@ -1031,11 +1032,6 @@ done
     done
 ) &
 
-# Update KERNEL_VERSION in ophub-release
-if [[ -f "${ophub_release_file}" ]]; then
-    sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${CURRENT_KERNEL}'|g" "${ophub_release_file}"
-fi
-
 exit 0
 POSTINST
     sed -i "s|KERNEL_NAME|${kernel_outname}|g" ${image_dir}/DEBIAN/postinst
@@ -1043,12 +1039,17 @@ POSTINST
     chmod 755 ${image_dir}/DEBIAN/postinst
 
     # Build the deb package (include version in filename since package name has no version)
-    image_deb="${image_pkg}_${pkg_version}-${pkg_revision}_${pkg_arch}.deb"
+    image_deb="linux-image_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${image_dir} ${deb_path}/${image_deb} >/dev/null
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${image_deb} ] file is packaged."
+}
+
+create_debs_libc() {
+    cd ${output_path}
 
     # 02. Create linux-libc-dev deb package
-    #echo -e "${INFO} Creating linux-libc-dev deb package..."
+    echo -e "${STEPS} Creating the [ linux-libc-dev ] deb packages..."
+
     libc_pkg="linux-libc-dev${custom_name}"
     libc_dir="${deb_path}/${libc_pkg}"
     mkdir -p ${libc_dir}/{DEBIAN,usr/include}
@@ -1077,24 +1078,16 @@ EOF
     # Calculate installed size
     libc_size=$(du -sk ${libc_dir} | cut -f1)
 
-    # Detect old linux-libc-dev packages
-    libc_replace_list="linux-libc-dev"
-    for old_pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-libc-dev' | sed 's/:arm64$//' | sort -u); do
-        [[ "${old_pkg}" == "${libc_pkg}" ]] && continue
-        [[ "${old_pkg}" == "linux-libc-dev" ]] && continue
-        libc_replace_list="${libc_replace_list}, ${old_pkg}"
-    done
-
     # Create control file for linux-libc-dev package
     cat >${libc_dir}/DEBIAN/control <<EOF
 Package: ${libc_pkg}
-Version: ${pkg_version}-${pkg_revision}
+Version: ${pkg_version}-${pkg_revision}${custom_name}
 Architecture: ${pkg_arch}
 Maintainer: ${pkg_maintainer}
 Installed-Size: ${libc_size}
 Provides: linux-libc-dev
-Conflicts: ${libc_replace_list}
-Replaces: ${libc_replace_list}
+Conflicts: linux-libc-dev
+Replaces: linux-libc-dev
 Section: kernel
 Priority: optional
 Multi-Arch: same
@@ -1103,31 +1096,46 @@ Description: Linux Kernel Headers for development ${kernel_outname}
  glibc and other userspace libraries and programs.
 EOF
 
+    # Create preinst script to remove old linux-libc-dev packages before install
+    cat >${libc_dir}/DEBIAN/preinst <<EOF
+#!/bin/bash
+set -e
+
+exit 0
+EOF
+    chmod 755 ${libc_dir}/DEBIAN/preinst
+
     # Create postinst script to clean old linux-libc-dev packages
-    cat >${libc_dir}/DEBIAN/postinst <<EOF
+    cat >${libc_dir}/DEBIAN/postinst <<'POSTINST'
 #!/bin/bash
 set -e
 
 # Remove old linux-libc-dev packages
 (
-    while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done
-    for pkg in \$(dpkg-query -W -f='\${Package}\n' 2>/dev/null | grep -E '^linux-libc-dev'); do
-        [[ "\${pkg}" == "${libc_pkg}" ]] && continue
-        dpkg --purge --force-depends "\${pkg}" 2>/dev/null || true
+    while fuser /var/lib/dpkg/lock >/dev/null 2>&1 || fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 1; done
+    for pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-libc-dev-'); do
+        [[ "${pkg}" == "CURRENT_LIBC_PKG" ]] && continue
+        dpkg --purge --force-depends "${pkg}" 2>/dev/null || true
     done
 ) &
 
 exit 0
-EOF
+POSTINST
+    sed -i "s|CURRENT_LIBC_PKG|${libc_pkg}|g" ${libc_dir}/DEBIAN/postinst
     chmod 755 ${libc_dir}/DEBIAN/postinst
 
     # Build the deb package (include version in filename since package name has no version)
-    libc_deb="${libc_pkg}_${pkg_version}-${pkg_revision}_${pkg_arch}.deb"
+    libc_deb="linux-libc-dev_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${libc_dir} ${deb_path}/${libc_deb} >/dev/null
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${libc_deb} ] file is packaged."
+}
+
+create_debs_headers() {
+    cd ${output_path}
 
     # 03. Create linux-headers deb package
-    #echo -e "${INFO} Creating linux-headers deb package..."
+    echo -e "${STEPS} Creating the [ linux-headers ] deb packages..."
+
     headers_pkg="linux-headers${custom_name}"
     headers_dir="${deb_path}/${headers_pkg}"
     mkdir -p ${headers_dir}/{DEBIAN,usr/src}
@@ -1150,29 +1158,18 @@ EOF
     # Calculate installed size
     headers_size=$(du -sk ${headers_dir} | cut -f1)
 
-    # Detect old linux-headers packages
-    headers_replace_list=""
-    for old_pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E '^linux-headers-' | sed 's/:arm64$//' | sort -u); do
-        [[ "${old_pkg}" == "${headers_pkg}" ]] && continue
-        [[ -n "${headers_replace_list}" ]] && headers_replace_list="${headers_replace_list}, ${old_pkg}" || headers_replace_list="${old_pkg}"
-    done
-
     # Create control file for linux-headers package
     {
         cat <<EOF
 Package: ${headers_pkg}
-Version: ${pkg_version}-${pkg_revision}
+Version: ${pkg_version}-${pkg_revision}${custom_name}
 Architecture: ${pkg_arch}
 Maintainer: ${pkg_maintainer}
 Installed-Size: ${headers_size}
 Depends: ${image_pkg}
 Provides: linux-headers
-EOF
-        [[ -n "${headers_replace_list}" ]] && {
-            echo "Conflicts: ${headers_replace_list}"
-            echo "Replaces: ${headers_replace_list}"
-        }
-        cat <<EOF
+Conflicts: linux-headers
+Replaces: linux-headers
 Section: kernel
 Priority: optional
 Description: Linux kernel headers ${kernel_outname}
@@ -1187,6 +1184,26 @@ set -e
 exit 0
 PREINST
     chmod 755 ${headers_dir}/DEBIAN/preinst
+
+    # Create prerm script to remove build and source symlinks before uninstall
+    cat >${headers_dir}/DEBIAN/prerm <<EOF
+#!/bin/bash
+set -e
+
+rm -rf /usr/lib/modules/${kernel_outname}/{build,source} 2>/dev/null || true
+exit 0
+EOF
+    chmod 755 ${headers_dir}/DEBIAN/prerm
+
+    # Create postrm script to remove header files after uninstall
+    cat >${headers_dir}/DEBIAN/postrm <<EOF
+#!/bin/bash
+set -e
+
+rm -rf /usr/src/linux-headers-${kernel_outname} 2>/dev/null || true
+exit 0
+EOF
+    chmod 755 ${headers_dir}/DEBIAN/postrm
 
     # Create postinst script to create build symlink and clean old headers
     cat >${headers_dir}/DEBIAN/postinst <<'POSTINST'
@@ -1222,12 +1239,17 @@ POSTINST
     sed -i "s|CURRENT_HEADERS_PKG|${headers_pkg}|g" ${headers_dir}/DEBIAN/postinst
     chmod 755 ${headers_dir}/DEBIAN/postinst
 
-    # Build the deb package
-    headers_deb="${headers_pkg}_${pkg_version}-${pkg_revision}_${pkg_arch}.deb"
+    headers_deb="linux-headers_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${headers_dir} ${deb_path}/${headers_deb} >/dev/null
     [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${headers_deb} ] file is packaged."
+}
+
+create_debs_dtb() {
+    cd ${output_path}
 
     # 04. Create linux-dtb deb packages for each platform
+    echo -e "${STEPS} Creating the [ linux-dtb ] deb packages..."
+
     declare -A platform_family=(["amlogic"]="meson64" ["rockchip"]="rockchip64" ["allwinner"]="sunxi64")
     platform_list=("amlogic" "rockchip" "allwinner")
     for platform in "${platform_list[@]}"; do
@@ -1248,9 +1270,6 @@ POSTINST
         # Copy dtb files
         cp -rf ${dtb_source}/* ${dtb_dir}/boot/dtb/${platform}/
 
-        # Generate file list for preinst
-        dtb_file_list="$(cd ${dtb_dir} && find boot -type f \( -name '*.dtb' -o -name '*.dtbo' \) | sort)"
-
         # Create copyright file
         mkdir -p ${dtb_dir}/usr/share/doc/${dtb_pkg}
         cat >${dtb_dir}/usr/share/doc/${dtb_pkg}/copyright <<EOF
@@ -1266,26 +1285,17 @@ EOF
         # Calculate installed size
         dtb_size=$(du -sk ${dtb_dir} | cut -f1)
 
-        # Detect old linux-dtb packages of same family
-        dtb_replace_list="linux-dtb-${family}, linux-dtb-${family}-${kernel_outname}"
-        for old_pkg in $(dpkg-query -W -f='${Package}\n' 2>/dev/null | grep -E "^linux-dtb-${family}" | sed 's/:arm64$//' | sort -u); do
-            [[ "${old_pkg}" == "${dtb_pkg}" ]] && continue
-            # Skip if already in the list
-            [[ "${dtb_replace_list}" == *"${old_pkg}"* ]] && continue
-            dtb_replace_list="${dtb_replace_list}, ${old_pkg}"
-        done
-
         # Create control file for linux-dtb package
         cat >${dtb_dir}/DEBIAN/control <<EOF
 Package: ${dtb_pkg}
-Version: ${pkg_version}-${pkg_revision}
+Version: ${pkg_version}-${pkg_revision}${custom_name}
 Architecture: ${pkg_arch}
 Maintainer: ${pkg_maintainer}
 Installed-Size: ${dtb_size}
 Depends: ${image_pkg}
 Provides: linux-dtb-${family}
-Conflicts: ${dtb_replace_list}
-Replaces: ${dtb_replace_list}
+Conflicts: linux-dtb-${family}
+Replaces: linux-dtb-${family}
 Section: kernel
 Priority: optional
 Description: Linux kernel DTB files for ${family} ${kernel_outname}
@@ -1297,47 +1307,81 @@ EOF
 #!/bin/bash
 set -e
 
+# Read platform info from ophub-release
+ophub_release_file="/etc/ophub-release"
+if [[ -f "\${ophub_release_file}" ]]; then
+    source "\${ophub_release_file}"
+fi
+
+# Backup current dtb files before installation
+if [[ -n "\${FDTFILE}" && -f "/boot/dtb/${platform}/\${FDTFILE}" ]]; then
+    cp -f "/boot/dtb/${platform}/\${FDTFILE}" "/tmp/\${FDTFILE}" 2>/dev/null || true
+fi
+
 # Remove only files that will be overwritten by this package
-while IFS= read -r f; do
-    [[ -n "\${f}" ]] && rm -f "/\${f}" 2>/dev/null || true
-done <<'DTB_FILE_LIST'
-${dtb_file_list}
-DTB_FILE_LIST
+rm -rf /boot/dtb/* 2>/dev/null || true
 
 exit 0
 EOF
         chmod 755 ${dtb_dir}/DEBIAN/preinst
 
-        # Create postinst script to create dtb symlink for rockchip platform
+        # Create postinst script to manage dtb symlinks and clean old packages
         cat >${dtb_dir}/DEBIAN/postinst <<EOF
 #!/bin/bash
 set -e
 
-# Platform-specific handling
-if [[ "${family}" == "rockchip64" ]]; then
-    # Create dtb symlink for rockchip platform
+CURRENT_KERNEL="KERNEL_NAME"
+
+# Clean old dtb symlinks (e.g., /boot/dtb-xxx)
+for l in /boot/dtb-*; do
+    [[ -L "\${l}" || -d "\${l}" ]] || continue
+    [[ "\${l}" == *"\${CURRENT_KERNEL}"* ]] && continue
+    rm -rf "\${l}" 2>/dev/null || true
+done
+
+# Platform-specific handling for rockchip
+if [[ "DTB_FAMILY" == "rockchip64" || "DTB_PLATFORM" == "rockchip" ]]; then
+    # Create dtb symlink for rockchip platform (matches armbian-update behavior)
     cd /boot
-    [[ -d dtb ]] && ln -sf dtb dtb-${kernel_outname}
+    [[ -d dtb ]] && ln -sf dtb dtb-\${CURRENT_KERNEL}
 fi
 
-# Remove old linux-dtb packages from dpkg database (background, wait for dpkg lock release)
-(
-    while fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 1; done
-    for pkg in \$(dpkg-query -W -f='\${Package}\n' 2>/dev/null | grep -E "^linux-dtb-${family}"); do
-        [[ "\${pkg}" == "${dtb_pkg}" ]] && continue
-        dpkg --purge --force-depends "\${pkg}" 2>/dev/null || true
-    done
-) &
+# Read platform info from ophub-release
+ophub_release_file="/etc/ophub-release"
+if [[ -f "\${ophub_release_file}" ]]; then
+    source "\${ophub_release_file}"
+fi
+
+# Restore the dtb file for the current platform if it was backed up
+if [[ -n "\${FDTFILE}" && ! -f "/boot/dtb/DTB_PLATFORM/\${FDTFILE}" && -f "/tmp/\${FDTFILE}" ]]; then
+    mv -f "/tmp/\${FDTFILE}" "/boot/dtb/DTB_PLATFORM/\${FDTFILE}" 2>/dev/null || true
+fi
 
 exit 0
 EOF
+        sed -i "s|KERNEL_NAME|${kernel_outname}|g" ${dtb_dir}/DEBIAN/postinst
+        sed -i "s|DTB_FAMILY|${family}|g" ${dtb_dir}/DEBIAN/postinst
+        sed -i "s|DTB_PLATFORM|${platform}|g" ${dtb_dir}/DEBIAN/postinst
         chmod 755 ${dtb_dir}/DEBIAN/postinst
 
         # Build the deb package
-        dtb_deb="${dtb_pkg}_${pkg_version}-${pkg_revision}_${pkg_arch}.deb"
+        dtb_deb="linux-dtb-${family}_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
         dpkg-deb -Zxz --build ${dtb_dir} ${deb_path}/${dtb_deb} >/dev/null
         [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${dtb_deb} ] file is packaged."
     done
+}
+
+create_debs() {
+    cd ${output_path}
+
+    # Create deb packages for kernel installation
+    echo -e "${STEPS} Creating all deb packages..."
+
+    # Create all deb packages
+    create_debs_image
+    create_debs_libc
+    create_debs_headers
+    create_debs_dtb
 
     cd ${deb_path}
     # Cleanup temporary build directories, keep only .deb files
@@ -1366,7 +1410,7 @@ compile_selection() {
         generate_uinitrd
         packit_dtbs
         packit_kernel
-        packit_debs
+        create_debs
     fi
 
     # Add sha256sum integrity verification file

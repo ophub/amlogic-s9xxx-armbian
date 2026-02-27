@@ -16,10 +16,10 @@
 #
 #========================================================================================
 
-# Custom Service Log - all script output will be logged here.
+# Custom Service Log - all script output will be logged here
 custom_log="/tmp/ophub_start_service.log"
 
-# A helper function for logging with a timestamp.
+# A helper function for logging with a timestamp
 log_message() {
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] $1" >>"${custom_log}"
 }
@@ -32,14 +32,15 @@ dmesg -n 1 >/dev/null 2>&1 || true
 log_message "Kernel console logging level set to 1 (Panic only)."
 
 # System Identification
-# Set the release check file to identify the device type.
+# Set the release check file to identify the device type
 ophub_release_file="/etc/ophub-release"
-FDT_FILE="" # Initialize FDT_FILE to be empty.
-
-[[ -f "${ophub_release_file}" ]] && { FDT_FILE="$(grep -oE 'meson.*dtb' "${ophub_release_file}" || true)"; }
-[[ -z "${FDT_FILE}" && -f "/boot/uEnv.txt" ]] && { FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##' || true)"; }
+FDT_FILE=""
+# Attempt to detect the FDT file from common boot configuration files
+[[ -f "/boot/uEnv.txt" ]] && { FDT_FILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##' || true)"; }
 [[ -z "${FDT_FILE}" && -f "/boot/extlinux/extlinux.conf" ]] && { FDT_FILE="$(grep -E '/dtb/.*\.dtb$' /boot/extlinux/extlinux.conf | sed -E 's#.*/##' || true)"; }
 [[ -z "${FDT_FILE}" && -f "/boot/armbianEnv.txt" ]] && { FDT_FILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##' || true)"; }
+# Update FDT file records information
+[[ -n "${FDT_FILE}" ]] && sed -i "s|^FDTFILE=.*|FDTFILE='${FDT_FILE}'|g" ${ophub_release_file}
 log_message "Detected FDT file: ${FDT_FILE:-'not found'}"
 
 # Device-Specific Services

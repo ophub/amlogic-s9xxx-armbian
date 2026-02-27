@@ -310,8 +310,12 @@ search_kernel() {
     cd ${current_path}
     echo -e "${STEPS} Start searching kernel version..."
 
+    # Set the kernel save path and clear old files
+    kernel_save_path="/var/cache/apt/archives/ophub"
+    [[ -d "${kernel_save_path}" ]] || mkdir -p "${kernel_save_path}"
+    rm -rf "${kernel_save_path}"/*
     # Set the kernel path
-    kernel_path="$(mktemp -d)"
+    kernel_path="${kernel_save_path}"
     local_found="no"
 
     # Check for local .deb files first, e.g: linux-image-ophub_6.12.69-1_arm64.deb -> 6.12.69
@@ -426,6 +430,10 @@ download_kernel() {
         kernel_path="${kernel_path}/deb-${inputs_kernel}"
     fi
 
+    # Set permissions for directories and files separately
+    find "${kernel_path}" -type d -exec chmod 755 {} \;
+    find "${kernel_path}" -type f -exec chmod a+r {} \;
+
     sync && echo ""
 }
 
@@ -436,20 +444,18 @@ check_kernel() {
 
     if [[ "${download_type}" == "deb" ]]; then
         # Find .deb kernel file
-        target_file="$(ls linux-image-*.deb 2>/dev/null | head -n 1)"
+        target_file="$(ls linux-image_*.deb 2>/dev/null | head -n 1)"
         [[ -z "${target_file}" ]] && error_msg "Kernel .deb file not found in [ ${kernel_path} ]"
 
-        # Extract kernel name: linux-image-ophub_6.12.69-1_arm64.deb -> ophub_6.12.69-1_arm64
-        kernel_name="$(echo "${target_file}" | grep -oP '(?<=linux-image-).*?(?=\.deb)')"
-        # Extract kernel signature: ophub_6.12.69-1_arm64 -> ophub
-        kernel_signature="${kernel_name%%_*}"
-        # Extract verify name: linux-image-ophub_6.12.69-1_arm64.deb -> 6.12.69-ophub
+        # Extract kernel name: linux-image_6.1.164-1-ophub_arm64.deb -> 6.1.164-1-ophub_arm64
+        kernel_name="$(echo "${target_file}" | grep -oP '(?<=linux-image_).*?(?=\.deb)')"
+        # Extract kernel signature: 6.1.164-1-ophub_arm64 -> ophub
+        kernel_signature="$(echo "${kernel_name}" | sed -E 's/^.*-([^-_]+)_.*/\1/')"
+        # Extract verify name: linux-image_6.1.164-1-ophub_arm64.deb -> 6.12.69-ophub
         verify_name="$(
             echo "${target_file}" |
-                grep -oP '(?<=linux-image-).*?(?=-\d+_arm64\.deb)' | {
-                read name
-                echo "${name#*_}-${name%%_*}"
-            }
+                grep -oP '(?<=linux-image_).*?(?=_arm64\.deb)' |
+                awk -F'-' '{print $1"-"$NF}'
         )"
 
         # Set file list for verification
@@ -498,7 +504,11 @@ check_kernel() {
         local i="1"
         for prefix in "${check_list[@]}"; do
             # Construct filename based on prefix and kernel name
-            tmp_file="${prefix}-${kernel_name}${file_ext}"
+            if [[ "${download_type}" == "deb" ]]; then
+                tmp_file="${prefix}_${kernel_name}${file_ext}"
+            else
+                tmp_file="${prefix}-${kernel_name}${file_ext}"
+            fi
 
             # Check if file exists
             if [[ ! -s "${tmp_file}" ]]; then
@@ -608,7 +618,7 @@ update_deb_kernel() {
     local n="0"
     local install_files=""
     for prefix in "${kernel_deb_list[@]}"; do
-        local f="$(ls ${prefix}-*.deb 2>/dev/null | head -n 1)"
+        local f="$(ls ${prefix}_*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${f}" ]]; then
             ((n++))
             install_files="${install_files} ${f}"
@@ -623,7 +633,7 @@ update_deb_kernel() {
         local i="1"
         install_failed=0
         for pkg in ${install_files}; do
-            dpkg -i "${pkg}" >/dev/null 2>&1
+            apt-get install -y --allow-downgrades ./"${pkg}"
             if [[ "${?}" -eq "0" ]]; then
                 echo -e "${INFO} (${i}/${n}) Installation of [ ${pkg} ] succeeded."
             else
@@ -648,7 +658,7 @@ update_deb_kernel() {
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
-    rm -f *${kernel_name}*.deb sha256sums
+    rm -rf ${kernel_save_path}/*
 
     sync && echo ""
 }
@@ -706,7 +716,7 @@ update_tar_kernel() {
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
     # Delete kernel tmpfiles
-    rm -f *${kernel_name}*.tar.gz sha256sums
+    rm -rf ${kernel_save_path}/*
 
     sync && echo ""
 }
