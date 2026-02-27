@@ -1307,17 +1307,6 @@ EOF
 #!/bin/bash
 set -e
 
-# Read platform info from ophub-release
-ophub_release_file="/etc/ophub-release"
-if [[ -f "\${ophub_release_file}" ]]; then
-    source "\${ophub_release_file}"
-fi
-
-# Backup current dtb files before installation
-if [[ -n "\${FDTFILE}" && -f "/boot/dtb/${platform}/\${FDTFILE}" ]]; then
-    cp -f "/boot/dtb/${platform}/\${FDTFILE}" "/tmp/\${FDTFILE}" 2>/dev/null || true
-fi
-
 # Remove only files that will be overwritten by this package
 rm -rf /boot/dtb/* 2>/dev/null || true
 
@@ -1344,17 +1333,6 @@ if [[ "DTB_FAMILY" == "rockchip64" || "DTB_PLATFORM" == "rockchip" ]]; then
     # Create dtb symlink for rockchip platform (matches armbian-update behavior)
     cd /boot
     [[ -d dtb ]] && ln -sf dtb dtb-\${CURRENT_KERNEL}
-fi
-
-# Read platform info from ophub-release
-ophub_release_file="/etc/ophub-release"
-if [[ -f "\${ophub_release_file}" ]]; then
-    source "\${ophub_release_file}"
-fi
-
-# Restore the dtb file for the current platform if it was backed up
-if [[ -n "\${FDTFILE}" && ! -f "/boot/dtb/DTB_PLATFORM/\${FDTFILE}" && -f "/tmp/\${FDTFILE}" ]]; then
-    mv -f "/tmp/\${FDTFILE}" "/boot/dtb/DTB_PLATFORM/\${FDTFILE}" 2>/dev/null || true
 fi
 
 exit 0

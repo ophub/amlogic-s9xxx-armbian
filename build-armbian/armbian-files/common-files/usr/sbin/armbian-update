@@ -30,6 +30,8 @@
 # download_kernel    : Download the kernel
 # check_kernel       : Check kernel files(.deb and .tar.gz)
 # backup_kernel      : Backup current kernel
+# backup_fdtfile     : Backup current dtb files
+# restore_fdtfile    : Restore dtb files from backup
 # update_tar_kernel  : Update the kernel in .tar.gz format
 # update_deb_kernel  : Update the kernel in .deb format
 # update_uboot       : Update the uboot
@@ -154,6 +156,7 @@ init_var() {
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
     MODEL_ID="${MODEL_ID}"
+    FDTFILE="${FDTFILE}"
     UBOOT_OVERLOAD="${UBOOT_OVERLOAD}"
     MAINLINE_UBOOT="${MAINLINE_UBOOT}"
     KERNEL_REPO="${KERNEL_REPO}"
@@ -164,6 +167,8 @@ init_var() {
 
     # Check the platform variable
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] is missing, stop updating the kernel."
+    # Check the FDT file variable
+    [[ -z "${FDTFILE}" ]] && error_msg "[ FDTFILE ] is missing, stop updating the kernel."
     # Check kernel download type
     if [[ -n "${DOWNLOAD_TYPE}" ]]; then
         download_type="${DOWNLOAD_TYPE}"
@@ -606,6 +611,25 @@ backup_kernel() {
     sync && echo ""
 }
 
+backup_fdtfile() {
+    # Check if the dtb backup directory exists, if not, create it
+    [[ -d "${backup_path}/dtb" ]] || mkdir -p ${backup_path}/dtb
+
+    # Backup the current dtb files
+    [[ -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]] && {
+        cp -f /boot/dtb/${PLATFORM}/${FDTFILE} ${backup_path}/dtb/
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to backup dtb files."
+    }
+}
+
+restore_fdtfile() {
+    # Restore the dtb files if the backup exists and the current dtb file is missing
+    [[ -f "${backup_path}/dtb/${FDTFILE}" && ! -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]] && {
+        cp -f ${backup_path}/dtb/${FDTFILE} /boot/dtb/${PLATFORM}/
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to restore dtb files."
+    }
+}
+
 # Update the .deb kernel
 update_deb_kernel() {
     cd ${kernel_path}
@@ -613,6 +637,9 @@ update_deb_kernel() {
 
     # Check if the kernel package is in deb format
     [[ "${download_type}" == "deb" ]] || error_msg "The kernel package is not in deb format."
+
+    # Backup the current dtb files
+    backup_fdtfile
 
     # Identify the .deb files that need to be installed
     local n="0"
@@ -633,7 +660,7 @@ update_deb_kernel() {
         local i="1"
         install_failed=0
         for pkg in ${install_files}; do
-            apt-get install -y --allow-downgrades ./"${pkg}"
+            apt-get install -y --allow-downgrades ./"${pkg}" >/dev/null 2>&1
             if [[ "${?}" -eq "0" ]]; then
                 echo -e "${INFO} (${i}/${n}) Installation of [ ${pkg} ] succeeded."
             else
@@ -657,6 +684,9 @@ update_deb_kernel() {
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
+    # Restore the dtb files if necessary
+    restore_fdtfile
+
     # Delete kernel tmpfiles
     rm -rf ${kernel_save_path}/*
 
@@ -670,6 +700,9 @@ update_tar_kernel() {
 
     # Check if the kernel package is in tar.gz format
     [[ "${download_type}" == "tar" ]] || error_msg "The kernel package is not in tar.gz format."
+
+    # Backup the current dtb files
+    backup_fdtfile
 
     # Delete the current kernel files
     rm -f /boot/config-* /boot/initrd.img-* /boot/System.map-* /boot/uInitrd-* /boot/vmlinuz-*
@@ -714,6 +747,9 @@ update_tar_kernel() {
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
+
+    # Restore the dtb files if necessary
+    restore_fdtfile
 
     # Delete kernel tmpfiles
     rm -rf ${kernel_save_path}/*
