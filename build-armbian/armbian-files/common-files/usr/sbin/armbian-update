@@ -619,15 +619,19 @@ backup_fdtfile() {
     [[ -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]] && {
         cp -f /boot/dtb/${PLATFORM}/${FDTFILE} ${backup_path}/dtb/
         [[ "${?}" -ne "0" ]] && error_msg "Failed to backup dtb files."
+        echo -e "${INFO} Current dtb file has been backed up to [ ${backup_path}/dtb/${FDTFILE} ]."
     }
 }
 
 restore_fdtfile() {
     # Restore the dtb files if the backup exists and the current dtb file is missing
-    [[ -f "${backup_path}/dtb/${FDTFILE}" && ! -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]] && {
+    if [[ -f "${backup_path}/dtb/${FDTFILE}" && ! -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]]; then
         cp -f ${backup_path}/dtb/${FDTFILE} /boot/dtb/${PLATFORM}/
         [[ "${?}" -ne "0" ]] && error_msg "Failed to restore dtb files."
-    }
+        echo -e "${INFO} Current dtb file has been restored."
+    elif [[ -f "/boot/dtb/${PLATFORM}/${FDTFILE}" ]]; then
+        echo -e "${INFO} The new kernel already contains the required dtb file, skipping restoration."
+    fi
 }
 
 # Update the .deb kernel
