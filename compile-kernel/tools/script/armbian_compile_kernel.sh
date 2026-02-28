@@ -437,7 +437,7 @@ apply_patch() {
         cd ${kernel_path}/${local_kernel_path}
         for file in *.patch; do
             echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
-            patch -p1 <"${file}"
+            patch -p1 <"${file}" || echo -e "${WARNING} The patch failed to apply, skipping."
         done
         rm -f *.patch
     else
@@ -453,7 +453,7 @@ apply_patch() {
         cd ${kernel_path}/${local_kernel_path}
         for file in *.patch; do
             echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
-            patch -p1 <"${file}"
+            patch -p1 <"${file}" || echo -e "${WARNING} The patch failed to apply, skipping."
         done
         rm -f *.patch
     else
@@ -1360,22 +1360,6 @@ create_debs() {
     create_debs_libc
     create_debs_headers
     create_debs_dtb
-
-    cd ${deb_path}
-    # Cleanup temporary build directories, keep only .deb files
-    find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
-    echo -e "${INFO} All deb packages build output: \n$(ls -hl *.deb 2>/dev/null) \n"
-    # Add sha256sum integrity verification file
-    sha256sum *.deb >sha256sums
-    echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
-
-    cd ${output_path}
-    tar -czf deb-${kernel_version}.tar.gz deb-${kernel_version}
-
-    # Cleanup temporary deb build directories
-    rm -rf ${deb_path}
-
-    echo -e "${SUCCESS} All deb packages are packaged successfully."
 }
 
 compile_selection() {
@@ -1391,13 +1375,23 @@ compile_selection() {
         create_debs
     fi
 
-    # Add sha256sum integrity verification file
     cd ${output_path}/${kernel_version}
+    # Add sha256sum integrity verification file
     sha256sum * >sha256sums
-    echo -e "${SUCCESS} The [ sha256sums ] file has been generated"
+
+    cd ${output_path}/deb-${kernel_version}
+    # Cleanup temporary build directories, keep only .deb files
+    find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
+    # Add sha256sum integrity verification file
+    sha256sum *.deb >sha256sums
 
     cd ${output_path}
+    # Package all kernel tar files into a single tar.gz file
     tar -czf ${kernel_version}.tar.gz ${kernel_version}
+    echo -e "${SUCCESS} All kernel tar packages are packaged successfully."
+    # Package all kernel deb files into a single tar.gz file
+    tar -czf deb-${kernel_version}.tar.gz deb-${kernel_version}
+    echo -e "${SUCCESS} All kernel deb packages are packaged successfully."
 
     echo -e "${INFO} Kernel series files are stored in [ ${output_path} ]."
     echo -e "${INFO} Current space usage: \n$(df -hT ${output_path}) \n"
@@ -1408,9 +1402,9 @@ clean_tmp() {
     echo -e "${STEPS} Clear the space..."
 
     sync && sleep 3
-    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,libc_headers/,${kernel_version}/}
-    [[ "${delete_source}" =~ ^(true|yes)$ ]] && rm -rf ${kernel_path}/* 2>/dev/null
-    rm -rf ${tmp_backup_path}
+    rm -rf ${output_path}/{boot/,dtb/,modules/,header/,libc_headers/,${kernel_version}/,deb-${kernel_version}/} || true
+    [[ "${delete_source}" =~ ^(true|yes)$ ]] && rm -rf ${kernel_path}/* || true
+    rm -rf ${tmp_backup_path} || true
 
     # Show ccache statistics
     echo -e "${INFO} ccache statistics:"
