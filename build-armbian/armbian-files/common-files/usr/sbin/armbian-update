@@ -150,8 +150,18 @@ init_var() {
 
     # Check release file
     [[ -f "${ophub_release_file}" ]] || error_msg "missing [ ${ophub_release_file} ] file."
+
     # Adjust parameter name
     sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
+
+    # Attempt to detect the FDT file from common boot configuration files
+    FDTFILE=""
+    [[ -f "/boot/uEnv.txt" ]] && { FDTFILE="$(grep -E '^FDT=.*\.dtb$' /boot/uEnv.txt | sed -E 's#.*/##' || true)"; }
+    [[ -z "${FDTFILE}" && -f "/boot/extlinux/extlinux.conf" ]] && { FDTFILE="$(grep -E '/dtb/.*\.dtb$' /boot/extlinux/extlinux.conf | sed -E 's#.*/##' || true)"; }
+    [[ -z "${FDTFILE}" && -f "/boot/armbianEnv.txt" ]] && { FDTFILE="$(grep -E '^fdtfile=.*\.dtb$' /boot/armbianEnv.txt | sed -E 's#.*/##' || true)"; }
+    # Update FDT file records information
+    [[ -n "${FDTFILE}" ]] && sed -i "s|^FDTFILE=.*|FDTFILE='${FDTFILE}'|g" ${ophub_release_file}
+
     # Get values
     source "${ophub_release_file}"
     PLATFORM="${PLATFORM}"
@@ -178,7 +188,8 @@ init_var() {
     fi
     # Check kernel signature
     [[ -n "${KERNEL_SIGNATURE}" ]] || {
-        echo "KERNEL_SIGNATURE='${kernel_uname#*-}'" >>${ophub_release_file}
+        KERNEL_SIGNATURE="${kernel_uname#*-}"
+        echo "KERNEL_SIGNATURE='${KERNEL_SIGNATURE}'" >>${ophub_release_file}
     }
 
     # Set the kernel packages
