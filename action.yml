@@ -146,9 +146,9 @@ runs:
                 if [[ -z "$(ls ${armbian_filepath}/${armbian_filename} 2>/dev/null)" ]]; then
                     echo -e "Copy files: [ ${armbian_file} ]"
                     if [[ "${armbian_file}" =~ ^/ ]]; then
-                        cp -vf ${armbian_file} ${armbian_filepath}/ || true
+                        cp -vf ${armbian_file} -t ${armbian_filepath}/ || true
                     else
-                        cp -vf ${{ github.workspace }}/${armbian_file} ${armbian_filepath}/ || true
+                        cp -vf ${{ github.workspace }}/${armbian_file} -t ${armbian_filepath}/ || true
                     fi
                 else
                     echo -e "The [ ${armbian_filepath}/${armbian_filename} ] file already exists, skipping."
@@ -197,7 +197,7 @@ runs:
                 copy_from_path="${copy_from_path%/}"
                 [[ "${copy_from_path}" != /* ]] && copy_from_path="${{ github.workspace }}/${copy_from_path}"
                 copy_to_path="build-armbian/armbian-files/common-files"
-                cp -avf --no-preserve=ownership "${copy_from_path}/." "${copy_to_path}/" || true
+                cp -avf --no-preserve=ownership "${copy_from_path}/." -t "${copy_to_path}/" || true
             else
                 echo -e "Use the default Armbian rebuild files."
             fi
@@ -243,7 +243,7 @@ runs:
                 if [[ "$(ls ${{ github.workspace }}/${{ inputs.kernel_config }}/config-* -l 2>/dev/null | grep "^-" | wc -l)" -ne "0" ]]; then
                     echo -e "Use a custom kernel compilation template..."
                     rm -f ${config_filepath}/* 2>/dev/null && sync
-                    cp -vf ${{ github.workspace }}/${{ inputs.kernel_config }}/config-* ${config_filepath}/ 2>/dev/null && sync
+                    cp -vrf "${{ github.workspace }}/${{ inputs.kernel_config }}/." -t "${config_filepath}/" || true
                     echo -e "List of Kernel Custom Compilation Configuration Templates: \n$(ls -lh ${config_filepath} 2>/dev/null)"
                 else
                     echo -e "The custom kernel compilation template path is invalid, continue to use the default template."
@@ -259,7 +259,7 @@ runs:
                 if [[ -d "${{ github.workspace }}/${{ inputs.kernel_patch }}" ]]; then
                     echo -e "Use custom kernel patches..."
                     rm -rf ${custom_kernel_patch}/* 2>/dev/null && sync
-                    cp -vrf ${{ github.workspace }}/${{ inputs.kernel_patch }}/ -t ${custom_kernel_patch} && sync
+                    cp -vrf "${{ github.workspace }}/${{ inputs.kernel_patch }}/." -t "${custom_kernel_patch}/" || true
                     echo -e "Directory of custom kernel patches: \n$(ls -lh ${custom_kernel_patch} 2>/dev/null)"
                 else
                     echo -e "Invalid custom kernel patch directory, skipping."
