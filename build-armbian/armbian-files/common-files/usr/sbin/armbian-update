@@ -339,7 +339,6 @@ search_kernel() {
         target_file="$(ls linux-image-*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${target_file}" ]]; then
             inputs_kernel="$(echo "${target_file}" | grep -oP '(?<=_)\d+\.\d+\.\d+(?=-)' || echo "${target_file}" | grep -oP '\d+\.\d+\.\d+')"
-            file_ext=".deb"
             download_type="deb"
             local_found="yes"
         fi
@@ -349,7 +348,6 @@ search_kernel() {
         target_file="$(ls boot-*.tar.gz 2>/dev/null | head -n 1)"
         if [[ -n "${target_file}" ]]; then
             inputs_kernel="$(echo "${target_file}" | grep -oP '(?<=boot-)\d+\.\d+\.\d+')"
-            file_ext=".tar.gz"
             download_type="tar"
             local_found="yes"
         fi
@@ -360,7 +358,7 @@ search_kernel() {
         echo -e "${INFO} Found local kernel. Version: [ ${inputs_kernel} ] Type: [ ${download_type} ]"
 
         [[ -f "sha256sums" ]] && mv -f sha256sums -t "${kernel_path}"
-        mv -f *"${file_ext}" -t "${kernel_path}"
+        mv -f *".${download_type}"* -t "${kernel_path}"
         [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files."
 
     else
@@ -395,8 +393,6 @@ search_kernel() {
                 # If found, update global variables and stop searching
                 if [[ -n "${latest_kernel}" ]]; then
                     download_type="${type}"
-                    # Set the file extension for later verification
-                    [[ "${type}" == "deb" ]] && file_ext=".deb" || file_ext=".tar.gz"
                     break
                 fi
             done
@@ -521,9 +517,9 @@ check_kernel() {
         for prefix in "${check_list[@]}"; do
             # Construct filename based on prefix and kernel name
             if [[ "${download_type}" == "deb" ]]; then
-                tmp_file="${prefix}_${kernel_name}${file_ext}"
+                tmp_file="${prefix}_${kernel_name}.deb"
             else
-                tmp_file="${prefix}-${kernel_name}${file_ext}"
+                tmp_file="${prefix}-${kernel_name}.tar.gz"
             fi
 
             # Check if file exists
@@ -534,7 +530,7 @@ check_kernel() {
                     ((i++))
                     continue
                 else
-                    error_msg "The [ ${tmp_file} ] file is missing."
+                    error_msg "(${i}/4) The [ ${tmp_file} ] file is missing."
                 fi
             fi
 
@@ -542,7 +538,7 @@ check_kernel() {
             tmp_sha256sum="$(sha256sum "${tmp_file}" | awk '{print $1}')"
             tmp_checkcode="$(grep "${tmp_file}" "${sha256sums_file}" | awk '{print $1}')"
 
-            [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "${tmp_file}: sha256sum verification failed."
+            [[ "${tmp_sha256sum}" == "${tmp_checkcode}" ]] || error_msg "(${i}/4) ${tmp_file}: sha256sum verification failed."
             echo -e "${INFO} (${i}/4) Verification of [ ${tmp_file} ] succeeded."
             ((i++))
         done
