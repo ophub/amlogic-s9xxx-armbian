@@ -334,9 +334,9 @@ search_kernel() {
     kernel_path="${kernel_save_path}"
     local_found="no"
 
-    # Check for local .deb files first, e.g: linux-image-ophub_6.12.69-1_arm64.deb -> 6.12.69
+    # Check for local .deb files first, e.g: linux-image_6.1.164-1-ophub_arm64.deb -> 6.1.164
     if [[ "$(find . -maxdepth 1 -type f -name "*.deb" 2>/dev/null | wc -l)" -ge "3" ]]; then
-        target_file="$(ls linux-image-*.deb 2>/dev/null | head -n 1)"
+        target_file="$(ls linux-image_*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${target_file}" ]]; then
             inputs_kernel="$(echo "${target_file}" | grep -oP '(?<=_)\d+\.\d+\.\d+(?=-)' || echo "${target_file}" | grep -oP '\d+\.\d+\.\d+')"
             download_type="deb"
