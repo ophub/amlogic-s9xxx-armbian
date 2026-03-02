@@ -926,7 +926,12 @@ EOF
 #!/bin/bash
 set -e
 
-rm -rf /usr/lib/modules/${kernel_outname}/modules.* 2>/dev/null || true
+# Only clean modules files on remove/purge, NOT during upgrade
+case "\${1}" in
+    remove|purge)
+        rm -rf /usr/lib/modules/${kernel_outname}/modules.* 2>/dev/null || true
+        ;;
+esac
 exit 0
 EOF
     chmod 755 ${image_dir}/DEBIAN/prerm
@@ -936,7 +941,12 @@ EOF
 #!/bin/bash
 set -e
 
-rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null || true
+# Only remove modules on remove/purge, NOT during upgrade
+case "\${1}" in
+    remove|purge)
+        rm -rf /usr/lib/modules/${kernel_outname} 2>/dev/null || true
+        ;;
+esac
 exit 0
 EOF
     chmod 755 ${image_dir}/DEBIAN/postrm
@@ -1190,7 +1200,12 @@ PREINST
 #!/bin/bash
 set -e
 
-rm -rf /usr/lib/modules/${kernel_outname}/{build,source} 2>/dev/null || true
+# Only remove symlinks on remove/purge, NOT during upgrade
+case "\${1}" in
+    remove|purge)
+        rm -rf /usr/lib/modules/${kernel_outname}/{build,source} 2>/dev/null || true
+        ;;
+esac
 exit 0
 EOF
     chmod 755 ${headers_dir}/DEBIAN/prerm
@@ -1200,7 +1215,12 @@ EOF
 #!/bin/bash
 set -e
 
-rm -rf /usr/src/linux-headers-${kernel_outname} 2>/dev/null || true
+# Only remove headers on remove/purge, NOT during upgrade
+case "\${1}" in
+    remove|purge)
+        rm -rf /usr/src/linux-headers-${kernel_outname} 2>/dev/null || true
+        ;;
+esac
 exit 0
 EOF
     chmod 755 ${headers_dir}/DEBIAN/postrm

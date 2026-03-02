@@ -659,9 +659,9 @@ update_deb_kernel() {
         local f="$(ls ${prefix}_*.deb 2>/dev/null | head -n 1)"
         if [[ -n "${f}" ]]; then
             ((n++))
-            install_files="${install_files} ${f}"
+            install_files="${install_files} ./${f}"
         else
-            error_msg "Kernel deb package not found: [ ${prefix}-*.deb ]"
+            error_msg "Kernel deb package not found: [ ${prefix}_*.deb ]"
         fi
     done
 
@@ -671,11 +671,16 @@ update_deb_kernel() {
         local i="1"
         install_failed=0
         for pkg in ${install_files}; do
-            apt-get install -y --allow-downgrades ./"${pkg}" >/dev/null 2>&1
+            # Install the package and capture the output log for error analysis if installation fails
+            pkg_log="$(apt-get install -y --reinstall --allow-downgrades "${pkg}" 2>&1)"
+
+            # Check the installation result
             if [[ "${?}" -eq "0" ]]; then
-                echo -e "${INFO} (${i}/${n}) Installation of [ ${pkg} ] succeeded."
+                echo -e "${INFO} (${i}/${n}) Installation of [ ${pkg#./} ] succeeded."
             else
-                echo -e "${PROMPT} (${i}/${n}) Installation of [ ${pkg} ] failed."
+                echo -e "${PROMPT} (${i}/${n}) Installation of [ ${pkg#./} ] failed. Error details:"
+                # Display the last 5 lines of the log to provide context on the failure without overwhelming the user
+                echo "${pkg_log}" | tail -n 5
                 install_failed=1
             fi
             ((i++))
@@ -684,7 +689,17 @@ update_deb_kernel() {
         # If any package installation failed, attempt to fix broken dependencies
         if [[ "${install_failed}" -ne "0" ]]; then
             echo -e "${INFO} Fix packages installation status..."
+
+            # First, try to fix broken dependencies which might be causing the installation failure
             apt-get install -f -y >/dev/null 2>&1
+            # Then, try to reinstall the kernel packages again to ensure they are properly installed
+            apt-get install -y --reinstall --allow-downgrades ${install_files} >/dev/null 2>&1
+            # Finally, verify the installation status of the kernel packages
+            if [[ "${?}" -eq "0" ]]; then
+                echo -e "${INFO} Package installation status has been fixed and verified."
+            else
+                error_msg "Failed to fix package installation status. Packages might be corrupted."
+            fi
         fi
     else
         error_msg "Missing kernel deb installation packages."
