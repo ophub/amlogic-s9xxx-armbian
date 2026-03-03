@@ -13,23 +13,40 @@
 #        第2列： 期望绑定在第几个cpu (从1开始)
 #
 #  配置文件改好，运行 balethirq.pl 即时生效
+# Radxa E25 网卡中断优化配置
+# 映射关系: 1->CPU0, 2->CPU1, 3->CPU2, 4->CPU3
 
-# pcie-lan rx
-eth0-0	3
-# pcie-lan tx-0
-eth0-16 2
-# pcie-lan tx-1
-eth0-18 2
+# ==========================
+# 1. PCIe LAN (eth0 - RTL8125B)
+# 内网吞吐，RX 和 TX 分开，避开 WAN 的重负载核
+# ==========================
+# RX 队列 (接收内网数据) -> 交给 CPU2, CPU3 (与 GMAC 共享，因为 GMAC 负载低)
+eth0-0          4
+eth0-1          3
 
-# pcie-wan rx
-eth1-0	4
-# pcie wan tx-0
-eth1-16	1
-# pcie wan tx-1
-eth1-18	1
+# TX 队列 (发送内网数据) -> 交给 CPU0, CPU1 (为 WAN 腾出 RX 资源)
+eth0-16         2
+eth0-18         1
 
+# ==========================
+# 2. PCIe WAN (eth1 - RTL8125B) [核心优化区]
+# 负载最重，必须打散！
+# 策略：TX (最重) 占用 CPU0, CPU1; RX 占用 CPU2, CPU3
+# 这样每个核都有 WAN 的任务，但避免了单核过热
+# ==========================
+# TX 队列 (NAT/防火墙主要消耗点)
+eth1-16         1
+eth1-18         2
+
+# RX 队列 (从外网进入)
+# 放在 CPU2, CPU3，与 LAN RX 共享，因为 RX 主要是 DMA，计算少
+eth1-0          3
+eth1-1          4
+
+# ==========================
+# 4. USB & Others
+# ==========================
 # usb 3.0
-xhci-hcd:usb2	1
-
+xhci-hcd:usb2	2
 # sata
-ahci[fc400000.sata] 2
+ahci[fc400000.sata] 4
