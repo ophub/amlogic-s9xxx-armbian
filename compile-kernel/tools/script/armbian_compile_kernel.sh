@@ -989,6 +989,24 @@ if [[ -f vmlinuz-KERNEL_NAME ]]; then
     esac
 fi
 
+# Run depmod to generate modules.dep and map files
+depmod -a KERNEL_NAME 2>/dev/null || true
+
+# Generate initrd.img and uInitrd if not exist
+if [[ ! -f /boot/initrd.img-KERNEL_NAME || ! -f /boot/uInitrd-KERNEL_NAME ]]; then
+    echo "initrd.img-KERNEL_NAME or uInitrd-KERNEL_NAME not found, generating with update-initramfs..."
+    if command -v update-initramfs >/dev/null 2>&1; then
+        initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
+        [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" "${initramfs_conf}"
+
+        update-initramfs -c -k KERNEL_NAME
+
+        [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" "${initramfs_conf}"
+    else
+        echo "WARNING: update-initramfs not found, system may not boot correctly!"
+    fi
+fi
+
 # Handle uInitrd based on platform and model
 if [[ "${MODEL_ID}" =~ ^(r304|r306)$ ]]; then
     # Special handling for MODEL_ID r304 and r306
@@ -1010,9 +1028,6 @@ elif [[ -f uInitrd-KERNEL_NAME ]]; then
         ;;
     esac
 fi
-
-# Run depmod to generate modules.dep and map files
-depmod -a KERNEL_NAME 2>/dev/null || true
 
 # Clean up old kernels (keep only the newly installed kernel)
 # This matches armbian-update behavior
