@@ -1077,6 +1077,11 @@ refactor_rootfs() {
         sed -i "s|^#*DefaultTimeoutStopSec.*|DefaultTimeoutStopSec=10s|g" ${system_conf}
     }
 
+    # Add custom sysctl configuration file
+    [[ -d "etc/sysctl.d" && -f "etc/sysctl.conf" ]] && {
+        ln -sf ../sysctl.conf etc/sysctl.d/99-sysctl.conf
+    }
+
     # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
     motd_tips="etc/default/armbian-motd"
     [[ -f "${motd_tips}" ]] && sed -i 's|^MOTD_DISABLE=.*|MOTD_DISABLE="tips"|g' ${motd_tips}
