@@ -1412,13 +1412,13 @@ compile_selection() {
 
     cd ${output_path}/${kernel_version}
     # Add sha256sum integrity verification file
-    sha256sum * >sha256sums
+    sha256sum *.tar.gz >sha256sums 2>/dev/null || true
 
     cd ${output_path}/deb-${kernel_version}
     # Cleanup temporary build directories, keep only .deb files
     find . -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} \;
     # Add sha256sum integrity verification file
-    sha256sum *.deb >sha256sums
+    sha256sum *.deb >sha256sums 2>/dev/null || true
 
     cd ${output_path}
     # Package all kernel tar files into a single tar.gz file
