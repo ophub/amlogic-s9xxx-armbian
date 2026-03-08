@@ -190,6 +190,8 @@ armbian-sync
 
 2. 安装必要的软件包（如 Ubuntu 24.04）
 
+进入 `~/amlogic-s9xxx-armbian` 根目录，然后运行安装命令:
+
 ```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y

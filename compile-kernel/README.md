@@ -18,6 +18,8 @@ Pre-compiled kernels are available in the [Releases](https://github.com/ophub/ke
 
 2. Install necessary software packages (for Ubuntu 24.04):
 
+Enter the `~/amlogic-s9xxx-armbian` root directory, and then run the installation command:
+
 ```yaml
 sudo apt-get update -y
 sudo apt-get full-upgrade -y

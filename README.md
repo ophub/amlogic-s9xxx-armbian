@@ -190,6 +190,8 @@ In the use of Armbian, some common problems that may be encountered can be found
 
 2. Install the necessary software packages (for Ubuntu 24.04)
 
+Enter the `~/amlogic-s9xxx-armbian` root directory, and then run the installation command:
+
 ```shell
 sudo apt-get update -y
 sudo apt-get full-upgrade -y
