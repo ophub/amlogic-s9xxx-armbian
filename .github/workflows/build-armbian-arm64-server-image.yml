@@ -68,7 +68,9 @@ on:
           - h88k
           - h88k-v3
           - h96-max-m2
+          - hk1-rbox-k8s
           - hs530r
+          - ht2
           - hugsun-x99
           - ipc-r
           - jp-tvbox
