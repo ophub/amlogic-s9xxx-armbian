@@ -157,7 +157,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Cache ccache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /builder/ccache
           key: kernel-${{ inputs.kernel_toolchain }}-${{ inputs.kernel_version }}-${{ env.source_hash }}
