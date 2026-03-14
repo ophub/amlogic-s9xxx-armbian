@@ -1,8 +1,8 @@
 # Armbian Software Center
 
-According to user feedback and demands in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) section, common [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) is gradually integrated to achieve one-click installation/update/uninstallation and other convenient operations. This includes `docker images`, `desktop software`, `application services`, etc.
+Based on user feedback and requests in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), commonly used [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) has been gradually integrated to provide one-click install/update/uninstall operations. This includes `Docker images`, `desktop software`, `application services`, and more.
 
-## Software introduction
+## Software Introduction
 
 | ID | SoftwareName           | Home | DockerHub:Port | Software introduction                             |
 | --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
@@ -61,13 +61,13 @@ According to user feedback and demands in the [Issue](https://github.com/ophub/a
 
 ## Software Center Usage Guide
 
-Log into the Armbian system → Enter the command:
+Log in to the Armbian system and enter the command:
 
 ```shell
 armbian-software
 ```
 
-A list of integrated software shortcuts for installation/management will appear, such as:
+A list of integrated software with shortcut management options will appear, for example:
 
 ```shell
 root@armbian:~# armbian-software
@@ -83,12 +83,12 @@ ID    NAME                STATE           MANAGE
 [ OPTIONS ] Please Input Software ID:
 ```
 
-- `Uninstalled software`: The status shows `not-installed`, input the `ID` of the software to `install`.
-- `Installed software`: The status shows `installed`, input the `ID` of the software and choose to `update` or `remove` as prompted.
+- `Uninstalled software`: Status shows `not-installed`. Enter the software `ID` to install.
+- `Installed software`: Status shows `installed`. Enter the software `ID` and follow the prompts to `update` or `remove`.
 
 ## Software Center Development Guide
 
-The scripts/commands of the software center are stored in the [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) directory. You can use the `armbian-software -u` command to sync and download this directory to the local system, updating the local software center list. The files starting with a number are `one-click installation script` files for the corresponding software. [software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) is a `unified instruction file` for installing/updating/removing software by commands. [software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) is the software list configuration file, explained as follows:
+The software center scripts and commands are stored in the [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) directory. Use `armbian-software -u` to sync and download this directory to the local system, updating the software center list. Files prefixed with numbers are `one-click installation scripts` for the corresponding software. [software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) is the `unified command file` for installing/updating/removing software. [software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) is the software list configuration file, described as follows:
 
 ```yaml
 # 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
@@ -99,25 +99,25 @@ The scripts/commands of the software center are stored in the [/usr/share/ophub/
 ...
 ```
 
-- `ID`: The `unique serial number` of the software.
-- `Software Name`: The `software name` (the name length is required to be less than 40 characters).
-- `AuthMethod@Package`: The `check method` for the installation status of the software and the corresponding `software package`, separated by the `@` symbol.
-  - For software installed with the `docker` container, check with the `docker` method, such as checking whether the `portainer` image is installed, check with `docker@portainer`.
-  - For software installed with the `apt` method, check with the `dpkg` method, such as checking whether the `firefox` software package is installed, check with `dpkg@firefox`.
-  - When there are executable files in the system's command directories (bin, sbin), use the `which` command to check for the existence of the binary command files. For instance, to verify the installation of the `frpc` service, use `which@frpc` to check.
-  - When there are no executable files in the system's command directories (bin, sbin), use the `find` command to check if a specific path exists. For example, to determine if the `ArozOS` system is installed, use `find@/root/arozos` to perform the check.
-- `Execute Selection`: Set the software to use a `unified instruction file` or an `independent script` for management.
-  - For `more streamlined` operation commands, they are collectively written in `command-docker.sh / command-desktop.sh / command-service.sh` files according to software classification, and named by software number. For example, the serial number of `portainer` is `102`, and its operation is written in `software_203()`.
-  - For operations that are `more complex and long in instructions`, they are managed by independent script files. For example, the independent script for installing `frpc` is named `302-frpc.sh` with the number as the prefix.
-- `Supported Release`: Set the supported Armbian `system version codename`. Use `all` to indicate support for all versions. If only certain versions are supported, specify the version codenames separated by `@` symbol.
+- `ID`: The software's `unique serial number`.
+- `Software Name`: The `software name` (must be fewer than 40 characters).
+- `AuthMethod@Package`: The `verification method` for checking installation status and the corresponding `software package`, separated by `@`.
+  - For Docker container images, use the `docker` method. Example: `docker@portainer` checks whether the `portainer` image is installed.
+  - For packages installed via `apt`, use the `dpkg` method. Example: `dpkg@firefox` checks whether the `firefox` package is installed.
+  - When executable files exist in system command directories (bin, sbin), use `which` to check for the binary. Example: `which@frpc` verifies the `frpc` service installation.
+  - When no executable files exist in system command directories, use `find` to check for a specific path. Example: `find@/root/arozos` checks whether the `ArozOS` system is installed.
+- `Execute Selection`: Specifies whether the software uses a `unified command file` or an `independent script` for management.
+  - For `simple` operations, commands are grouped by software category in `command-docker.sh / command-desktop.sh / command-service.sh` files, named by software serial number. For example, `portainer` (ID `102`) has its operations in `software_203()`.
+  - For `complex` operations with lengthy instructions, independent script files are used. For example, the `frpc` installation script is named `302-frpc.sh`, prefixed with its serial number.
+- `Supported Release`: Specifies the supported Armbian `system version codenames`. Use `all` to indicate support for all versions. For partial support, list the version codenames separated by `@`.
 
-We welcome everyone to contribute more software. Feel free to submit support requests in the [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues).
+Contributions of additional software are welcome. Feel free to submit requests in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues).
 
 
 
 # Armbian 软件中心
 
-根据用户在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的需求反馈，逐步整合常用[软件](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `docker 镜像`、`桌面软件`、`应用服务` 等。
+根据用户在 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中的反馈需求，已逐步整合常用[软件](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)，实现一键安装/更新/卸载等快捷操作。包括 `Docker 镜像`、`桌面软件`、`应用服务` 等。
 
 ## 软件介绍
 
@@ -178,13 +178,13 @@ We welcome everyone to contribute more software. Feel free to submit support req
 
 ## 软件中心使用说明
 
-登录 Armbian 系统 → 输入命令：
+登录 Armbian 系统后输入以下命令：
 
 ```shell
 armbian-software
 ```
 
-将出现当前已经集成的软件快捷安装/管理列表，如：
+将显示当前已整合的软件快捷管理列表，例如：
 
 ```shell
 root@armbian:~# armbian-software
@@ -200,12 +200,12 @@ ID    NAME                STATE           MANAGE
 [ OPTIONS ] Please Input Software ID:
 ```
 
-- `未安装的软件`：状态显示为 `not-installed`，输入软件对应的 `ID` 即可 `安装`。
-- `已安装的软件`：状态显示为 `installed`，输入软件对应的 `ID` ，根据提示选择 `更新` 或 `删除`。
+- `未安装的软件`：状态显示为 `not-installed`，输入软件对应的 `ID` 即可安装。
+- `已安装的软件`：状态显示为 `installed`，输入软件对应的 `ID`，根据提示选择更新或删除。
 
 ## 软件中心开发说明
 
-软件中心的脚本/命令集中存放在 [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) 目录下，使用 `armbian-software -u` 命令可以同步下载此目录至本地，更新本地的软件中心列表。其中以数字开头的文件是对应软件的 `一键安装脚本` 文件。[software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) 是使用命令安装/更新/删除操作的`统一指令文件`。[software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) 是软件列表配置文件，说明如下：
+软件中心的脚本和命令集中存放在 [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) 目录下。使用 `armbian-software -u` 命令可同步下载此目录至本地，更新本地软件中心列表。其中以数字开头的文件是对应软件的`一键安装脚本`。[software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) 是用于安装/更新/删除操作的`统一指令文件`。[software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) 是软件列表配置文件，说明如下：
 
 ```yaml
 # 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
@@ -216,17 +216,17 @@ ID    NAME                STATE           MANAGE
 ...
 ```
 
-- `ID`: 软件的 `唯一序号` 。
-- `Software Name`：`软件名称`（名称长度要求小于 40 个字符）。
-- `AuthMethod@Package`：软件安装状态的`检查方法`，与对应的`软件包`，使用 `@` 符号分割。
-  - 使用 `docker` 容器安装的镜像，采用 `docker` 方式检查，如检查是否安装了 `portainer` 镜像，使用 `docker@portainer` 进行检查；
-  - 使用 `apt` 方式安装的软件包采用 `dpkg` 方式检查，如检查是否安装了 `firefox` 软件包，使用 `dpkg@firefox` 进行检查；
-  - 在系统命令目录 (bin,sbin) 有可执行文件时，采用 `which` 方式检查二进制命令文件是否存在，如检查是否安装了 `frpc` 服务，使用 `which@frpc` 进行检查。
-  - 在系统命令目录 (bin,sbin) 没有可执行文件时，采用 `find` 方式检查指定路径是否存在，如检查是否安装了 `arozos` 系统，使用 `find@/root/arozos` 进行检查。
-- `Execute Selection`：设置软件使用 `统一指令文件` 或 `独立脚本` 进行管理。
-  - 对于 `比较精简` 的操作命令，按照软件分类，集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号进行命名。如 `portainer` 的序号是 `102`，他的操作写在 `software_203()` 中；
-  - 对于 `比较复杂、指令内容较长` 的操作，进行独立脚本文件管理。如安装 `frpc` 的独立脚本，以序号开头，命名为 `302-frpc.sh` 。
-- `Supported Release`：设置支持的 Armbian `系统版本代号`。全部版本都支持的使用 `all` 表示。仅本支持部分版本的填写版本代号，多个版本代号之间使用 `@` 符号连接。
+- `ID`: 软件的`唯一序号`。
+- `Software Name`：`软件名称`（名称长度需小于 40 个字符）。
+- `AuthMethod@Package`：软件安装状态的`检查方法`与对应的`软件包`，以 `@` 符号分隔。
+  - 通过 `docker` 容器安装的镜像，采用 `docker` 方式检查。例如：检查 `portainer` 镜像是否安装，使用 `docker@portainer`。
+  - 通过 `apt` 方式安装的软件包，采用 `dpkg` 方式检查。例如：检查 `firefox` 是否安装，使用 `dpkg@firefox`。
+  - 在系统命令目录 (bin, sbin) 存在可执行文件时，采用 `which` 方式检查。例如：检查 `frpc` 服务是否安装，使用 `which@frpc`。
+  - 在系统命令目录无可执行文件时，采用 `find` 方式检查指定路径是否存在。例如：检查 `arozos` 系统是否安装，使用 `find@/root/arozos`。
+- `Execute Selection`：设置软件使用`统一指令文件`或`独立脚本`进行管理。
+  - 对于操作命令`较为精简`的软件，按分类集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号命名。例如 `portainer`（序号 `102`）的操作写在 `software_203()` 中。
+  - 对于操作`较为复杂、指令内容较长`的软件，采用独立脚本文件管理。例如 `frpc` 的安装脚本以序号开头，命名为 `302-frpc.sh`。
+- `Supported Release`：设置支持的 Armbian `系统版本代号`。全部版本都支持时使用 `all` 表示。仅支持部分版本时，填写版本代号，多个代号之间使用 `@` 符号连接。
 
-欢迎大家补充更多软件。欢迎在 [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
+欢迎大家补充更多软件。欢迎在 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
 

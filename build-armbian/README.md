@@ -1,19 +1,19 @@
-# Description of Relevant Files
+# Build Files Reference
 
 View Chinese description | [查看中文说明](README.cn.md)
 
-The files required to compile Armbian are stored in the corresponding directories.
+The files required for compiling the Armbian system are organized in their respective directories.
 
 ## armbian-files
 
-The files stored here are related files that need to be used when building Armbian. Among them, the files under the `common-files` directory are general files, the files under the `platform-files` directory are files for each platform, and the files under the `different-files` directory are differentiated files for different devices. More explanations can be found in the `12.15` section of [documents](../documents/).
+This directory contains all the files used during the Armbian build process. The `common-files` subdirectory holds platform-independent shared files, the `platform-files` subdirectory holds platform-specific files, and the `different-files` subdirectory holds device-specific configuration files. For further details, refer to Section `12.15` of the [documentation](../documents/).
 
-The required firmware will be automatically downloaded from the [ophub/firmware](https://github.com/ophub/firmware) repository to the `common-files/usr/lib/firmware` directory.
+Required firmware files are automatically downloaded from the [ophub/firmware](https://github.com/ophub/firmware) repository into the `common-files/usr/lib/firmware` directory.
 
 ## kernel
 
-Create a folder corresponding to the version number under the `kernel` directory, such as `stable/5.10.125`. Multiple kernels create directories in sequence and put the corresponding kernel files into them. Kernel files can be downloaded from the [kernel](https://github.com/ophub/kernel) repository, or you can [customize the compilation](../compile-kernel). If the kernel files are not manually downloaded and stored, the script will automatically download from the kernel repository during compilation.
+Create a version-specific folder under the `kernel` directory, e.g., `stable/5.10.125`. For multiple kernels, create separate directories sequentially and place the corresponding kernel files in each. Kernel files can be downloaded from the [kernel](https://github.com/ophub/kernel) repository, or you can [compile them yourself](../compile-kernel). If no kernel files are present locally, the build script will automatically download them from the kernel repository.
 
 ## u-boot
 
-System boot files, according to different versions of the kernel, will be automated by installation/update and other related scripts when needed. The necessary u-boot will be automatically downloaded from the [ophub/u-boot](https://github.com/ophub/u-boot) repository to the `u-boot` directory.
+System bootloader files. Depending on the kernel version, the appropriate u-boot files are automatically managed by the installation and update scripts as needed. Required u-boot files are automatically downloaded from the [ophub/u-boot](https://github.com/ophub/u-boot) repository into the `u-boot` directory.

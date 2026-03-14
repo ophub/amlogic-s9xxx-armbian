@@ -1,10 +1,10 @@
 # LED Screen Display Control Instructions
 
-- The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The command file for the `Armbian` system is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the command file for the `OpenWrt` system is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If they are not currently in the system, they can be manually uploaded, and file execution permissions can be assigned: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
+- The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The `Armbian` command file is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the `OpenWrt` command file is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If these files are not present in your system, upload them manually and assign execution permissions: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
 
-- Upgrade the system kernel to the latest version. The `Armbian` system uses the `armbian-sync` command for upgrades. The `OpenWrt` system upgrades using `System Menu` → `Amlogic Service` → `Online Download Update`.
+- Update the system kernel to the latest version. For the `Armbian` system, use the `armbian-sync` command. For the `OpenWrt` system, navigate to `System Menu` → `Amlogic Service` → `Online Download Update`.
 
-- Currently, `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, `tx3.conf`, `x96air.conf`, `x88pro-x3.conf` and other devices have been tested. Configurations for other devices can be modified by checking: [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf). The second field value in the corresponding content in the configuration files from these two websites needs to be reduced by `1`. For example:
+- The following devices have been tested: `x96max.conf`, `x96maxplus.conf`, `h96max-x3.conf`, `hk1-x3.conf`, `hk1box.conf`, `tx3.conf`, `x96air.conf`, and `x88pro-x3.conf`. Configurations for other devices can be adapted from [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) and [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf). Note: the second field value in configuration entries from these sources must be decremented by `1`. For example:
 
 ```yaml
 vfd_gpio_clk='0,69,0'
@@ -21,21 +21,21 @@ vfd_gpio_dat='0,69,0'
 
 - Rename the configuration file to `diy.conf` and upload it to the `/usr/share/openvfd/conf` directory, then enter the command `armbian-openvfd 99` for testing.
 
-- The command `armbian-openvfd 0` can disable the LED display and clear the system process. Before each new configuration test, please first execute this disable command, and then execute `armbian-openvfd 99` to test the modified configuration.
+- The command `armbian-openvfd 0` disables the LED display and clears associated system processes. Before testing each new configuration, always run this disable command first, then execute `armbian-openvfd 99` to test the modified configuration.
 
-- However, some boxes may set a message on boot before Linux (e.g. displaying `BOOT`). To clear this message, execute `armbian-openvfd 0` to stop existing services, then `armbian-openvfd <boxid>` to take control of the LED display. If you want to disable the display, execute `armbian-openvfd 0` again.
+- Some devices may display a boot message before Linux starts (e.g., showing `BOOT`). To clear this message, first run `armbian-openvfd 0` to stop existing services, then run `armbian-openvfd <boxid>` to take control of the LED display. To disable the display entirely, run `armbian-openvfd 0` again.
 
-- After the screen display is normal, you can add it to the boot autostart task, change the `15` in the following command to your `box number`:
+- Once the display is working correctly, add it to the boot startup tasks. Replace `15` in the following commands with your device's `BoxID`:
 
 ```yaml
 # Execute the following command in the terminal to enable the openvfd service
 sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
 sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
-# Some devices require a restart to clear 'BOOT' and related messages
+# Some devices require restarting the OpenVFD service to clear 'BOOT' and related messages
 sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/start_service.sh
 ```
 
-- Everyone is welcome to test and share their device's configuration file (diy.conf) to benefit more people.
+- Everyone is welcome to test and share their device configuration files (diy.conf) to benefit the community.
 
 |  BoxName   | `BoxID` |  Armbian Command      |   OpenWrt Command       |  Function   |
 | ---------- | ------- | --------------------- | ----------------------- | ----------- |
@@ -59,11 +59,11 @@ sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/sta
 
 # LED 屏显示控制说明
 
-- 配置文件放在 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) 目录下，`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd)。如果当前系统中没有的可以手动上传，并赋予文件执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`
+- 配置文件位于 `Armbian/OpenWrt` 系统的 [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) 目录下。`Armbian` 系统的命令文件位于 [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd)，`OpenWrt` 系统的命令文件位于 [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd)。若当前系统中缺少这些文件，可手动上传并赋予执行权限：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`。
 
-- 将系统的内核升级到最新版本。`Armbian` 系统使用 `armbian-sync` 命令升级。`OpenWrt` 系统使用 `系统菜单` → `晶晨宝盒` → `在线下载更新` 功能升级。
+- 将系统内核升级至最新版本。`Armbian` 系统使用 `armbian-sync` 命令升级；`OpenWrt` 系统通过 `系统菜单` → `晶晨宝盒` → `在线下载更新` 进行升级。
 
-- 目前有 `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf`、`x96air.conf` 和 `x88pro-x3.conf` 等设备经过测试，其他设备的配置可以查看：[arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) 和 [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) 进行修改，需要把这两个网站中配置文件里对应内容中进行调整，把第二个字段的值减 `1` 后使用，如：
+- 目前已测试的设备配置包括 `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf`、`x96air.conf` 和 `x88pro-x3.conf` 等。其他设备的配置可参考 [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) 和 [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) 进行修改。注意：需将这两个网站配置文件中对应字段的第二个值减 `1` 后使用，例如：
 
 ```yaml
 vfd_gpio_clk='0,69,0'
@@ -80,11 +80,11 @@ vfd_gpio_dat='0,69,0'
 
 - 将配置文件命名为 `diy.conf` 并上传至 `/usr/share/openvfd/conf` 目录下，输入命令 `armbian-openvfd 99` 进行测试。
 
-- 通过命令 `armbian-openvfd 0` 可以禁用 LED 显示并清除系统进程，在每次测试新的配置前，请先执行此禁用命令，再执行 `armbian-openvfd 99` 进行更改后的配置测试。
+- 通过命令 `armbian-openvfd 0` 可禁用 LED 显示并清除相关系统进程。每次测试新配置前，请先执行此禁用命令，再执行 `armbian-openvfd 99` 进行配置测试。
 
-- 有些设备可能会在 Linux 启动之前在开机时显示一条信息（例如显示 `BOOT`）。要清除这条信息，请先执行 `armbian-openvfd 0` 以停止现有服务，然后执行 `armbian-openvfd <boxid>` 来接管 LED 显示。如果你想禁用显示屏，再次执行 `armbian-openvfd 0` 即可。
+- 部分设备可能在 Linux 启动前显示开机信息（例如显示 `BOOT`）。要清除此信息，请先执行 `armbian-openvfd 0` 停止现有服务，然后执行 `armbian-openvfd <boxid>` 接管 LED 显示。若要禁用显示屏，再次执行 `armbian-openvfd 0` 即可。
 
-- 屏幕显示正常后，可以添加至开机自启动任务，下面命令中的 `15` 改为你的 `盒子编号` ：
+- 屏幕显示正常后，可将其添加到开机自启动任务。将以下命令中的 `15` 替换为你的设备编号：
 
 ```yaml
 # 在终端执行以下命令启用 openvfd 服务
@@ -94,7 +94,7 @@ sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_se
 sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/start_service.sh
 ```
 
-- 欢迎大家测试后分享自己设备的配置文件（ diy.conf ），让更多人受益。
+- 欢迎大家测试后分享自己设备的配置文件（diy.conf），让更多人受益。
 
 |  盒子名称   | `盒子编号` |  Armbian 使用命令      |   OpenWrt 使用命令       |   功能   |
 | ---------- | -------- | --------------------- | ----------------------- | ------- |
