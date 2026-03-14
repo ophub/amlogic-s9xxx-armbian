@@ -18,7 +18,7 @@
 #
 #================================= Functions list =================================
 #
-# error_msg           : Output error message
+# error_msg           : Output error message and exit
 # log_to_file         : Log kernel compilation output to a file
 #
 # init_var            : Initialize all variables
@@ -28,22 +28,22 @@
 # get_kernel_source   : Get the kernel source code
 # get_kernel_config   : Get the kernel config files
 #
-# collect_headers     : Collect the kernel headers file for modules
-# compile_env         : Set up the compile kernel environment
+# collect_headers     : Collect kernel headers for building modules
+# compile_env         : Set up the kernel compilation environment
 # compile_dtbs        : Compile the dtbs
 # compile_kernel      : Compile the kernel
 # generate_uinitrd    : Generate initrd.img and uInitrd
-# packit_dtbs         : Packit dtbs files
-# packit_kernel       : Packit boot, modules and header files
+# packit_dtbs         : Package dtbs files
+# packit_kernel       : Package boot, modules, and header files
 # create_debs_image   : Create deb packages for linux-image
 # create_debs_libc    : Create deb packages for linux-libc-dev
 # create_debs_headers : Create deb packages for linux-headers
 # create_debs_dtb     : Create deb packages for linux-dtb
-# create_debs         : Create deb packages
+# create_debs         : Create all deb packages
 # compile_selection   : Choose to compile dtbs or all kernels
-# clean_tmp           : Clear temporary files
+# clean_tmp           : Clean up temporary files
 #
-# loop_recompile      : Loop to compile kernel
+# loop_recompile      : Loop to compile kernels
 #
 #========================= Set make environment variables =========================
 #
@@ -148,7 +148,7 @@ log_to_file() {
 }
 
 init_var() {
-    echo -e "${STEPS} Start Initializing Variables..."
+    echo -e "${STEPS} Initializing variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     local options="k:a:n:m:p:r:t:c:d:s:z:l:f:h:i:"
@@ -317,7 +317,7 @@ init_var() {
 
 toolchain_check() {
     cd ${current_path}
-    echo -e "${STEPS} Start checking the toolchain for compiling the kernel..."
+    echo -e "${STEPS} Checking the toolchain for kernel compilation..."
 
     # Install dependencies
     sudo apt-get -qq update
@@ -336,7 +336,7 @@ toolchain_check() {
     [[ -d "/etc/apt/sources.list.d" ]] || mkdir -p /etc/apt/sources.list.d
     if [[ "${toolchain_name}" == "clang" ]]; then
         # Install LLVM
-        echo -e "${INFO} Start installing the LLVM toolchain..."
+        echo -e "${INFO} Installing the LLVM toolchain..."
         sudo apt-get -qq install -y lsb-release software-properties-common gnupg
         curl -fsSL https://apt.llvm.org/llvm.sh | sudo bash -s all
         [[ "${?}" -eq "0" ]] || error_msg "LLVM installation failed."
@@ -351,7 +351,7 @@ toolchain_check() {
         # Download Arm GNU Toolchain
         [[ -d "${toolchain_path}" ]] || mkdir -p ${toolchain_path}
         if [[ ! -d "${toolchain_path}/${gun_file//.tar.xz/}/bin" ]]; then
-            echo -e "${INFO} Start downloading the ARM GNU toolchain [ ${gun_file} ]..."
+            echo -e "${INFO} Downloading the ARM GNU toolchain [ ${gun_file} ]..."
 
             # Download the ARM GNU toolchain. If it fails, wait 1 minute and try again, try 10 times.
             for i in {1..10}; do
@@ -392,7 +392,7 @@ toolchain_check() {
 
 query_version() {
     cd ${current_path}
-    echo -e "${STEPS} Start querying the latest kernel version..."
+    echo -e "${STEPS} Querying the latest kernel version..."
 
     # Set empty array
     tmp_arr_kernels=()
@@ -426,49 +426,49 @@ query_version() {
 
 apply_patch() {
     cd ${current_path}
-    echo -e "${STEPS} Start applying custom kernel patches..."
+    echo -e "${STEPS} Applying custom kernel patches..."
 
     # Apply the common kernel patches
     if [[ -d "${kernel_patch_path}/common-kernel-patches" ]]; then
-        echo -e "${INFO} Copy common kernel patches..."
+        echo -e "${INFO} Copying common kernel patches..."
         rm -f ${kernel_path}/${local_kernel_path}/*.patch
         cp -vf ${kernel_patch_path}/common-kernel-patches/*.patch -t ${kernel_path}/${local_kernel_path}
 
         cd ${kernel_path}/${local_kernel_path}
         for file in *.patch; do
-            echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
-            patch -p1 <"${file}" || echo -e "${WARNING} The patch failed to apply, skipping."
+            echo -e "${INFO} Applying kernel patch file: [ ${file} ]"
+            patch -p1 <"${file}" || echo -e "${WARNING} Failed to apply the patch, skipping."
         done
         rm -f *.patch
     else
-        echo -e "${INFO} No common kernel patches, skipping."
+        echo -e "${INFO} No common kernel patches found, skipping."
     fi
 
     # Apply the dedicated kernel patches
     if [[ -d "${kernel_patch_path}/${local_kernel_path}" ]]; then
-        echo -e "${INFO} Copy [ ${local_kernel_path} ] version dedicated kernel patches..."
+        echo -e "${INFO} Copying [ ${local_kernel_path} ] version dedicated kernel patches..."
         rm -f ${kernel_path}/${local_kernel_path}/*.patch
         cp -vf ${kernel_patch_path}/${local_kernel_path}/*.patch -t ${kernel_path}/${local_kernel_path}
 
         cd ${kernel_path}/${local_kernel_path}
         for file in *.patch; do
-            echo -e "${INFO} Apply kernel patch file: [ ${file} ]"
-            patch -p1 <"${file}" || echo -e "${WARNING} The patch failed to apply, skipping."
+            echo -e "${INFO} Applying kernel patch file: [ ${file} ]"
+            patch -p1 <"${file}" || echo -e "${WARNING} Failed to apply the patch, skipping."
         done
         rm -f *.patch
     else
-        echo -e "${INFO} No [ ${local_kernel_path} ] version dedicated kernel patches, skipping."
+        echo -e "${INFO} No [ ${local_kernel_path} ] version dedicated kernel patches found, skipping."
     fi
 }
 
 get_kernel_source() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading the kernel source code..."
+    echo -e "${STEPS} Downloading the kernel source code..."
 
     [[ -d "${kernel_path}" ]] || mkdir -p ${kernel_path}
 
     if [[ ! -d "${kernel_path}/${local_kernel_path}" ]]; then
-        echo -e "${INFO} Start cloning from [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
+        echo -e "${INFO} Cloning from [ https://github.com/${server_kernel_repo} -b ${code_branch} ]"
 
         # Clone the latest kernel source code. If it fails, wait 1 minute and try again, try 10 times.
         for i in {1..10}; do
@@ -507,7 +507,7 @@ get_kernel_source() {
 }
 
 get_kernel_config() {
-    echo -e "${STEPS} Start downloading the kernel config files..."
+    echo -e "${STEPS} Downloading the kernel config files..."
 
     # Check if the kernel config file already exists
     if [[ -s "${config_path}/config-${kernel_verpatch}" && "${config_download}" == "false" ]]; then
@@ -527,7 +527,7 @@ get_kernel_config() {
     rm -rf ${config_path}/*
     cp -f ${tmp_path}/${kernel_config_path}/${config_flavor}/config-* ${config_path}/
     [[ "${?}" -eq 0 ]] || error_msg "Failed to copy the kernel config file."
-    echo -e "${INFO} Kernel config files [ ${config_flavor} ] downloaded to [ ${config_path} ] directory."
+    echo -e "${INFO} Kernel config files [ ${config_flavor} ] downloaded to [ ${config_path} ]."
     echo -e "${INFO} Config files: \n$(ls -lh ${config_path}/ 2>/dev/null)"
 }
 
@@ -567,7 +567,7 @@ collect_headers() {
 
 compile_env() {
     cd ${current_path}
-    echo -e "${STEPS} Start checking local compilation environments."
+    echo -e "${STEPS} Checking local compilation environment..."
 
     # Get kernel output name
     kernel_outname="${kernel_version}${custom_name}"
@@ -584,7 +584,7 @@ compile_env() {
     mkdir -p ${output_path}/{boot/,dtb/{allwinner/,amlogic/,rockchip/},modules/,header/,libc_headers/,${kernel_version}/,deb-${kernel_version}/}
 
     cd ${kernel_path}/${local_kernel_path}
-    echo -e "${STEPS} Set compilation parameters."
+    echo -e "${STEPS} Setting compilation parameters..."
 
     # Show variable
     echo -e "${INFO} ARCH: [ ${SRC_ARCH} ]"
@@ -663,9 +663,9 @@ compile_dtbs() {
     cd ${kernel_path}/${local_kernel_path}
 
     # Make dtbs
-    echo -e "${STEPS} Start compilation dtbs [ ${local_kernel_path} ]..."
+    echo -e "${STEPS} Compiling dtbs [ ${local_kernel_path} ]..."
     make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" dtbs -j${PROCESS}
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The dtbs is compiled successfully."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The dtbs compiled successfully."
 }
 
 compile_kernel() {
@@ -675,35 +675,35 @@ compile_kernel() {
     [[ "${silent_log}" =~ ^(true|yes)$ ]] && silent_print="-s" || silent_print=""
 
     # Make kernel
-    echo -e "${STEPS} Start compilation kernel [ ${local_kernel_path} ]..."
+    echo -e "${STEPS} Compiling kernel [ ${local_kernel_path} ]..."
     make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" Image modules dtbs -j${PROCESS}
     #make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" bindeb-pkg KDEB_COMPRESS=xz KBUILD_DEBARCH=arm64 -j${PROCESS}
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel is compiled successfully." || error_msg "Kernel compilation failed."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel compiled successfully." || error_msg "Kernel compilation failed."
 
     # Install modules
-    echo -e "${STEPS} Install modules ..."
+    echo -e "${STEPS} Installing modules..."
     make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" INSTALL_MOD_PATH=${output_path}/modules modules_install
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is installed successfully." || error_msg "Modules installation failed."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} Modules installed successfully." || error_msg "Modules installation failed."
 
     # Strip debug information
     STRIP="${CROSS_COMPILE}strip"
     find ${output_path}/modules -name "*.ko" -print0 | xargs -0 ${STRIP} --strip-debug 2>/dev/null
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The modules is stripped successfully." || echo -e "${WARNING} The modules stripping failed."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} Modules stripped successfully." || echo -e "${WARNING} Modules stripping failed."
 
     # Collect kernel headers for building external modules
-    echo -e "${STEPS} Collect kernel headers ..."
+    echo -e "${STEPS} Collecting kernel headers..."
     collect_headers
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The kernel headers is collected successfully." || error_msg "Kernel headers collection failed."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} Kernel headers collected successfully." || error_msg "Kernel headers collection failed."
 
     # Install libc headers (for linux-libc-dev package)
-    echo -e "${STEPS} Install libc headers ..."
+    echo -e "${STEPS} Installing libc headers..."
     make ${silent_print} ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" INSTALL_HDR_PATH=${output_path}/libc_headers headers_install
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The libc headers is installed successfully." || error_msg "Libc headers installation failed."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} Libc headers installed successfully." || error_msg "Libc headers installation failed."
 }
 
 generate_uinitrd() {
     cd ${current_path}
-    echo -e "${STEPS} Generate uInitrd environment initialization..."
+    echo -e "${STEPS} Initializing uInitrd generation environment..."
 
     # Backup current system files for /boot
     echo -e "${INFO} Backup the files in the [ ${boot_backup_path} ] directory."
@@ -745,7 +745,7 @@ generate_uinitrd() {
     fi
 
     cd /boot
-    echo -e "${STEPS} Generate uInitrd file..."
+    echo -e "${STEPS} Generating uInitrd file..."
 
     # Enable update_initramfs
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" ${initramfs_conf}
@@ -757,10 +757,10 @@ generate_uinitrd() {
     [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" ${initramfs_conf}
 
     if [[ -f "uInitrd" ]]; then
-        echo -e "${SUCCESS} The initrd.img and uInitrd file is Successfully generated."
+        echo -e "${SUCCESS} The initrd.img and uInitrd files generated successfully."
         [[ ! -L "uInitrd" ]] && mv -vf uInitrd uInitrd-${kernel_outname}
     else
-        echo -e "${WARNING} The initrd.img and uInitrd file not updated."
+        echo -e "${WARNING} The initrd.img and uInitrd files were not updated."
     fi
 
     echo -e "${INFO} File situation in the /boot directory after update: \n$(ls -hl *${kernel_outname})"
@@ -791,7 +791,7 @@ packit_dtbs() {
         }
         tar -czf dtb-allwinner-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
-        echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file is packaged."
+        echo -e "${SUCCESS} The [ dtb-allwinner-${kernel_outname}.tar.gz ] file packaged successfully."
     }
 
     cd ${output_path}/dtb/amlogic
@@ -803,7 +803,7 @@ packit_dtbs() {
         }
         tar -czf dtb-amlogic-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
-        echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file is packaged."
+        echo -e "${SUCCESS} The [ dtb-amlogic-${kernel_outname}.tar.gz ] file packaged successfully."
     }
 
     cd ${output_path}/dtb/rockchip
@@ -815,7 +815,7 @@ packit_dtbs() {
         }
         tar -czf dtb-rockchip-${kernel_outname}.tar.gz *
         mv -f *.tar.gz ${output_path}/${kernel_version}
-        echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file is packaged."
+        echo -e "${SUCCESS} The [ dtb-rockchip-${kernel_outname}.tar.gz ] file packaged successfully."
     }
 }
 
@@ -828,17 +828,17 @@ packit_kernel() {
     chmod +x *
     tar -czf boot-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${output_path}/${kernel_version}
-    echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ boot-${kernel_outname}.tar.gz ] file packaged successfully."
 
     cd ${output_path}/modules/lib/modules
     tar -czf modules-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${output_path}/${kernel_version}
-    echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ modules-${kernel_outname}.tar.gz ] file packaged successfully."
 
     cd ${output_path}/header
     tar -czf header-${kernel_outname}.tar.gz *
     mv -f *.tar.gz ${output_path}/${kernel_version}
-    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file is packaged."
+    echo -e "${SUCCESS} The [ header-${kernel_outname}.tar.gz ] file packaged successfully."
 }
 
 create_debs_image() {
@@ -1066,7 +1066,7 @@ POSTINST
     # Build the deb package (include version in filename since package name has no version)
     image_deb="linux-image_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${image_dir} ${deb_path}/${image_deb} >/dev/null
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${image_deb} ] file is packaged."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${image_deb} ] file packaged successfully."
 }
 
 create_debs_libc() {
@@ -1152,7 +1152,7 @@ POSTINST
     # Build the deb package (include version in filename since package name has no version)
     libc_deb="linux-libc-dev_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${libc_dir} ${deb_path}/${libc_deb} >/dev/null
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${libc_deb} ] file is packaged."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${libc_deb} ] file packaged successfully."
 }
 
 create_debs_headers() {
@@ -1276,7 +1276,7 @@ POSTINST
 
     headers_deb="linux-headers_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
     dpkg-deb -Zxz --build ${headers_dir} ${deb_path}/${headers_deb} >/dev/null
-    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${headers_deb} ] file is packaged."
+    [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${headers_deb} ] file packaged successfully."
 }
 
 create_debs_dtb() {
@@ -1380,7 +1380,7 @@ EOF
         # Build the deb package
         dtb_deb="linux-dtb-${family}_${pkg_version}-${pkg_revision}${custom_name}_${pkg_arch}.deb"
         dpkg-deb -Zxz --build ${dtb_dir} ${deb_path}/${dtb_deb} >/dev/null
-        [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${dtb_deb} ] file is packaged."
+        [[ "${?}" -eq "0" ]] && echo -e "${SUCCESS} The [ ${dtb_deb} ] file packaged successfully."
     done
 }
 
@@ -1423,10 +1423,10 @@ compile_selection() {
     cd ${output_path}
     # Package all kernel tar files into a single tar.gz file
     tar -czf ${kernel_version}.tar.gz ${kernel_version}
-    echo -e "${SUCCESS} All kernel tar packages are packaged successfully."
+    echo -e "${SUCCESS} All kernel tar packages packaged successfully."
     # Package all kernel deb files into a single tar.gz file
     tar -czf deb-${kernel_version}.tar.gz deb-${kernel_version}
-    echo -e "${SUCCESS} All kernel deb packages are packaged successfully."
+    echo -e "${SUCCESS} All kernel deb packages packaged successfully."
 
     echo -e "${INFO} Kernel series files are stored in [ ${output_path} ]."
     echo -e "${INFO} Current space usage: \n$(df -hT ${output_path}) \n"
@@ -1434,7 +1434,7 @@ compile_selection() {
 
 clean_tmp() {
     cd ${current_path}
-    echo -e "${STEPS} Clear the space..."
+    echo -e "${STEPS} Cleaning up temporary files..."
 
     sync && sleep 3
     rm -rf ${output_path}/{boot/,dtb/,modules/,header/,libc_headers/,${kernel_version}/,deb-${kernel_version}/} || true
@@ -1445,7 +1445,7 @@ clean_tmp() {
     echo -e "${INFO} ccache statistics:"
     ccache -s 2>/dev/null
 
-    echo -e "${SUCCESS} All processes have been completed."
+    echo -e "${SUCCESS} Cleanup completed successfully."
 }
 
 loop_recompile() {
@@ -1469,14 +1469,14 @@ loop_recompile() {
             local_kernel_path="${code_repo}-${code_branch}"
         fi
 
-        # Show server start information
-        echo -e "${INFO} Armbian space usage before starting to compile: \n$(df -hT ${kernel_path}) \n"
+        # Show compilation start information
+        echo -e "${INFO} Armbian space usage before compilation: \n$(df -hT ${kernel_path}) \n"
 
         # Check disk space size
-        echo -ne "(${j}) Start compiling the kernel [\033[92m ${kernel_version} \033[0m]. "
+        echo -ne "(${j}) Compiling kernel [\033[92m ${kernel_version} \033[0m]. "
         now_remaining_space="$(df -Tk ${kernel_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
         if [[ "${now_remaining_space}" -le "15" ]]; then
-            echo -e "${WARNING} Remaining space is less than 15G, exit the compilation."
+            echo -e "${WARNING} Remaining space is less than 15G, exiting compilation."
             break
         else
             echo "Remaining space is ${now_remaining_space}G."
@@ -1494,8 +1494,8 @@ loop_recompile() {
 }
 
 # Show welcome message
-echo -e "${STEPS} Start compiling the kernel with Armbian..."
-echo -e "${INFO} The Armbian environment [ ${host_release} / ${arch_info} ]"
+echo -e "${STEPS} Starting kernel compilation with Armbian..."
+echo -e "${INFO} The Armbian environment: [ ${host_release} / ${arch_info} ]"
 
 # Check script permission, supports running on Armbian system.
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
@@ -1512,21 +1512,21 @@ toolchain_check
 
 # Show compile settings
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
-echo -e "${INFO} Kernel from: [ ${code_owner} ]"
+echo -e "${INFO} Kernel source: [ ${code_owner} ]"
 echo -e "${INFO} Kernel patch: [ ${auto_patch} ]"
 echo -e "${INFO} Kernel arch: [ ${SRC_ARCH} ]"
-echo -e "${INFO} Kernel Package: [ ${package_list} ]"
-echo -e "${INFO} kernel signature: [ ${custom_name} ]"
+echo -e "${INFO} Kernel package: [ ${package_list} ]"
+echo -e "${INFO} Kernel signature: [ ${custom_name} ]"
 echo -e "${INFO} Latest kernel version: [ ${auto_kernel} ]"
-echo -e "${INFO} kernel initrd compress: [ ${compress_format} ]"
+echo -e "${INFO} Kernel initrd compress: [ ${compress_format} ]"
 echo -e "${INFO} Ccache clear: [ ${ccache_clear} ]"
 echo -e "${INFO} Delete source: [ ${delete_source} ]"
 echo -e "${INFO} Silent log: [ ${silent_log} ]"
-echo -e "${INFO} Kernel List: [ $(echo ${build_kernel[@]} | xargs) ] \n"
+echo -e "${INFO} Kernel list: [ $(echo ${build_kernel[@]} | xargs) ] \n"
 
 # Loop to compile the kernel
 loop_recompile
 
-# Show server end information
+# Show compilation end information
 echo -e "${STEPS} Armbian space usage after compilation: \n$(df -hT ${kernel_path}) \n"
-echo -e "${SUCCESS} Kernel compiled successfully"
+echo -e "${SUCCESS} Kernel compilation completed successfully."

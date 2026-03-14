@@ -131,39 +131,39 @@ runs:
         if [[ "${build_target}" == "armbian" ]]; then
 
             cd ${{ github.action_path }}
-            echo -e "Start rebuilding Armbian..."
+            echo -e "Starting Armbian rebuild..."
 
             armbian_file="${{ inputs.armbian_path }}"
             armbian_filename="${armbian_file##*/}"
             armbian_filepath="build/output/images"
-            echo -e "Get armbian file input parameters: [ ${armbian_file} ]"
+            echo -e "Armbian file input parameters: [ ${armbian_file} ]"
             [[ -z "${armbian_file}" ]] && echo -e "The [ armbian_path ] variable must be specified." && exit 1
             [[ -d "${armbian_filepath}" ]] || mkdir -p ${armbian_filepath}
             if [[ "${armbian_file}" =~ ^http ]]; then
-                echo -e "Download file: [ ${armbian_file} ]"
+                echo -e "Downloading file: [ ${armbian_file} ]"
                 curl -fsSL "${armbian_file}" -o "${armbian_filepath}/${armbian_filename}"
             else
                 if [[ -z "$(ls ${armbian_filepath}/${armbian_filename} 2>/dev/null)" ]]; then
-                    echo -e "Copy files: [ ${armbian_file} ]"
+                    echo -e "Copying files: [ ${armbian_file} ]"
                     if [[ "${armbian_file}" =~ ^/ ]]; then
                         cp -vf ${armbian_file} -t ${armbian_filepath}/ || true
                     else
                         cp -vf ${{ github.workspace }}/${armbian_file} -t ${armbian_filepath}/ || true
                     fi
                 else
-                    echo -e "The [ ${armbian_filepath}/${armbian_filename} ] file already exists, skipping."
+                    echo -e "File [ ${armbian_filepath}/${armbian_filename} ] already exists, skipping."
                 fi
             fi
             sync
-            echo -e "About the [ ${armbian_filepath} ] directory: \n$(ls -lh ${armbian_filepath} 2>/dev/null)"
+            echo -e "Contents of [ ${armbian_filepath} ] directory: \n$(ls -lh ${armbian_filepath} 2>/dev/null)"
 
             cd ${armbian_filepath}
-            echo -e "Check the Armbian file format..."
+            echo -e "Checking the Armbian file format..."
             down_file="$(ls -l *.img* 2>/dev/null | grep "^-" | awk '{print $9}' | sort -u | head -n 1)"
             if [[ -n "${down_file}" ]]; then
                 echo -e "Selected Armbian file: [ ${down_file} ]"
             else
-                echo -e "The Armbian file is invalid."
+                echo -e "The Armbian file is invalid!"
                 exit 1
             fi
             [[ "${down_file:0-7}" == ".img.gz" ]] && gzip -df ${down_file} 2>/dev/null && sync
@@ -171,12 +171,12 @@ runs:
             [[ "${down_file:0-4}" == ".zip" ]] && unzip -o ${down_file} 2>/dev/null && sync
             echo -e "Armbian file: \n$(ls -lh *.img 2>/dev/null)"
 
-            echo -e "Check the armbian file name (-trunk_)..."
+            echo -e "Checking the Armbian filename (-trunk_)..."
             image_file="$(ls *.img 2>/dev/null | head -n 1)"
             if [[ "${image_file}" =~ "-trunk_" ]]; then
-                echo -e "The armbian file name is correct."
+                echo -e "The Armbian filename is correct."
             else
-                echo -e "Modify Armbian filename..."
+                echo -e "Modifying Armbian filename..."
                 # Get image version, such as 25.11.0
                 image_version="$(echo ${image_file} | grep -oE '[0-9]{2}\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1)"
                 # Get image kernel version, such as 6.12.56
@@ -192,18 +192,18 @@ runs:
 
             # Custom Armbian rebuild files
             if [[ -n "${{ inputs.armbian_files }}" && "${{ inputs.armbian_files }}" != "false" ]]; then
-                echo -e "Add my custom Armbian rebuild files..."
+                echo -e "Adding custom Armbian rebuild files..."
                 copy_from_path="${{ inputs.armbian_files }}"
                 copy_from_path="${copy_from_path%/}"
                 [[ "${copy_from_path}" != /* ]] && copy_from_path="${{ github.workspace }}/${copy_from_path}"
                 copy_to_path="build-armbian/armbian-files/common-files"
                 cp -avf --no-preserve=ownership "${copy_from_path}/." -t "${copy_to_path}/" || true
             else
-                echo -e "Use the default Armbian rebuild files."
+                echo -e "Using the default Armbian rebuild files."
             fi
 
             cd ${{ github.action_path }}
-            echo -e "Start to rebuild armbian..."
+            echo -e "Starting to rebuild Armbian..."
             make_command=""
             [[ -n "${{ inputs.armbian_board }}" ]] && make_command="${make_command} -b ${{ inputs.armbian_board }}"
             [[ -n "${{ inputs.kernel_repo }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_repo }}"
@@ -234,22 +234,22 @@ runs:
         elif [[ "${build_target}" == "kernel" ]]; then
 
             cd ${{ github.action_path }}
-            echo -e "Start compile kernel..."
+            echo -e "Starting kernel compilation..."
 
             # Custom kernel config files
             config_filepath="compile-kernel/tools/config"
             [[ -d "${config_filepath}" ]] || mkdir -p ${config_filepath}
             if [[ -n "${{ inputs.kernel_config }}" && "${{ inputs.kernel_config }}" != "false" ]]; then
                 if [[ "$(ls ${{ github.workspace }}/${{ inputs.kernel_config }}/config-* -l 2>/dev/null | grep "^-" | wc -l)" -ne "0" ]]; then
-                    echo -e "Use a custom kernel compilation template..."
+                    echo -e "Using a custom kernel compilation template..."
                     rm -f ${config_filepath}/* 2>/dev/null && sync
                     cp -vrf "${{ github.workspace }}/${{ inputs.kernel_config }}/." -t "${config_filepath}/" || true
                     echo -e "List of Kernel Custom Compilation Configuration Templates: \n$(ls -lh ${config_filepath} 2>/dev/null)"
                 else
-                    echo -e "The custom kernel compilation template path is invalid, continue to use the default template."
+                    echo -e "The custom kernel compilation template path is invalid. Using the default template."
                 fi
             else
-                echo -e "Use the default kernel compilation template."
+                echo -e "Using the default kernel compilation template."
             fi
 
             # Custom kernel patch files
@@ -257,18 +257,18 @@ runs:
             [[ -d "${custom_kernel_patch}" ]] || mkdir -p ${custom_kernel_patch}
             if [[ -n "${{ inputs.kernel_patch }}" && "${{ inputs.kernel_patch }}" != "false" ]]; then
                 if [[ -d "${{ github.workspace }}/${{ inputs.kernel_patch }}" ]]; then
-                    echo -e "Use custom kernel patches..."
+                    echo -e "Using custom kernel patches..."
                     rm -rf ${custom_kernel_patch}/* 2>/dev/null && sync
                     cp -vrf "${{ github.workspace }}/${{ inputs.kernel_patch }}/." -t "${custom_kernel_patch}/" || true
                     echo -e "Directory of custom kernel patches: \n$(ls -lh ${custom_kernel_patch} 2>/dev/null)"
                 else
-                    echo -e "Invalid custom kernel patch directory, skipping."
+                    echo -e "Invalid custom kernel patch directory. Skipping."
                 fi
             else
-                echo -e "No custom kernel patches available."
+                echo -e "No custom kernel patches provided."
             fi
 
-            echo -e "Build kernel compilation command."
+            echo -e "Building kernel compilation command."
             make_command=""
             [[ -n "${{ inputs.kernel_source }}" ]] && make_command="${make_command} -r ${{ inputs.kernel_source }}"
             [[ -n "${{ inputs.kernel_version }}" ]] && make_command="${make_command} -k ${{ inputs.kernel_version }}"
@@ -291,7 +291,7 @@ runs:
             cd ${{ inputs.docker_hostpath }}
             kernel_outpath="compile-kernel/output"
             output_tags="$(ls -l ${kernel_outpath}/*.tar.gz 2>/dev/null | awk '{print $9}' | grep -oP '\d+\.\d+\.\d+' | sort -u | xargs | tr "[ ]" "_")"
-            echo -e "Output environment variables."
+            echo -e "Setting output environment variables."
             echo "PACKAGED_OUTPUTTAGS=${output_tags}" >> ${GITHUB_ENV}
             echo "PACKAGED_OUTPUTPATH=${PWD}/${kernel_outpath}" >> ${GITHUB_ENV}
             echo "PACKAGED_OUTPUTDATE=$(date +"%m.%d.%H%M")" >> ${GITHUB_ENV}

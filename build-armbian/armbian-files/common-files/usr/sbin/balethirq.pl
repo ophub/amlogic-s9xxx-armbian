@@ -8,9 +8,9 @@ our %min_cpu_map;
 our %uniq_eth_cpu_map;
 our $all_cpu_mask = 0;
 
-# rpscpu掩码是否要排除eth0占用的核(0:否 1:是)
+# RPS CPU 掩码是否排除 eth0 占用的核心 (0: 否, 1: 是)
 our $rpscpu_exclude_eth0_core=1;
-# rpscpu掩码是否要排除eth1占用的核(0:否 1:是)
+# RPS CPU 掩码是否排除 eth1 占用的核心 (0: 否, 1: 是)
 our $rpscpu_exclude_eth1_core=1;
 
 our $usb_as_eth1 = 0;
@@ -23,7 +23,7 @@ our $usb_as_eth1 = 0;
 exit(0);
 
 ############################## sub functions #########################
-# 读取 /etc/balance_irq 或 /etc/config/balance_irq 配置文件
+# 读取 /etc/balance_irq 或 /etc/config/balance_irq 中的配置文件
 sub read_config {
     my $cpu_count = &get_cpu_count();
     my $fh;
@@ -45,7 +45,7 @@ sub read_config {
 	next if(/^\s*$/);
         my($name, $value) = split;
         my @cpus = split(',', $value);
-        # ARMV8 当前最多CPU核数是8核
+        # ARMv8 架构当前最多支持 8 核 CPU
         my $min_cpu = 9;
 
         foreach my $cpu (@cpus) {
@@ -65,7 +65,7 @@ sub read_config {
     close $fh;
 }
 
-# 计算cpu核数
+# 计算 CPU 核心数
 sub get_cpu_count {
     my $fh;
     open $fh, "<", "/proc/cpuinfo" or die $!;
@@ -93,7 +93,7 @@ sub read_irq_data {
         $irq =~ s/://;
         my $name = $raw[-1];
 	if(exists $local_map{$name}) {
-	    # r68s 有 2条 eth0 和 2条 eth1，只保留第1条
+	    # R68S 有 2 条 eth0 和 2 条 eth1，仅保留第 1 条
 	    next;
 	} else {
 	    $local_map{$name} = 1;
@@ -103,7 +103,7 @@ sub read_irq_data {
             $irq_map{$name} = $irq;
             if($name =~ m/\Axhci-hcd:usb[1-9]\Z/) {
 		if (not (exists $cpu_map{eth1} || exists $cpu_map{'eth1-0'}) ) {
-                    # 对于单网口的设备，USB外接网卡视为eth1
+                    # 对于单网口设备，USB 外接网卡视为 eth1
 		    $usb_as_eth1 = 1;
                     $uniq_eth_cpu_map{eth1} =  1 << ($min_cpu_map{$name} - 1);
 	        } else {
@@ -128,7 +128,7 @@ sub update_smp_affinity {
         }
         my $smp_affinity = sprintf("%0x", $mask);
         open $fh, ">", "/proc/irq/$irq/smp_affinity" or die $!;
-        print "irq name:$key, irq:$irq, affinity: $smp_affinity\n";
+        print "IRQ name: $key, IRQ: $irq, affinity: $smp_affinity\n";
         print $fh "$smp_affinity\n";
         close $fh;
     }
@@ -152,11 +152,11 @@ sub tunning_eth_ring {
 
             if( ($max_rx_ring > 0) && ($target_rx_ring>0) && ($max_rx_ring > $target_rx_ring) && ($cur_rx_ring != $target_rx_ring) ) {
                 system "/usr/sbin/ethtool -G ${eth} rx ${target_rx_ring} >/dev/null 2>&1";
-                print "Set the rx ring of ${eth} to ${target_rx_ring}\n";
+                print "Set the RX ring of ${eth} to ${target_rx_ring}\n";
             }
             if( ($max_tx_ring > 0) && ($target_tx_ring>0) && ($max_tx_ring > $target_tx_ring) && ($cur_tx_ring != $target_tx_ring) ) {
                 system "/usr/sbin/ethtool -G ${eth} tx ${target_tx_ring} >/dev/null 2>&1";
-                print "Set the tx ring of ${eth} to ${target_tx_ring}\n";
+                print "Set the TX ring of ${eth} to ${target_tx_ring}\n";
             }
         }
     }
@@ -165,8 +165,8 @@ sub tunning_eth_ring {
 sub enable_eth_rps_rfs {
     my $rps_sock_flow_entries = 0;
     for my $eth ("eth0","eth1","eth2","eth3","eth4","eth5","eth6") {
-	# rps优化只针对单队列网卡，
-	# 如果存在 rx-1,则表示该网卡支持 rss 多队列，不需要优化
+	# RPS 优化仅针对单队列网卡，
+	# 如果存在 rx-1，则表示该网卡支持 RSS 多队列，无需优化
         if((-d "/sys/class/net/${eth}/queues/rx-0") && (! -d "/sys/class/net/${eth}/queues/rx-1")) {
             my $value = 32768;
             $rps_sock_flow_entries += $value;
@@ -180,7 +180,7 @@ sub enable_eth_rps_rfs {
 	    }
 
             $eth_cpu_mask_hex = sprintf("%0x", $cpu_mask);
-            print "Set the rps cpu mask of $eth to 0x$eth_cpu_mask_hex\n";
+            print "Set the RPS CPU mask of $eth to 0x$eth_cpu_mask_hex\n";
             open my $fh, ">", "/sys/class/net/${eth}/queues/rx-0/rps_cpus" or die;
             print $fh $eth_cpu_mask_hex;
             close $fh;
@@ -194,7 +194,7 @@ sub enable_eth_rps_rfs {
             close $fh;
 
 	    if( ($eth eq "eth1") && ($usb_as_eth1 == 1) ) {
-                # USB外接网卡：eth1(RTL8153)，经实测最佳的rx_ring在 100-500范围, 默认值是100，超过500之后， 多CPU负载会失衡
+                # USB 外接网卡 eth1 (RTL8153)，经实测最佳 rx_ring 范围为 100-500，默认值 100，超过 500 后多核 CPU 负载会失衡
 	        &tunning_eth_ring($eth, 192, 0);
             }
         }
@@ -246,7 +246,7 @@ sub board_special_config() {
 
 sub optimize_eth_parameters {
     while (my $eth = shift) {
-        print "optimizing $eth ... ";
+        print "Optimizing $eth ... ";
         system "ethtool -K $eth scatter-gather on >/dev/null 2>&1";
         system "ethtool -K $eth tcp-segmentation-offload on >/dev/null 2>&1";
         system "ethtool -K $eth rx-udp-gro-forwarding on >/dev/null 2>&1";

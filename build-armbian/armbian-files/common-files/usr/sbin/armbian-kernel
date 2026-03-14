@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on Armbian, Compile the kernel.
+# Description: Run on Armbian to compile the kernel
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -18,7 +18,7 @@
 #======================================= Functions list =======================================
 #
 # error_msg       : Output error message
-# update_script   : Update compile scripts
+# update_script   : Update compilation scripts
 # clean_tmp       : Clear temporary files
 # help_info       : Display help information
 #
@@ -35,7 +35,7 @@ compile_script="${make_path}/recompile"
 script_name="${script_path}/armbian_compile_kernel.sh"
 arch_info="$(arch)"
 
-# The compile kernel scripts download repository
+# The kernel compilation scripts download repository
 script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
 script_dir="compile-kernel"
 
@@ -54,15 +54,15 @@ error_msg() {
 }
 
 update_script() {
-    echo -e "${STEPS} Start updating the compile kernel scripts..."
+    echo -e "${STEPS} Updating kernel compilation scripts..."
 
     # Install git
-    echo -e "${INFO} Start installing update dependencies..."
+    echo -e "${INFO} Installing update dependencies..."
     sudo apt-get -qq update
     [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get install -y git
 
-    # Get the latest scripts
-    echo -e "${INFO} Start syncing latest scripts..."
+    # Download the latest scripts from the repository
+    echo -e "${INFO} Fetching latest scripts from repository..."
     git_tmp_path="$(mktemp -d)"
     cd ${git_tmp_path}
     git init --quiet
@@ -70,43 +70,43 @@ update_script() {
     git config core.sparseCheckout true
     echo "${script_dir}/*" >>.git/info/sparse-checkout
     git pull --quiet --depth=1 origin main
-    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${script_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to download scripts from [ ${script_repo} ]."
 
-    # Update related files
+    # Update the compilation scripts
     cd ${make_path}
     mkdir -p ${compile_path}
     cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/* ${compile_path}
-    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to sync scripts from [ ${script_repo} ]."
     cp -f --no-preserve=ownership ${script_name} ${compile_script}
     chmod +x ${compile_script}
 
     # Clean up temporary files
     rm -rf ${git_tmp_path} 2>/dev/null
 
-    # Install dependencies
-    echo -e "${INFO} Start installing compilation dependencies..."
+    # Install compilation dependencies
+    echo -e "${INFO} Installing compilation dependencies..."
     sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
-    [[ "${?}" -ne "0" ]] && error_msg "Dependency installation failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to install dependencies."
 
     sync && sleep 3
-    echo -e "${SUCCESS} Scripts updated successfully."
+    echo -e "${SUCCESS} Compilation scripts updated successfully."
     exit 0
 }
 
 clean_tmp() {
     cd ${make_path}
-    echo -e "${STEPS} Start cleaning up scripts and spaces..."
+    echo -e "${STEPS} Cleaning up kernel source and output files..."
 
     rm -rf ${kernel_path} ${out_kernel} 2>/dev/null && sync
 
-    echo -e "${SUCCESS} Cleanup succeeded."
+    echo -e "${SUCCESS} Cleanup completed successfully."
     exit 0
 }
 
 help_info() {
     clear
     cat <<EOF
-==============================================================================================================================
+======================================================================================================================================
 
 01. Detailed instructions for compiling the kernel, list of optional parameters:
     Command: armbian-kernel -k 6.1.y -a true -m dtbs -t gcc
@@ -128,18 +128,18 @@ help_info() {
     -u : Update       Update the local compile script to the latest version.
     -c : Clear        Clear the local kernel source and generated files.
 
-==============================================================================================================================
+======================================================================================================================================
 EOF
     exit 0
 }
 
-# Check script permission, supports running on Armbian system.
+# Check script permission, only supports running on Armbian (aarch64)
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
-[[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
-# 10Gb free space required
+[[ "${arch_info}" == "aarch64" ]] || error_msg "This script only supports running on Armbian (aarch64) systems."
+# Require at least 5GiB of free space
 [[ -d "${make_path}" ]] || mkdir -p ${make_path}
 remaining_space="$(df -Tk ${make_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
-[[ "${remaining_space}" -ge "5" ]] || error_msg "The minimum space required to compile the kernel is 5GiB."
+[[ "${remaining_space}" -ge "5" ]] || error_msg "At least 5GiB of free space is required to compile the kernel."
 
 # Execute script assist functions
 case "${1}" in

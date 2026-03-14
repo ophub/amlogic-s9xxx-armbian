@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Backup and restore the system in emmc
+# Description: Backup and restore the eMMC system data
 # Copyright (C) 2017- The function borrowed from ddbr, Author: xXx
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
@@ -55,14 +55,14 @@ do_checkemmc() {
     emmc="$(lsblk -l -o NAME | grep -oE "mmcblk[0-9]boot0" | sort -u | sed "s/boot0//g")"
     # Find emmc disk, find emmc that does not contain the boot0 partition
     [[ -z "${emmc}" ]] && emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
-    # Check if emmc exists
-    [[ -z "${emmc}" ]] && error_msg "The eMMC storage not found in this device!"
-    # Show the emmc name
+    # Check if eMMC exists
+    [[ -z "${emmc}" ]] && error_msg "No eMMC storage found on this device!"
+    # Show the eMMC device name
     echo -e "${INFO} The device eMMC name: [ /dev/${emmc} ]"
 
     # Check emmc partition size
     dev_intsize="$(fdisk -s /dev/${emmc})"
-    [[ -z "$(echo "${dev_intsize}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to get eMMC size."
+    [[ -z "$(echo "${dev_intsize}" | sed -n "/^[0-9]\+$/p")" ]] && error_msg "Unable to determine eMMC size."
     echo -e "${INFO} The device eMMC size: [ $(($dev_intsize / 1024 / 1024))GB ]"
 
     # check directory
@@ -75,52 +75,52 @@ do_checkspace() {
     # Check the remaining space capacity
     remaining_space="$(df -Tk ${out_path} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
     if [[ -z "$(echo "${remaining_space}" | sed -n "/^[0-9]\+$/p")" ]]; then
-        error_msg "The path is not available, the remaining space cannot be obtained."
+        error_msg "Unable to determine available space on the target path."
     fi
     # Check if there is enough free space
     if [[ "${remaining_space}" -lt "${need_space}" ]]; then
-        error_msg "There is not enough space left. Please use [ armbian-tf ] to expand first."
+        error_msg "Insufficient disk space. Please use [ armbian-tf ] to expand the partition first."
     fi
 }
 
-# Backup the emmc system
+# Backup the eMMC system
 do_backup() {
-    echo -e "${STEPS} Start to backup the system in eMMC."
+    echo -e "${STEPS} Starting eMMC system backup..."
     do_checkspace
-    echo -e "${INFO} Saving and Compressing [ /dev/${emmc} ] to [ ${out_path}/${ddbr_image} ], Please wait..."
+    echo -e "${INFO} Compressing [ /dev/${emmc} ] to [ ${out_path}/${ddbr_image} ], please wait..."
     rm -f ${out_path}/${ddbr_image} 2>/dev/null && sync
     dd if=/dev/${emmc} | pv -s ${dev_intsize}"K" | gzip >${out_path}/${ddbr_image}
-    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Backup is complete."
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} eMMC backup completed successfully."
     sync && sleep 3
     exit 0
 }
 
-# Restore the emmc system
+# Restore the eMMC system
 do_restore() {
-    echo -e "${STEPS} Start to restore the system in eMMC."
-    [[ ! -f "${out_path}/${ddbr_image}" ]] && error_msg "The [ ${out_path}/${ddbr_image} ] File not found."
-    echo -e "${INFO} Restoring [ ${out_path}/${ddbr_image} ] to [ /dev/${emmc} ], Please wait..."
+    echo -e "${STEPS} Starting eMMC system restore..."
+    [[ ! -f "${out_path}/${ddbr_image}" ]] && error_msg "Backup file [ ${out_path}/${ddbr_image} ] not found."
+    echo -e "${INFO} Restoring [ ${out_path}/${ddbr_image} ] to [ /dev/${emmc} ], please wait..."
     gunzip -c ${out_path}/${ddbr_image} | pv -s ${dev_intsize}"K" | dd of=/dev/${emmc}
-    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} Restore is complete."
+    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} eMMC restore completed successfully."
     sync && sleep 3
     exit 0
 }
 
-echo -e "${STEPS} Welcome to use the eMMC system backup/restore service."
+echo -e "${STEPS} Welcome to the eMMC system backup/restore tool."
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 
 # Check emmc
 do_checkemmc
 
-# Prompt the user to select Backup/Restore
+# Prompt the user to select backup or restore
 cat <<EOF
---------------------------------------------------
-  Option  Function
---------------------------------------------------
-    b     :Backup the system from eMMC to USB
-    r     :Restore the system from USB to eMMC
---------------------------------------------------
+--------------------------------------------------------
+  Option  Description
+--------------------------------------------------------
+    b     :Backup eMMC system to external storage
+    r     :Restore system from external storage to eMMC
+--------------------------------------------------------
 EOF
 echo -ne "${OPTIONS} Please select (b/r): "
 read br

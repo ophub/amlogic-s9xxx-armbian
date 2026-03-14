@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Customize the startup script, adding content as needed.
+# Function: Customize the startup script. Add content as needed.
 # Dependent script: /etc/rc.local (which runs with 'set -e')
 # File path: /etc/custom_service/start_service.sh
 #
@@ -24,8 +24,8 @@ log_message() {
     echo "[$(date +"%Y.%m.%d.%H:%M:%S")] $1" >>"${custom_log}"
 }
 
-# Start of the script.
-log_message "Start the custom service..."
+# Start of the script
+log_message "Starting custom services..."
 
 # Disabled verbose kernel messages on console
 dmesg -n 1 >/dev/null 2>&1 || true
@@ -48,7 +48,7 @@ if modinfo rknpu >/dev/null 2>&1; then
 else
     grep -q -x "rknpu" "${ophub_load_conf}" 2>/dev/null && sed -i '/^rknpu$/d' "${ophub_load_conf}"
 fi
-log_message "Adjust the rknpu module in the system module load list"
+log_message "Adjusted the rknpu module in the system module load list."
 
 # For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
 if [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
@@ -165,8 +165,8 @@ fi
 todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf >/dev/null 2>&1 &
-    log_message "Root partition resized successfully."
+    log_message "Root partition resize completed."
 }
 
 # Finalization
-log_message "All custom services have been processed."
+log_message "All custom services have been processed successfully."

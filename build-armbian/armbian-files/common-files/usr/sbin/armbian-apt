@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Change the source of the system
+# Description: Change the APT mirror source of the system
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-apt
@@ -18,7 +18,7 @@
 # error_msg           : Output error message
 # check_release       : Check the system release
 # backup_source_list  : Backup the source list
-# change_source_list  : Change the source of the system
+# change_source_list  : Change the APT mirror source
 # select_mirror_site  : Select the mirror site
 #
 #========================= Set default parameters ==========================
@@ -41,21 +41,21 @@ error_msg() {
     exit 1
 }
 
-# Check the system release
+# Check the system release information
 check_release() {
     if [[ -f "${ophub_release_file}" ]]; then
         source "${ophub_release_file}"
         VERSION_CODEID="${VERSION_CODEID}"
         VERSION_CODENAME="${VERSION_CODENAME}"
-        [[ -z "${VERSION_CODEID}" ]] && error_msg "The system VERSION_CODEID is not detected!"
-        [[ -z "${VERSION_CODENAME}" ]] && error_msg "The system VERSION_CODENAME is not detected!"
+        [[ -z "${VERSION_CODEID}" ]] && error_msg "System VERSION_CODEID not detected!"
+        [[ -z "${VERSION_CODENAME}" ]] && error_msg "System VERSION_CODENAME not detected!"
 
         # Set the source files
         armbian_source_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources"
         armbian_source_backup_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources.bak"
 
     else
-        error_msg "The system release file is not detected!"
+        error_msg "System release file not found!"
     fi
 }
 
@@ -66,11 +66,11 @@ backup_source_list() {
     }
 }
 
-# Change the source of the system
+# Change the APT mirror source
 # Reference source: https://github.com/armbian/build/blob/main/lib/functions/rootfs/distro-specific.sh
 change_source_list() {
-    echo -e "${STEPS} Start to change the source of the system: [ ${MIRROR_URL} ]"
-    echo -e "${INFO} The system release is: [ ${VERSION_CODENAME} ]"
+    echo -e "${STEPS} Changing APT mirror source to: [ ${MIRROR_URL} ]"
+    echo -e "${INFO} System release: [ ${VERSION_CODENAME} ]"
 
     case "${VERSION_CODENAME}" in
     buster | bullseye | bookworm | trixie)
@@ -127,29 +127,29 @@ EOF
         ;;
 
     *)
-        error_msg "The system release is not detected: [ ${VERSION_CODENAME} ]"
+        error_msg "Unsupported system release: [ ${VERSION_CODENAME} ]"
         ;;
 
     esac
 
     # Remove the space at the beginning of each line
     sed -i 's|^[ t]*||g' ${armbian_source_file}
-    echo -e "${SUCCESS} Change the source of the system successfully."
+    echo -e "${SUCCESS} APT mirror source changed successfully."
 }
 
 # Select the mirror site
 select_mirror_site() {
     source_id="${1}"
-    echo -e "${INFO} Your selected source ID is: [ ${source_id} ]"
+    echo -e "${INFO} Selected mirror source ID: [ ${source_id} ]"
 
     case "${source_id}" in
         0)
             # Restore the default source
             if [[ -f "${armbian_source_backup_file}" ]]; then
                 cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
-                echo -e "${SUCCESS} Restore the default source successfully." && exit 0
+                echo -e "${SUCCESS} Default source restored successfully." && exit 0
             else
-                error_msg "The default source file does not exist."
+                error_msg "Default source backup file not found."
             fi
             ;;
         1)  MIRROR_URL="mirrors.tuna.tsinghua.edu.cn" ;;
@@ -172,15 +172,15 @@ select_mirror_site() {
         18) MIRROR_URL="mirror.yuki.net.uk" ;;
         19) MIRROR_URL="mirror.sg.gs" ;;
         20) MIRROR_URL="mirrors.xtom.jp" ;;
-        *) error_msg "The source ID is not detected." ;;
+        *) error_msg "Invalid mirror source ID." ;;
     esac
 
     # Change the source list
     change_source_list
 }
 
-echo -e "${STEPS} Welcome to the Armbian source change script."
-# Check the system release
+echo -e "${STEPS} Welcome to the APT Mirror Source Switching Tool."
+# Check the system release information
 check_release
 # Backup the source list
 backup_source_list
@@ -222,5 +222,5 @@ read mwid
 
 case "${mwid}" in
     [0-9]*) select_mirror_site "${mwid}" ;;
-         *) error_msg "Input error." && exit 0 ;;
+         *) error_msg "Invalid input." && exit 0 ;;
 esac

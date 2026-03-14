@@ -16,9 +16,9 @@
 #
 #======================================== Functions list ========================================
 #
-# error_msg    : Output error message
-# find_armbian : Find Armbian file (armbian/*rootfs.tar.gz)
-# build_docker : Build Armbian docker image
+# error_msg    : Output error message and exit
+# find_armbian : Find Armbian rootfs file (armbian/*rootfs.tar.gz)
+# build_docker : Build the Armbian Docker image
 #
 #================================ Set make environment variables ================================
 #
@@ -45,7 +45,7 @@ error_msg() {
 
 find_armbian() {
     cd ${current_path}
-    echo -e "${STEPS} Start searching for Armbian file..."
+    echo -e "${STEPS} Searching for Armbian rootfs file..."
 
     # Find whether the Armbian file exists
     armbian_file_name="$(ls ${armbian_path}/${armbian_rootfs_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')"
@@ -61,7 +61,7 @@ find_armbian() {
 
 build_docker() {
     cd ${current_path}
-    echo -e "${STEPS} Start building Armbian docker image..."
+    echo -e "${STEPS} Building Armbian Docker image..."
 
     # Move the docker image to the output directory
     rm -rf ${out_path} && mkdir -p ${out_path}
@@ -90,4 +90,4 @@ echo -e "${INFO} Current path: [ ${current_path} ]"
 find_armbian
 build_docker
 #
-echo -e "${SUCCESS} Docker image created successfully."
+echo -e "${SUCCESS} Docker image files created successfully."

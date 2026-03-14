@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Install Armbian to eMMC for Allwinner box
+# Function: Install Armbian to eMMC for Allwinner devices
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -16,13 +16,13 @@
 #
 #======================================== Functions list ========================================
 #
-# error_msg          : Output error message
-# check_depends      : Check dependencies
-# init_var           : Initialize all variables
-# set_rootfs_type    : Set the type of file system
-# create_partition   : Create emmc partition
-# copy_bootfs        : Copy bootfs partition files
-# copy_rootfs        : Copy rootfs partition files
+# error_msg          : Output error message and abort execution
+# check_depends      : Check and install required dependencies
+# init_var           : Initialize all runtime variables
+# set_rootfs_type    : Select the root filesystem type
+# create_partition   : Create eMMC partition layout
+# copy_bootfs        : Copy boot partition files to eMMC
+# copy_rootfs        : Copy root partition files to eMMC
 #
 #==================================== Set default parameters ====================================
 #
@@ -40,15 +40,15 @@ ERROR="[\033[91m ERROR \033[0m]"
 #
 #================================================================================================
 
-# Encountered a serious error, abort the script execution
+# Encountered a critical error, output the message and abort execution
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
 }
 
-# Check dependencies
+# Check and install required dependencies
 check_depends() {
-    echo -e "${STEPS} Start checking dependencies..."
+    echo -e "${STEPS} Checking required dependencies..."
 
     is_missing="0"
     necessary_packages=("tar" "hexdump" "mkfs.vfat" "mkfs.ext4" "mkfs.btrfs" "parted" "losetup" "fdisk" "lsblk")
@@ -61,18 +61,18 @@ check_depends() {
     done
 
     if [[ "${is_missing}" -eq "1" ]]; then
-        echo -e "${INFO} Start installing the necessary dependencies."
+        echo -e "${INFO} Installing missing dependencies..."
         sudo apt-get update
         sudo apt-get install -y ${install_packages[*]}
-        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop install."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to install dependencies. Installation aborted."
     else
-        echo -e "${INFO} Dependency check completes, Start installing Armbian."
+        echo -e "${INFO} All dependencies are satisfied. Proceeding with installation..."
     fi
 }
 
-# Initialize all variables
+# Initialize all runtime variables
 init_var() {
-    echo -e "${STEPS} Start initializing the environment..."
+    echo -e "${STEPS} Initializing the environment..."
 
     # View device configuration information
     [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
@@ -82,10 +82,10 @@ init_var() {
     MAINLINE_UBOOT="$(cat "${ophub_release_file}" | grep -E "^MAINLINE_UBOOT" | awk -F"'" '{print $2}')"
     BOOTLOADER_IMG="$(cat "${ophub_release_file}" | grep -E "^BOOTLOADER_IMG" | awk -F"'" '{print $2}')"
     [[ -n "${PLATFORM}" && -n "${FDTFILE}" && -n "${FAMILY}" && -n "${BOOTLOADER_IMG}" ]] || {
-        error_msg "Config is missing in [ ${ophub_release_file} ] file."
+        error_msg "Required configuration is missing in [ ${ophub_release_file} ]."
     }
 
-    # Display device configuration information
+    # Display device configuration
     echo -e "${INFO} PLATFORM: [ ${PLATFORM} ]"
     echo -e "${INFO} FDTFILE: [ ${FDTFILE} ]"
     echo -e "${INFO} FAMILY: [ ${FAMILY} ]"
@@ -95,7 +95,7 @@ init_var() {
     # Check the current system running disk
     root_devname="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print substr($3, 1, length($3)-2)}')"
     if lsblk -l | grep -E "^${root_devname}boot0" >/dev/null; then
-        error_msg "You are running in eMMC mode, please boot system with usb or tf card!"
+        error_msg "System is running from eMMC. Please boot from USB or TF card first!"
     fi
 
     # Find emmc disk, first find emmc containing boot0 partition
@@ -103,10 +103,10 @@ init_var() {
     # Find emmc disk, find emmc that does not contain the boot0 partition
     [[ -z "${install_emmc}" ]] && install_emmc="$(lsblk -l -o NAME | grep -oE '(mmcblk[0-9]?)' | grep -vE ^${root_devname} | sort -u)"
     # Check if emmc exists
-    [[ -z "${install_emmc}" ]] && error_msg "The eMMC storage not found in this device!"
-    # Location of emmc
+    [[ -z "${install_emmc}" ]] && error_msg "No eMMC storage found on this device!"
+    # Location of eMMC
     DEV_EMMC="/dev/${install_emmc}"
-    echo -e "${INFO} The device eMMC name: [ ${DEV_EMMC} ]"
+    echo -e "${INFO} Detected eMMC device: [ ${DEV_EMMC} ]"
 
     # Create a file preprocessing directory
     DIR_INSTALL="${tmp_path}/install"
@@ -124,9 +124,9 @@ init_var() {
     [[ -z "${ROOTFS_UUID}" ]] && error_msg "The new UUID is invalid, cannot continue."
 }
 
-# Set the type of file system
+# Select the root filesystem type
 set_rootfs_type() {
-    echo -e "${STEPS} Start selecting file system type..."
+    echo -e "${STEPS} Selecting root filesystem type..."
     cat <<EOF
 -----------------------------------------------
   ID   TYPE
@@ -151,13 +151,13 @@ EOF
         fstab_mount_string="defaults,noatime,nodiratime,commit=600,errors=remount-ro"
     fi
     echo -e "${INFO} Input Type ID: [ ${filetype} ]"
-    echo -e "${INFO} The type of file system: [ ${file_system_type} ]"
+    echo -e "${INFO} Selected filesystem type: [ ${file_system_type} ]"
 }
 
-# Create emmc partition
+# Create eMMC partition layout
 create_partition() {
     cd /
-    echo -e "${STEPS} Start creating eMMC partition..."
+    echo -e "${STEPS} Creating eMMC partition layout..."
 
     # Backup the bootloader, necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
@@ -180,7 +180,7 @@ create_partition() {
     # Clear emmc disk data
     exists_pts="$(parted ${DEV_EMMC} print 2>/dev/null | grep 'primary' | wc -l)"
     if [[ "${exists_pts}" -gt "0" ]]; then
-        echo -e "${INFO} Delete the existing [ ${exists_pts} ] partitions."
+        echo -e "${INFO} Deleting existing [ ${exists_pts} ] partition(s)."
         i=1
         while [[ "${i}" -le "${exists_pts}" ]]; do
             umount -f ${DEV_EMMC}p${i} 2>/dev/null
@@ -196,7 +196,7 @@ create_partition() {
     BLANK2="0"
 
     # Format emmc disk
-    echo -e "${INFO} Start create MBR and partition."
+    echo -e "${INFO} Creating MBR partition table and partitions."
     parted -s "${DEV_EMMC}" mklabel msdos
     parted -s "${DEV_EMMC}" mkpart primary fat32 $((BLANK1))MiB $((BLANK1 + BOOT - 1))MiB
     parted -s "${DEV_EMMC}" mkpart primary ${file_system_type} $((BLANK1 + BOOT + BLANK2))MiB 100%
@@ -218,10 +218,10 @@ create_partition() {
     [[ "${?}" -eq "0" ]] || error_msg "Failed to write bootloader using [ dd ]."
 }
 
-# Copy bootfs partition files
+# Copy boot partition files to eMMC
 copy_bootfs() {
     cd /
-    echo -e "${STEPS} Start processing the BOOTFS partition..."
+    echo -e "${STEPS} Processing BOOTFS partition..."
 
     PART_BOOT="${DEV_EMMC}p1"
 
@@ -231,14 +231,14 @@ copy_bootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_BOOT} ]."
     fi
 
-    echo -e "${INFO} Start formatting BOOTFS partition..."
+    echo -e "${INFO} Formatting BOOTFS partition..."
     mkfs.vfat -F 32 -n "BOOT_EMMC" ${PART_BOOT}
-    [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.vfat ]."
+    [[ "${?}" -eq "0" ]] || error_msg "Failed to format BOOTFS with [ mkfs.vfat ]."
 
     mount -o rw ${PART_BOOT} ${DIR_INSTALL}
     [[ "${?}" -eq "0" ]] || error_msg "Failed to mount BOOTFS partition."
 
-    echo -e "${INFO} Start copy BOOTFS partition data."
+    echo -e "${INFO} Copying BOOTFS partition data..."
     cp -rf /boot/* ${DIR_INSTALL}
     rm -rf ${DIR_INSTALL}/'System Volume Information'
 
@@ -281,10 +281,10 @@ copy_bootfs() {
     [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${DIR_INSTALL} ]."
 }
 
-# Copy rootfs partition files
+# Copy root partition files to eMMC
 copy_rootfs() {
     cd /
-    echo -e "${STEPS} Start processing the rootfs partition..."
+    echo -e "${STEPS} Processing ROOTFS partition..."
 
     PART_ROOT="${DEV_EMMC}p2"
 
@@ -294,7 +294,7 @@ copy_rootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to umount [ ${PART_ROOT} ]."
     fi
 
-    echo -e "${INFO} Start formatting ROOTFS partition..."
+    echo -e "${INFO} Formatting ROOTFS partition..."
     if [[ "${file_system_type}" == "btrfs" ]]; then
         mkfs.btrfs -f -U ${ROOTFS_UUID} -L "ROOTFS_EMMC" -m single ${PART_ROOT}
         [[ "${?}" -eq "0" ]] || error_msg "Failed to format using [ mkfs.btrfs ]"
@@ -309,7 +309,7 @@ copy_rootfs() {
         [[ "${?}" -eq "0" ]] || error_msg "Failed to mount ROOTFS partition."
     fi
 
-    echo -e "${INFO} Start copy ROOTFS partition data."
+    echo -e "${INFO} Copying ROOTFS partition data..."
     # Create relevant directories
     mkdir -p ${DIR_INSTALL}/{boot/,dev/,media/,mnt/,proc/,run/,sys/,tmp/}
     chmod 1777 ${DIR_INSTALL}/tmp
@@ -355,7 +355,7 @@ EOF
 
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
-echo -e "${STEPS} Start install Armbian to eMMC..."
+echo -e "${STEPS} Installing Armbian to eMMC..."
 
 # Check dependencies
 check_depends
@@ -370,5 +370,5 @@ copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
 
-echo -e "${SUCCESS} Installation successful. Run [ poweroff ], remove the installation media then re-insert the power supply to boot Armbian."
+echo -e "${SUCCESS} Installation completed successfully. Run [ poweroff ], remove the installation media, then re-insert the power supply to boot Armbian."
 exit 0

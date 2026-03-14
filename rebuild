@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Run on x86_64 Ubuntu-22.04, Rebuild armbian.
+# Description: Run on x86_64 Ubuntu-22.04 to rebuild Armbian images.
 # Copyright (C) 2021~ https://www.armbian.com
 # Copyright (C) 2021~ https://github.com/unifreq
 # Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian/blob/main/CONTRIBUTORS.md
@@ -19,30 +19,30 @@
 #
 #======================================== Functions list ========================================
 #
-# error_msg          : Output error message
-# process_msg        : Output process message
-# mount_try          : Mount the image file, fail again
+# error_msg          : Output error message and exit
+# process_msg        : Output process step message
+# mount_try          : Mount the image file with retry
 # get_textoffset     : Get kernel TEXT_OFFSET
 #
 # init_var           : Initialize all variables
-# check_data         : Check the validity of the data
+# check_data         : Validate the configuration data
 # find_armbian       : Find Armbian file (build/output/images/*.img)
-# git_pull_dir       : Download the files from the git repository
+# git_pull_dir       : Download files from a git repository
 # download_depends   : Download the dependency files
 # query_kernel       : Query the latest kernel version
-# check_kernel       : Check kernel files integrity
-# download_kernel    : Download the latest kernel
+# check_kernel       : Verify kernel file integrity via sha256sum
+# download_kernel    : Download the kernel files
 #
-# confirm_version    : Confirm version type
-# extract_armbian    : Extract Armbian files
-# make_image         : Making Armbian file
-# copy_files         : Copy the Armbian files
-# replace_kernel     : Replace kernel files
-# refactor_bootfs    : Refactor bootfs files
-# refactor_rootfs    : Refactor rootfs files
+# confirm_version    : Confirm version and board configuration
+# extract_armbian    : Extract Armbian image files
+# make_image         : Create a new Armbian image
+# copy_files         : Copy the Armbian files to the image
+# replace_kernel     : Replace kernel files in the image
+# refactor_bootfs    : Refactor bootfs partition files
+# refactor_rootfs    : Refactor rootfs partition files
 # clean_tmp          : Clear temporary files
 #
-# loop_rebuild       : Loop to rebuild Armbian files
+# loop_rebuild       : Loop to rebuild Armbian for all boards
 #
 #================================ Set make environment variables ================================
 #
@@ -170,7 +170,7 @@ get_textoffset() {
 }
 
 init_var() {
-    echo -e "${STEPS} Start Initializing Variables..."
+    echo -e "${STEPS} Initializing variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     local options="b:r:u:k:a:t:s:n:"
@@ -387,7 +387,7 @@ check_data() {
 
 find_armbian() {
     cd ${current_path}
-    echo -e "${STEPS} Start searching for Armbian file..."
+    echo -e "${STEPS} Searching for Armbian file..."
 
     # Get armbian release and version
     armbian_rebuild_name="$(ls ${armbian_rebuild_file} 2>/dev/null | head -n 1 | awk -F "/" '{print $NF}')"
@@ -433,7 +433,7 @@ git_pull_dir() {
 }
 
 download_depends() {
-    echo -e "${STEPS} Start downloading dependency files..."
+    echo -e "${STEPS} Downloading dependency files..."
 
     # Download Armbian u-boot files
     uboot_num="$(find "${uboot_path}/rockchip" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | wc -l)"
@@ -451,7 +451,7 @@ download_depends() {
 }
 
 query_kernel() {
-    echo -e "${STEPS} Start querying the latest kernel version..."
+    echo -e "${STEPS} Querying the latest kernel version..."
 
     # Check the version on the kernel repository
     x="1"
@@ -512,7 +512,7 @@ check_kernel() {
 
 download_kernel() {
     cd ${current_path}
-    echo -e "${STEPS} Start downloading the kernel files..."
+    echo -e "${STEPS} Downloading kernel files..."
 
     x="1"
     for key in "${!tags_list[@]}"; do
@@ -1228,7 +1228,7 @@ clean_tmp() {
 
 loop_rebuild() {
     cd ${current_path}
-    echo -e "${STEPS} Start building Armbian..."
+    echo -e "${STEPS} Building Armbian images..."
 
     j="1"
     for b in "${build_armbian[@]}"; do
@@ -1244,13 +1244,13 @@ loop_rebuild() {
                     kernel="${k}"
 
                     # Check disk space size
-                    echo -ne "(${j}.${i}) Start building Armbian [\033[92m ${board} - ${conf_kernel_tags}/${kernel} \033[0m]. "
+                    echo -ne "(${j}.${i}) Building Armbian [\033[92m ${board} - ${conf_kernel_tags}/${kernel} \033[0m]. "
                     now_remaining_space="$(df -Tk ${armbian_outputpath} | tail -n1 | awk '{print $5}' | echo $(($(xargs) / 1024 / 1024)))"
                     if [[ "${now_remaining_space}" -le "6" ]]; then
-                        echo -e "${WARNING} Remaining space is less than 6G, exit this build."
+                        echo -e "${WARNING} Remaining space is less than 6 GiB. Skipping this build."
                         break
                     else
-                        echo "Remaining space is ${now_remaining_space}G."
+                        echo "Remaining space: ${now_remaining_space} GiB."
                     fi
 
                     # Execute the following functions in sequence
@@ -1262,7 +1262,7 @@ loop_rebuild() {
                     refactor_rootfs
                     clean_tmp
 
-                    echo -e "(${j}.${i}) Armbian build successfully. \n"
+                    echo -e "(${j}.${i}) Armbian built successfully. \n"
                     ((i++))
                 }
             done
@@ -1273,7 +1273,7 @@ loop_rebuild() {
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to Rebuild Armbian!"
+echo -e "${STEPS} Welcome to the Armbian Rebuild Tool!"
 echo -e "${INFO} Server running on Ubuntu: [ Release: ${host_release} / Host: ${arch_info} ] \n"
 # Check script permission
 [[ "$(id -u)" == 0 ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
@@ -1302,4 +1302,4 @@ loop_rebuild
 
 # Show server end information
 echo -e "${STEPS} Server space usage after compilation: \n$(df -hT ${armbian_outputpath}) \n"
-echo -e "${SUCCESS} All process completed successfully."
+echo -e "${SUCCESS} All processes completed successfully."

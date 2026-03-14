@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Desktop system install Chinese support
+# Function: Install Chinese language support for desktop systems
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -16,10 +16,10 @@
 #
 #============================== Functions list ==============================
 #
-# error_msg               : Output error message
-# check_release           : Check release file
-# set_chinese_env         : Set Chinese environment
-# install_chinese_fonts   : Install Chinese language packages
+# error_msg               : Output error message and exit
+# check_release           : Check and load system release information
+# set_chinese_env         : Configure Chinese locale environment
+# install_chinese_fonts   : Install Chinese language packages and fonts
 #
 #========================== Set default parameters ==========================
 #
@@ -57,7 +57,7 @@ check_release() {
 # Set Chinese environment
 set_chinese_env() {
     # Add Chinese language setting
-    echo -e "${STEPS} Add Chinese environment variable settings..."
+    echo -e "${STEPS} Adding Chinese environment variable settings..."
     local etc_env="/etc/environment"
     sed -i '/^LANG=/d' ${etc_env}
     sed -i '/^LANGUAGE=/d' ${etc_env}
@@ -66,7 +66,7 @@ set_chinese_env() {
     echo 'LANGUAGE="zh_CN:zh:en_US:en"' >>${etc_env}
     echo 'export LANG' >>${etc_env}
     echo 'export LANGUAGE' >>${etc_env}
-    echo -e "${INFO} [ ${etc_env} ] content information: \n$(cat ${etc_env})"
+    echo -e "${INFO} Contents of [ ${etc_env} ]: \n$(cat ${etc_env})"
 
     local locale_conf="/etc/default/locale"
     [[ -f "${locale_conf}" ]] || touch ${locale_conf} 2>/dev/null
@@ -79,10 +79,10 @@ set_chinese_env() {
     echo 'LANGUAGE=zh_CN:zh:en_US:en' >>${locale_conf}
     echo 'LC_MESSAGES=zh_CN.UTF-8' >>${locale_conf}
     echo 'LC_ALL=zh_CN.UTF-8' >>${locale_conf}
-    echo -e "${INFO} [ ${locale_conf} ] content information: \n$(cat ${locale_conf})"
+    echo -e "${INFO} Contents of [ ${locale_conf} ]: \n$(cat ${locale_conf})"
 
-    # Add local support settings
-    echo -e "${STEPS} Add Chinese local settings..."
+    # Add locale support settings
+    echo -e "${STEPS} Adding Chinese locale settings..."
     local local_set="/var/lib/locales/supported.d/local"
     [[ -f "${local_set}" ]] || {
         mkdir -p "/var/lib/locales/supported.d"
@@ -92,10 +92,10 @@ set_chinese_env() {
     echo 'zh_CN.UTF-8 UTF-8' >>${local_set}
     echo 'zh_CN.GBK GBK' >>${local_set}
     echo 'zh_CN GB2312' >>${local_set}
-    echo -e "${INFO} [ ${local_set} ] content information: \n$(cat ${local_set})"
+    echo -e "${INFO} Contents of [ ${local_set} ]: \n$(cat ${local_set})"
 
     # Load settings
-    echo -e "${STEPS} Start generating Chinese locale..."
+    echo -e "${STEPS} Generating Chinese locale..."
     sudo locale-gen
 }
 
@@ -137,33 +137,33 @@ install_chinese_fonts() {
     sudo apt-get update
     case "${VERSION_CODENAME}" in
     jammy | noble | oracular)
-        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        echo -e "${STEPS} Installing Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${ubuntu_packages[*]}
         sudo apt-get install -y ${jammy_packages[*]}
         set_chinese_env
         ;;
     focal)
-        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        echo -e "${STEPS} Installing Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${ubuntu_packages[*]}
         sudo apt-get install -y ${focal_packages[*]}
         set_chinese_env
         ;;
     bullseye | bookworm | trixie)
-        echo -e "${STEPS} Start to install Chinese language pack for [ ${VERSION_CODENAME} ]..."
+        echo -e "${STEPS} Installing Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${debian_packages[*]}
         set_chinese_env
         ;;
-    *) error_msg "unsupported system: [ ${VERSION_CODENAME} ]" ;;
+    *) error_msg "Unsupported system: [ ${VERSION_CODENAME} ]" ;;
     esac
 
-    echo -e "${SUCCESS} Chinese desktop support setting completed."
+    echo -e "${SUCCESS} Chinese desktop support has been installed successfully."
 }
 
-# Check script permission, supports running on Armbian system.
+# Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ${0} ]"
 
-# Installation options
+# Prompt for installation
 echo -ne "${OPTIONS} Install Chinese desktop support? (y/n): "
 read optid
 optid="${optid/Y/y}" && optid="${optid/N/n}"
-[[ "${optid:0:1}" == "y" ]] && install_chinese_fonts || echo -e "${INFO} Skip Chinese desktop settings."
+[[ "${optid:0:1}" == "y" ]] && install_chinese_fonts || echo -e "${INFO} Skipped Chinese desktop settings."

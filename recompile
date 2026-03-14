@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Compile the kernel with Armbian Docker container
+# Description: Compile the kernel using an Armbian Docker container
 # Copyright (C) 2021~ https://www.kernel.org
 # Copyright (C) 2021~ https://github.com/unifreq
 # Copyright (C) 2021~ https://github.com/ophub/amlogic-s9xxx-armbian
@@ -18,10 +18,10 @@
 #
 #======================================= Functions list =======================================
 #
-# error_msg                : Output error message
+# error_msg                : Output error message and exit
 #
 # init_var                 : Initialize all variables
-# install_docker_engine    : Install Docker engine
+# install_docker_engine    : Install Docker engine if not present
 # launch_docker_container  : Launch the Armbian Docker container
 # configure_and_compile    : Configure the Docker environment and compile the kernel
 #
@@ -58,7 +58,7 @@ error_msg() {
 }
 
 init_var() {
-    echo -e "${STEPS} Start Initializing Variables..."
+    echo -e "${STEPS} Initializing variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     local options="k:a:n:m:p:r:t:c:d:s:z:l:f:h:i:"
@@ -93,7 +93,7 @@ init_var() {
 }
 
 install_docker_engine() {
-    echo -e "${STEPS} Start installing Docker engine..."
+    echo -e "${STEPS} Installing Docker engine..."
 
     curl -fsSL https://get.docker.com | sh
     usermod -aG docker ${USER}
@@ -101,7 +101,7 @@ install_docker_engine() {
 }
 
 launch_docker_container() {
-    echo -e "${STEPS} Start launching the Armbian Docker container..."
+    echo -e "${STEPS} Launching the Armbian Docker container..."
 
     # Check if the Armbian Docker container is running
     if [[ "$(docker ps -q -f name=${docker_container})" ]]; then
@@ -109,7 +109,7 @@ launch_docker_container() {
     else
         # Remove the stopped Armbian Docker container
         [[ "$(docker ps -aq -f status=exited -f name=${docker_container})" ]] && {
-            echo -e "${INFO} Start removing the stopped Docker container [ ${docker_container} ]..."
+            echo -e "${INFO} Removing the stopped Docker container [ ${docker_container} ]..."
             docker rm -f ${docker_container} >/dev/null 2>&1
         }
 
@@ -125,7 +125,7 @@ launch_docker_container() {
         [[ -d "${ccache_path}" ]] || mkdir -p ${ccache_path}
 
         # Pull the Armbian Docker image
-        echo -e "${INFO} Start pulling the Docker image: [ ${docker_image} ]..."
+        echo -e "${INFO} Pulling the Docker image: [ ${docker_image} ]..."
         docker run -d --privileged \
             --name ${docker_container} \
             -v ${compile_path}:/opt/kernel/compile-kernel \
@@ -139,9 +139,9 @@ launch_docker_container() {
 }
 
 configure_and_compile() {
-    echo -e "${STEPS} Start configuring the Docker environment and compiling the kernel..."
+    echo -e "${STEPS} Configuring the Docker environment and compiling the kernel..."
 
-    echo -e "${INFO} Synchronize server time."
+    echo -e "${INFO} Synchronizing server time."
     ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
 
     echo -e "${INFO} Restarting Docker container..."
@@ -158,12 +158,12 @@ configure_and_compile() {
     [[ -d "${kernel_patch_path}" ]] && docker cp ${kernel_patch_path}/. "${docker_container}":/opt/kernel/compile-kernel/tools/patch/
     docker exec -i "${docker_container}" ls -Alh /opt/kernel/compile-kernel/tools/patch/ || true
 
-    echo -e "${INFO} Start compiling the kernel inside the Docker container..."
+    echo -e "${INFO} Compiling the kernel inside the Docker container..."
     docker exec -i "${docker_container}" bash "${docker_script}" "${@}"
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to compile kernel"
+echo -e "${STEPS} Welcome to the Kernel Compilation Tool!"
 echo -e "${INFO} The host environment [ ${host_id}: ${host_release} / ${arch_info} ]"
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ./${0} ]"
@@ -179,4 +179,4 @@ configure_and_compile "${@}"
 
 # Show server end information
 echo -e "${STEPS} Host space usage after compilation: \n$(df -hT ${docker_hostpath}) \n"
-echo -e "${SUCCESS} All processes completed successfully"
+echo -e "${SUCCESS} All processes completed successfully."

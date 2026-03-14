@@ -1,5 +1,5 @@
 #!/bin/bash
-#======================================================================================
+#========================================================================================
 #
 # This file is licensed under the terms of the GNU General Public
 # License version 2. This program is licensed "as is" without any
@@ -9,12 +9,12 @@
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Dependent script: /usr/lib/armbian/armbian-firstrun
-# Function: Fix permissions and related settings(Executed at system initialization)
+# Function: Fix permissions and system settings (executed during initial system setup)
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-fix
 #
-#=============================== Set default parameters ===============================
+#================================ Set default parameters ================================
 #
 export DEBIAN_FRONTEND=noninteractive
 
@@ -37,22 +37,22 @@ tolog() {
 }
 
 # Show start message
-echo "" >${fix_log} && tolog "Start fixing..."
+echo "" >${fix_log} && tolog "Starting system fixes..."
 
 # Get the system release version, such as: jammy, noble, bookworm, bullseye, etc.
 [[ -f "/etc/lsb-release" ]] && DISTRIBUTION_CODENAME="$(grep CODENAME /etc/lsb-release | cut -d'=' -f2 || true)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -f "${os_release_file}" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME "${os_release_file}" | cut -d'=' -f2 || true)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -x "/usr/bin/lsb_release" ]] && DISTRIBUTION_CODENAME="$(/usr/bin/lsb_release -c | cut -d':' -f2 | tr -d '\t' || true)"
 
-# ===== A. Start repairing system permissions =====
+# ===== A. Fix system permissions =====
 
-# Fix common releases permissions
+# Fix common release permissions
 [[ -d "/var/tmp" ]] && chmod 777 /var/tmp 2>/dev/null && tolog "01. Fix tmp permissions"
 [[ -d "/etc/update-motd.d" ]] && chmod -x /etc/update-motd.d/* 2>/dev/null && chmod +x /etc/update-motd.d/{10-*,20-*,30-*} 2>/dev/null && tolog "02. Fix update-motd.d permissions"
 [[ -d "/var/cache/man" ]] && chown man:root /var/cache/man -R 2>/dev/null && tolog "03. Fix man permissions"
 [[ -d "/var/cache/man" ]] && chmod g+s /var/cache/man -R 2>/dev/null && tolog "04. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && chown root:root /etc/sudoers 2>/dev/null && tolog "05. Fix man permissions"
-[[ -f "/etc/sudoers" ]] && chmod 440 /etc/sudoers 2>/dev/null && tolog "06. Fix man permissions"
+[[ -f "/etc/sudoers" ]] && chown root:root /etc/sudoers 2>/dev/null && tolog "05. Fix sudoers ownership"
+[[ -f "/etc/sudoers" ]] && chmod 440 /etc/sudoers 2>/dev/null && tolog "06. Fix sudoers permissions"
 [[ -f "/usr/bin/sudo" ]] && chown root:root /usr/bin/sudo 2>/dev/null && tolog "07. Fix sudo permissions"
 [[ -f "/usr/bin/sudo" ]] && chmod 4755 /usr/bin/sudo 2>/dev/null && tolog "08. Fix sudo permissions"
 # Fix focal permissions
@@ -64,10 +64,10 @@ echo "" >${fix_log} && tolog "Start fixing..."
 [[ -f "/usr/libexec/sudo/sudoers.so" ]] && chmod 644 /usr/libexec/sudo/sudoers.so 2>/dev/null && tolog "13. Fix sudoers.so permissions"
 [[ -f "/usr/libexec/polkit-agent-helper-1" ]] && chmod 4755 /usr/libexec/polkit-agent-helper-1 2>/dev/null && tolog "14. Fix polkit-agent-helper-1 permissions"
 
-# ===== B. Start removing useless packages and scripts =====
+# ===== B. Remove unnecessary packages and scripts =====
 
-# Remove packages
-apt-get clean -y 2>/dev/null && rm -rf /var/cache/apt/* 2>/dev/null && rm -rf /var/lib/apt/* 2>/dev/null && tolog "20. Clean up local installation packages"
+# Clean APT cache
+apt-get clean -y 2>/dev/null && rm -rf /var/cache/apt/* 2>/dev/null && rm -rf /var/lib/apt/* 2>/dev/null && tolog "20. Clean APT cache"
 
 # Get kernel signature
 [[ -f "${ophub_release_file}" ]] && {
@@ -104,25 +104,25 @@ fi
 [[ -n "$(dpkg -l | awk '{print $2}' | grep sunxi-tools || true)" ]] && apt-mark hold sunxi-tools 2>/dev/null && tolog "26. Hold sunxi-tools"
 [[ -n "$(dpkg -l | awk '{print $2}' | grep initramfs-tools || true)" ]] && apt-mark hold initramfs-tools* 2>/dev/null && tolog "27. Hold initramfs-tools*"
 
-# Remove the scripts contained in [ armbian-bsp-cli-odroidn2 ] that will cause the system to fail to start
+# Remove bundled scripts from armbian-bsp-cli-odroidn2 that may prevent boot
 # [ dpkg -c armbian-bsp-cli-odroidn2_23.02.2_arm64.deb ] : https://paste.armbian.com/aloxuvokol
-# Move /usr/share/armbian to armbian.bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
-[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak 2>/dev/null && tolog "28. Move /usr/share/armbian to .bak"
-# Move /usr/lib/nand-sata-install to nand-sata-install.bak. [ Useless bootloader and u-boot ]
-[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install /usr/lib/nand-sata-install.bak 2>/dev/null && tolog "29. Move /usr/lib/nand-sata-install to .bak"
+# Rename /usr/share/armbian to .bak. [ dpkg -S boot.cmd ] : [ armbian-bsp-cli-odroidn2: /usr/share/armbian/boot.cmd ]
+[[ -d "/usr/share/armbian" ]] && mv -f /usr/share/armbian /usr/share/armbian.bak 2>/dev/null && tolog "28. Rename /usr/share/armbian to .bak"
+# Rename /usr/lib/nand-sata-install to .bak (unused bootloader and u-boot files)
+[[ -d "/usr/lib/nand-sata-install" ]] && mv -f /usr/lib/nand-sata-install /usr/lib/nand-sata-install.bak 2>/dev/null && tolog "29. Rename /usr/lib/nand-sata-install to .bak"
 # Disable update_initramfs
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
 [[ -f "${initramfs_conf}" ]] && sed -i "s|^update_initramfs=.*|update_initramfs=no|g" "${initramfs_conf}" && tolog "30. Set update-initramfs.conf"
 
-# ===== C. Start disabling system services =====
+# ===== C. Disable unnecessary system services =====
 
-# Regenerate new machine-id
+# Regenerate machine-id for unique identification
 rm -f /etc/machine-id /var/lib/dbus/machine-id 2>/dev/null && tolog "50. Delete machine-id"
 dbus-uuidgen --ensure=/etc/machine-id 2>/dev/null && tolog "51. Generate /etc/machine-id"
 dbus-uuidgen --ensure 2>/dev/null && tolog "52. Generate /var/lib/dbus/machine-id"
 
-# Turn off automatic hibernation to prevent hard drives from hanging
-systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target 2>/dev/null && tolog "53. Turn off automatic sleep mode"
+# Disable automatic hibernation to prevent storage device issues
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target 2>/dev/null && tolog "53. Disable automatic sleep/hibernation"
 
 # Disable tips of the day for [ /etc/update-motd.d/35-armbian-tips ]
 motd_tips="/etc/default/armbian-motd"
@@ -136,7 +136,7 @@ quotes_cron="/etc/cron.daily/armbian-quotes"
     tolog "55. Disable quotes cron plan"
 } || true
 
-# Remove motd-news service
+# Remove motd-news services
 motd_timer="/usr/lib/systemd/system/motd-news.timer"
 [[ -f "${motd_timer}" ]] && {
     systemctl stop motd-news.timer 2>/dev/null
@@ -155,30 +155,30 @@ rm -f /var/lib/systemd/deb-systemd-helper-enabled/timers.target.wants/motd-news.
 rm -f /var/lib/systemd/deb-systemd-helper-enabled/motd-news.timer.dsh-also 2>/dev/null
 rm -f /etc/systemd/system/timers.target.wants/motd-news.timer 2>/dev/null
 
-# Disable the system's partition adjustment service
+# Disable the partition auto-resize service
 systemctl stop armbian-resize-filesystem.service 2>/dev/null
 systemctl disable armbian-resize-filesystem.service 2>/dev/null
-tolog "58. Disable the armbian-resize-filesystem.service"
+tolog "58. Disable armbian-resize-filesystem.service"
 
 # Disable the ssh.socket: https://github.com/ophub/amlogic-s9xxx-armbian/discussions/1476
 systemctl disable --now ssh.socket 2>/dev/null
 systemctl enable --now ssh.service 2>/dev/null
 tolog "59. Disable the ssh.socket and enable ssh.service"
 
-# ===== D. Start adjusting custom settings =====
+# ===== D. Apply custom settings =====
 
-# Fix version differences(After 2022.12.03)
+# Fix legacy configuration file names (after 2022.12.03)
 [[ -f "/etc/amlogic_model_database.conf" ]] && {
     mv -f /etc/amlogic_model_database.conf /etc/model_database.conf 2>/dev/null
-    tolog "70. Adjust the model_database.conf file name"
+    tolog "70. Rename amlogic_model_database.conf to model_database.conf"
 } || true
 
 [[ -f "/etc/rockchip_model_database.conf" ]] && {
     mv -f /etc/rockchip_model_database.conf /etc/model_database.conf 2>/dev/null
-    tolog "71. Adjust the model_database.conf file name"
+    tolog "71. Rename rockchip_model_database.conf to model_database.conf"
 } || true
 
-# Confirm device information
+# Confirm and adjust device information
 [[ -f "${ophub_release_file}" ]] && {
     # Get welcome banner value
     family_name="$(cat ${ophub_release_file} | grep -E "^FAMILY=" | cut -d"'" -f2 || true)"
@@ -186,19 +186,19 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     soc_name="$(cat ${ophub_release_file} | grep -E "^SOC=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g" || true)"
     board_name="$(cat ${ophub_release_file} | grep -E "^BOARD=" | cut -d"'" -f2 | sed -e "s|\b[a-z]|\U&|g" || true)"
 
-    # Adjustment parameter name for ANDROID_UBOOT
+    # Migrate legacy ANDROID_UBOOT parameter name
     [[ -n "$(cat ${ophub_release_file} | grep -E "^ANDROID_UBOOT=")" ]] && {
         sed -i "s|^ANDROID_UBOOT=|BOOTLOADER_IMG=|g" ${ophub_release_file}
-        tolog "80. Adjust the ANDROID_UBOOT name"
+        tolog "80. Rename ANDROID_UBOOT to BOOTLOADER_IMG"
     }
 
-    # Adjustment parameter name for UBOOT_STATUS
+    # Migrate legacy UBOOT_STATUS parameter name
     [[ -n "$(cat ${ophub_release_file} | grep -E "^UBOOT_STATUS=")" ]] && {
         sed -i "s|^UBOOT_STATUS=|MLUBOOT_STATUS=|g" ${ophub_release_file}
-        tolog "81. Adjust the UBOOT_STATUS name"
+        tolog "81. Rename UBOOT_STATUS to MLUBOOT_STATUS"
     }
 
-    # Add default kernel tags
+    # Add default kernel tags if missing
     sed -i "s|^KERNEL_BRANCH=|KERNEL_TAGS=|g" ${ophub_release_file}
     sed -i "s|^KERNEL_TAGS='6.x.y'|KERNEL_TAGS='6.1.y'|g" ${ophub_release_file}
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_TAGS=")" ]] || {
@@ -207,24 +207,24 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         tolog "82. Add the KERNEL_TAGS name"
     }
 
-    # Add default KERNEL_REPO (Kernel download repository)
+    # Add default KERNEL_REPO if missing
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_REPO=")" ]] || {
         echo "KERNEL_REPO='ophub/kernel'" >>${ophub_release_file}
         tolog "83. Add the custom KERNEL_REPO URL"
     }
 
-    # Add default KERNEL_BACKUP (Automatic backup kernel)
+    # Add default KERNEL_BACKUP if missing
     [[ -n "$(cat ${ophub_release_file} | grep -E "^KERNEL_BACKUP=")" ]] || {
         echo "KERNEL_BACKUP='yes'" >>${ophub_release_file}
         tolog "84. Add the custom KERNEL_BACKUP"
     }
 
-    # Get the board name
+    # Get the board display name by platform
     [[ "${platform_name}" == "amlogic" ]] && bd_name="Aml.${soc_name}"
     [[ "${platform_name}" == "rockchip" ]] && bd_name="RK.${board_name}"
     [[ "${platform_name}" == "allwinner" ]] && bd_name="AW.${board_name}"
 
-    # Adjust custom release information
+    # Update armbian-release configuration
     [[ -f "${armbian_release_file}" ]] && {
         [[ -n "${bd_name}" ]] && {
             sed -i "s|^BOARD=.*|BOARD=\"${board_name}\"|g" ${armbian_release_file}
@@ -246,10 +246,10 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_release_file}
         sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|BOOTSCRIPT_FORCE_UPDATE=\"no\"|g" ${armbian_release_file}
         sed -i "s|^FORCE_UBOOT_UPDATE=.*|FORCE_UBOOT_UPDATE=\"no\"|g" ${armbian_release_file}
-        tolog "85. Adjust custom board name: ${armbian_release_file}"
+        tolog "85. Update custom board info: ${armbian_release_file}"
     }
 
-    # Adjust custom image information
+    # Update armbian-image-release configuration
     [[ -f "${armbian_image_file}" ]] && {
         [[ -n "${bd_name}" ]] && {
             sed -i "s|^BOARD=.*|BOARD=\"${board_name}\"|g" ${armbian_image_file}
@@ -269,18 +269,18 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
         sed -i "s|^BOARD_TYPE=.*|BOARD_TYPE=diy|g" ${armbian_image_file}
         sed -i "s|^FORCE_BOOTSCRIPT_UPDATE=.*|FORCE_BOOTSCRIPT_UPDATE=\"no\"|g" ${armbian_image_file}
         sed -i "s|^BOOTSCRIPT_FORCE_UPDATE=.*|BOOTSCRIPT_FORCE_UPDATE=\"no\"|g" ${armbian_image_file}
-        tolog "86. Adjust custom board name: ${armbian_image_file}"
+        tolog "86. Update custom board info: ${armbian_image_file}"
     }
 
-    # Adjust custom image information
+    # Update os-release information
     [[ -f "${os_release_file}" ]] && {
         short_version="$(cat ${os_release_file} | grep -E '^PRETTY_NAME=' | grep -oE '[2-9][0-9]\.[0-9]{1,2}\.[0-9]{1,2}' | head -n 1 || true)"
         sed -i "s|^PRETTY_NAME=.*|PRETTY_NAME=\"Armbian OS ${short_version} ${DISTRIBUTION_CODENAME}\"|g" ${os_release_file}
         sed -i "s|^ARMBIAN_PRETTY_NAME=.*|ARMBIAN_PRETTY_NAME=\"Armbian OS ${short_version} ${DISTRIBUTION_CODENAME}\"|g" ${os_release_file}
-        tolog "87. Adjust custom board name: ${os_release_file}"
+        tolog "87. Update custom board info: ${os_release_file}"
     }
 
-    # Disable ttyFIQ0 & ttyAML0 (ttyS2)
+    # Disable unused serial console on non-Amlogic platforms
     [[ "${platform_name}" != "amlogic" ]] && {
         systemctl disable serial-getty@ttyFIQ0 2>/dev/null
         systemctl disable serial-getty@ttyAML0 2>/dev/null
@@ -288,26 +288,26 @@ tolog "59. Disable the ssh.socket and enable ssh.service"
     }
 } || true
 
-# Set system status to supported
+# Set system distribution status to supported
 [[ -n "${DISTRIBUTION_CODENAME}" && -f "${armbian_os_status}" ]] && {
     sed -i "s|^${DISTRIBUTION_CODENAME}=.*|${DISTRIBUTION_CODENAME}=supported|g" ${armbian_os_status}
-    tolog "90. Set the ${DISTRIBUTION_CODENAME} system status to support"
+    tolog "90. Set ${DISTRIBUTION_CODENAME} distribution status to supported"
 } || true
 
-# Maximize root partition size
+# Expand root partition if flagged
 todo_rootfs_resize="/root/.no_rootfs_resize"
 [[ -f "${todo_rootfs_resize}" && "$(cat ${todo_rootfs_resize} 2>/dev/null | xargs)" == "yes" ]] && {
     armbian-tf 2>/dev/null &&
-        tolog "91. Root partition resized successfully"
+        tolog "91. Root partition expanded successfully"
 } || true
 
-# Hidd the IP address of WAN & IPv6
+# Hide WAN & IPv6 addresses from MOTD
 ip_info_file="/etc/update-motd.d/20-ip-info"
 [[ -f "${ip_info_file}" ]] && {
     sed -i '/^get_wan.*_address/s/{.*/{ true; }/' ${ip_info_file}
     sed -i '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' ${ip_info_file}
-    tolog "92. Hide the IP address of WAN & IPv6"
+    tolog "92. Hide WAN & IPv6 addresses from MOTD"
 } || true
 
 # Show end message
-tolog "successfully fixed."
+tolog "All system fixes applied successfully."

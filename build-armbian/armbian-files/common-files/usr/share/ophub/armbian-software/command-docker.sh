@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Execute docker software install/update/remove command
+# Function: Manage Docker container software installation, update, and removal
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -72,7 +72,7 @@ software_102() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
 
         # Prompt users whether to use their own SSL certificate
         echo -ne "${OPTIONS} Using your own SSL certificate? (y/N): "
@@ -106,7 +106,7 @@ software_102() {
 
         sync && sleep 3
         [[ "${use_ssl}" == "yes" ]] && {
-            echo -e "${NOTE} Please place your SSL certificate in: [ ${install_path}/certs/portainer.crt & portainer.key]"
+            echo -e "${NOTE} Please place your SSL certificate in: [ ${install_path}/certs/portainer.crt & portainer.key ]"
         }
         echo -e "${NOTE} The ${container_name} address: [ https://${my_address}:9443 ]"
         echo -e "${SUCCESS} The ${container_name} installed successfully."
@@ -127,7 +127,7 @@ software_103() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/selfhostedpro/yacht
         docker volume create ${container_name}
         docker run -d --name ${container_name} \
@@ -170,7 +170,7 @@ software_104() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
 
         echo -ne "${OPTIONS} Set login username, the default is [ ${tr_default_user} ]: "
         read tr_user
@@ -199,7 +199,7 @@ software_104() {
             ${image_name}
 
         # Set the transmission-web-control
-        #echo -e "${STEPS} Start the installation interface: [ transmission-web-control ]..."
+        #echo -e "${STEPS} Installing the transmission-web-control interface..."
         #tr_cn_url="https://github.com/ronggang/transmission-web-control/raw/master/release/install-tr-control-cn.sh"
         #bash <(curl -fsSL ${tr_cn_url}) ${install_path}
 
@@ -224,7 +224,7 @@ software_105() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/qbittorrent
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -260,7 +260,7 @@ software_106() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/arm64v8/nextcloud
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -294,7 +294,7 @@ software_107() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/jellyfin
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -330,7 +330,7 @@ software_108() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/homeassistant/home-assistant
         docker run -d --name=${container_name} \
             --privileged \
@@ -366,7 +366,7 @@ software_109() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/kodcloud/kodbox
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -398,7 +398,7 @@ software_110() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/couchpotato
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -431,7 +431,7 @@ software_111() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/sonarr
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -464,7 +464,7 @@ software_112() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/radarr
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -497,7 +497,7 @@ software_113() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/syncthing
         docker run -d --name=${container_name} \
             --hostname=${container_name} \
@@ -534,7 +534,7 @@ software_114() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/filebrowser/filebrowser
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -568,7 +568,7 @@ software_115() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/linuxserver/heimdall
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -600,7 +600,7 @@ software_116() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://nodered.org/docs/getting-started/docker
         docker run -itd --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -641,7 +641,7 @@ EOF
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/arm64v8/eclipse-mosquitto/
         docker run -itd --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -681,7 +681,7 @@ software_118() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
 
         # Create a virtual network: macvlan
         [[ -z "${my_macvlan}" ]] && {
@@ -732,7 +732,7 @@ software_119() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/netdata/netdata
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -772,7 +772,7 @@ software_120() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/cnk3x/xunlei
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -807,7 +807,7 @@ software_121() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/infrastlabs/docker-headless
         docker run -itd --name=${container_name} \
             -e PUID=${docker_puid} \
@@ -848,7 +848,7 @@ software_122() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/deluan/navidrome
         docker run -d --name=${container_name} \
             --user $(id -u):$(id -g) \
@@ -879,7 +879,7 @@ software_123() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
 
         echo -ne "${OPTIONS} Set your login password: "
         read openlist_pass
@@ -918,7 +918,7 @@ software_124() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/whyour/qinglong
         docker run -dit --name=${container_name} \
             -v ${install_path}/ql:/ql/data \
@@ -950,7 +950,7 @@ software_125() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
 
         # Set your OPENAI_API_KEY
         echo -ne "${OPTIONS} Please input your OPENAI_API_KEY, such as sk-xxxxx: "
@@ -994,7 +994,7 @@ software_126() {
 
     case "${software_manage}" in
     install)
-        echo -e "${STEPS} Start installing the docker image: [ ${container_name} ]..."
+        echo -e "${STEPS} Installing Docker container: [ ${container_name} ]..."
         # Instructions: https://hub.docker.com/r/n8nio/n8n
         docker run -d --name=${container_name} \
             -e PUID=${docker_puid} \

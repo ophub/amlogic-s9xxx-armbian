@@ -8,22 +8,22 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Execute software install/update/remove command
+# Function: Shared utility functions for software management scripts
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 #============================== Functions list ==============================
 #
-# error_msg                 : Output error message
-# check_release             : Check release file
-# software_install          : Install package
-# software_update           : Update package
-# software_remove           : Remove package
-# docker_container_remove   : Delete the docker container
-# docker_image_remove       : Delete the docker image
-# docker_update             : Update docker
-# docker_remove             : Remove docker
-# init_var                  : Initialize variables
+# error_msg                 : Output error message and exit
+# check_release             : Check and load system release information
+# software_install          : Install specified packages
+# software_update           : Update all system packages
+# software_remove           : Remove specified packages
+# docker_container_remove   : Stop and remove a Docker container
+# docker_image_remove       : Remove a Docker image
+# docker_update             : Update a Docker container to the latest image
+# docker_remove             : Fully remove a Docker container, image, and data
+# init_var                  : Initialize and parse command-line parameters
 #
 #========================== Set default parameters ==========================
 #
@@ -83,7 +83,7 @@ check_release() {
 
 software_install() {
     install_list="${1}"
-    echo -e "${STEPS} Start installing packages: [ ${install_list} ]..."
+    echo -e "${STEPS} Installing packages: [ ${install_list} ]..."
 
     # Install the package
     sudo apt-get update
@@ -93,7 +93,7 @@ software_install() {
 }
 
 software_update() {
-    echo -e "${STEPS} Start updating packages..."
+    echo -e "${STEPS} Updating packages..."
 
     # Update the package
     sudo apt-get update
@@ -102,12 +102,12 @@ software_update() {
     sudo apt-get --purge autoremove -y
     sudo apt-get autoclean -y
 
-    echo -e "${SUCCESS} Package updated successfully."
+    echo -e "${SUCCESS} Packages updated successfully."
 }
 
 software_remove() {
     remove_list="${1}"
-    echo -e "${STEPS} Start removing packages: [ ${remove_list} ]..."
+    echo -e "${STEPS} Removing packages: [ ${remove_list} ]..."
 
     # Update the package
     sudo apt-get update
@@ -118,58 +118,58 @@ software_remove() {
     echo -e "${SUCCESS} [ ${remove_list} ] packages removed successfully."
 }
 
-# Delete the docker container
+# Stop and remove the Docker container
 docker_container_remove() {
     local container_name="${1}"
     [[ -n "${container_name}" ]] || error_msg "Docker container name is empty!"
 
-    # Query the container ID based on the image name and delete it
-    echo -e "${STEPS} Start removing container: [ ${container_name} ]..."
+    # Query the container ID based on the image name and remove it
+    echo -e "${STEPS} Removing container: [ ${container_name} ]..."
     docker stop $(docker ps -aq --filter name=${container_name})
     docker rm -f $(docker ps -aq --filter name=${container_name})
-    echo -e "${SUCCESS} ${container_name} removed successfully."
+    echo -e "${SUCCESS} Container [ ${container_name} ] removed successfully."
 }
 
-# Delete the docker image
+# Remove the Docker image
 docker_image_remove() {
     local image_name="${1}"
     [[ -n "${image_name}" ]] || error_msg "Docker image name is empty!"
 
-    # Query the image ID based on the image name and delete it
-    echo -e "${STEPS} Start removing image: [ ${image_name} ]..."
+    # Query the image ID based on the image name and remove it
+    echo -e "${STEPS} Removing image: [ ${image_name} ]..."
     docker image rm -f $(docker images -q --filter reference=${image_name})
-    # Automatic deletion of unused docker images
+    # Automatically remove unused Docker images
     docker image prune -f >/dev/null
-    echo -e "${SUCCESS} ${image_name} removed successfully."
+    echo -e "${SUCCESS} Image [ ${image_name} ] removed successfully."
 }
 
-# Update docker
+# Update a Docker container
 docker_update() {
     [[ -n "${image_name}" && -n "${container_name}" ]] || error_msg "Docker image or container name is empty!"
 
-    echo -e "${STEPS} Start updating the docker: [ ${container_name} ]..."
+    echo -e "${STEPS} Updating Docker container: [ ${container_name} ]..."
     # Update docker image
     docker pull "${image_name}"
     # Delete old container
     docker_container_remove "${container_name}"
     # Start a new one
     sudo bash ${command_docker} -s ${software_id} -m install
-    # Automatic deletion of unused docker images
+    # Automatically remove unused Docker images
     docker image prune -f >/dev/null
 }
 
-# Remove docker
+# Remove a Docker container completely
 docker_remove() {
-    [[ -n "${image_name}" && -n "${container_name}" && -n "${install_path}" ]] || error_msg "Docker image, container or path is empty!"
+    [[ -n "${image_name}" && -n "${container_name}" && -n "${install_path}" ]] || error_msg "Docker image, container, or path is empty!"
 
-    echo -e "${STEPS} Start removing docker: [ ${container_name} ]..."
+    echo -e "${STEPS} Removing Docker container: [ ${container_name} ]..."
     # Delete old container
     docker_container_remove "${container_name}"
     # Delete old image
     docker_image_remove "${image_name}"
 
     # Delete the installation directory
-    echo -ne "${OPTIONS} Delete [ ${install_path} ] directory? (y/n): "
+    echo -ne "${OPTIONS} Delete the [ ${install_path} ] directory? (y/n): "
     read del_dir
     [[ "${del_dir,,}" == "y" ]] && [[ -d "${install_path}" ]] && rm -rf ${install_path} 2>/dev/null
 

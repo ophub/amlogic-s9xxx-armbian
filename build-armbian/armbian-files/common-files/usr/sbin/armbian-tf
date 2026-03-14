@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Partition Expansion Tool
+# Function: Root Partition Expansion Tool
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -31,11 +31,11 @@ error_msg() {
     exit 1
 }
 
-# Check disk
+# Check the disk where the root partition resides
 do_checkdisk() {
     # Find the partition where root is located
     ROOT_PTNAME="$(df / | tail -n1 | awk '{print $1}' | awk -F '/' '{print $3}')"
-    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the partition corresponding to the root file system!"
+    [[ -z "${ROOT_PTNAME}" ]] && error_msg "Cannot find the root filesystem partition!"
 
     # Find the disk where the partition is located, supporting multi-digit partition numbers
     case "${ROOT_PTNAME}" in
@@ -59,19 +59,19 @@ do_checkdisk() {
     sync && sleep 3
 }
 
-# Expand the current partition
+# Expand the root partition to fill available space
 expansion_partition() {
-    echo -e "${INFO} Start repairing hard disk size..."
+    echo -e "${INFO} Repairing disk partition table..."
     printf 'f\n' | parted ---pretend-input-tty /dev/${DISK_NAME} unit MiB print || repair_status="no"
-    [[ "${repair_status}" == "no" ]] && error_msg "Disk size repair failed, stop partitioning."
+    [[ "${repair_status}" == "no" ]] && error_msg "Failed to repair disk partition table. Expansion aborted."
 
     pt_num="$(parted -s /dev/${DISK_NAME} print | awk '$1~/[1-9]+/ {print $1}' | wc -l)"
-    [[ "${pt_num}" -ne "2" ]] && error_msg "Not 2 partitions, stop automatic expansion."
+    [[ "${pt_num}" -ne "2" ]] && error_msg "Expected 2 partitions but found ${pt_num}. Automatic expansion aborted."
 
-    echo -e "${INFO} Start to expand the current partition..."
+    echo -e "${INFO} Expanding the root partition..."
     printf 'Yes\n-1\n' | parted ---pretend-input-tty /dev/${DISK_NAME} resizepart 2 100%
 
-    echo -e "${INFO} Expansion file system..."
+    echo -e "${INFO} Resizing the filesystem..."
     ROOTFS_TYPE="$(df -hT / | grep "/" | awk '{print $2}')"
     if [[ "${ROOTFS_TYPE}" == "btrfs" ]]; then
         btrfs filesystem resize max /
@@ -81,13 +81,13 @@ expansion_partition() {
         [[ "${?}" -ne "0" ]] && error_msg "[ resize2fs ] operation failed."
     fi
 
-    # Do not delete files, only modify values to prevent secondary expansion of the armbian-resize-filesystem
+    # Do not delete the flag file, only modify the value to prevent re-expansion by armbian-resize-filesystem
     echo "no" >/root/.no_rootfs_resize
-    echo -e "${SUCCESS} The current partition expansion is successful."
+    echo -e "${SUCCESS} Root partition expanded successfully."
 }
 
 # Show welcome message
-echo -e "${STEPS} Welcome to Partition Expansion Tool."
+echo -e "${STEPS} Welcome to the Root Partition Expansion Tool."
 
 do_checkdisk
 expansion_partition

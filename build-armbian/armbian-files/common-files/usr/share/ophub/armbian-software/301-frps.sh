@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Execute software install/update/uninstall script
+# Function: Manage frps (FRP server) software installation, update, and removal
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -19,11 +19,11 @@
 #
 #============================== Functions list ==============================
 #
-# error_msg           : Output error message
-# software_download   : Software download
-# software_install    : Software install
-# software_update     : Software update
-# software_remove     : Software remove
+# error_msg           : Output error message and exit
+# software_download   : Download the latest frps release
+# software_install    : Install and configure frps
+# software_update     : Update frps to the latest version
+# software_remove     : Remove frps and clean up files
 #
 #========================== Set default parameters ==========================
 #
@@ -49,7 +49,7 @@ error_msg() {
 }
 
 software_download() {
-    echo -e "${STEPS} Start downloading [ ${software_name} ] software..."
+    echo -e "${STEPS} Downloading [ ${software_name} ] software..."
 
     # Software version query api
     software_api="https://api.github.com/repos/fatedier/frp/releases"
@@ -57,25 +57,25 @@ software_download() {
     software_latest_version="$(curl -s "${software_api}" | grep "tag_name" | awk -F '"' '{print $4}' | tr " " "\n" | sort -rV | head -n 1)"
     # Query download address, E.g: https://github.com/fatedier/frp/releases/download/v0.43.0/frp_0.43.0_linux_arm64.tar.gz
     software_url="$(curl -s "${software_api}" | grep -oE "https:.*${software_latest_version}.*linux_arm64.*.tar.gz")"
-    [[ -n "${software_url}" ]] || error_msg "The download address is empty!"
-    echo -e "${INFO} Software download from: [ ${software_url} ]"
+    [[ -n "${software_url}" ]] || error_msg "Failed to obtain the download address!"
+    echo -e "${INFO} Downloading from: [ ${software_url} ]"
 
     # Download software, E.g: /tmp/tmp.xxx/frp_0.43.0_linux_arm64.tar.gz
     tmp_download="$(mktemp -d)"
     software_filename="${software_url##*/}"
     curl -fsSL "${software_url}" -o "${tmp_download}/${software_filename}"
-    [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Software download failed!"
-    echo -e "${INFO} Software downloaded successfully: $(ls ${tmp_download} -l)"
+    [[ "${?}" -eq "0" && -s "${tmp_download}/${software_filename}" ]] || error_msg "Failed to download the software!"
+    echo -e "${INFO} Download completed: $(ls ${tmp_download} -l)"
 
-    # Unzip the download file
+    # Unzip the downloaded file
     tar -xf ${tmp_download}/${software_filename} -C ${tmp_download} && sync
-    # software directory, E.g: /tmp/tmp.xxx/frp_0.43.0_linux_arm64
+    # Software directory, E.g: /tmp/tmp.xxx/frp_0.43.0_linux_arm64
     software_dir="${tmp_download}/${software_filename/.tar.gz/}"
     echo -e "${INFO} Software directory: [ ${software_dir} ]"
 }
 
 software_install() {
-    echo -e "${STEPS} Start installing [ ${software_name} ] software..."
+    echo -e "${STEPS} Installing [ ${software_name} ] software..."
     software_download
 
     # Generate random token
@@ -140,7 +140,7 @@ EOF
     sync
 
     # Set up to start automatically
-    echo -e "${INFO} Start service..."
+    echo -e "${INFO} Starting service..."
     sudo systemctl daemon-reload
     sudo systemctl enable --now frps
     sudo systemctl restart frps
@@ -175,7 +175,7 @@ EOF
 }
 
 software_update() {
-    echo -e "${STEPS} Start updating [ ${software_name} ] software..."
+    echo -e "${STEPS} Updating [ ${software_name} ] software..."
     software_download
 
     # Stop frps.service
@@ -192,12 +192,12 @@ software_update() {
     sudo systemctl enable --now frps
     sudo systemctl restart frps
 
-    echo -e "${SUCCESS} Software update successfully."
+    echo -e "${SUCCESS} Software updated successfully."
     exit 0
 }
 
 software_remove() {
-    echo -e "${STEPS} Start removing [ ${software_name} ] software..."
+    echo -e "${STEPS} Removing [ ${software_name} ] software..."
 
     # Stop frps.service
     sudo systemctl stop frps
@@ -214,7 +214,7 @@ software_remove() {
 }
 
 software_help() {
-    echo -e "${STEPS} Script usage instructions."
+    echo -e "${STEPS} Script usage instructions:"
 
     cat <<EOF
 =====================================================================
@@ -228,8 +228,8 @@ EOF
     exit 0
 }
 
-# Check script permission, supports running on Armbian system.
-echo -e "${STEPS} Welcome to [ ${software_name} ] software script: [ ${0} ]"
+# Check script permission
+echo -e "${STEPS} Welcome to the [ ${software_name} ] management script: [ ${0} ]"
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo ${0} ]"
 #
 # Execute script assist functions

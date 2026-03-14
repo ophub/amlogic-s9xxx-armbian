@@ -8,7 +8,7 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Description: Third-party software install/update/remove management
+# Description: Third-party software install/update/remove management center
 # Copyright (C) 2021- https://github.com/unifreq
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
@@ -17,14 +17,14 @@
 #======================================= Functions list =======================================
 #
 # error_msg               : Output error message
-# check_release           : Check firmware information
-# check_depends           : Check runtime dependencies
-# check_software_status   : Initialize check
-# search_software_model   : Search for software model
+# check_release           : Check system release information
+# check_depends           : Check and install runtime dependencies
+# check_software_status   : Initialize and check software status
+# search_software_model   : Search for software model by ID
 # show_software_list      : Display the software list
-# update_script           : Update compile scripts
+# update_script           : Update software management scripts
 # clean_tmp               : Clear temporary files
-# help_info               : Show help info
+# help_info               : Show help information
 #
 #=============================== Set make environment variables ===============================
 #
@@ -34,7 +34,7 @@ software_conf="${software_path}/software-list.conf"
 ophub_release_file="/etc/ophub-release"
 arch_info="$(arch)"
 #
-# The compile kernel scripts download repository
+# The software management scripts download repository
 script_repo="https://github.com/ophub/amlogic-s9xxx-armbian.git"
 script_dir="build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software"
 #
@@ -53,19 +53,20 @@ error_msg() {
     exit 1
 }
 
+# Check system release information
 check_release() {
     if [[ -f "${ophub_release_file}" ]]; then
         source "${ophub_release_file}" 2>/dev/null
         VERSION_CODEID="${VERSION_CODEID}"
         VERSION_CODENAME="${VERSION_CODENAME}"
     else
-        error_msg "${ophub_release_file} file is missing!"
+        error_msg "Missing release file: [ ${ophub_release_file} ]"
     fi
 
-    [[ -n "${VERSION_CODEID}" && -n "${VERSION_CODENAME}" ]] || error_msg "${ophub_release_file} value is missing!"
+    [[ -n "${VERSION_CODEID}" && -n "${VERSION_CODENAME}" ]] || error_msg "Incomplete release info in [ ${ophub_release_file} ]"
 }
 
-# Check dependencies
+# Check and install required dependencies
 check_depends() {
     # List of required dependencies
     dpkg_packages=(
@@ -87,18 +88,18 @@ check_depends() {
     done
     # Install missing packages
     if [[ "${is_dpkg}" -eq "1" ]]; then
-        echo -e "${STEPS} Start installing the necessary dependencies..."
+        echo -e "${STEPS} Installing required dependencies..."
         sudo apt-get update
         sudo apt-get install -y ${dpkg_packages[*]}
-        [[ "${?}" -eq "0" ]] || error_msg "Dependency installation failed, stop install."
+        [[ "${?}" -eq "0" ]] || error_msg "Failed to install dependencies."
     fi
 }
 
-# Initialization check
+# Initialize and check software installation status
 check_software_status() {
-    # Check if the ${software_conf} file exists
-    [[ -s "${software_conf}" ]] || error_msg "[ ${software_conf} ] file is missing!"
-    [[ -n "$(cat ${software_conf} | grep -E "^[0-9]{1,9}.*:")" ]] || error_msg "[ ${software_conf} ] file is empty!"
+    # Check if the software configuration file exists
+    [[ -s "${software_conf}" ]] || error_msg "Missing configuration file: [ ${software_conf} ]"
+    [[ -n "$(cat ${software_conf} | grep -E "^[0-9]{1,9}.*:")" ]] || error_msg "Configuration file is empty: [ ${software_conf} ]"
 
     # Check software installation status
     tmp_conf="$(mktemp)"
@@ -137,10 +138,10 @@ check_software_status() {
         [[ "${support}" == "supported" ]] && echo "${line}:${support}:${state}:${manage}" >>${tmp_conf} && sync
     done
     software_database="$(cat ${tmp_conf} 2>/dev/null)"
-    [[ -n "${software_database}" ]] || error_msg "There is no suitable software for [ ${VERSION_CODEID}:${VERSION_CODENAME} ]."
+    [[ -n "${software_database}" ]] || error_msg "No compatible software found for [ ${VERSION_CODEID}:${VERSION_CODENAME} ]."
 }
 
-# Search the software model
+# Search for software model by ID
 search_software_model() {
     local sid="${1}"
     local ret_count="$(echo "${software_database}" | grep -E "^${sid}:" | wc -l)"
@@ -149,11 +150,11 @@ search_software_model() {
     fi
 }
 
-# Functions: Show software list
-# Explain: 1.ID   2.NAME   3.STATE          4.MANAGE
+# Display the software list and handle user selection
+# Columns: 1.ID   2.NAME   3.STATE          4.MANAGE
 # Example: 11     :frps    :not-installed   :install
 show_software_list() {
-    echo -e "${STEPS} Start selecting software [ Current system: \033[92m${VERSION_CODEID}/${VERSION_CODENAME}\033[0m ]..."
+    echo -e "${STEPS} Displaying software list [ System: \033[92m${VERSION_CODEID}/${VERSION_CODENAME}\033[0m ]..."
 
     # Check software status
     check_software_status
@@ -179,7 +180,7 @@ show_software_list() {
     read software_id
     # Check the validity of the selection
     ret="$(search_software_model "${software_id}")"
-    [[ -z "${ret}" ]] && error_msg "Software ID [ ${software_id} ] was not found, exit!"
+    [[ -z "${ret}" ]] && error_msg "Software ID [ ${software_id} ] not found!"
     #echo -e "${INFO} Software Model: [ ${ret} ]"
 
     # Display selected software information
@@ -193,19 +194,19 @@ show_software_list() {
         echo -e "${INFO} Software ID: [ ${software_id} ]"
         echo -e "${INFO} Software Name: [ ${software_name} ]"
     else
-        error_msg "The software does not support the current system, only supports [ ${software_release//@/ \| } ]."
+        error_msg "This software is not compatible with the current system. Supported: [ ${software_release//@/ \| } ]."
     fi
 
-    # Select Installed Software Update or Remove
+    # Choose to update or remove installed software
     [[ "${software_state}" == "installed" ]] && {
-        echo -ne "${OPTIONS} Do you want to Update=(u) or Remove=(r)? (u/r): "
+        echo -ne "${OPTIONS} Update=(u) or Remove=(r)? (u/r): "
         read optid
         optid="${optid/U/u}" && optid="${optid/R/r}"
-        [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Input error!"
+        [[ "${optid:0:1}" == "u" || "${optid:0:1}" == "r" ]] || error_msg "Invalid input!"
         [[ "${optid:0:1}" == "u" ]] && software_manage="update" || software_manage="remove"
     }
 
-    echo -e "${STEPS} Start processing software: [ ${software_execute} ${software_manage} ${software_name} ]..."
+    echo -e "${STEPS} Processing: [ ${software_execute} ${software_manage} ${software_name} ]..."
 
     # Perform software install/update/remove operations
     if [[ "${software_execute}" == "command-"* ]]; then
@@ -217,11 +218,11 @@ show_software_list() {
     fi
 }
 
-# Update related scripts and configuration files
+# Update software management scripts from repository
 update_script() {
-    echo -e "${STEPS} Start update script..."
+    echo -e "${STEPS} Updating software management scripts..."
 
-    # Get the latest scripts
+    # Download the latest scripts from the repository
     git_tmp_path="$(mktemp -d)"
     cd ${git_tmp_path}
     git init --quiet
@@ -229,56 +230,56 @@ update_script() {
     echo "${script_dir}/*" >>.git/info/sparse-checkout
     git remote add origin ${script_repo}
     git pull --quiet --depth=1 origin main
-    [[ "${?}" -ne "0" ]] && error_msg "Download [ ${script_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to download scripts from [ ${script_repo} ]."
 
-    # Update related files
+    # Update the software management scripts
     mkdir -p ${software_path}
     cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/* ${software_path}
-    [[ "${?}" -ne "0" ]] && error_msg "Sync [ ${script_repo} ] scripts failed."
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to sync scripts from [ ${script_repo} ]."
     find ${software_path} -type f -name '*.sh' -exec chmod +x {} \;
 
     # Clean up temporary files
     rm -rf ${git_tmp_path} 2>/dev/null
 
     sync && sleep 3
-    echo -e "${SUCCESS} Script update complete."
+    echo -e "${SUCCESS} Scripts updated successfully."
     exit 0
 }
 
-# Clear software management related files
+# Clear software management scripts and temporary files
 clean_tmp() {
-    echo -e "${STEPS} Clear the space..."
+    echo -e "${STEPS} Cleaning up software management files..."
 
     rm -rf ${software_path} 2>/dev/null && sync
 
-    echo -e "${SUCCESS} Space clearing complete."
+    echo -e "${SUCCESS} Cleanup completed successfully."
     exit 0
 }
 
-# show help info
+# Show help information
 help_info() {
     clear
     cat <<EOF
-=====================================================================
+======================================================================
 Command Example : armbian-software -u
              -u : Update    Update install software script.
              -c : Clear     Clear the local install software script.
              -h : Help      Help information display.
              -q : Quit      Quit install software services.
               * : Other     Show software list.
-=====================================================================
+======================================================================
 EOF
     exit 0
 }
 
-# Check script permission, supports running on Armbian system.
+# Check script permission, only supports running on Armbian (aarch64)
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
-[[ "${arch_info}" == "aarch64" ]] || error_msg "The script only supports running under Armbian system."
-# Check for the existence of software management scripts
-[[ -f "${software_conf}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update install software script."
-# Check firmware information
+[[ "${arch_info}" == "aarch64" ]] || error_msg "This script only supports running on Armbian (aarch64) systems."
+# Ensure the software configuration file exists
+[[ -f "${software_conf}" ]] || echo -e "${INFO} Please run [ armbian-software -u ] to update the software management scripts."
+# Check system release information
 check_release
-# Check runtime dependencies
+# Check and install runtime dependencies
 check_depends
 
 # Execute script assist functions

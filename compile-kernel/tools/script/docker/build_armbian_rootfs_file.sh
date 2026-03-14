@@ -46,7 +46,7 @@ error_msg() {
 }
 
 init_var() {
-    echo -e "${STEPS} Start Initializing Variables..."
+    echo -e "${STEPS} Initializing variables..."
 
     # If it is followed by [ : ], it means that the option requires a parameter value
     local options="v:s:c:k:p:"
@@ -111,7 +111,7 @@ init_var() {
 }
 
 redo_rootfs() {
-    echo -e "${STEPS} Start redoing Armbian [ ${version_codename} ] rootfs file..."
+    echo -e "${STEPS} Rebuilding Armbian [ ${version_codename} ] rootfs file..."
 
     # Searching for Armbian image
     image_file="$(basename $(ls ${image_path}/*.img 2>/dev/null | head -n 1))"
@@ -129,12 +129,12 @@ redo_rootfs() {
     # Create temporary directory
     mkdir -p ${tmp_rootfs}
     sudo chown root:root ${tmp_rootfs}
-    [[ "${?}" == "0" ]] && echo -e "${INFO} 01. Creating temporary directory completed." || error_msg "01. Failed to create directory!"
+    [[ "${?}" == "0" ]] && echo -e "${INFO} 01. Temporary directory created successfully." || error_msg "01. Failed to create directory!"
 
     # Redo Armbian rootfs
     if [[ -n "${rootfs_file}" ]]; then
         sudo tar -mxf ${rootfs_file} -C ${tmp_rootfs}/
-        [[ "${?}" == "0" ]] && echo -e "${INFO} 02. Unpacking Armbian rootfs completed." || error_msg "02. Failed to unpack rootfs file!"
+        [[ "${?}" == "0" ]] && echo -e "${INFO} 02. Armbian rootfs unpacked successfully." || error_msg "02. Failed to unpack rootfs file!"
 
         cd ${tmp_rootfs}/
 
@@ -147,14 +147,14 @@ redo_rootfs() {
                 sudo sed -i "s|^#*PermitRootLogin .*|PermitRootLogin yes|g" ${ssh_config}
                 sudo sed -i "s|^#*PasswordAuthentication .*|PasswordAuthentication yes|g" ${ssh_config}
                 [[ -d "var/run/sshd" ]] || sudo mkdir -p -m0755 var/run/sshd
-                echo -e "${INFO} 03.01 Adjusting sshd_config completed."
+                echo -e "${INFO} 03.01 sshd_config adjusted successfully."
             } || error_msg "03.01 Failed to adjust sshd_config!"
 
             # Set root password to 1234
             [[ -f "etc/shadow" ]] && {
                 rootnewpasswd="$(openssl passwd -6 "1234")"
                 sudo sed -i "s|^root:\*|root:${rootnewpasswd}|" etc/shadow
-                echo -e "${INFO} 03.02 Adjusting the default account completed."
+                echo -e "${INFO} 03.02 Default account adjusted successfully."
             } || error_msg "03.02 Failed to adjust root password!"
         else
             echo -e "${NOTE} 03. Skipping sshd_config adjustment."
@@ -191,7 +191,7 @@ if [ -f "$HOME/.bashrc" ]; then
 fi
 
 EOF
-                echo -e "${INFO} 04. Adjusting the default color completed."
+                echo -e "${INFO} 04. Default color scheme adjusted successfully."
             } || error_msg "04. Failed to adjust dircolors!"
         else
             echo -e "${NOTE} 04. Skipping sshd_config adjustment."
@@ -206,7 +206,7 @@ EOF
             [[ "${?}" == "0" ]] && {
                 sudo chmod +x ${add_script}
                 sudo chown root:root ${add_script}
-                echo -e "${INFO} 05.01. Adding armbian-kernel script completed."
+                echo -e "${INFO} 05.01. armbian-kernel script added successfully."
             } || error_msg "05.01. Failed to add armbian-kernel script!"
 
             # Add uInitrd generation script
@@ -231,7 +231,7 @@ exit 0
 
 EOF
             sudo chmod +x etc/initramfs/post-update.d/99-uboot
-            [[ "${?}" == "0" ]] && echo -e "${INFO} 05.02. Adding uInitrd generation script completed." || error_msg "05.02. Failed to adjust uInitrd!"
+            [[ "${?}" == "0" ]] && echo -e "${INFO} 05.02. uInitrd generation script added successfully." || error_msg "05.02. Failed to adjust uInitrd!"
         else
             echo -e "${NOTE} 05. Skipping armbian-kernel script addition."
         fi
@@ -239,7 +239,7 @@ EOF
         # Compress the rootfs file
         sudo tar -czf ${rootfs_save_name} *
         sudo mv -f ${rootfs_save_name} ../
-        [[ "${?}" == "0" ]] && echo -e "${INFO} 06. Making Armbian rootfs completed." || error_msg "06. Failed to redo rootfs!"
+        [[ "${?}" == "0" ]] && echo -e "${INFO} 06. Armbian rootfs created successfully." || error_msg "06. Failed to redo rootfs!"
     else
         error_msg "02. Failed to find rootfs file!"
     fi
@@ -249,7 +249,7 @@ EOF
         cd ${image_path}/
         mv -f ${image_file} ${image_save_name}
         pigz -qf *.img || gzip -qf *.img
-        [[ "${?}" == "0" ]] && echo -e "${INFO} 07. Renaming Armbian image completed." || error_msg "07. Failed to rename the image!"
+        [[ "${?}" == "0" ]] && echo -e "${INFO} 07. Armbian image renamed successfully." || error_msg "07. Failed to rename the image!"
     else
         error_msg "07. Failed to find Armbian image!"
     fi
@@ -263,13 +263,13 @@ EOF
     # Delete Armbian build source codes and temporary files
     cd ${build_path}/
     sudo rm -rf $(ls . | grep -v "^output$" | xargs)
-    [[ "${?}" == "0" ]] && echo -e "${INFO} 09. Armbian source code cleanup completed." || error_msg "09. Failed to clean up!"
+    [[ "${?}" == "0" ]] && echo -e "${INFO} 09. Armbian source code cleaned up successfully." || error_msg "09. Failed to clean up!"
 
     cd ${current_path}/
     sync && sleep 3
 }
 
-echo -e "${STEPS} Start to redo the Armbian rootfs file."
+echo -e "${STEPS} Starting to rebuild the Armbian rootfs file..."
 echo -e "${INFO} Current path: [ ${current_path} ]"
 
 # Initialize variables
@@ -277,4 +277,4 @@ init_var "${@}"
 # Redo Armbian rootfs
 redo_rootfs
 
-echo -e "${SUCCESS} Armbian rootfs file redo completed."
+echo -e "${SUCCESS} Armbian rootfs file rebuilt successfully."

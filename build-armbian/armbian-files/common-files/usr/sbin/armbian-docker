@@ -8,14 +8,14 @@
 # This file is a part of the Rebuild Armbian
 # https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function: Install docker to armbian
+# Function: Install and manage Docker on Armbian
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Function         : Command
-# Install docker   : armbain-docker
-# Update  docker   : armbain-docker update
-# Remove  docker   : armbain-docker remove
+# Usage              : Command
+# Install Docker     : armbian-docker
+# Update  Docker     : armbian-docker update
+# Remove  Docker     : armbian-docker remove
 #
 #========================= Set default parameters ==========================
 #
@@ -37,7 +37,7 @@ error_msg() {
     exit 1
 }
 
-# Check release info
+# Check system release information
 check_release() {
     source "${ophub_release_file}"
     VERSION_CODEID="${VERSION_CODEID}"     # ubuntu       -  debian
@@ -56,9 +56,9 @@ check_release() {
     echo -e "${INFO} VERSION_CODENAME: [ ${VERSION_CODENAME} ]"
 }
 
-# Add select docker install source by janko888 20220927
+# Select Docker installation source mirror
 select_source() {
-    echo -e "${STEPS} Start selecting docker source..."
+    echo -e "${STEPS} Select Docker download source..."
     cat <<EOF
 -----------------------------------------------
   ID  SOURCE
@@ -81,9 +81,9 @@ EOF
     fi
 }
 
-# Install docker environment
+# Install Docker engine and dependencies
 docker_install() {
-    echo -e "${STEPS} Initialize the docker installation environment..."
+    echo -e "${STEPS} Initializing Docker installation environment..."
 
     # Check release info
     check_release
@@ -104,14 +104,14 @@ docker_install() {
     # echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     echo "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] ${DOCKER_SOURCE}/${VERSION_CODEID} ${VERSION_CODENAME} stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
 
-    echo -e "${STEPS} Install docker related packages..."
+    echo -e "${STEPS} Installing Docker packages..."
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-    echo -e "${STEPS} Install docker accelerator..."
+    echo -e "${STEPS} Configuring Docker registry mirrors..."
     [[ -d "/etc/docker" ]] || mkdir -p /etc/docker
     if [[ "${source_id}" -ne "1" ]]; then
-        # Docker image in China
+        # Docker registry mirrors for China
         sudo cat >/etc/docker/daemon.json <<EOF
 {
   "bip": "172.31.0.1/24",
@@ -129,7 +129,7 @@ docker_install() {
 }
 EOF
     else
-        # Docker official image
+        # Docker official registry
         sudo cat >/etc/docker/daemon.json <<EOF
 {
   "bip": "172.31.0.1/24",
@@ -148,16 +148,16 @@ EOF
     sudo systemctl daemon-reload
     sudo systemctl restart docker
 
-    # Set up ordinary users to run docker directly
+    # Allow the current user to run Docker commands without sudo
     sudo usermod -a -G docker $USER 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} Docker installed successfully."
 }
 
-# Update docker
+# Update Docker packages
 docker_update() {
-    echo -e "${STEPS} Start updating docker packages..."
+    echo -e "${STEPS} Updating Docker packages..."
 
     # Update the docker package
     sudo apt-get update
@@ -166,13 +166,13 @@ docker_update() {
     sudo apt-get --purge autoremove -y
     sudo apt-get autoclean -y
 
-    echo -e "${SUCCESS} Docker update successfully."
+    echo -e "${SUCCESS} Docker updated successfully."
     exit 0
 }
 
-# Remove docker
+# Remove Docker and clean up
 docker_remove() {
-    echo -e "${STEPS} Start removing docker..."
+    echo -e "${STEPS} Removing Docker..."
 
     # Remove the docker package
     sudo apt-get update
@@ -188,9 +188,9 @@ docker_remove() {
     exit 0
 }
 
-echo -e "${INFO} Welcome to the docker management tool."
+echo -e "${INFO} Welcome to the Docker Management Tool."
 # Check script permission
-[[ "$(id -u)" == "0" ]] || error_msg "please run this script as root: [ sudo $0 ]"
+[[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 
 # Execute script assist functions
 case "${1}" in

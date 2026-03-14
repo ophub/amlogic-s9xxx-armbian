@@ -15,7 +15,7 @@
 #
 # Try to start Nginx service in the background if it exists.
 start_nginx_service() {
-    echo "[SETUP] Checking for and attempting to start Nginx service..."
+    echo "[SETUP] Checking and starting Nginx service..."
     if ! command -v nginx >/dev/null 2>&1; then
         echo "[INFO] Nginx not found, skipping."
         return
@@ -39,7 +39,7 @@ other_initialization() {
     # cp -rf /path/to/website_code /var/www/html/myblog
 }
 
-echo "Container Initialization Started..."
+echo "[INIT] Container initialization started..."
 # Start Nginx services.
 start_nginx_service
 # Perform other setup tasks.
@@ -49,7 +49,7 @@ other_initialization
 #
 # This command keeps the container alive. Its lifecycle is the container's lifecycle.
 # We choose sshd as the primary foreground process.
-echo "Initialization Complete. Starting Main Process..."
+echo "[INIT] Initialization complete. Starting main process..."
 if command -v sshd >/dev/null 2>&1; then
     echo "[RUN] Starting SSHD as the main process..."
     # Ensure the sshd run directory exists.
