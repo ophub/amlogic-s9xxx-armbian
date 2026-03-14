@@ -291,7 +291,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Initialization environment
+      - name: Initialize the build environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -317,7 +317,7 @@ jobs:
           timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Create simulated physical disk
+      - name: Create virtual disk for extended storage
         run: |
           mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
           root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
@@ -336,7 +336,7 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Download source code
+      - name: Download Armbian source code
         id: down
         working-directory: /builder
         if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
@@ -352,28 +352,28 @@ jobs:
         working-directory: /builder
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         run: |
-          # Enable QEMU emulation for ARM architecture
+          # Enable QEMU emulation for ARM cross-compilation
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes 2>/dev/null || true
-          # Compile method and parameter description: https://docs.armbian.com/Developer-Guide_Build-Options
+          # Compile options reference: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
               ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=odroidn2 BRANCH=current BUILD_MINIMAL=no \
                            BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Organize files and clear space
+      - name: Organize output files and reclaim disk space
         id: clean
         if: ${{ steps.compile.outputs.status == 'success' && !cancelled() }}
         run: |
-          # Organize and keep essential files, delete unnecessary files
+          # Extract essential artifacts and remove build files
           chmod +x ${ROOTFS_SCRIPT}
           ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }} -s true -c true -k true -p arm64
 
-          # Clean build directory except output folder
+          # Remove build files while preserving output
           cd build/
           rm -rf $(ls . | grep -v "^output$" | xargs) 2>/dev/null
 
-          # Output cleaning result information
+          # Display disk usage after cleanup
           df -hT ${PWD}
           echo "build_tag=Armbian_${{ inputs.set_release }}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -388,7 +388,7 @@ jobs:
           makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Rebuild Armbian
+      - name: Rebuild Armbian for target boards
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.clean.outputs.status == 'success' && !cancelled() }}
         with:
@@ -402,7 +402,7 @@ jobs:
           armbian_fstype: ${{ inputs.armbian_fstype }}
           builder_name: ${{ inputs.builder_name }}
 
-      - name: Upload Rebuild image to Release
+      - name: Upload rebuilt images to Release
         uses: ncipollo/release-action@main
         if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
@@ -414,11 +414,11 @@ jobs:
           makeLatest: true
           token: ${{ secrets.GITHUB_TOKEN }}
           body: |
-            ### Armbian Image information
+            ### Armbian Image Information
             - Default username: `root`
             - Default password: `1234`
             - Install command: `armbian-install`
             - Update command: `armbian-update`
-            ### Applicable platform
+            ### Applicable Platform
             - 🐧 `arm64`
             - 🐋 Docker image: https://hub.docker.com/u/ophub

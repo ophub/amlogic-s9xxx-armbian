@@ -97,7 +97,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Initialization environment
+      - name: Initialize the environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive

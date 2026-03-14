@@ -95,7 +95,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Initialization environment
+      - name: Initialize the build environment
         id: init
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -121,7 +121,7 @@ jobs:
           timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Create simulated physical disk
+      - name: Create virtual disk for extended storage
         id: disk
         run: |
           mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
@@ -141,7 +141,7 @@ jobs:
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Get kernel source hash
+      - name: Get kernel source commit hash
         id: kernelhash
         run: |
           # Get the latest source hash from the kernel repository
