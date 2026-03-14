@@ -5,7 +5,7 @@
 # Build and Push to: https://hub.docker.com/
 #=====================================================================================
 
-name: Build and publish Armbian arm64 Docker image
+name: Build Armbian arm64 Docker image
 
 on:
   repository_dispatch:

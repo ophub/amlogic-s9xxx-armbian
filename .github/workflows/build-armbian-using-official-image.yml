@@ -3,7 +3,7 @@
 # Copyright (C) 2021 https://github.com/ophub/amlogic-s9xxx-armbian
 #==========================================================================
 
-name: Build Armbian from official upstream images
+name: Build Armbian from official images
 
 on:
   repository_dispatch:
