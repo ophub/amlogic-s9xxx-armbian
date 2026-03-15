@@ -23,7 +23,7 @@ on:
       publish_docker:
         description: "Publish Docker image"
         required: false
-        default: "none"
+        default: "ophub/armbian"
         type: choice
         options:
           - ophub/armbian
@@ -128,12 +128,20 @@ jobs:
           echo "build_tag=Armbian_${{ inputs.set_release }}_amd64_server_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
+      - name: Build the Docker image
+        id: makedocker
+        if: ${{ inputs.publish_docker != 'none' && !cancelled() }}
+        run: |
+          chmod +x ${MAKE_DOCKER_SH}
+          ${MAKE_DOCKER_SH} ${{ inputs.set_release }} amd64
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
       - name: Upload Armbian image to Release
         uses: ncipollo/release-action@main
         if: ${{ steps.clean.outputs.status == 'success' && !cancelled() }}
         with:
           tag: ${{ env.build_tag }}
-          artifacts: armbian/*
+          artifacts: "armbian/*,out/*"
           allowUpdates: true
           makeLatest: false
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -144,14 +152,6 @@ jobs:
             ### Applicable Platform
             - 💻 `amd64(uefi-x86)`
             - 🐋 Docker image: https://hub.docker.com/u/ophub
-
-      - name: Build the Docker image
-        id: makedocker
-        if: ${{ inputs.publish_docker != 'none' && !cancelled() }}
-        run: |
-          chmod +x ${MAKE_DOCKER_SH}
-          ${MAKE_DOCKER_SH} ${{ inputs.set_release }} amd64
-          echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Login to Docker Hub
         id: login
