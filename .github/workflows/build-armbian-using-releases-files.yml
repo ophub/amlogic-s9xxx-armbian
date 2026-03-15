@@ -17,6 +17,7 @@ on:
         options:
           - trixie
           - bookworm
+          - resolute
           - noble
           - jammy
       armbian_board:

@@ -73,7 +73,7 @@ change_source_list() {
     echo -e "${INFO} System release: [ ${VERSION_CODENAME} ]"
 
     case "${VERSION_CODENAME}" in
-    buster | bullseye | bookworm | trixie)
+    buster | bullseye | bookworm | trixie | forky)
         declare -a suites=("${VERSION_CODENAME}" "${VERSION_CODENAME}-updates")
         declare -a components=(main contrib non-free)
 
@@ -104,7 +104,7 @@ EOF
         fi
         ;;
 
-    focal | jammy | noble | oracular | plucky)
+    focal | jammy | noble | oracular | plucky | questing | resolute)
         cat >${armbian_source_file} <<EOF
             Types: deb
             URIs: http://${MIRROR_URL}/ubuntu-ports/
