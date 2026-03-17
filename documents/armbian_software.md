@@ -1,5 +1,7 @@
 # Armbian Software Center
 
+[View English description](#armbian-software-center) | [查看中文说明](#armbian-软件中心) | [日本語の説明を確認する](#armbian-ソフトウェアセンター)
+
 Based on user feedback and requests in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), commonly used [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) has been gradually integrated to provide one-click install/update/uninstall operations. This includes `Docker images`, `desktop software`, `application services`, and more.
 
 ## Software Introduction
@@ -229,4 +231,121 @@ ID    NAME                STATE           MANAGE
 - `Supported Release`：设置支持的 Armbian `系统版本代号`。全部版本都支持时使用 `all` 表示。仅支持部分版本时，填写版本代号，多个代号之间使用 `@` 符号连接。
 
 欢迎大家补充更多软件。欢迎在 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
+
+
+
+# Armbian ソフトウェアセンター
+
+ユーザーからの [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) でのフィードバックやリクエストに基づき、よく使われる[ソフトウェア](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf)を順次統合し、ワンクリックでのインストール/更新/アンインストールなどの操作を実現しています。`Docker イメージ`、`デスクトップソフトウェア`、`アプリケーションサービス`などが含まれます。
+
+## ソフトウェア紹介
+
+| ID | ソフトウェア名          | Home | DockerHub:Port | ソフトウェア紹介                                     |
+| --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
+| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker はアプリケーションの開発、配布、実行のためのオープンプラットフォームです。 |
+| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 世界で最も人気のあるコンテナ管理プラットフォームです。 |
+| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | テンプレートとワンクリックデプロイに重点を置いたコンテナ管理 UI です。 |
+| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission はクロスプラットフォームの BitTorrent クライアントです。 |
+| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent は BitTorrent クライアントです。 |
+| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud はオンプレミスのユニバーサルファイルアクセスと同期プラットフォームを提供し、強力なコラボレーション機能とデスクトップ、モバイル、Web インターフェースを備えています。 |
+| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin はフリーソフトウェアのメディアシステムで、メディアの管理とストリーミングを制御できます。 |
+| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant は1000以上の異なるデバイスやサービスと統合し、強力な自動化機能を備えています。 |
+| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | プライベートクラウドのオンラインドキュメント管理ソリューションです。 |
+| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | CouchPotato は自動 NZB および torrent ダウンローダーで、観たい映画を自動的に検索します。 |
+| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr は Usenet および BitTorrent ユーザー向けの個人用ビデオレコーダーです。 |
+| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr は Usenet および BitTorrent ユーザー向けの映画コレクションマネージャーです。 |
+| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing は継続的なファイル同期プログラムです。 |
+| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser は指定ディレクトリ内でファイル管理インターフェースを提供し、ファイルのアップロード、削除、プレビュー、リネーム、編集が可能です。 |
+| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall は、よく使うウェブサイトやウェブアプリケーションへのリンクをシンプルに整理する方法です。 |
+| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED はプログラミングツールです。ブラウザベースのエディターを提供し、パレット内の多様なノードを使ってフローを簡単に連結し、ワンクリックでデプロイ・実行できます。 |
+| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT プロトコルはパブリッシュ/サブスクライブモデルによる軽量なメッセージングを提供します。Eclipse Mosquitto は MQTT プロトコルバージョン 5、3.1.1、3.1 のサーバーのオープンソース実装です。 |
+| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | OpenWrt プロジェクトは組み込みデバイス向けの Linux オペレーティングシステムで、3000以上の標準化アプリケーションパッケージと非常に豊富なサードパーティプラグインをサポートしています。 |
+| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata はシステムとアプリケーションのための分散型リアルタイムパフォーマンス・ヘルスモニタリングツールです。 |
+| 120 | XunLei                | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | 迅雷 Synology スイートから抽出されたリモートダウンロードサービスプログラムです。 |
+| 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | オーディオ/ロケール/IBus サポート付きのリモートデスクトップ。マルチデスクトップ（Gnome、Plasma、Mate、Xfce、Cinnamon）対応。 |
+| 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome はセルフホスト型のオープンソース音楽サーバーおよびストリーマーです。任意のブラウザやモバイルデバイスから音楽コレクションを自由に楽しめます。 |
+| 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | 複数のストレージに対応するファイルリストプログラムで、Gin と Solidjs を使用しています。 |
+| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | python3、javaScript、shell、typescript をサポートするスケジュールタスク管理パネルです。 |
+| 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | ワンクリックで無料デプロイできるクロスプラットフォーム対応のプライベート ChatGPT アプリケーションです。 |
+| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n はワークフロー自動化プラットフォームで、技術チームにノーコードの高効率な開発速度を提供します。400以上の統合、ネイティブ AI 機能を内蔵し、フェアコードライセンスを採用。強力な自動化フローを構築しながら、データとデプロイメントを完全に制御できます。 |
+| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME は集中型のデスクトップ作業環境を提供し、作業の完了を支援します。`デスクトップ`はモニターに接続して使用でき、[リモートデスクトップ](https://learn.microsoft.com/ja-jp/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)ソフトウェアを使用して接続することもできます。 |
+| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 優れたウェブブラウザです。 |
+| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC は無料でオープンソースのクロスプラットフォームマルチメディアプレーヤー兼フレームワークで、ほとんどのマルチメディアファイルを再生できます。 |
+| 204 | MPV                   | [Home](https://mpv.io/) | -    | 無料でオープンソースのクロスプラットフォーム対応メディアプレーヤーです。 |
+| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP はクロスプラットフォームの画像エディターです。 |
+| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita はプロフェッショナルな無料オープンソースのペインティングプログラムです。 |
+| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice は無料で強力なオフィススイートです。洗練されたインターフェースと豊富な機能で、創造性を発揮し生産性を向上させます。 |
+| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut は無料でオープンソースのクロスプラットフォーム動画エディターです。 |
+| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive は無料でオープンソースの動画エディターです。 |
+| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird は速度、プライバシー、最新技術を組み合わせて、より良いメール体験を提供します。 |
+| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution は統合されたメール、カレンダー、アドレス帳機能を提供する個人情報管理アプリケーションです。 |
+| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview は KDE 製の軽量で使いやすい画像ビューアーで、画像コレクションの閲覧・表示に最適です。 |
+| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）は画像ビューアープログラムです。高速かつ機能的な画像ビューアーを目指しています。 |
+| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code は軽量ながら強力なソースコードエディターです。 |
+| 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit は GNOME デスクトップ環境向けのフル機能テキストエディターです。簡単なメモやドキュメントの作成に使用でき、高度な機能を活用して独自のソフトウェア開発環境としても使用できます。 |
+| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | 強力でありながら使いやすいオープンソースのスクリーンショットソフトウェアです。 |
+| 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp は高速なリバースプロキシで、NAT やファイアウォールの背後にあるローカルサーバーをインターネットに公開できます。 |
+| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp はイントラネットペネトレーションに特化した高性能リバースプロキシアプリケーションで、TCP、UDP、HTTP、HTTPS などのプロトコルをサポートしています。 |
+| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS サーバー側。軽量で高性能、強力なイントラネットペネトレーションプロキシサーバーで、強力な Web 管理端末を備えています。 |
+| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC は NPS のクライアントです。 |
+| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | 自分のサーバー上の個人メディアから、無料やオンデマンドの映画・番組、ライブ TV、ポッドキャスト、ウェブ番組、ストリーミング音楽まで、あらゆるデバイスの1つのアプリですべて楽しめます。 |
+| 306 | Emby-Server           | [Home](https://emby.media/) | -    | 個人メディアをクラウドに同期して、簡単にバックアップ、アーカイブ、変換できます。コンテンツを複数の解像度で保存し、あらゆるデバイスからの直接ストリーミングを実現します。 |
+| 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（カーネルベースの仮想マシン）は、仮想化拡張機能を含む Linux 向けの完全な仮想化ソリューションです。virt-manager は libvirt を介して仮想マシンを管理するデスクトップユーザーインターフェースです。主に KVM VM を対象としていますが、Xen と LXC（Linux コンテナ）も管理できます。KVM 仮想マシンには [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS などをインストールできます。 |
+| 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 仮想環境は QEMU/KVM と LXC に基づくオープンソースのサーバー仮想化管理ソリューションです。統合されたウェブインターフェースまたは CLI で仮想マシン、コンテナ、高可用性クラスター、ストレージ、ネットワークを管理できます。 |
+| 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS はシンプルで使いやすく、エレガントなオープンソースのパーソナルクラウドシステムです。 |
+| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS は低消費電力プラットフォームに適した Web ベースのデスクトップオペレーティングシステムです。ファイル/ディスク管理、ネットワーク統計、Web サーバーなどの機能を備えています。 |
+
+## ソフトウェアセンター使用方法
+
+Armbian システムにログインし、以下のコマンドを入力します：
+
+```shell
+armbian-software
+```
+
+統合済みソフトウェアのショートカット管理リストが表示されます。例：
+
+```shell
+root@armbian:~# armbian-software
+[ STEPS ] Start selecting software [ Current system: debian/bullseye ]...
+----------------------------------------------------------
+ID    NAME                STATE           MANAGE
+----------------------------------------------------------
+102   Portainer           installed       update/remove
+202   Firefox             installed       update/remove
+302   Frpc                not-installed   install
+...
+----------------------------------------------------------
+[ OPTIONS ] Please Input Software ID:
+```
+
+- `未インストールのソフトウェア`：ステータスが `not-installed` と表示されます。ソフトウェアの `ID` を入力するとインストールされます。
+- `インストール済みのソフトウェア`：ステータスが `installed` と表示されます。ソフトウェアの `ID` を入力し、プロンプトに従って更新または削除を選択します。
+
+## ソフトウェアセンター開発ガイド
+
+ソフトウェアセンターのスクリプトとコマンドは [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) ディレクトリに集中して保存されています。`armbian-software -u` コマンドでこのディレクトリをローカルに同期ダウンロードし、ソフトウェアセンターリストを更新できます。数字で始まるファイルは対応するソフトウェアの`ワンクリックインストールスクリプト`です。[software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) はインストール/更新/削除操作のための`統一コマンドファイル`です。[software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) はソフトウェアリスト設定ファイルで、説明は以下の通りです：
+
+```yaml
+# 1.ID     2.Software Name     3.AuthMethod@Package      4.Execute Selection     5.Supported Release
+102        :Portainer          :docker@portainer         :command-docker.sh      :all
+202        :Firefox            :dpkg@firefox             :command-desktop.sh     :all
+302        :Frpc               :which@frpc               :302-frpc.sh            :all
+308        :PVE                :dpkg@pve-manager         :command-service.sh     :bullseye@bookworm
+...
+```
+
+- `ID`：ソフトウェアの`一意のシリアル番号`。
+- `Software Name`：`ソフトウェア名`（名前の長さは40文字未満である必要があります）。
+- `AuthMethod@Package`：ソフトウェアのインストール状態の`検査方法`と対応する`ソフトウェアパッケージ`で、`@` 記号で区切ります。
+  - `docker` コンテナ経由でインストールされたイメージは `docker` 方式で検査します。例：`portainer` イメージがインストールされているか確認する場合、`docker@portainer` を使用します。
+  - `apt` 経由でインストールされたパッケージは `dpkg` 方式で検査します。例：`firefox` がインストールされているか確認する場合、`dpkg@firefox` を使用します。
+  - システムのコマンドディレクトリ (bin, sbin) に実行ファイルが存在する場合、`which` 方式で検査します。例：`frpc` サービスがインストールされているか確認する場合、`which@frpc` を使用します。
+  - システムのコマンドディレクトリに実行ファイルがない場合、`find` 方式で指定パスの存在を検査します。例：`arozos` システムがインストールされているか確認する場合、`find@/root/arozos` を使用します。
+- `Execute Selection`：ソフトウェアが`統一コマンドファイル`または`独立スクリプト`で管理されるかを設定します。
+  - `比較的シンプルな`操作のソフトウェアは、カテゴリ別に `command-docker.sh / command-desktop.sh / command-service.sh` ファイルに集約し、ソフトウェアシリアル番号で命名します。例えば `portainer`（シリアル番号 `102`）の操作は `software_203()` に記述されています。
+  - `比較的複雑で、コマンド内容が長い`ソフトウェアは、独立したスクリプトファイルで管理します。例えば `frpc` のインストールスクリプトはシリアル番号を先頭に付けて `302-frpc.sh` と命名します。
+- `Supported Release`：サポートされる Armbian `システムバージョンコードネーム`を設定します。すべてのバージョンをサポートする場合は `all` を使用します。一部のバージョンのみサポートする場合は、バージョンコードネームを記入し、複数のコードネームは `@` 記号で連結します。
+
+より多くのソフトウェアの追加を歓迎します。[Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) でサポートリクエストを提出してください。
 

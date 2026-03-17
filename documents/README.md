@@ -1,6 +1,6 @@
 # Armbian Build and Usage Guide
 
-View Chinese description | [查看中文说明](README.cn.md)
+[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
 
 GitHub Actions is a CI/CD service from Microsoft that provides high-performance virtual server environments for building, testing, packaging, and deploying projects. Public repositories can use it free of charge with no time limit, and each build can run for up to 6 hours — more than sufficient for compiling Armbian (typically completed within about 3 hours). This project is shared for educational and experience-exchange purposes. Please do not initiate any harmful network attacks or misuse GitHub Actions.
 

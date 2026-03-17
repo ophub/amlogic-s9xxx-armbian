@@ -1,6 +1,6 @@
 # 构建文件说明
 
-查看英文说明 | [View English description](README.md)
+[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
 
 编译 Armbian 系统所需的文件按功能分类存放在各个子目录中。
 

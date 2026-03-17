@@ -1,6 +1,6 @@
 # Build Files Reference
 
-View Chinese description | [查看中文说明](README.cn.md)
+[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
 
 The files required for compiling the Armbian system are organized in their respective directories.
 

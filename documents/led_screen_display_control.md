@@ -1,5 +1,7 @@
 # LED Screen Display Control Instructions
 
+[View English description](#led-screen-display-control-instructions) | [查看中文说明](#led-屏显示控制说明) | [日本語の説明を確認する](#led-スクリーン表示制御の説明)
+
 - The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The `Armbian` command file is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the `OpenWrt` command file is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If these files are not present in your system, upload them manually and assign execution permissions: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
 
 - Update the system kernel to the latest version. For the `Armbian` system, use the `armbian-sync` command. For the `OpenWrt` system, navigate to `System Menu` → `Amlogic Service` → `Online Download Update`.
@@ -115,3 +117,64 @@ sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/sta
 | diy        |  99      |  armbian-openvfd 99   |   openwrt-openvfd 99    | 启用 LED |
 | -          |  0       |  armbian-openvfd 0    |   openwrt-openvfd 0     | 禁用 LED |
 | -          |  -u      |  armbian-openvfd -u   |   openwrt-openvfd -u    | 更新配置  |
+
+
+
+# LED スクリーン表示制御の説明
+
+- 設定ファイルは `Armbian/OpenWrt` システムの [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) ディレクトリにあります。`Armbian` システムのコマンドファイルは [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd) に、`OpenWrt` システムのコマンドファイルは [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd) にあります。現在のシステムにこれらのファイルがない場合は、手動でアップロードして実行権限を付与してください：`chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`。
+
+- システムカーネルを最新バージョンにアップグレードしてください。`Armbian` システムは `armbian-sync` コマンドでアップグレードします。`OpenWrt` システムは `システムメニュー` → `晶晨宝盒` → `オンラインダウンロード更新` からアップグレードします。
+
+- 現在テスト済みのデバイス設定には `x96max.conf`、`x96maxplus.conf`、`h96max-x3.conf`、`hk1-x3.conf`、`hk1box.conf`、`tx3.conf`、`x96air.conf`、`x88pro-x3.conf` などがあります。その他のデバイスの設定は [arthur-liberman/vfd-configurations](https://github.com/arthur-liberman/vfd-configurations) と [LibreELEC/linux_openvfd](https://github.com/LibreELEC/linux_openvfd/tree/master/conf) を参考に修正できます。注意：これら2つのサイトの設定ファイルの対応フィールドの2番目の値を `1` 減らしてから使用する必要があります。例：
+
+```yaml
+vfd_gpio_clk='0,69,0'
+vfd_gpio_dat='0,70,0'
+```
+以下に修正：
+
+```yaml
+vfd_gpio_clk='0,68,0'
+vfd_gpio_dat='0,69,0'
+```
+
+- [x96maxplus](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd/conf/x96maxplus.conf) の設定を例に説明します：表示される時刻テキストの順序が正しくない場合、`vfd_chars='4,0,1,2,3'` の数字の順序を `vfd_chars='1,2,3,4,0'` などに調整してテストできます。時刻が反転表示される場合、`vfd_display_type='0x02,0x00,0x01,0x00'` の `最初の値 0x02` を `0x01` などに調整してテストできます。表示内容はデバイスでサポートされている具体的な状況に応じて `functions='usb apps setup sd hdmi cvbs'` の値を調整できます。
+
+- 設定ファイルを `diy.conf` にリネームして `/usr/share/openvfd/conf` ディレクトリにアップロードし、コマンド `armbian-openvfd 99` を入力してテストします。
+
+- コマンド `armbian-openvfd 0` で LED 表示を無効にし、関連するシステムプロセスをクリアできます。新しい設定をテストする前に、まずこの無効化コマンドを実行し、その後 `armbian-openvfd 99` を実行して設定をテストしてください。
+
+- 一部のデバイスは Linux 起動前に起動メッセージを表示する場合があります（例：`BOOT` と表示）。このメッセージをクリアするには、まず `armbian-openvfd 0` を実行して既存のサービスを停止し、次に `armbian-openvfd <boxid>` を実行して LED 表示を制御します。表示を完全に無効にするには、再度 `armbian-openvfd 0` を実行してください。
+
+- スクリーン表示が正常に動作した後、起動時の自動開始タスクに追加できます。以下のコマンドの `15` をお使いのデバイスの番号に置き換えてください：
+
+```yaml
+# ターミナルで以下のコマンドを実行して openvfd サービスを有効にする
+sed -i 's|^#*openvfd_enable=.*|openvfd_enable="yes"|g' /etc/custom_service/start_service.sh
+sed -i 's|^#*openvfd_boxid=.*|openvfd_boxid="15"|g' /etc/custom_service/start_service.sh
+# 一部のデバイスでは 'BOOT' などの関連メッセージをクリアするために OpenVFD サービスの再起動が必要です
+sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/start_service.sh
+```
+
+- テスト後にご自身のデバイスの設定ファイル（diy.conf）を共有していただくことを歓迎します。より多くの方の参考になります。
+
+|  デバイス名  | `デバイス番号` |  Armbian コマンド       |   OpenWrt コマンド        |   機能    |
+| ---------- | ----------- | --------------------- | ----------------------- | -------- |
+| x96max     |  11         |  armbian-openvfd 11   |   openwrt-openvfd 11    | LED 有効  |
+| x96maxplus |  12         |  armbian-openvfd 12   |   openwrt-openvfd 12    | LED 有効  |
+| x96air     |  13         |  armbian-openvfd 13   |   openwrt-openvfd 13    | LED 有効  |
+| h96max-x3  |  14         |  armbian-openvfd 14   |   openwrt-openvfd 14    | LED 有効  |
+| hk1-x3     |  15         |  armbian-openvfd 15   |   openwrt-openvfd 15    | LED 有効  |
+| hk1box     |  16         |  armbian-openvfd 16   |   openwrt-openvfd 16    | LED 有効  |
+| tx3        |  17         |  armbian-openvfd 17   |   openwrt-openvfd 17    | LED 有効  |
+| tx3-mini   |  18         |  armbian-openvfd 18   |   openwrt-openvfd 18    | LED 有効  |
+| t95        |  19         |  armbian-openvfd 19   |   openwrt-openvfd 19    | LED 有効  |
+| t95z-plus  |  20         |  armbian-openvfd 20   |   openwrt-openvfd 20    | LED 有効  |
+| tx9-pro    |  21         |  armbian-openvfd 21   |   openwrt-openvfd 21    | LED 有効  |
+| x92        |  22         |  armbian-openvfd 22   |   openwrt-openvfd 22    | LED 有効  |
+| whale      |  23         |  armbian-openvfd 23   |   openwrt-openvfd 23    | LED 有効  |
+| x88pro-x3  |  24         |  armbian-openvfd 24   |   openwrt-openvfd 24    | LED 有効  |
+| diy        |  99         |  armbian-openvfd 99   |   openwrt-openvfd 99    | LED 有効  |
+| -          |  0          |  armbian-openvfd 0    |   openwrt-openvfd 0     | LED 無効  |
+| -          |  -u         |  armbian-openvfd -u   |   openwrt-openvfd -u    | 設定更新  |
