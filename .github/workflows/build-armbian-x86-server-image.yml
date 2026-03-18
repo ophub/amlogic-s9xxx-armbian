@@ -124,7 +124,7 @@ jobs:
           rm -rf build
           # Display disk usage after cleanup
           df -hT ${PWD}
-          echo "build_tag=Armbian_${{ inputs.set_release }}_amd64_server_$(date +"%Y.%m")" >> ${GITHUB_ENV}
+          echo "build_tag=Armbian_amd64_server_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Build the Docker image
