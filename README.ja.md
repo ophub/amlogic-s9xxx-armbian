@@ -230,7 +230,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 1. ワークフロー設定ファイルは[.github/workflows/](.github/workflows/)ディレクトリにあります。
 
-2. 新規ビルド：[Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions)ページで***`Build Armbian server image`***を選択し、[build-armbian-arm64-server-image.yml](.github/workflows/build-armbian-arm64-server-image.yml)ワークフローを使用します。Ubuntuシリーズ（例：`jammy`）またはDebianシリーズ（例：`bullseye`）から選択できます。***`Run workflow`***をクリックしてビルドを開始します。
+2. 新規ビルド：[Actions](https://github.com/ophub/amlogic-s9xxx-armbian/actions)ページで***`Build Armbian server image`***を選択し、[build-armbian-arm64-server-image.yml](.github/workflows/build-armbian-arm64-server-image.yml)ワークフローを使用します。Ubuntuシリーズ（例：`resolute`）またはDebianシリーズ（例：`trixie`）から選択できます。***`Run workflow`***をクリックしてビルドを開始します。
 
 3. 再ビルド：[Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases)にコンパイル済みの`Armbian_.*-trunk_.*.img.gz`ファイルがすでにあり、他のボード用に再パッケージするだけの場合は、ソースコンパイル手順をスキップし、[build-armbian-using-releases-files.yml](.github/workflows/build-armbian-using-releases-files.yml)を使用して二次ビルドを行います。
 

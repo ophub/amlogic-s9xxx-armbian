@@ -19,7 +19,6 @@ on:
           - bookworm
           - resolute
           - noble
-          - jammy
       publish_docker:
         description: "Publish Docker image"
         required: false

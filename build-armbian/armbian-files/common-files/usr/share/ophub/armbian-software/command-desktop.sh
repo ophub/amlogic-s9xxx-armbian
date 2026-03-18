@@ -75,10 +75,10 @@ software_201() {
         local input_drivers="xserver-xorg-input-libinput xserver-xorg-input-evdev"
 
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
-            # Install ubuntu-desktop on Ubuntu (focal/jammy/lunar/mantic)
+            # Install ubuntu-desktop on Ubuntu (resolute/noble)
             software_install "ubuntu-desktop ${display_manager} ${input_drivers}"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Install gnome on Debian (bullseye/bookworm/trixie)
+            # Install gnome on Debian (bookworm/trixie)
             software_install "gnome ${display_manager} ${input_drivers}"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
@@ -120,10 +120,10 @@ EOF
     update) software_update ;;
     remove)
         if [[ "${VERSION_CODEID}" == "ubuntu" ]]; then
-            # Remove ubuntu-desktop(gdm3) on Ubuntu (focal/jammy/lunar/mantic)
+            # Remove ubuntu-desktop(gdm3) on Ubuntu (resolute/noble)
             software_remove "ubuntu-desktop gdm3"
         elif [[ "${VERSION_CODEID}" == "debian" ]]; then
-            # Remove gnome(gdm3) on Debian (bullseye/bookworm/trixie)
+            # Remove gnome(gdm3) on Debian (bookworm/trixie)
             software_remove "gnome gdm3"
         else
             error_msg "VERSION_CODEID not supported: [ ${VERSION_CODEID} ]"
@@ -142,7 +142,7 @@ software_202() {
     case "${software_manage}" in
     install)
         case "${VERSION_CODENAME}" in
-        jammy | lunar | mantic)
+        resolute | noble | jammy)
             sudo add-apt-repository ppa:mozillateam/ppa -y
             sudo apt-get update
             software_install "firefox-esr"
@@ -159,7 +159,7 @@ software_202() {
     update) software_update ;;
     remove)
         case "${VERSION_CODENAME}" in
-        jammy | lunar | mantic)
+        resolute | noble | jammy)
             software_remove "firefox-esr"
             sudo add-apt-repository --remove ppa:mozillateam/ppa -y
             ;;

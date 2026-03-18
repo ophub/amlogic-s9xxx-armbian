@@ -397,9 +397,9 @@ armbian-install
 
 Ubuntu/Debian/Armbian システムで Docker 版の Armbian イメージを使用できます。これらのイメージは [Docker Hub](https://hub.docker.com/r/ophub) にホストされており、直接ダウンロードして使用できます。
 
-4つの異なるカーネルバージョンの Armbian Docker イメージが提供されています：`armbian-trixie`、`armbian-bookworm`、`armbian-noble`、`armbian-jammy`。各バージョンとも `arm64` と `amd64` アーキテクチャを提供しており、必要に応じて選択できます。
+4つの異なるカーネルバージョンの Armbian Docker イメージが提供されています：`armbian-trixie`、`armbian-bookworm`、`armbian-noble`、`armbian-resolute`。各バージョンとも `arm64` と `amd64` アーキテクチャを提供しており、必要に応じて選択できます。
 
-armbian-trixie は debian13 ベース、armbian-bookworm は debian12 ベース、armbian-noble は ubuntu24.04 ベース、armbian-jammy は ubuntu22.04 ベースです。
+armbian-trixie は debian13 ベース、armbian-bookworm は debian12 ベース、armbian-noble は ubuntu24.04 ベース、armbian-resolute は ubuntu26.04 ベースです。
 
 arm64 バージョンは Amlogic/Rockchip/Allwinner などのプラットフォームアーキテクチャのデバイスに適用され、amd64 バージョンは x86_64 アーキテクチャの PC やサーバーに適用されます。
 

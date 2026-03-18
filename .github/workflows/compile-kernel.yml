@@ -72,8 +72,8 @@ on:
         options:
           - trixie
           - bookworm
+          - resolute
           - noble
-          - jammy
       kernel_sign:
         description: "Set the kernel custom signature"
         required: false

@@ -113,8 +113,8 @@ install_chinese_fonts() {
         "ibus-table-wubi" "ibus-libpinyin"
     )
 
-    # Packages of jammy/lunar/mantic system
-    local jammy_packages=(
+    # Packages of resolute/noble system
+    local resolute_packages=(
         "kde-config-fcitx5"
     )
 
@@ -136,10 +136,10 @@ install_chinese_fonts() {
     # Install the Chinese language packages for the desktop system
     sudo apt-get update
     case "${VERSION_CODENAME}" in
-    jammy | noble | oracular)
+    resolute | jammy | noble | oracular)
         echo -e "${STEPS} Installing Chinese language pack for [ ${VERSION_CODENAME} ]..."
         sudo apt-get install -y ${ubuntu_packages[*]}
-        sudo apt-get install -y ${jammy_packages[*]}
+        sudo apt-get install -y ${resolute_packages[*]}
         set_chinese_env
         ;;
     focal)

@@ -19,7 +19,6 @@ on:
           - bookworm
           - resolute
           - noble
-          - jammy
       armbian_board:
         description: "Select device board."
         required: false

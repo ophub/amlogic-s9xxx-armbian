@@ -12,7 +12,7 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Optional parameters:
-# -v, --VERSION_CODENAME: Set the version codename of Armbian rootfs file, e.g., bookworm, jammy, etc.
+# -v, --VERSION_CODENAME: Set the version codename of Armbian rootfs file, e.g., bookworm, resolute, etc.
 # -s, --SSHD_CONFIG:      Enable or disable sshd_config file, default is false.
 # -c, --COMMAND_COLORS:   Enable or disable command colors, default is false.
 # -k, --COMPILE_KERNEL:   Add armbian-kernel and uInitrd generation script, default none.

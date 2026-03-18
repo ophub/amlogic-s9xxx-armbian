@@ -39,7 +39,7 @@ tolog() {
 # Show start message
 echo "" >${fix_log} && tolog "Starting system fixes..."
 
-# Get the system release version, such as: jammy, noble, bookworm, bullseye, etc.
+# Get the system release version, such as: resolute, noble, trixie, bookworm, etc.
 [[ -f "/etc/lsb-release" ]] && DISTRIBUTION_CODENAME="$(grep CODENAME /etc/lsb-release | cut -d'=' -f2 || true)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -f "${os_release_file}" ]] && DISTRIBUTION_CODENAME="$(grep VERSION_CODENAME "${os_release_file}" | cut -d'=' -f2 || true)"
 [[ -z "${DISTRIBUTION_CODENAME}" && -x "/usr/bin/lsb_release" ]] && DISTRIBUTION_CODENAME="$(/usr/bin/lsb_release -c | cut -d':' -f2 | tr -d '\t' || true)"

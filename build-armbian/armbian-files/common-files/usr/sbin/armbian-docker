@@ -40,15 +40,15 @@ error_msg() {
 # Check system release information
 check_release() {
     source "${ophub_release_file}"
-    VERSION_CODEID="${VERSION_CODEID}"     # ubuntu       -  debian
-    VERSION_CODENAME="${VERSION_CODENAME}" # jammy/focal  -  bullseye
+    VERSION_CODEID="${VERSION_CODEID}"     # ubuntu          -  debian
+    VERSION_CODENAME="${VERSION_CODENAME}" # resolute/noble  -  trixie/bookworm
     if [[ -z "${VERSION_CODEID}" ]]; then
         echo -ne "${OPTIONS} Please Input VERSION_CODEID Name [ubuntu/debian]: "
         read VERSION_CODEID
         VERSION_CODEID="${VERSION_CODEID}"
     fi
     if [[ -z "${VERSION_CODENAME}" ]]; then
-        echo -ne "${OPTIONS} Please Input VERSION_CODENAME Name [jammy/focal/bullseye]: "
+        echo -ne "${OPTIONS} Please Input VERSION_CODENAME Name [resolute/noble/trixie/bookworm]: "
         read VERSION_CODENAME
         VERSION_CODENAME="${VERSION_CODENAME}"
     fi

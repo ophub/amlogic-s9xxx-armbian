@@ -354,7 +354,7 @@ jobs:
 
           # Detect the OS release name from the URL
           set_release=""
-          ARR_RELEASE=("noble" "jammy" "trixie" "bookworm")
+          ARR_RELEASE=("resolute" "noble" "trixie" "bookworm")
           i=1
           for r in ${ARR_RELEASE[*]}; do
               if [[ "${armbian_url}" == *"${r}"* ]]; then

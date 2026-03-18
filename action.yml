@@ -182,7 +182,7 @@ runs:
                 # Get image kernel version, such as 6.12.56
                 image_kernel="$(echo ${image_file} | grep -oE '[0-9]+\.[0-9]{1,2}\.[0-9]{1,3}' | grep -v "${image_version}" | head -n 1)"
                 # Get image codename, such as trixie
-                image_codename="$(echo ${image_file} | grep -oE "(trixie|bookworm|bullseye|noble|jammy)" || echo '')"
+                image_codename="$(echo ${image_file} | grep -oE "(trixie|bookworm|bullseye|resolute|noble|jammy)" || echo '')"
                 # Rename armbian image file
                 image_save_name="Armbian_${image_version}-trunk_${image_codename}_arm64_${image_kernel}.img"
                 rm -f ${image_save_name}

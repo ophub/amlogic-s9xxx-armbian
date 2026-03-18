@@ -104,7 +104,7 @@ EOF
         fi
         ;;
 
-    focal | jammy | noble | oracular | plucky | questing | resolute)
+    resolute | focal | jammy | noble | oracular | plucky | questing)
         cat >${armbian_source_file} <<EOF
             Types: deb
             URIs: http://${MIRROR_URL}/ubuntu-ports/
