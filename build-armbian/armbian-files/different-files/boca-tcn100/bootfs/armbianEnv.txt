@@ -1,0 +1,8 @@
+verbosity=1
+bootlogo=false
+overlay_prefix=rk3588
+fdtfile=rockchip/rk3588s-boca-tcn100.dtb
+rootdev=/dev/mmcblk0p2
+extraargs=rw rootwait net.ifnames=0
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
