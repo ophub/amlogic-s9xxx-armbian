@@ -64,6 +64,7 @@ on:
           - gea-6319
           - gzpeite-p01
           - h28k
+          - h618-devboard
           - h66k
           - h68k
           - h69k
