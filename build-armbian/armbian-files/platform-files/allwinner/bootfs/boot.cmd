@@ -13,6 +13,17 @@ setenv console "both"
 setenv docker_optimizations "on"
 setenv bootlogo "false"
 
+setenv vendor "allwinner"
+
+# Remember the default fdtfile provided by u-boot and delete the vendor name
+if setexpr subfdt sub ${vendor}/ "" ${fdtfile};then
+	setenv deffdt_file ${subfdt}
+fi
+
+# Remember the default u-boot fdtdir
+setenv deffdt_dir "${prefix}dtb"
+if test "$fdtdir" = ""; then setenv fdtdir "${deffdt_dir}/${vendor}";fi
+
 # Print boot source
 itest.b *0x10028 == 0x00 && echo "U-boot loaded from SD"
 itest.b *0x10028 == 0x02 && echo "U-boot loaded from eMMC or secondary SD"
@@ -23,6 +34,37 @@ echo "Boot script loaded from ${devtype}"
 if test -e ${devtype} ${devnum} ${prefix}armbianEnv.txt; then
 	load ${devtype} ${devnum} ${load_addr} ${prefix}armbianEnv.txt
 	env import -t ${load_addr} ${filesize}
+fi
+
+# Delete the vendor's name from the fdtfile variable and record the result
+# after the file with the environment variables has been read
+if setexpr subfdt sub ${vendor}/ "" ${fdtfile};then
+	setenv fdtfile ${subfdt}
+fi
+
+# In this shell, we can only check the existence of the file.
+# Make a check of reasonable ways to find the dtb file.
+# Set the true value of the paths.
+if test -e ${devtype} ${devnum} "${fdtdir}/${fdtfile}"; then
+	echo "Load fdt: ${fdtdir}/${fdtfile}"
+else
+	echo "The file ${fdtfile} was not found in the path ${fdtdir}"
+	if test -e ${devtype} ${devnum} "${deffdt_dir}/${fdtfile}"; then
+		setenv fdtdir "${deffdt_dir}"
+		echo "Load fdt: ${fdtdir}/${fdtfile}"
+	else
+		if test -e ${devtype} ${devnum} "${deffdt_dir}/${vendor}/${deffdt_file}"; then
+			setenv fdtdir "${deffdt_dir}/${vendor}"
+			setenv fdtfile "${deffdt_file}"
+			echo "Load fdt: ${fdtdir}/${fdtfile}"
+		else
+			if test -e ${devtype} ${devnum} "${deffdt_dir}/${deffdt_file}"; then
+				setenv fdtdir "${deffdt_dir}"
+				setenv fdtfile "${deffdt_file}"
+				echo "Load fdt: ${fdtdir}/${fdtfile}"
+			fi
+		fi
+	fi
 fi
 
 if test "${console}" = "display" || test "${console}" = "both"; then setenv consoleargs "console=ttyS0,115200 console=tty1"; fi
@@ -39,13 +81,13 @@ if test "${devtype}" = "mmc"; then part uuid mmc 0:1 partuuid; fi
 
 setenv bootargs "root=${rootdev} rootwait rootfstype=${rootfstype} ${consoleargs} consoleblank=0 loglevel=${verbosity} ubootpart=${partuuid} usb-storage.quirks=${usbstoragequirks} ${extraargs} ${extraboardargs}"
 
-if test "${docker_optimizations}" = "on"; then setenv bootargs "${bootargs} cgroup_enable=memory swapaccount=1"; fi
+if test "${docker_optimizations}" = "on"; then setenv bootargs "${bootargs} cgroup_enable=memory"; fi
 
-load ${devtype} ${devnum} ${fdt_addr_r} ${prefix}dtb/${fdtfile}
+load ${devtype} ${devnum} ${fdt_addr_r} ${fdtdir}/${fdtfile}
 fdt addr ${fdt_addr_r}
 fdt resize 65536
 for overlay_file in ${overlays}; do
-	if load ${devtype} ${devnum} ${load_addr} ${prefix}dtb/allwinner/overlay/${overlay_prefix}-${overlay_file}.dtbo; then
+	if load ${devtype} ${devnum} ${load_addr} ${fdtdir}/overlay/${overlay_prefix}-${overlay_file}.dtbo; then
 		echo "Applying kernel provided DT overlay ${overlay_prefix}-${overlay_file}.dtbo"
 		fdt apply ${load_addr} || setenv overlay_error "true"
 	fi
@@ -58,9 +100,9 @@ for overlay_file in ${user_overlays}; do
 done
 if test "${overlay_error}" = "true"; then
 	echo "Error applying DT overlays, restoring original DT"
-	load ${devtype} ${devnum} ${fdt_addr_r} ${prefix}dtb/${fdtfile}
+	load ${devtype} ${devnum} ${fdt_addr_r} ${fdtdir}/${fdtfile}
 else
-	if load ${devtype} ${devnum} ${load_addr} ${prefix}dtb/allwinner/overlay/${overlay_prefix}-fixup.scr; then
+	if load ${devtype} ${devnum} ${load_addr} ${fdtdir}/overlay/${overlay_prefix}-fixup.scr; then
 		echo "Applying kernel provided DT fixup script (${overlay_prefix}-fixup.scr)"
 		source ${load_addr}
 	fi
