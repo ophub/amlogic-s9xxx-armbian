@@ -279,7 +279,7 @@ check_data() {
     [[ -f "${model_conf}" ]] || error_msg "Missing model config file: [ ${model_conf} ]"
 
     # Get a list of build devices
-    if [[ "${build_board}" =~ ^(all|first50|range50_100|range100_150|last20)$ ]]; then
+    if [[ "${build_board}" == "all" ]]; then
         board_list=":(yes)"
         build_armbian=($(
             cat ${model_conf} |
@@ -287,32 +287,55 @@ check_data() {
                 grep -E "^[^#].*:yes$" | awk -F':' '{print $14}' |
                 sort -u | xargs
         ))
+    elif [[ "${build_board}" =~ ^(amlogic|rockchip|allwinner)([0-9]+_[0-9]+|[0-9]+)?$ ]]; then
+        # Get the platform name and range, such as [ amlogic50 ], [ rockchip50_100 ], etc.
+        # name is [ amlogic ], [ rockchip ], [ allwinner ], range is [ 50 ], [ 50_100 ], etc.
+        # amlogic50 -> platform_name=amlogic, platform_range=50, rockchip50_100 -> platform_name=rockchip, platform_range=50_100
+        platform_name="${BASH_REMATCH[1]}"
+        platform_range="${BASH_REMATCH[2]}"
+        build_armbian=($(
+            cat ${model_conf} |
+                sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
+                grep -E "^[^#].*:${platform_name}:.*:yes$" | awk -F':' '{print $14}' |
+                sort -u | xargs
+        ))
+        # Slice by range if specified, such as [ amlogic50 ], [ rockchip50_100 ], etc.
+        if [[ "${platform_range}" =~ ^([0-9]+)_([0-9]+)$ ]]; then
+            build_armbian=("${build_armbian[@]:${BASH_REMATCH[1]}:$((BASH_REMATCH[2] - BASH_REMATCH[1]))}")
+        elif [[ -n "${platform_range}" ]]; then
+            build_armbian=("${build_armbian[@]:0:${platform_range}}")
+        fi
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes)"
+    elif [[ "${build_board}" =~ ^(first|last)([0-9]+)$ ]]; then
+        # first<N>: first N boards, last<N>: last N boards
+        slice_type="${BASH_REMATCH[1]}"
+        slice_num="${BASH_REMATCH[2]}"
+        build_armbian=($(
+            cat ${model_conf} |
+                sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
+                grep -E "^[^#].*:yes$" | awk -F':' '{print $14}' |
+                sort -u | xargs
+        ))
+        [[ "${slice_type}" == "first" ]] && build_armbian=("${build_armbian[@]:0:${slice_num}}")
+        [[ "${slice_type}" == "last" ]] && build_armbian=("${build_armbian[@]: -${slice_num}}")
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes)"
+    elif [[ "${build_board}" =~ ^range([0-9]+)_([0-9]+)$ ]]; then
+        # range<N>_<M>: boards from index N, count M-N
+        range_start="${BASH_REMATCH[1]}"
+        range_end="${BASH_REMATCH[2]}"
+        build_armbian=($(
+            cat ${model_conf} |
+                sed -e 's/NA//g' -e 's/NULL//g' -e 's/[ ][ ]*//g' |
+                grep -E "^[^#].*:yes$" | awk -F':' '{print $14}' |
+                sort -u | xargs
+        ))
+        build_armbian=("${build_armbian[@]:${range_start}:$((range_end - range_start))}")
+        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes)"
     else
         board_list=":($(echo ${build_board} | sed -e 's/_/\|/g')):(yes|no)"
         build_armbian=($(echo ${build_board} | sed -e 's/_/ /g'))
     fi
     [[ "${#build_armbian[@]}" -eq 0 ]] && error_msg "The [ BOARD ] is missing, stop building."
-
-    # Select the first 50 boards
-    [[ "${build_board}" == "first50" ]] && {
-        build_armbian=("${build_armbian[@]:0:50}")
-        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
-    }
-    # Select the boards from 51st to 100th
-    [[ "${build_board}" == "range50_100" ]] && {
-        build_armbian=("${build_armbian[@]:50:50}")
-        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
-    }
-    # Select the boards from 101st to 150th
-    [[ "${build_board}" == "range100_150" ]] && {
-        build_armbian=("${build_armbian[@]:100:50}")
-        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
-    }
-    # Select the last 20 boards
-    [[ "${build_board}" == "last20" ]] && {
-        build_armbian=("${build_armbian[@]: -20}")
-        board_list=":($(echo ${build_armbian[@]} | sed -e 's/ /\|/g')):(yes|no)"
-    }
 
     # Get the kernel array
     kernel_from=($(
