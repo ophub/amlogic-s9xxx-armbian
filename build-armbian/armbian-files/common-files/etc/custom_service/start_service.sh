@@ -118,6 +118,19 @@ if [[ -x "/usr/sbin/balethirq.pl" ]]; then
     log_message "Network optimization service (balethirq.pl) execution attempted."
 fi
 
+# Enable UDP GRO forwarding on all physical ethernet interfaces
+# View command: ethtool -k eth0 | grep -i udp
+if command -v ethtool >/dev/null 2>&1; then
+    for iface in /sys/class/net/*/device; do
+        iface_name="$(basename "${iface%/device}")"
+        # Skip non-ethernet interfaces (type != 1) and wireless interfaces
+        [[ "$(cat /sys/class/net/${iface_name}/type 2>/dev/null)" != "1" ]] && continue
+        [[ -d "/sys/class/net/${iface_name}/wireless" ]] && continue
+        ethtool -K "${iface_name}" rx-udp-gro-forwarding on >/dev/null 2>&1
+        log_message "Enabled rx-udp-gro-forwarding on ${iface_name}."
+    done
+fi
+
 # Led display control, Only for Amlogic devices (meson-*) with valid boxid.
 openvfd_enable="no"  # yes or no, set to "yes" to enable OpenVFD service.
 openvfd_boxid="15"   # Set the boxid according to your device. Refer to the documentation for details.
