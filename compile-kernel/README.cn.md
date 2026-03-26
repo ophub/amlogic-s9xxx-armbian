@@ -1,6 +1,6 @@
 # 内核编译与使用指南
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 本项目编译的内核兼容 `Armbian` 和 `OpenWrt` 系统，可用于 [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian)、[amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt)、[flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions) 和 [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) 等项目。既可在编译固件时集成，也可安装到已有系统中使用。
 

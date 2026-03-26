@@ -1,6 +1,6 @@
 # カーネルのコンパイルと使用ガイド
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 本プロジェクトでコンパイルしたカーネルは `Armbian` と `OpenWrt` システムに対応しており、[amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian)、[amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt)、[flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions)、[unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit) などのプロジェクトで使用できます。ファームウェアのコンパイル時に統合することも、既存のシステムにインストールして使用することもできます。
 

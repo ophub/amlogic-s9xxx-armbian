@@ -1,6 +1,6 @@
 # Kernel Compilation and Usage Guide
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 The compiled kernel is compatible with both `Armbian` and `OpenWrt` systems. It can be used in projects such as [amlogic-s9xxx-armbian](https://github.com/ophub/amlogic-s9xxx-armbian), [amlogic-s9xxx-openwrt](https://github.com/ophub/amlogic-s9xxx-openwrt), [flippy-openwrt-actions](https://github.com/ophub/flippy-openwrt-actions), and [unifreq/openwrt_packit](https://github.com/unifreq/openwrt_packit). The kernel can be integrated during firmware compilation or installed into an existing system.
 

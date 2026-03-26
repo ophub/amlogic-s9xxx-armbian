@@ -4,7 +4,7 @@
 
 # Armbian
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築された軽量Linuxディストリビューションです。Armbianシステムはスリムでクリーンであり、Debian/Ubuntuと100%互換性があり、その機能と豊富なソフトウェアエコシステムを継承しています。TF/SD/USBストレージおよびデバイスのeMMCで安全かつ安定して動作します。本プロジェクトは、公式Armbianシステムの完全性を維持しつつ、TVボックスなどの公式にサポートされていないデバイスへのサポートを拡張し、便利な管理コマンドのセットを追加しています。TVボックスのAndroid TVシステムをArmbianに置き換え、強力なサーバーに変身させることができます。
 

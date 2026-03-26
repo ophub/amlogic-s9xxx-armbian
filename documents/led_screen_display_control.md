@@ -1,6 +1,6 @@
 # LED Screen Display Control Instructions
 
-[View English description](#led-screen-display-control-instructions) | [查看中文说明](#led-屏显示控制说明) | [日本語の説明を確認する](#led-スクリーン表示制御の説明)
+[English Instructions](#led-screen-display-control-instructions) | [中文说明](#led-屏显示控制说明) | [日本語説明](#led-スクリーン表示制御の説明)
 
 - The configuration files are located in the [/usr/share/openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/share/openvfd) directory of the `Armbian/OpenWrt` system. The `Armbian` command file is at [/usr/sbin/armbian-openvfd](../build-armbian/armbian-files/platform-files/amlogic/rootfs/usr/sbin/armbian-openvfd), and the `OpenWrt` command file is at [/usr/sbin/openwrt-openvfd](https://github.com/ophub/amlogic-s9xxx-openwrt/blob/main/make-openwrt/openwrt-files/common-files/usr/sbin/openwrt-openvfd). If these files are not present in your system, upload them manually and assign execution permissions: `chmod +x /usr/share/openvfd/vfdservice /usr/sbin/*-openvfd`.
 

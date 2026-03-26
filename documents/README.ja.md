@@ -1,6 +1,6 @@
 # Armbian の構築と使用方法
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 GitHub Actions は Microsoft が提供するサービスであり、高性能な仮想サーバー環境を利用して、プロジェクトの構築、テスト、パッケージング、デプロイが可能です。パブリックリポジトリでは時間制限なく無料で利用でき、1回のコンパイル時間は最大6時間で、Armbian のコンパイルニーズを十分に満たします（通常3時間程度で完了します）。本プロジェクトは技術交流のみを目的としており、不備がありましたらご容赦ください。ネットワーク攻撃や GitHub Actions の悪用はお控えください。
 

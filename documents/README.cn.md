@@ -1,6 +1,6 @@
 # Armbian 构建及使用方法
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服务器环境，可用于构建、测试、打包和部署项目。公开仓库可免费无时间限制地使用，单次编译时间长达 6 小时，足以满足 Armbian 的编译需求（通常 3 小时左右即可完成编译）。本项目仅供技术交流，不足之处敬请谅解。请勿发起网络攻击或恶意使用 GitHub Actions。
 

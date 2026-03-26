@@ -1,6 +1,6 @@
 # Armbian Software Center
 
-[View English description](#armbian-software-center) | [查看中文说明](#armbian-软件中心) | [日本語の説明を確認する](#armbian-ソフトウェアセンター)
+[English Instructions](#armbian-software-center) | [中文说明](#armbian-软件中心) | [日本語説明](#armbian-ソフトウェアセンター)
 
 Based on user feedback and requests in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), commonly used [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) has been gradually integrated to provide one-click install/update/uninstall operations. This includes `Docker images`, `desktop software`, `application services`, and more.
 

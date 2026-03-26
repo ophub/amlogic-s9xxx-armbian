@@ -1,6 +1,6 @@
 # ビルドファイルの説明
 
-[View English description](README.md) | [查看中文说明](README.cn.md) | [日本語の説明を確認する](README.ja.md)
+[English Instructions](README.md) | [中文说明](README.cn.md) | [日本語説明](README.ja.md)
 
 Armbian システムのコンパイルに必要なファイルは、機能別に各サブディレクトリに分類して格納されています。
 
