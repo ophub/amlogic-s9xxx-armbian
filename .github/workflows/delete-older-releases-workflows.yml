@@ -20,7 +20,7 @@ on:
         default: true
         type: boolean
       prerelease_option:
-        description: "Whether to differentiate pre-release."
+        description: "Filter by pre-release status."
         required: false
         default: "all"
         type: choice
