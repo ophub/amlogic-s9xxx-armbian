@@ -332,11 +332,6 @@ verify_version() {
         case "${force_update,,}" in
         y*)
             echo -e "${INFO} Proceeding with force update..."
-            [[ "${local_found}" == "yes" ]] && {
-                [[ -f "sha256sums" ]] && mv -f sha256sums -t "${kernel_path}"
-                mv -f *".${download_type}"* -t "${kernel_path}"
-                [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files."
-            }
             ;;
         *)
             echo -e "${FINISH} Update cancelled by user."
@@ -381,6 +376,11 @@ search_kernel() {
     # Handle Local Files
     if [[ "${local_found}" == "yes" ]]; then
         echo -e "${INFO} Found local kernel packages. Version: [ ${inputs_kernel} ] Type: [ ${download_type} ]"
+
+        # Move local kernel files to the kernel path for subsequent installation and verification
+        [[ -f "sha256sums" ]] && mv -f sha256sums -t "${kernel_path}"
+        mv -f *".${download_type}"* -t "${kernel_path}"
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to move local kernel files."
 
     else
         # Handle Online Query
