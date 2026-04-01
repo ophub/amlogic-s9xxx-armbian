@@ -1,0 +1,13 @@
+[Unit]
+Description=TCN200 SATA LED monitor
+After=local-fs.target armbian-led-state.service
+Wants=armbian-led-state.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/tcn200-sata-leds.sh
+Restart=always
+RestartSec=1
+
+[Install]
+WantedBy=multi-user.target

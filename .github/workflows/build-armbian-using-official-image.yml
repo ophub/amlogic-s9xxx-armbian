@@ -43,6 +43,7 @@ on:
           - bdy-g18-pro
           - beikeyun
           - boca-tcn100
+          - boca-tcn200
           - cd1000
           - chainedbox
           - cm3588-nas

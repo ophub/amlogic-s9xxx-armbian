@@ -1,0 +1,11 @@
+verbosity=1
+bootlogo=false
+overlay_prefix=rk3588
+fdtfile=rockchip/rk3588s-boca-tcn200.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+extraargs=rw rootwait net.ifnames=0
+extraboardargs=console=ttyFIQ0 irqchip.gicv3_pseudo_nmi=0
+console=display
+docker_optimizations=on
