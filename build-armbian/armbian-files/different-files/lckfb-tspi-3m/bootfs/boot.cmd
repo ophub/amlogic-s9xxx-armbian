@@ -28,7 +28,7 @@ if test "${bootlogo}" = "true"; then setenv consoleargs "bootsplash.bootfile=boo
 
 
 # Load Image fdt and uInitrd
-load ${devtype} ${devnum} ${kernel_addr_r} ${prefix}vmlinuz-6.1.9-lckfb_tspi_3m-lckfb
+load ${devtype} ${devnum} ${kernel_addr_r} ${prefix}Image
 load ${devtype} ${devnum} ${fdt_addr_r} ${prefix}dtb/${fdtfile}
 load ${devtype} ${devnum} ${ramdisk_addr_r} ${prefix}uInitrd
 
