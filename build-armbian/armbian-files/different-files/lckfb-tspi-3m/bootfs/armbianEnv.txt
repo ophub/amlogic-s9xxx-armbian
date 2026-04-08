@@ -1,0 +1,12 @@
+verbosity=7
+bootlogo=true
+consoleargs=console=ttyFIQ0
+overlay_prefix=
+overlays=
+user_overlays=
+fdtfile=rockchip/rk3576-tspi-3m.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+earlycon=on
+earlyconargs=earlycon=uart8250,mmio32,0x2ad40000
+extraargs=rcupdate.rcu_expedited=1 rcu_nocbs=all
