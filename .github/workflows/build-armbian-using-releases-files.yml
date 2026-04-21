@@ -219,6 +219,7 @@ on:
           - tpm312
           - tqc-a01
           - tvi3315a
+          - vontar-h618
           - vplus
           - wocyber-a3
           - wxy-oect
