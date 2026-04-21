@@ -1503,6 +1503,8 @@ Amlogic デバイスは `/boot/uEnv.txt` ファイルで設定します。Rockch
 
 - 例えば `Home Assistant Supervisor` は `docker cgroup v1` のみをサポートしていますが、現在の docker はデフォルトで v2 バージョンをインストールします。v1 に切り替える場合は、cmdline に `systemd.unified_cgroup_hierarchy=0` パラメータを追加し、再起動すると `docker cgroup v1` に切り替わります。
 
+- cmdline に `mmc_core.max_freq=50000000` 設定を追加することで、eMMC の最大周波数を `50MHz` に制限できます。一部の S905L2 ボックスでは、高周波（HS200/HS400、100MHz以上）において eMMC が不安定になることがありますが、周波数を下げることで、起動失敗やランダムなクラッシュ、読み書きエラー、不安定性などの問題を解決できます。
+
 - cmdline に `max_loop=128` 設定を追加することで、許可される loop マウント数を調整できます。
 
 - cmdline に `usbcore.usbfs_memory_mb=1024` 設定を追加することで、USBFS メモリバッファをデフォルトの `16 mb` からより大きなサイズに永続的に変更できます（`cat /sys/module/usbcore/parameters/usbfs_memory_mb`）。USB での大容量ファイル転送能力を向上させます。
@@ -1666,7 +1668,7 @@ max-frequency = <208000000>;
 };
 ```
 
-通常、`&sd_emmc_c` の周波数を `max-frequency = <200000000>;` から `max-frequency = <100000000>;` に下げれば解決します。効果がない場合は `50000000` にさらに下げてテストし、同時に `&sd_emmc_b` の設定で `USB/SD/TF` を調整するか、`sd-uhs-sdr` で速度制限することもできます。dts ファイルを修正して [コンパイル](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) してテストファイルを生成するか、`12.13 節` の方法で既存の dtb ファイルを逆コンパイルして修正できます。dtb ファイルの逆コンパイル時は十六進数値を使用します。十進数の `200000000` に対応する十六進数は `0xbebc200`、十進数の `100000000` に対応する十六進数は `0x5f5e100`、十進数の `50000000` に対応する十六進数は `0x2faf080`、十進数の `25000000` に対応する十六進数は `0x17d7840` です。
+通常、`&sd_emmc_c` の周波数を `max-frequency = <200000000>;` から `max-frequency = <100000000>;` に下げれば解決します。効果がない場合は `50000000` にさらに下げてテストし、同時に `&sd_emmc_b` の設定で `USB/SD/TF` を調整するか、`sd-uhs-sdr` で速度制限することもできます。dts ファイルを修正して [コンパイル](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) してテストファイルを生成するか、`12.13 節` の方法で既存の dtb ファイルを逆コンパイルして修正できます。dtb ファイルの逆コンパイル時は十六進数値を使用します。十進数の `200000000` に対応する十六進数は `0xbebc200`、十進数の `100000000` に対応する十六進数は `0x5f5e100`、十進数の `50000000` に対応する十六進数は `0x2faf080`、十進数の `25000000` に対応する十六進数は `0x17d7840` です。また、`12.14 節` の cmdline 設定方法を参照し、cmdline に `mmc_core.max_freq=50000000` パラメータを追加して eMMC の最大周波数を制限することで、読み書きエラーや不安定な問題を解決することも可能です。
 
 ソフトウェア面の最適化の他に、[ハードウェアアップグレード](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) や [手動改造](https://www.right.com.cn/forum/thread-901586-1-1.html) で解決することもできます。
 

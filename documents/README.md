@@ -1510,6 +1510,8 @@ In Amlogic devices, add/modify/delete settings in `/boot/uEnv.txt`. In Rockchip 
 
 - For instance, `Home Assistant Supervisor` only supports `docker cgroup v1`, while the default Docker installation uses v2. To switch to v1, add `systemd.unified_cgroup_hierarchy=0` to cmdline and reboot.
 
+- Adding `mmc_core.max_freq=50000000` to cmdline limits the maximum frequency of eMMC to `50MHz`. The eMMC in certain S905L2 boxes is unstable at high frequencies (HS200/HS400, 100MHz+); downclocking can resolve issues such as boot failures, random crashes, read/write errors, and general instability.
+
 - Adding `max_loop=128` to cmdline adjusts the maximum number of loop mounts.
 
 - Adding `usbcore.usbfs_memory_mb=1024` to cmdline increases the USBFS memory buffer from the default `16 mb` (`cat /sys/module/usbcore/parameters/usbfs_memory_mb`), improving large USB file transfers.
@@ -1672,7 +1674,7 @@ Take the code snippet in the [dts](https://github.com/unifreq/linux-5.15.y/tree/
 };
 ```
 
-Generally, reducing the frequency of `&sd_emmc_c` from `max-frequency = <200000000>;` to `max-frequency = <100000000>;` resolves the issue. If not, try `50000000`. Adjust `&sd_emmc_b` for `USB/SD/TF` settings, and use `sd-uhs-sdr` to limit speed. Modify the dts file and [compile](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) to get a test file, or use the decompilation method in `Section 12.13` to modify an existing dtb file. When modifying decompiled dtb files, use hexadecimal values: decimal `200000000` = hex `0xbebc200`, `100000000` = `0x5f5e100`, `50000000` = `0x2faf080`, `25000000` = `0x17d7840`.
+Generally, reducing the frequency of `&sd_emmc_c` from `max-frequency = <200000000>;` to `max-frequency = <100000000>;` resolves the issue. If not, try `50000000`. Adjust `&sd_emmc_b` for `USB/SD/TF` settings, and use `sd-uhs-sdr` to limit speed. Modify the dts file and [compile](https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/compile-kernel) to get a test file, or use the decompilation method in `Section 12.13` to modify an existing dtb file. When modifying decompiled dtb files, use hexadecimal values: decimal `200000000` = hex `0xbebc200`, `100000000` = `0x5f5e100`, `50000000` = `0x2faf080`, `25000000` = `0x17d7840`. Alternatively, refer to the cmdline configuration method in `Section 12.14` and add the `mmc_core.max_freq=50000000` parameter to the cmdline to limit the maximum frequency of the eMMC, thereby resolving read/write errors and instability issues.
 
 In addition to software-layer solutions, this issue can also be resolved through [hardware upgrades](https://github.com/ophub/amlogic-s9xxx-armbian/issues/998) or [physical modifications](https://www.right.com.cn/forum/thread-901586-1-1.html).
 
