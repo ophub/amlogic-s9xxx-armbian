@@ -1166,15 +1166,6 @@ refactor_rootfs() {
         chmod +x etc/update-motd.d/{10-*,20-*,30-*}
     }
 
-    # Disable IP information display
-    ip_info_file="etc/update-motd.d/20-ip-info"
-    [[ -f "${ip_info_file}" ]] && {
-        sed -i \
-            -e '/^get_wan.*_address/s/{.*/{ true; }/' \
-            -e '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' \
-            "${ip_info_file}"
-    }
-
     # Explicitly disable resizing for Amlogic device [ /usr/lib/armbian/armbian-resize-filesystem ], use armbian-tf settings
     echo "yes" >root/.no_rootfs_resize
 

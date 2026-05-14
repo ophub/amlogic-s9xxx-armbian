@@ -350,7 +350,7 @@ ip_info_file="/etc/update-motd.d/20-ip-info"
 [[ -f "${ip_info_file}" ]] && {
     sed -i \
         -e '/^get_wan.*_address/s/{.*/{ true; }/' \
-        -e '/if.*ipv6s.*||.*wan6/,/fi/s/^/#/' \
+        -e '/^[#[:space:]]*if[^#]*ipv6s.*||.*wan6/,/^[#[:space:]]*fi[[:space:]]*$/{/^[[:space:]]*#/!s/^/#/}' \
         ${ip_info_file} 2>/dev/null || true
     tolog "92. Hide WAN & IPv6 addresses from MOTD"
 } || true
