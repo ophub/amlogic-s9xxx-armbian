@@ -94,16 +94,16 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload rebuilt images to Release
-        uses: ncipollo/release-action@main
+        uses: ophub/upload-to-release@main
         if: ${{ steps.make.outputs.status == 'success' && !cancelled() }}
         with:
           tag: ${{ steps.down.outputs.build_tag }}
           artifacts: out/*.tar.gz
-          allowUpdates: true
-          removeArtifacts: false
-          replacesArtifacts: true
-          makeLatest: true
-          token: ${{ secrets.GITHUB_TOKEN }}
+          allow_updates: true
+          remove_artifacts: false
+          replaces_artifacts: true
+          make_latest: true
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image Information
             - Default username: `root`

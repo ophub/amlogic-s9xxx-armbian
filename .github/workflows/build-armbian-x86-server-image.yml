@@ -136,14 +136,16 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
-        uses: ncipollo/release-action@main
+        uses: ophub/upload-to-release@main
         if: ${{ steps.clean.outputs.status == 'success' && !cancelled() }}
         with:
           tag: ${{ env.build_tag }}
           artifacts: "armbian/*,out/*"
-          allowUpdates: true
-          makeLatest: false
-          token: ${{ secrets.GITHUB_TOKEN }}
+          allow_updates: true
+          remove_artifacts: false
+          replaces_artifacts: true
+          make_latest: false
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
           body: |
             ### Armbian Image Information
             - Default username: `root`
