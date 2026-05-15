@@ -208,7 +208,7 @@ GitHub Actions のデフォルトコンパイル領域は 84G で、システム
     sudo mkfs.xfs /dev/github/runner
     sudo mkdir -p /builder
     sudo mount /dev/github/runner /builder
-    sudo chown -R runner.runner /builder
+    sudo chown -R runner:runner /builder
     df -Th
 ```
 
@@ -222,13 +222,13 @@ Armbian システムの [Docker](https://hub.docker.com/u/ophub) イメージの
 
 ```yaml
 - name: Upload Armbian image to Release
-  uses: ncipollo/release-action@main
+  uses: ophub/upload-to-release@main
   if: ${{ env.PACKAGED_STATUS }} == 'success' && !cancelled()
   with:
     tag: Armbian_${{ env.ARMBIAN_RELEASE }}_${{ env.PACKAGED_OUTPUTDATE }}
     artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
-    allowUpdates: true
-    token: ${{ secrets.GITHUB_TOKEN }}
+    allow_updates: true
+    gh_token: ${{ secrets.GITHUB_TOKEN }}
     body: |
       These are the Armbian OS image
       * OS information
