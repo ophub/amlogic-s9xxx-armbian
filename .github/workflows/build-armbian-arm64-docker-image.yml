@@ -94,7 +94,7 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload rebuilt images to Release
-        uses: ophub/upload-to-release@main
+        uses: ophub/upload-to-releases@main
         if: ${{ steps.make.outputs.status == 'success' && !cancelled() }}
         with:
           tag: ${{ steps.down.outputs.build_tag }}

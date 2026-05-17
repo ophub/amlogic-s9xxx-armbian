@@ -410,7 +410,7 @@ jobs:
           builder_name: ${{ inputs.builder_name }}
 
       - name: Upload Armbian images to Release
-        uses: ophub/upload-to-release@main
+        uses: ophub/upload-to-releases@main
         if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
         with:
           tag: ${{ env.build_tag }}
