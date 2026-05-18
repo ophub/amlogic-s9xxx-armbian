@@ -12,9 +12,10 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "noble"
+        default: "all"
         type: choice
         options:
+          - all
           - trixie
           - bookworm
           - resolute
@@ -34,9 +35,31 @@ env:
   MAKE_DOCKER_SH: compile-kernel/tools/script/docker/build_armbian_docker_image.sh
 
 jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set build matrix based on set_release input
+        id: set-matrix
+        run: |
+          if [[ "${{ inputs.set_release }}" == "all" ]]; then
+            MATRIX='{"include":[{"release":"trixie"},{"release":"bookworm"},{"release":"resolute"},{"release":"noble"}]}'
+          else
+            MATRIX='{"include":[{"release":"${{ inputs.set_release }}"}]}'
+          fi
+          echo "matrix=${MATRIX}" >> "${GITHUB_OUTPUT}"
+
   build:
+    needs: setup
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+
+    name: build-armbian-x86-${{ matrix.release }}
 
     steps:
       - name: Checkout
@@ -97,7 +120,7 @@ jobs:
           ln -sf /builder/build ${{ github.workspace }}/build
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Compile Armbian [ ${{ inputs.set_release }} ]
+      - name: Compile Armbian [ ${{ matrix.release }} ]
         id: compile
         working-directory: /builder
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
@@ -106,7 +129,7 @@ jobs:
           docker run --rm --privileged multiarch/qemu-user-static --reset -p yes 2>/dev/null || true
           # Compile options reference: https://docs.armbian.com/Developer-Guide_Build-Options
           cd build/
-              ./compile.sh RELEASE=${{ inputs.set_release }} BOARD=uefi-x86 BRANCH=current BUILD_MINIMAL=no \
+              ./compile.sh RELEASE=${{ matrix.release }} BOARD=uefi-x86 BRANCH=current BUILD_MINIMAL=no \
                            BUILD_ONLY=default HOST=armbian BUILD_DESKTOP=no EXPERT=yes KERNEL_CONFIGURE=no \
                            COMPRESS_OUTPUTIMAGE="sha" SHARE_LOG=yes
           echo "status=success" >> ${GITHUB_OUTPUT}
@@ -117,7 +140,7 @@ jobs:
         run: |
           # Extract essential artifacts and remove build files
           chmod +x ${ROOTFS_SCRIPT}
-          ${ROOTFS_SCRIPT} -v ${{ inputs.set_release }} -s true -c true -k false -p amd64
+          ${ROOTFS_SCRIPT} -v ${{ matrix.release }} -s true -c true -k false -p amd64
           # Remove build files while preserving output
           [[ -d "armbian" ]] || mkdir armbian
           cp -af build/output/images/* armbian/
@@ -132,7 +155,7 @@ jobs:
         if: ${{ inputs.publish_docker != 'none' && !cancelled() }}
         run: |
           chmod +x ${MAKE_DOCKER_SH}
-          ${MAKE_DOCKER_SH} ${{ inputs.set_release }} amd64
+          ${MAKE_DOCKER_SH} ${{ matrix.release }} amd64
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Upload Armbian image to Release
@@ -174,9 +197,9 @@ jobs:
           echo "Loaded image: ${loaded_image}"
 
           # Tag for Docker Hub
-          docker tag "${loaded_image}" "${{ inputs.publish_docker }}-${{ inputs.set_release }}:amd64"
+          docker tag "${loaded_image}" "${{ inputs.publish_docker }}-${{ matrix.release }}:amd64"
 
           # Push to Docker Hub
-          docker push "${{ inputs.publish_docker }}-${{ inputs.set_release }}:amd64"
+          docker push "${{ inputs.publish_docker }}-${{ matrix.release }}:amd64"
 
           echo "status=success" >> ${GITHUB_OUTPUT}

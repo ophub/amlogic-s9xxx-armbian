@@ -14,9 +14,10 @@ on:
       source_branch:
         description: "Select the source branch"
         required: false
-        default: "trixie"
+        default: "all"
         type: choice
         options:
+          - all
           - trixie
           - bookworm
           - resolute
@@ -34,15 +35,37 @@ env:
   MAKE_DOCKER_SH: compile-kernel/tools/script/docker/build_armbian_docker_image.sh
 
 jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set build matrix based on source_branch input
+        id: set-matrix
+        run: |
+          if [[ "${{ inputs.source_branch }}" == "all" ]]; then
+            MATRIX='{"include":[{"branch":"trixie"},{"branch":"bookworm"},{"branch":"resolute"},{"branch":"noble"}]}'
+          else
+            MATRIX='{"include":[{"branch":"${{ inputs.source_branch }}"}]}'
+          fi
+          echo "matrix=${MATRIX}" >> "${GITHUB_OUTPUT}"
+
   build:
+    needs: setup
     runs-on: ubuntu-24.04-arm
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+
+    name: build-docker-${{ matrix.branch }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Download Armbian rootfs file [ ${{ inputs.source_branch }} ]
+      - name: Download Armbian rootfs file [ ${{ matrix.branch }} ]
         id: down
         if: (!cancelled())
         run: |
@@ -51,7 +74,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
-              jq -r --arg RTK "Armbian_${{ inputs.source_branch }}_arm64_" \
+              jq -r --arg RTK "Armbian_${{ matrix.branch }}_arm64_" \
               --arg BOARD "rootfs" \
               '[.[] | select(.tag_name | contains($RTK)) |
               {tag: .tag_name} + (.assets[] | select(.name | contains($BOARD) and endswith(".tar.gz")) |
@@ -89,7 +112,7 @@ jobs:
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         run: |
           chmod +x ${MAKE_DOCKER_SH}
-          ${MAKE_DOCKER_SH} ${{ inputs.source_branch }} arm64
+          ${MAKE_DOCKER_SH} ${{ matrix.branch }} arm64
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 
@@ -134,12 +157,12 @@ jobs:
           echo "Loaded image: ${loaded_image}"
 
           # Tag for Docker Hub
-          docker tag "${loaded_image}" "${{ inputs.docker_img }}-${{ inputs.source_branch }}:arm64"
-          docker tag "${loaded_image}" "${{ inputs.docker_img }}-${{ inputs.source_branch }}:latest"
+          docker tag "${loaded_image}" "${{ inputs.docker_img }}-${{ matrix.branch }}:arm64"
+          docker tag "${loaded_image}" "${{ inputs.docker_img }}-${{ matrix.branch }}:latest"
 
           # Push to Docker Hub
-          docker push "${{ inputs.docker_img }}-${{ inputs.source_branch }}:arm64"
-          docker push "${{ inputs.docker_img }}-${{ inputs.source_branch }}:latest"
+          docker push "${{ inputs.docker_img }}-${{ matrix.branch }}:arm64"
+          docker push "${{ inputs.docker_img }}-${{ matrix.branch }}:latest"
 
           echo "status=success" >> ${GITHUB_OUTPUT}
 

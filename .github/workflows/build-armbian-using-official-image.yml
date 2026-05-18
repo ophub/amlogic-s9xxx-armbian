@@ -16,13 +16,11 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "amlogic"
         type: choice
         options:
-          - all
           - allwinner
           - amlogic
-          - rockchip
           - rockchip50
           - rockchip50_100
           - rockchip100_150

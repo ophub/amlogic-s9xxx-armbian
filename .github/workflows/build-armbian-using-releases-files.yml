@@ -12,9 +12,10 @@ on:
       set_release:
         description: "Select OS Release."
         required: false
-        default: "trixie"
+        default: "all"
         type: choice
         options:
+          - all
           - trixie
           - bookworm
           - resolute
@@ -22,13 +23,11 @@ on:
       armbian_board:
         description: "Select device board."
         required: false
-        default: "all"
+        default: "amlogic"
         type: choice
         options:
-          - all
           - allwinner
           - amlogic
-          - rockchip
           - rockchip50
           - rockchip50_100
           - rockchip100_150
@@ -308,9 +307,31 @@ env:
   TZ: Etc/UTC
 
 jobs:
+  setup:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set build matrix based on set_release input
+        id: set-matrix
+        run: |
+          if [[ "${{ inputs.set_release }}" == "all" ]]; then
+            MATRIX='{"include":[{"release":"trixie"},{"release":"bookworm"},{"release":"resolute"},{"release":"noble"}]}'
+          else
+            MATRIX='{"include":[{"release":"${{ inputs.set_release }}"}]}'
+          fi
+          echo "matrix=${MATRIX}" >> "${GITHUB_OUTPUT}"
+
   build:
+    needs: setup
     runs-on: ubuntu-24.04
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+
+    name: build-armbian-${{ matrix.release }}
 
     steps:
       - name: Checkout
@@ -376,7 +397,7 @@ jobs:
               -H "Accept: application/vnd.github+json" \
               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
               https://api.github.com/repos/${{ github.repository }}/releases?per_page=20 | \
-              jq -r --arg RTK "Armbian_${{ inputs.set_release }}_arm64_" \
+              jq -r --arg RTK "Armbian_${{ matrix.release }}_arm64_" \
               --arg BOARD "-trunk_" \
               '[.[] | select(.tag_name | contains($RTK))] |
               map(.assets[] | select(.name | contains($BOARD) and endswith(".img.gz"))) |
@@ -406,10 +427,10 @@ jobs:
           # Decompress the image
           cd "${armbian_buildpath}" && gzip -df *.img.gz && sync
 
-          echo "build_tag=Armbian_${{ inputs.set_release }}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
+          echo "build_tag=Armbian_${{ matrix.release }}_arm64_${{ inputs.armbian_edition }}_$(date +"%Y.%m")" >> ${GITHUB_ENV}
           echo "status=success" >> ${GITHUB_OUTPUT}
 
-      - name: Rebuild Armbian [ ${{ inputs.set_release }} ]
+      - name: Rebuild Armbian [ ${{ matrix.release }} ]
         uses: ophub/amlogic-s9xxx-armbian@main
         if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
         with:
