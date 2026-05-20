@@ -115,6 +115,7 @@ on:
           - rk3318-box
           - rock-5-itx
           - rock-3b
+          - rock-3c
           - rock5b
           - rock5c
           - ruisen-box
