@@ -166,10 +166,11 @@ runs:
                 echo -e "The Armbian file is invalid!"
                 exit 1
             fi
-            # Decompress the Armbian image file.
+            # Decompress the Armbian image file. Use -k to keep the original
+            # compressed file so its sha256sum is preserved for upload dedup.
             case "${down_file}" in
-                *.img.gz) gzip -df "${down_file}" 2>/dev/null && sync ;;
-                *.img.xz) xz -d "${down_file}" 2>/dev/null && sync ;;
+                *.img.gz) gzip -dkf "${down_file}" 2>/dev/null && sync ;;
+                *.img.xz) xz -dk "${down_file}" 2>/dev/null && sync ;;
                 *.zip)    unzip -o "${down_file}" 2>/dev/null && sync ;;
             esac
             echo -e "Armbian file: \n$(ls -lh *.img 2>/dev/null)"
@@ -225,20 +226,24 @@ runs:
             sudo ./rebuild "${make_args[@]}"
 
             cd ${{ github.action_path }}/${armbian_filepath}
-            # Compress Armbian image file. Guard against an empty glob (no .img produced) and
-            # prefer pigz when present, otherwise fall back to gzip.
+            # Remove the decompressed input .img to free up space; the original .img.gz is kept.
+            rm -f *-trunk_*.img
+            # Compress any remaining .img files (e.g. user-supplied extras). Guard against an
+            # empty glob and prefer pigz when present, otherwise fall back to gzip.
             shopt -s nullglob
             imgs=( *.img )
             shopt -u nullglob
-            if [[ "${#imgs[@]}" -eq 0 ]]; then
-                echo "error: No .img file produced in [ ${PWD} ], aborting."
+            if [[ "${#imgs[@]}" -gt 0 ]]; then
+                if command -v pigz >/dev/null 2>&1; then
+                    pigz -qf "${imgs[@]}"
+                else
+                    gzip -qf "${imgs[@]}"
+                fi
+            fi
+            if [[ -z "$(ls *.img.gz 2>/dev/null)" ]]; then
+                echo "error: No .img.gz file produced in [ ${PWD} ], aborting."
                 echo "PACKAGED_STATUS=failure" >> ${GITHUB_ENV}
                 exit 1
-            fi
-            if command -v pigz >/dev/null 2>&1; then
-                pigz -qf "${imgs[@]}"
-            else
-                gzip -qf "${imgs[@]}"
             fi
             sync && sleep 3
 
