@@ -121,6 +121,7 @@ on:
           - renegade-rk3328
           - rk3318-box
           - rock-5-itx
+          - rock-3b
           - rock5b
           - rock5c
           - ruisen-box
