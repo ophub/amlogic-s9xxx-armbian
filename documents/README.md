@@ -1518,6 +1518,8 @@ In Amlogic devices, add/modify/delete settings in `/boot/uEnv.txt`. In Rockchip 
 
 - Adding `usbcore.usb3_disable=1` to cmdline disables all USB 3.0 devices.
 
+- Adding `usbcore.autosuspend=-1` to cmdline disables USB auto-suspend (prevents USB devices from powering down to save energy); adding `rootdelay=120` makes the system wait 120 seconds before mounting the root partition at boot (giving USB devices time to become ready); adding `mitigations=off` disables CPU vulnerability mitigations (Spectre/Meltdown), improving performance.
+
 - Adding `extraargs=video=HDMI-A-1:1920x1080@60` to cmdline forces the display to 1080p.
 
 <div style="width:100%;margin-top:40px;margin:5px;">

@@ -1511,6 +1511,8 @@ Amlogic デバイスは `/boot/uEnv.txt` ファイルで設定します。Rockch
 
 - cmdline に `usbcore.usb3_disable=1` 設定を追加することで、すべての USB 3.0 デバイスを無効にできます。
 
+- cmdline に `usbcore.autosuspend=-1` 設定を追加することで、USB オートサスペンドを無効にできます（USB デバイスの省電力による切断を防止）；`rootdelay=120` 設定を追加することで、起動時にルートパーティションをマウントする前に 120 秒待機します（USB デバイスが準備完了するまでの時間を確保）；`mitigations=off` 設定を追加することで、CPU 脆弱性の緩和策（Spectre/Meltdown）を無効にし、パフォーマンスを向上させます。
+
 - cmdline に `extraargs=video=HDMI-A-1:1920x1080@60` 設定を追加することで、ビデオ表示モードを 1080p に強制できます。
 
 <div style="width:100%;margin-top:40px;margin:5px;">
