@@ -1,0 +1,197 @@
+#!/bin/bash
+
+# EasePi A2 红外功能一键修复脚本
+# 版本: 1.0
+# 日期: 2026-02-18
+
+# 检查服务状态函数
+check_service_status() {
+    echo "检查服务状态..."
+    
+    # 检查 ir-keymap.service 状态
+    if systemctl is-active --quiet ir-keymap.service; then
+        echo "✅ ir-keymap.service 已执行"
+    else
+        echo "❌ ir-keymap.service 未执行，正在执行..."
+        systemctl start ir-keymap.service
+        if [ $? -eq 0 ]; then
+            echo "✅ ir-keymap.service 执行成功"
+        else
+            echo "⚠️ ir-keymap.service 执行失败，但不影响基本功能"
+        fi
+    fi
+    
+    # 检查协议配置
+    echo "检查协议配置..."
+    PROTOCOLS=$(ir-keytable 2>&1 | grep "Enabled kernel protocols")
+    echo "当前协议: $PROTOCOLS"
+    
+    if echo "$PROTOCOLS" | grep -q "nec"; then
+        echo "✅ NEC 协议已启用"
+    else
+        echo "❌ NEC 协议未启用，正在启用..."
+        ir-keytable -p nec
+        if [ $? -eq 0 ]; then
+            echo "✅ NEC 协议启用成功"
+        else
+            echo "❌ NEC 协议启用失败"
+            return 1
+        fi
+    fi
+    
+    echo "服务状态检查完成，核心功能正常！"
+    return 0
+}
+
+echo "========================================"
+echo "EasePi A2 红外功能一键修复脚本"
+echo "========================================"
+echo ""
+
+# 检查是否以root身份运行
+if [ "$(id -u)" != "0" ]; then
+    echo "错误: 请以root身份运行此脚本"
+    exit 1
+fi
+
+# 1. 检查并安装必要的依赖
+echo "1. 检查并安装必要的依赖工具..."
+echo ""
+
+# 检查ir-keytable是否已安装
+if ! command -v ir-keytable &> /dev/null; then
+    echo "ir-keytable未安装，正在安装..."
+    # 安装ir-keytable
+    apt-get install -y ir-keytable
+else
+    echo "ir-keytable已安装，跳过安装步骤"
+fi
+
+# 2. 复制配置文件
+echo ""
+echo "3. 复制配置文件到系统路径..."
+echo ""
+
+# 创建必要的目录
+echo "创建必要的目录..."
+mkdir -p /etc/modules-load.d/
+mkdir -p /etc/rc_keymaps/
+
+# 备份原有配置文件
+echo "备份原有配置文件..."
+if [ -f /etc/modules-load.d/infrared.conf ]; then
+    mv /etc/modules-load.d/infrared.conf /etc/modules-load.d/infrared.conf.bak
+fi
+
+# 复制模块加载配置
+if [ -f "backup_20260218/infrared.conf" ]; then
+    echo "复制模块加载配置..."
+    cp backup_20260218/infrared.conf /etc/modules-load.d/
+    echo "✅ 模块加载配置复制成功"
+else
+    echo "⚠️ 找不到 backup_20260218/infrared.conf 文件"
+fi
+
+# 复制按键映射配置文件
+if [ -f "backup_20260218/final_remote_config" ]; then
+    echo "复制按键映射配置..."
+    cp backup_20260218/final_remote_config /etc/rc_keymaps/easepi_remote
+    echo "✅ 按键映射配置复制成功"
+else
+    echo "⚠️ 找不到 backup_20260218/final_remote_config 文件"
+fi
+
+# 3. 应用按键映射配置并启用NEC协议
+echo ""
+echo "5. 应用按键映射配置..."
+echo ""
+
+ir-keytable -c -w /etc/rc_keymaps/easepi_remote
+ir-keytable -p nec
+
+echo "按键映射配置已应用，NEC 协议已启用"
+# 4.持久化配置
+echo ""
+echo "5 持久化配置..."
+echo ""
+# 复制系统服务文件
+echo "复制系统服务文件..."
+cp backup_20260218/systemd/ir-keymap.service /etc/systemd/system/
+# 重新加载systemd配置
+systemctl daemon-reload
+# 启用服务
+systemctl enable ir-keymap.service
+echo "系统服务已复制并启用"
+
+# 5. 验证配置
+echo ""
+echo "6. 验证配置..."
+echo ""
+# 检查模块加载
+lsmod | grep -E 'ir|gpio'
+# 检查设备节点
+ls -la /dev/lirc*
+
+# 6. 设置设备权限
+echo ""
+echo "2. 设置设备权限..."
+echo ""
+# 添加video組
+groupadd -f video
+# 将当前用户添加到video组
+CURRENT_USER=$(logname 2>/dev/null || echo "pi")
+usermod -a -G video "$CURRENT_USER"
+
+if [ -c "/dev/lirc0" ]; then
+    chown root:video /dev/lirc0
+    chmod 660 /dev/lirc0
+fi
+
+# 7. 执行服务状态检查
+echo "7. 执行服务状态检查..."
+# 执行检查
+check_service_status
+
+# 8.确保NEC协议可用
+echo "8. 确保NEC协议可用..."
+# 循环检查并启用NEC协议，确保lircd服务启动后协议配置不被覆盖
+MAX_RETRIES=5
+RETRY_COUNT=0
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    # 启用NEC协议
+    echo "启用NEC协议..."
+    ir-keytable -p nec
+    # 等待1秒让配置生效
+    sleep 1
+        # 检查协议配置
+    echo "检查协议状态..."
+        # 将标准错误也重定向到标准输出，确保grep能捕获到所有输出
+    if ir-keytable 2>&1 | grep -q "nec"; then
+        echo "✅ NEC协议已成功启用并保持生效"
+        break
+    else
+        echo "⚠️ NEC协议未启用，重试中... ($((RETRY_COUNT+1))/$MAX_RETRIES)"
+        RETRY_COUNT=$((RETRY_COUNT+1))
+        # 等待2秒后重试
+        sleep 2
+    fi
+done
+
+if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+    echo "❌ 无法启用NEC协议，请手动检查"
+else
+    echo "✅ 最终NEC协议启用成功"
+fi
+
+# 验证最终协议配置
+ir-keytable | grep "Enabled kernel protocols"
+
+echo ""
+echo "========================================"
+echo "修复完成！"
+echo "========================================"
+echo "请重启系统以确保所有配置生效。"
+echo "重启后，您可以使用以下命令测试红外功能："
+echo "ir-keytable -t   # 测试红外信号接收"
+echo ""
