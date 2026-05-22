@@ -1221,6 +1221,14 @@ refactor_rootfs() {
         sed -e "s/macaddr=.*/macaddr=${random_macaddr}:06/" "brcmfmac43430-sdio.txt" >"brcmfmac43430-sdio.panther,x2.txt"
         # ct2000 s922x is brm4359
         sed -i "s/macaddr=.*/macaddr=${random_macaddr}:07/" "brcmfmac4359-sdio.ali,ct2000.txt"
+        # easepi-r2 is AP6256 (BCM43455) wifi/bluetooth
+        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:08/" "brcmfmac43455-sdio.txt" >"brcmfmac43455-sdio.linkease,easepi-r2.txt"
+        ln -sf brcmfmac43455-sdio.bin brcmfmac43455-sdio.linkease,easepi-r2.bin
+        ln -sf brcmfmac43455-sdio.clm_blob brcmfmac43455-sdio.linkease,easepi-r2.clm_blob
+        # easepi-a2 is AP6255 (BCM43455) wifi/bluetooth
+        sed -e "s/macaddr=.*/macaddr=${random_macaddr}:09/" "brcmfmac43455-sdio.txt" >"brcmfmac43455-sdio.easepi,a2.txt"
+        ln -sf brcmfmac43455-sdio.bin brcmfmac43455-sdio.easepi,a2.bin
+        ln -sf brcmfmac43455-sdio.clm_blob brcmfmac43455-sdio.easepi,a2.clm_blob
     )
 
     # Add custom Armbian information
