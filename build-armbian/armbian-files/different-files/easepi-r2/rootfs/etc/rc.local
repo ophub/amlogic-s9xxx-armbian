@@ -1,0 +1,34 @@
+#!/bin/bash
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+# 执行飞牛自定义服务
+[[ -x "/etc/custom_service/start_service.sh" ]] && bash /etc/custom_service/start_service.sh &
+
+# 中断负载均衡
+[[ -x "/usr/bin/balethirq.pl" ]] && perl /usr/bin/balethirq.pl >/dev/null 2>&1 &
+
+# RTC时钟同步（HYM8563）
+if [ -c /dev/rtc0 ]; then
+	hwclock --hctosys >/dev/null 2>&1 &
+fi
+
+# 红外初始化
+[[ -x "/usr/local/ir/fix_infrared.sh" ]] && bash /usr/local/ir/fix_infrared.sh >/dev/null 2>&1 &
+
+# 蓝牙初始化
+[[ -x "/usr/local/bluetooth/fix_bluetooth.sh" ]] && bash /usr/local/bluetooth/fix_bluetooth.sh >/dev/null 2>&1 &
+
+# WiFi初始化
+[[ -x "/usr/local/wifi/fix_wifi.sh" ]] && bash /usr/local/wifi/fix_wifi.sh >/dev/null 2>&1 &
+
+exit 0
