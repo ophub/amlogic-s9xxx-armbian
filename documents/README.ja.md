@@ -581,7 +581,7 @@ armbian-update
 | オプションパラメータ  | デフォルト値        | 選択肢           | 説明                              |
 | -------- | ------------ | ------------- | -------------------------------- |
 | -r       | ophub/kernel | `<owner>/<repo>` | github.com からカーネルをダウンロードするリポジトリを設定  |
-| -u       | 自動        | stable/flippy/beta/rk3588/rk35xx/h6 | 使用するカーネルの [tags サフィックス](https://github.com/ophub/kernel/releases) を設定 |
+| -u       | 自動        | stable/flippy/beta/rk3588/rk35xx | 使用するカーネルの [tags サフィックス](https://github.com/ophub/kernel/releases) を設定 |
 | -k       | 最新版        | カーネルバージョン       | [カーネルバージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable) を設定  |
 | -b       | yes          | yes/no        | カーネル更新時に現在使用中のカーネルを自動バックアップ    |
 | -d       | deb          | tar/deb       | 優先使用するカーネルパッケージ形式を設定。指定形式が存在しない場合、スクリプトは自動的に別の形式を試行します。カスタムドライバをコンパイルする場合は `deb` 形式を推奨。 |

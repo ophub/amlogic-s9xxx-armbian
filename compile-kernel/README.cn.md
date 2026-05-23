@@ -45,7 +45,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -k     | Kernel      | 指定内核版本，如 `-k 5.15.100`。多个内核以 `_` 分隔，如 `-k 5.15.100_5.15.50`。使用 `-k all` 表示编译全部主线内核，当前等价于 `-k 5.10.y_5.15.y_6.1.y_6.6.y_6.12.y_6.18.y`，内核列表会随上游内核源码仓库 [unifreq](https://github.com/unifreq) 的维护状态动态调整。 |
 | -a     | AutoKernel  | 设置是否自动采用同系列最新版本内核。设为 `true` 时，将自动检查 `-k` 指定的内核（如 `5.15.100`）同系列是否存在更新版本，若存在则自动切换为最新版。设为 `false` 时则编译指定版本。默认值：`true` |
 | -m     | MakePackage | 设置内核构建的包列表。设为 `all` 时生成 `Image、modules、dtbs` 全部文件；设为 `dtbs` 时仅生成 3 个 DTB 文件。默认值：`all` |
-| -f     | configFlavor | 指定从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 下载的配置文件 `config-*` 到本地 [tools/config](tools/config) 目录。若本地已存在对应内核版本的配置文件且未设置此参数，则跳过下载。可选项为内核仓库中存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：`stable` / `rk3588` / `rk35xx` / `h6`。默认值：`stable` |
+| -f     | configFlavor | 指定从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 下载的配置文件 `config-*` 到本地 [tools/config](tools/config) 目录。若本地已存在对应内核版本的配置文件且未设置此参数，则跳过下载。可选项为内核仓库中存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：`stable` / `rk3588` / `rk35xx`。默认值：`stable` |
 | -p     | AutoPatch   | 设置是否应用自定义内核补丁。设为 `true` 时将使用 [tools/patch](tools/patch) 目录下的内核补丁，详细说明参考[内核补丁添加方法](../documents/README.cn.md#9-编译-armbian-内核)。默认值：`false` |
 | -n     | CustomName  | 设置内核自定义签名。例如设为 `-ophub` 时，生成的内核名称为 `5.15.100-ophub`。签名中请勿包含空格。默认值：`-ophub` |
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
@@ -102,7 +102,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_package    | all              | 设置内核构建的包列表。默认值：`all`。功能参考 `-m`             |
 | kernel_sign       | -ophub           | 设置内核自定义签名。默认值：`-ophub`。功能参考 `-n`             |
 | kernel_toolchain  | gcc              | 设置编译内核的工具链。默认值：`gcc`。功能参考 `-t`             |
-| config_flavor     | stable           | 指定从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 下载的配置文件 `config-*` 到本地 [tools/config](tools/config) 目录。若本地已存在对应内核版本的配置文件且未设置此参数，则跳过下载。可选项为内核仓库中存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：`stable` / `rk3588` / `rk35xx` / `h6`。默认值：`stable`。若同时设置了 `kernel_config` 参数，最终优先采用 `config_flavor` 指定的配置文件。这两个参数互斥，可任选其一：通过前者使用 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 的内核配置文件，或通过后者使用你自己仓库的配置文件。功能参考 `-f` |
+| config_flavor     | stable           | 指定从内核仓库 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 下载的配置文件 `config-*` 到本地 [tools/config](tools/config) 目录。若本地已存在对应内核版本的配置文件且未设置此参数，则跳过下载。可选项为内核仓库中存在的[目录名](https://github.com/ophub/kernel/tree/main/kernel-config/release)，例如：`stable` / `rk3588` / `rk35xx`。默认值：`stable`。若同时设置了 `kernel_config` 参数，最终优先采用 `config_flavor` 指定的配置文件。这两个参数互斥，可任选其一：通过前者使用 [ophub/kernel](https://github.com/ophub/kernel/tree/main/kernel-config/release) 的内核配置文件，或通过后者使用你自己仓库的配置文件。功能参考 `-f` |
 | kernel_config     | false            | 默认使用 [tools/config](tools/config) 目录下的配置模板。可指定你仓库中存放内核配置文件的目录，如 `kernel/config_path`。该目录下的配置模板须以内核主版本命名，如 `config-5.10`、`config-5.15` 等。 |
 | kernel_patch      | false            | 指定你仓库中自定义内核补丁文件的目录。若设置此参数，编译前将自动从指定目录下载补丁文件；未设置则跳过。 |
 | auto_patch        | false            | 设置是否应用自定义内核补丁。默认值：`false`。功能参考 `-p` |

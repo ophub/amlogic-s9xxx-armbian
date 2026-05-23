@@ -274,7 +274,7 @@ init_var() {
     # Set kernel download tags
     [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|h6)")" ]] && {
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx)")" ]] && {
         echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ]. Resetting to default [ stable ]."
         KERNEL_TAGS="stable"
     }
@@ -1130,7 +1130,7 @@ help_info() {
   │  Optional │ Default       │ Value                               │ Description                                                   │
   ├───────────┼───────────────┼─────────────────────────────────────┼───────────────────────────────────────────────────────────────┤
   │  -r       │ ophub/kernel  │ <owner>/<repo>                      │ Set the repository for downloading kernels from github.com    │
-  │  -u       │ <KERNEL_TAGS> │ stable/flippy/beta/rk3588/rk35xx/h6 │ Set the tags suffix of the kernel used                        │
+  │  -u       │ <KERNEL_TAGS> │ stable/flippy/beta/rk3588/rk35xx    │ Set the tags suffix of the kernel used                        │
   │  -k       │ latest        │ kernel-version                      │ Set the kernel version                                        │
   │  -b       │ yes           │ yes/no                              │ Automatically backup the current system kernel                │
   │  -d       │ deb           │ tar/deb                             │ Set the download type for the kernel                          │
