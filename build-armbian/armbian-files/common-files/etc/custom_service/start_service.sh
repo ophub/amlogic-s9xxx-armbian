@@ -19,7 +19,6 @@
 set +euo pipefail
 
 trap 'exit 0' EXIT
-trap '' HUP INT QUIT TERM PIPE
 
 # Custom Service Log - all script output will be logged here
 custom_log="/tmp/ophub_start_service.log"
@@ -200,4 +199,5 @@ todo_rootfs_resize="/root/.no_rootfs_resize"
 
 # Finalization
 log_message "All custom services have been processed successfully."
+trap '' HUP INT QUIT TERM PIPE
 exit 0

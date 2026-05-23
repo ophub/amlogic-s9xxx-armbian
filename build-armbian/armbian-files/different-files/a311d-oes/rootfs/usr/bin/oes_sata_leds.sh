@@ -16,6 +16,18 @@ declare -A PORT_LED_MAP=(
     ["ata3"]="/sys/class/leds/green:disk_2/brightness"
 )
 
+# 优雅退出：熄灭所有LED，终止监控进程
+monitor_pid=""
+cleanup() {
+    trap - TERM INT HUP
+    [[ -n "${monitor_pid}" ]] && kill "${monitor_pid}" 2>/dev/null
+    for port in "${!PORT_LED_MAP[@]}"; do
+        [[ -w "${PORT_LED_MAP[$port]}" ]] && echo 0 >"${PORT_LED_MAP[$port]}"
+    done
+    exit 0
+}
+trap cleanup TERM INT HUP
+
 # 获取当前所有活动的SATA端口ID (例如 ata1, ata2, ata3)
 get_active_ata_ids() {
     find /sys/class/block/sd* -exec readlink -f {} + 2>/dev/null | grep -o 'ata[0-9]\+' | sort -u || true
@@ -72,23 +84,19 @@ if command -v logread >/dev/null 2>&1; then
     echo "系统环境检测为: OpenWrt，使用 'logread' 进行监控。"
     MONITOR_CMD="logread -f"
 else
-    # 否则，我们判定为 Armbian 或其他标准 Linux 系统。
-    echo "系统环境检测为: Armbian，使用 'tail' 进行监控。"
-
-    # [[ -r "file" ]]: 检查文件是否存在且可读。
-    if [[ -r "/var/log/kern.log" ]]; then
-        # -F 选项比 -f 更强大，它可以正确处理日志文件的轮替(log rotation)。
-        MONITOR_CMD="tail -F /var/log/kern.log"
-    else
-        echo "错误: /var/log/kern.log 不存在或不可读！无法进行监控。"
-        exit 1
-    fi
+    echo "系统环境检测为: Armbian，使用 'journalctl' 进行监控。"
+    # -k 表示只看内核日志，-f 表示持续追踪，-n 0 表示不显示历史日志
+    MONITOR_CMD="journalctl -k -f -n 0"
 fi
 
 echo "持续监听SATA硬盘状态..."
 
-# 使用 tail -F 或 logread -f 持续监控内核日志的变化
-${MONITOR_CMD} 2>/dev/null | while read -r line; do
+# 使用 coproc 启动监控进程以获取其 PID，确保 SIGTERM 可以终止它
+coproc MONITOR { ${MONITOR_CMD} 2>/dev/null; }
+monitor_pid=${MONITOR_PID}
+exec {MONITOR[1]} >&-
+
+while IFS= read -r line <&"${MONITOR[0]}"; do
     port=""
     new_value=""
 
