@@ -1,0 +1,10 @@
+[Unit]
+Description=Apply IR keymap configuration
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash -c "/usr/bin/ir-keytable -c -w /etc/rc_keymaps/easepi_remote && /usr/bin/ir-keytable -p nec"
+
+[Install]
+WantedBy=multi-user.target
