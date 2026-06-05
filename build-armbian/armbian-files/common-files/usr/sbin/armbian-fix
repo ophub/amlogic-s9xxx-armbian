@@ -355,5 +355,9 @@ ip_info_file="/etc/update-motd.d/20-ip-info"
     tolog "92. Hide WAN & IPv6 addresses from MOTD"
 } || true
 
+# Run ldconfig to update library cache
+ldconfig 2>/dev/null || true
+tolog "93. Update library cache"
+
 # Show end message
 tolog "All system fixes applied successfully."

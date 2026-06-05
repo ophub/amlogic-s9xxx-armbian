@@ -1,0 +1,17 @@
+librknnrt.so - Rockchip RKNN Neural Network Runtime Library
+============================================================
+
+Source:
+  https://github.com/airockchip/rknpu2/raw/master/runtime/RK356X/Linux/librknn_api/aarch64/librknnrt.so
+
+Purpose:
+  Provides NPU (Neural Processing Unit) inference support for Rockchip RK356X/RK3588
+  series SoCs. Enables AI model inference acceleration using the on-chip NPU hardware.
+
+Install path:
+  /usr/local/lib/librknnrt.so
+
+Usage:
+  Run `ldconfig` after placing the file to update the dynamic linker cache.
+  Verify with: `ldconfig -p | grep librknnrt`
+
