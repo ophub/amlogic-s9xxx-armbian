@@ -364,14 +364,21 @@ create_partition() {
     fi
 
     # Use the ampart partition tool
+    # Skip ampart on s905x: its stock bootloader (e.g. B860H/HG680P) accesses fixed
+    # eMMC offsets (such as the u-boot env at [ 628 MiB ]) regardless of the
+    # partition table, so the ampart layout starting at [ 117 MiB ] cannot be used.
     AMPART_STATUS="no"
-    [[ -x "/usr/bin/ampart" && "${use_ampart}" == "yes" ]] && {
+    [[ -x "/usr/bin/ampart" && "${use_ampart}" == "yes" && "${AMLOGIC_SOC}" != "s905x" ]] && {
         ampart_tool
         [[ "${?}" -eq "0" ]] && AMPART_STATUS="yes" && echo -e "${STEPS} Successfully repartitioned eMMC with ampart."
     }
 
     # Set partition size (Unit: MiB)
-    if [[ "${AMPART_STATUS}" == "yes" ]]; then
+    if [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
+        BLANK1="700" # s905x stock bootloader uses fixed offsets in the first [ 700 MiB ], must be reserved.
+        BOOT="512"
+        BLANK2="0"
+    elif [[ "${AMPART_STATUS}" == "yes" ]]; then
         BLANK1="117" # After using the ampart to part disk, space after [ 117 MiB ] could be used.
         BOOT="512"
         BLANK2="0"
@@ -387,10 +394,6 @@ create_partition() {
         BLANK1="68"
         BOOT="512"
         BLANK2="220"
-    elif [[ "${AMLOGIC_SOC}" == "s905x" ]]; then
-        BLANK1="700"
-        BOOT="512"
-        BLANK2="0"
     elif [[ "${AMLOGIC_SOC}" == "s905l3a" && "${boxid}" -eq "304" ]]; then
         BLANK1="570" # e900v22c/d: The first [ 570 MiB ] is not writable.
         BOOT="512"
