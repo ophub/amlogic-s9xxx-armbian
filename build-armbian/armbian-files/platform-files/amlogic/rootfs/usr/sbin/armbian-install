@@ -26,6 +26,7 @@
 #======================================== Functions list ========================================
 #
 # error_msg          : Output error message and abort execution
+# check_release_file : Check if the ophub release file exists and source it
 # check_depends      : Check and install required dependencies
 # init_var           : Initialize all runtime variables and parse options
 # show_aml_model     : Display the list of supported Amlogic devices
@@ -39,10 +40,12 @@
 #
 # Use mainline u-boot by default (-m)
 auto_mainline_uboot="no"
-# Use ampart partition tool by default (-a)
-use_ampart="yes"
 # Show all device list by default (-l)
 show_all_list="no"
+# Use ampart partition tool by default (-a)
+default_ampart="yes"
+# Configure the list of SoCs that do not use the ampart tool by default.
+without_ampart=("s905x")
 
 # Set install list profile
 model_conf="/etc/model_database.conf"
@@ -64,6 +67,13 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+# Check if the ophub release file exists
+check_release_file() {
+    [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
+    source "${ophub_release_file}"
+    [[ " ${without_ampart[*]} " =~ " ${SOC} " ]] && default_ampart="no"
 }
 
 # Check dependencies
@@ -109,7 +119,7 @@ init_var() {
             ;;
         -a | --Ampart_tool)
             if [[ -n "${2}" ]]; then
-                [[ "${2}" == "yes" ]] && use_ampart="yes" || use_ampart="no"
+                [[ "${2}" == "yes" ]] && default_ampart="yes" || default_ampart="no"
                 shift
             else
                 error_msg "Invalid -a parameter [ ${2} ]!"
@@ -132,14 +142,13 @@ init_var() {
 
     # Display settings results
     echo -e "${INFO} Use mainline u-boot: [ ${auto_mainline_uboot} ]"
-    echo -e "${INFO} Use ampart tool: [ ${use_ampart} ]"
+    echo -e "${INFO} Use ampart tool: [ ${default_ampart} ]"
     echo -e "${INFO} Show all devices: [ ${show_all_list} ]"
 
     # Find a list of devices of the same family
     SEARCH_FAMILY=""
     [[ "${show_all_list}" == "no" ]] && {
-        [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
-        source "${ophub_release_file}" && SEARCH_FAMILY="$(basename ${FAMILY})"
+        SEARCH_FAMILY="$(basename ${FAMILY})"
         [[ -n "${SEARCH_FAMILY}" ]] && SEARCH_FAMILY=":${SEARCH_FAMILY}:"
     }
 
@@ -365,7 +374,7 @@ create_partition() {
 
     # Use the ampart partition tool
     AMPART_STATUS="no"
-    [[ -x "/usr/bin/ampart" && "${use_ampart}" == "yes" ]] && {
+    [[ -x "/usr/bin/ampart" && "${default_ampart}" == "yes" ]] && {
         ampart_tool
         [[ "${?}" -eq "0" ]] && AMPART_STATUS="yes" && echo -e "${STEPS} Successfully repartitioned eMMC with ampart."
     }
@@ -600,6 +609,8 @@ EOF
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 echo -e "${STEPS} Installing Armbian to internal eMMC..."
 
+# Check release file
+check_release_file
 # Check dependencies
 check_depends
 # Initialize all variables
