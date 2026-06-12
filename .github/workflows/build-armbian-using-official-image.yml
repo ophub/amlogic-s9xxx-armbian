@@ -344,20 +344,20 @@ jobs:
           echo "status=success" >> ${GITHUB_OUTPUT}
 
       - name: Create virtual disk for extended storage
+        id: disk
         run: |
-          mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
-          root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
-          sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+          # Get available space in exact GB
+          root_avail=$(df --block-size=1G / | tail -1 | awk '{print $4}')
+          root_size=$(( root_avail - 4 ))
+          [[ "${root_size}" -gt 0 ]] || { echo "Error: Insufficient space on /: ${root_avail}G available"; exit 1; }
+
           sudo truncate -s "${root_size}"G /root.img
-          sudo losetup /dev/loop6 /mnt/mnt.img
-          sudo losetup /dev/loop7 /root.img
-          sudo pvcreate /dev/loop6
-          sudo pvcreate /dev/loop7
-          sudo vgcreate github /dev/loop6 /dev/loop7
-          sudo lvcreate -n runner -l 100%FREE github
-          sudo mkfs.xfs -f -i sparse=0 -b size=4096 /dev/github/runner
+          build_dev=$(sudo losetup --find --show /root.img)
+          echo "Using /: ${root_size}G"
+
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 "${build_dev}"
           sudo mkdir -p /builder
-          sudo mount /dev/github/runner /builder
+          sudo mount "${build_dev}" /builder
           sudo chown -R runner:runner /builder
           df -Th
           echo "status=success" >> ${GITHUB_OUTPUT}
