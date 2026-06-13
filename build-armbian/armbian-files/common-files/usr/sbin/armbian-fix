@@ -16,7 +16,10 @@
 #
 #================================ Set default parameters ================================
 #
+# Suppress interactive prompts during package installation
 export DEBIAN_FRONTEND=noninteractive
+# Configuration values for the armbian-firstrun service, true  = delete + generate host keys
+export OPENSSHD_REGENERATE_HOST_KEYS=true
 
 # Set the armbian release check file
 armbian_release_file="/etc/armbian-release"

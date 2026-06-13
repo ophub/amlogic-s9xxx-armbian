@@ -1176,6 +1176,13 @@ refactor_rootfs() {
     # Add tasks that need to be executed on initial startup
     armbian_firstrun="usr/lib/armbian/armbian-firstrun"
     [[ -f "${armbian_firstrun}" ]] && sed -i '/\/etc\/armbian-release/i\[[ -x "/usr/sbin/armbian-fix" ]] && . /usr/sbin/armbian-fix' ${armbian_firstrun}
+    # Configuration values for the armbian-firstrun service, true  = delete + generate host keys
+    etc_firstrun="etc/default/armbian-firstrun"
+    if [[ -f "${etc_firstrun}" ]] && grep -q "^OPENSSHD_REGENERATE_HOST_KEYS" "${etc_firstrun}"; then
+        sed -i "s|^OPENSSHD_REGENERATE_HOST_KEYS=.*|OPENSSHD_REGENERATE_HOST_KEYS=true|" "${etc_firstrun}"
+    else
+        echo "OPENSSHD_REGENERATE_HOST_KEYS=true" >>"${etc_firstrun}"
+    fi
 
     # Improve systemd startup speed, avoid timeout waiting
     armbian_firstlogin="usr/lib/armbian/armbian-firstlogin"
