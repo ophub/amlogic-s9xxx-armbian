@@ -61,7 +61,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
 
-    name: build-docker-${{ matrix.branch }}
+    name: build-docker:${{ matrix.branch }}
 
     steps:
       - name: Checkout
