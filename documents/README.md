@@ -92,6 +92,8 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
         - [12.11.2.2 How to use cm9vdA's u-boot building script](#121122-how-to-use-cm9vdas-u-boot-building-script)
     - [12.12 Error in Memory Size Recognition](#1212-error-in-memory-size-recognition)
     - [12.13 How to Decompile dtb Files](#1213-how-to-decompile-dtb-files)
+      - [12.13.1 Directly Decompile dtb Files](#12131-directly-decompile-dtb-files)
+      - [12.13.2 Export Full-State DTS from a Running Device (Recommended)](#12132-export-full-state-dts-from-a-running-device-recommended)
     - [12.14 How to Modify cmdline Settings](#1214-how-to-modify-cmdline-settings)
     - [12.15 How to Add New Supported Devices](#1215-how-to-add-new-supported-devices)
       - [12.15.1 Add Device Configuration File](#12151-add-device-configuration-file)
@@ -1483,7 +1485,9 @@ Do not manually copy the u-boot file for any other purpose. Incorrect u-boot fil
 
 ### 12.13 How to Decompile dtb Files
 
-Some new devices are not currently supported (or have hardware variants). Try adjusting related parameters by decompiling the dtb file.
+#### 12.13.1 Directly Decompile dtb Files
+
+You can directly decompile existing dtb files and adapt by adjusting related parameters.
 
 ```shell
 # Install dependencies
@@ -1498,11 +1502,19 @@ dtc -I dts -O dtb -o xxx.dtb xxx.dts
 
 # 3. Save data and reboot
 sync && reboot
-
-# 4. [Optional action] Perform testing based on requirements
-# e.g., reinstall for testing when addressing the issue mentioned in 12.16
-armbian-install
 ```
+
+#### 12.13.2 Export Full-State DTS from a Running Device (Recommended)
+
+During the adaptation and maintenance of certain devices, we may only have access to the compiled binary device tree file (.dtb), while the corresponding kernel source code (.dts) is unavailable. In such cases, it is recommended to run the following command on a properly functioning Armbian system to directly decompile and export the currently active device tree from the kernel runtime environment:
+
+```shell
+dtc -I fs -O dts /sys/firmware/devicetree/base > my_runtime.dts
+```
+
+This command extracts device tree data directly from kernel memory, producing a more accurate and complete text output than simply decompiling the static .dtb file on disk. This is because the bootloader (such as U-Boot) or system firmware dynamically modifies or injects the device tree based on actual hardware detection results during the boot phase (for example: updating bootargs boot parameters in real time, dynamically toggling the status of specific peripherals, or adjusting reg register addresses). Decompiling the static file on disk directly will not capture these runtime changes.
+
+The Runtime device tree obtained through this method represents the final applied form used by the kernel, accurately reflecting the actual topology and operational state of the hardware at the system's low level. When referencing, fixing, or re-adapting the .dts source code for the device, this file is of great reference value, making conflict troubleshooting and peripheral configuration completion more accurate and efficient.
 
 ### 12.14 How to Modify cmdline Settings
 
