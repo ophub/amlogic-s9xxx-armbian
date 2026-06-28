@@ -108,6 +108,7 @@ on:
           - orangepi-3b
           - orangepi-5-plus
           - orangepi-5-pro
+          - orangepi-5-ultra
           - orangepi-5b
           - orangepi-zero3
           - painet-p3
