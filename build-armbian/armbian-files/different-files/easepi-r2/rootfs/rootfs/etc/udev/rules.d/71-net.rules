@@ -1,0 +1,2 @@
+# 4G modem - match by rndis_host driver
+SUBSYSTEM=="net", ACTION=="add", SUBSYSTEMS=="usb", DRIVERS=="rndis_host", NAME:="4Gnet"
