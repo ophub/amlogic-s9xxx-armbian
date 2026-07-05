@@ -1,0 +1,7 @@
+# EasePi-R2 4x 2.5G Ethernet
+SUBSYSTEM=="net", ACTION=="add", KERNELS=="0004:41:00.0", NAME:="eth0"
+SUBSYSTEM=="net", ACTION=="add", KERNELS=="0002:21:00.0", NAME:="eth1"
+SUBSYSTEM=="net", ACTION=="add", KERNELS=="0001:11:00.0", NAME:="eth2"
+SUBSYSTEM=="net", ACTION=="add", KERNELS=="0003:31:00.0", NAME:="eth3"
+# 4G modem - match by rndis_host driver
+SUBSYSTEM=="net", ACTION=="add", SUBSYSTEMS=="usb", DRIVERS=="rndis_host", NAME:="4Gnet"

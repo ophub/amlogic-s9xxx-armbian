@@ -1,0 +1,10 @@
+#!/bin/bash
+
+IFACE="$1"
+ACTION="$2"
+
+if [[ "$IFACE" =~ ^eth[0-3]$ ]]; then
+    /usr/local/bin/set_default_gateway.sh "$IFACE" "$ACTION"
+fi
+
+exit 0

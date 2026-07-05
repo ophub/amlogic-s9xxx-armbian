@@ -1,0 +1,13 @@
+[Unit]
+Description=Set Ethernet interfaces as default gateway with priority
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/set_default_gateway.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[Unit]
+Description=fnOS Kernel Boot Repair Service
+After=local-fs.target systemd-modules-load.service
+ConditionPathExists=/usr/local/fix/fix-kernel-boot.sh
+ConditionPathExists=/boot/vmlinuz-6.18.18.c821-trim
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/fix/fix-kernel-boot.sh --auto
+TimeoutStartSec=300
+StandardOutput=journal+console
+StandardError=journal+console
+
+[Install]
+WantedBy=multi-user.target
