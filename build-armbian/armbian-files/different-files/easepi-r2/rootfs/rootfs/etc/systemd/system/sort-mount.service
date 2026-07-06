@@ -1,0 +1,12 @@
+[Unit]
+Description=Bind mount injected sort JS over original
+After=network.target
+Before=sort-sync-access.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/sync_sort.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

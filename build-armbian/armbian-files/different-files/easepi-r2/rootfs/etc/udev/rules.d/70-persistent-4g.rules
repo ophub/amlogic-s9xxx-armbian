@@ -1,3 +1,0 @@
-# EasePi-R2 4G模块网络接口命名
-# 将USB 4G模块(RNDIS)重命名为4Gnet
-SUBSYSTEM=="net", ACTION=="add", SUBSYSTEMS=="usb", DRIVERS=="rndis_host", NAME="4Gnet"

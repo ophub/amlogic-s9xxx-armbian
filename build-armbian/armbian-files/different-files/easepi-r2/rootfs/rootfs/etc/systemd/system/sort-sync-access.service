@@ -1,0 +1,15 @@
+[Unit]
+Description=On-demand sort cache trigger via nginx access log monitoring
+After=network.target nginx.service
+Wants=nginx.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/sort_sync_access.sh
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

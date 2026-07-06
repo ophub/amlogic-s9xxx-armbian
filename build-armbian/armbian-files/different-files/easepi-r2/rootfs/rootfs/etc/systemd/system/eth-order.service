@@ -1,0 +1,16 @@
+[Unit]
+Description=EasePi Ethernet Interface Order
+# This service ONLY implements the mechanism to reorder interfaces.
+# Desired interface naming and order is defined by device-specific config:
+#   - eth_order file or device tree property
+#   - udev rules for special devices
+
+After=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/eth-order.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sysinit.target
