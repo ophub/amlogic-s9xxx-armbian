@@ -16,7 +16,7 @@
 LOG=/var/log/sort_sync.log
 ASSETS_DIR=/usr/trim/www/assets
 INJECTED_SRC=/usr/local/share/injected_Setting.js
-HASH_FILE=/var/cache/sort_inject_hash
+INJECTED_VER=/var/cache/sort_inject_version
 MAX_RETRY=5
 RETRY_DELAY=3
 
@@ -38,7 +38,6 @@ if [ -f "$LOG" ]; then
     fi
 fi
 
-OLD="sort((e,t)=>e.index-t.index)"
 SORT_MARKER="eth0\",\"eth1\",\"eth2\",\"eth3\",\"wlan0\",\"4Gnet"
 
 # Check if the bind mount is broken (target has 0 links - file was replaced)
@@ -73,25 +72,33 @@ for attempt in $(seq 1 $MAX_RETRY); do
         log "detected broken bind mount, unmounted"
     fi
 
-    # Check if the injected source file is already valid
-    if [ -f "$INJECTED_SRC" ] && grep -qF "$SORT_MARKER" "$INJECTED_SRC" 2>/dev/null; then
-        if mount | grep -qF "$JS_FILE"; then
-            if grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-                log "bind mount active and valid, skipping"
-                exit 0
-            fi
-            umount "$JS_FILE" 2>/dev/null
-            log "bind mount had wrong content, re-mounting"
-        fi
-        mount --bind "$INJECTED_SRC" "$JS_FILE" 2>/dev/null
-        if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-            log "bind mount re-established"
-            exit 0
-        fi
-        log "bind mount failed, will regenerate"
-    fi
+    # Check if the injected source file is already valid AND matches current JS version
+	if [ -f "$INJECTED_SRC" ] && grep -qF "$SORT_MARKER" "$INJECTED_SRC" 2>/dev/null; then
+	    # Check version: if JS file name changed, regenerate instead of reusing old injection
+	    js_basename=$(basename "$JS_FILE")
+	    cached_ver=$(cat "$INJECTED_VER" 2>/dev/null)
+	    if [ "$cached_ver" != "$js_basename" ]; then
+	        log "JS version changed ($cached_ver -> $js_basename), will regenerate"
+	        rm -f "$INJECTED_SRC"
+	    else
+	        if mount | grep -qF "$JS_FILE"; then
+	            if grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
+	                log "bind mount active and valid, skipping"
+	                exit 0
+	            fi
+	            umount "$JS_FILE" 2>/dev/null
+	            log "bind mount had wrong content, re-mounting"
+	        fi
+	        mount --bind "$INJECTED_SRC" "$JS_FILE" 2>/dev/null
+	        if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
+	            log "bind mount re-established"
+	            exit 0
+	        fi
+	        log "bind mount failed, will regenerate"
+	    fi
+	fi
 
-    if ! grep -qF "$OLD" "$JS_FILE" 2>/dev/null; then
+    if ! python3 -c "import re; content=open('$JS_FILE').read(); print(1 if re.search(r'\.sort\(\(([^,]+),([^)]+)\)=>\1\.index-\2\.index\)', content) else 0)" | grep -q "1"; then
         if grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
             log "sort already present in source, creating bind mount source"
             cp "$JS_FILE" "$INJECTED_SRC"
@@ -116,7 +123,7 @@ for attempt in $(seq 1 $MAX_RETRY); do
         if grep -qF "$SORT_MARKER" "$INJECTED_SRC" 2>/dev/null; then
             mount --bind "$INJECTED_SRC" "$JS_FILE" 2>/dev/null
             if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-                md5sum "$INJECTED_SRC" 2>/dev/null | awk '{print $1}' > "$HASH_FILE"
+                echo "$js_basename" > "$INJECTED_VER"
                 log "sort injected and bind mounted: ${js_basename}"
                 exit 0
             else

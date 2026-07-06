@@ -1,11 +1,11 @@
 [Unit]
 Description=EasePi Ethernet Interface Order
-# This service ONLY implements the mechanism to reorder interfaces.
-# Desired interface naming and order is defined by device-specific config:
-#   - eth_order file or device tree property
-#   - udev rules for special devices
-
-After=systemd-udev-settle.service
+# Fallback mechanism: 71-net.rules (udev) is the authoritative source for
+# interface naming. This service runs only if /etc/eth_order or device-tree
+# eth_order exists, providing a secondary rename path.
+# NOTE: systemd-udev-settle.service is intentionally NOT used here —
+# it is deprecated and causes unnecessary boot delays. The eth-order.sh
+# script handles missing interfaces gracefully (2>/dev/null).
 
 [Service]
 Type=oneshot

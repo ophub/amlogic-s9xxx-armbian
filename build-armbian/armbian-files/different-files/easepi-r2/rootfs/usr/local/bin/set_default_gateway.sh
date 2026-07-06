@@ -49,6 +49,10 @@ set_interface_metric() {
     
     sleep 1
     
+    # NOTE: nmcli connection up is required for the route-metric change to take
+    # effect. If the connection is already active, this may cause a brief
+    # reconnection (< 1s). The early return above (metric already correct)
+    # prevents unnecessary calls.
     nmcli connection up "$connection_name" 2>/dev/null || true
     
     sleep 2
