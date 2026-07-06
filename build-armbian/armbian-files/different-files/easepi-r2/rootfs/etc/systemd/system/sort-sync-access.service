@@ -1,7 +1,7 @@
 [Unit]
 Description=On-demand sort cache trigger via nginx access log monitoring
-After=network.target nginx.service
-Wants=nginx.service
+After=network.target trim_nginx.service
+Wants=trim_nginx.service
 
 [Service]
 Type=simple

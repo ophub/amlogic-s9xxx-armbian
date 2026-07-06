@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import re
 
 def main():
     if len(sys.argv) != 3:
@@ -12,15 +13,15 @@ def main():
     with open(input_file, "r") as f:
         content = f.read()
     
-    old = "sort((e,t)=>e.index-t.index)"
-    new = 'sort((e,t)=>{const o=["eth0","eth1","eth2","eth3","wlan0","4Gnet"];return o.indexOf(e.name)-o.indexOf(t.name)})'
+    old_pattern = r'\.sort\(\(([^,]+),([^)]+)\)=>\1\.index-\2\.index\)'
+    new_sort = '.sort((e,t)=>{const o=["eth0","eth1","eth2","eth3","wlan0","4Gnet"];return o.indexOf(e.name)-o.indexOf(t.name)})'
     
-    content = content.replace(old, new)
+    content, count = re.subn(old_pattern, new_sort, content)
     
     with open(output_file, "w") as f:
         f.write(content)
     
-    print("Done")
+    print(f"Done, replaced {count} occurrences")
 
 if __name__ == "__main__":
     main()
