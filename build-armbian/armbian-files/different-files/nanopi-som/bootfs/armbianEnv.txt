@@ -1,0 +1,11 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3399-nanopi-som.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+overlay_prefix=rk3399
+overlays=
+extraargs=rw rootwait plymouth.enable=0
+extraboardargs=net.ifnames=0 max_loop=128
+docker_optimizations=on
