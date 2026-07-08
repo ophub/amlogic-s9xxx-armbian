@@ -110,6 +110,7 @@ on:
           - nanopi-m5
           - nanopi-r5c
           - nanopi-r5s
+          - nanopi-som
           - nsy-g16-plus
           - nsy-g68-plus
           - orangepi-3b
