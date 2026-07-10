@@ -94,7 +94,6 @@ on:
           - kylin3399
           - lckfb-tspi
           - lckfb-tspi-3m
-          - recomputer-rk3576-devkit
           - leez
           - lubancat-1
           - lubancat-2
@@ -125,6 +124,7 @@ on:
           - photonicat
           - r66s
           - r68s
+          - recomputer-rk3576-devkit
           - renegade-rk3328
           - rk3318-box
           - roceos-k40pro
