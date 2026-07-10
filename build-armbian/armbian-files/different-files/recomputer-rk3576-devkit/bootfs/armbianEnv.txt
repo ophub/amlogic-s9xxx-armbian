@@ -1,0 +1,7 @@
+verbosity=1
+bootlogo=false
+console=both
+overlay_prefix=seeed-rk3576
+fdtfile=rockchip/rk3576-recomputer-rk3576-devkit.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4

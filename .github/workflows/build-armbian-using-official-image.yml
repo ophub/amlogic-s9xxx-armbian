@@ -87,6 +87,7 @@ on:
           - kylin3399
           - lckfb-tspi
           - lckfb-tspi-3m
+          - recomputer-rk3576-devkit
           - leez
           - lubancat-1
           - lubancat-2
