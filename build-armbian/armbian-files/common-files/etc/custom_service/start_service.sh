@@ -82,6 +82,41 @@ if [[ "${FDTFILE}" == "rk3568-swan1-w28.dtb" ]]; then
     log_message "USB power control GPIOs set for Swan1-w28."
 fi
 
+# For rk3399-zysj board: release the on-board USB HUB reset
+if [[ "${FDTFILE}" == "rk3399-zysj.dtb" ]]; then
+    (
+        # The 5V rails (vcc-sys / vcc5v0-host / vbus-typec) are already driven high by
+        # their regulators, but the USB HUB reset line (usb-hub-res = gpio1.18) is left
+        # un-driven, so the HUB stays in reset and none of the expanded ports enumerate.
+        # Resolve the sysfs numbers from each gpiochip base, because newer kernels (6.18)
+        # allocate the base dynamically and gpio0 no longer starts at 0.
+        gpio1_base="" gpio4_base=""
+        for chip in /sys/class/gpio/gpiochip*; do
+            case "$(cat "${chip}/label" 2>/dev/null)" in
+            gpio1) gpio1_base="$(cat "${chip}/base" 2>/dev/null)" ;;
+            gpio4) gpio4_base="$(cat "${chip}/base" 2>/dev/null)" ;;
+            esac
+        done
+        if [[ -n "${gpio1_base}" && -n "${gpio4_base}" ]]; then
+            pwr_en="$((gpio4_base + 28))"  # gpio4.28, board GPIO note "156"
+            hub_rst="$((gpio1_base + 18))" # gpio1.18, usb-hub-res
+
+            # Assert the extra power enable.
+            echo "${pwr_en}" >/sys/class/gpio/export 2>/dev/null
+            echo "out" >"/sys/class/gpio/gpio${pwr_en}/direction" 2>/dev/null
+            echo "1" >"/sys/class/gpio/gpio${pwr_en}/value" 2>/dev/null
+
+            # Release the USB HUB reset (gpio1.18) with a short low->high pulse.
+            echo "${hub_rst}" >/sys/class/gpio/export 2>/dev/null
+            echo "out" >"/sys/class/gpio/gpio${hub_rst}/direction" 2>/dev/null
+            echo "0" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
+            sleep 1
+            echo "1" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
+        fi
+    ) &
+    log_message "USB HUB reset released for rk3399-zysj."
+fi
+
 # For smart-am60(rk3588)/orangepi-5b(rk3588s) board: Bluetooth control
 if [[ "${FDTFILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
     # This is a sequence of commands, with the last one running in the background.
