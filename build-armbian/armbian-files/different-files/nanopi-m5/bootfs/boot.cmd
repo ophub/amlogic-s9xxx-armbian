@@ -6,7 +6,7 @@
 setenv load_addr "0x48000000"
 setenv overlay_error "false"
 # default values
-setenv rootdev "/dev/mmcblk0p1"
+setenv rootdev "/dev/mmcblk0p2"
 setenv verbosity "1"
 setenv console "both"
 setenv bootlogo "false"

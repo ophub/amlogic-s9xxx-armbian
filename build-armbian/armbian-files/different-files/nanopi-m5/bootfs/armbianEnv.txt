@@ -1,7 +1,7 @@
-verbosity=1
-bootlogo=true
+verbosity=7
+bootlogo=false
 console=both
-overlay_prefix=rk35xx
+overlay_prefix=
 overlays=
 fdtfile=rockchip/rk3576-nanopi-m5.dtb
 rootdev=/dev/mmcblk0p2
