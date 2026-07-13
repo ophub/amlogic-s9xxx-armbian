@@ -135,7 +135,6 @@ launch_docker_container() {
             -v ${compile_path}:/opt/kernel/compile-kernel \
             -v ${ccache_path}:/root/.ccache \
             -v /etc/localtime:/etc/localtime:ro \
-            -v /etc/timezone:/etc/timezone:ro \
             -e CCACHE_DIR=/root/.ccache \
             --restart=no \
             ${docker_image}
