@@ -77,18 +77,18 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null
           sudo swapoff -a
           sudo rm -f /swapfile /mnt/swapfile
-          sudo -E apt-get -y update
-          sudo -E apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
-          sudo -E apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-build-armbian-depends)
-          sudo -E systemctl daemon-reload
-          #sudo -E apt-get -y full-upgrade
-          sudo -E apt-get -y autoremove --purge
-          sudo -E apt-get clean
+          sudo apt-get -y update
+          sudo apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+          sudo apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-build-armbian-depends)
+          sudo systemctl daemon-reload
+          #sudo apt-get -y full-upgrade
+          sudo apt-get -y autoremove --purge
+          sudo apt-get clean
           sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
           sudo rm -rf ~/{.cargo,.dotnet,.rustup}
-          sudo -E timedatectl set-timezone "${TZ:-Etc/UTC}"
-          sudo -E ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
-          sudo -E timedatectl set-ntp true
+          sudo timedatectl set-timezone "${TZ:-Etc/UTC}"
+          sudo ntpdate ntp.ubuntu.com 0.pool.ntp.org || true
+          sudo timedatectl set-ntp true
           date -u
           timedatectl status || true
           echo "status=success" >> ${GITHUB_OUTPUT}
