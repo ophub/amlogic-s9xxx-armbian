@@ -461,7 +461,7 @@ git_pull_dir() {
 
     # Copy the files to the storage directory
     mkdir -p "${git_path}"
-    cp -af --no-preserve=ownership "${git_tmp_path}/${git_dir}/." "${git_path}" ||
+    cp -af --update=none --no-preserve=ownership "${git_tmp_path}/${git_dir}/." "${git_path}" ||
         error_msg "Failed to move the [ ${git_dir} ] files to the [ ${git_path} ] directory."
 
     # Delete temporary files
