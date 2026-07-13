@@ -36,7 +36,7 @@ env:
 
 jobs:
   setup:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -52,7 +52,7 @@ jobs:
 
   build:
     needs: setup
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
     permissions:
       contents: write

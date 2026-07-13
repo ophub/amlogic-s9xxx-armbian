@@ -89,7 +89,7 @@ env:
 
 jobs:
   setup:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -105,7 +105,7 @@ jobs:
 
   build:
     needs: setup
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     if: ${{ github.event.repository.owner.id == github.event.sender.id }}
     permissions:
       contents: write
@@ -132,7 +132,7 @@ jobs:
           sudo rm -f /swapfile /mnt/swapfile
           sudo apt-get -y update
           sudo apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
-          sudo apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2404-build-armbian-depends)
+          sudo apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2604-build-armbian-depends)
           sudo systemctl daemon-reload
           #sudo apt-get -y full-upgrade
           sudo apt-get -y autoremove --purge
