@@ -502,12 +502,14 @@ docker rm -f armbian-trixie
 
 ### 9.3 如何自定义编译驱动模块
 
-Linux 主线内核中部分驱动尚未内置，可自行编译驱动模块。请选择支持主线内核的驱动，安卓驱动通常不兼容主线内核，无法编译。示例如下：
+Linux 主线内核中部分驱动尚未内置，可自行编译驱动模块。请选择支持主线内核的驱动，安卓驱动通常不兼容主线内核，无法编译。参考帖子 [如何编译 rtl8189fs 驱动模块](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3193)
+
+示例如下：
 
 ```shell
 # 第一步，更新最新内核
 # 由于早期的 header 文件不全，所以需要更新到最新的内核。
-# 各内核版本要求不低于 5.10.222, 5.15.163, 6.1.100, 6.6.41。
+# 各内核版本要求不低于 5.10.222, 5.15.163, 6.1.100, 6.6.41, 6.12, 6.18
 armbian-sync
 armbian-update -k 6.1
 
@@ -516,9 +518,9 @@ armbian-update -k 6.1
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
 # 下载编译工具
-wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 解压
-tar -Jxf arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
 armbian-kernel -u
 
@@ -529,7 +531,7 @@ cd ~/
 git clone https://github.com/jwrdegoede/rtl8189ES_linux
 cd rtl8189ES_linux
 # 设置编译环境
-gun_file="arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+gun_file="arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
 export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"

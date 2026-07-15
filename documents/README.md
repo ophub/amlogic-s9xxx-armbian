@@ -503,12 +503,14 @@ Before adding a custom kernel patch, compare it against the upstream kernel sour
 
 ### 9.3 How to Customize Compilation of Driver Modules
 
-Some drivers are not yet included in the mainline Linux kernel but can be compiled as custom modules. Only drivers compatible with the mainline kernel can be compiled; Android-specific drivers are generally unsupported. For example:
+Some drivers are not yet included in the mainline Linux kernel but can be compiled as custom modules. Only drivers compatible with the mainline kernel can be compiled; Android-specific drivers are generally unsupported. See the guide: [How to Compile the rtl8189fs Driver Module⁠](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3193)
+
+For example:
 
 ```shell
 # Step 1: Update to the latest kernel
 # Due to incomplete header files in earlier versions, it is necessary to update to the latest kernel version.
-# The requirement for each kernel version is not lower than 5.10.222, 5.15.163, 6.1.100, 6.6.41.
+# The requirement for each kernel version is not lower than 5.10.222, 5.15.163, 6.1.100, 6.6.41, 6.12, 6.18.
 armbian-sync
 armbian-update -k 6.1
 
@@ -517,9 +519,9 @@ armbian-update -k 6.1
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
 # Download the compilation tools
-wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # Extract
-tar -Jxf arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # Install additional compilation dependencies (optional; you can manually install missing components based on errors).
 armbian-kernel -u
 
@@ -530,7 +532,7 @@ cd ~/
 git clone https://github.com/jwrdegoede/rtl8189ES_linux
 cd rtl8189ES_linux
 # Set up the compilation environment
-gun_file="arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+gun_file="arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
 export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"

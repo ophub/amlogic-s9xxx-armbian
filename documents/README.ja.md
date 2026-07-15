@@ -502,12 +502,14 @@ Ubuntu、Debian、Armbian システムでのカーネルコンパイルをサポ
 
 ### 9.3 カスタムドライバモジュールのコンパイル方法
 
-Linux メインラインカーネルには一部のドライバがまだ内蔵されていないため、自分でドライバモジュールをコンパイルできます。メインラインカーネルをサポートするドライバを選択してください。Android ドライバは通常メインラインカーネルと互換性がなく、コンパイルできません。例は以下の通りです：
+Linux メインラインカーネルには一部のドライバがまだ内蔵されていないため、自分でドライバモジュールをコンパイルできます。メインラインカーネルをサポートするドライバを選択してください。Android ドライバは通常メインラインカーネルと互換性がなく、コンパイルできません。投稿 [rtl8189fs ドライバーモジュールのコンパイル方法⁠⁠](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3193) を参照してください。
+
+例は以下の通りです：
 
 ```shell
 # ステップ1：最新カーネルに更新
 # 初期の header ファイルが不完全なため、最新のカーネルに更新する必要があります。
-# 各カーネルバージョンの要件：5.10.222, 5.15.163, 6.1.100, 6.6.41 以上
+# 各カーネルバージョンの要件：5.10.222, 5.15.163, 6.1.100, 6.6.41, 6.12, 6.18 以上
 armbian-sync
 armbian-update -k 6.1
 
@@ -516,9 +518,9 @@ armbian-update -k 6.1
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
 # コンパイルツールのダウンロード
-wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 解凍
-tar -Jxf arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # その他のコンパイル依存パッケージのインストール（オプション、エラーメッセージに応じて不足分を手動インストール可能）
 armbian-kernel -u
 
@@ -529,7 +531,7 @@ cd ~/
 git clone https://github.com/jwrdegoede/rtl8189ES_linux
 cd rtl8189ES_linux
 # コンパイル環境の設定
-gun_file="arm-gnu-toolchain-14.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+gun_file="arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
 toolchain_path="/usr/local/toolchain"
 toolchain_name="gcc"
 export CROSS_COMPILE="${toolchain_path}/${gun_file//.tar.xz/}/bin/aarch64-none-linux-gnu-"
