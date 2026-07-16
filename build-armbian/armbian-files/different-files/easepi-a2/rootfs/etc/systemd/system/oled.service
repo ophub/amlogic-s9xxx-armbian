@@ -1,12 +1,12 @@
 [Unit]
 Description=EasePi A2 OLED Display (Go)
-After=network.target
+After=network.target systemd-modules-load.service
 StartLimitIntervalSec=0
 ConditionPathExists=/dev/i2c-3
 
 [Service]
 Type=simple
-ExecStart=/usr/local/oled/oled --silent
+ExecStart=/usr/local/oled/oled
 Restart=always
 RestartSec=3
 

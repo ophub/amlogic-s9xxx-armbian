@@ -54,7 +54,7 @@ is_bind_mount_broken() {
 }
 
 for attempt in $(seq 1 $MAX_RETRY); do
-    JS_FILE=$(find "$ASSETS_DIR" -maxdepth 1 -name "Setting-*.js" 2>/dev/null | head -1)
+    JS_FILE=$(find "$ASSETS_DIR" -maxdepth 1 -name "Setting-*.js" 2>/dev/null | xargs ls -t 2>/dev/null | head -1)
 
     if [ -z "$JS_FILE" ]; then
         sleep "$RETRY_DELAY"
@@ -78,8 +78,9 @@ for attempt in $(seq 1 $MAX_RETRY); do
 	    js_basename=$(basename "$JS_FILE")
 	    cached_ver=$(cat "$INJECTED_VER" 2>/dev/null)
 	    if [ "$cached_ver" != "$js_basename" ]; then
-	        log "JS version changed ($cached_ver -> $js_basename), will regenerate"
-	        rm -f "$INJECTED_SRC"
+                log "JS version changed ($cached_ver -> $js_basename), will regenerate"
+                chattr -i "$INJECTED_SRC" 2>/dev/null
+                rm -f "$INJECTED_SRC"
 	    else
 	        if mount | grep -qF "$JS_FILE"; then
 	            if grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
@@ -90,8 +91,9 @@ for attempt in $(seq 1 $MAX_RETRY); do
 	            log "bind mount had wrong content, re-mounting"
 	        fi
 	        mount --bind "$INJECTED_SRC" "$JS_FILE" 2>/dev/null
-	        if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-	            log "bind mount re-established"
+                if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
+                    chattr +i "$INJECTED_SRC" 2>/dev/null
+                    log "bind mount re-established"
 	            exit 0
 	        fi
 	        log "bind mount failed, will regenerate"
@@ -100,12 +102,14 @@ for attempt in $(seq 1 $MAX_RETRY); do
 
     if ! python3 -c "import re; content=open('$JS_FILE').read(); print(1 if re.search(r'\.sort\(\(([^,]+),([^)]+)\)=>\1\.index-\2\.index\)', content) else 0)" | grep -q "1"; then
         if grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-            log "sort already present in source, creating bind mount source"
-            cp "$JS_FILE" "$INJECTED_SRC"
-            chown root:root "$INJECTED_SRC"
-            chmod 644 "$INJECTED_SRC"
-            mount --bind "$INJECTED_SRC" "$JS_FILE"
-            log "bind mount created from already-injected source"
+                log "sort already present in source, creating bind mount source"
+                chattr -i "$INJECTED_SRC" 2>/dev/null
+                cp "$JS_FILE" "$INJECTED_SRC"
+                chown root:root "$INJECTED_SRC"
+                chmod 644 "$INJECTED_SRC"
+                mount --bind "$INJECTED_SRC" "$JS_FILE"
+                chattr +i "$INJECTED_SRC" 2>/dev/null
+                log "bind mount created from already-injected source"
             exit 0
         fi
         log "target pattern not found in source JS (version changed?): $(basename "$JS_FILE")"
@@ -116,15 +120,17 @@ for attempt in $(seq 1 $MAX_RETRY); do
     log "generating injected JS: ${js_basename}"
 
     if /usr/local/bin/sort_inject.py "$JS_FILE" "$INJECTED_SRC.tmp" 2>/dev/null; then
-        mv "$INJECTED_SRC.tmp" "$INJECTED_SRC"
+            chattr -i "$INJECTED_SRC" 2>/dev/null
+            mv "$INJECTED_SRC.tmp" "$INJECTED_SRC"
         chown root:root "$INJECTED_SRC"
         chmod 644 "$INJECTED_SRC"
 
         if grep -qF "$SORT_MARKER" "$INJECTED_SRC" 2>/dev/null; then
             mount --bind "$INJECTED_SRC" "$JS_FILE" 2>/dev/null
             if mount | grep -qF "$JS_FILE" && grep -qF "$SORT_MARKER" "$JS_FILE" 2>/dev/null; then
-                echo "$js_basename" > "$INJECTED_VER"
-                log "sort injected and bind mounted: ${js_basename}"
+                    echo "$js_basename" > "$INJECTED_VER"
+                    chattr +i "$INJECTED_SRC" 2>/dev/null
+                    log "sort injected and bind mounted: ${js_basename}"
                 exit 0
             else
                 log "bind mount failed after injection: ${js_basename}"

@@ -12,8 +12,6 @@
 # By default this script does nothing.
 
 [[ -x "/etc/custom_service/start_service.sh" ]] && bash /etc/custom_service/start_service.sh &
-# oled初始化命令
-bash /usr/local/oled/oled_init.sh >/dev/null 2>&1 &
 # ir初始化命令
 #bash /usr/local/ir/fix_infrared.sh >/dev/null 2>&1 &
 
