@@ -1,0 +1,10 @@
+verbosity=1
+bootlogo=false
+fdtfile=rockchip/rk3528-x88pro13.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
+rootflags=rw,errors=remount-ro
+extraargs=rw rootwait
+console=both
+consoleargs=console=ttyS2,1500000
+overlay_prefix=rk35xx
