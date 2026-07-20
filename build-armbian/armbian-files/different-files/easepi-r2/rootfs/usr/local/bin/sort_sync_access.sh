@@ -38,7 +38,10 @@ tail -F "$ACCESS_LOG" 2>/dev/null | while read -r line; do
     if [ -f "$COOLDOWN_FILE" ]; then
         last_run=$(cat "$COOLDOWN_FILE" 2>/dev/null)
         now=$(date +%s)
-        if [ -n "$last_run" ] && [ $((now - last_run)) -lt $COOLDOWN_SECS ] 2>/dev/null; then
+        # Reset cooldown if timestamp is in the future (system time jump)
+        if [ -n "$last_run" ] && [ "$last_run" -gt "$now" ] 2>/dev/null; then
+            rm -f "$COOLDOWN_FILE"
+        elif [ -n "$last_run" ] && [ $((now - last_run)) -lt $COOLDOWN_SECS ] 2>/dev/null; then
             continue
         fi
     fi

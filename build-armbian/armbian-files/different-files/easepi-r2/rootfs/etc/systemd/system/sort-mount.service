@@ -1,6 +1,6 @@
 [Unit]
 Description=Bind mount injected sort JS over original
-After=network.target
+After=network.target trim_main.service trim_file_monitor.service
 Before=sort-sync-access.service
 
 [Service]
