@@ -12,5 +12,5 @@ docker_optimizations=on
 extraargs=rw rootwait
 extraboardargs=net.ifnames=0 max_loop=128
 overlay_prefix=rk3588
-overlays=uart7-m2
+overlays=
 user_overlays=
