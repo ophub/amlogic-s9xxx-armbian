@@ -1,0 +1,144 @@
+#!/bin/bash
+#==========================================================================
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Description: Front-panel LED/VFD display control for Amlogic boxes whose
+#              device tree binds the panel via the tm1628/fd628 (spi-gpio)
+#              binding, which the legacy openvfd path cannot drive on
+#              mainline (6.x) kernels.
+#
+# Builds and DKMS-installs Jeff Lessard's tm16xx driver
+# (https://github.com/jefflessard/tm16xx-display), which binds to the
+# existing device-tree node (compatible "fdhisi,fd628"/"titanmec,tm1628")
+# with no DTB changes, then enables the clock/status display-service.
+#
+# Commands:
+#   armbian-tm16xx install   Build + DKMS-install the driver, enable at boot
+#   armbian-tm16xx status    Show driver/service/display state
+#   armbian-tm16xx remove     Disable and uninstall
+#==========================================================================
+
+set -o pipefail
+
+TM_REPO="https://github.com/jefflessard/tm16xx-display"
+PKG="tm16xx"
+PKG_VER="1.0"
+DKMS_SRC="/usr/src/${PKG}-${PKG_VER}"
+KVER="$(uname -r)"
+
+STEPS="[\033[95m STEPS \033[0m]"
+INFO="[\033[94m INFO \033[0m]"
+SUCCESS="[\033[92m SUCCESS \033[0m]"
+ERROR="[\033[91m ERROR \033[0m]"
+
+error_msg() { echo -e "${ERROR} ${1}"; exit 1; }
+[[ "$(id -u)" -eq 0 ]] || error_msg "Please run as root (sudo)."
+
+do_install() {
+    echo -e "${STEPS} Installing tm16xx front-panel driver..."
+
+    # Dependencies
+    for pkg in git dkms build-essential; do
+        dpkg -l "${pkg}" >/dev/null 2>&1 || { apt-get update -qq; apt-get install -y "${pkg}"; }
+    done
+    [[ -d "/lib/modules/${KVER}/build" ]] || \
+        error_msg "Kernel headers for ${KVER} not found. Install them (armbian-config -> headers) and retry."
+
+    # Fetch sources
+    local tmp; tmp="$(mktemp -d)"
+    echo -e "${INFO} Cloning ${TM_REPO}"
+    git clone --depth 1 "${TM_REPO}" "${tmp}/tm16xx-display" || error_msg "git clone failed"
+    local src="${tmp}/tm16xx-display/drivers/auxdisplay"
+
+    # Stage a self-contained DKMS tree (keypad omitted; only linedisp + tm16xx objs)
+    echo -e "${INFO} Staging DKMS source at ${DKMS_SRC}"
+    rm -rf "${DKMS_SRC}"; mkdir -p "${DKMS_SRC}/include"
+    cp "${src}"/line-display.c "${src}"/line-display.h "${src}"/tm16xx.h \
+       "${src}"/tm16xx_compat.h "${src}"/tm16xx_core.c "${src}"/tm16xx_spi.c \
+       "${src}"/tm16xx_i2c.c "${DKMS_SRC}/"
+    cp -r "${tmp}/tm16xx-display/include/." "${DKMS_SRC}/include/"
+
+    cat > "${DKMS_SRC}/Makefile" <<'MK'
+# Kbuild for out-of-tree tm16xx (keypad omitted; only the objects we ship)
+ccflags-y += -DCONFIG_TM16XX -DCONFIG_TM16XX_I2C -DCONFIG_TM16XX_SPI
+ccflags-y += -include $(src)/tm16xx_compat.h -I$(src)/include
+obj-m += line-display.o
+obj-m += tm16xx.o
+tm16xx-y := tm16xx_core.o
+obj-m += tm16xx_spi.o
+obj-m += tm16xx_i2c.o
+MK
+
+    cat > "${DKMS_SRC}/dkms.conf" <<DK
+PACKAGE_NAME="${PKG}"
+PACKAGE_VERSION="${PKG_VER}"
+AUTOINSTALL="yes"
+BUILT_MODULE_NAME[0]="line-display"
+DEST_MODULE_LOCATION[0]="/updates"
+BUILT_MODULE_NAME[1]="tm16xx"
+DEST_MODULE_LOCATION[1]="/updates"
+BUILT_MODULE_NAME[2]="tm16xx_spi"
+DEST_MODULE_LOCATION[2]="/updates"
+BUILT_MODULE_NAME[3]="tm16xx_i2c"
+DEST_MODULE_LOCATION[3]="/updates"
+MAKE[0]="make -C /lib/modules/\${kernelver}/build M=\${dkms_tree}/\${PACKAGE_NAME}/\${PACKAGE_VERSION}/build modules"
+CLEAN="make -C /lib/modules/\${kernelver}/build M=\${dkms_tree}/\${PACKAGE_NAME}/\${PACKAGE_VERSION}/build clean"
+DK
+
+    # Build + install via DKMS
+    echo -e "${INFO} Building with DKMS"
+    dkms add -m "${PKG}" -v "${PKG_VER}" 2>/dev/null
+    dkms build -m "${PKG}" -v "${PKG_VER}" --force || error_msg "dkms build failed"
+    dkms install -m "${PKG}" -v "${PKG_VER}" --force || error_msg "dkms install failed"
+
+    # Force-load at boot: the device modalias (spi:fd628) does not match the
+    # module's spi alias, so coldplug won't auto-load it; bind via OF-compat once loaded.
+    echo "tm16xx_spi" > /etc/modules-load.d/tm16xx.conf
+    modprobe tm16xx_spi 2>/dev/null
+
+    # Clock / status daemon (shipped by the upstream repo)
+    if [[ -f "${tmp}/tm16xx-display/display-service" ]]; then
+        install -m 0755 "${tmp}/tm16xx-display/display-service" /usr/sbin/display-service
+        install -m 0644 "${tmp}/tm16xx-display/display.service" /lib/systemd/system/display.service
+        systemctl daemon-reload
+        systemctl enable --now display.service 2>/dev/null
+    fi
+
+    rm -rf "${tmp}"
+    sleep 1
+    if [[ -d /sys/class/leds/display ]]; then
+        echo -e "${SUCCESS} tm16xx installed; front-panel display enabled."
+    else
+        error_msg "Driver installed but /sys/class/leds/display did not appear — check 'dmesg' and the DTB panel node."
+    fi
+}
+
+do_status() {
+    echo -e "${INFO} dkms:    $(dkms status ${PKG} 2>/dev/null || echo 'not registered')"
+    echo -e "${INFO} spi bind: $(for d in /sys/bus/spi/devices/*; do basename "$(readlink "$d/driver" 2>/dev/null)" 2>/dev/null; done | grep -m1 tm16xx || echo 'none')"
+    echo -e "${INFO} service: $(systemctl is-active display 2>/dev/null)"
+    echo -e "${INFO} display: $([[ -d /sys/class/leds/display ]] && echo present || echo absent)"
+}
+
+do_remove() {
+    echo -e "${STEPS} Removing tm16xx front-panel driver..."
+    systemctl disable --now display.service 2>/dev/null
+    rm -f /usr/sbin/display-service /lib/systemd/system/display.service /etc/modules-load.d/tm16xx.conf
+    rmmod tm16xx_spi tm16xx_i2c tm16xx line-display 2>/dev/null
+    dkms remove -m "${PKG}" -v "${PKG_VER}" --all 2>/dev/null
+    rm -rf "${DKMS_SRC}"
+    systemctl daemon-reload
+    echo -e "${SUCCESS} Removed."
+}
+
+case "${1}" in
+    install) do_install ;;
+    status)  do_status ;;
+    remove)  do_remove ;;
+    *) echo "Usage: armbian-tm16xx {install|status|remove}"; exit 1 ;;
+esac
