@@ -6,13 +6,13 @@
 setenv load_addr "0x9000000"
 setenv overlay_error "false"
 # default values
-setenv rootdev "/dev/mmcblk0p1"
-setenv verbosity "1"
-setenv console "both"
-setenv bootlogo "false"
+setenv rootdev "/dev/mmcblk0p2"
 setenv rootfstype "ext4"
 setenv docker_optimizations "on"
 setenv earlycon "off"
+
+# workaround: armbianEnv.txt may use Rootdev (capital R) instead of rootdev
+if test "${Rootdev}" != ""; then setenv rootdev "${Rootdev}"; fi
 
 echo "Boot script loaded from ${devtype} ${devnum}"
 

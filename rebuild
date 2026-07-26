@@ -78,7 +78,7 @@ board_release_file="etc/armbian-board-release.conf"
 ophub_release_file="etc/ophub-release"
 
 # U-BOOT files download repository
-uboot_repo="https://github.com/ophub/u-boot"
+uboot_repo="https://github.com/kemp233/u-boot"
 # Firmware files download repository
 firmware_repo="https://github.com/ophub/firmware"
 
@@ -800,6 +800,8 @@ make_image() {
     # Write the specific bootloader for [ Rockchip ] boxes
     [[ "${PLATFORM}" == "rockchip" ]] && {
         bootloader_path="${uboot_path}/${PLATFORM}/${board}"
+        # LB2004 uses MD1000's bootloader (MD1000 idbloader works on LB2004 hardware, lb2004 idbloader does not)
+        [[ "${board}" == "lb2004" ]] && bootloader_path="${uboot_path}/${PLATFORM}/md1000"
         if [[ -n "${BOOTLOADER_IMG}" && -f "${bootloader_path}/${BOOTLOADER_IMG}" ]] &&
             [[ -n "${MAINLINE_UBOOT}" && -f "${bootloader_path}/${MAINLINE_UBOOT}" ]] &&
             [[ -n "${TRUST_IMG}" && -f "${bootloader_path}/${TRUST_IMG}" ]]; then

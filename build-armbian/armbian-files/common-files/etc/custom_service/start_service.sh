@@ -64,93 +64,76 @@ else
 fi
 log_message "Adjusted the rknpu module in the system module load list."
 
-# For Tencent Aurora 3Pro (s905x3-b) box: Load Bluetooth module
-if [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
-    grep -q -x "btmtksdio" "${ophub_load_conf}" 2>/dev/null || echo "btmtksdio" >>"${ophub_load_conf}"
-    log_message "Attempted to load btmtksdio module for Tencent-Aurora-3Pro."
-fi
+# [DISABLED for LB2004] For Tencent Aurora 3Pro (s905x3-b) box
+# if [[ "${FDTFILE}" == "meson-sm1-skyworth-lb2004-a4091.dtb" ]]; then
+#     grep -q -x "btmtksdio" "${ophub_load_conf}" 2>/dev/null || echo "btmtksdio" >>"${ophub_load_conf}"
+#     log_message "Attempted to load btmtksdio module for Tencent-Aurora-3Pro."
+# fi
 
-# For swan1-w28(rk3568) board: USB power and switch control
-if [[ "${FDTFILE}" == "rk3568-swan1-w28.dtb" ]]; then
-    (
-        # GPIO operations are critical, but we also add error suppression.
-        gpioset 0 21=1 >/dev/null 2>&1
-        gpioset 3 20=1 >/dev/null 2>&1
-        gpioset 4 21=1 >/dev/null 2>&1
-        gpioset 4 22=1 >/dev/null 2>&1
-    ) &
-    log_message "USB power control GPIOs set for Swan1-w28."
-fi
+# [DISABLED for LB2004] For swan1-w28(rk3568) board: USB power and switch control
+# if [[ "${FDTFILE}" == "rk3568-swan1-w28.dtb" ]]; then
+#     (
+#         gpioset 0 21=1 >/dev/null 2>&1
+#         gpioset 3 20=1 >/dev/null 2>&1
+#         gpioset 4 21=1 >/dev/null 2>&1
+#         gpioset 4 22=1 >/dev/null 2>&1
+#     ) &
+#     log_message "USB power control GPIOs set for Swan1-w28."
+# fi
 
-# For rk3399-zysj board: release the on-board USB HUB reset
-if [[ "${FDTFILE}" == "rk3399-zysj.dtb" ]]; then
-    (
-        # The 5V rails (vcc-sys / vcc5v0-host / vbus-typec) are already driven high by
-        # their regulators, but the USB HUB reset line (usb-hub-res = gpio1.18) is left
-        # un-driven, so the HUB stays in reset and none of the expanded ports enumerate.
-        # Resolve the sysfs numbers from each gpiochip base, because newer kernels (6.18)
-        # allocate the base dynamically and gpio0 no longer starts at 0.
-        gpio1_base="" gpio4_base=""
-        for chip in /sys/class/gpio/gpiochip*; do
-            case "$(cat "${chip}/label" 2>/dev/null)" in
-            gpio1) gpio1_base="$(cat "${chip}/base" 2>/dev/null)" ;;
-            gpio4) gpio4_base="$(cat "${chip}/base" 2>/dev/null)" ;;
-            esac
-        done
-        if [[ -n "${gpio1_base}" && -n "${gpio4_base}" ]]; then
-            pwr_en="$((gpio4_base + 28))"  # gpio4.28, board GPIO note "156"
-            hub_rst="$((gpio1_base + 18))" # gpio1.18, usb-hub-res
+# [DISABLED for LB2004] For rk3399-zysj board: release the on-board USB HUB reset
+# if [[ "${FDTFILE}" == "rk3399-zysj.dtb" ]]; then
+#     (
+#         gpio1_base="" gpio4_base=""
+#         for chip in /sys/class/gpio/gpiochip*; do
+#             case "$(cat "${chip}/label" 2>/dev/null)" in
+#             gpio1) gpio1_base="$(cat "${chip}/base" 2>/dev/null)" ;;
+#             gpio4) gpio4_base="$(cat "${chip}/base" 2>/dev/null)" ;;
+#             esac
+#         done
+#         if [[ -n "${gpio1_base}" && -n "${gpio4_base}" ]]; then
+#             pwr_en="$((gpio4_base + 28))"  # gpio4.28
+#             hub_rst="$((gpio1_base + 18))" # gpio1.18
+#             echo "${pwr_en}" >/sys/class/gpio/export 2>/dev/null
+#             echo "out" >"/sys/class/gpio/gpio${pwr_en}/direction" 2>/dev/null
+#             echo "1" >"/sys/class/gpio/gpio${pwr_en}/value" 2>/dev/null
+#             echo "${hub_rst}" >/sys/class/gpio/export 2>/dev/null
+#             echo "out" >"/sys/class/gpio/gpio${hub_rst}/direction" 2>/dev/null
+#             echo "0" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
+#             sleep 1
+#             echo "1" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
+# fi
+#     ) &
+#     log_message "USB HUB reset released for rk3399-zysj."
+# fi
 
-            # Assert the extra power enable.
-            echo "${pwr_en}" >/sys/class/gpio/export 2>/dev/null
-            echo "out" >"/sys/class/gpio/gpio${pwr_en}/direction" 2>/dev/null
-            echo "1" >"/sys/class/gpio/gpio${pwr_en}/value" 2>/dev/null
+# [DISABLED for LB2004] For smart-am60(rk3588)/orangepi-5b(rk3588s) board: Bluetooth control
+# if [[ "${FDTFILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
+#     (
+#         rfkill block all
+#         chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 >/dev/null 2>&1
+#         sleep 2
+#         rfkill unblock all
+#         /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6275p/BCM4362A2.hcd /dev/ttyS9 &
+#     ) &
+#     log_message "Bluetooth firmware download process started for Smart-am60/orangepi-5b."
+# fi
 
-            # Release the USB HUB reset (gpio1.18) with a short low->high pulse.
-            echo "${hub_rst}" >/sys/class/gpio/export 2>/dev/null
-            echo "out" >"/sys/class/gpio/gpio${hub_rst}/direction" 2>/dev/null
-            echo "0" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
-            sleep 1
-            echo "1" >"/sys/class/gpio/gpio${hub_rst}/value" 2>/dev/null
-        fi
-    ) &
-    log_message "USB HUB reset released for rk3399-zysj."
-fi
-
-# For smart-am60(rk3588)/orangepi-5b(rk3588s) board: Bluetooth control
-if [[ "${FDTFILE}" =~ ^(rk3588-smart-am60\.dtb|rk3588s-orangepi-5b\.dtb)$ ]]; then
-    # This is a sequence of commands, with the last one running in the background.
-    # The background command (&) won't affect the script's exit code.
-    (
-        rfkill block all
-        chmod a+x /lib/firmware/ap6276p/brcm_patchram_plus1 >/dev/null 2>&1
-        sleep 2
-        rfkill unblock all
-        /lib/firmware/ap6276p/brcm_patchram_plus1 --enable_hci --no2bytes --use_baudrate_for_download --tosleep 200000 --baudrate 1500000 --patchram /lib/firmware/ap6275p/BCM4362A2.hcd /dev/ttyS9 &
-    ) &
-    log_message "Bluetooth firmware download process started for Smart-am60/orangepi-5b."
-fi
-
-# For nsy-g16-plus/nsy-g68-plus/bdy-g18-pro board
-if [[ "${FDTFILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568-bdy-g18-pro\.dtb)$ ]]; then
-    (
-        # Wait for network to be up
-        sleep 10
-
-        # Set MTU to 1500 for eth0 and br0
-        set_mtu() {
-            [[ -d "/sys/class/net/${1}" ]] && ip link set "${1}" mtu 1500 >/dev/null 2>&1
-        }
-        set_mtu eth0
-        set_mtu br0
-
-        # Close offloading features to improve stability
-        if [[ -d "/sys/class/net/eth0" ]] && command -v ethtool >/dev/null 2>&1; then
-            ethtool -K eth0 tso off gso off gro off tx off rx off >/dev/null 2>&1
-        fi
-    ) &
-    log_message "Network optimizations for ${FDTFILE} applied."
-fi
+# [DISABLED for LB2004] For nsy-g16-plus/nsy-g68-plus/btr-g18-pl board
+# if [[ "${FDTFILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568-bdy-g18-pro\.dtb)$ ]]; then
+#     (
+#         sleep 10
+#         set_mtu() {
+#             [[ -d "/sys/class/net/${1}" ]] && ip link set "${1}" mtu 1500 >/dev/null 2>&1
+#         }
+#         set_mtu eth0
+#         set_mtu br0
+#         if [[ -d "/sys/class/net/eth0" ]] && command -v ethtool >/dev/null 2>&1; then
+#             ethtool -K eth0 tso off gaf off gso off gro off gro off rx off >/dev/null 2>&1
+#         fi
+#     ) &
+#     log_message "Network optimizations for ${FDTFILE} applied."
+# fi
 
 # General System Services
 
@@ -182,29 +165,27 @@ if command -v ethtool >/dev/null 2>&1; then
     shopt -u nullglob
 fi
 
-# Led display control, Only for Amlogic devices (meson-*) with valid boxid.
-openvfd_enable="no"  # yes or no, set to "yes" to enable OpenVFD service.
-openvfd_boxid="15"   # Set the boxid according to your device. Refer to the documentation for details.
-openvfd_restart="no" # yes or no, set to "yes" to restart the OpenVFD service.
-if [[ "${openvfd_boxid}" != "0" && "${FDTFILE}" =~ ^meson- ]]; then
-    (
-        # Start OpenVFD service
-        [[ "${openvfd_enable}" == "yes" ]] && armbian-openvfd "${openvfd_boxid}" >/dev/null 2>&1
-        # Some devices require a restart to clear 'BOOT' and related messages
-        [[ "${openvfd_restart}" == "yes" ]] && {
-            armbian-openvfd "0" >/dev/null 2>&1
-            sleep 3
-            armbian-openvfd "${openvfd_boxid}" >/dev/null 2>&1
-        }
-        log_message "OpenVFD service execution attempted."
-    ) &
-fi
+# [DISABLED for LB2004] OpenVFD — only for Amlogic (meson-*) devices
+# openvfd_enable="no"
+# openvfd_boxid="15"
+# openvfd_restart="no"
+# if [[ "${openvfd_boxid}" != "0" && "${FDTFILE}" =~ ^meson- ]]; then
+#     (
+#         [[ "${openvfd_enable}" == "yes" ]] && armbian-openvfd "${openvfd_boxid}" >/dev/null 2>&1
+#         [[ "${openvfd_restart}" == "yes" ]] && {
+#             armbian-openvfd "0" >/dev/null 2>&1
+#             sleep 3
+#             armbian-openvfd "${openvfd_boxid}" >/dev/null 2>&1
+#         }
+#         log_message "OpenVFD service execution attempted."
+#     ) &
+# fi
 
-# For vplus(Allwinner h6) led color lights
-if [[ -x "/usr/bin/rgb-vplus" ]]; then
-    rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE >/dev/null 2>&1 &
-    log_message "Vplus RGB LED service started in background."
-fi
+# [DISABLED for LB2004] For vplbus(Allwinner h6) led color lights
+# if [[ -x "/usr/bin/rgb-vplus" ]]; then
+#     rgb-vplus --RedName=RED --GreenName=GREEN --BlueName=BLUE >/dev/null 2>&1 &
+#     log_message "Vplus RGB LED service started in background."
+# fi
 
 # For fan control service
 if [[ -x "/usr/bin/pwm-fan.pl" ]]; then
@@ -212,18 +193,17 @@ if [[ -x "/usr/bin/pwm-fan.pl" ]]; then
     log_message "Fan control service (pwm-fan.pl) started in background."
 fi
 
-# For oes(A311d) SATA LED status monitoring
-if [[ -x "/usr/bin/oes_sata_leds.sh" ]]; then
-    /usr/bin/oes_sata_leds.sh >/var/log/oes-sata-leds.log 2>&1 &
-    log_message "SATA status check service (oes_sata_leds.sh) started in background."
-fi
+# [DISABLED for LB2004] For oes(A311d) SATA LED status monitoring
+# if [[ -x "/usr/bin/oes_sata_leds.sh" ]]; then
+#     /usr/bin/oes_sata_leds.sh >/var/log/oes-sata-leds.log 2>&1 &
+#     log_message "SATA status check service (oes_sata_leds.sh) started in background."
+# fi
 
-# For pveproxy startup service
-if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$" || true)" ]]; then
-    # Restarting systemd services can sometimes fail during early boot.
-    (systemctl restart pveproxy >/dev/null 2>&1) &
-    log_message "PVE proxy service restart attempted."
-fi
+# [DISABLED for LB2004] For pveproxy startup service
+# if [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^pve-manager$" || true)" ]]; then
+#     (systemctl restart pveproxy >/dev/null 2>&1) &
+#     log_message "PVE proxy service restart attempted."
+# fi
 
 # Maximize root partition size
 todo_rootfs_resize="/root/.no_rootfs_resize"

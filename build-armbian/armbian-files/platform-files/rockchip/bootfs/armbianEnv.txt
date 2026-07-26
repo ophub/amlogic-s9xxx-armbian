@@ -1,7 +1,7 @@
 verbosity=1
 bootlogo=false
 fdtfile=rockchip/rk3399-king3399.dtb
-rootdev=/dev/mmcblk0p2
+rootdev=UUID=00000000-0000-0000-0000-000000000000
 rootfstype=ext4
 rootflags=rw,errors=remount-ro
 overlay_prefix=rk3399

@@ -1,0 +1,11 @@
+diff -Nur a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+--- a/arch/arm64/boot/dts/rockchip/Makefile
++++ b/arch/arm64/boot/dts/rockchip/Makefile
+@@ -232,6 +232,7 @@
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-bpi-r2-pro.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-bpi-r2-pro-plt.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-braswell.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-dahua-asi8212a.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-ceres-demo-board.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-evb.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-fastrhino-r66s.dtb
