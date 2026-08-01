@@ -1559,6 +1559,8 @@ toolchain_check
 # Show compile settings
 echo -e "${INFO} Kernel compilation toolchain: [ ${toolchain_name} ]"
 echo -e "${INFO} Kernel source: [ ${code_owner} ]"
+echo -e "${INFO} Kernel repo: [ ${linux_repo} ]"
+echo -e "${INFO} Kernel branch: [ ${code_branch} ]"
 echo -e "${INFO} Kernel patch: [ ${auto_patch} ]"
 echo -e "${INFO} Kernel arch: [ ${SRC_ARCH} ]"
 echo -e "${INFO} Kernel package: [ ${package_list} ]"
