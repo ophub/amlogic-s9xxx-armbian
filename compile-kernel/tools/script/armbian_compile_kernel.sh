@@ -1452,17 +1452,17 @@ compile_selection() {
     # Rename kernel version directory and deb package directory if the code branch is different from the repo branch
     if [[ "${code_branch}" != "${repo_branch}" ]]; then
         # Rename kernel version directory
-        rm -rf ${kernel_version}-${code_branch}
-        mv -f ${kernel_version} ${kernel_version}-${code_branch}
-        echo -e "${INFO} Renamed kernel version directory to [ ${kernel_version}-${code_branch} ]"
+        rm -rf ${kernel_version}${custom_name}
+        mv -f ${kernel_version} ${kernel_version}${custom_name}
+        echo -e "${INFO} Renamed kernel version directory to [ ${kernel_version}${custom_name} ]"
 
         # Rename deb package directory
-        rm -rf deb-${kernel_version}-${code_branch}
-        mv -f deb-${kernel_version} deb-${kernel_version}-${code_branch}
-        echo -e "${INFO} Renamed deb package directory to [ deb-${kernel_version}-${code_branch} ]"
+        rm -rf deb-${kernel_version}${custom_name}
+        mv -f deb-${kernel_version} deb-${kernel_version}${custom_name}
+        echo -e "${INFO} Renamed deb package directory to [ deb-${kernel_version}${custom_name} ]"
 
         # Update kernel_version variable to include the code branch for packaging
-        kernel_version="${kernel_version}-${code_branch}"
+        kernel_version="${kernel_version}${custom_name}"
     fi
 
     # Package all kernel tar files into a single tar.gz file
