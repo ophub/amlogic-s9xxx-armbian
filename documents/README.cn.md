@@ -1118,7 +1118,7 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 
 #### 12.7.3 如何启用无线
 
-部分设备支持无线网络，启用方法如下：
+部分设备支持无线网络。关于无线 AP 模式的使用方法，请参考[说明](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5161303377)；配合开启 DHCP 服务的配置方法，请参考[说明](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5162533992)。关于无线客户端（Client）模式的使用方法，请参见以下说明：
 
 ```shell
 # 安装管理工具

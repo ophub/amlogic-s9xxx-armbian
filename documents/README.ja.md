@@ -1118,7 +1118,7 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 
 #### 12.7.3 ワイヤレスの有効化方法
 
-一部のデバイスは無線ネットワークをサポートしています。有効化方法は以下の通りです：
+一部のデバイスは無線ネットワークに対応しています。無線APモードの利用方法については[説明](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5161303377)をご参照ください。DHCPサービスを併せて有効にする設定方法については[説明](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5162533992)をご参照ください。無線クライアントモードの利用方法については、以下の説明をご覧ください：
 
 ```shell
 # 管理ツールのインストール

@@ -1121,7 +1121,7 @@ net.ipv6.conf.lo.disable_ipv6 = 1
 
 #### 12.7.3 How to Enable Wireless
 
-Some devices support wireless networking. Enable it as follows:
+Some devices support wireless connectivity. For instructions on using the wireless AP mode, please refer to [the guide](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5161303377). For details on configuring the DHCP service in conjunction with this mode, please refer to [the guide](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3610#issuecomment-5162533992). To use the wireless client mode, please refer to the instructions below:
 
 ```shell
 # Install management tool
