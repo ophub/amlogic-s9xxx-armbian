@@ -13,7 +13,7 @@ on:
       kernel_source:
         description: "Select the kernel source"
         required: false
-        default: "unifreq"
+        default: "ophub"
         type: choice
         options:
           - unifreq
