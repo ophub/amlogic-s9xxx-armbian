@@ -1,0 +1,8 @@
+verbosity=1
+bootlogo=true
+console=both
+extraargs=cma=256M
+overlay_prefix=rk3588s
+fdtfile=rockchip/rk3588s-youyeetoo-r1.dtb
+rootdev=/dev/mmcblk0p2
+rootfstype=ext4
