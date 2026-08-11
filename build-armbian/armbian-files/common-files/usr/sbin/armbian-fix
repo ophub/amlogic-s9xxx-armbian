@@ -362,5 +362,16 @@ ip_info_file="/etc/update-motd.d/20-ip-info"
 ldconfig 2>/dev/null || true
 tolog "93. Update library cache"
 
+# Restore the systemd-osc-context script if it was previously diverted
+# rm /etc/profile.d/80-systemd-osc-context.sh
+# dpkg-divert --remove --rename /etc/profile.d/80-systemd-osc-context.sh
+#
+# Disable the systemd-osc-context script
+systemd_osc_context="/etc/profile.d/80-systemd-osc-context.sh"
+[[ -f "${systemd_osc_context}" ]] && {
+    dpkg-divert --add --rename /etc/profile.d/80-systemd-osc-context.sh 2>/dev/null
+    tolog "94. Disable the systemd-osc-context script"
+}
+
 # Show end message
 tolog "All system fixes applied successfully."
