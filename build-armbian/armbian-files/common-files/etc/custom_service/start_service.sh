@@ -152,6 +152,17 @@ if [[ "${FDTFILE}" =~ ^(rk3568-nsy-g16-plus\.dtb|rk3568-nsy-g68-plus\.dtb|rk3568
     log_message "Network optimizations for ${FDTFILE} applied."
 fi
 
+# For bdy-g98(rk3588) board: the two 2.5G PCIe NICs (RTL8125/8126) may ship
+# with a blank config EEPROM, in which case the driver falls back to a random
+# MAC on every boot. The script derives a stable per-unit MAC and persists it
+# via a .link file (applied by udev from the next boot on), and also sets it
+# immediately so the very first boot is covered. Units with a factory MAC are
+# left untouched.
+if [[ "${FDTFILE}" == "rk3588-bdy-g98.dtb" && -x "/usr/local/sbin/g98-nic-mac-fix.sh" ]]; then
+    /usr/local/sbin/g98-nic-mac-fix.sh >>"${custom_log}" 2>&1
+    log_message "G98 2.5G NIC MAC fix executed."
+fi
+
 # General System Services
 
 # Restart ssh service
