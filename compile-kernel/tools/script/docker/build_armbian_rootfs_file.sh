@@ -28,7 +28,7 @@ build_path="${current_path}/build"
 image_path="${build_path}/output/images"
 cache_path="${build_path}/cache/rootfs"
 tmp_rootfs="${image_path}/tmp_rootfs"
-
+common_files="${current_path}/build-armbian/armbian-files/common-files"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -211,30 +211,32 @@ EOF
 
             # Add uInitrd generation script
             sudo mkdir -p etc/initramfs/post-update.d/
-            sudo chown root:root etc/initramfs/post-update.d/
-            sudo tee etc/initramfs/post-update.d/99-uboot >/dev/null <<'EOF'
-#!/bin/bash -e
-
-tempname="/boot/uInitrd-$1"
-echo "update-initramfs: Armbian: Converting to u-boot format: ${tempname}" >&2
-mkimage -A arm64 -O linux -T ramdisk -C gzip -n uInitrd -d $2 $tempname
-
-echo "update-initramfs: Armbian: Symlinking ${tempname} to /boot/uInitrd" >&2
-ln -sfv $(basename $tempname) /boot/uInitrd || {
-        echo "update-initramfs: Symlink failed, moving ${tempname} to /boot/uInitrd" >&2
-        mv -v $tempname /boot/uInitrd
-}
-
-echo "update-initramfs: Armbian: done." >&2
-
-exit 0
-
-EOF
-            sudo chmod +x etc/initramfs/post-update.d/99-uboot
+            sudo cp -f "${common_files}/etc/initramfs/post-update.d/99-uboot" etc/initramfs/post-update.d/99-uboot
             [[ "${?}" == "0" ]] && echo -e "${INFO} 05.02. uInitrd generation script added successfully." || error_msg "05.02. Failed to adjust uInitrd!"
+            sudo chmod +x etc/initramfs/post-update.d/99-uboot
+            sudo chown root:root etc/initramfs/post-update.d/99-uboot
         else
             echo -e "${NOTE} 05. Skipping armbian-kernel script addition."
         fi
+
+        # 05.03. Add EDID initramfs hook
+        sudo mkdir -p etc/initramfs-tools/hooks/
+        sudo cp -f "${common_files}/etc/initramfs-tools/hooks/edid" etc/initramfs-tools/hooks/edid
+        [[ "${?}" == "0" ]] && echo -e "${INFO} 05.03. EDID initramfs hook added successfully." || error_msg "05.03. Failed to add EDID initramfs hook!"
+        sudo chmod +x etc/initramfs-tools/hooks/edid
+        sudo chown root:root etc/initramfs-tools/hooks/edid
+
+        # 05.04. Add EDID firmware blobs (bundled into the initramfs by the hook above)
+        edid_tmp="$(mktemp -d)"
+        git clone -q --depth 1 --filter=blob:none --sparse https://github.com/ophub/firmware "${edid_tmp}/fw" 2>/dev/null
+        git -C "${edid_tmp}/fw" sparse-checkout set firmware/edid >/dev/null 2>&1
+        [[ -d "${edid_tmp}/fw/firmware/edid" ]] && {
+            sudo mkdir -p usr/lib/firmware/edid
+            sudo cp -af "${edid_tmp}/fw/firmware/edid/." usr/lib/firmware/edid/
+            sudo chown -R root:root usr/lib/firmware/edid
+            echo -e "${INFO} 05.04. EDID firmware blobs added successfully."
+        } || error_msg "05.04. Failed to add EDID firmware blobs!"
+        rm -rf "${edid_tmp}"
 
         # Compress the rootfs file
         sudo tar -czf ${rootfs_save_name} *
