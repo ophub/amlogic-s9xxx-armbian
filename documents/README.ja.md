@@ -1762,3 +1762,47 @@ net.ipv4.tcp_congestion_control = bbr
 # net.core.default_qdisc = fq_codel
 # net.ipv4.tcp_congestion_control = cubic
 ```
+
+### 12.21 HDMI EDID 認識異常の解決方法
+
+**利用シーン**：一部のデバイスでは、HDMI ポートがモニターから EDID を読み取れません（モニターの EDID チップが DDC バス上で応答しない、基板レベルのハードウェア共通の問題）。カーネルがモニターの能力リストを取得できず、映像が全く出力されないか、1024x768 のフォールバック解像度でしか出力されない状態になります（代表的な例は bdy-g98。詳細は [ophub/fnnas#606](https://github.com/ophub/fnnas/issues/606#issuecomment-5282389038) を参照）。同様に、KVM スイッチや HDMI 変換/キャプチャデバイスを使用する場合にも EDID が失われたり異常になったりすることがあります。また、モニターなし（headless）の環境で、システムに常に固定解像度で出力させたい場合もあります。これらはすべて、カーネルパラメータで EDID ファームウェアを強制的に注入し、モニターからの読み取りを回避することで解決できます。
+
+**仕組み**：システムイメージには initramfs フックが内蔵されており、initramfs が生成/再構築されるたびに、`/lib/firmware/edid/` ディレクトリ内のすべての EDID ファームウェアファイル（よく使われる解像度を約30個プリセット）が自動的に同梱されます。この仕組みはデフォルトでは待機状態です——カーネルパラメータを追加しない限り、同梱されたファイルは一切影響しません。
+
+**追加方法**：`/boot/armbianEnv.txt` を編集し、`extraargs=` の行末に追記します（6.x カーネルの例）：
+
+```shell
+extraargs=video=HDMI-A-1:e drm.edid_firmware=HDMI-A-1:edid/1920x1080.bin
+```
+
+`video=HDMI-A-1:e` はそのインターフェースを強制的に有効化するためのもの（任意）、`drm.edid_firmware=` は強制的に使用する EDID ファイルを指定します（パスは `/lib/firmware/` からの相対パス）。よくある3つの落とし穴：
+
+- 設定ファイルは `/boot/armbianEnv.txt`、`/boot/uEnv.txt`、`/boot/extlinux/extlinux.conf` などの場合があります。実際の状況に応じて変更してください。
+- **パラメータのプレフィックスはカーネルバージョンによって異なります**：6.x カーネルは `drm.edid_firmware`、それ以前のカーネルは `drm_kms_helper.edid_firmware` を使用します。不明な場合はデバイス上で確認してください：`/sys/module/drm/parameters/edid_firmware` が存在すれば `drm.` プレフィックスを使用し、なければ `/sys/module/drm_kms_helper/parameters/` 配下の同名ファイルを確認します。プレフィックスを間違えるとカーネルは黙って無視し、エラーも出ず効果もありません。
+- インターフェース名は `HDMI-A-1` とは限りません。`ls /sys/class/drm/ | grep HDMI` でデバイス上の実際の名前を確認できます。
+
+保存後、initramfs を再構築して再起動します：
+
+```shell
+# "update-initramfs: Not updating initramfs." と表示された場合は、先に次を実行：
+sed -i 's/^update_initramfs=.*/update_initramfs=yes/' /etc/initramfs-tools/update-initramfs.conf
+
+update-initramfs -u -k $(uname -r)
+reboot
+```
+
+**確認方法**：
+
+```shell
+lsinitramfs /boot/initrd.img-$(uname -r) | grep edid   # initramfs 内に edid ファイルが見えるはず
+dmesg | grep -i edid                                   # ファームウェアがカーネルに読み込まれたことを確認
+cat /sys/class/drm/card0-HDMI-A-1/modes                # 目的の解像度が表示されれば有効
+```
+
+**解像度の変更**：`ls /lib/firmware/edid/` で一覧表示されるプリセットファイルから別のもの（例：`1920x1080_50hz.bin`）を選び、カーネルパラメータを新しいファイル名に向け、上記の `update-initramfs` コマンドを再実行して再起動するだけです。自作の EDID ファイル（128 バイトのベースブロック、または拡張ブロック付きのマルチブロックファイル）を配置することもでき、手順は同じです。
+
+**注意事項**：
+
+- プリセットの EDID には CTA 拡張ブロックが含まれていないため、**HDMI オーディオは使用できません**。オーディオが必要な場合は、拡張ブロック付きの EDID ファイルを使用してください。
+- カーネルで `CONFIG_DRM_LOAD_EDID_FIRMWARE=y` が有効になっている必要があります（本リポジトリでコンパイルされたカーネルでは有効済み）。
+- モニターの自動認識に戻したい場合：`extraargs` からこの2つのパラメータを削除して再起動するだけで、他の操作は不要です。

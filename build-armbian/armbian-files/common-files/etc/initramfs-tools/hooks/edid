@@ -21,6 +21,10 @@
 #
 # Note: the file name must not contain a dot (run-parts skips such
 # files) and the file must be executable.
+#
+# For more usage details, see Section 12.21 of the documentation.
+# https://github.com/ophub/amlogic-s9xxx-armbian/tree/main/documents
+
 
 PREREQ=""
 prereqs() { echo "$PREREQ"; }

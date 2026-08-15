@@ -1769,3 +1769,47 @@ net.ipv4.tcp_congestion_control = bbr
 # net.core.default_qdisc = fq_codel
 # net.ipv4.tcp_congestion_control = cubic
 ```
+
+### 12.21 How to Fix HDMI EDID Detection Problems
+
+**Use cases**: On some devices the HDMI port cannot read the EDID from the monitor (the monitor's EDID chip never answers on the DDC bus — a board-level hardware trait), so the kernel never obtains the monitor's capability list. The symptom is no display output at all, or output only at the 1024x768 fallback resolution (a typical case is bdy-g98; see [ophub/fnnas#606](https://github.com/ophub/fnnas/issues/606#issuecomment-5282389038) for details). Similarly, EDID can be lost or corrupted when using a KVM switch or an HDMI adapter/capture device; or in headless (no-monitor) setups you may want the system to always output at a fixed resolution. All of these cases can be solved by force-feeding an EDID firmware file via kernel parameters, bypassing the read from the monitor.
+
+**How it works**: The system image ships with a built-in initramfs hook that automatically bundles all EDID firmware files under `/lib/firmware/edid/` (about 30 common resolutions pre-installed) into the initramfs every time it is generated/rebuilt. The mechanism stays dormant by default — unless the kernel parameter is added, the bundled files have no effect at all.
+
+**How to enable**: Edit `/boot/armbianEnv.txt` and append to the end of the `extraargs=` line (6.x kernel example):
+
+```shell
+extraargs=video=HDMI-A-1:e drm.edid_firmware=HDMI-A-1:edid/1920x1080.bin
+```
+
+Here `video=HDMI-A-1:e` force-enables the interface (optional), and `drm.edid_firmware=` specifies the EDID file to use (path relative to `/lib/firmware/`). Three common pitfalls:
+
+- The config file may be `/boot/armbianEnv.txt`, `/boot/uEnv.txt`, or `/boot/extlinux/extlinux.conf`, etc. — modify whichever one your device actually uses.
+- **The parameter prefix depends on the kernel version**: 6.x kernels use `drm.edid_firmware`, while earlier kernels use `drm_kms_helper.edid_firmware`. If unsure, check on the device: if `/sys/module/drm/parameters/edid_firmware` exists, use the `drm.` prefix; otherwise look for the file with the same name under `/sys/module/drm_kms_helper/parameters/`. A wrong prefix is silently ignored by the kernel — no error, no effect.
+- The interface name is not necessarily `HDMI-A-1`; check the actual name on your device with `ls /sys/class/drm/ | grep HDMI`.
+
+After saving, rebuild the initramfs and reboot:
+
+```shell
+# If you see "update-initramfs: Not updating initramfs.", run this first:
+sed -i 's/^update_initramfs=.*/update_initramfs=yes/' /etc/initramfs-tools/update-initramfs.conf
+
+update-initramfs -u -k $(uname -r)
+reboot
+```
+
+**Verification**:
+
+```shell
+lsinitramfs /boot/initrd.img-$(uname -r) | grep edid   # the edid files should be visible in the initramfs
+dmesg | grep -i edid                                   # confirm the firmware was loaded by the kernel
+cat /sys/class/drm/card0-HDMI-A-1/modes                # the target resolution appears = it works
+```
+
+**Changing the resolution**: Pick another pre-installed file from the list shown by `ls /lib/firmware/edid/` (e.g. `1920x1080_50hz.bin`), point the kernel parameter at the new file name, then re-run the `update-initramfs` command above and reboot. You can also drop in a custom EDID file (a 128-byte base block, or a multi-block file with extension blocks) — the procedure is the same.
+
+**Notes**:
+
+- The pre-installed EDID files contain no CTA extension block, so **HDMI audio will not work**; if you need audio, use an EDID file with an extension block.
+- The kernel must be built with `CONFIG_DRM_LOAD_EDID_FIRMWARE=y` (already enabled in the kernels compiled from this repository).
+- To restore automatic monitor detection: remove the two parameters from `extraargs` and reboot — nothing else is needed.

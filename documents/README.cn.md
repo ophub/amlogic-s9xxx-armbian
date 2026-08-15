@@ -108,6 +108,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
     - [12.18 如何编译 boot.scr 文件](#1218-如何编译-bootscr-文件)
     - [12.19 如何开启远程桌面和修改默认端口](#1219-如何开启远程桌面和修改默认端口)
     - [12.20 TCP 拥塞控制优化方案](#1220-tcp-拥塞控制优化方案)
+    - [12.21 关于 HDMI EDID 识别异常问题的解决方法](#1221-关于-hdmi-edid-识别异常问题的解决方法)
 
 ## 1. 注册自己的 Github 的账户
 
@@ -1762,3 +1763,47 @@ net.ipv4.tcp_congestion_control = bbr
 # net.core.default_qdisc = fq_codel
 # net.ipv4.tcp_congestion_control = cubic
 ```
+
+### 12.21 关于 HDMI EDID 识别异常问题的解决方法
+
+**应用场景**：部分设备的 HDMI 接口无法从显示器读取 EDID（显示器的 EDID 芯片在 DDC 总线上不应答，属于板级硬件共性），内核拿不到显示器的能力列表，表现为无显示输出或只能以 1024x768 兜底分辨率输出（典型如 bdy-g98，详见 [ophub/fnnas#606](https://github.com/ophub/fnnas/issues/606#issuecomment-5282389038)）。类似地，使用 KVM 切换器、HDMI 转接/采集设备时 EDID 也可能丢失或异常；或者在无显示器（headless）场景下，希望系统始终以固定分辨率输出。这些情况都可以通过内核参数强制注入一份 EDID 固件，绕开对显示器的读取。
+
+**工作原理**：系统镜像已内置 initramfs 钩子，每次生成/重建 initramfs 时都会自动把 `/lib/firmware/edid/` 目录下的全部 EDID 固件文件（预置约 30 个常用分辨率）打包进去。该机制默认处于待命状态——只要不加内核参数，打包进去的文件不产生任何影响。
+
+**添加方法**：编辑 `/boot/armbianEnv.txt`，在 `extraargs=` 一行的末尾追加（以 6.x 内核为例）：
+
+```shell
+extraargs=video=HDMI-A-1:e drm.edid_firmware=HDMI-A-1:edid/1920x1080.bin
+```
+
+其中 `video=HDMI-A-1:e` 用于强制使能该接口（可选），`drm.edid_firmware=` 指定强制使用的 EDID 文件（路径相对于 `/lib/firmware/`）。两个容易踩的坑：
+
+- 配置文件可能是 `/boot/armbianEnv.txt`、`/boot/uEnv.txt` 或 `/boot/extlinux/extlinux.conf` 等，请根据实际情况修改。
+- **参数前缀与内核版本有关**：6.x 内核用 `drm.edid_firmware`，早期内核用 `drm_kms_helper.edid_firmware`。不确定时在设备上确认：存在 `/sys/module/drm/parameters/edid_firmware` 就用 `drm.` 前缀，否则查看 `/sys/module/drm_kms_helper/parameters/` 下的同名文件。前缀写错内核会静默忽略，不报错也不生效。
+- 接口名不一定是 `HDMI-A-1`，可用 `ls /sys/class/drm/ | grep HDMI` 查看设备上的实际名称。
+
+保存后重建 initramfs 并重启：
+
+```shell
+# 若提示 "update-initramfs: Not updating initramfs."，先执行：
+sed -i 's/^update_initramfs=.*/update_initramfs=yes/' /etc/initramfs-tools/update-initramfs.conf
+
+update-initramfs -u -k $(uname -r)
+reboot
+```
+
+**验证**：
+
+```shell
+lsinitramfs /boot/initrd.img-$(uname -r) | grep edid   # initramfs 中应能看到 edid 文件
+dmesg | grep -i edid                                   # 确认固件被内核加载
+cat /sys/class/drm/card0-HDMI-A-1/modes                # 出现目标分辨率即生效
+```
+
+**更换分辨率**：从 `ls /lib/firmware/edid/` 列出的预置文件中另选一个（如 `1920x1080_50hz.bin`），把内核参数指向新文件名，重新执行上面的 `update-initramfs` 命令并重启即可。也可以放入自制的 EDID 文件（128 字节的基块，或带扩展块的多块文件），方法相同。
+
+**注意事项**：
+
+- 预置的 EDID 不含 CTA 扩展块，因此 **HDMI 音频不可用**；需要音频时请换用带扩展块的 EDID 文件。
+- 需要内核开启 `CONFIG_DRM_LOAD_EDID_FIRMWARE=y`（本仓库编译的内核已开启）。
+- 想恢复显示器自动识别：从 `extraargs` 中删掉这两个参数，重启即可，无需其他操作。
