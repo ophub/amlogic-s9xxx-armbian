@@ -1,0 +1,39 @@
+#!/bin/sh
+# Bundle EDID firmware blobs into the initramfs (common to all boards).
+#
+# Some boards cannot read the EDID from their monitor over the DDC bus
+# (the monitor's EDID EEPROM never answers; first seen on bdy-g98, see
+# https://github.com/ophub/fnnas/issues/606#issuecomment-5282389038) and
+# must drive the display with a forced EDID from the kernel command line.
+# The blobs are inert by themselves: unless the parameter below is set,
+# bundling them changes nothing.
+#
+#     6.x kernels:  drm.edid_firmware=HDMI-A-1:edid/1920x1080.bin
+#     5.x kernels:  drm_kms_helper.edid_firmware=HDMI-A-1:edid/1920x1080.bin
+#
+# A wrong prefix is silently ignored by the kernel (no error, no effect).
+# Set the parameter via extraargs in /boot/armbianEnv.txt.
+#
+# The DRM driver requests this firmware a few seconds into boot, long
+# before the root filesystem is mounted, therefore the blob must already
+# be present inside the initramfs. This hook copies every blob found in
+# /lib/firmware/edid/ into the initramfs whenever it is (re)generated.
+#
+# Note: the file name must not contain a dot (run-parts skips such
+# files) and the file must be executable.
+
+PREREQ=""
+prereqs() { echo "$PREREQ"; }
+case $1 in prereqs) prereqs; exit 0;; esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+[ -d /lib/firmware/edid ] || exit 0
+
+for edid_file in /lib/firmware/edid/*.bin; do
+    [ -f "${edid_file}" ] || continue
+    mkdir -p "${DESTDIR}/lib/firmware/edid"
+    copy_file firmware "${edid_file}" "/lib/firmware/edid/$(basename "${edid_file}")"
+done
+
+exit 0
