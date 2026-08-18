@@ -117,6 +117,7 @@ on:
           - orangepi-5b
           - orangepi-zero3
           - painet-p3
+          - painet-p5
           - panther-x2
           - photonicat
           - r66s
