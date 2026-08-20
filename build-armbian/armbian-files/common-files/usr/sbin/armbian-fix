@@ -369,16 +369,29 @@ ip_info_file="/etc/update-motd.d/20-ip-info"
 ldconfig 2>/dev/null || true
 tolog "93. Update library cache"
 
-# Restore the systemd-osc-context script if it was previously diverted
-# rm /etc/profile.d/80-systemd-osc-context.sh
-# dpkg-divert --remove --rename /etc/profile.d/80-systemd-osc-context.sh
+# Restore the systemd-osc-context script if it was previously disabled:
+#   dpkg-divert --remove --rename --divert /usr/lib/systemd/profile.d/80-systemd-osc-context.sh.diverted /usr/lib/systemd/profile.d/80-systemd-osc-context.sh
+#   dpkg-divert --remove --no-rename --divert /etc/profile.d/80-systemd-osc-context.sh.diverted /etc/profile.d/80-systemd-osc-context.sh
+#   systemd-tmpfiles --create /usr/lib/tmpfiles.d/20-systemd-osc-context.conf
 #
-# Disable the systemd-osc-context script
-systemd_osc_context="/etc/profile.d/80-systemd-osc-context.sh"
-[[ -f "${systemd_osc_context}" ]] && {
-    dpkg-divert --add --rename /etc/profile.d/80-systemd-osc-context.sh 2>/dev/null
+# Disable the systemd-osc-context script (OSC 3008, UAPI.15)
+systemd_osc_context_lib="/usr/lib/systemd/profile.d/80-systemd-osc-context.sh"
+systemd_osc_context_etc="/etc/profile.d/80-systemd-osc-context.sh"
+[[ -f "${systemd_osc_context_lib}" ]] && {
+    # 1. Divert the real script and leave a neutered stub in its place
+    dpkg-divert --add --rename \
+        --divert "${systemd_osc_context_lib}.diverted" \
+        "${systemd_osc_context_lib}" >/dev/null 2>&1
+    echo "Neutered locally via dpkg-divert." >"${systemd_osc_context_lib}" 2>/dev/null
+
+    # 2. Divert the /etc path too
+    dpkg-divert --remove --no-rename "${systemd_osc_context_etc}" >/dev/null 2>&1
+    dpkg-divert --add --no-rename \
+        --divert "${systemd_osc_context_etc}.diverted" \
+        "${systemd_osc_context_etc}" >/dev/null 2>&1
+
     tolog "94. Disable the systemd-osc-context script"
-}
+} || true
 
 # Show end message
 tolog "All system fixes applied successfully."
