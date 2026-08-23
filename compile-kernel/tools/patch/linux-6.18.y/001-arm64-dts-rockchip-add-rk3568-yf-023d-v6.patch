@@ -12,10 +12,10 @@ index 62ddf6f..808baa0 100644
  	rk3588-tiger-haikou-video-demo.dtbo
 diff --git a/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts b/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts
 new file mode 100644
-index 0000000..7549cde
+index 0000000..dfd05b5
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts
-@@ -0,0 +1,812 @@
+@@ -0,0 +1,801 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +
 +/dts-v1/;
@@ -555,17 +555,6 @@ index 0000000..7549cde
 +	};
 +};
 +
-+&nandc {
-+	status = "okay";
-+
-+	nand@0 {
-+		reg = <0>;
-+		nand-ecc-mode = "hw";
-+		nand-ecc-strength = <16>;
-+		nand-ecc-step-size = <1024>;
-+		nand-bus-width = <8>;
-+	};
-+};
 +
 +&pcie2x1 {
 +	pinctrl-names = "default";
