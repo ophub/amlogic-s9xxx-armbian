@@ -1,0 +1,195 @@
+#==========================================================================
+# Description: Build Armbian image for YoungFeel YF-023D (RK3568 + Maxio MAE0621A PHY)
+# - Base image is pulled from upstream ophub/amlogic-s9xxx-armbian releases
+# - Kernel packages are pulled from THIS repository's kernel_stable release
+#   (run "Compile YF-023D kernel" first, at least once)
+# - Board row r220/yf023d + u-boot files are provided in this repository
+#==========================================================================
+
+name: Build YF-023D Armbian image
+
+on:
+  workflow_dispatch:
+    inputs:
+      set_release:
+        description: "Select OS Release."
+        required: false
+        default: "bookworm"
+        type: choice
+        options:
+          - trixie
+          - bookworm
+          - resolute
+          - noble
+      armbian_kernel:
+        description: "Select kernel version."
+        required: false
+        default: "6.12.y"
+        type: choice
+        options:
+          - 6.12.y
+          - 6.18.y
+          - 6.12.y_6.18.y
+      armbian_fstype:
+        description: "Select armbian rootfs type."
+        required: false
+        default: "ext4"
+        type: choice
+        options:
+          - ext4
+          - btrfs
+      armbian_edition:
+        description: "Select image edition type."
+        required: false
+        default: "server"
+        type: choice
+        options:
+          - server
+          - desktop
+
+env:
+  TZ: Etc/UTC
+
+jobs:
+  setup:
+    runs-on: ubuntu-26.04-arm
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - name: Set build matrix based on set_release input
+        id: set-matrix
+        run: |
+          echo 'matrix={"include":[{"release":"${{ inputs.set_release }}"}]}' >> "${GITHUB_OUTPUT}"
+
+  build:
+    needs: setup
+    runs-on: ubuntu-26.04-arm
+    if: ${{ github.event.repository.owner.id == github.event.sender.id }}
+    permissions:
+      contents: write
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.setup.outputs.matrix) }}
+
+    name: build-yf023d-armbian-${{ matrix.release }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Initialize the build environment
+        id: init
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi -f $(docker images -q) 2>/dev/null || true
+          [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android 2>/dev/null
+          sudo swapoff -a
+          sudo rm -f /swapfile /mnt/swapfile
+          sudo apt-get -y update
+          sudo apt-get -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+          sudo apt-get -y install $(curl -fsSL https://ophub.org/ubuntu2604-build-armbian-depends)
+          sudo systemctl daemon-reload
+          #sudo apt-get -y full-upgrade
+          sudo apt-get -y autoremove --purge
+          sudo apt-get clean
+          sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+          sudo rm -rf ~/{.cargo,.dotnet,.rustup}
+          sudo timedatectl set-timezone "${TZ:-Etc/UTC}"
+          date -u
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Create virtual disk for extended storage
+        id: disk
+        run: |
+          root_avail=$(df --block-size=1G / | tail -1 | awk '{print $4}')
+          root_size=$(( root_avail - 4 ))
+          [[ "${root_size}" -gt 0 ]] || { echo "Error: Insufficient space on /: ${root_avail}G available"; exit 1; }
+
+          sudo truncate -s "${root_size}"G /root.img
+          build_dev=$(sudo losetup --find --show /root.img)
+          echo "Using /: ${root_size}G"
+
+          sudo mkfs.xfs -f -i sparse=0 -b size=4096 "${build_dev}"
+          sudo mkdir -p /builder
+          sudo mount "${build_dev}" /builder
+          sudo chown -R runner:runner /builder
+          df -Th
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Download Armbian base image from ophub releases
+        id: down
+        working-directory: /builder
+        if: ${{ steps.init.outputs.status == 'success' && !cancelled() }}
+        run: |
+          armbian_buildpath="build/output/images"
+          [[ -d "${armbian_buildpath}" ]] || mkdir -p "${armbian_buildpath}"
+          ln -sf /builder/build ${{ github.workspace }}/build
+
+          # Query the latest base image release from upstream ophub repo
+          latest_version=$(curl -s \
+              -H "Accept: application/vnd.github+json" \
+              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              https://api.github.com/repos/ophub/amlogic-s9xxx-armbian/releases?per_page=50 | \
+              jq -r --arg RTK "Armbian_${{ matrix.release }}_arm64_" \
+              --arg BOARD "-trunk_" \
+              '[.[] | select(.tag_name | contains($RTK))] |
+              map(.assets[] | select(.name | contains($BOARD) and endswith(".img.gz"))) |
+              sort_by(.updated_at) |
+              reverse |
+              .[0] |
+              {data: .updated_at, url: .url, name: .name}')
+
+          [[ -z "${latest_version}" || "${latest_version}" == "null" ]] && {
+              echo "Error: Failed to resolve Armbian base image download URL."
+              exit 1
+          }
+
+          latest_url="$(echo ${latest_version} | jq -r '.url')"
+          armbian_filename="$(echo ${latest_version} | jq -r '.name')"
+
+          echo "Downloading: ${armbian_filename}"
+          curl -fsSL \
+               -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/octet-stream" \
+               "${latest_url}" \
+               -o "${armbian_buildpath}/${armbian_filename}"
+          [[ "${?}" -ne "0" ]] && echo "Error: Download failed." && exit 1
+
+          echo "build_tag=Armbian_${{ matrix.release }}_arm64_yf023d_$(date +"%Y.%m")" >> ${GITHUB_ENV}
+          echo "status=success" >> ${GITHUB_OUTPUT}
+
+      - name: Rebuild Armbian for YF-023D [ ${{ matrix.release }} ]
+        uses: ./
+        if: ${{ steps.down.outputs.status == 'success' && !cancelled() }}
+        with:
+          build_target: armbian
+          armbian_path: build/output/images/*.img.gz
+          armbian_board: yf023d
+          armbian_kernel: ${{ inputs.armbian_kernel }}
+          auto_kernel: true
+          kernel_repo: gdd-xxx/amlogic-s9xxx-armbian
+          kernel_usage: stable
+          armbian_fstype: ${{ inputs.armbian_fstype }}
+          builder_name: ophub
+
+      - name: Upload YF-023D Armbian images to Release
+        uses: ophub/upload-to-releases@main
+        if: ${{ env.PACKAGED_STATUS == 'success' && !cancelled() }}
+        with:
+          tag: ${{ env.build_tag }}
+          artifacts: ${{ env.PACKAGED_OUTPUTPATH }}/*
+          allow_updates: true
+          remove_artifacts: false
+          replaces_artifacts: true
+          make_latest: true
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ### Armbian Image Information for YoungFeel YF-023D (rk3568)
+            - Default username: `root`
+            - Default password: `1234`
+            - Install command: `armbian-install`
+            - Update command: `armbian-update`
+            - Ethernet: Maxio MAE0621A PHY (driver built-in)
