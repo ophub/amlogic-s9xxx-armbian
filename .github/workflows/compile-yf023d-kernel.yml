@@ -17,9 +17,10 @@ on:
         default: "6.12.y"
         type: choice
         options:
+          - 6.1.y
           - 6.12.y
           - 6.18.y
-          - 6.12.y_6.18.y
+          - 6.1.y_6.12.y_6.18.y
       kernel_source:
         description: "Select the kernel source"
         required: false

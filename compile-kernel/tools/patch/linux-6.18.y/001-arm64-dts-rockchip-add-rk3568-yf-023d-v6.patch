@@ -1,21 +1,9 @@
-diff --git a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
-index 62ddf6f..808baa0 100644
---- a/arch/arm64/boot/dts/rockchip/Makefile
-+++ b/arch/arm64/boot/dts/rockchip/Makefile
-@@ -431,6 +431,7 @@ rk3588-rock-5b-plus-radxa-4k-cam-dtbs := rk3588-rock-5b-plus.dtb \
- 	rk3588-rock-5b-plus-radxa-cam4k-cam0.dtbo \
- 	rk3588-rock-5b-plus-radxa-cam4k-cam1.dtbo
- 
-+dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3568-yf-023d-v6.dtb
- dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588-tiger-haikou-haikou-video-demo.dtb
- rk3588-tiger-haikou-haikou-video-demo-dtbs := rk3588-tiger-haikou.dtb \
- 	rk3588-tiger-haikou-video-demo.dtbo
 diff --git a/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts b/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts
 new file mode 100644
-index 0000000..dfd05b5
+index 0000000..83ff731
 --- /dev/null
 +++ b/arch/arm64/boot/dts/rockchip/rk3568-yf-023d-v6.dts
-@@ -0,0 +1,801 @@
+@@ -0,0 +1,797 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +
 +/dts-v1/;
@@ -538,10 +526,6 @@ index 0000000..dfd05b5
 +	status = "okay";
 +};
 +
-+&i2s2_2ch {
-+	rockchip,trcm-sync-tx-only;
-+	status = "okay";
-+};
 +
 +&mdio1 {
 +	rgmii_phy1: ethernet-phy@0 {
