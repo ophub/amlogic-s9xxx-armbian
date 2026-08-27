@@ -231,6 +231,7 @@ on:
           - sv-33a6x-vpu
           - swan1-w28
           - sw799
+          - sz3390
           - taram
           - tanix-tx6
           - tb-ls3399
