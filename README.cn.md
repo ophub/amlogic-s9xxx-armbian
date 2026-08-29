@@ -8,7 +8,7 @@
 
 Armbian（中文名：岸边）是基于 Debian/Ubuntu 构建的专为 ARM 芯片设计的轻量级 Linux 发行版。Armbian 系统精简、清洁，100% 兼容并继承了 Debian/Ubuntu 的功能与丰富的软件生态，可以安全稳定地运行在 TF/SD/USB 及设备的 eMMC 存储中。本项目保留了 Armbian 官方系统的完整性，并进一步拓展了对电视盒子等非官方支持设备的适配，同时增加了一系列便捷操作指令。现在你可以将电视盒子的安卓 TV 系统替换为 Armbian，使其成为一台功能强大的服务器。
 
-本项目依托众多[贡献者](CONTRIBUTORS.md)的力量，为 `Amlogic`、`Rockchip` 和 `Allwinner` 平台的设备构建 Armbian 系统，支持写入 eMMC 使用、更新内核等功能。详细使用方法请参见 [Armbian 使用文档](./documents/README.cn.md)。最新的 Armbian 系统可在 [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有帮助，请点击仓库右上角的 `Star` 表示支持。
+本项目依托众多[贡献者](CONTRIBUTORS.md)的力量，为 `Amlogic`、`Rockchip` 和 `Allwinner` 平台的设备构建 Armbian 系统，支持写入 eMMC 使用、更新内核等功能。详细使用方法请参见 [📚Armbian 使用文档](./documents/README.cn.md)。最新的 Armbian 系统可在 [⬇️Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases) 中下载。欢迎 `Fork` 并进行个性化定制。如果对你有帮助，请点击仓库右上角的 `⭐Star` 表示支持。
 
 ## Armbian 系统默认信息
 
@@ -51,7 +51,7 @@ Armbian（中文名：岸边）是基于 Debian/Ubuntu 构建的专为 ARM 芯�
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3534), [TX6-H](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3528), [T95-max](https://github.com/ophub/fnnas/issues/546), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 
 > [!TIP]
-> 目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)仅支持在 `TF/SD/USB` 中使用，其他型号的盒子均支持写入 `EMMC`。更多信息请查阅 [✅支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。添加新设备支持可参考说明文档 12.15 章节的方法：[添加新的支持设备](documents/README.cn.md#1215-如何添加新的支持设备)。使用前请先阅读 [Armbian 使用文档](./documents/README.cn.md)，常见问题均已提供解决方案。
+> 目前 [s905 的盒子](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)仅支持在 `TF/SD/USB` 中使用，其他型号的盒子均支持写入 `EMMC`。更多信息请查阅 [✅支持的设备列表说明](build-armbian/armbian-files/common-files/etc/model_database.conf)。添加新设备支持可参考说明文档 12.15 章节的方法：[✳️添加新的支持设备](documents/README.cn.md#1215-如何添加新的支持设备)。使用前请先阅读 [📚Armbian 使用文档](./documents/README.cn.md)，常见问题均已提供解决方案。
 
 ## 安装及升级 Armbian 的相关说明
 

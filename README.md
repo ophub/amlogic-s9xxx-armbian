@@ -8,7 +8,7 @@
 
 Armbian is a lightweight Linux distribution built specifically for ARM chips, based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with Debian/Ubuntu, inheriting its functionality and rich software ecosystem. It runs securely and stably on TF/SD/USB storage and the device's eMMC. This project preserves the integrity of the official Armbian system while extending support for unofficially supported devices such as TV boxes, and adds a set of convenient management commands. You can now replace the Android TV system on your TV box with Armbian, transforming it into a powerful server.
 
-This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` devices. It supports writing to eMMC, kernel updates, and other features. For detailed usage, see the [Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and customize. If this project is helpful, please click the `Star` button in the upper right corner to show your support.
+This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` devices. It supports writing to eMMC, kernel updates, and other features. For detailed usage, see the [📚Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [⬇️Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and customize. If this project is helpful, please click the `⭐Star` button in the upper right corner to show your support.
 
 ## Default Information for Armbian System
 
@@ -51,7 +51,7 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3534), [TX6-H](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3528), [T95-max](https://github.com/ophub/fnnas/issues/546), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 
 > [!TIP]
-> At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used with `TF/SD/USB`; other box models support writing to `EMMC`. For more information, refer to the [✅ Supported Device List](build-armbian/armbian-files/common-files/etc/model_database.conf). To add new device support, see Section 12.15 of the documentation: [Adding New Supported Devices](documents/README.md#1215-how-to-add-new-supported-devices). Please read the [Armbian User Documentation](./documents) before use, as it provides solutions to common issues.
+> At present, the [s905 box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173) can only be used with `TF/SD/USB`; other box models support writing to `EMMC`. For more information, refer to the [✅ Supported Device List](build-armbian/armbian-files/common-files/etc/model_database.conf). To add new device support, see Section 12.15 of the documentation: [✳️Adding New Supported Devices](documents/README.md#1215-how-to-add-new-supported-devices). Please read the [📚Armbian User Documentation](./documents) before use, as it provides solutions to common issues.
 
 ## Installation and Upgrade Instructions for Armbian
 

@@ -8,7 +8,7 @@
 
 Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築された軽量Linuxディストリビューションです。Armbianシステムはスリムでクリーンであり、Debian/Ubuntuと100%互換性があり、その機能と豊富なソフトウェアエコシステムを継承しています。TF/SD/USBストレージおよびデバイスのeMMCで安全かつ安定して動作します。本プロジェクトは、公式Armbianシステムの完全性を維持しつつ、TVボックスなどの公式にサポートされていないデバイスへのサポートを拡張し、便利な管理コマンドのセットを追加しています。TVボックスのAndroid TVシステムをArmbianに置き換え、強力なサーバーに変身させることができます。
 
-本プロジェクトは多くの[コントリビューター](CONTRIBUTORS.md)に支えられ、`Amlogic`、`Rockchip`、`Allwinner`デバイス向けのArmbianシステムを構築しています。eMMCへの書き込み、カーネル更新などの機能をサポートしています。詳しい使い方は[Armbianユーザードキュメント](./documents/README.ja.md)をご覧ください。最新のArmbianシステムは[Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases)からダウンロードできます。`Fork`してカスタマイズすることを歓迎します。本プロジェクトがお役に立ちましたら、右上の`Star`ボタンをクリックしてサポートをお願いします。
+本プロジェクトは多くの[コントリビューター](CONTRIBUTORS.md)に支えられ、`Amlogic`、`Rockchip`、`Allwinner`デバイス向けのArmbianシステムを構築しています。eMMCへの書き込み、カーネル更新などの機能をサポートしています。詳しい使い方は[📚Armbianユーザードキュメント](./documents/README.ja.md)をご覧ください。最新のArmbianシステムは[⬇️Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases)からダウンロードできます。`Fork`してカスタマイズすることを歓迎します。本プロジェクトがお役に立ちましたら、右上の`⭐Star`ボタンをクリックしてサポートをお願いします。
 
 ## Armbianシステムのデフォルト情報
 
@@ -51,7 +51,7 @@ Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築
 | h6 | [Vplus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1100), [Tanix-TX6](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3534), [TX6-H](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3528), [T95-max](https://github.com/ophub/fnnas/issues/546), [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 
 > [!TIP]
-> 現在、[s905ボックス](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)は`TF/SD/USB`でのみ使用できます。その他のボックスモデルは`EMMC`への書き込みに対応しています。詳細は[✅ 対応デバイス一覧](build-armbian/armbian-files/common-files/etc/model_database.conf)をご参照ください。新しいデバイスサポートの追加については、ドキュメントのセクション12.15：[新しい対応デバイスの追加方法](documents/README.ja.md#1215-新しいサポートデバイスの追加方法)をご覧ください。ご使用前に[Armbianユーザードキュメント](./documents/README.ja.md)をお読みください。よくある問題の解決方法が記載されています。
+> 現在、[s905ボックス](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1173)は`TF/SD/USB`でのみ使用できます。その他のボックスモデルは`EMMC`への書き込みに対応しています。詳細は[✅ 対応デバイス一覧](build-armbian/armbian-files/common-files/etc/model_database.conf)をご参照ください。新しいデバイスサポートの追加については、ドキュメントのセクション12.15：[✳️新しい対応デバイスの追加方法](documents/README.ja.md#1215-新しいサポートデバイスの追加方法)をご覧ください。ご使用前に[📚Armbianユーザードキュメント](./documents/README.ja.md)をお読みください。よくある問題の解決方法が記載されています。
 
 ## Armbianのインストールとアップグレード手順
 
