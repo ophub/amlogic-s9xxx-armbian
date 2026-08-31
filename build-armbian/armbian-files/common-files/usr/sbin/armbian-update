@@ -272,7 +272,10 @@ init_var() {
     kernel_api="https://github.com/${KERNEL_REPO}"
 
     # Set kernel download tags
-    [[ -n "${kernel_usage}" ]] && KERNEL_TAGS="${kernel_usage}"
+    [[ -n "${kernel_usage}" ]] && {
+        KERNEL_TAGS="${kernel_usage}"
+        sed -i "s|^KERNEL_TAGS=.*|KERNEL_TAGS='${KERNEL_TAGS}'|g" ${ophub_release_file}
+    }
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
     [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx)")" ]] && {
         echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ]. Resetting to default [ stable ]."
