@@ -41,7 +41,6 @@ fix_log="/tmp/armbian-fix.log"
 # Get the release information
 [[ -f "${ophub_release_file}" ]] && {
     kernel_signature="$(cat ${ophub_release_file} | grep -E "^KERNEL_SIGNATURE=" | cut -d"'" -f2 || true)"
-    download_type="$(cat ${ophub_release_file} | grep -E "^DOWNLOAD_TYPE=" | cut -d"'" -f2 || true)"
 }
 
 # Add log
@@ -143,11 +142,7 @@ done
 # 27. Adjust update-initramfs.conf
 initramfs_conf="/etc/initramfs-tools/update-initramfs.conf"
 [[ -f "${initramfs_conf}" ]] && {
-    if [[ "${download_type}" == "deb" ]]; then
-        sed -i "s|^update_initramfs=.*|update_initramfs=yes|g" "${initramfs_conf}" 2>/dev/null || true
-    else
-        sed -i "s|^update_initramfs=.*|update_initramfs=no|g" "${initramfs_conf}" 2>/dev/null || true
-    fi
+    sed -i "s|^update_initramfs=.*|update_initramfs=no|g" "${initramfs_conf}" 2>/dev/null || true
     tolog "27. Adjust update-initramfs.conf"
 } || true
 
