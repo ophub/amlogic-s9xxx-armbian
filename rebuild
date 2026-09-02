@@ -1157,6 +1157,34 @@ refactor_rootfs() {
     # Make the .bashrc take effect, Default shell settings file: /etc/default/useradd
     echo '[[ "${SHELL}" == *bash && -f "${HOME}/.bashrc" ]] && . ${HOME}/.bashrc' >>etc/profile
 
+    # Ensure the standard PATH block exists in /etc/profile.
+    # Some upstream rootfs ship an /etc/profile missing this section, which leaves root
+    # logins without /sbin & /usr/sbin in PATH (e.g. armbian-apt not found).
+    # Only prepend when the root sbin PATH is not already set (idempotent).
+    [[ -f "etc/profile" ]] && ! grep -q 'PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"' etc/profile && {
+        new_profile="$(awk '
+            BEGIN {
+                block = "# Set the standard PATH (root gets sbin, others get games)\n" \
+                        "if [ \"$(id -u)\" -eq 0 ]; then\n" \
+                        "  PATH=\"/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\"\n" \
+                        "else\n" \
+                        "  PATH=\"/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games\"\n" \
+                        "fi\n" \
+                        "export PATH\n"
+                inserted = 0
+            }
+            # After the 2nd header comment line, emit the block once
+            !inserted && /^# and Bourne compatible shells/ { print; printf "\n%s", block; inserted = 1; next }
+            { print }
+            END { if (!inserted) printf "%s", block }
+        ' etc/profile)" &&
+            [[ -n "${new_profile}" ]] &&
+            printf '%s\n' "${new_profile}" | tee etc/profile.new >/dev/null &&
+            chown root:root etc/profile.new &&
+            chmod 644 etc/profile.new &&
+            mv -f etc/profile.new etc/profile
+    }
+
     # Renaming/disabling related files
     mv -f etc/udev/rules.d/hdmi.rules etc/udev/rules.d/hdmi.rules.bak 2>/dev/null
 
