@@ -1,3 +1,419 @@
+> This repo is a fork of https://github.com/ophub/amlogic-s9xxx-armbian to be able to build the older versions of the kernel. Let me know if you need some other version that is not pre-built and i will make a release for it as well.
+
+<details>
+<summary> Full walkthrough for flashing an Android Box <i>Amlogic S905X3</i> into a self-hosted Home Assistant + Zigbee hub.</summary>
+
+# Android TV Box → Armbian + Home Assistant + Zigbee2MQTT
+
+A start-to-finish guide for converting a low-cost Amlogic Android TV box into a
+self-hosted Home Assistant + Zigbee hub running Armbian Linux.
+
+This guide documents a completed installation on the hardware listed below and records the
+problems encountered along the way, so that they can be avoided on repeat. The **⚠️ notes**
+mark the steps most likely to cause trouble and are worth reading first.
+
+---
+
+## Scope
+
+1. Obtaining an Armbian image with a *working* kernel
+2. Writing it to a USB stick from macOS
+3. Booting the box and installing to internal storage (eMMC)
+4. Stability notes (this class of hardware is marginal — see Part 5)
+5. Installing Home Assistant
+6. Installing Mosquitto + Zigbee2MQTT
+7. Pairing devices and making a button control a plug
+
+## Hardware used (substitute equivalents as needed)
+
+- **Box:** A95X F3 Air — **Amlogic S905X3**, 4 GB RAM, ~64 GB eMMC, 100 Mbps Ethernet
+- **Zigbee coordinator:** SONOFF **ZBDongle-P** (TI CC2652P chip, Z-Stack firmware)
+- **Build/flash host:** macOS in this guide (Linux/Windows also work; commands differ)
+- **A USB flash drive** (8 GB+). A microSD is possible but proved less reliable — see Part 2.
+
+> If the box is a different Amlogic model, the **board name** (Part 1) and **device tree
+> (DTB)** will differ. The remainder of the procedure is unchanged.
+
+---
+
+## ⚠️ Most important point
+
+The newest ophub kernels (**6.18.x** at the time of writing) were found to **kernel-panic**
+on this box — frequent crashes reporting
+`stack-protector: Kernel stack is corrupted in rcu_sched_clock_irq`.
+
+The **6.6 LTS kernel is stable** where 6.18 is unusable. All steps below assume a 6.6 image.
+
+---
+
+## Part 1 — Obtain the Armbian image
+
+Two options. Option A is fastest; Option B produces a fresh build.
+
+### Option A — use the pre-built image (fastest)
+
+A pre-built 6.6 image is published in this repository's **Releases** section. Download the
+`.img.gz` and proceed to Part 2.
+
+> If the release is missing or has aged out, use Option B to rebuild one.
+
+### Option B — build the image (GitHub Actions, free)
+
+The **ophub/amlogic-s9xxx-armbian** project is used. Building runs on GitHub's free Linux
+runners and costs nothing on a public fork.
+
+1. Create a **GitHub account** if needed.
+2. Fork <https://github.com/ophub/amlogic-s9xxx-armbian> (the **Fork** button, top-right). A
+   fork of a public repository is itself public, which is what makes the build free.
+3. In the fork → **Actions** tab → click the **"I understand… enable workflows"** banner if
+   shown.
+4. Open the **"Build Armbian arm64 server image"** workflow → **Run workflow**.
+5. Set the inputs:
+   - **Select OS Release:** `bookworm`
+   - **Select device board:** `s905x3-a95xf3`  *(dedicated A95X F3 target; the correct DTB is
+     included automatically)*
+   - **Select kernel version:** `6.6.y`  ← **not 6.18**
+   - Leave the remainder at defaults (`ophub/kernel`, `stable`, `ext4`, `server`).
+6. Run it. Build time is roughly **40–90 minutes** (the rootfs is compiled from source).
+7. On completion the image is published to the fork's **Releases** tab. Download the
+   `.img.gz`; the filename resembles
+   `Armbian_..._amlogic_s905x3-a95xf3_bookworm_6.6.x_server_....img.gz`.
+
+> **Board note:** a `s905x3-a95xf3-gb` option also exists; `-gb` appears to denote a
+> gigabit-Ethernet variant. This box is 100 Mbps, so the plain `s905x3-a95xf3` was used. If
+> Ethernet is absent after first boot, this is the first parameter to reconsider.
+
+---
+
+## Part 2 — Write the image to a USB stick (macOS)
+
+A **USB flash drive is recommended over a microSD card.** During this installation, two
+separate SD cards / readers failed mid-write (`dd: Device not configured`, and balenaEtcher's
+writer process terminating) — behaviour consistent with a failing card or a flaky reader. A
+USB stick avoids both failure modes.
+
+### Option A — balenaEtcher (simplest)
+
+1. Install from <https://etcher.balena.io> and open it.
+2. **Flash from file** → the downloaded `.img.gz` (Etcher decompresses it automatically).
+3. **Select target** → the USB stick (verify it is not another disk).
+4. **Flash!** → supply the macOS password when prompted. Allow it to flash **and** validate.
+5. If macOS reports "disk not readable" at the end, click **Ignore**, then eject.
+
+### Option B — command line (robust; the method used here)
+
+```bash
+cd ~/Downloads
+
+# 1. Verify the archive is not corrupt (should print "OK")
+gunzip -tv Armbian_*.img.gz
+
+# 2. Decompress to a raw .img (-k keeps the compressed copy)
+gunzip -k Armbian_*.img.gz
+
+# 3. Identify the USB stick — look for an "external, physical" disk
+diskutil list
+
+# 4. Unmount it (substitute diskN, e.g. disk4)
+diskutil unmountDisk /dev/diskN
+
+# 5. Write it — note the 'r' in rdiskN (raw device; substantially faster)
+sudo dd if=Armbian_*.img of=/dev/rdiskN bs=4m
+#   (no output during the write; press Ctrl+T to print progress)
+
+# 6. Flush and eject
+sync && diskutil eject /dev/diskN
+```
+
+> **⚠️ A write that dies with `Device not configured`, or that crawls at ~2 MB/s**, indicates
+> a failing card/reader rather than a bad image. Switch media. A healthy device writes at
+> 20–30+ MB/s.
+
+---
+
+## Part 3 — First boot
+
+Amlogic boxes must be instructed to boot from external media via a hidden reset button.
+
+1. Power off and **unplug** the box.
+2. Insert the USB stick.
+3. Locate the reset button — on the A95X F3 Air it is reported to be **inside the AV /
+   headphone jack** (pressed with a toothpick). *(If unresponsive, a pinhole button may be
+   present on the underside.)*
+4. **Hold the button**, apply power **while still holding**, continue holding ~8–10 s, then
+   release.
+5. Armbian should boot from the USB stick.
+
+> If an **Android recovery** menu appears instead, no valid boot media was found (a failed
+> write, or the button released too early). Select **Power off** — do not choose any recovery
+> action — and revisit Part 2.
+
+**Login:** the default is commonly `root` / `1234`, with a forced password change on first
+login. *(This detail is unverified from documentation; the on-screen first-boot prompt is
+authoritative.)*
+
+**Confirm the boot source is the USB stick, not the internal eMMC:**
+
+```bash
+lsblk
+```
+
+- The **eMMC** appears as `mmcblk2`, identifiable by its `mmcblk2boot0` / `mmcblk2boot1`
+  siblings (capacity varies by model — commonly 32 GB or 64 GB).
+- The **USB stick** appears as `sda`. If root (`/`) is mounted from `sda`, the stick was
+  booted.
+
+---
+
+## Part 4 — Install to internal storage (eMMC)
+
+Running from USB works, but installing to eMMC makes the system permanent and allows booting
+without the stick.
+
+```bash
+sudo armbian-install
+```
+
+- At the device list, select the **A95X F3** entry (DTB `meson-sm1-a95xf3-air.dtb`).
+- For the filesystem type, select **ext4**.
+- Allow it to complete (a few minutes): eMMC is formatted, the system copied, and u-boot
+  written.
+
+On completion: **power off, remove the USB stick, power on normally** (the reset-button trick
+is only for external boot). The system boots from eMMC.
+
+> **⚠️ `armbian-update` must not be run.** It fetches the newest kernel (6.18.x) and
+> reintroduces the crashes. If a kernel update is ever required, it must be pinned:
+> `armbian-update -k 6.6.y`. Ordinary `apt upgrade` is safe — it does not touch the ophub
+> kernel.
+
+---
+
+## Part 5 — Stability notes (⚠️ marginal hardware)
+
+The dominant cause of instability on this box is the kernel version. Running the **6.6 LTS
+kernel** (Part 1) eliminated the frequent panics observed under 6.18; this is the single most
+important measure.
+
+A secondary, load-dependent class of crash was observed on 6.6 after Home Assistant and the
+Zigbee dongle were added. Two contributing factors are plausible: aggressive CPU frequency
+scaling toward an unstable top operating point, and marginal power delivery from the stock
+supply once a USB dongle draws additional current.
+
+Possible mitigations, in order of expected effectiveness:
+
+- **A higher-quality power supply** rated **5 V / 3 A or more** for the box. ⚠️ It must match
+  the required **voltage, polarity, and barrel size** printed on the unit — an incorrect
+  supply can destroy the box.
+- **A powered USB hub with a short extension cable** for the Zigbee dongle. This offloads the
+  dongle's current draw from the box and, as a secondary benefit, moves the 2.4 GHz radio
+  away from the HDMI/USB3 ports, whose emissions degrade Zigbee range.
+- **Capping the maximum CPU frequency** via `/etc/default/cpufrequtils` (the `MAX_SPEED`
+  value; `1800000` was chosen, a value below the top of the `scaling_available_frequencies`
+  list). **Note:** in this installation, editing that file produced no observable effect, and
+  the matter was not pursued further because the system remained stable in practice. It is
+  recorded here as a possible avenue rather than a confirmed fix.
+
+In this installation, no powered hub was obtained; the dongle was connected directly to the
+box, and the system nonetheless operated stably during subsequent use. The stability of this
+hardware class should still be regarded as marginal, and a solid power supply should be
+prioritised for any continuous (24/7) deployment.
+
+---
+
+## Part 6 — Install Home Assistant
+
+**Home Assistant Supervised** is used (full add-on/app store; feature-equivalent to HAOS).
+
+```bash
+armbian-config --cmd HAS001
+```
+
+Then:
+
+1. Wait for the containers to be pulled (first boot: **10–20 minutes**). Progress can be
+   observed with `docker ps` until a `homeassistant` container is running and remains up.
+2. Determine the box IP: `ip -4 addr show eth0 | grep inet`
+3. Open **`http://<box-ip>:8123`** and complete onboarding (the administrator account is
+   created at this step).
+
+> **Expected warnings:** the system will be flagged **"unsupported"**, and possibly
+> **"unhealthy"**, under Settings → System. This is normal — the Supervised method is not
+> officially supported by Home Assistant, and TV-box hardware is likewise unofficial.
+> Functionality is unaffected. (Backups are stored under `/armbian/haos`.)
+
+> **⚠️ Interface naming:** recent Home Assistant releases renamed the **"Add-ons"** section to
+> **"Apps"**, and moved **Developer Tools** to **Settings → Tools**. Where older material
+> says "Add-ons," read "Apps."
+
+---
+
+## Part 7 — Mosquitto broker + Zigbee2MQTT
+
+### 7a. Install Mosquitto
+
+Settings → **Apps** → **App Store** → install **Mosquitto broker** → **Start** it. Home
+Assistant normally auto-detects it and offers to configure the **MQTT integration** — accept.
+
+### 7b. Create a dedicated MQTT user
+
+The broker requires authentication, and **every client must use valid credentials** or it
+silently fails to connect. (This was a significant source of difficulty during this
+installation: button presses reached the broker but not Home Assistant, because the
+credentials did not match.)
+
+Settings → **People** → **Users** tab → **Add user**:
+
+- Name: `mqtt`
+- Password: a recorded value
+- Type: **Local access only** (a service account requires no administrator rights and still
+  authenticates for LAN MQTT).
+
+### 7c. Add the Zigbee2MQTT repository and install it
+
+Zigbee2MQTT is **not** in the default store; its repository must be added first:
+
+1. App Store → **⋮ (top-right)** → **Repositories**
+2. Add: **`https://github.com/zigbee2mqtt/hassio-zigbee2mqtt`**
+3. Install **Zigbee2MQTT** (the stable variant, not "Edge").
+
+### 7d. Configure Zigbee2MQTT
+
+On first start, Zigbee2MQTT presents an **onboarding wizard** (reached via the app's **Open
+Web UI**).
+
+- **Devices found:** select the entry resembling
+  `usb-1a86_USB_Serial-if00-port0 (1a86), /dev/ttyUSB0` — the ZBDongle-P. *(The `/dev/ttySx`
+  entries are the box's internal serial ports and should be ignored.)*
+- **Serial → port:** `/dev/ttyUSB0`
+- **Serial → adapter:** **`zstack`** ← **critical.** Auto-detection **fails** on a generic
+  serial chip; the type must be specified. The ZBDongle-P (CC2652P) runs Z-Stack, hence
+  `zstack`.
+- **MQTT:** leave blank — with the Mosquitto add-on in use, Zigbee2MQTT connects
+  automatically. If explicit values are requested, use broker `core-mosquitto`, port `1883`,
+  and the `mqtt` credentials.
+- **Network** (PAN ID / Extended PAN ID / Network key): for a **new** network, retain the
+  random defaults. *(These must instead match the old values only when migrating an existing
+  Zigbee network, in which case "Restore mode" is also used.)*
+- Optionally set the Zigbee **channel** to avoid Wi-Fi interference (Advanced tab; 15/20/25
+  are clean choices). Changing it later requires re-pairing all devices, so it should be
+  decided now.
+
+Save and start. A healthy **Log** tab shows `zigbee-herdsman started`, coordinator/firmware
+details, and `Connected to MQTT`.
+
+> **⚠️ "No valid USB adapter found"** in the log indicates a missing/incorrect `adapter`
+> type. Set `adapter: zstack` explicitly.
+
+> **Recommendation — use a stable port path.** Once operational, replace `/dev/ttyUSB0` with
+> the `by-id` path so that re-enumeration on reboot cannot rename it:
+> ```bash
+> ls -l /dev/serial/by-id/
+> ```
+> Use the resulting `/dev/serial/by-id/usb-1a86_...` string as the port.
+
+### 7e. Point the MQTT integration at the `mqtt` user
+
+Settings → Devices & Services → **MQTT** → Configure (or remove and re-add): broker
+`core-mosquitto`, port `1883`, username `mqtt`, the recorded password. The discovery prefix
+remains `homeassistant` (default).
+
+---
+
+## Part 8 — Pair devices and automate
+
+### Pairing
+
+1. In the Zigbee2MQTT web UI, click **Permit join (All)**.
+2. Place a device in pairing mode (device-specific — often a ~5 s button hold; a new bulb may
+   require 3–5 power cycles).
+3. The device appears in Zigbee2MQTT, is interviewed, and receives controls. **Rename it
+   immediately** — the name propagates to Home Assistant, and later renaming is awkward.
+4. Turn **Permit join off** when finished.
+
+> **Plugs appear in Home Assistant automatically; buttons frequently do not** — a button has
+> no persistent state, so no dashboard card is auto-created. It remains connected and usable
+> in automations. This is expected behaviour.
+
+### Making a button toggle a plug
+
+Buttons emit momentary MQTT **actions** (`single`, `double`, `hold`), which are captured with
+an **MQTT trigger** automation (a "device" trigger does not reliably catch momentary
+actions).
+
+First, confirm the emitted value: in the Zigbee2MQTT dashboard, press the button and observe
+the `action` value (e.g. `single`).
+
+Then Settings → **Automations** → Create → **⋮ → Edit in YAML**. The following configuration
+was found to work:
+
+```yaml
+alias: Click toggles plug
+description: ''
+triggers:
+  - trigger: mqtt
+    topic: zigbee2mqtt/button-room-plug
+    value_template: "{{ value_json.action }}"
+    payload: single
+    alias: When button is single clicked
+conditions: []
+actions:
+  - action: switch.toggle
+    target:
+      entity_id: switch.plug_room_light
+mode: single
+```
+
+Common errors that prevent this from firing:
+
+- **`topic` and `payload` must sit directly on the trigger** — they must not be nested under
+  an `options:` key (the YAML editor sometimes inserts one; remove it).
+- **`value_template: "{{ value_json.action }}"` is required** — the message is JSON
+  (`{"action":"single",...}`), so without the template a bare `payload: single` never
+  matches.
+- **The plug's real entity ID must be confirmed:** Settings → Devices → *the plug* → its
+  switch entity → copy the exact ID. It may not be `switch.plug_room_light`.
+
+Save and press the button. For diagnosis: **⋮ → Traces** on the automation (a trace indicates
+the trigger fired; no trace indicates a non-matching trigger), and **Settings → Tools → MQTT
+→ Listen** on `zigbee2mqtt/<button>` confirms whether Home Assistant receives the action.
+
+---
+
+## Troubleshooting summary (issues encountered during this installation)
+
+| Symptom | Cause | Resolution |
+|---|---|---|
+| Constant kernel panics (`rcu_sched_clock_irq`) | Kernel 6.18 on this box | Use **6.6 LTS** (Part 1). Never run `armbian-update`. |
+| `dd`: `Device not configured`, ~2 MB/s writes | Failing SD card / reader | Use a **USB stick** |
+| Boots into Android recovery | No valid boot media found | Re-flash; hold the reset button longer |
+| Crashes under load | Marginal power / CPU frequency | Good 5 V/3 A PSU + powered hub (frequency capping was attempted but produced no observable effect here) |
+| Zigbee2MQTT: "No valid USB adapter found" | adapter type not set | Set **`adapter: zstack`** |
+| MQTT: "Connection Refused: not authorised" | Broker requires credentials | Create an **`mqtt` user** and use it for every client |
+| Button works in Zigbee2MQTT but not in Home Assistant | Malformed MQTT trigger / wrong entity ID | Use the YAML above; verify the entity ID |
+| "Add-ons" / "Developer Tools" not found | Renamed in recent Home Assistant | Look under **"Apps"** and **Settings → Tools** |
+
+---
+
+## Condensed procedure
+
+1. Obtain a 6.6 image — either from this repository's **Releases**, or by forking
+   ophub/amlogic-s9xxx-armbian and running **Build Armbian arm64 server image** with
+   `bookworm` / `s905x3-a95xf3` / **`6.6.y`**.
+2. Write the `.img` to a **USB stick** (not SD) with `dd`.
+3. Boot via the reset-button trick → `armbian-install` to eMMC → **never `armbian-update`**.
+4. For stability, prioritise a good power supply (and, if needed, a powered hub).
+5. `armbian-config --cmd HAS001` → onboard at `:8123`.
+6. Install **Mosquitto**, create an **`mqtt` user** (Local access only), add the
+   **zigbee2mqtt/hassio-zigbee2mqtt** repository, install **Zigbee2MQTT**.
+7. Zigbee2MQTT: port `/dev/ttyUSB0`, adapter **`zstack`**, MQTT blank (auto). MQTT integration
+   → `core-mosquitto:1883` with the `mqtt` user.
+8. Pair devices; automate buttons with an **MQTT trigger** using `value_json.action`.
+</details>
+
+<details>
+<summary>The readme from the original repo</summary>
+
 <div align="center">
     <img alt="Armbian" src="https://github.com/user-attachments/assets/74e55052-031b-48f8-9aca-e5f1dd9e256a" />
 </div>
@@ -318,3 +734,4 @@ The [u-boot](https://github.com/ophub/u-boot), [kernel](https://github.com/ophub
 
 The amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](LICENSE)
 
+</details>
