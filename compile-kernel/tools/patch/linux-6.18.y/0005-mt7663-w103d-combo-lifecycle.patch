@@ -1,0 +1,314 @@
+diff --git a/drivers/bluetooth/btmtksdio-w103d.h b/drivers/bluetooth/btmtksdio-w103d.h
+new file mode 100644
+index 0000000..6b67035
+--- /dev/null
++++ b/drivers/bluetooth/btmtksdio-w103d.h
+@@ -0,0 +1,155 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Included by btmtksdio.c.  State is per SDIO card, never per hci index. */
++#include <linux/completion.h>
++#include <linux/refcount.h>
++#define MT7663_COMBO_PROVIDER
++#include <linux/mt7663-combo.h>
++
++struct mt7663_combo {
++	struct list_head node;
++	struct sdio_func *bt_func;
++	struct mutex transition;
++	struct completion setup_done;
++	refcount_t refs;
++	int setup_status;
++	bool removing;
++};
++
++static LIST_HEAD(mt7663_combos);
++static DEFINE_MUTEX(mt7663_combos_lock);
++
++static int btmtksdio_combo_post_init(struct hci_dev *hdev)
++{
++	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	struct mt7663_combo *combo = bdev->combo;
++	int ret;
++
++	if (!combo)
++		return 0;
++	/* setup() only downloads firmware. The following HCI initialization
++	 * still reads BD_ADDR from the shared eFuse engine. Publish readiness
++	 * after that sequence, before Wi-Fi starts direct eFuse register reads.
++	 */
++	mutex_lock(&combo->transition);
++	ret = combo->removing ? -ENODEV : 0;
++	combo->setup_status = ret;
++	complete_all(&combo->setup_done);
++	mutex_unlock(&combo->transition);
++	dev_info(bdev->dev, "W103D: combo HCI initialization result=%d\n", ret);
++	return ret;
++}
++
++void mt7663_combo_put(struct mt7663_combo *combo)
++{
++	if (combo && refcount_dec_and_test(&combo->refs)) {
++		put_device(&combo->bt_func->dev);
++		kfree(combo);
++	}
++}
++EXPORT_SYMBOL_GPL(mt7663_combo_put);
++
++struct mt7663_combo *mt7663_combo_get(struct sdio_func *func)
++{
++	struct mt7663_combo *combo, *found = ERR_PTR(-EPROBE_DEFER);
++	struct device_link *link;
++
++	if (!of_machine_is_compatible("zte,w103d"))
++		return NULL;
++
++	mutex_lock(&mt7663_combos_lock);
++	list_for_each_entry(combo, &mt7663_combos, node) {
++		if (combo->bt_func->card != func->card)
++			continue;
++		refcount_inc(&combo->refs);
++		found = combo;
++		break;
++	}
++	mutex_unlock(&mt7663_combos_lock);
++	if (IS_ERR(found))
++		return found;
++
++	/* Managed links also order sysfs unbind and system suspend/resume.
++	 * Firmware readiness is checked separately by combo_begin().
++	 */
++	link = device_link_add(&func->dev, &found->bt_func->dev,
++			       DL_FLAG_AUTOPROBE_CONSUMER);
++	if (!link) {
++		mt7663_combo_put(found);
++		return ERR_PTR(-EINVAL);
++	}
++	if (!device_is_bound(&found->bt_func->dev)) {
++		mt7663_combo_put(found);
++		return ERR_PTR(-EPROBE_DEFER);
++	}
++	return found;
++}
++EXPORT_SYMBOL_GPL(mt7663_combo_get);
++
++int mt7663_combo_begin(struct mt7663_combo *combo)
++{
++	int ret;
++
++	if (!combo)
++		return 0;
++	if (!wait_for_completion_timeout(&combo->setup_done, 20 * HZ))
++		return -ETIMEDOUT;
++	mutex_lock(&combo->transition);
++	ret = combo->removing ? -ENODEV : combo->setup_status;
++	if (ret)
++		mutex_unlock(&combo->transition);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(mt7663_combo_begin);
++
++void mt7663_combo_end(struct mt7663_combo *combo)
++{
++	if (combo)
++		mutex_unlock(&combo->transition);
++}
++EXPORT_SYMBOL_GPL(mt7663_combo_end);
++
++static void btmtksdio_combo_detach(struct mt7663_combo *combo)
++{
++	if (!combo)
++		return;
++	mutex_lock(&combo->transition);
++	combo->removing = true;
++	combo->setup_status = -ENODEV;
++	complete_all(&combo->setup_done);
++	mutex_unlock(&combo->transition);
++}
++
++static void btmtksdio_combo_release(void *data)
++{
++	struct mt7663_combo *combo = data;
++
++	btmtksdio_combo_detach(combo);
++	mutex_lock(&mt7663_combos_lock);
++	list_del(&combo->node);
++	mutex_unlock(&mt7663_combos_lock);
++	mt7663_combo_put(combo);
++}
++
++static int btmtksdio_combo_register(struct btmtksdio_dev *bdev)
++{
++	struct mt7663_combo *combo;
++
++	if (bdev->data->chipid != 0x7663 ||
++	    !of_machine_is_compatible("zte,w103d"))
++		return 0;
++	combo = kzalloc(sizeof(*combo), GFP_KERNEL);
++	if (!combo)
++		return -ENOMEM;
++	combo->bt_func = bdev->func;
++	get_device(&bdev->func->dev);
++	mutex_init(&combo->transition);
++	init_completion(&combo->setup_done);
++	refcount_set(&combo->refs, 1);
++	combo->setup_status = -EINPROGRESS;
++	bdev->combo = combo;
++	mutex_lock(&mt7663_combos_lock);
++	list_add_tail(&combo->node, &mt7663_combos);
++	mutex_unlock(&mt7663_combos_lock);
++	return devm_add_action_or_reset(bdev->dev, btmtksdio_combo_release,
++					combo);
++}
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 452651a..adc9e8d 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -127,7 +127,10 @@ struct mtkbtsdio_hdr {
+ 	u8	bt_type;
+ } __packed;
+ 
++struct mt7663_combo;
++
+ struct btmtksdio_dev {
++	struct mt7663_combo *combo;
+ 	struct hci_dev *hdev;
+ 	struct sdio_func *func;
+ 	struct device *dev;
+@@ -143,6 +146,8 @@ struct btmtksdio_dev {
+ 	struct gpio_desc *reset;
+ };
+ 
++#include "btmtksdio-w103d.h"
++
+ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 			    struct btmtk_hci_wmt_params *wmt_params)
+ {
+@@ -1345,6 +1350,44 @@ ignore_wmt_cmd:
+ 	return 0;
+ }
+ 
++static int btmtksdio_combo_setup(struct hci_dev *hdev)
++{
++	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	struct mt7663_combo *combo = bdev->combo;
++	int ret;
++
++	if (!combo)
++		return btmtksdio_setup(hdev);
++	mutex_lock(&combo->transition);
++	if (combo->removing) {
++		mutex_unlock(&combo->transition);
++		return -ENODEV;
++	}
++	reinit_completion(&combo->setup_done);
++	combo->setup_status = -EINPROGRESS;
++	ret = btmtksdio_setup(hdev);
++	combo->setup_status = ret ? ret : -EINPROGRESS;
++	if (ret)
++		complete_all(&combo->setup_done);
++	dev_info(bdev->dev, "W103D: combo Bluetooth setup result=%d\n", ret);
++	mutex_unlock(&combo->transition);
++	return ret;
++}
++
++static int btmtksdio_combo_shutdown(struct hci_dev *hdev)
++{
++	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	int ret;
++
++	if (bdev->combo)
++		mutex_lock(&bdev->combo->transition);
++	ret = btmtksdio_shutdown(hdev);
++	/* FUNC_CTRL off does not undo the shared ROM patch setup. */
++	if (bdev->combo)
++		mutex_unlock(&bdev->combo->transition);
++	return ret;
++}
++
+ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+@@ -1498,8 +1541,9 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	hdev->close    = btmtksdio_close;
+ 	hdev->reset    = btmtksdio_reset;
+ 	hdev->flush    = btmtksdio_flush;
+-	hdev->setup    = btmtksdio_setup;
+-	hdev->shutdown = btmtksdio_shutdown;
++	hdev->setup    = btmtksdio_combo_setup;
++	hdev->post_init = btmtksdio_combo_post_init;
++	hdev->shutdown = btmtksdio_combo_shutdown;
+ 	hdev->send     = btmtksdio_send_frame;
+ 	hdev->wakeup   = btmtksdio_sdio_wakeup;
+ 	/*
+@@ -1519,6 +1563,12 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 
+ 	sdio_set_drvdata(func, bdev);
+ 
++	err = btmtksdio_combo_register(bdev);
++	if (err) {
++		hci_free_dev(hdev);
++		return err;
++	}
++
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		dev_err(&func->dev, "Can't register HCI device\n");
+@@ -1578,6 +1628,7 @@ static void btmtksdio_remove(struct sdio_func *func)
+ 	if (!bdev)
+ 		return;
+ 
++	btmtksdio_combo_detach(bdev->combo);
+ 	hdev = bdev->hdev;
+ 
+ 	/* Make sure to call btmtksdio_close_hw before removing sdio card */
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7615/Kconfig b/drivers/net/wireless/mediatek/mt76/mt7615/Kconfig
+index 8cc0c1b..18e1fb3 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7615/Kconfig
++++ b/drivers/net/wireless/mediatek/mt76/mt7615/Kconfig
+@@ -54,3 +54,13 @@ config MT7663S
+ 	  This adds support for MT7663S 802.11ac 2x2:2 wireless devices.
+ 
+ 	  To compile this driver as a module, choose M here.
++
++config MT7663S_W103D_COMBO
++	bool "W103D MT7663 shared Bluetooth setup coordination"
++	depends on MT7663S
++	depends on BT_MTKSDIO=y || (MT7663S=m && BT_MTKSDIO=m)
++	default y
++	help
++	  Wait for the same card's Bluetooth WMT setup and serialize firmware
++	  transitions on W103D. Module dependencies load the Bluetooth supplier
++	  first; device links order unbind and suspend. Other boards are unchanged.
+diff --git a/include/linux/mt7663-combo.h b/include/linux/mt7663-combo.h
+new file mode 100644
+index 0000000..1eb5d91
+--- /dev/null
++++ b/include/linux/mt7663-combo.h
+@@ -0,0 +1,27 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _LINUX_MT7663_COMBO_H
++#define _LINUX_MT7663_COMBO_H
++
++#include <linux/kconfig.h>
++
++struct sdio_func;
++struct mt7663_combo;
++
++/* The Bluetooth supplier owns the card's WMT setup state.  A successful
++ * begin holds its transition mutex; no SDIO host claim may surround it.
++ */
++#if IS_ENABLED(CONFIG_MT7663S_W103D_COMBO) || defined(MT7663_COMBO_PROVIDER)
++struct mt7663_combo *mt7663_combo_get(struct sdio_func *func);
++void mt7663_combo_put(struct mt7663_combo *combo);
++int mt7663_combo_begin(struct mt7663_combo *combo);
++void mt7663_combo_end(struct mt7663_combo *combo);
++#else
++static inline struct mt7663_combo *mt7663_combo_get(struct sdio_func *func)
++{
++	return NULL;
++}
++static inline void mt7663_combo_put(struct mt7663_combo *combo) {}
++static inline int mt7663_combo_begin(struct mt7663_combo *combo) { return 0; }
++static inline void mt7663_combo_end(struct mt7663_combo *combo) {}
++#endif
++#endif
