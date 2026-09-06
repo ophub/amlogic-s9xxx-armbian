@@ -17,6 +17,7 @@
 #define MCU_CMD_VENDOR_CH_PRIVILEGE 0x1c
 #define MCU_CMD_VENDOR_UPDATE_STA_RECORD 0x13
 #define MCU_CMD_VENDOR_REMOVE_STA_RECORD 0x14
+#define MCU_CMD_VENDOR_SET_BSS_RLM_PARAM 0x19
 
 /* Mark a legacy CID as SET so mt7615_mcu_fill_msg() emits the same
  * set_query value as gen4m's wlanSendSetQueryCmd().  The CE bit is an
@@ -1320,6 +1321,86 @@ void mt7663s_w103d_configure_filter(struct ieee80211_hw *hw,
 	mt7663s_w103d_reg_wr(&dev->mt76, 0x820f5004, rfcr1);
 }
 
+/* gen4m CMD_SET_BSS_RLM_PARAM, including its natural tail padding.  The
+ * extended BSS_INFO_BASIC command does not populate this firmware's home
+ * channel.  Without it, a completed online scan leaves connection probing
+ * on the wrong channel and mac80211 disconnects the otherwise healthy AP.
+ */
+struct mt7663s_w103d_bss_rlm {
+	u8 bss_idx;
+	u8 rf_band;
+	u8 primary_chan;
+	u8 rf_sco;
+	u8 erp_protect;
+	u8 ht_protect;
+	u8 gf_operation;
+	u8 tx_rifs;
+	__le16 ht_op_info3;
+	__le16 ht_op_info2;
+	u8 ht_op_info1;
+	u8 short_preamble;
+	u8 short_slot;
+	u8 vht_width;
+	u8 center_seg1;
+	u8 center_seg2;
+	__le16 basic_rates;
+	u8 nss;
+	u8 reserved;
+} __packed;
+
+static void
+mt7663s_w103d_fill_bss_rlm(struct mt76_phy *mphy,
+			struct ieee80211_vif *vif,
+			struct mt7663s_w103d_bss_rlm *req)
+{
+	struct mt7615_vif *mvif = (struct mt7615_vif *)vif->drv_priv;
+	struct cfg80211_chan_def *chandef = &mphy->chandef;
+	enum nl80211_band band = chandef->chan->band;
+
+	memset(req, 0, sizeof(*req));
+	req->bss_idx = mvif->mt76.idx;
+	req->rf_band = band == NL80211_BAND_5GHZ ? 2 : 1;
+	req->primary_chan = chandef->chan->hw_value;
+	if (chandef->width == NL80211_CHAN_WIDTH_40)
+		req->rf_sco = chandef->center_freq1 >
+			     chandef->chan->center_freq ? 1 : 3;
+	else if (chandef->width == NL80211_CHAN_WIDTH_80)
+		req->rf_sco = ((chandef->chan->center_freq -
+			       chandef->center_freq1 + 30) / 20) & 1 ? 3 : 1;
+	req->erp_protect = vif->bss_conf.use_cts_prot;
+	req->ht_protect = vif->bss_conf.ht_operation_mode &
+			  IEEE80211_HT_OP_MODE_PROTECTION;
+	req->ht_op_info2 = cpu_to_le16(vif->bss_conf.ht_operation_mode);
+	req->ht_op_info1 = req->rf_sco |
+		(req->rf_sco ? IEEE80211_HT_PARAM_CHAN_WIDTH_ANY : 0);
+	req->short_preamble = vif->bss_conf.use_short_preamble;
+	req->short_slot = vif->bss_conf.use_short_slot;
+	req->vht_width = chandef->width == NL80211_CHAN_WIDTH_80;
+	if (req->vht_width)
+		req->center_seg1 = ieee80211_frequency_to_channel(
+			chandef->center_freq1);
+	/* gen4m rlmFillSyncCmdParam uses the BSS basic rate set here. */
+	req->basic_rates = cpu_to_le16(mt7663s_w103d_vendor_rate_set(
+		vif->bss_conf.basic_rates, band));
+	req->nss = max_t(u8, hweight8(mphy->antenna_mask), 1);
+}
+
+static int
+mt7663s_w103d_sync_bss_rlm(struct mt7615_dev *dev,
+			struct ieee80211_vif *vif)
+{
+	struct mt7663s_w103d_bss_rlm req;
+
+	BUILD_BUG_ON(sizeof(req) != 22);
+	BUILD_BUG_ON(offsetof(struct mt7663s_w103d_bss_rlm, basic_rates) != 18);
+	if (!vif->cfg.assoc || !dev->mphy.chandef.chan)
+		return 0;
+	mt7663s_w103d_fill_bss_rlm(&dev->mphy, vif, &req);
+	return mt76_mcu_send_msg(&dev->mt76,
+		MCU_CMD_VENDOR_SET(MCU_CMD_VENDOR_SET_BSS_RLM_PARAM),
+		&req, sizeof(req), false);
+}
+
 void mt7663s_w103d_note_assoc(struct ieee80211_hw *hw,
 			      struct ieee80211_vif *vif, u64 changed)
 {
@@ -1327,6 +1408,17 @@ void mt7663s_w103d_note_assoc(struct ieee80211_hw *hw,
 	struct mt76_phy *mphy = hw->priv;
 	struct mt7663s_w103d_intr_state *state =
 		mt7663s_w103d_intr_state(&dev->mt76);
+	int ret;
+
+	if (vif->cfg.assoc &&
+	    (changed & (BSS_CHANGED_ASSOC | BSS_CHANGED_BANDWIDTH |
+			BSS_CHANGED_HT | BSS_CHANGED_ERP_SLOT |
+			BSS_CHANGED_ERP_PREAMBLE | BSS_CHANGED_ERP_CTS_PROT))) {
+		ret = mt7663s_w103d_sync_bss_rlm(dev, vif);
+		if (ret)
+			dev_warn(dev->mt76.dev,
+				 "W103D: failed to sync BSS channel: %d\n", ret);
+	}
 
 	if (state && (changed & BSS_CHANGED_ASSOC) && vif->cfg.assoc &&
 	    mphy->chandef.chan &&
@@ -1350,6 +1442,13 @@ int mt7663s_w103d_hw_scan(struct ieee80211_hw *hw,
 
 	if (!mt7615_firmware_offload(dev))
 		return 1;
+
+	/* Ensure the N9 scan scheduler knows the associated home channel before
+	 * releasing the JOIN privilege.  Refuse the scan if synchronization fails.
+	 */
+	ret = mt7663s_w103d_sync_bss_rlm(dev, vif);
+	if (ret)
+		return ret;
 
 	/* Association holds a JOIN privilege on 5 GHz.  The firmware does not
 	 * expire it reliably after deauthentication, and its scan engine then
@@ -1889,21 +1988,24 @@ int mt7663s_w103d_mcu_send_message(struct mt76_dev *mdev,
 		 * wildcard passive request traverses the complete channel list
 		 * and returns the same broadcast BSS entries reliably.  Keep the
 		 * caller's channel list and random address, but remove directed
-		 * SSIDs/probes and use the normal passive dwell time.
+		 * SSIDs/probes.  As in gen4m, let N9 choose the dwell/home-channel
+		 * scheduling and timeout rather than imposing a whole-scan deadline.
 		 */
-		if (skb->len >= sizeof(*txd) + sizeof(*req) && req->scan_type) {
+		if (skb->len >= sizeof(*txd) + sizeof(*req)) {
 			channels = req->channels_num + req->ext_channels_num;
-			req->scan_type = 0;
-			req->ssid_type = BIT(0);
-			req->ssids_num = 0;
-			req->probe_req_num = 0;
-			req->ssid_type_ext = 0;
-			req->channel_dwell_time = cpu_to_le16(120);
-			req->channel_min_dwell_time = cpu_to_le16(120);
-			req->timeout_value = cpu_to_le16(channels * 120);
-			dev_info_ratelimited(mdev->dev,
-				"W103D: active scan converted to passive (%u channels)\n",
-				channels);
+			if (req->scan_type) {
+				req->scan_type = 0;
+				req->ssid_type = BIT(0);
+				req->ssids_num = 0;
+				req->probe_req_num = 0;
+				req->ssid_type_ext = 0;
+				dev_dbg(mdev->dev,
+					"W103D: active scan converted to passive (%u channels)\n",
+					channels);
+			}
+			req->channel_dwell_time = 0;
+			req->channel_min_dwell_time = 0;
+			req->timeout_value = 0;
 		}
 
 		/* MT7663 sends scan results and SCAN_DONE through the MCU RX queue. */

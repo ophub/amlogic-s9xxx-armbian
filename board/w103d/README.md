@@ -158,6 +158,7 @@ Run the native regressions on Linux with Python 3 and GCC:
 ```sh
 python3 compile-kernel/tools/mt76/tests/test_rx_enhance.py
 python3 compile-kernel/tools/mt76/tests/test_combo.py
+python3 compile-kernel/tools/mt76/tests/test_scan_rlm.py
 python3 compile-kernel/tools/mt76/tests/test_mmc_irq.py "$KERNEL_SRC"
 ```
 
