@@ -615,6 +615,14 @@ compile_env() {
     [[ -s "${config_path}/config-${kernel_verpatch}" ]] || error_msg "Missing [ config-${kernel_verpatch} ] template!"
     echo -e "${INFO} Copy [ ${config_path}/config-${kernel_verpatch} ] to [ .config ]"
     cp -f ${config_path}/config-${kernel_verpatch} .config
+    # The W103D patch series requires the same options used by board testing.
+    w103d_config="${compile_path}/../board/w103d/linux/w103d-${kernel_verpatch}.config"
+    if [[ -f include/linux/mt7663-combo.h ]]; then
+        [[ -s "${w103d_config}" ]] || error_msg "Missing W103D config fragment: ${w103d_config}"
+        bash scripts/kconfig/merge_config.sh -m .config "${w103d_config}" || error_msg "W103D config merge failed."
+        make ${MAKE_SET_STRING} CC="${CC}" LD="${LD}" olddefconfig || error_msg "W103D olddefconfig failed."
+        grep -qx 'CONFIG_MT7663S_W103D_COMBO=y' .config || error_msg "W103D combo support is disabled."
+    fi
     # Clear kernel signature
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"\"|" .config
 

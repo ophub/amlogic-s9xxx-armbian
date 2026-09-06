@@ -1,0 +1,196 @@
+diff --git a/drivers/mmc/core/sdio.c b/drivers/mmc/core/sdio.c
+index 2e37700ae..f705b94e4 100644
+--- a/drivers/mmc/core/sdio.c
++++ b/drivers/mmc/core/sdio.c
+@@ -7,6 +7,7 @@
+ 
+ #include <linux/err.h>
+ #include <linux/pm_runtime.h>
++#include <linux/property.h>
+ #include <linux/sysfs.h>
+ 
+ #include <linux/mmc/host.h>
+@@ -661,11 +662,15 @@ static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
+ 			      struct mmc_card *oldcard)
+ {
+ 	struct mmc_card *card;
++	bool fixed_1_8v;
+ 	int err;
+ 	int retries = 10;
+ 	u32 rocr = 0;
+ 	u32 ocr_card = ocr;
+ 
++	fixed_1_8v = device_property_read_bool(mmc_dev(host),
++						"zte,sdio-fixed-1-8v");
++
+ 	WARN_ON(!host->claimed);
+ 
+ 	/* to query card if 1.8V signalling is supported */
+@@ -740,7 +745,14 @@ static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
+ 	 * to make sure which speed mode should work.
+ 	 */
+ 	if (rocr & ocr & R4_18V_PRESENT) {
+-		err = mmc_set_uhs_voltage(host, ocr_card);
++		if (fixed_1_8v &&
++		    host->ios.signal_voltage == MMC_SIGNAL_VOLTAGE_180) {
++			dev_info(mmc_dev(host),
++				 "fixed 1.8V SDIO rail, skipping CMD11 voltage switch\n");
++			err = 0;
++		} else {
++			err = mmc_set_uhs_voltage(host, ocr_card);
++		}
+ 		if (err == -EAGAIN) {
+ 			mmc_sdio_pre_init(host, ocr_card, card);
+ 			retries--;
+@@ -1333,4 +1345,3 @@ int mmc_attach_sdio(struct mmc_host *host)
+ 
+ 	return err;
+ }
+-
+diff --git a/drivers/mmc/host/meson-gx-mmc.c b/drivers/mmc/host/meson-gx-mmc.c
+index e5b19ce84..102592ef1 100644
+--- a/drivers/mmc/host/meson-gx-mmc.c
++++ b/drivers/mmc/host/meson-gx-mmc.c
+@@ -164,7 +164,10 @@ struct meson_host {
+ 	bool dram_access_quirk;
+ 
+ 	struct pinctrl *pinctrl;
++	struct pinctrl_state *pins_active;
+ 	struct pinctrl_state *pins_clk_gate;
++	struct pinctrl_state *pins_sdio_transfer;
++	struct pinctrl_state *pins_sdio_transfer_clk_gate;
+ 
+ 	unsigned int bounce_buf_size;
+ 	void *bounce_buf;
+@@ -342,8 +345,12 @@ static void meson_mmc_clk_ungate(struct meson_host *host)
+ {
+ 	u32 cfg;
+ 
+-	if (host->pins_clk_gate)
+-		pinctrl_select_default_state(host->dev);
++	if (host->pins_clk_gate) {
++		if (host->pins_active)
++			pinctrl_select_state(host->pinctrl, host->pins_active);
++		else
++			pinctrl_select_default_state(host->dev);
++	}
+ 
+ 	/* Make sure the clock is not stopped in the controller */
+ 	cfg = readl(host->regs + SD_EMMC_CFG);
+@@ -530,6 +537,26 @@ static int meson_mmc_resampling_tuning(struct mmc_host *mmc, u32 opcode)
+ 	unsigned int val, dly, max_dly, i;
+ 	int ret;
+ 
++	if (host->pins_sdio_transfer &&
++	    host->pins_active != host->pins_sdio_transfer) {
++		ret = pinctrl_select_state(host->pinctrl,
++					   host->pins_sdio_transfer);
++		if (ret)
++			return ret;
++
++		host->pins_active = host->pins_sdio_transfer;
++		host->pins_clk_gate = host->pins_sdio_transfer_clk_gate;
++
++		val = readl(host->regs + host->data->adjust);
++		val &= ~ADJUST_ADJ_DELAY_MASK;
++		val |= ADJUST_ADJ_EN;
++		val |= FIELD_PREP(ADJUST_ADJ_DELAY_MASK, 3);
++		writel(val, host->regs + host->data->adjust);
++		dev_info_once(host->dev,
++			      "switched to SDIO transfer routing with vendor delay 3\n");
++		return 0;
++	}
++
+ 	/* Resampling is done using the source clock */
+ 	max_dly = DIV_ROUND_UP(clk_get_rate(host->mux_clk),
+ 			       clk_get_rate(host->mmc_clk));
+@@ -1111,7 +1138,6 @@ static int meson_mmc_probe(struct platform_device *pdev)
+ 	/* The G12A SDIO Controller needs an SRAM bounce buffer */
+ 	host->dram_access_quirk = device_property_read_bool(&pdev->dev,
+ 					"amlogic,dram-access-quirk");
+-
+ 	/* Get regulators and the supported OCR mask */
+ 	ret = mmc_regulator_get_supply(mmc);
+ 	if (ret)
+@@ -1157,6 +1183,22 @@ static int meson_mmc_probe(struct platform_device *pdev)
+ 		host->pins_clk_gate = NULL;
+ 	}
+ 
++	host->pins_active = pinctrl_lookup_state(host->pinctrl,
++						 PINCTRL_STATE_DEFAULT);
++	if (IS_ERR(host->pins_active))
++		host->pins_active = NULL;
++
++	host->pins_sdio_transfer = pinctrl_lookup_state(host->pinctrl,
++							"sdio-transfer");
++	host->pins_sdio_transfer_clk_gate =
++		pinctrl_lookup_state(host->pinctrl,
++				     "sdio-transfer-clk-gate");
++	if (IS_ERR(host->pins_sdio_transfer) ||
++	    IS_ERR(host->pins_sdio_transfer_clk_gate)) {
++		host->pins_sdio_transfer = NULL;
++		host->pins_sdio_transfer_clk_gate = NULL;
++	}
++
+ 	core_clk = devm_clk_get_enabled(&pdev->dev, "core");
+ 	if (IS_ERR(core_clk))
+ 		return PTR_ERR(core_clk);
+diff --git a/drivers/pinctrl/meson/pinctrl-meson-g12a.c b/drivers/pinctrl/meson/pinctrl-meson-g12a.c
+index 6d172c9a5..c985d266e 100644
+--- a/drivers/pinctrl/meson/pinctrl-meson-g12a.c
++++ b/drivers/pinctrl/meson/pinctrl-meson-g12a.c
+@@ -12,6 +12,13 @@
+ #include "pinctrl-meson.h"
+ #include "pinctrl-meson-axg-pmx.h"
+ 
++/*
++ * G12A Rev.B has a virtual pinmux bit which routes SD_EMMC_B to the
++ * GPIOX SDIO pads.  The vendor tree calls it GPIOV_0/sdio_dummy.  Keep it
++ * after the public GPIO range so existing DT GPIO numbers remain stable.
++ */
++#define GPIOV_0		(GPIOX_19 + 1)
++
+ static const struct pinctrl_pin_desc meson_g12a_periphs_pins[] = {
+ 	MESON_PIN(GPIOZ_0),
+ 	MESON_PIN(GPIOZ_1),
+@@ -98,6 +105,7 @@ static const struct pinctrl_pin_desc meson_g12a_periphs_pins[] = {
+ 	MESON_PIN(GPIOX_17),
+ 	MESON_PIN(GPIOX_18),
+ 	MESON_PIN(GPIOX_19),
++	MESON_PIN(GPIOV_0),
+ };
+ 
+ static const struct pinctrl_pin_desc meson_g12a_aobus_pins[] = {
+@@ -155,6 +163,7 @@ static const unsigned int sdio_d2_pins[]		= { GPIOX_2 };
+ static const unsigned int sdio_d3_pins[]		= { GPIOX_3 };
+ static const unsigned int sdio_clk_pins[]		= { GPIOX_4 };
+ static const unsigned int sdio_cmd_pins[]		= { GPIOX_5 };
++static const unsigned int sdio_dummy_pins[]		= { GPIOV_0 };
+ 
+ /* sdcard */
+ static const unsigned int sdcard_d0_c_pins[]		= { GPIOC_0 };
+@@ -641,6 +650,7 @@ static const struct meson_pmx_group meson_g12a_periphs_groups[] = {
+ 	GROUP(sdio_d3,			1),
+ 	GROUP(sdio_clk,			1),
+ 	GROUP(sdio_cmd,			1),
++	GROUP(sdio_dummy,		1),
+ 	GROUP(spi0_mosi_x,		4),
+ 	GROUP(spi0_miso_x,		4),
+ 	GROUP(spi0_ss0_x,		4),
+@@ -1349,6 +1359,8 @@ static const struct meson_bank meson_g12a_periphs_banks[] = {
+ 		5,  0,  5,  0,  16,  0, 17,  0,  18,  0,  6, 0),
+ 	BANK_DS("X",    GPIOX_0,  GPIOX_19,  IRQID_GPIOX_0,  IRQID_GPIOX_19,
+ 		2,  0,  2,  0,   6,  0,  7,  0,   8,  0,  2, 0),
++	BANK("V",       GPIOV_0,  GPIOV_0,   -1, -1,
++		5, 17,  5, 17,  16, 17, 17, 17,  18, 17),
+ };
+ 
+ static const struct meson_bank meson_g12a_aobus_banks[] = {
+@@ -1368,6 +1380,7 @@ static const struct meson_pmx_bank meson_g12a_periphs_pmx_banks[] = {
+ 	BANK_PMX("C",    GPIOC_0, GPIOC_7,  0x9, 0),
+ 	BANK_PMX("A",    GPIOA_0, GPIOA_15, 0xd, 0),
+ 	BANK_PMX("X",    GPIOX_0, GPIOX_19, 0x3, 0),
++	BANK_PMX("V",    GPIOV_0, GPIOV_0,  0x2, 24),
+ };
+ 
+ static const struct meson_axg_pmx_data meson_g12a_periphs_pmx_banks_data = {

@@ -1,0 +1,168 @@
+From: W103D bring-up <local@w103d>
+Subject: [PATCH] mmc: meson-gx: handle unaligned transfers through SRAM
+
+The G12A SDIO controller uses its 1.5 KiB internal SRAM when the
+dram-access quirk is active. That window must be accessed with aligned
+32-bit MMIO operations, but an SDIO client may legally submit a scatterlist
+whose offsets or lengths are not word aligned. Rejecting such a request
+breaks command exchange with the MT7663 on W103D.
+
+Allocate a normal-memory staging buffer for the quirk. Gather arbitrary
+scatterlists into it before aligned writes to SRAM, and perform the inverse
+operation after reads. Zero-pad the last output word without copying the
+padding back to the caller. The MMC limits already cap every request to the
+SRAM size, so the controller still never receives an oversized transfer.
+Use the architecture's 32-bit MMIO copy primitives for the aligned SRAM
+window instead of issuing a fully ordered readl()/writel() for every word.
+
+This changes only the G12A SRAM quirk path; normal coherent-DMA operation is
+unchanged.
+
+diff --git a/drivers/mmc/host/meson-gx-mmc.c b/drivers/mmc/host/meson-gx-mmc.c
+index a39906079..b8fd7fe4a 100644
+--- a/drivers/mmc/host/meson-gx-mmc.c
++++ b/drivers/mmc/host/meson-gx-mmc.c
+@@ -27,6 +27,7 @@
+ #include <linux/interrupt.h>
+ #include <linux/bitfield.h>
+ #include <linux/pinctrl/consumer.h>
++#include <linux/slab.h>
+ 
+ #define DRIVER_NAME "meson-gx-mmc"
+ 
+@@ -741,51 +742,37 @@ static void meson_mmc_desc_chain_transfer(struct mmc_host *mmc, u32 cmd_cfg)
+ 	writel(start, host->regs + SD_EMMC_START);
+ }
+ 
+-/* local sg copy for dram_access_quirk */
++/* Copy arbitrary SG data through the word-access-only controller SRAM. */
+ static void meson_mmc_copy_buffer(struct meson_host *host, struct mmc_data *data,
+ 				  size_t buflen, bool to_buffer)
+ {
+-	unsigned int sg_flags = SG_MITER_ATOMIC;
+-	struct scatterlist *sgl = data->sg;
+-	unsigned int nents = data->sg_len;
+-	struct sg_mapping_iter miter;
+-	unsigned int offset = 0;
+-
+-	if (to_buffer)
+-		sg_flags |= SG_MITER_FROM_SG;
+-	else
+-		sg_flags |= SG_MITER_TO_SG;
+-
+-	sg_miter_start(&miter, sgl, nents, sg_flags);
+-
+-	while ((offset < buflen) && sg_miter_next(&miter)) {
+-		unsigned int buf_offset = 0;
+-		unsigned int len, left;
+-		u32 *buf = miter.addr;
+-
+-		len = min(miter.length, buflen - offset);
+-		left = len;
++	size_t io_len = ALIGN(buflen, sizeof(u32));
++	u32 *staging = host->bounce_buf;
++	size_t copied;
+ 
+-		if (to_buffer) {
+-			do {
+-				writel(*buf++, host->bounce_iomem_buf + offset + buf_offset);
++	if (WARN_ON_ONCE(buflen > host->bounce_buf_size))
++		return;
+ 
+-				buf_offset += 4;
+-				left -= 4;
+-			} while (left);
+-		} else {
+-			do {
+-				*buf++ = readl(host->bounce_iomem_buf + offset + buf_offset);
++	if (to_buffer) {
++		copied = sg_copy_to_buffer(data->sg, data->sg_len,
++					   staging, buflen);
++		if (WARN_ON_ONCE(copied != buflen))
++			return;
+ 
+-				buf_offset += 4;
+-				left -= 4;
+-			} while (left);
+-		}
++		if (io_len > buflen)
++			memset((u8 *)staging + buflen, 0, io_len - buflen);
+ 
+-		offset += len;
++		__iowrite32_copy(host->bounce_iomem_buf, staging,
++				 io_len / sizeof(u32));
++		return;
+ 	}
+ 
+-	sg_miter_stop(&miter);
++	__ioread32_copy(staging, host->bounce_iomem_buf,
++			  io_len / sizeof(u32));
++
++	copied = sg_copy_from_buffer(data->sg, data->sg_len,
++				     staging, buflen);
++	WARN_ON_ONCE(copied != buflen);
+ }
+ 
+ static void meson_mmc_start_cmd(struct mmc_host *mmc, struct mmc_command *cmd)
+@@ -853,43 +843,12 @@ static void meson_mmc_start_cmd(struct mmc_host *mmc, struct mmc_command *cmd)
+ 	writel(cmd->arg, host->regs + SD_EMMC_CMD_ARG);
+ }
+ 
+-static int meson_mmc_validate_dram_access(struct mmc_host *mmc, struct mmc_data *data)
+-{
+-	struct scatterlist *sg;
+-	int i;
+-
+-	/* Reject request if any element offset or size is not 32bit aligned */
+-	for_each_sg(data->sg, sg, data->sg_len, i) {
+-		if (!IS_ALIGNED(sg->offset, sizeof(u32)) ||
+-		    !IS_ALIGNED(sg->length, sizeof(u32))) {
+-			dev_err(mmc_dev(mmc), "unaligned sg offset %u len %u\n",
+-				data->sg->offset, data->sg->length);
+-			return -EINVAL;
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+ static void meson_mmc_request(struct mmc_host *mmc, struct mmc_request *mrq)
+ {
+ 	struct meson_host *host = mmc_priv(mmc);
+ 	host->needs_pre_post_req = mrq->data &&
+ 			!(mrq->data->host_cookie & SD_EMMC_PRE_REQ_DONE);
+ 
+-	/*
+-	 * The memory at the end of the controller used as bounce buffer for
+-	 * the dram_access_quirk only accepts 32bit read/write access,
+-	 * check the alignment and length of the data before starting the request.
+-	 */
+-	if (host->dram_access_quirk && mrq->data) {
+-		mrq->cmd->error = meson_mmc_validate_dram_access(mmc, mrq->data);
+-		if (mrq->cmd->error) {
+-			mmc_request_done(mmc, mrq);
+-			return;
+-		}
+-	}
+-
+ 	if (host->needs_pre_post_req) {
+ 		meson_mmc_get_transfer_mode(mmc, mrq);
+ 		if (!meson_mmc_desc_chain_mode(mrq->data))
+@@ -1254,9 +1213,16 @@ static int meson_mmc_probe(struct platform_device *pdev)
+ 		 * The MMC Controller embeds 1,5KiB of internal SRAM
+ 		 * that can be used to be used as bounce buffer.
+ 		 * In the case of the G12A SDIO controller, use these
+-		 * instead of the DDR memory
++		 * instead of the DDR memory.  Keep a normal-memory staging
++		 * buffer so arbitrary SG layouts never cause unaligned MMIO.
+ 		 */
+ 		host->bounce_buf_size = SD_EMMC_SRAM_DATA_BUF_LEN;
++		host->bounce_buf = devm_kzalloc(host->dev,
++						 host->bounce_buf_size, GFP_KERNEL);
++		if (!host->bounce_buf) {
++			ret = -ENOMEM;
++			goto err_free_irq;
++		}
+ 		host->bounce_iomem_buf = host->regs + SD_EMMC_SRAM_DATA_BUF_OFF;
+ 		host->bounce_dma_addr = res->start + SD_EMMC_SRAM_DATA_BUF_OFF;
+ 	} else {

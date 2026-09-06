@@ -1,0 +1,3 @@
+# Unified-diff context prefixes are significant, including on blank lines.
+# Check source whitespace after applying the patches to the kernel tree.
+*.patch whitespace=-blank-at-eol,-space-before-tab

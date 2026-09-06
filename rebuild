@@ -1365,6 +1365,13 @@ loop_rebuild() {
                     replace_kernel
                     refactor_bootfs
                     refactor_rootfs
+                    # Do not publish a W103D image assembled with stock wireless
+                    # firmware or a kernel package missing this board's patches.
+                    if [[ "${board}" == "w103d" ]]; then
+                        python3 "${current_path}/board/w103d/validation/verify_image.py" \
+                            --rootfs "${tag_rootfs}" --bootfs "${tag_bootfs}" \
+                            --release "${kernel_name}" || error_msg "W103D image validation failed."
+                    fi
                     clean_tmp
 
                     echo -e "(${j}.${i}) Armbian built successfully. \n"
