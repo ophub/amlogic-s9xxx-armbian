@@ -3,15 +3,16 @@
 Target: `unifreq/linux-6.18.y` commit
 `6943daf37ba41998e600f2249a9b84030290b37c` (Linux 6.18.49).
 
-Apply `0001` through `0006` in numeric order. The board registration and
+Apply `0001` through `0007` in numeric order. The board registration and
 Bluetooth hook context are rebased onto this tree. In particular, retain
 6.18's `btmtksdio_close_hw()` and its workqueue/SDIO-host deadlock fix,
 MT7668-specific behavior, HCI quirk helpers and runtime-PM changes.
 The same-card W103D readiness callback remains after HCI initialization.
 
 The isolated MT7663S and combo review copies are shared with the 6.12 series
-in `compile-kernel/tools/mt76/`. The existing 6.12 source and patches are
-unchanged. The separate kernel configuration is
+in `compile-kernel/tools/mt76/`. Patch 0007 keeps Null connection probes from
+overwriting the reported payload TX rate; it also has a 6.12 counterpart.
+The separate kernel configuration is
 `board/w103d/linux/w103d-6.18.config`.
 
 Use `board/w103d/validation/verify_patch_series.py KERNEL --series 6.18`

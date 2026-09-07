@@ -12,7 +12,7 @@ and `linux/w103d-6.18.config`. The hardware results below apply to 6.12;
 
 ## Kernel integration
 
-Apply the six patches in `compile-kernel/tools/patch/linux-6.12.y` in
+Apply the seven patches in `compile-kernel/tools/patch/linux-6.12.y` in
 numbered order. They were built against `unifreq/linux-6.12.y` commit
 `4c81f10ed9fea62e29081f0d2a129f1b59bf2fe5` (6.12.107):
 
@@ -22,6 +22,11 @@ numbered order. They were built against `unifreq/linux-6.12.y` commit
 4. Route GPIOX SDIO pins to SD_EMMC_B, which supports descriptor DMA.
 5. Coordinate same-card Bluetooth and Wi-Fi initialization and teardown.
 6. Complete successful, copy-free W103D SDIO requests in the hard IRQ.
+7. Exclude Null connection probes from mac80211 payload TX bitrate reporting.
+
+The [2026-09-07 scan/probe and bitrate follow-up](linux/scan-rate-validation.md)
+records the remaining scan-triggered disconnect fix, KDE bitrate reporting
+correction, 6.18 hardware results and unresolved scanning packet loss.
 
 The review copies in `linux/`, `compile-kernel/tools/mt76/mt7663s/` and
 `compile-kernel/tools/mt76/combo/` match the patched kernel sources. Update

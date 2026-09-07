@@ -1753,7 +1753,8 @@ mt7663s_w103d_tx_rate_val(struct mt76_phy *mphy,
 		rate_idx = val & 0xff;
 	}
 
-	if (stbc && nss == 1) {
+	if (stbc && nss == 1 &&
+	    (rate->flags & (IEEE80211_TX_RC_MCS | IEEE80211_TX_RC_VHT_MCS))) {
 		nss++;
 		rateval |= MT_TX_RATE_STBC;
 	}
@@ -1776,9 +1777,12 @@ mt7663s_w103d_fix_5g_tx_rate(struct mt7615_dev *dev,
 	u16 rateval;
 	u8 bw;
 
-	if (!is_data) {
-		/* Management/control traffic cannot fall back to the inaccessible
-		 * WTBL rate table.  Index 0 is mandatory 6 Mbps OFDM on 5 GHz.
+	if (!is_data || (info->flags & IEEE80211_TX_CTL_USE_MINRATE)) {
+		/* mac80211 probes the AP after scanning with a minimum-rate Null
+		 * frame.  Overriding it with minstrel's data rate/retry count can
+		 * exhaust the connection probes and cause a local reason=4 drop.
+		 * Management/control/Null traffic cannot use the inaccessible WTBL
+		 * rate table either.  Index 0 is mandatory 6 Mbps OFDM on 5 GHz.
 		 */
 		rate.idx = 0;
 		rate.count = 8;
@@ -1825,7 +1829,8 @@ mt7663s_w103d_fix_5g_tx_rate(struct mt7615_dev *dev,
 				 FIELD_PREP(MT_TXD6_TX_RATE, rateval));
 	if (rate.flags & IEEE80211_TX_RC_SHORT_GI)
 		txwi[6] |= cpu_to_le32(MT_TXD6_SGI);
-	if (info->flags & IEEE80211_TX_CTL_LDPC)
+	if ((info->flags & IEEE80211_TX_CTL_LDPC) &&
+	    (rate.flags & (IEEE80211_TX_RC_MCS | IEEE80211_TX_RC_VHT_MCS)))
 		txwi[6] |= cpu_to_le32(MT_TXD6_LDPC);
 }
 
@@ -1836,8 +1841,8 @@ int mt7663s_w103d_tx_prepare_skb(struct mt76_dev *mdev, void *txwi_ptr,
 {
 	struct mt7615_dev *dev = container_of(mdev, struct mt7615_dev, mt76);
 	struct ieee80211_hdr *hdr = (void *)tx_info->skb->data;
-	bool is_data = ieee80211_is_data(hdr->frame_control);
-	bool firmware_ba = ieee80211_is_data_qos(hdr->frame_control) &&
+	bool is_data = ieee80211_is_data_present(hdr->frame_control);
+	bool firmware_ba = is_data && ieee80211_is_data_qos(hdr->frame_control) &&
 		!is_multicast_ether_addr(hdr->addr1);
 	u32 sdio_len;
 	int ret;

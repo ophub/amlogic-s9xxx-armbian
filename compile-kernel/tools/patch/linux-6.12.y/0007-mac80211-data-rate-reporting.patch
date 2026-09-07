@@ -1,0 +1,32 @@
+From: W103D Project <local@w103d>
+Subject: [PATCH] mac80211: exclude Null frames from software TX bitrate reporting
+
+Connection probes after scans use a minimum-rate Null/QoS Null frame.
+The generic data-frame check includes these frames and overwrites the
+station TX bitrate with 6 Mbps OFDM or 1 Mbps CCK even when payload traffic
+continues at HT/VHT rates. Update this statistic only for payload data or
+hardware-encapsulated data; keep actual low-rate payload reporting intact.
+
+---
+
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -790,11 +790,14 @@
+ 		tx->rate = info->control.rates[0];
+ 	}
+ 
+-	if (txrc.reported_rate.idx < 0) {
++	if (txrc.reported_rate.idx < 0)
+ 		txrc.reported_rate = tx->rate;
+-		if (tx->sta && ieee80211_is_tx_data(tx->skb))
+-			tx->sta->deflink.tx_stats.last_rate = txrc.reported_rate;
+-	} else if (tx->sta)
++
++	/* Null/QoS Null connection probes deliberately use a basic rate.
++	 * Keep the station's data bitrate from being replaced by these
++	 * non-payload frames, including probes sent after a scan.
++	 */
++	if (tx->sta && (encap || ieee80211_is_data_present(hdr->frame_control)))
+ 		tx->sta->deflink.tx_stats.last_rate = txrc.reported_rate;
+ 
+ 	if (ratetbl)

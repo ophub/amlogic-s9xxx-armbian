@@ -23,8 +23,8 @@ def main():
     kernel = args.kernel.resolve()
     repo = Path(__file__).resolve().parents[3]
     patches = sorted((repo / f'compile-kernel/tools/patch/linux-{args.series}.y').glob('*.patch'))
-    if len(patches) != 6:
-        raise RuntimeError('Expected the complete six-patch W103D series')
+    if len(patches) != 7:
+        raise RuntimeError('Expected the complete seven-patch W103D series')
     revision = run('git', 'rev-parse', 'HEAD', cwd=kernel).stdout.strip()
     with tempfile.TemporaryDirectory(prefix='w103d-patchcheck-') as temporary:
         tree = Path(temporary) / 'kernel'
@@ -55,7 +55,8 @@ def main():
             run('git', 'diff', '--check', cwd=tree)
             tests = repo / 'compile-kernel/tools/mt76/tests'
             run('python3', str(tests / 'test_mmc_irq.py'), str(tree))
-            print(f'PASS: Linux {args.series}, source copies, source whitespace and MMC IRQ regression; base {revision}')
+            run('python3', str(tests / 'test_tx_rate_reporting.py'), str(tree))
+            print(f'PASS: Linux {args.series}, source copies, whitespace, MMC IRQ and TX rate reporting; base {revision}')
         finally:
             run('git', 'worktree', 'remove', '--force', str(tree), cwd=kernel)
 

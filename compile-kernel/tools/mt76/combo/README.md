@@ -36,6 +36,13 @@ only Wi-Fi while retaining Bluetooth. Forced module removal is unsupported.
 This does not implement recovery from arbitrary firmware crashes or reset the
 entire SDIO card while another function is active.
 
+On the 2021 N9 firmware, a reload during live use has also been observed to
+time out the firmware-exit command, followed by Bluetooth ownership failures
+and a Wi-Fi probe failure (`Bluetooth setup is not ready`). Reloading the
+original module cannot recover that shared firmware state. For deployments
+over this board's only Wi-Fi link, retain the original module and use a normal
+reboot to load the replacement; verify the loaded build ID after boot.
+
 Run the actual coordinator's native failure/lifetime/serialization regression:
 
 ```sh
