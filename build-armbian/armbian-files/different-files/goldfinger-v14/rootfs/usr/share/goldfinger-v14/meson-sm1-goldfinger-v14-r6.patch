@@ -1,0 +1,103 @@
+--- a/board.dts
++++ b/board.dts
+@@ -5,7 +5,7 @@
+	#address-cells = <0x02>;
+	#size-cells = <0x02>;
+	compatible = "amlogic,sm1";
+-	model = "AMedia X96 Max+ (eth0 speed:100Mb/s)";
++	model = "Goldfinger V14 r6";
+
+	aliases {
+		mmc0 = "/soc/mmc@ffe03000";
+@@ -282,7 +282,7 @@
+				clocks = <0x02 0x24>;
+				clock-names = "pclk";
+				resets = <0x05 0x3d>;
+-				status = "disabled";
++				status = "okay";
+				phandle = <0x65>;
+			};
+
+@@ -1937,12 +1937,9 @@
+
+					ethernet-phy@0 {
+						reg = <0x00>;
+-						max-speed = <0x64>;
+						reset-assert-us = <0x7530>;
+						reset-deassert-us = <0x13880>;
+						reset-gpios = <0x15 0x0f 0x07>;
+-						interrupt-parent = <0x16>;
+-						interrupts = <0x1a 0x08>;
+						phandle = <0x09>;
+					};
+				};
+@@ -2184,7 +2181,7 @@
+					#sound-dai-cells = <0x01>;
+					sound-name-prefix = "TOACODEC";
+					resets = <0x17 0x17>;
+-					status = "disabled";
++					status = "okay";
+					phandle = <0xf4>;
+				};
+
+@@ -2991,16 +2988,13 @@
+
+				bluetooth {
+					compatible = "brcm,bcm43438-bt";
+-					interrupt-parent = <0x16>;
+-					interrupts = <0x5f 0x04>;
+-					interrupt-names = "host-wakeup";
+					shutdown-gpios = <0x15 0x52 0x00>;
+					max-speed = <0x1e8480>;
+					clocks = <0x2c>;
+					clock-names = "lpo";
+					vbat-supply = <0x2d>;
+					vddio-supply = <0x22>;
+-					status = "disabled";
++					status = "okay";
+					phandle = <0x134>;
+				};
+			};
+@@ -3551,9 +3545,10 @@
+
+	sound {
+		compatible = "amlogic,axg-sound-card";
+-		model = "X96-MAX";
++		model = "GOLDFINGER-R3";
++		audio-widgets = "Headphone\0Headphones";
+		audio-aux-devs = <0x4f>;
+-		audio-routing = "TDMOUT_B IN 0\0FRDDR_A OUT 1\0TDMOUT_B IN 1\0FRDDR_B OUT 1\0TDMOUT_B IN 2\0FRDDR_C OUT 1\0TDM_B Playback\0TDMOUT_B OUT";
++		audio-routing = "TDMOUT_B IN 0\0FRDDR_A OUT 1\0TDMOUT_B IN 1\0FRDDR_B OUT 1\0TDMOUT_B IN 2\0FRDDR_C OUT 1\0TDM_B Playback\0TDMOUT_B OUT\0Headphones\0ACODEC LOLP\0Headphones\0ACODEC LORP";
+		clocks = <0x02 0x0d 0x02 0x0b 0x02 0x0c>;
+		assigned-clocks = <0x02 0x0d 0x02 0x0b 0x02 0x0c>;
+		assigned-clock-parents = <0x00 0x00 0x00>;
+@@ -3581,9 +3576,13 @@
+			dai-tdm-slot-tx-mask-3 = <0x01 0x01>;
+			mclk-fs = <0x100>;
+
+-			codec {
++			codec-0 {
+				sound-dai = <0x54 0x01>;
+			};
++
++			codec-1 {
++				sound-dai = <0xf4 0x01>;
++			};
+		};
+
+		dai-link-4 {
+@@ -3593,6 +3592,14 @@
+				sound-dai = <0x1c>;
+			};
+		};
++
++		dai-link-5 {
++			sound-dai = <0xf4 0x03>;
++
++			codec {
++				sound-dai = <0x65>;
++			};
++		};
+	};
+
+	regulator-vddgpu {

@@ -51,6 +51,8 @@ without_ampart=("s905x")
 model_conf="/etc/model_database.conf"
 # Add custom armbian firmware information
 ophub_release_file="/etc/ophub-release"
+# Optional board-specific installer settings and hooks
+board_release_file="/etc/armbian-board-release.conf"
 # Set the installation file preprocessing directory
 tmp_path="/ddbr"
 
@@ -73,6 +75,7 @@ error_msg() {
 check_release_file() {
     [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
     source "${ophub_release_file}"
+    [[ -s "${board_release_file}" ]] && source "${board_release_file}"
     [[ " ${without_ampart[*]} " =~ " ${SOC} " ]] && default_ampart="no"
 }
 
@@ -233,9 +236,14 @@ show_aml_model() {
     printf "%-5s %-10s %-45s %-50s\n" 0 Other Customize Enter-custom-dtb-name
     printf "%-s\n" "${split_line}"
 
-    # Display device options
-    echo -ne "${OPTIONS} Please Input ID: "
-    read boxid
+    # A board-specific image may lock installation to its own validated profile.
+    if [[ -n "${BOARD_INSTALL_MODEL_ID:-}" ]]; then
+        boxid="${BOARD_INSTALL_MODEL_ID}"
+        echo -e "${INFO} Board-specific image selected model ID: [ ${boxid} ]"
+    else
+        echo -ne "${OPTIONS} Please Input ID: "
+        read boxid
+    fi
     if [[ "${boxid}" -eq "0" ]]; then
         read -p "Please Input SoC Name(such as s9xxx): " AMLOGIC_SOC
         AMLOGIC_SOC="${AMLOGIC_SOC}"
@@ -274,12 +282,22 @@ show_aml_model() {
     # Check DTB file
     [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "DTB file [ ${FDTFILE} ] not found. Installation aborted!"
     # Check UBOOT_OVERLOAD file
-    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "U-Boot overload file [ ${UBOOT_OVERLOAD} ] not found. Installation aborted!"
+    if [[ "${NEED_OVERLOAD}" == "yes" && "${BOARD_ALLOW_DIRECT_BOOT:-no}" != "yes" ]]; then
+        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "U-Boot overload file [ ${UBOOT_OVERLOAD} ] not found. Installation aborted!"
+    fi
 }
 
 # Select the root filesystem type
 set_rootfs_type() {
     echo -e "${STEPS} Selecting root filesystem type..."
+    if [[ -n "${BOARD_INSTALL_FILESYSTEM:-}" ]]; then
+        file_system_type="${BOARD_INSTALL_FILESYSTEM}"
+        [[ "${file_system_type}" == "ext4" ]] || error_msg "Unsupported board filesystem: [ ${file_system_type} ]"
+        uenv_mount_string="UUID=${ROOTFS_UUID} rw rootfstype=ext4"
+        fstab_mount_string="defaults,noatime,nodiratime,commit=60,errors=remount-ro"
+        echo -e "${INFO} Board-validated filesystem: [ ${file_system_type} ]"
+        return
+    fi
     cat <<EOF
 -----------------------------------------------
   ID   TYPE
@@ -340,6 +358,12 @@ ampart_tool() {
 create_partition() {
     cd /
     echo -e "${STEPS} Creating eMMC partition layout..."
+
+    # Boards with a validated non-generic eMMC layout may provide this hook.
+    if declare -F board_create_partition >/dev/null 2>&1; then
+        board_create_partition
+        return
+    fi
 
     # Backup the bootloader, necessary for system recovery
     [[ -d "/usr/lib/u-boot" ]] || mkdir -p /usr/lib/u-boot
@@ -563,7 +587,10 @@ copy_rootfs() {
             echo -e "${INFO} Copying [ ${src} ] ..."
             tar -cf - ${src} | (
                 cd ${DIR_INSTALL}
-                tar -xpf -
+                # Amlogic boxes commonly boot without an RTC. A board hook can
+                # establish a trusted time lower bound; suppress any remaining
+                # harmless future-mtime notices without hiding extraction errors.
+                tar --warning=no-timestamp -xpf -
             )
         fi
     done
@@ -625,6 +652,12 @@ create_partition
 copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
+
+# Make a board-specific boot-selection change only after both filesystems have
+# been populated successfully. The hook must verify or roll back its own write.
+if declare -F board_activate_boot >/dev/null 2>&1; then
+    board_activate_boot
+fi
 
 echo -e "${SUCCESS} Installation completed successfully. Run [ poweroff ], remove the installation media, then re-insert the power supply to boot the new system."
 exit 0

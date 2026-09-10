@@ -3,6 +3,14 @@
 /tmp_dir
 /build-armbian/kernel
 /build-armbian/u-boot
+/build-armbian/armbian-files/different-files/goldfinger-v14/bootfs/aml_autoscript
+/build-armbian/armbian-files/different-files/goldfinger-v14/bootfs/s905_autoscript
+/build-armbian/armbian-files/different-files/goldfinger-v14/bootfs/emmc_autoscript
+/build-armbian/armbian-files/different-files/goldfinger-v14/rootfs/usr/lib/firmware/brcm/*.bin
+/build-armbian/armbian-files/different-files/goldfinger-v14/rootfs/usr/lib/firmware/brcm/*.txt
+/build-armbian/armbian-files/different-files/goldfinger-v14/rootfs/usr/lib/firmware/brcm/*.hcd
+/build-armbian/armbian-files/different-files/goldfinger-v14/rootfs/usr/lib/goldfinger-v14/packages/*.deb
+/build-armbian/armbian-files/different-files/goldfinger-v14/rootfs/usr/share/doc/goldfinger-v14/firmware/NOTICE.rkwifibt
 /compile-kernel/kernel
 /compile-kernel/output
 /compile-kernel/tools/armbian
