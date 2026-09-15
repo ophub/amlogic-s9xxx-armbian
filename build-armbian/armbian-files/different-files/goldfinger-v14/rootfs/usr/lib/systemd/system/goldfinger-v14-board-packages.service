@@ -1,0 +1,13 @@
+[Unit]
+Description=Install offline Goldfinger V14 board packages
+After=local-fs.target dbus.service
+Before=multi-user.target
+ConditionPathExists=!/var/lib/goldfinger-v14/bluez-installed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/lib/goldfinger-v14/install-board-packages.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
