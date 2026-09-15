@@ -50,10 +50,10 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -n     | CustomName  | カーネルのカスタム署名を設定します。例えば `-ophub` に設定すると、生成されるカーネル名は `5.15.100-ophub` になります。署名にスペースを含めないでください。デフォルト値：`-ophub` |
 | -t     | Toolchain   | カーネルコンパイルのツールチェーンを設定します。選択肢：`clang / gcc / gcc-<version>`。デフォルト値：`gcc` |
 | -z     | CompressFormat | カーネル内の initrd で使用する圧縮フォーマットを設定します。選択肢：`xz / gzip / zstd / lzma`。デフォルト値：`xz` |
-| -d     | DeleteSource | カーネルのコンパイル完了後にソースコードを削除するかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
 | -s     | SilentLog   | コンパイル時にサイレントモードを有効にしてログ出力を削減するかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
 | -l     | EnableLog   | コンパイルプロセスをログファイルに記録するかどうかを設定します：`/var/log/kernel_compile_*.log`。選択肢：`true / false`。デフォルト値：`false` |
 | -c     | CcacheClear | コンパイル前に ccache キャッシュをクリアするかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
+| -d     | DeleteSource | カーネルのコンパイル完了後にソースコードを削除するかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
 | -h     | DockerHostpath | カーネルコンパイル時の Docker コンテナのホストマシン上のマウントパスを設定します。デフォルトは現在のディレクトリを使用します。 |
 | -i     | DockerImage | カーネルコンパイル用の Docker コンテナイメージを設定します。デフォルト値：`ophub/armbian-trixie:arm64` |
 
@@ -107,10 +107,10 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_patch      | false            | リポジトリ内のカスタムカーネルパッチファイルのディレクトリを指定します。このパラメータを設定すると、コンパイル前に指定ディレクトリからパッチファイルを自動ダウンロードします。未設定の場合はスキップします。 |
 | auto_patch        | false            | カスタムカーネルパッチを適用するかどうかを設定します。デフォルト値：`false`。機能は `-p` を参照 |
 | compress_format   | xz               | カーネル内の initrd で使用する圧縮フォーマットを設定します。デフォルト値：`xz`。機能は `-z` を参照 |
-| delete_source     | false            | コンパイル完了後にカーネルソースコードを削除するかどうかを設定します。デフォルト値：`false`。機能は `-d` を参照 |
 | silent_log        | false            | コンパイル時にサイレントモードを有効にしてログ出力を削減するかどうかを設定します。デフォルト値：`false`。機能は `-s` を参照 |
 | enable_log        | false            | コンパイルプロセスをログファイルに記録するかどうかを設定します：`/var/log/kernel_compile_*.log`。デフォルト値：`false`。機能は `-l` を参照 |
 | ccache_clear      | false            | コンパイル前に ccache キャッシュをクリアするかどうかを設定します。デフォルト値：`false`。機能は `-c` を参照 |
+| delete_source     | false            | コンパイル完了後にカーネルソースコードを削除するかどうかを設定します。デフォルト値：`false`。機能は `-d` を参照 |
 | docker_hostpath   | .                | カーネルコンパイル時の Docker コンテナのホストマシン上のマウントパスを設定します。デフォルトは現在のディレクトリ。機能は `-h` を参照 |
 | docker_image      | ophub/armbian-trixie:arm64 | カーネルコンパイル用の Docker コンテナイメージを設定します。機能は `-i` を参照 |
 

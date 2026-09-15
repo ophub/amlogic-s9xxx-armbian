@@ -50,10 +50,10 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -n     | CustomName  | 设置内核自定义签名。例如设为 `-ophub` 时，生成的内核名称为 `5.15.100-ophub`。签名中请勿包含空格。默认值：`-ophub` |
 | -t     | Toolchain   | 设置编译内核的工具链。可选项：`clang / gcc / gcc-<version>`。默认值：`gcc` |
 | -z     | CompressFormat | 设置内核中 initrd 使用的压缩格式。可选项：`xz / gzip / zstd / lzma`。默认值：`xz` |
-| -d     | DeleteSource | 设置内核编译完成后是否删除源代码。可选项：`true / false`。默认值：`false` |
 | -s     | SilentLog   | 设置编译时是否启用静默模式以减少日志输出。可选项：`true / false`。默认值：`false` |
 | -l     | EnableLog   | 设置是否将编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。可选项：`true / false`。默认值：`false` |
 | -c     | CcacheClear | 设置编译前是否清除 ccache 缓存。可选项：`true / false`。默认值：`false` |
+| -d     | DeleteSource | 设置内核编译完成后是否删除源代码。可选项：`true / false`。默认值：`false` |
 | -h     | DockerHostpath | 设置内核编译时 Docker 容器在宿主机的挂载路径。默认使用当前目录。 |
 | -i     | DockerImage | 设置编译内核的 Docker 容器镜像。默认值：`ophub/armbian-trixie:arm64` |
 
@@ -107,10 +107,10 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | kernel_patch      | false            | 指定你仓库中自定义内核补丁文件的目录。若设置此参数，编译前将自动从指定目录下载补丁文件；未设置则跳过。 |
 | auto_patch        | false            | 设置是否应用自定义内核补丁。默认值：`false`。功能参考 `-p` |
 | compress_format   | xz               | 设置内核中 initrd 使用的压缩格式。默认值：`xz`。功能参考 `-z` |
-| delete_source     | false            | 设置编译完成后是否删除内核源代码。默认值：`false`。功能参考 `-d` |
 | silent_log        | false            | 设置编译时是否启用静默模式以减少日志输出。默认值：`false`。功能参考 `-s` |
 | enable_log        | false            | 设置是否将编译过程记录到日志文件：`/var/log/kernel_compile_*.log`。默认值：`false`。功能参考 `-l` |
 | ccache_clear      | false            | 设置编译前是否清除 ccache 缓存。默认值：`false`。功能参考 `-c` |
+| delete_source     | false            | 设置编译完成后是否删除内核源代码。默认值：`false`。功能参考 `-d` |
 | docker_hostpath   | .                | 设置内核编译时 Docker 容器在宿主机的挂载路径。默认使用当前目录。功能参考 `-h` |
 | docker_image      | ophub/armbian-trixie:arm64 | 设置编译内核的 Docker 容器镜像。功能参考 `-i` |
 

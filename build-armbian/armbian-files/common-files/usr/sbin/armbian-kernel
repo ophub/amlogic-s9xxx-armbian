@@ -19,7 +19,7 @@
 #
 # error_msg       : Output error message
 # update_script   : Update compilation scripts
-# clean_tmp       : Clear temporary files
+# output_clean    : Clear the kernel source and output files
 # help_info       : Display help information
 #
 #=============================== Set make environment variables ===============================
@@ -114,7 +114,7 @@ update_script() {
     exit 0
 }
 
-clean_tmp() {
+output_clean() {
     cd ${make_path}
     echo -e "${STEPS} Cleaning up kernel source and output files..."
 
@@ -139,15 +139,15 @@ help_info() {
     -r : Repository   Set the kernel source code repository, such as [ -r owner/repo@branch ]
     -p : AutoPatch    Sets whether to use custom kernel patches, such as [ -p true ], Optional: [ true/false ]
     -z : Compress     Set the compression format used for initrd in the kernel, such as [ -z xz ], Optional: [ xz/gzip/zstd/lzma ]
-    -d : DeleteSource Set whether to delete the kernel source code after compilation, such as [ -d true ], Optional: [ true/false ]
     -s : SilentLog    Set whether to use silent mode to reduce log output, such as [ -s true ], Optional: [ true/false ]
     -l : EnableLog    Set whether to output logs to a file, such as [ -l true ], Optional: [ true/false ]
     -c : CcacheClear  Set whether to clear ccache before compiling, such as [ -c true ], Optional: [ true/false ]
+    -d : DeleteSource Set whether to delete the kernel source code after compilation, such as [ -d true ], Optional: [ true/false ]
 
 02. Script assist functions:
     Command: armbian-kernel -u
     -u : Update       Update the local compile script to the latest version.
-    -c : Clear        Clear the local kernel source and generated files.
+    -o : OutputClean  Clear the kernel source and output files.
 
 ======================================================================================================================================
 EOF
@@ -164,9 +164,9 @@ remaining_space="$(df -Tk ${make_path} | tail -n1 | awk '{print $5}' | echo $(($
 
 # Execute script assist functions
 case "${1}" in
-    -u | --update) update_script ;;
-    -c | --clean)  clean_tmp ;;
-    -h | --help)   help_info ;;
+    -u | --update)        update_script ;;
+    -o | --output-clean)  output_clean ;;
+    --help)               help_info ;;
     *)
         [[ -f "${compile_script}" ]] || error_msg "Please run [ armbian-kernel -u ] to update scripts."
         cd ${make_path} && sudo ${compile_script} "${@}"

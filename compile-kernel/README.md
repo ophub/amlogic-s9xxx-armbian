@@ -50,10 +50,10 @@ You can compile the kernel directly in an [Armbian](https://github.com/ophub/aml
 | -n        | CustomName  | Sets the custom signature appended to the kernel version. For example, setting `-ophub` produces a kernel named `5.15.100-ophub`. Do not include spaces in the custom signature. Default: `-ophub` |
 | -t        | Toolchain   | Sets the toolchain for kernel compilation. Options: `clang / gcc / gcc-<version>`. Default: `gcc` |
 | -z        | CompressFormat | Sets the compression format for initrd in the kernel. Options: `xz / gzip / zstd / lzma`. Default: `xz` |
-| -d        | DeleteSource | Sets whether to delete the kernel source code after compilation. Options: `true / false`. Default: `false` |
 | -s        | SilentLog   | Sets whether to enable silent mode to reduce log output during compilation. Options: `true / false`. Default: `false` |
 | -l        | EnableLog   | Sets whether to log the kernel compilation process to a file: `/var/log/kernel_compile_*.log`. Options: `true / false`. Default: `false` |
 | -c        | CcacheClear | Sets whether to clear the ccache before compilation. Options: `true / false`. Default: `false` |
+| -d        | DeleteSource | Sets whether to delete the kernel source code after compilation. Options: `true / false`. Default: `false` |
 | -h     | DockerHostpath | Sets the host mount path for kernel compilation in Docker. Default: current directory. |
 | -i     | DockerImage | Sets the Docker container image used for kernel compilation. Default: `ophub/armbian-trixie:arm64` |
 
@@ -107,10 +107,10 @@ These parameters correspond to the `local compilation commands`. Refer to the de
 | kernel_patch     | false         | Sets the directory in your repository containing custom kernel patch files. If specified, patch files are automatically downloaded from the designated directory before compilation. If not set, this step is skipped. |
 | auto_patch       | false         | Sets whether to apply custom kernel patches. Default: `false`. Refer to `-p` for details. |
 | compress_format  | xz            | Sets the compression format for initrd in the kernel. Default: `xz`. Refer to `-z` for details. |
-| delete_source    | false         | Sets whether to delete the kernel source code after compilation. Default: `false`. Refer to `-d` for details. |
 | silent_log       | false         | Sets whether to enable silent mode to reduce log output during compilation. Default: `false`. Refer to `-s` for details. |
 | enable_log       | false         | Sets whether to log the kernel compilation process to a file: `/var/log/kernel_compile_*.log`. Default: `false`. Refer to `-l` for details. |
 | ccache_clear     | false         | Sets whether to clear the ccache before compilation. Default: `false`. Refer to `-c` for details. |
+| delete_source    | false         | Sets whether to delete the kernel source code after compilation. Default: `false`. Refer to `-d` for details. |
 | docker_hostpath  | .             | Sets the host mount path for kernel compilation in Docker. Defaults to the current working directory. Refer to `-h` for details. |
 | docker_image     | ophub/armbian-trixie:arm64 | Sets the Docker container image used for kernel compilation. Refer to `-i` for details. |
 
