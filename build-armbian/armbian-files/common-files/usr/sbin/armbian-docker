@@ -78,6 +78,9 @@ EOF
         DOCKER_SOURCE="https://mirrors.ustc.edu.cn/docker-ce/linux"
     elif [[ "${source_id}" -eq "4" ]]; then
         DOCKER_SOURCE="https://mirrors.cloud.tencent.com/docker-ce/linux"
+    else
+        # Empty or unknown input falls back to docker.com, so treat it as ID 1
+        source_id="1"
     fi
 }
 
