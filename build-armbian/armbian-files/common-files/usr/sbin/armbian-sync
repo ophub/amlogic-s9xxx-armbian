@@ -138,15 +138,17 @@ sync_config() {
     [[ "${?}" -ne "0" ]] && error_msg "Failed to sync common [ ${share_path} ] scripts."
     find ${share_path} -type f -name '*.sh' -exec chmod +x {} \;
 
-    # Update Amlogic platform specific scripts
-    [[ "${PLATFORM}" == "amlogic" ]] && {
-        # Update Amlogic platform command and service scripts
-        echo -e "${STEPS} Syncing Amlogic platform-specific scripts..."
-        cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${sbin_path}/* ${sbin_path}
-        [[ "${?}" -ne "0" ]] && error_msg "Failed to sync Amlogic [ ${sbin_path} ] scripts."
+    # Update platform specific command and service scripts
+    platform_sbin_path="${git_tmp_path}/${script_dir}/platform-files/${PLATFORM}/rootfs${sbin_path}"
+    [[ -d "${platform_sbin_path}" ]] && {
+        echo -e "${STEPS} Syncing ${PLATFORM} platform-specific scripts..."
+        cp -af --no-preserve=ownership ${platform_sbin_path}/* ${sbin_path}
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to sync ${PLATFORM} [ ${sbin_path} ] scripts."
         chmod +x ${sbin_path}/armbian-*
+    }
 
-        # Update OpenVFD LED display service scripts
+    # Update Amlogic OpenVFD LED display service scripts
+    [[ "${PLATFORM}" == "amlogic" ]] && {
         echo -e "${STEPS} Syncing Amlogic OpenVFD service scripts..."
         [[ -d "${openvfd_path}" ]] || mkdir -p ${openvfd_path}
         cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${openvfd_path}/* ${openvfd_path}
