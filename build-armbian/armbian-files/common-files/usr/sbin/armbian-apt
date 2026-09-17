@@ -89,7 +89,7 @@ show_mirror_list() {
   ├──────┼───────────────────┼─────────────────────────────────┤
   │   6  │  Russia           │  mirror.yandex.ru               │
   │   7  │  South Korea      │  ftp.kaist.ac.kr                │
-  │   8  │  South Korea      │  ftp.lanet.kr                   │
+  │   8  │  South Korea      │  ftp.lanet.kr,ftp.kaist.ac.kr   │
   │   9  │  Singapore        │  mirror.sg.gs                   │
   │  10  │  Australia        │  mirror.aarnet.edu.au           │
   ├──────┼───────────────────┼─────────────────────────────────┤
@@ -212,6 +212,11 @@ select_mirror_site() {
 
     # Configure Debian and Ubuntu mirror sources separately for certain countries/regions
     case "${source_id}" in
+    8)
+        DEBIAN_MIRROR="http://ftp.lanet.kr/debian"
+        DEBIAN_SECURITY="http://ftp.lanet.kr/debian-security"
+        UBUNTU_MIRROR="http://ftp.kaist.ac.kr/ubuntu-ports"
+        ;;
     13)
         DEBIAN_MIRROR="https://mirror.steadfastnet.com/debian"
         DEBIAN_SECURITY="https://mirror.steadfastnet.com/debian-security"
