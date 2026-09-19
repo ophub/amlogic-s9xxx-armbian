@@ -55,7 +55,7 @@ You can compile the kernel directly in an [Armbian](https://github.com/ophub/aml
 | -c        | CcacheClear | Sets whether to clear the ccache before compilation. Options: `true / false`. Default: `false` |
 | -d        | DeleteSource | Sets whether to delete the kernel source code after compilation. Options: `true / false`. Default: `false` |
 | -h     | DockerHostpath | Sets the host mount path for kernel compilation in Docker. Default: current directory. |
-| -i     | DockerImage | Sets the Docker container image used for kernel compilation. Default: `ophub/armbian-trixie:arm64` |
+| -i     | DockerImage | Sets the Docker container image used for kernel compilation. Default: `ophub/armbian-resolute:arm64` |
 
 - `sudo ./recompile`: Compile the kernel using the default configuration.
 - `sudo ./recompile -k 5.15.100`: Use the default configuration and specify the kernel version to be compiled through `-k`. Multiple versions are connected using `_` for simultaneous compilation.
@@ -112,7 +112,7 @@ These parameters correspond to the `local compilation commands`. Refer to the de
 | ccache_clear     | false         | Sets whether to clear the ccache before compilation. Default: `false`. Refer to `-c` for details. |
 | delete_source    | false         | Sets whether to delete the kernel source code after compilation. Default: `false`. Refer to `-d` for details. |
 | docker_hostpath  | .             | Sets the host mount path for kernel compilation in Docker. Defaults to the current working directory. Refer to `-h` for details. |
-| docker_image     | ophub/armbian-trixie:arm64 | Sets the Docker container image used for kernel compilation. Refer to `-i` for details. |
+| docker_image     | ophub/armbian-resolute:arm64 | Sets the Docker container image used for kernel compilation. Refer to `-i` for details. |
 
 - ### GitHub Action Output Variables
 

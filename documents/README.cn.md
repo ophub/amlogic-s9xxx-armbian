@@ -431,31 +431,31 @@ docker network create -d macvlan \
 
 #### 8.4.3 运行 Armbian Docker 容器
 
-以 `armbian-trixie:arm64` 镜像为例，说明如何运行 Armbian 容器。
+以 `armbian-resolute:arm64` 镜像为例，说明如何运行 Armbian 容器。
 
 ```shell
 # 以后台方式运行 Armbian 容器
 # 其中的容器名称，IP 地址，镜像版本等根据自己的实际情况修改
-docker run -itd --name=armbian-trixie \
+docker run -itd --name=armbian-resolute \
     --privileged \
     --network macvlan \
     --ip 10.1.1.15 \
-    --hostname=armbian-trixie \
+    --hostname=armbian-resolute \
     -e TZ=Asia/Shanghai \
     --restart unless-stopped \
-    ophub/armbian-trixie:arm64
+    ophub/armbian-resolute:arm64
 
 # 查看 Armbian 容器日志
-docker logs -f armbian-trixie
+docker logs -f armbian-resolute
 
 # 进入 Armbian 容器
-docker exec -it armbian-trixie bash
+docker exec -it armbian-resolute bash
 
 # 退出 Armbian 容器
 exit
 
 # 停止并删除 Armbian 容器
-docker rm -f armbian-trixie
+docker rm -f armbian-resolute
 ```
 
 ## 9. 编译 Armbian 内核

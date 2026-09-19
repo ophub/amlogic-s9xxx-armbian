@@ -34,7 +34,7 @@ kernel_patch_path="${current_path}/compile-kernel/tools/patch"
 
 # Set Docker host mount directory and image
 docker_hostpath="${PWD}"
-docker_image="ophub/armbian-trixie:arm64"
+docker_image="ophub/armbian-resolute:arm64"
 docker_container="armbian-ophub"
 docker_script="/usr/sbin/armbian-kernel"
 

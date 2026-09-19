@@ -108,6 +108,7 @@ GitHub Actions は Microsoft が提供するサービスであり、高性能な
     - [12.18 boot.scr ファイルのコンパイル方法](#1218-bootscr-ファイルのコンパイル方法)
     - [12.19 リモートデスクトップの有効化とデフォルトポートの変更方法](#1219-リモートデスクトップの有効化とデフォルトポートの変更方法)
     - [12.20 TCP 輻輳制御の最適化方法](#1220-tcp-輻輳制御の最適化方法)
+    - [12.21 HDMI EDID 認識異常の解決方法](#1221-hdmi-edid-認識異常の解決方法)
 
 ## 1. 自分の Github アカウントを登録する
 
@@ -430,31 +431,31 @@ docker network create -d macvlan \
 
 #### 8.4.3 Armbian Docker コンテナの実行
 
-`armbian-trixie:arm64` イメージを例に、Armbian コンテナの実行方法を説明します。
+`armbian-resolute:arm64` イメージを例に、Armbian コンテナの実行方法を説明します。
 
 ```shell
 # バックグラウンドで Armbian コンテナを実行
 # コンテナ名、IPアドレス、イメージバージョンなどは実際の状況に合わせて変更してください
-docker run -itd --name=armbian-trixie \
+docker run -itd --name=armbian-resolute \
     --privileged \
     --network macvlan \
     --ip 10.1.1.15 \
-    --hostname=armbian-trixie \
+    --hostname=armbian-resolute \
     -e TZ=Asia/Shanghai \
     --restart unless-stopped \
-    ophub/armbian-trixie:arm64
+    ophub/armbian-resolute:arm64
 
 # Armbian コンテナのログを確認
-docker logs -f armbian-trixie
+docker logs -f armbian-resolute
 
 # Armbian コンテナに入る
-docker exec -it armbian-trixie bash
+docker exec -it armbian-resolute bash
 
 # Armbian コンテナから出る
 exit
 
 # Armbian コンテナを停止して削除
-docker rm -f armbian-trixie
+docker rm -f armbian-resolute
 ```
 
 ## 9. Armbian カーネルのコンパイル

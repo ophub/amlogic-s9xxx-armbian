@@ -55,7 +55,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -c     | CcacheClear | コンパイル前に ccache キャッシュをクリアするかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
 | -d     | DeleteSource | カーネルのコンパイル完了後にソースコードを削除するかどうかを設定します。選択肢：`true / false`。デフォルト値：`false` |
 | -h     | DockerHostpath | カーネルコンパイル時の Docker コンテナのホストマシン上のマウントパスを設定します。デフォルトは現在のディレクトリを使用します。 |
-| -i     | DockerImage | カーネルコンパイル用の Docker コンテナイメージを設定します。デフォルト値：`ophub/armbian-trixie:arm64` |
+| -i     | DockerImage | カーネルコンパイル用の Docker コンテナイメージを設定します。デフォルト値：`ophub/armbian-resolute:arm64` |
 
 - `sudo ./recompile` ：デフォルト設定でカーネルをコンパイルします。
 - `sudo ./recompile -k 5.15.100` ：デフォルト設定を使用し、`-k` でコンパイルするカーネルバージョンを指定します。複数バージョンを同時にコンパイルする場合は `_` で連結します。
@@ -112,7 +112,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | ccache_clear      | false            | コンパイル前に ccache キャッシュをクリアするかどうかを設定します。デフォルト値：`false`。機能は `-c` を参照 |
 | delete_source     | false            | コンパイル完了後にカーネルソースコードを削除するかどうかを設定します。デフォルト値：`false`。機能は `-d` を参照 |
 | docker_hostpath   | .                | カーネルコンパイル時の Docker コンテナのホストマシン上のマウントパスを設定します。デフォルトは現在のディレクトリ。機能は `-h` を参照 |
-| docker_image      | ophub/armbian-trixie:arm64 | カーネルコンパイル用の Docker コンテナイメージを設定します。機能は `-i` を参照 |
+| docker_image      | ophub/armbian-resolute:arm64 | カーネルコンパイル用の Docker コンテナイメージを設定します。機能は `-i` を参照 |
 
 - ### GitHub Action 出力変数の説明
 

@@ -55,7 +55,7 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 | -c     | CcacheClear | 设置编译前是否清除 ccache 缓存。可选项：`true / false`。默认值：`false` |
 | -d     | DeleteSource | 设置内核编译完成后是否删除源代码。可选项：`true / false`。默认值：`false` |
 | -h     | DockerHostpath | 设置内核编译时 Docker 容器在宿主机的挂载路径。默认使用当前目录。 |
-| -i     | DockerImage | 设置编译内核的 Docker 容器镜像。默认值：`ophub/armbian-trixie:arm64` |
+| -i     | DockerImage | 设置编译内核的 Docker 容器镜像。默认值：`ophub/armbian-resolute:arm64` |
 
 - `sudo ./recompile` : 使用默认配置编译内核。
 - `sudo ./recompile -k 5.15.100` : 使用默认配置，并通过 `-k` 进行指定需要编译的内核版本，多个版本同时编译时使用 `_` 进行连接。
@@ -112,7 +112,7 @@ uses: YOUR-REPO/amlogic-s9xxx-armbian@main
 | ccache_clear      | false            | 设置编译前是否清除 ccache 缓存。默认值：`false`。功能参考 `-c` |
 | delete_source     | false            | 设置编译完成后是否删除内核源代码。默认值：`false`。功能参考 `-d` |
 | docker_hostpath   | .                | 设置内核编译时 Docker 容器在宿主机的挂载路径。默认使用当前目录。功能参考 `-h` |
-| docker_image      | ophub/armbian-trixie:arm64 | 设置编译内核的 Docker 容器镜像。功能参考 `-i` |
+| docker_image      | ophub/armbian-resolute:arm64 | 设置编译内核的 Docker 容器镜像。功能参考 `-i` |
 
 - ### GitHub Action 输出变量说明
 

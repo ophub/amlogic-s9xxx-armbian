@@ -108,6 +108,7 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
     - [12.18 How to build the boot.scr file](#1218-how-to-build-the-bootscr-file)
     - [12.19 How to Enable Remote Desktop and Modify the Default Port](#1219-how-to-enable-remote-desktop-and-modify-the-default-port)
     - [12.20 TCP Congestion Control Optimization Guide](#1220-tcp-congestion-control-optimization-guide)
+    - [12.21 How to Fix HDMI EDID Detection Problems](#1221-how-to-fix-hdmi-edid-detection-problems)
 
 ## 1. Register your own Github account
 
@@ -430,31 +431,31 @@ docker network create -d macvlan \
 
 #### 8.4.3 Run Armbian Docker Container
 
-Here, the `armbian-trixie:arm64` image is used as an example to demonstrate how to run an Armbian container.
+Here, the `armbian-resolute:arm64` image is used as an example to demonstrate how to run an Armbian container.
 
 ```shell
 # Run the Armbian container in detached mode
 # Modify the container name, IP address, image version, etc., according to your actual situation
-docker run -itd --name=armbian-trixie \
+docker run -itd --name=armbian-resolute \
     --privileged \
     --network macvlan \
     --ip 10.1.1.15 \
-    --hostname=armbian-trixie \
+    --hostname=armbian-resolute \
     -e TZ=Asia/Shanghai \
     --restart unless-stopped \
-    ophub/armbian-trixie:arm64
+    ophub/armbian-resolute:arm64
 
 # View Armbian container logs
-docker logs -f armbian-trixie
+docker logs -f armbian-resolute
 
 # Enter the Armbian container
-docker exec -it armbian-trixie bash
+docker exec -it armbian-resolute bash
 
 # Exit the Armbian container
 exit
 
 # Stop and remove the Armbian container
-docker rm -f armbian-trixie
+docker rm -f armbian-resolute
 ```
 
 ## 9. Compiling Armbian Kernel
