@@ -168,6 +168,7 @@ on:
           - s905l3b-e900v22d
           - s905l3b-e900v22e
           - s905l3b-ip103h
+          - s905l3b-m302a
           - s905l3b-rg020et-ca
           - s905l3b-unt403a
           - s905lb-ipbs9505
