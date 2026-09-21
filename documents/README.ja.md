@@ -103,7 +103,7 @@ GitHub Actions は Microsoft が提供するサービスであり、高性能な
         - [12.15.3.2 重要なパーティションのバックアップ](#121532-重要なパーティションのバックアップ)
         - [12.15.3.3 特殊パーティション書き込みファイルの追加](#121533-特殊パーティション書き込みファイルの追加)
       - [12.15.4 フロー制御ファイルの追加](#12154-フロー制御ファイルの追加)
-    - [12.16 eMMC への書き込み時の I/O エラーの解決方法](#1216-emmc-への書き込み時の-io-エラーの解決方法)
+    - [12.16 DTBの周波数に起因するシステムの起動失敗やeMMC書き込み時のI/Oエラーを解決する方法](#1216-dtbの周波数に起因するシステムの起動失敗やemmc書き込み時のioエラーを解決する方法)
     - [12.17 Bullseye バージョンで音が出ない問題の解決方法](#1217-bullseye-バージョンで音が出ない問題の解決方法)
     - [12.18 boot.scr ファイルのコンパイル方法](#1218-bootscr-ファイルのコンパイル方法)
     - [12.19 リモートデスクトップの有効化とデフォルトポートの変更方法](#1219-リモートデスクトップの有効化とデフォルトポートの変更方法)
@@ -1635,7 +1635,18 @@ hexdump -C reserved_first_8M.bin | less
 
 [yml ワークフロー制御ファイル](../.github/workflows/build-armbian-arm64-server-image.yml) の `armbian_board` に対応する `BOARD` オプションを追加し、GitHub Actions での使用をサポートさせます。
 
-### 12.16 eMMC への書き込み時の I/O エラーの解決方法
+### 12.16 DTBの周波数に起因するシステムの起動失敗やeMMC書き込み時のI/Oエラーを解決する方法
+
+DTBの周波数が高い場合、一部のデバイスが正常に起動できず、起動画面でフリーズしてしまうことがあります。例えば、[Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3678#issuecomment-5749939734) で報告されている事例のように、以下のようなエラーが出力されます。
+
+```shell
+Loading, please wait...
+Starting systemd-udevd version 259.5-0ubuntus.4
+Begin: Loading essential drivers ... done.
+Begin: Running /scripts/init-premount ... done.
+Begin: Mounting root file system... Begin: Running /scripts/local-top ... done.
+Begin: Running /scripts/local-premount ... Scanning for Btrfs filesystems
+```
 
 一部のデバイスは USB/SD/TF から Armbian を正常に起動できますが、eMMC に書き込む際に I/O 書き込みエラーが発生します。例えば [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989) のケースでは、以下のようなエラーが報告されています：
 

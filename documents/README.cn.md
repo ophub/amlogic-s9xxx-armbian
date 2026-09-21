@@ -103,7 +103,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
         - [12.15.3.2 备份关键分区](#121532-备份关键分区)
         - [12.15.3.3 添加特殊分区写入文件](#121533-添加特殊分区写入文件)
       - [12.15.4 添加流程控制文件](#12154-添加流程控制文件)
-    - [12.16 如何解决写入 eMMC 时 I/O 错误的问题](#1216-如何解决写入-emmc-时-io-错误的问题)
+    - [12.16 如何解决 dtb 频率导致系统无法启动或写入 eMMC 时 I/O 错误的问题](#1216-如何解决-dtb-频率导致系统无法启动或写入-emmc-时-io-错误的问题)
     - [12.17 如何解决 Bullseye 版本没有声音的问题](#1217-如何解决-bullseye-版本没有声音的问题)
     - [12.18 如何编译 boot.scr 文件](#1218-如何编译-bootscr-文件)
     - [12.19 如何开启远程桌面和修改默认端口](#1219-如何开启远程桌面和修改默认端口)
@@ -1635,7 +1635,18 @@ hexdump -C reserved_first_8M.bin | less
 
 在 [yml 工作流控制文件](../.github/workflows/build-armbian-arm64-server-image.yml) 的 `armbian_board` 中添加对应的 `BOARD` 选项，使其支持在 GitHub Actions 中使用。
 
-### 12.16 如何解决写入 eMMC 时 I/O 错误的问题
+### 12.16 如何解决 dtb 频率导致系统无法启动或写入 eMMC 时 I/O 错误的问题
+
+当 dtb 的频率较高时，会导致部分设备无法正常启动，卡在启动界面上，例如 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3678#issuecomment-5749939734) 中的案例，报错内容如下：
+
+```shell
+Loading, please wait...
+Starting systemd-udevd version 259.5-0ubuntus.4
+Begin: Loading essential drivers ... done.
+Begin: Running /scripts/init-premount ... done.
+Begin: Mounting root file system... Begin: Running /scripts/local-top ... done.
+Begin: Running /scripts/local-premount ... Scanning for Btrfs filesystems
+```
 
 部分设备可从 USB/SD/TF 正常启动 Armbian，但写入 eMMC 时会出现 I/O 写入错误，例如 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989) 中的案例，报错内容如下：
 

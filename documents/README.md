@@ -103,7 +103,7 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
         - [12.15.3.2 Back Up Key Partitions](#121532-back-up-key-partitions)
         - [12.15.3.3 Add a Special Partition Writing File](#121533-add-a-special-partition-writing-file)
       - [12.15.4 Add Process Control Files](#12154-add-process-control-files)
-    - [12.16 How to Resolve the Issue of I/O Errors While Writing to eMMC](#1216-how-to-resolve-the-issue-of-io-errors-while-writing-to-emmc)
+    - [12.16 How to Resolve System Boot Failures or eMMC Write I/O Errors Caused by DTB Frequency](#1216-how-to-resolve-system-boot-failures-or-emmc-write-io-errors-caused-by-dtb-frequency)
     - [12.17 How to Solve the Issue of No Sound in the Bullseye Version](#1217-how-to-solve-the-issue-of-no-sound-in-the-bullseye-version)
     - [12.18 How to build the boot.scr file](#1218-how-to-build-the-bootscr-file)
     - [12.19 How to Enable Remote Desktop and Modify the Default Port](#1219-how-to-enable-remote-desktop-and-modify-the-default-port)
@@ -1641,7 +1641,18 @@ For implementation details, refer to the `write_board_bootloader` function in [/
 
 Add the corresponding `BOARD` option to `armbian_board` in the [yml workflow control file](../.github/workflows/build-armbian-arm64-server-image.yml), which supports use in `Actions` on github.com.
 
-### 12.16 How to Resolve the Issue of I/O Errors While Writing to eMMC
+### 12.16 How to Resolve System Boot Failures or eMMC Write I/O Errors Caused by DTB Frequency
+
+When the DTB frequency is set too high, some devices may fail to boot properly and become stuck on the boot screen. An example can be seen in this [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3678#issuecomment-5749939734), with the following error output:
+
+```shell
+Loading, please wait...
+Starting systemd-udevd version 259.5-0ubuntus.4
+Begin: Loading essential drivers ... done.
+Begin: Running /scripts/init-premount ... done.
+Begin: Mounting root file system... Begin: Running /scripts/local-top ... done.
+Begin: Running /scripts/local-premount ... Scanning for Btrfs filesystems
+```
 
 Some devices can boot Armbian normally from USB/SD/TF but report I/O write errors when writing to eMMC, such as the case in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989):
 
