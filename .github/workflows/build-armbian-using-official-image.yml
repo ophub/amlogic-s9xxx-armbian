@@ -122,6 +122,7 @@ on:
           - painet-p5
           - panther-x2
           - photonicat
+          - quarkpi-ca2
           - r66s
           - r68s
           - recomputer-rk3576-devkit

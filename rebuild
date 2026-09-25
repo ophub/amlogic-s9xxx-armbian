@@ -996,17 +996,15 @@ refactor_bootfs() {
         [[ "${BOOT_CONF}" == "extlinux.conf" ]] && mv -f "${boot_extlinux_file}" "${rename_extlinux_file}"
     }
 
-    # Board-specific (QuarkPi-CA2 / RK3588S): the stock on-board Rockchip U-Boot shipped with
-    # this board only scans <devname>_extlinux/extlinux.conf on the boot partitions (it cannot
-    # parse boot.scr from a newer mkimage), so publish the same boot entry under that name too.
-    # boot.scr is kept intact for ophub's own U-Boot.
+    # Board-specific (ALIENTEK-QuarkPi-CA2 / RK3588S): the stock on-board Rockchip U-Boot shipped with
+    # this board only scans <devname>_extlinux/extlinux.conf on the boot partitions.
     if [[ "${board}" == "quarkpi-ca2" && -f "${rename_extlinux_file}" ]]; then
         for _d in mmc0_extlinux mmc1_extlinux; do
             mkdir -p "${_d}"
             sed -e "s|/Image|/vmlinuz-${kernel_name}|g" \
                 -e "s|/uInitrd|/uInitrd-${kernel_name}|g" \
                 -e "s|console=ttyS2,1500000|console=ttyFIQ0,1500000|g" \
-                "${rename_extlinux_file}" > "${_d}/extlinux.conf"
+                "${rename_extlinux_file}" >"${_d}/extlinux.conf"
         done
     fi
 
