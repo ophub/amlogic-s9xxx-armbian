@@ -259,6 +259,7 @@ on:
           - yskj
           - zcube1-max
           - zk-r39a
+          - ztl-a568
           - zysj
       armbian_kernel:
         description: "Select kernel version."
