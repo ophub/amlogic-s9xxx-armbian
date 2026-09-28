@@ -1,0 +1,46 @@
+#!/bin/bash
+#================================================================================================
+#
+# This file is licensed under the terms of the GNU General Public
+# License version 2. This program is licensed "as is" without any
+# warranty of any kind, whether express or implied.
+#
+# This file is a part of the Rebuild Armbian
+# https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Function: The `armbian-install` entry point for the Rockchip platform.
+#
+#   The installer was redesigned as an armbian-config module
+#   (module_partitioner, backed by the module_install_engine library). Upstream
+#   keeps the historical /usr/bin/armbian-install entry point as a compatibility
+#   shim that forwards every argument to that module unchanged:
+#
+#     armbian-install                                     interactive TUI
+#     armbian-install --target /dev/sdX --boot emmc --fs ext4 --yes
+#     armbian-install --api detect | plan ...             machine-readable
+#
+#   That shim ships in the bsp package, which images that install their u-boot
+#   from release files (as this project does) never install, so the documented
+#   command is missing even though the engine itself is present in
+#   armbian-config. This file is the same shim, so the command works here too.
+#
+#   Upstream source: armbian/build packages/bsp/common/usr/bin/armbian-install
+#
+#   Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
+#
+# Command: armbian-install  /  armbian-install --target /dev/mmcblk0 --boot emmc --fs ext4 --yes
+#
+#================================================================================================
+
+trap "systemctl start docker >/dev/null 2>&1; exit" INT TERM
+
+# Re-exec as root if needed.
+[[ $EUID != 0 ]] && exec sudo "$0" "$@"
+
+if ! command -v armbian-config >/dev/null 2>&1; then
+	echo "armbian-install now ships as part of armbian-config." >&2
+	echo "Install it with:  apt-get install armbian-config" >&2
+	exit 1
+fi
+
+exec armbian-config --api module_partitioner "$@"
