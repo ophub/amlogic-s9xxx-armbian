@@ -4,7 +4,7 @@ consoleargs=console=ttyS0,1500000
 overlay_prefix=rk3576
 overlays=
 user_overlays=
-fdtfile=rockchip/rk3576-tspi-3m.dtb
+fdtfile=rockchip/rk3576-lckfb-tspi-3m.dtb
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
 earlycon=on
