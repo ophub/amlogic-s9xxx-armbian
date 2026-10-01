@@ -1,7 +1,7 @@
 verbosity=7
 bootlogo=true
-consoleargs=console=ttyFIQ0
-overlay_prefix=
+consoleargs=console=ttyS0,1500000
+overlay_prefix=rk3576
 overlays=
 user_overlays=
 fdtfile=rockchip/rk3576-tspi-3m.dtb
