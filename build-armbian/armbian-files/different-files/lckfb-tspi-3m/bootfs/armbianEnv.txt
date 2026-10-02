@@ -2,7 +2,7 @@ verbosity=7
 bootlogo=true
 consoleargs=console=ttyS0,1500000
 overlay_prefix=rk3576
-overlays=
+overlays=lckfb-tspi-3m-fan
 user_overlays=
 fdtfile=rockchip/rk3576-lckfb-tspi-3m.dtb
 rootdev=/dev/mmcblk0p2
