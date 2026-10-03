@@ -8,7 +8,7 @@ GitHub Actions は Microsoft が提供するサービスであり、高性能な
 
 - [Armbian の構築と使用方法](#armbian-の構築と使用方法)
 - [目次](#目次)
-  - [1. 自分の Github アカウントを登録する](#1-自分の-github-アカウントを登録する)
+  - [1. 自分の GitHub アカウントを登録する](#1-自分の-github-アカウントを登録する)
   - [2. プライバシー変数 GITHUB\_TOKEN 等の設定](#2-プライバシー変数-github_token-等の設定)
   - [3. リポジトリをフォークしてワークフロー権限を設定する](#3-リポジトリをフォークしてワークフロー権限を設定する)
   - [4. Armbian システムのカスタマイズファイルの説明](#4-armbian-システムのカスタマイズファイルの説明)
@@ -16,7 +16,7 @@ GitHub Actions は Microsoft が提供するサービスであり、高性能な
     - [5.1 手動コンパイル](#51-手動コンパイル)
     - [5.2 定期コンパイル](#52-定期コンパイル)
     - [5.3 デフォルトシステム設定のカスタマイズ](#53-デフォルトシステム設定のカスタマイズ)
-    - [5.4 論理ボリュームを使用して Github Actions のコンパイル領域を拡張する](#54-論理ボリュームを使用して-github-actions-のコンパイル領域を拡張する)
+    - [5.4 論理ボリュームを使用して GitHub Actions のコンパイル領域を拡張する](#54-論理ボリュームを使用して-github-actions-のコンパイル領域を拡張する)
     - [5.5 Armbian Docker イメージの作成](#55-armbian-docker-イメージの作成)
   - [6. システムの保存](#6-システムの保存)
   - [7. システムのダウンロード](#7-システムのダウンロード)
@@ -110,7 +110,7 @@ GitHub Actions は Microsoft が提供するサービスであり、高性能な
     - [12.20 TCP 輻輳制御の最適化方法](#1220-tcp-輻輳制御の最適化方法)
     - [12.21 HDMI EDID 認識異常の解決方法](#1221-hdmi-edid-認識異常の解決方法)
 
-## 1. 自分の Github アカウントを登録する
+## 1. 自分の GitHub アカウントを登録する
 
 後続のシステムカスタマイズ操作を行うために、アカウントを登録してください。github.com ウェブサイトの右上にある `Sign up` ボタンをクリックし、案内に従って登録を完了してください。
 
@@ -191,7 +191,7 @@ schedule:
 
 ローカルコンパイル時は `-b` パラメータで指定し、GitHub Actions でのコンパイル時は `armbian_board` パラメータで指定します。`-b all` は `BUILD` が `yes` の全デバイスを構築することを意味します。`BOARD` パラメータを指定する場合、`BUILD` 値が `yes` でも `no` でも構築可能です。例：`-b r68s_s905x3-tx3_s905l3a-cm311`
 
-### 5.4 論理ボリュームを使用して Github Actions のコンパイル領域を拡張する
+### 5.4 論理ボリュームを使用して GitHub Actions のコンパイル領域を拡張する
 
 GitHub Actions のデフォルトコンパイル領域は 84G で、システムと必要なパッケージを除くと利用可能な領域は約 50G です。全ファームウェアのコンパイル時に容量不足が発生する場合があり、論理ボリュームを使用してコンパイル領域を約 110G に拡張できます。[.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) ファイルの方法を参照し、以下のコマンドで論理ボリュームを作成し、コンパイル時に論理ボリュームのパスを使用してください。
 
@@ -270,11 +270,11 @@ Armbian システムにログイン（デフォルトユーザー: root, デフ�
 armbian-install
 ```
 
-| オプションパラメータ  | デフォルト値   | 選択肢     | 説明                |
-| -------  | ------- | ------  | -----------------   |
-| -m       | no      | yes/no  | Mainline u-boot を使用 |
-| -a       | yes     | yes/no  | [ampart](https://github.com/7Ji/ampart) パーティションテーブル調整ツールを使用 |
-| -l       | no      | yes/no  | List. 全デバイスリストを表示 |
+| オプションパラメータ | デフォルト値 | 選択肢 | 説明 |
+| --- | --- | --- | --- |
+| -m | no | yes/no | Mainline u-boot を使用 |
+| -a | yes | yes/no | [ampart](https://github.com/7Ji/ampart) パーティションテーブル調整ツールを使用 |
+| -l | no | yes/no | 全デバイスリストを表示 |
 
 例: `armbian-install -m yes -a no`
 
@@ -386,7 +386,6 @@ RKDevTool フラッシュツールを開き、右クリックで項目を追加�
 - 泰山派が電源オフの状態で Recovery キーを押しながら Type-C データケーブルを接続し、RKDevTool に `LOADER デバイスを発見` と表示されたら Recovery キーを離します。右クリックで項目を追加します。
 - アドレス `0x00000000`、名前 `system`、パスはフラッシュする `Armbian.img` システムを選択します。
 - 実行をクリックし、プログレスバーが完了するまで待ちます。
-
 
 ### 8.3 Allwinner シリーズのインストール方法
 
@@ -514,7 +513,6 @@ Linux メインラインカーネルには一部のドライバがまだ内蔵�
 armbian-sync
 armbian-update -k 6.1
 
-
 # ステップ2：コンパイルツールのインストール
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
@@ -524,7 +522,6 @@ wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.
 tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # その他のコンパイル依存パッケージのインストール（オプション、エラーメッセージに応じて不足分を手動インストール可能）
 armbian-kernel -u
-
 
 # ステップ3：ドライバのダウンロードとコンパイル
 # ドライバソースコードのダウンロード
@@ -544,7 +541,6 @@ export KSRC=/usr/lib/modules/$(uname -r)/build
 export M="/root/rtl8189ES_linux"
 # ドライバのコンパイル
 make
-
 
 # ステップ4：ドライバのインストール
 sudo cp -f 8189es.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
@@ -583,16 +579,16 @@ Armbian システムにログイン → コマンドを入力：
 armbian-update
 ```
 
-| オプションパラメータ  | デフォルト値        | 選択肢           | 説明                              |
-| -------- | ------------ | ------------- | -------------------------------- |
-| -r       | ophub/kernel | `<owner>/<repo>` | github.com からカーネルをダウンロードするリポジトリを設定  |
-| -u       | 自動        | stable/flippy/beta/rk3588/rk35xx | 使用するカーネルの [tags サフィックス](https://github.com/ophub/kernel/releases) を設定 |
-| -k       | 最新版        | カーネルバージョン       | [カーネルバージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable) を設定  |
-| -b       | yes          | yes/no        | カーネル更新時に現在使用中のカーネルを自動バックアップ    |
-| -d       | deb          | tar/deb       | 優先使用するカーネルパッケージ形式を設定。指定形式が存在しない場合、スクリプトは自動的に別の形式を試行します。カスタムドライバをコンパイルする場合は `deb` 形式を推奨。 |
-| -m       | no           | yes/no        | メインライン u-boot を使用                    |
-| -s       | なし           | なし/ディスク名称     | [SOS] eMMC/NVMe/sdX などのディスク内のシステムカーネルを復旧 |
-| -h       | なし           | なし             | 使用方法のヘルプを表示                       |
+| オプションパラメータ | デフォルト値 | 選択肢 | 説明 |
+| --- | --- | --- | --- |
+| -r | ophub/kernel | `<owner>/<repo>` | github.com からカーネルをダウンロードするリポジトリを設定 |
+| -u | 自動 | stable/flippy/beta/rk3588/rk35xx | 使用するカーネルの [tags サフィックス](https://github.com/ophub/kernel/releases) を設定 |
+| -k | 最新版 | カーネルバージョン | [カーネルバージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable) を設定 |
+| -b | yes | yes/no | カーネル更新時に現在使用中のカーネルを自動バックアップ |
+| -d | deb | tar/deb | 優先使用するカーネルパッケージ形式を設定。指定形式が存在しない場合、スクリプトは自動的に別の形式を試行します。カスタムドライバをコンパイルする場合は `deb` 形式を推奨。 |
+| -m | no | yes/no | メインライン u-boot を使用 |
+| -s | なし | なし/ディスク名称 | [SOS] eMMC/NVMe/sdX などのディスク内のシステムカーネルを復旧 |
+| -h | なし | なし | 使用方法のヘルプを表示 |
 
 例: `armbian-update -k 5.15 -u stable -d deb`
 
@@ -1449,7 +1445,7 @@ git clone -b debian https://github.com/radxa/build.git
 # ~/rk3588-sdk/rkbin/：ビルド済みの Rockchip バイナリ（第1ステージローダーと ATF（Arm Trustzone ファームウェア）を含む）。
 # ~/rk3588-sdk/u-boot/：OS（Linux や Android など）を起動するための第2ステージブートローダー。
 
-# 03. u-boot のコンパイル（For ROCK 5B）
+# 03. u-boot のコンパイル (For ROCK 5B)
 cd ~/rk3588-sdk
 ./build/mk-uboot.sh rk3588-rock-5b
 
@@ -1471,7 +1467,6 @@ cm9vdA のオープンソースプロジェクト [cm9vdA/build-linux](https://g
 - Lenovo-Leez-P710(rk3399) デバイスの u-boot コンパイル：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609#issuecomment-1681494735)
 - DLFR100(rk3399) デバイスの u-boot コンパイル：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522#issuecomment-1622919423)
 - ZYSJ(rk3399) デバイスの u-boot コンパイル：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380#issuecomment-1539325464)
-
 
 ### 12.12 メモリサイズの誤認識
 

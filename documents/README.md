@@ -8,7 +8,7 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
 
 - [Armbian Build and Usage Guide](#armbian-build-and-usage-guide)
 - [Table of Contents](#table-of-contents)
-  - [1. Register your own Github account](#1-register-your-own-github-account)
+  - [1. Register your own GitHub account](#1-register-your-own-github-account)
   - [2. Set up private variable GITHUB\_TOKEN etc](#2-set-up-private-variable-github_token-etc)
   - [3. Fork the repository and set Workflow permissions](#3-fork-the-repository-and-set-workflow-permissions)
   - [4. Customization instructions for personalized Armbian system files](#4-customization-instructions-for-personalized-armbian-system-files)
@@ -16,7 +16,7 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
     - [5.1 Manual Compilation](#51-manual-compilation)
     - [5.2 Scheduled Compilation](#52-scheduled-compilation)
     - [5.3 Customizing Default System Configuration](#53-customizing-default-system-configuration)
-    - [5.4 Expanding Github Actions Compilation Space Using Logical Volumes](#54-expanding-github-actions-compilation-space-using-logical-volumes)
+    - [5.4 Expanding GitHub Actions Compilation Space Using Logical Volumes](#54-expanding-github-actions-compilation-space-using-logical-volumes)
     - [5.5 Build Armbian Docker image](#55-build-armbian-docker-image)
   - [6. Saving the System](#6-saving-the-system)
   - [7. Downloading the System](#7-downloading-the-system)
@@ -110,13 +110,13 @@ GitHub Actions is a CI/CD service from Microsoft that provides high-performance 
     - [12.20 TCP Congestion Control Optimization Guide](#1220-tcp-congestion-control-optimization-guide)
     - [12.21 How to Fix HDMI EDID Detection Problems](#1221-how-to-fix-hdmi-edid-detection-problems)
 
-## 1. Register your own Github account
+## 1. Register your own GitHub account
 
 Register an account to proceed with system customization. Click the `Sign up` button in the upper right corner of github.com and follow the prompts to complete registration.
 
 ## 2. Set up private variable GITHUB_TOKEN etc
 
-According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique `GITHUB_TOKEN` secret at the start of every workflow job for use within the workflow. The `{{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
+According to the [GitHub Docs](https://docs.github.com/en/actions/security-guides/automatic-token-authentication), GitHub automatically creates a unique `GITHUB_TOKEN` secret at the start of every workflow job for use within the workflow. The `${{ secrets.GITHUB_TOKEN }}` can be used for authentication within the workflow job.
 
 When building an [Armbian Docker](../.github/workflows/build-armbian-arm64-docker-image.yml) image in Actions and pushing it to Docker Hub, you need to set two secrets: `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD`. On your repository's page, click Settings in the top right corner, then navigate to `Settings` > `Secrets and variables` > `Actions` > `Repository secrets` > `New repository secret`, add the following two secrets:
 
@@ -166,7 +166,7 @@ The system can be compiled manually, on a schedule, or triggered by specific eve
 
 ### 5.1 Manual Compilation
 
-In your repository's navigation bar, click the Actions button, then select Build armbian > Run workflow > Run workflow to start compilation. The process takes approximately 3 hours and is complete once all steps finish. The illustration is as follows:
+In your repository's navigation bar, click the Actions button, then select Build Armbian > Run workflow > Run workflow to start compilation. The process takes approximately 3 hours and is complete once all steps finish. The illustration is as follows:
 
 <div style="width:100%;margin-top:40px;margin:5px;">
 <img src=https://user-images.githubusercontent.com/68696949/163203938-e7762b09-e6b8-4cf5-b1f1-9c67c1a29953.png width="300" />
@@ -191,9 +191,9 @@ Devices with `BUILD` set to `yes` are included in the default build and can be u
 
 For local compilation, use the `-b` parameter; for GitHub Actions, use the `armbian_board` parameter. `-b all` packages all devices with `BUILD` set to `yes`. Specifying a `BOARD` explicitly will package it regardless of its `BUILD` value. For example: `-b r68s_s905x3-tx3_s905l3a-cm311`.
 
-### 5.4 Expanding Github Actions Compilation Space Using Logical Volumes
+### 5.4 Expanding GitHub Actions Compilation Space Using Logical Volumes
 
-GitHub Actions provides 84GB of compile space by default, with approximately 50GB available after accounting for the system and required packages. When compiling all firmware, this may be insufficient. Use logical volumes to expand the compile space to approximately 110GB. Refer to the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file and use the commands below to create a logical volume. Then use the logical volume path during compilation.
+GitHub Actions provides 84GB of compile space by default, with approximately 50GB available after accounting for the system and required packages. When compiling all firmware images, this may be insufficient. You can use logical volumes to expand the compile space to approximately 110GB. Refer to the [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) file and use the commands below to create a logical volume, then use the logical volume path during compilation.
 
 ```yaml
 - name: Create simulated physical disk
@@ -270,11 +270,11 @@ Log in to the Armbian system (default user: root, default password: 1234) → En
 armbian-install
 ```
 
-| Optional Parameter | Default Value | Options | Description                          |
-| ------------------ | ------------- | ------- | ------------------------------------ |
-| -m                 | no            | yes/no  | Use Mainline u-boot                  |
-| -a                 | yes           | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition table adjustment tool |
-| -l                 | no            | yes/no  | List. Display the entire device list |
+| Optional Parameter | Default Value | Options | Description |
+| --- | --- | --- | --- |
+| -m | no | yes/no | Use mainline u-boot |
+| -a | yes | yes/no | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
+| -l | no | yes/no | Display the entire device list |
 
 Example: `armbian-install -m yes -a no`
 
@@ -387,7 +387,6 @@ This method is based on [cc747](https://post.smzdm.com/p/a4wkdo7l/)'s tutorial. 
 - Address `0x00000000`, name `system`, path select the `Armbian.img` system to be flashed.
 - Click Execute and wait for the progress to complete.
 
-
 ### 8.3 Allwinner Series Installation Method
 
 Log in to the Armbian system (default user: root, default password: 1234) → Enter the command:
@@ -472,7 +471,7 @@ When the kernel patch directory [tools/patch](../../compile-kernel/tools/patch) 
         └── tools
             └── patch
                 ├── common-kernel-patches  # Fixed directory name: stores common kernel patches for all versions
-                ├── linux-5.15.y           # Named after the kernel source library: stores dedicated patches
+                ├── linux-5.15.y           # Named after the kernel source repository: stores dedicated patches
                 ├── linux-6.1.y
                 ├── linux-5.10.y-rk35xx
                 └── more kernel directory...
@@ -501,7 +500,6 @@ When specifying a custom kernel patch via `kernel_patch`, follow the naming conv
 
 Before adding a custom kernel patch, compare it against the upstream kernel source repository [unifreq/linux-k.x.y](https://github.com/unifreq) to verify it has not already been applied and to avoid conflicts. Tested kernel patches are encouraged to be submitted to the kernel repositories maintained by unifreq. Your contributions help make Armbian and OpenWrt more stable and functional for everyone.
 
-
 ### 9.3 How to Customize Compilation of Driver Modules
 
 Some drivers are not yet included in the mainline Linux kernel but can be compiled as custom modules. Only drivers compatible with the mainline kernel can be compiled; Android-specific drivers are generally unsupported. See the guide: [How to Compile the rtl8189fs Driver Module⁠](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3193)
@@ -515,7 +513,6 @@ For example:
 armbian-sync
 armbian-update -k 6.1
 
-
 # Step 2: Install compilation tools
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
@@ -525,7 +522,6 @@ wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.
 tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # Install additional compilation dependencies (optional; you can manually install missing components based on errors).
 armbian-kernel -u
-
 
 # Step 3: Download and compile the driver
 # Download driver source code
@@ -545,7 +541,6 @@ export KSRC=/usr/lib/modules/$(uname -r)/build
 export M="/root/rtl8189ES_linux"
 # Compile the driver
 make
-
 
 # Step 4: Install the driver
 sudo cp -f 8189es.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
@@ -585,15 +580,15 @@ armbian-update
 ```
 
 | Optional Parameters | Default Value | Options | Description |
-| -------- | ------------ | ------------- | -------------------------------- |
-| -r | ophub/kernel | `<owner>/<repo>` | Set the repository to download the kernel from github.com |
-| -u | Automatic | stable/flippy/beta/rk3588/rk35xx | Set the suffix of the used kernel's [tags](https://github.com/ophub/kernel/releases) |
-| -k | Latest Version | Kernel Version | Set the [Kernel Version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -b | yes | yes/no | Automatically backup the kernel currently in use when updating the kernel |
-| -d | deb | tar/deb | Set the preferred kernel package format. If unavailable, the script will automatically try the alternative. `deb` is recommended for compiling custom drivers. |
-| -m | no | yes/no | Use the mainline u-boot |
-| -s | None | None/DiskName | [SOS] Restore the system kernel in eMMC/NVMe/sdX and other disks |
-| -h | None | None | View the usage help |
+| --- | --- | --- | --- |
+| -r | ophub/kernel | `<owner>/<repo>` | Set the repository on github.com for downloading the kernel |
+| -u | Automatic | stable/flippy/beta/rk3588/rk35xx | Set the [tags suffix](https://github.com/ophub/kernel/releases) of the kernel used |
+| -k | Latest Version | Kernel Version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -b | yes | yes/no | Automatically back up the currently used kernel when updating |
+| -d | deb | tar/deb | Set the preferred kernel package format. If unavailable, the script will automatically try the alternative format. The `deb` format is recommended for compiling custom drivers. |
+| -m | no | yes/no | Use mainline u-boot |
+| -s | none | none/DiskName | [SOS] Restore the system kernel on eMMC/NVMe/sdX or other disks |
+| -h | none | none | View help information |
 
 Example: `armbian-update -k 5.15 -u stable -d deb`
 
@@ -649,7 +644,6 @@ armbian-software
 Use `armbian-software -u` to update the local software center list. Based on community feedback in [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues), commonly used [software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) is gradually integrated with one-click installation, update, and uninstallation support. This includes `docker images`, `desktop software`, `application services`, etc. See more [instructions](armbian_software.md).
 
 Use `armbian-apt` to select an appropriate software mirror for your region, improving download speeds. For example, select the `mirrors.tuna.tsinghua.edu.cn` source in China:
-
 
 ```shell
 armbian-apt
@@ -712,7 +706,6 @@ Alternatively, flash the Android system to eMMC via USB cable. Android system im
 #### 12.3.1 Backup and Restore Using Armbian-ddbr
 
 Before installing Armbian on a new device, back up the original Android TV system in case restoration is needed later. Boot Armbian from `TF/SD/USB`, run `armbian-ddbr`, and enter `b` when prompted to create a backup. The backup is saved to `/ddbr/BACKUP-arm-64-emmc.img.gz` — download and keep it in a safe location. To restore, upload the backup file to the same path on the `TF/SD/USB` device, run `armbian-ddbr`, and enter `r` when prompted.
-
 
 #### 12.3.2 Recovering using Amlogic Flashing Tool
 
@@ -777,7 +770,7 @@ to `/etc/modprobe.d/blacklist.conf` and restart.
 
 ### 12.7 Network Configuration
 
-#### 12.7.1 Network Configuration Using Interfaces 
+#### 12.7.1 Network Configuration Using Interfaces
 
 The default content of the network configuration file `/etc/network/interfaces` is as follows:
 
@@ -814,7 +807,7 @@ gateway 192.168.1.1
 dns-nameservers 192.168.1.1
 ```
 
-##### 12.7.1.3 Establish Interconnected Network Using OpenWrt in Docker 
+##### 12.7.1.3 Establish Interconnected Network Using OpenWrt in Docker
 
 Modify the MAC address as needed.
 
@@ -1205,7 +1198,7 @@ bluetoothctl discoverable on
 bluetoothctl pair 12:34:56:78:90:AB
 
 # Check the paired Bluetooth devices
-blluetoothctl paired-devices
+bluetoothctl paired-devices
 
 # Connect to the Bluetooth device
 bluetoothctl connect 12:34:56:78:90:AB
@@ -1305,7 +1298,6 @@ If the Android boot logo is needed, the 852M + 32M (`852M~884M`) `logo` partitio
 - 100M~836M
 - 837M~852M
 - 884M~end
-
 
 #### 12.10.4 For eMMC Installation
 
@@ -1430,14 +1422,13 @@ Two types of files are generated: the `u-boot.bin` in the u-boot root directory 
 
 💡 Tip: Before writing to eMMC for testing, review section 12.3 for recovery methods. Ensure you know the short-circuit point location, have the original .img format Android system file, and have verified the short-circuit flashing process. Master all recovery methods before proceeding.
 
-
 #### 12.11.2 How to build the u-boot file for Rockchip devices
 
 Since most Rockchip device manufacturers have open-sourced their u-boot code, the relevant source code can be obtained directly from their repositories. Additionally, some open-source contributors have shared user-friendly u-boot compilation scripts. Below are several examples illustrating different compilation methods.
 
 ##### 12.11.2.1 How to use Radxa's u-boot building script
 
-Taking compiling [Rock5b(rk3588)](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) as an example.
+Taking the compilation of [Rock5B(rk3588)](https://wiki.radxa.com/Rock5/guide/build-u-boot-on-5b) as an example.
 
 ```shell
 # 01.Install the necessary build dependencies
@@ -1455,7 +1446,7 @@ git clone -b debian https://github.com/radxa/build.git
 # ~/rk3588-sdk/rkbin/: Pre-built Rockchip binaries, including first stage loader and ATF (Arm Trustzone Firmware)
 # ~/rk3588-sdk/u-boot/: Second stage bootloader used to start the OS (e.g. Linux or Android)
 
-# 03.Build u-boot （For ROCK 5B）
+# 03.Build u-boot (For ROCK 5B)
 cd ~/rk3588-sdk
 ./build/mk-uboot.sh rk3588-rock-5b
 
@@ -1470,15 +1461,13 @@ cd ~/rk3588-sdk
 
 By adding more options in `board_configs.sh` and `mk-uboot.sh` within the [radxa/build](https://github.com/radxa/build) source code, u-boot files for other devices can also be compiled. For example, see the instructions for compiling the [Beelink-IPC-R(rk3588)](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/415#issuecomment-1508234307) device.
 
-
 ##### 12.11.2.2 How to use cm9vdA's u-boot building script
 
-cm9vdA provides scripts and instructions for compiling u-boot and the kernel in his open-source project [cm9vdA/build-linux](https://github.com/cm9vdA/build-linux). The following are documented compilation processes for various Rockchip devices:
+cm9vdA provides scripts and instructions for compiling u-boot and the kernel in their open-source project [cm9vdA/build-linux](https://github.com/cm9vdA/build-linux). The following are documented compilation processes for various Rockchip devices:
 
 - Build u-boot for Lenovo-Leez-P710 (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609#issuecomment-1681494735)
 - Build u-boot for DLFR100 (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522#issuecomment-1622919423)
 - Build u-boot for ZYSJ (rk3399) device: [Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380#issuecomment-1539325464)
-
 
 ### 12.12 Error in Memory Size Recognition
 
@@ -1643,7 +1632,7 @@ Add the corresponding `BOARD` option to `armbian_board` in the [yml workflow con
 
 ### 12.16 How to Resolve System Boot Failures or eMMC Write I/O Errors Caused by DTB Frequency
 
-When the DTB frequency is set too high, some devices may fail to boot properly and become stuck on the boot screen. An example can be seen in this [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3678#issuecomment-5749939734), with the following error output:
+When the DTB frequency is set too high, some devices may fail to boot properly and become stuck on the boot screen. An example can be seen in this [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3678#issuecomment-5749939734), with the following error output:
 
 ```shell
 Loading, please wait...
@@ -1654,7 +1643,7 @@ Begin: Mounting root file system... Begin: Running /scripts/local-top ... done.
 Begin: Running /scripts/local-premount ... Scanning for Btrfs filesystems
 ```
 
-Some devices can boot Armbian normally from USB/SD/TF but report I/O write errors when writing to eMMC, such as the case in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989):
+Some devices can boot Armbian normally from USB/SD/TF but report I/O write errors when writing to eMMC, such as the case in this [Issue](https://github.com/ophub/amlogic-s9xxx-armbian/issues/989):
 
 ```shell
 [  284.338449] I/O error, dev mmcblk2, sector 0 op 0x1:(WRITE) flags 0x800 phys_seg 1 prio class 2
@@ -1740,8 +1729,8 @@ sudo apt-get install -y u-boot-tools
 
 # Edit the boot.cmd file
 cd /boot
-copy /boot/boot.cmd /boot/boot.cmd.bak
-copy /boot/boot.scr /boot/boot.scr.bak
+cp /boot/boot.cmd /boot/boot.cmd.bak
+cp /boot/boot.scr /boot/boot.scr.bak
 nano boot.cmd
 
 # Compile the boot.scr file

@@ -12,8 +12,8 @@ Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築
 
 ## Armbianシステムのデフォルト情報
 
-| システム名    | デフォルトユーザー名 | デフォルトパスワード  | SSHポート  | IPアドレス  |
-| -------------- | ---------------- | ----------------- | --------- | ----------- |
+| システム名 | デフォルトユーザー名 | デフォルトパスワード | SSHポート | IPアドレス |
+| --- | --- | --- | --- | --- |
 | 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | ルーターから取得 |
 | 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | 静的MacVLAN IP |
 
@@ -22,7 +22,7 @@ Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築
 ⬆️ 各プラットフォーム（Amlogic/Rockchip/Allwinner）のモデルは、SoC性能の高い順に並べられています。
 
 | SoC | [デバイス](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | [カーネル](https://github.com/ophub/kernel) |
-| ---- | ---- | ---- |
+| --- | --- | --- |
 | a311d | [Khadas-VIM3](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/99), [WXY-OES](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2666) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | s922x | [Beelink-GT-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/370), [Beelink-GT-King-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/707), [Ugoos-AM6-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/464), [ODROID-N2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/201), [X88-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/988), [Ali-CT2000](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1150), [WXY-OES-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3029) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | s905x3 | [X96-Max+](https://github.com/ophub/amlogic-s9xxx-armbian/issues/351), [HK1-Box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/414), [Vontar-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1006), [H96-Max-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1250), [Ugoos-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/782), [TX3(QZ)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/644), [TX3(BZ)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1077), [X96-Air](https://github.com/ophub/amlogic-s9xxx-armbian/issues/366), [X96-Max+_A100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/779), [A95X-F3-Air](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2282), [Tencent-Aurora-3Pro(s905x3-b)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/506), [X96-Max+Q1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/788), [X96-Max+100W](https://github.com/ophub/amlogic-s9xxx-armbian/issues/909), [X96-Max+_2101](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1086), [Infinity-B32](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1181), [Whale](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1166), [X88-Pro-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [X99-Max-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [Transpeed-X3-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [TOX1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3441), [Khadas-VIM3L](https://github.com/ophub/amlogic-s9xxx-armbian/pull/3482) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
@@ -67,11 +67,11 @@ Armbianは、Debian/Ubuntuをベースに、ARMチップ向けに特別に構築
 armbian-install
 ```
 
-| オプション | デフォルト | 選択肢 | 説明       |
-| -------- | ------- | ------- | ----------------- |
-| -m       | no      | yes/no  | メインラインu-bootを使用 |
-| -a       | yes     | yes/no  | [ampart](https://github.com/7Ji/ampart)パーティション調整ツールを使用 |
-| -l       | no      | yes/no  | 完全なデバイスリストを表示 |
+| オプション | デフォルト | 選択肢 | 説明 |
+| --- | --- | --- | --- |
+| -m | no | yes/no | メインラインu-bootを使用 |
+| -a | yes | yes/no | [ampart](https://github.com/7Ji/ampart)パーティション調整ツールを使用 |
+| -l | no | yes/no | 完全なデバイスリストを表示 |
 
 例：`armbian-install -m yes -a no`
 
@@ -85,16 +85,16 @@ Armbianシステムにログインし、以下のコマンドを入力します�
 armbian-update
 ```
 
-| オプション | デフォルト      | 選択肢       | 説明                      |
-| -------- | ------------ | ------------- | -------------------------------- |
-| -r       | ophub/kernel | `<owner>/<repo>` | github.comからカーネルをダウンロードするリポジトリを設定 |
-| -u       | 自動判定   | stable/flippy/beta/rk3588/rk35xx | カーネルの[タグサフィックス](https://github.com/ophub/kernel/releases)を設定 |
-| -k       | 最新バージョン | カーネルバージョン | [カーネルバージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable)を設定 |
-| -b       | yes          | yes/no        | 更新時に現在使用中のカーネルを自動バックアップ |
-| -d       | deb          | tar/deb       | 優先するカーネルパッケージ形式を設定。利用できない場合、スクリプトが自動的に代替形式を試みます。カスタムドライバーのコンパイルには`deb`形式を推奨。 |
-| -m       | no           | yes/no        | メインラインu-bootを使用 |
-| -s       | なし         | なし/ディスク名 | [SOS] eMMC/NVMe/sdXまたは他のディスク上のシステムカーネルを復元 |
-| -h       | なし         | なし          | ヘルプ情報を表示 |
+| オプション | デフォルト | 選択肢 | 説明 |
+| --- | --- | --- | --- |
+| -r | ophub/kernel | `<owner>/<repo>` | github.comからカーネルをダウンロードするリポジトリを設定 |
+| -u | 自動判定 | stable/flippy/beta/rk3588/rk35xx | カーネルの[タグサフィックス](https://github.com/ophub/kernel/releases)を設定 |
+| -k | 最新バージョン | カーネルバージョン | [カーネルバージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable)を設定 |
+| -b | yes | yes/no | 更新時に現在使用中のカーネルを自動バックアップ |
+| -d | deb | tar/deb | 優先するカーネルパッケージ形式を設定。利用できない場合、スクリプトが自動的に代替形式を試みます。カスタムドライバーのコンパイルには`deb`形式を推奨。 |
+| -m | no | yes/no | メインラインu-bootを使用 |
+| -s | なし | なし/ディスク名 | [SOS] eMMC/NVMe/sdXまたは他のディスク上のシステムカーネルを復元 |
+| -h | なし | なし | ヘルプ情報を表示 |
 
 例：`armbian-update -k 5.15 -u stable -d deb`
 
@@ -205,16 +205,16 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 - ### ローカルパッケージングパラメータの説明
 
-| パラメータ | 意味     | 説明 |
-| ----      | ----------  | ----------  |
-| -b        | ボード      | ターゲットデバイスのコードネームを指定します。特定のデバイスを指定してコンパイルする（例：`-b s905x3`）か、アンダースコアで複数のデバイスコードネームを繋いで一括コンパイルする（例：`-b s905x3_s905d`）ことができます。このパラメータは、特殊なキーワードによる一括コンパイルもサポートしています。`all` はすべてのデバイスをコンパイルし、`first50` はデバイスライブラリの最初の50個をコンパイルします。`range50_100` は51番目から100番目のデバイスをコンパイルし（`range100_150` も同様）、`last20` は最後の20個をコンパイルすることを意味します。さらに、ハードウェアプラットフォーム（`amlogic`、`rockchip`、`allwinner`）別のコンパイルにも対応しており、プラットフォーム名を直接入力するだけで対応するすべてのイメージをコンパイルできます（例：`-b amlogic`）。プラットフォーム名の後に数値を追加すると、そのプラットフォームのリスト内の特定の範囲を指定してコンパイルできます。たとえば、`-b amlogic50` はAmlogicプラットフォームのサポートリストの最初の50個のデバイスをコンパイルし、`-b amlogic50_100` は51番目から100番目のデバイスをコンパイルすることを意味します。サポートされているデバイスコードネームの具体的なリストについては、[model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) の `BOARD` 設定項目を参照してください。デフォルト値：`all` |
-| -r        | カーネルリポジトリ | github.comのカーネルリポジトリの`<owner>/<repo>`を指定。デフォルト値：`ophub/kernel` |
-| -u        | カーネル用途 | 使用するカーネルの`タグサフィックス`を設定（[stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)、[flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy)、[beta](https://github.com/ophub/kernel/releases/tag/kernel_beta)など）。デフォルト値：`stable` |
-| -k        | カーネル     | [カーネル](https://github.com/ophub/kernel/releases/tag/kernel_stable)名を指定（例：`-k 6.6.12`）。複数のカーネルは`_`で結合（例：`-k 6.6.12_5.15.50`）。`-k`パラメータで自由に指定できるカーネルバージョンは、`stable/flippy/beta`を使用するカーネルにのみ有効です。[rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) などの他のカーネルシリーズは、専用のカーネルのみ使用できます。 |
-| -a        | 自動カーネル | 同じシリーズの最新カーネルを自動的に使用するかどうかを設定。`true`の場合、`-k`で指定されたシリーズ（例：6.6.12）内の新しいバージョンがカーネルリポジトリで確認され、見つかった場合は最新バージョンが自動的に使用されます。`false`の場合、指定された正確なバージョンが使用されます。デフォルト：`true` |
-| -t        | ルートFSタイプ | ROOTFSパーティションのファイルシステムタイプを設定。選択肢：`ext4`または`btrfs`。例：`-t btrfs`。デフォルト：`ext4` |
-| -s        | サイズ       | イメージパーティションサイズを設定。ROOTFSパーティションのみ設定する場合は単一の値を指定（例：`-s 2560`）。BOOTFSとROOTFSの両方を設定する場合は`/`で結合（例：`-s 512/2560`）。デフォルト：`512/2560` |
-| -n        | ビルダー名 | Armbianシステムのビルダー署名を設定。スペースを含めないでください。デフォルト：なし |
+| パラメータ | 意味 | 説明 |
+| --- | --- | --- |
+| -b | ボード | ターゲットデバイスのコードネームを指定します。特定のデバイスを指定してコンパイルする（例：`-b s905x3`）か、アンダースコアで複数のデバイスコードネームを繋いで一括コンパイルする（例：`-b s905x3_s905d`）ことができます。このパラメータは、特殊なキーワードによる一括コンパイルもサポートしています。`all` はすべてのデバイスをコンパイルし、`first50` はデバイスライブラリの最初の50個をコンパイルします。`range50_100` は51番目から100番目のデバイスをコンパイルし（`range100_150` も同様）、`last20` は最後の20個をコンパイルすることを意味します。さらに、ハードウェアプラットフォーム（`amlogic`、`rockchip`、`allwinner`）別のコンパイルにも対応しており、プラットフォーム名を直接入力するだけで対応するすべてのイメージをコンパイルできます（例：`-b amlogic`）。プラットフォーム名の後に数値を追加すると、そのプラットフォームのリスト内の特定の範囲を指定してコンパイルできます。たとえば、`-b amlogic50` はAmlogicプラットフォームのサポートリストの最初の50個のデバイスをコンパイルし、`-b amlogic50_100` は51番目から100番目のデバイスをコンパイルすることを意味します。サポートされているデバイスコードネームの具体的なリストについては、[model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf) の `BOARD` 設定項目を参照してください。デフォルト値：`all` |
+| -r | カーネルリポジトリ | github.comのカーネルリポジトリの`<owner>/<repo>`を指定。デフォルト値：`ophub/kernel` |
+| -u | カーネル用途 | 使用するカーネルの`タグサフィックス`を設定（[stable](https://github.com/ophub/kernel/releases/tag/kernel_stable)、[flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy)、[beta](https://github.com/ophub/kernel/releases/tag/kernel_beta)など）。デフォルト値：`stable` |
+| -k | カーネル | [カーネル](https://github.com/ophub/kernel/releases/tag/kernel_stable)名を指定（例：`-k 6.6.12`）。複数のカーネルは`_`で結合（例：`-k 6.6.12_5.15.50`）。`-k`パラメータで自由に指定できるカーネルバージョンは、`stable/flippy/beta`を使用するカーネルにのみ有効です。[rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) などの他のカーネルシリーズは、専用のカーネルのみ使用できます。 |
+| -a | 自動カーネル | 同じシリーズの最新カーネルを自動的に使用するかどうかを設定。`true`の場合、`-k`で指定されたシリーズ（例：6.6.12）内の新しいバージョンがカーネルリポジトリで確認され、見つかった場合は最新バージョンが自動的に使用されます。`false`の場合、指定された正確なバージョンが使用されます。デフォルト：`true` |
+| -t | ルートFSタイプ | ROOTFSパーティションのファイルシステムタイプを設定。選択肢：`ext4`または`btrfs`。例：`-t btrfs`。デフォルト：`ext4` |
+| -s | サイズ | イメージパーティションサイズを設定。ROOTFSパーティションのみ設定する場合は単一の値を指定（例：`-s 2560`）。BOOTFSとROOTFSの両方を設定する場合は`/`で結合（例：`-s 512/2560`）。デフォルト：`512/2560` |
+| -n | ビルダー名 | Armbianシステムのビルダー署名を設定。スペースを含めないでください。デフォルト：なし |
 
 - `sudo ./rebuild`：デフォルト設定ですべてのデバイスモデルをパッケージング。
 - `sudo ./rebuild -b s905x3 -k 6.6.12`：推奨。指定したカーネルでデフォルト設定のビルド。
@@ -250,28 +250,28 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 これらのパラメータは、上記のローカルパッケージングコマンドオプションに対応しています。
 
-| パラメータ       | デフォルト       | 説明                                             |
-|-----------------|---------------|---------------------------------------------------------|
-| armbian_path    | なし          | 元のArmbianファイルのパスを設定。ワークフローファイルパス（例：`build/output/images/*.img`）およびネットワークダウンロードURL（例：`https://dl.armbian.com/*/Armbian_*.img.xz`）をサポート。 |
-| armbian_board   | all           | パッケージボックスの`board`を設定。`-b`を参照       |
-| kernel_repo     | ophub/kernel  | github.comのカーネルリポジトリの`<owner>/<repo>`を指定。`-r`を参照 |
-| kernel_usage    | stable        | 使用するカーネルの`タグサフィックス`を設定。`-u`を参照 |
-| armbian_kernel  | 6.12.y_6.18.y | カーネルの[バージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable)を設定。`-k`を参照 |
-| auto_kernel     | true          | 同じシリーズの最新バージョンのカーネルを自動的に採用するかどうかを設定。`-a`を参照       |
-| armbian_fstype  | ext4          | システムのROOTFSパーティションのファイルシステムタイプを設定。`-t`を参照  |
-| armbian_size    | 512/2560      | システムのBOOTFSおよびROOTFSパーティションのサイズを設定。`-s`を参照  |
-| armbian_files   | false         | カスタムArmbianファイルを追加。設定した場合、このディレクトリ内のすべてのファイルが[common-files](build-armbian/armbian-files/common-files)にコピーされます。ファイルが正しくオーバーレイされるよう、ディレクトリ構造はArmbianのルートディレクトリを反映する必要があります（例：デフォルト設定ファイルは`etc/default/`配下に配置）。 |
-| builder_name    | なし          | Armbianシステムのビルダー署名を設定。`-n`を参照 |
+| パラメータ | デフォルト | 説明 |
+| --- | --- | --- |
+| armbian_path | なし | 元のArmbianファイルのパスを設定。ワークフローファイルパス（例：`build/output/images/*.img`）およびネットワークダウンロードURL（例：`https://dl.armbian.com/*/Armbian_*.img.xz`）をサポート。 |
+| armbian_board | all | パッケージボックスの`board`を設定。`-b`を参照 |
+| kernel_repo | ophub/kernel | github.comのカーネルリポジトリの`<owner>/<repo>`を指定。`-r`を参照 |
+| kernel_usage | stable | 使用するカーネルの`タグサフィックス`を設定。`-u`を参照 |
+| armbian_kernel | 6.12.y_6.18.y | カーネルの[バージョン](https://github.com/ophub/kernel/releases/tag/kernel_stable)を設定。`-k`を参照 |
+| auto_kernel | true | 同じシリーズの最新バージョンのカーネルを自動的に採用するかどうかを設定。`-a`を参照 |
+| armbian_fstype | ext4 | システムのROOTFSパーティションのファイルシステムタイプを設定。`-t`を参照 |
+| armbian_size | 512/2560 | システムのBOOTFSおよびROOTFSパーティションのサイズを設定。`-s`を参照 |
+| armbian_files | false | カスタムArmbianファイルを追加。設定した場合、このディレクトリ内のすべてのファイルが[common-files](build-armbian/armbian-files/common-files)にコピーされます。ファイルが正しくオーバーレイされるよう、ディレクトリ構造はArmbianのルートディレクトリを反映する必要があります（例：デフォルト設定ファイルは`etc/default/`配下に配置）。 |
+| builder_name | なし | Armbianシステムのビルダー署名を設定。`-n`を参照 |
 
 - ### GitHub Actions出力変数の説明
 
 `Releases`へのアップロードには、リポジトリの`ワークフロー読み取りおよび書き込み権限`が必要です。詳細は[使用方法の説明](documents/README.ja.md#2-プライバシー変数-github_token-等の設定)をご覧ください。
 
-| パラメータ                        | デフォルト       | 説明                           |
-|----------------------------------|---------------|---------------------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}   | out           | Armbianシステムファイルの出力パス      |
-| ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058    | パッケージング日時（月.日.時分） |
-| ${{ env.PACKAGED_STATUS }}       | success       | パッケージングステータス：success / failure   |
+| パラメータ | デフォルト | 説明 |
+| --- | --- | --- |
+| ${{ env.PACKAGED_OUTPUTPATH }} | out | Armbianシステムファイルの出力パス |
+| ${{ env.PACKAGED_OUTPUTDATE }} | 04.13.1058 | パッケージング日時（月.日.時分） |
+| ${{ env.PACKAGED_STATUS }} | success | パッケージングステータス：success / failure |
 
 ## Armbian Dockerイメージのビルド
 
@@ -306,7 +306,6 @@ Armbianシステムの[Docker](https://hub.docker.com/u/ophub)イメージの作
 - [7Ji](https://7ji.github.io/)は、Amlogicプラットフォームのリバースエンジニアリングと開発に関する記事を公開しており、ArchLinux ARMのインストールやAmlogicブートメカニズムの分析などのトピックを扱っています。[ampart](https://github.com/7Ji/ampart)プロジェクトは、Amlogic eMMCパーティションテーブルとDTBパーティションの読み取り・編集用パーティションツールを提供し、eMMCスペースの100%活用を実現しています。[amlogic-s9xxx-archlinuxarm](https://github.com/7Ji/amlogic-s9xxx-archlinuxarm)プロジェクトは、`Arch Linux ARM`のビルドおよび使用手順を提供しています。[YAopenvfD](https://github.com/7Ji/YAopenvfD)プロジェクトは、代替のopenvfdデーモン実装を提供しています。
 - [13584452567](https://github.com/13584452567)は、本リポジトリにおける`Rockchip`デバイスサポートの先駆者です。彼の貢献により、[EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991)、[King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080)、[TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094)、[Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132)、[ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247)、[tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687)、[xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698)など、多数の`Rockchip`デバイスのサポートが拡大されました。また、[TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638)などの`Allwinner`デバイス用の専用[カーネル](https://github.com/13584452567/linux-6.6.y)をメンテナンスし、[Discussions](https://github.com/ophub/amlogic-s9xxx-armbian/discussions/1634)や[Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues)で広範な技術サポートとソリューションを提供し、コミュニティに多大な貢献をしています。
 - [cooip-jm](https://github.com/cooip-jm)は、Armbian、LXC、Docker、AdGuard、その他のアプリケーションに関する多くのガイドを[wiki](https://github.com/cooip-jm/About-openwrt/wiki)で共有しています。ぜひご覧ください。
-
 
 ## リンク
 

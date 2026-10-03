@@ -8,7 +8,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
 
 - [Armbian 构建及使用方法](#armbian-构建及使用方法)
 - [目录](#目录)
-  - [1. 注册自己的 Github 的账户](#1-注册自己的-github-的账户)
+  - [1. 注册自己的 GitHub 账户](#1-注册自己的-github-的账户)
   - [2. 设置隐私变量 GITHUB\_TOKEN 等](#2-设置隐私变量-github_token-等)
   - [3. Fork 仓库并设置工作流权限](#3-fork-仓库并设置工作流权限)
   - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
@@ -16,7 +16,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
     - [5.1 手动编译](#51-手动编译)
     - [5.2 定时编译](#52-定时编译)
     - [5.3 自定义默认系统配置](#53-自定义默认系统配置)
-    - [5.4 使用逻辑卷扩大 Github Actions 编译空间](#54-使用逻辑卷扩大-github-actions-编译空间)
+    - [5.4 使用逻辑卷扩大 GitHub Actions 编译空间](#54-使用逻辑卷扩大-github-actions-编译空间)
     - [5.5 制作 Armbian Docker 镜像](#55-制作-armbian-docker-镜像)
   - [6. 保存系统](#6-保存系统)
   - [7. 下载系统](#7-下载系统)
@@ -110,7 +110,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
     - [12.20 TCP 拥塞控制优化方案](#1220-tcp-拥塞控制优化方案)
     - [12.21 关于 HDMI EDID 识别异常问题的解决方法](#1221-关于-hdmi-edid-识别异常问题的解决方法)
 
-## 1. 注册自己的 Github 的账户
+## 1. 注册自己的 GitHub 账户
 
 注册账户以进行后续的系统定制操作。点击 github.com 网站右上角的 `Sign up` 按钮，根据提示完成注册。
 
@@ -191,7 +191,7 @@ schedule:
 
 本地编译时通过 `-b` 参数指定，GitHub Actions 编译时通过 `armbian_board` 参数指定。`-b all` 表示构建所有 `BUILD` 为 `yes` 的设备。指定 `BOARD` 参数时，无论 `BUILD` 值为 `yes` 或 `no` 均可构建，例如：`-b r68s_s905x3-tx3_s905l3a-cm311`
 
-### 5.4 使用逻辑卷扩大 Github Actions 编译空间
+### 5.4 使用逻辑卷扩大 GitHub Actions 编译空间
 
 GitHub Actions 默认编译空间为 84G，去除系统和必要软件包后可用空间约 50G。编译全部固件时可能遇到空间不足的问题，可通过逻辑卷将编译空间扩大至约 110G。参照 [.github/workflows/build-armbian-arm64-server-image.yml](../.github/workflows/build-armbian-arm64-server-image.yml) 文件中的方法，使用以下命令创建逻辑卷，并在编译时使用逻辑卷路径。
 
@@ -270,13 +270,13 @@ Amlogic、Rockchip 和 Allwinner 的安装方法各不相同。不同设备支�
 armbian-install
 ```
 
-| 可选参数  | 默认值   | 选项     | 说明                |
-| -------  | ------- | ------  | -----------------   |
-| -m       | no      | yes/no  | 使用 Mainline u-boot |
-| -a       | yes     | yes/no  | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
-| -l       | no      | yes/no  | List. 显示全部设备列表 |
+| 可选参数 | 默认值 | 选项 | 说明 |
+| --- | --- | --- | --- |
+| -m | no | yes/no | 使用 Mainline u-boot |
+| -a | yes | yes/no | 使用 [ampart](https://github.com/7Ji/ampart) 分区表调整工具 |
+| -l | no | yes/no | 显示全部设备列表 |
 
-举例: `armbian-install -m yes -a no`
+举例：`armbian-install -m yes -a no`
 
 ### 8.2 Rockchip 系列安装方法
 
@@ -386,7 +386,6 @@ dd if=armbian.img  of=/dev/nvme0n1  bs=1M status=progress
 - 泰山派关机状态下按住 Recovery 键后插入type-c数据线，待 RKDevTool 提示`发现一个 LOADER 设备`后松开 Recovery 键。右键添加项。
 - 地址 `0x00000000`, 名字 `system`, 路径选择要刷的 `Armbian.img` 系统。
 - 点击执行，等待进度条完成即可
-
 
 ### 8.3 Allwinner 系列安装方法
 
@@ -514,7 +513,6 @@ Linux 主线内核中部分驱动尚未内置，可自行编译驱动模块。�
 armbian-sync
 armbian-update -k 6.1
 
-
 # 第二步，安装编译工具
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
@@ -524,7 +522,6 @@ wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.
 tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
 armbian-kernel -u
-
 
 # 第三步，下载驱动，编译
 # 下载驱动源码
@@ -544,7 +541,6 @@ export KSRC=/usr/lib/modules/$(uname -r)/build
 export M="/root/rtl8189ES_linux"
 # 编译驱动
 make
-
 
 # 第四步，安装驱动
 sudo cp -f 8189es.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
@@ -583,18 +579,18 @@ cfg80211              917504  2 8189es,brcmfmac
 armbian-update
 ```
 
-| 可选参数  | 默认值        | 选项           | 说明                              |
-| -------- | ------------ | ------------- | -------------------------------- |
-| -r       | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库  |
-| -u       | 自动化        | stable/flippy/beta/rk3588/rk35xx | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
-| -k       | 最新版        | 内核版本       | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable)  |
-| -b       | yes          | yes/no        | 更新内核时自动备份当前系统使用的内核    |
-| -d       | deb          | tar/deb       | 设置优先使用的内核包格式。若指定格式不存在，脚本将自动尝试另一种格式。如需编译自定义驱动推荐选择 `deb` 格式。 |
-| -m       | no           | yes/no        | 使用主线 u-boot                    |
-| -s       | 无           | 无/磁盘名称     | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
-| -h       | 无           | 无             | 查看使用帮助                       |
+| 可选参数 | 默认值 | 选项 | 说明 |
+| --- | --- | --- | --- |
+| -r | ophub/kernel | `<owner>/<repo>` | 设置从 github.com 下载内核的仓库 |
+| -u | 自动识别 | stable/flippy/beta/rk3588/rk35xx | 设置使用的内核的 [tags 后缀](https://github.com/ophub/kernel/releases) |
+| -k | 最新版 | 内核版本 | 设置[内核版本](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -b | yes | yes/no | 更新内核时自动备份当前使用的内核 |
+| -d | deb | tar/deb | 设置首选的内核包格式。若指定格式不存在，脚本将自动尝试另一种格式。如需编译自定义驱动，推荐使用 `deb` 格式。 |
+| -m | no | yes/no | 使用主线 u-boot |
+| -s | 无 | 无/磁盘名称 | [SOS] 恢复 eMMC/NVMe/sdX 等磁盘中的系统内核 |
+| -h | 无 | 无 | 查看使用帮助 |
 
-举例: `armbian-update -k 5.15 -u stable -d deb`
+举例：`armbian-update -k 5.15 -u stable -d deb`
 
 通过 `-k` 参数指定内核版本号时，既可精确指定版本号（如 `armbian-update -k 5.15.50`），也可指定内核系列（如 `armbian-update -k 5.15`），指定系列时将自动使用该系列的最新版本。
 
@@ -1471,7 +1467,6 @@ cm9vdA 的开源项目 [cm9vdA/build-linux](https://github.com/cm9vdA/build-linu
 - 编译 Lenovo-Leez-P710(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1609#issuecomment-1681494735)
 - 编译 DLFR100(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1522#issuecomment-1622919423)
 - 编译 ZYSJ(rk3399) 设备的 u-boot：[Link](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1380#issuecomment-1539325464)
-
 
 ### 12.12 内存大小识别错误
 

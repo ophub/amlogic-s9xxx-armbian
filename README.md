@@ -8,12 +8,12 @@
 
 Armbian is a lightweight Linux distribution built specifically for ARM chips, based on Debian/Ubuntu. The Armbian system is lean, clean, and 100% compatible with Debian/Ubuntu, inheriting its functionality and rich software ecosystem. It runs securely and stably on TF/SD/USB storage and the device's eMMC. This project preserves the integrity of the official Armbian system while extending support for unofficially supported devices such as TV boxes, and adds a set of convenient management commands. You can now replace the Android TV system on your TV box with Armbian, transforming it into a powerful server.
 
-This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` devices. It supports writing to eMMC, kernel updates, and other features. For detailed usage, see the [📚Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [⬇️Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and customize. If this project is helpful, please click the `⭐Star` button in the upper right corner to show your support.
+This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian system for `Amlogic`, `Rockchip`, and `Allwinner` devices. It supports writing to eMMC, kernel updates, and other features. For detailed usage, please refer to the [📚Armbian User Documentation](./documents). The latest Armbian system can be downloaded from [⬇️Releases](https://github.com/ophub/amlogic-s9xxx-armbian/releases). Welcome to `Fork` and customize. If this project is helpful, please click the `⭐Star` button in the upper right corner to show your support.
 
 ## Default Information for Armbian System
 
-| System Name    | Default Username | Default Password  | SSH Port  | IP Address  |
-| -------------- | ---------------- | ----------------- | --------- | ----------- |
+| System Name | Default Username | Default Password | SSH Port | IP Address |
+| --- | --- | --- | --- | --- |
 | 🐧 [Armbian.OS](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | root | 1234 | 22 | Obtain from router |
 | 🐋 [Armbian.Docker](https://hub.docker.com/u/ophub) | root | 1234 | 22 | Static MacVLAN IP |
 
@@ -22,7 +22,7 @@ This project relies on many [contributors](CONTRIBUTORS.md) to build the Armbian
 ⬆️ Models from each platform (Amlogic/Rockchip/Allwinner) are ranked by SoC performance from high to low.
 
 | SoC | [Device](https://github.com/ophub/amlogic-s9xxx-armbian/releases) | [Kernel](https://github.com/ophub/kernel) |
-| ---- | ---- | ---- |
+| --- | --- | --- |
 | a311d | [Khadas-VIM3](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/99), [WXY-OES](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2666) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | s922x | [Beelink-GT-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/370), [Beelink-GT-King-Pro](https://github.com/ophub/amlogic-s9xxx-armbian/issues/707), [Ugoos-AM6-Plus](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/464), [ODROID-N2](https://github.com/ophub/amlogic-s9xxx-openwrt/issues/201), [X88-King](https://github.com/ophub/amlogic-s9xxx-armbian/issues/988), [Ali-CT2000](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1150), [WXY-OES-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3029) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
 | s905x3 | [X96-Max+](https://github.com/ophub/amlogic-s9xxx-armbian/issues/351), [HK1-Box](https://github.com/ophub/amlogic-s9xxx-armbian/issues/414), [Vontar-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1006), [H96-Max-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1250), [Ugoos-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/782), [TX3(QZ)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/644), [TX3(BZ)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1077), [X96-Air](https://github.com/ophub/amlogic-s9xxx-armbian/issues/366), [X96-Max+_A100](https://github.com/ophub/amlogic-s9xxx-armbian/issues/779), [A95X-F3-Air](https://github.com/ophub/amlogic-s9xxx-armbian/issues/2282), [Tencent-Aurora-3Pro(s905x3-b)](https://github.com/ophub/amlogic-s9xxx-armbian/issues/506), [X96-Max+Q1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/788), [X96-Max+100W](https://github.com/ophub/amlogic-s9xxx-armbian/issues/909), [X96-Max+_2101](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1086), [Infinity-B32](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1181), [Whale](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1166), [X88-Pro-X3](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [X99-Max-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [Transpeed-X3-Plus](https://github.com/ophub/amlogic-s9xxx-armbian/issues/1621), [TOX1](https://github.com/ophub/amlogic-s9xxx-armbian/issues/3441), [Khadas-VIM3L](https://github.com/ophub/amlogic-s9xxx-armbian/pull/3482) | [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
@@ -67,11 +67,11 @@ Choose the Armbian system that matches your device model. Refer to the correspon
 armbian-install
 ```
 
-| Optional | Default | Options | Description       |
-| -------- | ------- | ------- | ----------------- |
-| -m       | no      | yes/no  | Use mainline u-boot |
-| -a       | yes     | yes/no  | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
-| -l       | no      | yes/no  | Show full device list |
+| Optional | Default | Options | Description |
+| --- | --- | --- | --- |
+| -m | no | yes/no | Use mainline u-boot |
+| -a | yes | yes/no | Use [ampart](https://github.com/7Ji/ampart) partition adjustment tool |
+| -l | no | yes/no | Show full device list |
 
 Example: `armbian-install -m yes -a no`
 
@@ -85,16 +85,16 @@ Log in to the Armbian system and enter the command:
 armbian-update
 ```
 
-| Optional | Default      | Options       | Description                      |
-| -------- | ------------ | ------------- | -------------------------------- |
-| -r       | ophub/kernel | `<owner>/<repo>` | Set the repository for downloading kernels from github.com |
-| -u       | Automation   | stable/flippy/beta/rk3588/rk35xx | Set the kernel [tags suffix](https://github.com/ophub/kernel/releases) |
-| -k       | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
-| -b       | yes          | yes/no        | Automatically back up the currently used kernel when updating |
-| -d       | deb          | tar/deb       | Set the preferred kernel package format. If unavailable, the script will automatically try the alternative format. The `deb` format is recommended for compiling custom drivers. |
-| -m       | no           | yes/no        | Use mainline u-boot |
-| -s       | None         | None/DiskName | [SOS] Restore the system kernel on eMMC/NVMe/sdX or other disks |
-| -h       | None         | None          | View help information |
+| Optional | Default | Options | Description |
+| --- | --- | --- | --- |
+| -r | ophub/kernel | `<owner>/<repo>` | Set the repository on github.com for downloading kernels |
+| -u | Automation | stable/flippy/beta/rk3588/rk35xx | Set the kernel [tags suffix](https://github.com/ophub/kernel/releases) |
+| -k | Latest version | Kernel version | Set the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable) |
+| -b | yes | yes/no | Automatically back up the currently used kernel when updating |
+| -d | deb | tar/deb | Set the preferred kernel package format. If unavailable, the script will automatically try the alternative format. The `deb` format is recommended for compiling custom drivers. |
+| -m | no | yes/no | Use mainline u-boot |
+| -s | none | none/DiskName | [SOS] Restore the system kernel on eMMC/NVMe/sdX or other disks |
+| -h | none | none | View help information |
 
 Example: `armbian-update -k 5.15 -u stable -d deb`
 
@@ -205,16 +205,16 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 - ### Local Packaging Parameter Description
 
-| Parameter | Meaning     | Description |
-| ----      | ----------  | ----------  |
-| -b        | Board      | Specifies the target device codename (default is `all`). You can specify a single device (e.g., `-b s905x3`) or connect multiple codenames with underscores to compile them together (e.g., `-b s905x3_s905d`). The parameter also supports special keywords for batch compilation: `all` compiles every device in the database, `first50` compiles the first 50 devices, `range50_100` compiles devices from the 51st to the 100th (similarly for `range100_150`), and `last20` compiles the last 20 devices. Additionally, you can compile by hardware platform (`amlogic`, `rockchip`, `allwinner`) to build all images for that specific platform, for example, `-b amlogic`. Appending numeric values to the platform name allows you to compile a specific range within that platform's support list; for example, `-b amlogic50` builds the first 50 devices under the Amlogic platform, and `-b amlogic50_100` builds the 51st to the 100th devices. For a complete list of supported device codenames, please refer to the `BOARD` configuration items in [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf). Default: `all` |
-| -r        | KernelRepo | Specify the `<owner>/<repo>` of the github.com kernel repository. Default value: `ophub/kernel` |
-| -u        | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default value: `stable` |
-| -k        | Kernel     | Specify [kernel](https://github.com/ophub/kernel/releases/tag/kernel_stable) name, such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) can only use specific kernels. |
-| -a        | AutoKernel | Set whether to automatically use the latest kernel within the same series. When `true`, the kernel repository is checked for newer versions within the series specified by `-k` (e.g., 6.6.12), and if found, the latest version is used automatically. When `false`, the exact specified version is used. Default: `true` |
-| -t        | RootfsType | Set the file system type of the ROOTFS partition. Options: `ext4` or `btrfs`. Example: `-t btrfs`. Default: `ext4` |
-| -s        | Size       | Set the image partition sizes. To set only the ROOTFS partition, specify a single value (e.g., `-s 2560`). To set both BOOTFS and ROOTFS, join them with `/` (e.g., `-s 512/2560`). Default: `512/2560` |
-| -n        | BuilderName | Set the Armbian system builder signature. Do not include spaces. Default: None |
+| Parameter | Meaning | Description |
+| --- | --- | --- |
+| -b | Board | Specifies the target device codename (default is `all`). You can specify a single device (e.g., `-b s905x3`) or connect multiple codenames with underscores to compile them together (e.g., `-b s905x3_s905d`). The parameter also supports special keywords for batch compilation: `all` compiles every device in the database, `first50` compiles the first 50 devices, `range50_100` compiles devices from the 51st to the 100th (similarly for `range100_150`), and `last20` compiles the last 20 devices. Additionally, you can compile by hardware platform (`amlogic`, `rockchip`, `allwinner`) to build all images for that specific platform, for example, `-b amlogic`. Appending numeric values to the platform name allows you to compile a specific range within that platform's support list; for example, `-b amlogic50` builds the first 50 devices under the Amlogic platform, and `-b amlogic50_100` builds the 51st to the 100th devices. For a complete list of supported device codenames, please refer to the `BOARD` configuration items in [model_database.conf](build-armbian/armbian-files/common-files/etc/model_database.conf). Default: `all` |
+| -r | KernelRepo | Specify the `<owner>/<repo>` of the github.com kernel repository. Default: `ophub/kernel` |
+| -u | kernelUsage | Set the `tags suffix` of the kernel used, such as [stable](https://github.com/ophub/kernel/releases/tag/kernel_stable), [flippy](https://github.com/ophub/kernel/releases/tag/kernel_flippy), [beta](https://github.com/ophub/kernel/releases/tag/kernel_beta). Default: `stable` |
+| -k | Kernel | Specify the [kernel version](https://github.com/ophub/kernel/releases/tag/kernel_stable), such as `-k 6.6.12`. Connect multiple kernels with `_`, such as `-k 6.6.12_5.15.50`. The kernel version freely specified by the `-k` parameter is only valid for kernels using `stable/flippy/beta`. Other kernel series such as [rk3588](https://github.com/ophub/kernel/releases/tag/kernel_rk3588) / [rk35xx](https://github.com/ophub/kernel/releases/tag/kernel_rk35xx) can only use specific kernels. |
+| -a | AutoKernel | Set whether to automatically use the latest kernel within the same series. When `true`, the kernel repository is checked for newer versions within the series specified by `-k` (e.g., 6.6.12), and if found, the latest version is used automatically. When `false`, the exact specified version is used. Default: `true` |
+| -t | RootfsType | Set the file system type of the ROOTFS partition. Options: `ext4` or `btrfs`. Example: `-t btrfs`. Default: `ext4` |
+| -s | Size | Set the image partition sizes. To set only the ROOTFS partition, specify a single value (e.g., `-s 2560`). To set both BOOTFS and ROOTFS, join them with `/` (e.g., `-s 512/2560`). Default: `512/2560` |
+| -n | BuilderName | Set the Armbian system builder signature. Do not include spaces. Default: none |
 
 - `sudo ./rebuild`: Use default configuration to package all device models.
 - `sudo ./rebuild -b s905x3 -k 6.6.12`: Recommended. Build with default configuration for the specified kernel.
@@ -250,28 +250,28 @@ sudo apt-get install -y $(cat compile-kernel/tools/script/ubuntu2404-build-armbi
 
 These parameters correspond to the local packaging command options described above.
 
-| Parameter       | Default       | Description                                             |
-|-----------------|---------------|---------------------------------------------------------|
-| armbian_path    | None          | Set the path of the original Armbian file. Supports workflow file paths (e.g., `build/output/images/*.img`) and network download URLs (e.g., `https://dl.armbian.com/*/Armbian_*.img.xz`). |
-| armbian_board   | all           | Set the `board` of the package box, refer to `-b`       |
-| kernel_repo     | ophub/kernel  | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
-| kernel_usage    | stable        | Set the `tags suffix` of the used kernel. Refer to `-u` |
-| armbian_kernel  | 6.12.y_6.18.y | Set the [version](https://github.com/ophub/kernel/releases/tag/kernel_stable) of the kernel, refer to `-k` |
-| auto_kernel     | true          | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a`       |
-| armbian_fstype  | ext4          | Set the file system type of the system's ROOTFS partition, refer to `-t`  |
-| armbian_size    | 512/2560      | Set the size of the system BOOTFS and ROOTFS partitions, function reference `-s`  |
-| armbian_files   | false         | Add custom Armbian files. When set, all files in this directory will be copied to [common-files](build-armbian/armbian-files/common-files). The directory structure must mirror the Armbian root directory to ensure files are correctly overlaid (e.g., default configuration files should be placed under `etc/default/`). |
-| builder_name    | None          | Set the Armbian system builder signature, refer to `-n` |
+| Parameter | Default | Description |
+| --- | --- | --- |
+| armbian_path | None | Set the path of the original Armbian file. Supports workflow file paths (e.g., `build/output/images/*.img`) and network download URLs (e.g., `https://dl.armbian.com/*/Armbian_*.img.xz`). |
+| armbian_board | all | Set the `board` of the package box, refer to `-b` |
+| kernel_repo | ophub/kernel | Specify `<owner>/<repo>` of the github.com kernel repository, refer to `-r` |
+| kernel_usage | stable | Set the `tags suffix` of the used kernel. Refer to `-u` |
+| armbian_kernel | 6.12.y_6.18.y | Set the kernel [version](https://github.com/ophub/kernel/releases/tag/kernel_stable), refer to `-k` |
+| auto_kernel | true | Set whether to automatically adopt the latest version of the same series kernel, refer to `-a` |
+| armbian_fstype | ext4 | Set the file system type of the system's ROOTFS partition, refer to `-t` |
+| armbian_size | 512/2560 | Set the size of the system BOOTFS and ROOTFS partitions, refer to `-s` |
+| armbian_files | false | Add custom Armbian files. When set, all files in this directory will be copied to [common-files](build-armbian/armbian-files/common-files). The directory structure must mirror the Armbian root directory to ensure files are correctly overlaid (e.g., default configuration files should be placed under `etc/default/`). |
+| builder_name | None | Set the Armbian system builder signature, refer to `-n` |
 
 - ### GitHub Actions Output Variable Description
 
 Uploading to `Releases` requires `Workflow read and write permissions` for the repository. See the [usage instructions](documents/README.md#2-set-up-private-variable-github_token) for details.
 
-| Parameter                        | Default       | Description                           |
-|----------------------------------|---------------|---------------------------------------|
-| ${{ env.PACKAGED_OUTPUTPATH }}   | out           | Armbian system files output path      |
-| ${{ env.PACKAGED_OUTPUTDATE }}   | 04.13.1058    | Packaging date (month.day.hourminute) |
-| ${{ env.PACKAGED_STATUS }}       | success       | Packaging status: success / failure   |
+| Parameter | Default | Description |
+| --- | --- | --- |
+| ${{ env.PACKAGED_OUTPUTPATH }} | out | Armbian system files output path |
+| ${{ env.PACKAGED_OUTPUTDATE }} | 04.13.1058 | Packaging date (month.day.hourminute) |
+| ${{ env.PACKAGED_STATUS }} | success | Packaging status: success / failure |
 
 ## Build Armbian Docker Image
 
@@ -307,7 +307,6 @@ The [u-boot](https://github.com/ophub/u-boot), [kernel](https://github.com/ophub
 - [13584452567](https://github.com/13584452567) is the pioneer for `Rockchip` device support in this repository. Through his contributions, support was expanded for numerous `Rockchip` devices including [EAIDK-610](https://github.com/ophub/amlogic-s9xxx-armbian/pull/991), [King3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1080), [TN3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1094), [Kylin3399](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1132), [ZCube1-Max](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1247), [tvi3315a](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1687), [xiaobao](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1698), and more. He also maintains specialized [kernels](https://github.com/13584452567/linux-6.6.y) for `Allwinner` devices such as [TQC-A01](https://github.com/ophub/amlogic-s9xxx-armbian/pull/1638), and has provided extensive technical support and solutions in [Discussions](https://github.com/ophub/amlogic-s9xxx-armbian/discussions/1634) and [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues), making significant contributions to the community.
 - [cooip-jm](https://github.com/cooip-jm) shares many guides on Armbian, LXC, Docker, AdGuard, and other applications in his [wiki](https://github.com/cooip-jm/About-openwrt/wiki). Recommended reading.
 
-
 ## Links
 
 - [armbian](https://github.com/armbian/build)
@@ -316,5 +315,4 @@ The [u-boot](https://github.com/ophub/u-boot), [kernel](https://github.com/ophub
 
 ## License
 
-The amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](LICENSE)
-
+amlogic-s9xxx-armbian © OPHUB is licensed under [GPL-2.0](LICENSE)

@@ -6,60 +6,60 @@ Based on user feedback and requests in [Issues](https://github.com/ophub/amlogic
 
 ## Software Introduction
 
-| ID | SoftwareName           | Home | DockerHub:Port | Software introduction                             |
-| --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
-| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker is an open platform for developing, shipping, and running applications. |
-| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | The most popular container management platform in the world. |
-| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | A container management UI with a focus on templates and 1-click deployments. |
-| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission is a cross-platform BitTorrent client. |
-| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent is a BitTorrent client. |
-| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud offers an on-premise Universal File Access and sync platform with powerful collaboration capabilities and desktop, mobile and web interfaces. |
-| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin is a Free Software Media System that puts you in control of managing and streaming your media. |
-| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant integrates with over a thousand different devices and services, Has powerful automation features. |
-| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | Private cloud online document management solution. |
-| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato is an automatic NZB and torrent downloader, Automatically find movies you want to watch. |
-| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr is a PVR for Usenet and BitTorrent users. |
-| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr is a movie collection manager for Usenet and BitTorrent users. |
-| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing is a continuous file synchronization program. |
-| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. |
-| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
-| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED is a programming tool. It provides a browser-based editor that makes it easy to wire together flows using the wide range of nodes in the palette that can be deployed to its runtime in a single-click. |
-| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | The MQTT protocol provides a lightweight method of carrying out messaging using a publish/subscribe model. Eclipse Mosquitto is an open source implementation of a server for versions 5, 3.1.1, and 3.1 of the MQTT protocol. |
-| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | The OpenWrt Project is a Linux operating system targeting embedded devices, it has more than 3000+ standardized application packages and a very rich third-party plug-in support. |
-| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata is distributed, real-time, performance and health monitoring for systems and applications. |
-| 120 | XunLei                | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | The Thunder remote download service program extracted from the Thunder Synology suite. |
-| 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | Remote Desktop with Audio/Locale/IBus Support. Multi Desktop (Gnome, Plasma, Mate, Xfce, Cinnamon) |
-| 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome is a self-hosted, open source music server and streamer. It gives you freedom to listen to your music collection from any browser or mobile device. |
-| 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | A file list program that supports multiple storage, powered by Gin and Solidjs. |
-| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | A timed task management panel that supports typescript, javaScript, python3, and shell. |
-| 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | A well-designed cross-platform ChatGPT UI (Web / PWA / Linux / Win / MacOS). |
-| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n is a workflow automation platform that gives technical teams the flexibility of code with the speed of no-code. With 400+ integrations, native AI capabilities, and a fair-code license, n8n lets you build powerful automations while maintaining full control over your data and deployments. |
-| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME provides a focused desktop working environment that helps you get things done. `Desktop` can be connected to a monitor for use, or they can be used with [remote desktop](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients) software. |
-| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | An excellent web browser. |
-| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
-| 204 | MPV                   | [Home](https://mpv.io/) | -    | A free, open source, and cross-platform media player. |
-| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP is a cross-platform image editor. |
-| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita is a professional FREE and open source painting program. |
-| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
-| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut is a free, open source, cross-platform video editor. |
-| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive is Free and Open Source Video Editor. |
-| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird makes email better for you, bringing together speed, privacy and the latest technologies. |
-| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution is a personal information management application that provides integrated mail, calendaring and address book functionality. |
-| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview is a fast and easy to use image viewer by KDE, ideal for browsing and displaying a collection of images. |
-| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME(eog) is a image viewer program.  It is meant to be a fast and functional image viewer. |
-| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code is a lightweight but powerful source code editor. |
-| 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit is a full-featured text editor for the GNOME desktop environment. You can use it to prepare simple notes and documents, or you can use some of its advanced features, making it your own software development environment. |
-| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | Powerful, yet simple to use open-source screenshot software. |
-| 301 | Frps                  | [Home](https://gofrp.org/) | -    | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
-| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
-| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS is a lightweight, high-performance, powerful intranet penetration proxy server, with a powerful web management terminal. |
-| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPCs are clients of NPS. |
-| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
-| 306 | Emby-Server           | [Home](https://emby.media/) | -    | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
-| 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM (for Kernel-Based Virtual Machines) is a complete virtualization solution for Linux with virtualization extensions. The virt-manager application is a desktop user interface for managing virtual machines through libvirt. It primarily targets KVM VMs, but also manages Xen and LXC (linux containers). KVM virtual machine can install [OpenWrt](https://github.com/unifreq/openwrt_packit), Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc. |
-| 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox Virtual Environment is an open source server virtualization management solution based on QEMU/KVM and LXC. You can manage virtual machines, containers, highly available clusters, storage and networks with an integrated, easy-to-use web interface or via CLI. |
-| 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS is a simple, easy-to-use, elegant open-source Personal Cloud system. |
-| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS is a web-based desktop operating system suitable for low-power platforms. It features file/disk management, network statistics, a web server, and more. |
+| ID | SoftwareName | Home | DockerHub:Port | Software introduction |
+| --- | --- | --- | --- | --- |
+| 101 | Docker | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker is an open platform for developing, shipping, and running applications. |
+| 102 | Portainer | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | The most popular container management platform in the world. |
+| 103 | Yacht | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | A container management UI with a focus on templates and 1-click deployments. |
+| 104 | Transmission | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission is a cross-platform BitTorrent client. |
+| 105 | qBittorrent | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent is a BitTorrent client. |
+| 106 | NextCloud | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud offers an on-premise Universal File Access and sync platform with powerful collaboration capabilities and desktop, mobile and web interfaces. |
+| 107 | Jellyfin | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin is a Free Software Media System that puts you in control of managing and streaming your media. |
+| 108 | HomeAssistant | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant integrates with over a thousand different devices and services, Has powerful automation features. |
+| 109 | Kodbox | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | Private cloud online document management solution. |
+| 110 | CouchPotato | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato is an automatic NZB and torrent downloader, Automatically find movies you want to watch. |
+| 111 | Sonarr | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr is a PVR for Usenet and BitTorrent users. |
+| 112 | Radarr | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr is a movie collection manager for Usenet and BitTorrent users. |
+| 113 | Syncthing | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing is a continuous file synchronization program. |
+| 114 | FileBrowser | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser provides a file managing interface within a specified directory and it can be used to upload, delete, preview, rename and edit your files. |
+| 115 | Heimdall | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall is a way to organise all those links to your most used web sites and web applications in a simple way. |
+| 116 | Node-RED | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED is a programming tool. It provides a browser-based editor that makes it easy to wire together flows using the wide range of nodes in the palette that can be deployed to its runtime in a single-click. |
+| 117 | Mosquitto | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | The MQTT protocol provides a lightweight method of carrying out messaging using a publish/subscribe model. Eclipse Mosquitto is an open source implementation of a server for versions 5, 3.1.1, and 3.1 of the MQTT protocol. |
+| 118 | OpenWrt | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | The OpenWrt Project is a Linux operating system targeting embedded devices, it has more than 3000+ standardized application packages and a very rich third-party plug-in support. |
+| 119 | Netdata | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata is distributed, real-time, performance and health monitoring for systems and applications. |
+| 120 | XunLei | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | The Thunder remote download service program extracted from the Thunder Synology suite. |
+| 121 | Docker-Headless | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | Remote Desktop with Audio/Locale/IBus Support. Multi Desktop (Gnome, Plasma, Mate, Xfce, Cinnamon) |
+| 122 | Navidrome | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533 | Navidrome is a self-hosted, open source music server and streamer. It gives you freedom to listen to your music collection from any browser or mobile device. |
+| 123 | Openlist | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244 | A file list program that supports multiple storage, powered by Gin and Solidjs. |
+| 124 | QingLong | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700 | A timed task management panel that supports typescript, javaScript, python3, and shell. |
+| 125 | ChatGPT-Next-Web | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000 | A well-designed cross-platform ChatGPT UI (Web / PWA / Linux / Win / MacOS). |
+| 126 | N8N | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678 | n8n is a workflow automation platform that gives technical teams the flexibility of code with the speed of no-code. With 400+ integrations, native AI capabilities, and a fair-code license, n8n lets you build powerful automations while maintaining full control over your data and deployments. |
+| 201 | Desktop:GNOME | [Home](https://www.gnome.org/) | - | GNOME provides a focused desktop working environment that helps you get things done. `Desktop` can be connected to a monitor for use, or they can be used with [remote desktop](https://learn.microsoft.com/en-us/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients) software. |
+| 202 | Firefox | [Home](https://www.mozilla.org/) | - | An excellent web browser. |
+| 203 | VLC | [Home](https://www.videolan.org/) | - | VLC is a free, open source, cross-platform multimedia player and framework that can play most multimedia files. |
+| 204 | MPV | [Home](https://mpv.io/) | - | A free, open source, and cross-platform media player. |
+| 205 | GIMP | [Home](https://www.gimp.org/) | - | GIMP is a cross-platform image editor. |
+| 206 | Krita | [Home](https://krita.org/) | - | Krita is a professional FREE and open source painting program. |
+| 207 | LibreOffice | [Home](https://www.libreoffice.org/) | - | LibreOffice is a free and powerful office suite, Its clean interface and feature-rich tools help you unleash your creativity and enhance your productivity. |
+| 208 | Shotcut | [Home](https://shotcut.org/) | - | Shotcut is a free, open source, cross-platform video editor. |
+| 209 | Kdenlive | [Home](https://kdenlive.org/) | - | Kdenlive is Free and Open Source Video Editor. |
+| 210 | Thunderbird | [Home](https://www.thunderbird.net/) | - | Thunderbird makes email better for you, bringing together speed, privacy and the latest technologies. |
+| 211 | Evolution | [Home](https://github.com/GNOME/evolution) | - | Evolution is a personal information management application that provides integrated mail, calendaring and address book functionality. |
+| 212 | Gwenview | [Home](https://apps.kde.org/gwenview/) | - | Gwenview is a fast and easy to use image viewer by KDE, ideal for browsing and displaying a collection of images. |
+| 213 | Eog | [Home](https://gitlab.gnome.org/GNOME/eog) | - | Eye of GNOME(eog) is a image viewer program.  It is meant to be a fast and functional image viewer. |
+| 214 | VisualStudioCode | [Home](https://code.visualstudio.com/) | - | Visual Studio Code is a lightweight but powerful source code editor. |
+| 215 | Gedit | [Home](https://github.com/GNOME/gedit) | - | Gedit is a full-featured text editor for the GNOME desktop environment. You can use it to prepare simple notes and documents, or you can use some of its advanced features, making it your own software development environment. |
+| 216 | Flameshot | [Home](https://flameshot.org/) | - | Powerful, yet simple to use open-source screenshot software. |
+| 301 | Frps | [Home](https://gofrp.org/) | - | A fast reverse proxy to help you expose a local server behind a NAT or firewall to the internet. |
+| 302 | Frpc | [Home](https://gofrp.org/) | - | Frp is a high-performance reverse proxy application focusing on intranet penetration, supporting TCP, UDP, HTTP, HTTPS and other protocols. |
+| 303 | NPS | [Home](https://ehang-io.github.io/nps) | - | NPS is a lightweight, high-performance, powerful intranet penetration proxy server, with a powerful web management terminal. |
+| 304 | NPC | [Home](https://ehang-io.github.io/nps) | - | NPCs are clients of NPS. |
+| 305 | Plex | [Home](https://www.plex.tv/) | - | From personal media on your own server, to free and on-demand Movies & Shows, live TV, podcasts, and web shows, to streaming music, you can enjoy it all in one app, on any device. |
+| 306 | Emby-Server | [Home](https://emby.media/) | - | Sync your personal media to the cloud for easy backup, archiving, and converting. Store your content in multiple resolutions to enable direct streaming from any device. |
+| 307 | KVM | [Home](https://virt-manager.org/) | - | KVM (for Kernel-Based Virtual Machines) is a complete virtualization solution for Linux with virtualization extensions. The virt-manager application is a desktop user interface for managing virtual machines through libvirt. It primarily targets KVM VMs, but also manages Xen and LXC (linux containers). KVM virtual machine can install [OpenWrt](https://github.com/unifreq/openwrt_packit), Debian, Ubuntu, OpenSUSE, ArchLinux, Centos, Gentoo, KyLin, UOS, etc. |
+| 308 | PVE | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox Virtual Environment is an open source server virtualization management solution based on QEMU/KVM and LXC. You can manage virtual machines, containers, highly available clusters, storage and networks with an integrated, easy-to-use web interface or via CLI. |
+| 309 | CasaOS | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS is a simple, easy-to-use, elegant open-source Personal Cloud system. |
+| 310 | ArozOS | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS is a web-based desktop operating system suitable for low-power platforms. It features file/disk management, network statistics, a web server, and more. |
 
 ## Software Center Usage Guide
 
@@ -109,13 +109,11 @@ The software center scripts and commands are stored in the [/usr/share/ophub/arm
   - When executable files exist in system command directories (bin, sbin), use `which` to check for the binary. Example: `which@frpc` verifies the `frpc` service installation.
   - When no executable files exist in system command directories, use `find` to check for a specific path. Example: `find@/root/arozos` checks whether the `ArozOS` system is installed.
 - `Execute Selection`: Specifies whether the software uses a `unified command file` or an `independent script` for management.
-  - For `simple` operations, commands are grouped by software category in `command-docker.sh / command-desktop.sh / command-service.sh` files, named by software serial number. For example, `portainer` (ID `102`) has its operations in `software_203()`.
+  - For `simple` operations, commands are grouped by software category in `command-docker.sh / command-desktop.sh / command-service.sh` files, named by software serial number. For example, `portainer` (ID `102`) has its operations in `software_102()`.
   - For `complex` operations with lengthy instructions, independent script files are used. For example, the `frpc` installation script is named `302-frpc.sh`, prefixed with its serial number.
 - `Supported Release`: Specifies the supported Armbian `system version codenames`. Use `all` to indicate support for all versions. For partial support, list the version codenames separated by `@`.
 
 Contributions of additional software are welcome. Feel free to submit requests in [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues).
-
-
 
 # Armbian 软件中心
 
@@ -123,60 +121,60 @@ Contributions of additional software are welcome. Feel free to submit requests i
 
 ## 软件介绍
 
-| ID | 软件名称               | Home | DockerHub:Port | 软件介绍                                            |
-| --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
-| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker 是一个用于开发、发布和运行应用程序的开放平台。 |
-| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 全球最受欢迎的容器管理平台。 |
-| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | 容器管理 UI，侧重于模板和一键式部署。 |
-| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission 是一个跨平台的 BitTorrent 客户端。 |
-| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent 是一个 BitTorrent 客户端。  |
-| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud 提供了一个本地通用文件访问和同步平台，具有强大的协作功能以及桌面，移动和 Web 界面。 |
-| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin 是一个自由软件媒体系统，让你控制管理和流媒体你的媒体。 |
-| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant 集成了一千多种不同的设备和服务，具有强大的自动化功能。 |
-| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | 私有云在线文档管理解决方案。 |
-| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato 是一个自动 NZB 和 torrent 下载器，自动查找要观看的电影。 |
-| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr 是 Usenet 和 BitTorrent 用户的个人视频录像机。 |
-| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr 是 Usenet 和 BitTorrent 用户的电影收藏管理器。 |
-| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing 是一个连续的文件同步程序。 |
-| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
-| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和 Web 应用程序的方法。 |
-| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED 是一种编程工具。它提供了一个基于浏览器的编辑器，使得使用调色板中的各种节点轻松地将流连接在一起，只需单击一下即可部署运行。 |
-| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT 协议提供了一种使用发布/订阅模型执行消息传递的轻量级方法。Eclipse Mosquitto 是 MQTT 协议版本 5、3.1.1 和 3.1 的服务器的开源实现。 |
-| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | OpenWrt 项目是一个针对嵌入式设备的 Linux 操作系统，它拥有超过 3000+ 个标准化应用软件包和非常丰富的第三方插件支持。 |
-| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata 是针对系统和应用程序的分布式实时性能和运行状况监控。 |
-| 120 | XunLei                | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | 从迅雷群晖套件中提取出来的迅雷远程下载服务程序。 |
-| 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | 具有音频/区域设置/IBus 支持的远程桌面。 支持多桌面（Gnome、Plasma、Mate、Xfce、Cinnamon） |
-| 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome 是一个自托管的开源音乐服务器和流媒体。 它使您可以自由地从任何浏览器或移动设备收听音乐收藏。 |
-| 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | 一个支持多种存储的文件列表程序，使用 Gin 和 Solidjs。 |
-| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | 支持 python3、javaScript、shell、typescript 的定时任务管理面板。 |
-| 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | 一键免费部署你的跨平台私人 ChatGPT 应用。 |
-| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n 是一个工作流自动化平台，为技术团队提供了无代码的高效开发速度。它内置了超过 400 种集成、原生的 AI 能力，并采用公平代码许可，让你在构建强大自动化流程的同时，仍然能完全掌控自己的数据和部署。 |
-| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。`桌面`可以连接显示器使用，也可以使用[远程桌面](https://learn.microsoft.com/zh-cn/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)软件连接使用。 |
-| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 一款优秀的网页浏览器。 |
-| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
-| 204 | MPV                   | [Home](https://mpv.io/) | -    | 一个免费的、开源的、跨平台的媒体播放器。 |
-| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP 是一个跨平台的图像编辑器。 |
-| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita 是一个专业的免费和开源绘画程序。 |
-| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
-| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
-| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive 是一个免费和开源视频编辑器。 |
-| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird 将速度、隐私和最新技术结合在一起，让您更好地利用电子邮件。 |
-| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution 是一个个人信息管理应用程序，提供集成的邮件、日历和地址簿功能。 |
-| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview 是 KDE 出品的一款轻便易用的图像查看器，是浏览、显示多张图像时的理想工具。 |
-| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）一个图像查看器程序。它旨在成为一个快速且功能强大的图像查看器。 |
-| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
-| 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit 是一个用于 GNOME 桌面环境的全功能文本编辑器。您可以使用它来准备简单的笔记和文档，也可以使用它的一些高级功能，使其成为您自己的软件开发环境。 |
-| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | 功能强大，但易于使用的开源屏幕截图软件。 |
-| 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
-| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
-| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS 服务端。一款轻量级、高性能、功能强大的内网渗透代理服务器，具有强大的 Web 管理终端。 |
-| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC 是 NPS 的客户端。 |
-| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
-| 306 | Emby-Server           | [Home](https://emby.media/) | -    | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
-| 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（用于基于内核的虚拟机）是包含虚拟化扩展适用于 Linux 的完整虚拟化解决方案。virt-manager 应用程序是一个桌面用户界面，用于通过 libvirt 管理虚拟机。它主要针对 KVM VM，但也管理 Xen 和 LXC（Linux 容器）。KVM 虚拟机可以安装 [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS 等等。 |
-| 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 虚拟环境是一个基于 QEMU/KVM 和 LXC 的开源服务器虚拟化管理解决方案。您可以使用集成的、易于使用的 web 界面或通过 CLI 管理虚拟机、容器、高可用集群、存储和网络。 |
-| 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS 是一个简单、易于使用、优雅的开源个人云系统。 |
-| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS 是一个适用于低功耗平台的 Web 桌面操作系统。有文件/磁盘管理，网络统计，WEB服务器等功能。 |
+| ID | 软件名称 | Home | DockerHub:Port | 软件介绍 |
+| --- | --- | --- | --- | --- |
+| 101 | Docker | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker 是一个用于开发、发布和运行应用程序的开放平台。 |
+| 102 | Portainer | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 全球最受欢迎的容器管理平台。 |
+| 103 | Yacht | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | 容器管理 UI，侧重于模板和一键式部署。 |
+| 104 | Transmission | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission 是一个跨平台的 BitTorrent 客户端。 |
+| 105 | qBittorrent | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent 是一个 BitTorrent 客户端。 |
+| 106 | NextCloud | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud 提供了一个本地通用文件访问和同步平台，具有强大的协作功能以及桌面，移动和 Web 界面。 |
+| 107 | Jellyfin | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin 是一个自由软件媒体系统，让你控制管理和流媒体你的媒体。 |
+| 108 | HomeAssistant | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant 集成了一千多种不同的设备和服务，具有强大的自动化功能。 |
+| 109 | Kodbox | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | 私有云在线文档管理解决方案。 |
+| 110 | CouchPotato | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | Couchpotato 是一个自动 NZB 和 torrent 下载器，自动查找要观看的电影。 |
+| 111 | Sonarr | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr 是 Usenet 和 BitTorrent 用户的个人视频录像机。 |
+| 112 | Radarr | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr 是 Usenet 和 BitTorrent 用户的电影收藏管理器。 |
+| 113 | Syncthing | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing 是一个连续的文件同步程序。 |
+| 114 | FileBrowser | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser 在指定目录中提供文件管理界面，可用于上传，删除，预览，重命名和编辑文件。 |
+| 115 | Heimdall | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall 是一种以简单的方式组织所有这些链接到您最常用的网站和 Web 应用程序的方法。 |
+| 116 | Node-RED | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED 是一种编程工具。它提供了一个基于浏览器的编辑器，使得使用调色板中的各种节点轻松地将流连接在一起，只需单击一下即可部署运行。 |
+| 117 | Mosquitto | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT 协议提供了一种使用发布/订阅模型执行消息传递的轻量级方法。Eclipse Mosquitto 是 MQTT 协议版本 5、3.1.1 和 3.1 的服务器的开源实现。 |
+| 118 | OpenWrt | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | OpenWrt 项目是一个针对嵌入式设备的 Linux 操作系统，它拥有超过 3000+ 个标准化应用软件包和非常丰富的第三方插件支持。 |
+| 119 | Netdata | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata 是针对系统和应用程序的分布式实时性能和运行状况监控。 |
+| 120 | XunLei | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | 从迅雷群晖套件中提取出来的迅雷远程下载服务程序。 |
+| 121 | Docker-Headless | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | 具有音频/区域设置/IBus 支持的远程桌面。 支持多桌面（Gnome、Plasma、Mate、Xfce、Cinnamon） |
+| 122 | Navidrome | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533 | Navidrome 是一个自托管的开源音乐服务器和流媒体。 它使您可以自由地从任何浏览器或移动设备收听音乐收藏。 |
+| 123 | Openlist | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244 | 一个支持多种存储的文件列表程序，使用 Gin 和 Solidjs。 |
+| 124 | QingLong | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700 | 支持 python3、javaScript、shell、typescript 的定时任务管理面板。 |
+| 125 | ChatGPT-Next-Web | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000 | 一键免费部署你的跨平台私人 ChatGPT 应用。 |
+| 126 | N8N | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678 | n8n 是一个工作流自动化平台，为技术团队提供了无代码的高效开发速度。它内置了超过 400 种集成、原生的 AI 能力，并采用公平代码许可，让你在构建强大自动化流程的同时，仍然能完全掌控自己的数据和部署。 |
+| 201 | Desktop:GNOME | [Home](https://www.gnome.org/) | - | GNOME 提供了一个专注的桌面工作环境，可帮助您完成工作。`桌面`可以连接显示器使用，也可以使用[远程桌面](https://learn.microsoft.com/zh-cn/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)软件连接使用。 |
+| 202 | Firefox | [Home](https://www.mozilla.org/) | - | 一款优秀的网页浏览器。 |
+| 203 | VLC | [Home](https://www.videolan.org/) | - | VLC 是一款自由、开源的跨平台多媒体播放器及框架，可播放大多数多媒体文件。 |
+| 204 | MPV | [Home](https://mpv.io/) | - | 一个免费的、开源的、跨平台的媒体播放器。 |
+| 205 | GIMP | [Home](https://www.gimp.org/) | - | GIMP 是一个跨平台的图像编辑器。 |
+| 206 | Krita | [Home](https://krita.org/) | - | Krita 是一个专业的免费和开源绘画程序。 |
+| 207 | LibreOffice | [Home](https://www.libreoffice.org/) | - | LibreOffice 是一个免费且功能强大的办公套件，其简洁的界面和功能丰富的工具可帮助您释放创造力并提高生产力。 |
+| 208 | Shotcut | [Home](https://shotcut.org/) | - | Shotcut 是一个免费的，开源的，跨平台的视频编辑器。 |
+| 209 | Kdenlive | [Home](https://kdenlive.org/) | - | Kdenlive 是一个免费和开源视频编辑器。 |
+| 210 | Thunderbird | [Home](https://www.thunderbird.net/) | - | Thunderbird 将速度、隐私和最新技术结合在一起，让您更好地利用电子邮件。 |
+| 211 | Evolution | [Home](https://github.com/GNOME/evolution) | - | Evolution 是一个个人信息管理应用程序，提供集成的邮件、日历和地址簿功能。 |
+| 212 | Gwenview | [Home](https://apps.kde.org/gwenview/) | - | Gwenview 是 KDE 出品的一款轻便易用的图像查看器，是浏览、显示多张图像时的理想工具。 |
+| 213 | Eog | [Home](https://gitlab.gnome.org/GNOME/eog) | - | Eye of GNOME（eog）一个图像查看器程序。它旨在成为一个快速且功能强大的图像查看器。 |
+| 214 | VisualStudioCode | [Home](https://code.visualstudio.com/) | - | Visual Studio Code 是一个轻量级但功能强大的源代码编辑器。 |
+| 215 | Gedit | [Home](https://github.com/GNOME/gedit) | - | Gedit 是一个用于 GNOME 桌面环境的全功能文本编辑器。您可以使用它来准备简单的笔记和文档，也可以使用它的一些高级功能，使其成为您自己的软件开发环境。 |
+| 216 | Flameshot | [Home](https://flameshot.org/) | - | 功能强大，但易于使用的开源屏幕截图软件。 |
+| 301 | Frps | [Home](https://gofrp.org/) | - | Frp 是一种快速反向代理，可帮助您将 NAT 或防火墙后面的本地服务器暴露给互联网。 |
+| 302 | Frpc | [Home](https://gofrp.org/) | - | Frp 是一个专注于内网穿透的高性能的反向代理应用，支持 TCP、UDP、HTTP、HTTPS 等多种协议。 |
+| 303 | NPS | [Home](https://ehang-io.github.io/nps) | - | NPS 服务端。一款轻量级、高性能、功能强大的内网渗透代理服务器，具有强大的 Web 管理终端。 |
+| 304 | NPC | [Home](https://ehang-io.github.io/nps) | - | NPC 是 NPS 的客户端。 |
+| 305 | Plex | [Home](https://www.plex.tv/) | - | 从您自己服务器上的个人媒体，到免费和点播的电影和节目，直播电视，播客和网络节目，再到流媒体音乐，您可以在任何设备上的一个应用程序中享受所有这些内容。 |
+| 306 | Emby-Server | [Home](https://emby.media/) | - | 将您的个人媒体同步到云，以便轻松备份、存档和转换。以多种分辨率存储您的内容，以便从任何设备直接流式传输。 |
+| 307 | KVM | [Home](https://virt-manager.org/) | - | KVM（用于基于内核的虚拟机）是包含虚拟化扩展适用于 Linux 的完整虚拟化解决方案。virt-manager 应用程序是一个桌面用户界面，用于通过 libvirt 管理虚拟机。它主要针对 KVM VM，但也管理 Xen 和 LXC（Linux 容器）。KVM 虚拟机可以安装 [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS 等等。 |
+| 308 | PVE | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 虚拟环境是一个基于 QEMU/KVM 和 LXC 的开源服务器虚拟化管理解决方案。您可以使用集成的、易于使用的 web 界面或通过 CLI 管理虚拟机、容器、高可用集群、存储和网络。 |
+| 309 | CasaOS | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS 是一个简单、易于使用、优雅的开源个人云系统。 |
+| 310 | ArozOS | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS 是一个适用于低功耗平台的 Web 桌面操作系统。有文件/磁盘管理，网络统计，WEB服务器等功能。 |
 
 ## 软件中心使用说明
 
@@ -226,13 +224,11 @@ ID    NAME                STATE           MANAGE
   - 在系统命令目录 (bin, sbin) 存在可执行文件时，采用 `which` 方式检查。例如：检查 `frpc` 服务是否安装，使用 `which@frpc`。
   - 在系统命令目录无可执行文件时，采用 `find` 方式检查指定路径是否存在。例如：检查 `arozos` 系统是否安装，使用 `find@/root/arozos`。
 - `Execute Selection`：设置软件使用`统一指令文件`或`独立脚本`进行管理。
-  - 对于操作命令`较为精简`的软件，按分类集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号命名。例如 `portainer`（序号 `102`）的操作写在 `software_203()` 中。
+  - 对于操作命令`较为精简`的软件，按分类集中写在 `command-docker.sh / command-desktop.sh / command-service.sh` 文件中，以软件序号命名。例如 `portainer`（序号 `102`）的操作写在 `software_102()` 中。
   - 对于操作`较为复杂、指令内容较长`的软件，采用独立脚本文件管理。例如 `frpc` 的安装脚本以序号开头，命名为 `302-frpc.sh`。
 - `Supported Release`：设置支持的 Armbian `系统版本代号`。全部版本都支持时使用 `all` 表示。仅支持部分版本时，填写版本代号，多个代号之间使用 `@` 符号连接。
 
 欢迎大家补充更多软件。欢迎在 [Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) 中提交支持需求。
-
-
 
 # Armbian ソフトウェアセンター
 
@@ -240,60 +236,60 @@ ID    NAME                STATE           MANAGE
 
 ## ソフトウェア紹介
 
-| ID | ソフトウェア名          | Home | DockerHub:Port | ソフトウェア紹介                                     |
-| --- | --------------------- | --------------------- | ---- | ------------------------------------------------- |
-| 101 | Docker                | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker はアプリケーションの開発、配布、実行のためのオープンプラットフォームです。 |
-| 102 | Portainer             | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 世界で最も人気のあるコンテナ管理プラットフォームです。 |
-| 103 | Yacht                 | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | テンプレートとワンクリックデプロイに重点を置いたコンテナ管理 UI です。 |
-| 104 | Transmission          | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission はクロスプラットフォームの BitTorrent クライアントです。 |
-| 105 | qBittorrent           | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent は BitTorrent クライアントです。 |
-| 106 | NextCloud             | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud はオンプレミスのユニバーサルファイルアクセスと同期プラットフォームを提供し、強力なコラボレーション機能とデスクトップ、モバイル、Web インターフェースを備えています。 |
-| 107 | Jellyfin              | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin はフリーソフトウェアのメディアシステムで、メディアの管理とストリーミングを制御できます。 |
-| 108 | HomeAssistant         | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant は1000以上の異なるデバイスやサービスと統合し、強力な自動化機能を備えています。 |
-| 109 | Kodbox                | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | プライベートクラウドのオンラインドキュメント管理ソリューションです。 |
-| 110 | CouchPotato           | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | CouchPotato は自動 NZB および torrent ダウンローダーで、観たい映画を自動的に検索します。 |
-| 111 | Sonarr                | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr は Usenet および BitTorrent ユーザー向けの個人用ビデオレコーダーです。 |
-| 112 | Radarr                | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr は Usenet および BitTorrent ユーザー向けの映画コレクションマネージャーです。 |
-| 113 | Syncthing             | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing は継続的なファイル同期プログラムです。 |
-| 114 | FileBrowser           | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser は指定ディレクトリ内でファイル管理インターフェースを提供し、ファイルのアップロード、削除、プレビュー、リネーム、編集が可能です。 |
-| 115 | Heimdall              | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall は、よく使うウェブサイトやウェブアプリケーションへのリンクをシンプルに整理する方法です。 |
-| 116 | Node-RED              | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED はプログラミングツールです。ブラウザベースのエディターを提供し、パレット内の多様なノードを使ってフローを簡単に連結し、ワンクリックでデプロイ・実行できます。 |
-| 117 | Mosquitto             | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT プロトコルはパブリッシュ/サブスクライブモデルによる軽量なメッセージングを提供します。Eclipse Mosquitto は MQTT プロトコルバージョン 5、3.1.1、3.1 のサーバーのオープンソース実装です。 |
-| 118 | OpenWrt               | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | OpenWrt プロジェクトは組み込みデバイス向けの Linux オペレーティングシステムで、3000以上の標準化アプリケーションパッケージと非常に豊富なサードパーティプラグインをサポートしています。 |
-| 119 | Netdata               | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata はシステムとアプリケーションのための分散型リアルタイムパフォーマンス・ヘルスモニタリングツールです。 |
-| 120 | XunLei                | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | 迅雷 Synology スイートから抽出されたリモートダウンロードサービスプログラムです。 |
-| 121 | Docker-Headless       | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | オーディオ/ロケール/IBus サポート付きのリモートデスクトップ。マルチデスクトップ（Gnome、Plasma、Mate、Xfce、Cinnamon）対応。 |
-| 122 | Navidrome             | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533  | Navidrome はセルフホスト型のオープンソース音楽サーバーおよびストリーマーです。任意のブラウザやモバイルデバイスから音楽コレクションを自由に楽しめます。 |
-| 123 | Openlist                 | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244  | 複数のストレージに対応するファイルリストプログラムで、Gin と Solidjs を使用しています。 |
-| 124 | QingLong              | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700  | python3、javaScript、shell、typescript をサポートするスケジュールタスク管理パネルです。 |
-| 125 | ChatGPT-Next-Web      | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000  | ワンクリックで無料デプロイできるクロスプラットフォーム対応のプライベート ChatGPT アプリケーションです。 |
-| 126 | N8N                   | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678  | n8n はワークフロー自動化プラットフォームで、技術チームにノーコードの高効率な開発速度を提供します。400以上の統合、ネイティブ AI 機能を内蔵し、フェアコードライセンスを採用。強力な自動化フローを構築しながら、データとデプロイメントを完全に制御できます。 |
-| 201 | Desktop:GNOME         | [Home](https://www.gnome.org/) | -    | GNOME は集中型のデスクトップ作業環境を提供し、作業の完了を支援します。`デスクトップ`はモニターに接続して使用でき、[リモートデスクトップ](https://learn.microsoft.com/ja-jp/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)ソフトウェアを使用して接続することもできます。 |
-| 202 | Firefox               | [Home](https://www.mozilla.org/) | -    | 優れたウェブブラウザです。 |
-| 203 | VLC                   | [Home](https://www.videolan.org/) | -    | VLC は無料でオープンソースのクロスプラットフォームマルチメディアプレーヤー兼フレームワークで、ほとんどのマルチメディアファイルを再生できます。 |
-| 204 | MPV                   | [Home](https://mpv.io/) | -    | 無料でオープンソースのクロスプラットフォーム対応メディアプレーヤーです。 |
-| 205 | GIMP                  | [Home](https://www.gimp.org/) | -    | GIMP はクロスプラットフォームの画像エディターです。 |
-| 206 | Krita                 | [Home](https://krita.org/) | -    | Krita はプロフェッショナルな無料オープンソースのペインティングプログラムです。 |
-| 207 | LibreOffice           | [Home](https://www.libreoffice.org/) | -    | LibreOffice は無料で強力なオフィススイートです。洗練されたインターフェースと豊富な機能で、創造性を発揮し生産性を向上させます。 |
-| 208 | Shotcut               | [Home](https://shotcut.org/) | -    | Shotcut は無料でオープンソースのクロスプラットフォーム動画エディターです。 |
-| 209 | Kdenlive              | [Home](https://kdenlive.org/) | -    | Kdenlive は無料でオープンソースの動画エディターです。 |
-| 210 | Thunderbird           | [Home](https://www.thunderbird.net/) | -    | Thunderbird は速度、プライバシー、最新技術を組み合わせて、より良いメール体験を提供します。 |
-| 211 | Evolution             | [Home](https://github.com/GNOME/evolution) | -    | Evolution は統合されたメール、カレンダー、アドレス帳機能を提供する個人情報管理アプリケーションです。 |
-| 212 | Gwenview              | [Home](https://apps.kde.org/gwenview/) | -    | Gwenview は KDE 製の軽量で使いやすい画像ビューアーで、画像コレクションの閲覧・表示に最適です。 |
-| 213 | Eog                   | [Home](https://gitlab.gnome.org/GNOME/eog) | -    | Eye of GNOME（eog）は画像ビューアープログラムです。高速かつ機能的な画像ビューアーを目指しています。 |
-| 214 | VisualStudioCode      | [Home](https://code.visualstudio.com/) | -    | Visual Studio Code は軽量ながら強力なソースコードエディターです。 |
-| 215 | Gedit                 | [Home](https://github.com/GNOME/gedit) | -    | Gedit は GNOME デスクトップ環境向けのフル機能テキストエディターです。簡単なメモやドキュメントの作成に使用でき、高度な機能を活用して独自のソフトウェア開発環境としても使用できます。 |
-| 216 | Flameshot             | [Home](https://flameshot.org/) | -    | 強力でありながら使いやすいオープンソースのスクリーンショットソフトウェアです。 |
-| 301 | Frps                  | [Home](https://gofrp.org/) | -    | Frp は高速なリバースプロキシで、NAT やファイアウォールの背後にあるローカルサーバーをインターネットに公開できます。 |
-| 302 | Frpc                  | [Home](https://gofrp.org/) | -    | Frp はイントラネットペネトレーションに特化した高性能リバースプロキシアプリケーションで、TCP、UDP、HTTP、HTTPS などのプロトコルをサポートしています。 |
-| 303 | NPS                   | [Home](https://ehang-io.github.io/nps) | -    | NPS サーバー側。軽量で高性能、強力なイントラネットペネトレーションプロキシサーバーで、強力な Web 管理端末を備えています。 |
-| 304 | NPC                   | [Home](https://ehang-io.github.io/nps) | -    | NPC は NPS のクライアントです。 |
-| 305 | Plex                  | [Home](https://www.plex.tv/) | -    | 自分のサーバー上の個人メディアから、無料やオンデマンドの映画・番組、ライブ TV、ポッドキャスト、ウェブ番組、ストリーミング音楽まで、あらゆるデバイスの1つのアプリですべて楽しめます。 |
-| 306 | Emby-Server           | [Home](https://emby.media/) | -    | 個人メディアをクラウドに同期して、簡単にバックアップ、アーカイブ、変換できます。コンテンツを複数の解像度で保存し、あらゆるデバイスからの直接ストリーミングを実現します。 |
-| 307 | KVM                   | [Home](https://virt-manager.org/) | -    | KVM（カーネルベースの仮想マシン）は、仮想化拡張機能を含む Linux 向けの完全な仮想化ソリューションです。virt-manager は libvirt を介して仮想マシンを管理するデスクトップユーザーインターフェースです。主に KVM VM を対象としていますが、Xen と LXC（Linux コンテナ）も管理できます。KVM 仮想マシンには [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS などをインストールできます。 |
-| 308 | PVE                   | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 仮想環境は QEMU/KVM と LXC に基づくオープンソースのサーバー仮想化管理ソリューションです。統合されたウェブインターフェースまたは CLI で仮想マシン、コンテナ、高可用性クラスター、ストレージ、ネットワークを管理できます。 |
-| 309 | CasaOS                | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS はシンプルで使いやすく、エレガントなオープンソースのパーソナルクラウドシステムです。 |
-| 310 | ArozOS                | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS は低消費電力プラットフォームに適した Web ベースのデスクトップオペレーティングシステムです。ファイル/ディスク管理、ネットワーク統計、Web サーバーなどの機能を備えています。 |
+| ID | ソフトウェア名 | Home | DockerHub:Port | ソフトウェア紹介 |
+| --- | --- | --- | --- | --- |
+| 101 | Docker | [Home](https://www.docker.com/) | [Docker](https://docs.docker.com/engine/install/) | Docker はアプリケーションの開発、配布、実行のためのオープンプラットフォームです。 |
+| 102 | Portainer | [Home](https://www.portainer.io/) | [Docker](https://hub.docker.com/r/portainer/portainer-ce) :9443 | 世界で最も人気のあるコンテナ管理プラットフォームです。 |
+| 103 | Yacht | [Home](https://yacht.sh/) | [Docker](https://hub.docker.com/r/selfhostedpro/yacht) :8001 | テンプレートとワンクリックデプロイに重点を置いたコンテナ管理 UI です。 |
+| 104 | Transmission | [Home](https://transmissionbt.com/) | [Docker](https://github.com/linuxserver/docker-transmission) :9091 | Transmission はクロスプラットフォームの BitTorrent クライアントです。 |
+| 105 | qBittorrent | [Home](https://www.qbittorrent.org/) | [Docker](https://hub.docker.com/r/linuxserver/qbittorrent) :8080 | qBittorrent は BitTorrent クライアントです。 |
+| 106 | NextCloud | [Home](https://nextcloud.com/) | [Docker](https://hub.docker.com/r/arm64v8/nextcloud) :8088 | Nextcloud はオンプレミスのユニバーサルファイルアクセスと同期プラットフォームを提供し、強力なコラボレーション機能とデスクトップ、モバイル、Web インターフェースを備えています。 |
+| 107 | Jellyfin | [Home](https://jellyfin.org/) | [Docker](https://hub.docker.com/r/linuxserver/jellyfin) :8096 | Jellyfin はフリーソフトウェアのメディアシステムで、メディアの管理とストリーミングを制御できます。 |
+| 108 | HomeAssistant | [Home](https://www.home-assistant.io/) | [Docker](https://hub.docker.com/r/linuxserver/homeassistant) :8123 | Home Assistant は1000以上の異なるデバイスやサービスと統合し、強力な自動化機能を備えています。 |
+| 109 | Kodbox | [Home](https://kodcloud.com/) | [Docker](https://hub.docker.com/r/kodcloud/kodbox) :8081 | プライベートクラウドのオンラインドキュメント管理ソリューションです。 |
+| 110 | CouchPotato | [Home](https://couchpota.to/) | [Docker](https://hub.docker.com/r/linuxserver/couchpotato) :5050 | CouchPotato は自動 NZB および torrent ダウンローダーで、観たい映画を自動的に検索します。 |
+| 111 | Sonarr | [Home](https://sonarr.tv/) | [Docker](https://hub.docker.com/r/linuxserver/sonarr) :8989 | Sonarr は Usenet および BitTorrent ユーザー向けの個人用ビデオレコーダーです。 |
+| 112 | Radarr | [Home](https://radarr.video/) | [Docker](https://hub.docker.com/r/linuxserver/radarr) :7878 | Radarr は Usenet および BitTorrent ユーザー向けの映画コレクションマネージャーです。 |
+| 113 | Syncthing | [Home](https://syncthing.net/) | [Docker](https://hub.docker.com/r/linuxserver/syncthing) :8384 | Syncthing は継続的なファイル同期プログラムです。 |
+| 114 | FileBrowser | [Home](https://filebrowser.org/) | [Docker](https://hub.docker.com/r/filebrowser/filebrowser) :8002 | File Browser は指定ディレクトリ内でファイル管理インターフェースを提供し、ファイルのアップロード、削除、プレビュー、リネーム、編集が可能です。 |
+| 115 | Heimdall | [Home](https://heimdall.site/) | [Docker](https://hub.docker.com/r/linuxserver/heimdall) :8003 | Heimdall は、よく使うウェブサイトやウェブアプリケーションへのリンクをシンプルに整理する方法です。 |
+| 116 | Node-RED | [Home](https://nodered.org/) | [Docker](https://nodered.org/docs/getting-started/docker) :1880 | Node-RED はプログラミングツールです。ブラウザベースのエディターを提供し、パレット内の多様なノードを使ってフローを簡単に連結し、ワンクリックでデプロイ・実行できます。 |
+| 117 | Mosquitto | [Home](https://www.mosquitto.org/) | [Docker](https://hub.docker.com/r/arm64v8/eclipse-mosquitto) :1883 | MQTT プロトコルはパブリッシュ/サブスクライブモデルによる軽量なメッセージングを提供します。Eclipse Mosquitto は MQTT プロトコルバージョン 5、3.1.1、3.1 のサーバーのオープンソース実装です。 |
+| 118 | OpenWrt | [Home](https://www.openwrt.org/) | [Docker](https://hub.docker.com/r/ophub/openwrt-armv8) :80 | OpenWrt プロジェクトは組み込みデバイス向けの Linux オペレーティングシステムで、3000以上の標準化アプリケーションパッケージと非常に豊富なサードパーティプラグインをサポートしています。 |
+| 119 | Netdata | [Home](https://learn.netdata.cloud/) | [Docker](https://hub.docker.com/r/netdata/netdata) :19999 | Netdata はシステムとアプリケーションのための分散型リアルタイムパフォーマンス・ヘルスモニタリングツールです。 |
+| 120 | XunLei | [Home](https://github.com/cnk3x/xunlei) | [Docker](https://hub.docker.com/r/cnk3x/xunlei) :2345 | 迅雷 Synology スイートから抽出されたリモートダウンロードサービスプログラムです。 |
+| 121 | Docker-Headless | [Home](https://github.com/infrastlabs/docker-headless) | [Docker](https://hub.docker.com/r/infrastlabs/docker-headless) :10081 | オーディオ/ロケール/IBus サポート付きのリモートデスクトップ。マルチデスクトップ（Gnome、Plasma、Mate、Xfce、Cinnamon）対応。 |
+| 122 | Navidrome | [Home](https://www.navidrome.org/) | [Docker](https://hub.docker.com/r/deluan/navidrome) :4533 | Navidrome はセルフホスト型のオープンソース音楽サーバーおよびストリーマーです。任意のブラウザやモバイルデバイスから音楽コレクションを自由に楽しめます。 |
+| 123 | Openlist | [Home](https://www.oplist.org/) | [Docker](https://hub.docker.com/r/openlistteam/openlist) :5244 | 複数のストレージに対応するファイルリストプログラムで、Gin と Solidjs を使用しています。 |
+| 124 | QingLong | [Home](https://github.com/whyour/qinglong) | [Docker](https://hub.docker.com/r/whyour/qinglong) :5700 | python3、javaScript、shell、typescript をサポートするスケジュールタスク管理パネルです。 |
+| 125 | ChatGPT-Next-Web | [Home](https://github.com/Yidadaa/ChatGPT-Next-Web) | [Docker](https://hub.docker.com/r/yidadaa/chatgpt-next-web) :3000 | ワンクリックで無料デプロイできるクロスプラットフォーム対応のプライベート ChatGPT アプリケーションです。 |
+| 126 | N8N | [Home](https://n8n.io/) | [Docker](https://hub.docker.com/r/n8nio/n8n) :5678 | n8n はワークフロー自動化プラットフォームで、技術チームにノーコードの高効率な開発速度を提供します。400以上の統合、ネイティブ AI 機能を内蔵し、フェアコードライセンスを採用。強力な自動化フローを構築しながら、データとデプロイメントを完全に制御できます。 |
+| 201 | Desktop:GNOME | [Home](https://www.gnome.org/) | - | GNOME は集中型のデスクトップ作業環境を提供し、作業の完了を支援します。`デスクトップ`はモニターに接続して使用でき、[リモートデスクトップ](https://learn.microsoft.com/ja-jp/windows-server/remote/remote-desktop-services/clients/remote-desktop-clients)ソフトウェアを使用して接続することもできます。 |
+| 202 | Firefox | [Home](https://www.mozilla.org/) | - | 優れたウェブブラウザです。 |
+| 203 | VLC | [Home](https://www.videolan.org/) | - | VLC は無料でオープンソースのクロスプラットフォームマルチメディアプレーヤー兼フレームワークで、ほとんどのマルチメディアファイルを再生できます。 |
+| 204 | MPV | [Home](https://mpv.io/) | - | 無料でオープンソースのクロスプラットフォーム対応メディアプレーヤーです。 |
+| 205 | GIMP | [Home](https://www.gimp.org/) | - | GIMP はクロスプラットフォームの画像エディターです。 |
+| 206 | Krita | [Home](https://krita.org/) | - | Krita はプロフェッショナルな無料オープンソースのペインティングプログラムです。 |
+| 207 | LibreOffice | [Home](https://www.libreoffice.org/) | - | LibreOffice は無料で強力なオフィススイートです。洗練されたインターフェースと豊富な機能で、創造性を発揮し生産性を向上させます。 |
+| 208 | Shotcut | [Home](https://shotcut.org/) | - | Shotcut は無料でオープンソースのクロスプラットフォーム動画エディターです。 |
+| 209 | Kdenlive | [Home](https://kdenlive.org/) | - | Kdenlive は無料でオープンソースの動画エディターです。 |
+| 210 | Thunderbird | [Home](https://www.thunderbird.net/) | - | Thunderbird は速度、プライバシー、最新技術を組み合わせて、より良いメール体験を提供します。 |
+| 211 | Evolution | [Home](https://github.com/GNOME/evolution) | - | Evolution は統合されたメール、カレンダー、アドレス帳機能を提供する個人情報管理アプリケーションです。 |
+| 212 | Gwenview | [Home](https://apps.kde.org/gwenview/) | - | Gwenview は KDE 製の軽量で使いやすい画像ビューアーで、画像コレクションの閲覧・表示に最適です。 |
+| 213 | Eog | [Home](https://gitlab.gnome.org/GNOME/eog) | - | Eye of GNOME（eog）は画像ビューアープログラムです。高速かつ機能的な画像ビューアーを目指しています。 |
+| 214 | VisualStudioCode | [Home](https://code.visualstudio.com/) | - | Visual Studio Code は軽量ながら強力なソースコードエディターです。 |
+| 215 | Gedit | [Home](https://github.com/GNOME/gedit) | - | Gedit は GNOME デスクトップ環境向けのフル機能テキストエディターです。簡単なメモやドキュメントの作成に使用でき、高度な機能を活用して独自のソフトウェア開発環境としても使用できます。 |
+| 216 | Flameshot | [Home](https://flameshot.org/) | - | 強力でありながら使いやすいオープンソースのスクリーンショットソフトウェアです。 |
+| 301 | Frps | [Home](https://gofrp.org/) | - | Frp は高速なリバースプロキシで、NAT やファイアウォールの背後にあるローカルサーバーをインターネットに公開できます。 |
+| 302 | Frpc | [Home](https://gofrp.org/) | - | Frp はイントラネットペネトレーションに特化した高性能リバースプロキシアプリケーションで、TCP、UDP、HTTP、HTTPS などのプロトコルをサポートしています。 |
+| 303 | NPS | [Home](https://ehang-io.github.io/nps) | - | NPS サーバー側。軽量で高性能、強力なイントラネットペネトレーションプロキシサーバーで、強力な Web 管理端末を備えています。 |
+| 304 | NPC | [Home](https://ehang-io.github.io/nps) | - | NPC は NPS のクライアントです。 |
+| 305 | Plex | [Home](https://www.plex.tv/) | - | 自分のサーバー上の個人メディアから、無料やオンデマンドの映画・番組、ライブ TV、ポッドキャスト、ウェブ番組、ストリーミング音楽まで、あらゆるデバイスの1つのアプリですべて楽しめます。 |
+| 306 | Emby-Server | [Home](https://emby.media/) | - | 個人メディアをクラウドに同期して、簡単にバックアップ、アーカイブ、変換できます。コンテンツを複数の解像度で保存し、あらゆるデバイスからの直接ストリーミングを実現します。 |
+| 307 | KVM | [Home](https://virt-manager.org/) | - | KVM（カーネルベースの仮想マシン）は、仮想化拡張機能を含む Linux 向けの完全な仮想化ソリューションです。virt-manager は libvirt を介して仮想マシンを管理するデスクトップユーザーインターフェースです。主に KVM VM を対象としていますが、Xen と LXC（Linux コンテナ）も管理できます。KVM 仮想マシンには [OpenWrt](https://github.com/unifreq/openwrt_packit)、Debian、Ubuntu、OpenSUSE、ArchLinux、Centos、Gentoo、KyLin、UOS などをインストールできます。 |
+| 308 | PVE | [Home](https://github.com/pimox/pimox7) | https://IP:8006 | Proxmox 仮想環境は QEMU/KVM と LXC に基づくオープンソースのサーバー仮想化管理ソリューションです。統合されたウェブインターフェースまたは CLI で仮想マシン、コンテナ、高可用性クラスター、ストレージ、ネットワークを管理できます。 |
+| 309 | CasaOS | [Home](https://github.com/IceWhaleTech/CasaOS) | http://IP | CasaOS はシンプルで使いやすく、エレガントなオープンソースのパーソナルクラウドシステムです。 |
+| 310 | ArozOS | [Home](https://github.com/tobychui/arozos) | http://IP:8080 | ArozOS は低消費電力プラットフォームに適した Web ベースのデスクトップオペレーティングシステムです。ファイル/ディスク管理、ネットワーク統計、Web サーバーなどの機能を備えています。 |
 
 ## ソフトウェアセンター使用方法
 
@@ -343,9 +339,8 @@ ID    NAME                STATE           MANAGE
   - システムのコマンドディレクトリ (bin, sbin) に実行ファイルが存在する場合、`which` 方式で検査します。例：`frpc` サービスがインストールされているか確認する場合、`which@frpc` を使用します。
   - システムのコマンドディレクトリに実行ファイルがない場合、`find` 方式で指定パスの存在を検査します。例：`arozos` システムがインストールされているか確認する場合、`find@/root/arozos` を使用します。
 - `Execute Selection`：ソフトウェアが`統一コマンドファイル`または`独立スクリプト`で管理されるかを設定します。
-  - `比較的シンプルな`操作のソフトウェアは、カテゴリ別に `command-docker.sh / command-desktop.sh / command-service.sh` ファイルに集約し、ソフトウェアシリアル番号で命名します。例えば `portainer`（シリアル番号 `102`）の操作は `software_203()` に記述されています。
+  - `比較的シンプルな`操作のソフトウェアは、カテゴリ別に `command-docker.sh / command-desktop.sh / command-service.sh` ファイルに集約し、ソフトウェアシリアル番号で命名します。例えば `portainer`（シリアル番号 `102`）の操作は `software_102()` に記述されています。
   - `比較的複雑で、コマンド内容が長い`ソフトウェアは、独立したスクリプトファイルで管理します。例えば `frpc` のインストールスクリプトはシリアル番号を先頭に付けて `302-frpc.sh` と命名します。
 - `Supported Release`：サポートされる Armbian `システムバージョンコードネーム`を設定します。すべてのバージョンをサポートする場合は `all` を使用します。一部のバージョンのみサポートする場合は、バージョンコードネームを記入し、複数のコードネームは `@` 記号で連結します。
 
 より多くのソフトウェアの追加を歓迎します。[Issues](https://github.com/ophub/amlogic-s9xxx-armbian/issues) でサポートリクエストを提出してください。
-

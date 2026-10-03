@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 **Device Information | 设备信息**
- - SOC: [e.g. S095x3]
+ - SOC: [e.g. S905x3]
  - Model [e.g. HK1]
 
 **Armbian Version | 系统版本**

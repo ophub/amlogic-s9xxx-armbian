@@ -39,25 +39,25 @@ sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/sta
 
 - Everyone is welcome to test and share their device configuration files (diy.conf) to benefit the community.
 
-|  BoxName   | `BoxID` |  Armbian Command      |   OpenWrt Command       |  Function   |
-| ---------- | ------- | --------------------- | ----------------------- | ----------- |
-| x96max     |  11     |  armbian-openvfd 11   |   openwrt-openvfd 11    | Enable LED  |
-| x96maxplus |  12     |  armbian-openvfd 12   |   openwrt-openvfd 12    | Enable LED  |
-| x96air     |  13     |  armbian-openvfd 13   |   openwrt-openvfd 13    | Enable LED  |
-| h96max-x3  |  14     |  armbian-openvfd 14   |   openwrt-openvfd 14    | Enable LED  |
-| hk1-x3     |  15     |  armbian-openvfd 15   |   openwrt-openvfd 15    | Enable LED  |
-| hk1box     |  16     |  armbian-openvfd 16   |   openwrt-openvfd 16    | Enable LED  |
-| tx3        |  17     |  armbian-openvfd 17   |   openwrt-openvfd 17    | Enable LED  |
-| tx3-mini   |  18     |  armbian-openvfd 18   |   openwrt-openvfd 18    | Enable LED  |
-| t95        |  19     |  armbian-openvfd 19   |   openwrt-openvfd 19    | Enable LED  |
-| t95z-plus  |  20     |  armbian-openvfd 20   |   openwrt-openvfd 20    | Enable LED  |
-| tx9-pro    |  21     |  armbian-openvfd 21   |   openwrt-openvfd 21    | Enable LED  |
-| x92        |  22     |  armbian-openvfd 22   |   openwrt-openvfd 22    | Enable LED  |
-| whale      |  23     |  armbian-openvfd 23   |   openwrt-openvfd 23    | Enable LED  |
-| x88pro-x3  |  24     |  armbian-openvfd 24   |   openwrt-openvfd 24    | Enable LED  |
-| diy        |  99     |  armbian-openvfd 99   |   openwrt-openvfd 99    | Enable LED  |
-| -          |  0      |  armbian-openvfd 0    |   openwrt-openvfd 0     | Disable LED |
-| -          |  -u     |  armbian-openvfd -u   |   openwrt-openvfd -u    | Update Conf |
+| BoxName | `BoxID` | Armbian Command | OpenWrt Command | Function |
+| --- | --- | --- | --- | --- |
+| x96max | 11 | armbian-openvfd 11 | openwrt-openvfd 11 | Enable LED |
+| x96maxplus | 12 | armbian-openvfd 12 | openwrt-openvfd 12 | Enable LED |
+| x96air | 13 | armbian-openvfd 13 | openwrt-openvfd 13 | Enable LED |
+| h96max-x3 | 14 | armbian-openvfd 14 | openwrt-openvfd 14 | Enable LED |
+| hk1-x3 | 15 | armbian-openvfd 15 | openwrt-openvfd 15 | Enable LED |
+| hk1box | 16 | armbian-openvfd 16 | openwrt-openvfd 16 | Enable LED |
+| tx3 | 17 | armbian-openvfd 17 | openwrt-openvfd 17 | Enable LED |
+| tx3-mini | 18 | armbian-openvfd 18 | openwrt-openvfd 18 | Enable LED |
+| t95 | 19 | armbian-openvfd 19 | openwrt-openvfd 19 | Enable LED |
+| t95z-plus | 20 | armbian-openvfd 20 | openwrt-openvfd 20 | Enable LED |
+| tx9-pro | 21 | armbian-openvfd 21 | openwrt-openvfd 21 | Enable LED |
+| x92 | 22 | armbian-openvfd 22 | openwrt-openvfd 22 | Enable LED |
+| whale | 23 | armbian-openvfd 23 | openwrt-openvfd 23 | Enable LED |
+| x88pro-x3 | 24 | armbian-openvfd 24 | openwrt-openvfd 24 | Enable LED |
+| diy | 99 | armbian-openvfd 99 | openwrt-openvfd 99 | Enable LED |
+| - | 0 | armbian-openvfd 0 | openwrt-openvfd 0 | Disable LED |
+| - | -u | armbian-openvfd -u | openwrt-openvfd -u | Update Conf |
 
 # LED 屏显示控制说明
 
@@ -98,27 +98,25 @@ sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/sta
 
 - 欢迎大家测试后分享自己设备的配置文件（diy.conf），让更多人受益。
 
-|  盒子名称   | `盒子编号` |  Armbian 使用命令      |   OpenWrt 使用命令       |   功能   |
-| ---------- | -------- | --------------------- | ----------------------- | ------- |
-| x96max     |  11      |  armbian-openvfd 11   |   openwrt-openvfd 11    | 启用 LED |
-| x96maxplus |  12      |  armbian-openvfd 12   |   openwrt-openvfd 12    | 启用 LED |
-| x96air     |  13      |  armbian-openvfd 13   |   openwrt-openvfd 13    | 启用 LED |
-| h96max-x3  |  14      |  armbian-openvfd 14   |   openwrt-openvfd 14    | 启用 LED |
-| hk1-x3     |  15      |  armbian-openvfd 15   |   openwrt-openvfd 15    | 启用 LED |
-| hk1box     |  16      |  armbian-openvfd 16   |   openwrt-openvfd 16    | 启用 LED |
-| tx3        |  17      |  armbian-openvfd 17   |   openwrt-openvfd 17    | 启用 LED |
-| tx3-mini   |  18      |  armbian-openvfd 18   |   openwrt-openvfd 18    | 启用 LED |
-| t95        |  19      |  armbian-openvfd 19   |   openwrt-openvfd 19    | 启用 LED |
-| t95z-plus  |  20      |  armbian-openvfd 20   |   openwrt-openvfd 20    | 启用 LED |
-| tx9-pro    |  21      |  armbian-openvfd 21   |   openwrt-openvfd 21    | 启用 LED |
-| x92        |  22      |  armbian-openvfd 22   |   openwrt-openvfd 22    | 启用 LED |
-| whale      |  23      |  armbian-openvfd 23   |   openwrt-openvfd 23    | 启用 LED |
-| x88pro-x3  |  24      |  armbian-openvfd 24   |   openwrt-openvfd 24    | 启用 LED |
-| diy        |  99      |  armbian-openvfd 99   |   openwrt-openvfd 99    | 启用 LED |
-| -          |  0       |  armbian-openvfd 0    |   openwrt-openvfd 0     | 禁用 LED |
-| -          |  -u      |  armbian-openvfd -u   |   openwrt-openvfd -u    | 更新配置  |
-
-
+| 盒子名称 | `盒子编号` | Armbian 使用命令 | OpenWrt 使用命令 | 功能 |
+| --- | --- | --- | --- | --- |
+| x96max | 11 | armbian-openvfd 11 | openwrt-openvfd 11 | 启用 LED |
+| x96maxplus | 12 | armbian-openvfd 12 | openwrt-openvfd 12 | 启用 LED |
+| x96air | 13 | armbian-openvfd 13 | openwrt-openvfd 13 | 启用 LED |
+| h96max-x3 | 14 | armbian-openvfd 14 | openwrt-openvfd 14 | 启用 LED |
+| hk1-x3 | 15 | armbian-openvfd 15 | openwrt-openvfd 15 | 启用 LED |
+| hk1box | 16 | armbian-openvfd 16 | openwrt-openvfd 16 | 启用 LED |
+| tx3 | 17 | armbian-openvfd 17 | openwrt-openvfd 17 | 启用 LED |
+| tx3-mini | 18 | armbian-openvfd 18 | openwrt-openvfd 18 | 启用 LED |
+| t95 | 19 | armbian-openvfd 19 | openwrt-openvfd 19 | 启用 LED |
+| t95z-plus | 20 | armbian-openvfd 20 | openwrt-openvfd 20 | 启用 LED |
+| tx9-pro | 21 | armbian-openvfd 21 | openwrt-openvfd 21 | 启用 LED |
+| x92 | 22 | armbian-openvfd 22 | openwrt-openvfd 22 | 启用 LED |
+| whale | 23 | armbian-openvfd 23 | openwrt-openvfd 23 | 启用 LED |
+| x88pro-x3 | 24 | armbian-openvfd 24 | openwrt-openvfd 24 | 启用 LED |
+| diy | 99 | armbian-openvfd 99 | openwrt-openvfd 99 | 启用 LED |
+| - | 0 | armbian-openvfd 0 | openwrt-openvfd 0 | 禁用 LED |
+| - | -u | armbian-openvfd -u | openwrt-openvfd -u | 更新配置 |
 
 # LED スクリーン表示制御の説明
 
@@ -159,22 +157,22 @@ sed -i 's|^#*openvfd_restart=.*|openvfd_restart="yes"|g' /etc/custom_service/sta
 
 - テスト後にご自身のデバイスの設定ファイル（diy.conf）を共有していただくことを歓迎します。より多くの方の参考になります。
 
-|  デバイス名  | `デバイス番号` |  Armbian コマンド       |   OpenWrt コマンド        |   機能    |
-| ---------- | ----------- | --------------------- | ----------------------- | -------- |
-| x96max     |  11         |  armbian-openvfd 11   |   openwrt-openvfd 11    | LED 有効  |
-| x96maxplus |  12         |  armbian-openvfd 12   |   openwrt-openvfd 12    | LED 有効  |
-| x96air     |  13         |  armbian-openvfd 13   |   openwrt-openvfd 13    | LED 有効  |
-| h96max-x3  |  14         |  armbian-openvfd 14   |   openwrt-openvfd 14    | LED 有効  |
-| hk1-x3     |  15         |  armbian-openvfd 15   |   openwrt-openvfd 15    | LED 有効  |
-| hk1box     |  16         |  armbian-openvfd 16   |   openwrt-openvfd 16    | LED 有効  |
-| tx3        |  17         |  armbian-openvfd 17   |   openwrt-openvfd 17    | LED 有効  |
-| tx3-mini   |  18         |  armbian-openvfd 18   |   openwrt-openvfd 18    | LED 有効  |
-| t95        |  19         |  armbian-openvfd 19   |   openwrt-openvfd 19    | LED 有効  |
-| t95z-plus  |  20         |  armbian-openvfd 20   |   openwrt-openvfd 20    | LED 有効  |
-| tx9-pro    |  21         |  armbian-openvfd 21   |   openwrt-openvfd 21    | LED 有効  |
-| x92        |  22         |  armbian-openvfd 22   |   openwrt-openvfd 22    | LED 有効  |
-| whale      |  23         |  armbian-openvfd 23   |   openwrt-openvfd 23    | LED 有効  |
-| x88pro-x3  |  24         |  armbian-openvfd 24   |   openwrt-openvfd 24    | LED 有効  |
-| diy        |  99         |  armbian-openvfd 99   |   openwrt-openvfd 99    | LED 有効  |
-| -          |  0          |  armbian-openvfd 0    |   openwrt-openvfd 0     | LED 無効  |
-| -          |  -u         |  armbian-openvfd -u   |   openwrt-openvfd -u    | 設定更新  |
+| デバイス名 | `デバイス番号` | Armbian コマンド | OpenWrt コマンド | 機能 |
+| --- | --- | --- | --- | --- |
+| x96max | 11 | armbian-openvfd 11 | openwrt-openvfd 11 | LED 有効 |
+| x96maxplus | 12 | armbian-openvfd 12 | openwrt-openvfd 12 | LED 有効 |
+| x96air | 13 | armbian-openvfd 13 | openwrt-openvfd 13 | LED 有効 |
+| h96max-x3 | 14 | armbian-openvfd 14 | openwrt-openvfd 14 | LED 有効 |
+| hk1-x3 | 15 | armbian-openvfd 15 | openwrt-openvfd 15 | LED 有効 |
+| hk1box | 16 | armbian-openvfd 16 | openwrt-openvfd 16 | LED 有効 |
+| tx3 | 17 | armbian-openvfd 17 | openwrt-openvfd 17 | LED 有効 |
+| tx3-mini | 18 | armbian-openvfd 18 | openwrt-openvfd 18 | LED 有効 |
+| t95 | 19 | armbian-openvfd 19 | openwrt-openvfd 19 | LED 有効 |
+| t95z-plus | 20 | armbian-openvfd 20 | openwrt-openvfd 20 | LED 有効 |
+| tx9-pro | 21 | armbian-openvfd 21 | openwrt-openvfd 21 | LED 有効 |
+| x92 | 22 | armbian-openvfd 22 | openwrt-openvfd 22 | LED 有効 |
+| whale | 23 | armbian-openvfd 23 | openwrt-openvfd 23 | LED 有効 |
+| x88pro-x3 | 24 | armbian-openvfd 24 | openwrt-openvfd 24 | LED 有効 |
+| diy | 99 | armbian-openvfd 99 | openwrt-openvfd 99 | LED 有効 |
+| - | 0 | armbian-openvfd 0 | openwrt-openvfd 0 | LED 無効 |
+| - | -u | armbian-openvfd -u | openwrt-openvfd -u | 設定更新 |
