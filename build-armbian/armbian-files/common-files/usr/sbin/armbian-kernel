@@ -54,15 +54,13 @@ error_msg() {
 }
 
 update_script() {
-    echo -e "${STEPS} Updating kernel compilation scripts..."
-
     # Install git
-    echo -e "${INFO} Installing update dependencies..."
+    echo -e "${STEPS} Installing update dependencies..."
     sudo apt-get -qq update
     [[ -z "$(dpkg -l | awk '{print $2}' | grep -w "^git$")" ]] && sudo apt-get install -y git
 
     # Download the latest scripts from the repository
-    echo -e "${INFO} Fetching latest scripts from repository..."
+    echo -e "${STEPS} Syncing latest scripts from repository..."
     git_tmp_path="$(mktemp -d)"
     # Ensure tmp dir is removed on any exit path (success / error / Ctrl-C)
     trap '[[ -n "${git_tmp_path}" && -d "${git_tmp_path}" ]] && rm -rf "${git_tmp_path}" 2>/dev/null' EXIT INT TERM
@@ -100,17 +98,20 @@ update_script() {
     [[ "${?}" -ne "0" ]] && error_msg "Failed to sync scripts from [ ${script_repo} ]."
     cp -f --no-preserve=ownership ${script_name} ${compile_script}
     chmod +x ${compile_script}
+    [[ "${?}" -ne "0" ]] && error_msg "Failed to sync compilation scripts."
+    echo -e "${SUCCESS} Compilation scripts synced successfully."
 
     # Clean up temporary files
+    sync && sleep 3
     rm -rf ${git_tmp_path} 2>/dev/null
 
     # Install compilation dependencies
-    echo -e "${INFO} Installing compilation dependencies..."
+    echo -e "${STEPS} Installing compilation dependencies..."
     sudo apt-get install -y $(cat ${script_path}/armbian-compile-kernel-depends)
     [[ "${?}" -ne "0" ]] && error_msg "Failed to install dependencies."
 
     sync && sleep 3
-    echo -e "${SUCCESS} Compilation scripts updated successfully."
+    echo -e "${SUCCESS} Compilation dependencies installed successfully."
     exit 0
 }
 
@@ -154,6 +155,7 @@ EOF
     exit 0
 }
 
+echo -e "${STEPS} Welcome to the Armbian kernel compilation script."
 # Check script permission, only supports running on Armbian (aarch64)
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 [[ "${arch_info}" == "aarch64" ]] || error_msg "This script only supports running on Armbian (aarch64) systems."
