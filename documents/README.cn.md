@@ -8,7 +8,7 @@ GitHub Actions 是 Microsoft 推出的一项服务，提供高性能的虚拟服
 
 - [Armbian 构建及使用方法](#armbian-构建及使用方法)
 - [目录](#目录)
-  - [1. 注册自己的 GitHub 账户](#1-注册自己的-github-的账户)
+  - [1. 注册自己的 GitHub 账户](#1-注册自己的-github-账户)
   - [2. 设置隐私变量 GITHUB\_TOKEN 等](#2-设置隐私变量-github_token-等)
   - [3. Fork 仓库并设置工作流权限](#3-fork-仓库并设置工作流权限)
   - [4. 个性化 Armbian 系统定制文件说明](#4-个性化-armbian-系统定制文件说明)
@@ -517,7 +517,7 @@ armbian-update -k 6.1
 mkdir -p /usr/local/toolchain
 cd /usr/local/toolchain
 # 下载编译工具
-wget https://github.com/ophub/kernel/releases/download/dev/arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
+wget https://github.com/ophub/kernel/releases/download/toolchain/arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 解压
 tar -Jxf arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz
 # 安装其他编译依赖包（可选项，可根据错误提示手动安装缺少项）
