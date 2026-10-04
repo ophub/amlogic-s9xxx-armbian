@@ -105,9 +105,9 @@ declare -A tags_list
 # Array entries omit the "u-boot-" prefix of the file name (e.g. p201.bin = u-boot-p201.bin)
 uboot_meson_gxl=("p201.bin" "p212.bin" "s905x-s912.bin" "n1.bin" "r3300l.bin" "s905x-s905lb.bin")
 uboot_meson_gxm=("p212.bin" "s905x-s912.bin" "zyxq.bin")
-uboot_meson_g12a=("x96max.bin" "e900v22c.bin" "w103d.bin" "sei510.bin" "sei610.bin" "u200.bin")
+uboot_meson_g12a=("x96max.bin" "e900v22c.bin" "w103d.bin" "sei510.bin" "u200.bin")
 uboot_meson_g12b=("gtking.bin" "gtkingpro.bin" "gtkingpro-rev-a.bin" "s905x2-s922.bin" "odroid-n2.bin")
-uboot_meson_sm1=("x96maxplus.bin" "ugoos-x3.bin" "tx3-qz.bin" "tx3-bz.bin" "skyworth-lb2004.bin" "s905x3.bin")
+uboot_meson_sm1=("x96maxplus.bin" "ugoos-x3.bin" "tx3-qz.bin" "tx3-bz.bin" "skyworth-lb2004.bin" "s905x3.bin" "sei610.bin")
 uboot_meson_gxbb=("p201.bin" "s905.bin")
 
 # Initialize the build device
