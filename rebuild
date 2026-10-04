@@ -101,6 +101,15 @@ auto_kernel="true"
 # Initialize the kernel array
 declare -A tags_list
 
+# Amlogic u-boot files: https://github.com/ophub/u-boot/tree/main/u-boot/amlogic/overload
+# Array entries omit the "u-boot-" prefix of the file name (e.g. p201.bin = u-boot-p201.bin)
+uboot_meson_gxl=("p201.bin" "p212.bin" "s905x-s912.bin" "n1.bin" "r3300l.bin" "s905x-s905lb.bin")
+uboot_meson_gxm=("p212.bin" "s905x-s912.bin" "zyxq.bin")
+uboot_meson_g12a=("x96max.bin" "e900v22c.bin" "w103d.bin" "sei510.bin" "sei610.bin" "u200.bin")
+uboot_meson_g12b=("gtking.bin" "gtkingpro.bin" "gtkingpro-rev-a.bin" "s905x2-s922.bin" "odroid-n2.bin")
+uboot_meson_sm1=("x96maxplus.bin" "ugoos-x3.bin" "tx3-qz.bin" "tx3-bz.bin" "skyworth-lb2004.bin" "s905x3.bin")
+uboot_meson_gxbb=("p201.bin" "s905.bin")
+
 # Initialize the build device
 build_board="all"
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
@@ -641,6 +650,9 @@ confirm_version() {
     [[ -n "${MAINLINE_UBOOT}" ]] && RECORD_MAINLINE_UBOOT="/usr/lib/u-boot/${MAINLINE_UBOOT}" || RECORD_MAINLINE_UBOOT=""
     [[ -n "${BOOTLOADER_IMG}" ]] && RECORD_BOOTLOADER_IMG="/usr/lib/u-boot/${BOOTLOADER_IMG}" || RECORD_BOOTLOADER_IMG=""
     [[ -n "${TRUST_IMG}" ]] && RECORD_TRUST_IMG="/usr/lib/u-boot/${TRUST_IMG}" || RECORD_TRUST_IMG=""
+    # Set the Amlogic u-boot series
+    family_rename="${FAMILY//-/_}"
+    eval "amlogic_uboot=(\${uboot_${family_rename}[@]})"
 
     # Get the kernel tags and version
     conf_kernel_tags="${KERNEL_TAGS%%/*}"
@@ -887,8 +899,16 @@ copy_files() {
     [[ -n "${tag_rootfs}" && -d "${tag_rootfs}/usr/lib/u-boot" ]] && rm -rf "${tag_rootfs}/usr/lib/u-boot"/*
     [[ -d "${bootloader_path}" ]] && cp -af --no-preserve=ownership "${bootloader_path}/." "${tag_rootfs}/usr/lib/u-boot"
 
-    # Copy the overload files
-    [[ "${PLATFORM}" == "amlogic" ]] && cp -rf ${uboot_path}/${PLATFORM}/overload/. ${tag_bootfs}
+    # Copy the Amlogic overload files
+    [[ "${PLATFORM}" == "amlogic" ]] && {
+        for au in "${amlogic_uboot[@]}"; do
+            if [[ -f "${uboot_path}/${PLATFORM}/overload/u-boot-${au}" ]]; then
+                cp -f "${uboot_path}/${PLATFORM}/overload/u-boot-${au}" "${tag_bootfs}"
+            else
+                error_msg "The [ u-boot-${au} ] file is missing in the [ ${uboot_path}/${PLATFORM}/overload ] directory."
+            fi
+        done
+    }
 
     # Remove the .git directories
     rm -rf $(find ${tmp_build} -type d -name '.git')
