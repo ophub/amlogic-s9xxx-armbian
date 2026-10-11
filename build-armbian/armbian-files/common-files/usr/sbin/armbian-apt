@@ -55,6 +55,7 @@ check_release() {
         # Set the source files
         armbian_source_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources"
         armbian_source_backup_file="/etc/apt/sources.list.d/${VERSION_CODEID}.sources.bak"
+        armbian_repo_file="/etc/apt/sources.list.d/armbian.sources"
 
     else
         error_msg "System release file not found!"
@@ -66,6 +67,11 @@ backup_source_list() {
     # If the source file exists and the backup file does not exist, then back up the source file to the backup file
     [[ -f "${armbian_source_file}" && ! -f "${armbian_source_backup_file}" ]] && {
         cp -f "${armbian_source_file}" "${armbian_source_backup_file}"
+    }
+
+    # Backup the ARMBIAN repository file
+    [[ -f "${armbian_repo_file}" && ! -f "${armbian_repo_file}.bak" ]] && {
+        cp -f "${armbian_repo_file}" "${armbian_repo_file}.bak"
     }
 
     # Disable outdated APT source files
@@ -177,6 +183,13 @@ EOF
 
     # Remove the space at the beginning of each line
     sed -i 's|^[ \t]*||' "${armbian_source_file}"
+
+    # Update the ARMBIAN mirror source only for mirrors known to host the Armbian repository (ID 1-4)
+    if [[ "${source_id}" =~ ^(1|2|3|4)$ && -f "${armbian_repo_file}" ]]; then
+        sed -i "s|^URIs:.*|URIs: ${ARMBIAN_MIRROR}|" "${armbian_repo_file}"
+        echo -e "${INFO} ARMBIAN mirror source: [ ${ARMBIAN_MIRROR} ]"
+    fi
+
     echo -e "${SUCCESS} APT mirror source changed successfully."
 }
 
@@ -191,6 +204,7 @@ select_mirror_site() {
             # Restore the source file from the backup file
             cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
             [[ -f "/etc/apt/sources.list.bak" ]] && cp -f /etc/apt/sources.list.bak /etc/apt/sources.list
+            [[ -f "${armbian_repo_file}.bak" ]] && cp -f "${armbian_repo_file}.bak" "${armbian_repo_file}"
 
             echo -e "${SUCCESS} Default source restored successfully."
             exit 0
@@ -209,6 +223,7 @@ select_mirror_site() {
     DEBIAN_MIRROR="http://${MIRROR_URL}/debian"
     DEBIAN_SECURITY="http://${MIRROR_URL}/debian-security"
     UBUNTU_MIRROR="http://${MIRROR_URL}/ubuntu-ports"
+    ARMBIAN_MIRROR="http://${MIRROR_URL}/armbian"
 
     # Configure Debian and Ubuntu mirror sources separately for certain countries/regions
     case "${source_id}" in
