@@ -6,3 +6,4 @@ overlay_prefix=rk3588
 fdtfile=rockchip/rk3588s-orangepi-5-pro.dtb
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
+extraboardargs=net.ifnames=0
