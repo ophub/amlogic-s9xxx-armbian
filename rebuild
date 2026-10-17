@@ -91,9 +91,8 @@ kernel_usage=""
 stable_kernel=("6.12.y" "6.18.y")
 flippy_kernel=(${stable_kernel[@]})
 beta_kernel=(${stable_kernel[@]})
-rk3588_kernel=("6.1.y")
-rk35xx_kernel=("6.1.y")
-h6_kernel=("6.6.y")
+rk3588_kernel=("6.1.y" "6.12.y")
+rk35xx_kernel=("6.1.y" "6.12.y")
 specific_6xy=("6.1.y" "6.6.y" "6.12.y" "6.18.y")
 specific_5xy=("5.10.y" "5.15.y")
 # Set to automatically use the latest kernel
