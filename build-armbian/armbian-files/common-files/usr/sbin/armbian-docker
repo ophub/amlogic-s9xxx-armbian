@@ -100,7 +100,8 @@ docker_install() {
     # Install GPG certificate
     rm -f /usr/share/keyrings/docker-archive-keyring.gpg
     # sudo curl -fsSL https://download.docker.com/linux/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    sudo curl -fsSL ${DOCKER_SOURCE}/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    sudo curl -fsSL ${DOCKER_SOURCE}/${VERSION_CODEID}/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg ||
+        error_msg "Failed to download the Docker GPG key from [ ${DOCKER_SOURCE} ]."
 
     # Add software source information
     rm -f /etc/apt/sources.list.d/docker.list
@@ -152,7 +153,8 @@ EOF
     sudo systemctl restart docker
 
     # Allow the current user to run Docker commands without sudo
-    sudo usermod -a -G docker $USER 2>/dev/null
+    target_user="${SUDO_USER:-${USER}}"
+    [[ -n "${target_user}" && "${target_user}" != "root" ]] && sudo usermod -a -G docker "${target_user}" 2>/dev/null
 
     sync && sleep 3
     echo -e "${SUCCESS} Docker installed successfully."
@@ -164,10 +166,8 @@ docker_update() {
 
     # Update the docker package
     sudo apt-get update
-    sudo apt-get upgrade -y
-    sudo apt-get dist-upgrade -y
-    sudo apt-get --purge autoremove -y
-    sudo apt-get autoclean -y
+    # Upgrade only the Docker packages, not the whole system
+    sudo apt-get install --only-upgrade -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
     echo -e "${SUCCESS} Docker updated successfully."
     exit 0
@@ -182,10 +182,15 @@ docker_remove() {
     sudo apt-get remove --purge -y docker-ce docker-ce-cli containerd.io docker-compose* docker-ce-*
     sudo apt-get --purge autoremove -y
     sudo apt-get autoclean -y
-    #
-    sudo rm -rf /etc/docker 2>/dev/null
-    sudo rm -rf /var/lib/docker 2>/dev/null
     sudo rm -rf /var/run/docker.sock 2>/dev/null
+    # Containers, images and volumes are kept unless the user explicitly asks to delete them
+    if [[ "${1}" == "--purge-data" ]]; then
+        echo -ne "${OPTIONS} Delete ALL Docker data in [ /var/lib/docker ] and [ /etc/docker ]? Type YES to confirm: "
+        read confirm
+        [[ "${confirm}" == "YES" ]] && sudo rm -rf /etc/docker /var/lib/docker && echo -e "${INFO} Docker data deleted."
+    else
+        echo -e "${INFO} Docker data kept in [ /var/lib/docker ]. Use [ armbian-docker remove --purge-data ] to delete it."
+    fi
 
     echo -e "${SUCCESS} Docker removed successfully."
     exit 0
@@ -198,6 +203,6 @@ echo -e "${INFO} Welcome to the Docker Management Tool."
 # Execute script assist functions
 case "${1}" in
     update) docker_update ;;
-    remove) docker_remove ;;
+    remove) docker_remove "${2}" ;;
     *)      docker_install ;;
 esac
