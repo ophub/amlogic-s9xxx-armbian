@@ -12,10 +12,12 @@
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
 # Command: armbian-apt
+#          armbian-apt -h
 #
 #============================= Functions list #=============================
 #
 # error_msg           : Output error message
+# help_info           : Display help information
 # check_release       : Check the system release
 # backup_source_list  : Backup the source list
 # show_mirror_list    : Display the mirror list
@@ -43,6 +45,31 @@ error_msg() {
     exit 1
 }
 
+# Display help information
+help_info() {
+    clear
+    cat <<EOF
+==========================================================================================================
+
+01. Change the APT mirror source of the system:
+    Command: armbian-apt
+    The tool is interactive: it lists the available mirrors, then prompts for an ID.
+    ID 1-20 : Switch the Debian/Ubuntu sources to the selected mirror, and the ARMBIAN source for ID 1-4.
+    ID 0    : Restore the default sources from the backup files.
+
+02. Script assist functions:
+    Command: armbian-apt -h
+    -h : Help    Display this help information.
+
+03. Notes:
+    No file is modified until a valid mirror ID is entered.
+    The original source files are backed up as [ *.bak ] before the first switch.
+
+==========================================================================================================
+EOF
+    exit 0
+}
+
 # Check the system release information
 check_release() {
     if [[ -f "${ophub_release_file}" ]]; then
@@ -65,7 +92,11 @@ check_release() {
 # Backup the source list
 backup_source_list() {
     # If the source file exists and the backup file does not exist, then back up the source file to the backup file
-    [[ -f "${armbian_source_file}" && ! -f "${armbian_source_backup_file}" ]] && {
+    # Skip it when [ sources.list.bak ] already exists: that backup is only created on systems whose sources
+    # lived in the legacy one-line [ sources.list ], where the deb822 file was then written by this tool itself.
+    # Backing that up would save a mirror as if it were the original source, and restoring it later would
+    # leave the mirror active beside the restored [ sources.list ].
+    [[ -f "${armbian_source_file}" && ! -f "${armbian_source_backup_file}" && ! -f "/etc/apt/sources.list.bak" ]] && {
         cp -f "${armbian_source_file}" "${armbian_source_backup_file}"
     }
 
@@ -202,10 +233,22 @@ select_mirror_site() {
 
     # ID 0: restore default source from backup
     if [[ "${source_id}" == "0" ]]; then
-        # Restore whatever backups exist (deb822 file and/or legacy sources.list)
         restored="0"
-        [[ -f "${armbian_source_backup_file}" ]] && cp -f "${armbian_source_backup_file}" "${armbian_source_file}" && restored="1"
-        [[ -f "/etc/apt/sources.list.bak" ]] && cp -f /etc/apt/sources.list.bak /etc/apt/sources.list && restored="1"
+        if [[ -f "/etc/apt/sources.list.bak" ]]; then
+            # This tool disabled the legacy one-line sources.list when it switched the mirror: put it back
+            cp -f /etc/apt/sources.list.bak /etc/apt/sources.list && restored="1"
+            if [[ -f "${armbian_source_backup_file}" ]]; then
+                # The deb822 file existed before the switch: restore it from its backup file
+                cp -f "${armbian_source_backup_file}" "${armbian_source_file}"
+            else
+                # The deb822 file did not exist before the switch, so this tool wrote it: delete it,
+                # otherwise the mirror would stay active beside the restored sources.list
+                rm -f "${armbian_source_file}"
+            fi
+        elif [[ -f "${armbian_source_backup_file}" ]]; then
+            # The system uses the deb822 format: restore it from its backup file
+            cp -f "${armbian_source_backup_file}" "${armbian_source_file}" && restored="1"
+        fi
         [[ -f "${armbian_repo_file}.bak" ]] && cp -f "${armbian_repo_file}.bak" "${armbian_repo_file}"
         [[ "${restored}" == "1" ]] || error_msg "Default source backup file not found."
 
@@ -244,6 +287,9 @@ select_mirror_site() {
         ;;
     esac
 
+    # Back up the original source files now: the selected ID is valid and the files are about to change
+    backup_source_list
+
     # Change the source list
     change_source_list
 }
@@ -252,11 +298,9 @@ select_mirror_site() {
 main() {
     # Handle help before touching any file
     case "${1}" in
-    -h | --help)
-        echo "Usage: armbian-apt   (interactive: choose a mirror ID, or 0 to restore the default sources)"
-        exit 0
-        ;;
+        -h | --help) help_info ;;
     esac
+
     echo -e "${STEPS} Welcome to the APT Mirror Source Switching Tool."
     # Check the system release information
     check_release
@@ -270,8 +314,6 @@ main() {
     # Validate the input and select the mirror site
     case "${mwid}" in
     [0-9]*)
-        # Backup only after a valid choice, and never for ID 0 (restore)
-        [[ "${mwid}" != "0" ]] && backup_source_list
         select_mirror_site "${mwid}"
         ;;
     *)
