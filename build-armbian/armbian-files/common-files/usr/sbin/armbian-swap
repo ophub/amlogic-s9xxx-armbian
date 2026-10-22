@@ -118,10 +118,28 @@ create_the_swap() {
     [[ "${?}" -ne "0" ]] && error_msg "[ swapon ] operation failed."
 
     # Add swap to the mount point
-    # Remove only previous swap entries (fstype field == swap); keep every other line
-    cp -f /etc/fstab /etc/fstab.armbian-swap.bak
-    awk '$1 ~ /^#/ || $3 != "swap"' /etc/fstab.armbian-swap.bak >/etc/fstab
-    echo "${SWAP_PATH}/swapfile none swap defaults 0 0" >>/etc/fstab
+    # Keep a copy of the original fstab for recovery, created only on the first run
+    [[ -f "/etc/fstab.armbian-swap.bak" ]] || cp -f /etc/fstab /etc/fstab.armbian-swap.bak ||
+        error_msg "Failed to back up [ /etc/fstab ]. It was left unchanged."
+
+    # Remove only previous swap entries (fstype field == swap), keep every other line.
+    # Build the new content in a temporary file in the same directory and rename it into
+    # place: writing with [ > /etc/fstab ] truncates the file before awk runs, so any
+    # failure or power loss in between would leave an empty fstab and an unbootable system.
+    # The temporary file must stay in /etc: /tmp is a separate tmpfs, and a cross-device
+    # [ mv ] falls back to copy+unlink, which is not atomic.
+    tmp_fstab="$(mktemp /etc/fstab.armbian-swap.XXXXXX)" || error_msg "Failed to create a temporary fstab."
+    # Keep the whole chain inside the test: if any step fails, the temporary file is
+    # discarded and the real fstab is never touched.
+    if awk '$1 ~ /^#/ || $3 != "swap"' /etc/fstab >"${tmp_fstab}" &&
+        echo "${SWAP_PATH}/swapfile none swap defaults 0 0" >>"${tmp_fstab}" &&
+        chmod 644 "${tmp_fstab}" && mv -f "${tmp_fstab}" /etc/fstab; then
+        sync
+        echo -e "${INFO} The swap entry was added to [ /etc/fstab ]."
+    else
+        rm -f "${tmp_fstab}"
+        error_msg "Failed to update [ /etc/fstab ]. It was left unchanged."
+    fi
 
     # Disable zram swap
     zram_config="/etc/default/armbian-zram-config"
