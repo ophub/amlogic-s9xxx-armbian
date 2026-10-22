@@ -88,9 +88,11 @@ do_checkdisk() {
 # Delete the current swap file
 delete_current_swap() {
     echo -e "${STEPS} Current swap size: [ ${1} ] bytes. Removing..."
-    current_swap_file="$(cat /proc/swaps | sed -n '$p' | awk '{print $1}' | echo $(xargs))"
-    swapoff ${current_swap_file} 2>/dev/null && sync
-    rm -f ${current_swap_file} 2>/dev/null && sync
+    # Only handle swap *files* (Type == file); never touch zram or swap partitions
+    current_swap_file="$(awk 'NR>1 && $2 == "file" {f=$1} END {print f}' /proc/swaps)"
+    [[ -n "${current_swap_file}" && -f "${current_swap_file}" ]] || return 0
+    swapoff "${current_swap_file}" 2>/dev/null && sync
+    rm -f "${current_swap_file}" 2>/dev/null && sync
     echo -e "${SUCCESS} Previous swap removed successfully."
 }
 
@@ -116,12 +118,17 @@ create_the_swap() {
     [[ "${?}" -ne "0" ]] && error_msg "[ swapon ] operation failed."
 
     # Add swap to the mount point
-    sed -i '/swap/d' /etc/fstab
-    echo "${SWAP_PATH}/swapfile swap swap defaults 0 0" >>/etc/fstab
+    # Remove only previous swap entries (fstype field == swap); keep every other line
+    cp -f /etc/fstab /etc/fstab.armbian-swap.bak
+    awk '$1 ~ /^#/ || $3 != "swap"' /etc/fstab.armbian-swap.bak >/etc/fstab
+    echo "${SWAP_PATH}/swapfile none swap defaults 0 0" >>/etc/fstab
 
     # Disable zram swap
     zram_config="/etc/default/armbian-zram-config"
-    [[ -f "${zram_config}" ]] && sed -i "s|# SWAP=false|SWAP=false|g" ${zram_config}
+    [[ -f "${zram_config}" ]] && grep -q "^# SWAP=false" ${zram_config} && {
+        sed -i "s|# SWAP=false|SWAP=false|g" ${zram_config}
+        echo -e "${INFO} zram swap disabled in [ ${zram_config} ] (set SWAP=true to re-enable)."
+    }
 
     sync && sleep 3
     echo -e "${INFO} Current swap status: \n$(cat /proc/swaps)"
