@@ -12,10 +12,12 @@
 # Copyright (C) 2021- https://github.com/unifreq/openwrt_packit
 # Copyright (C) 2021- https://github.com/ophub/amlogic-s9xxx-armbian
 #
-# Usage              : Command
-# Install Docker     : armbian-docker
-# Update  Docker     : armbian-docker update
-# Remove  Docker     : armbian-docker remove
+# Usage                   : Command
+# Install Docker          : armbian-docker
+# Update  Docker          : armbian-docker update
+# Remove  Docker          : armbian-docker remove
+# Remove Docker and data  : armbian-docker remove --purge-data
+# Help information        : armbian-docker -h
 #
 #========================= Set default parameters ==========================
 #
@@ -35,6 +37,38 @@ ERROR="[\033[91m ERROR \033[0m]"
 error_msg() {
     echo -e "${ERROR} ${1}"
     exit 1
+}
+
+# Display help information
+help_info() {
+    clear
+    cat <<EOF
+==========================================================================================================
+
+01. Install Docker:
+    Command: armbian-docker
+    Select a Docker download source (1-4), then install the Docker engine and its plugins.
+    The invoking user is added to the [ docker ] group, so Docker commands work without sudo.
+
+02. Update Docker:
+    Command: armbian-docker update
+    Upgrade only the Docker packages, the rest of the system is left untouched.
+
+03. Remove Docker:
+    Command: armbian-docker remove
+    Purge the Docker packages, but keep the data in [ /var/lib/docker ] (images, containers, volumes).
+
+04. Remove Docker and delete its data:
+    Command: armbian-docker remove --purge-data
+    Same as above, then delete [ /var/lib/docker ] and [ /etc/docker ] after typing [ YES ] to confirm.
+
+05. Script assist functions:
+    Command: armbian-docker -h
+    -h : Help    Display this help information.
+
+==========================================================================================================
+EOF
+    exit 0
 }
 
 # Check system release information
@@ -164,6 +198,11 @@ EOF
 docker_update() {
     echo -e "${STEPS} Updating Docker packages..."
 
+    # Docker must be installed before it can be updated: [ apt-get install --only-upgrade ]
+    # silently skips packages that are not installed, which would report a false success.
+    [[ -n "$(dpkg -l | awk '{print $2}' | grep -w "^docker-ce$" 2>/dev/null)" ]] ||
+        error_msg "Docker is not installed. Run [ armbian-docker ] to install it."
+
     # Update the docker package
     sudo apt-get update
     # Upgrade only the Docker packages, not the whole system
@@ -187,7 +226,12 @@ docker_remove() {
     if [[ "${1}" == "--purge-data" ]]; then
         echo -ne "${OPTIONS} Delete ALL Docker data in [ /var/lib/docker ] and [ /etc/docker ]? Type YES to confirm: "
         read confirm
-        [[ "${confirm}" == "YES" ]] && sudo rm -rf /etc/docker /var/lib/docker && echo -e "${INFO} Docker data deleted."
+        if [[ "${confirm}" == "YES" ]]; then
+            sudo rm -rf /etc/docker /var/lib/docker
+            echo -e "${INFO} Docker data deleted."
+        else
+            echo -e "${INFO} Confirmation not given, Docker data kept in [ /var/lib/docker ]."
+        fi
     else
         echo -e "${INFO} Docker data kept in [ /var/lib/docker ]. Use [ armbian-docker remove --purge-data ] to delete it."
     fi
@@ -202,7 +246,8 @@ echo -e "${INFO} Welcome to the Docker Management Tool."
 
 # Execute script assist functions
 case "${1}" in
-    update) docker_update ;;
-    remove) docker_remove "${2}" ;;
-    *)      docker_install ;;
+    update)      docker_update ;;
+    remove)      docker_remove "${2}" ;;
+    -h | --help) help_info ;;
+    *)           docker_install ;;
 esac
