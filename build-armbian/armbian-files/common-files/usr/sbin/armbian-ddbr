@@ -88,9 +88,16 @@ do_backup() {
     echo -e "${STEPS} Starting eMMC system backup..."
     do_checkspace
     echo -e "${INFO} Compressing [ /dev/${emmc} ] to [ ${out_path}/${ddbr_image} ], please wait..."
-    rm -f ${out_path}/${ddbr_image} 2>/dev/null && sync
-    dd if=/dev/${emmc} | pv -s ${dev_intsize}"K" | gzip >${out_path}/${ddbr_image}
-    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} eMMC backup completed successfully."
+    # Write to a temporary file first, so a failed backup never destroys the previous good one
+    tmp_image="${out_path}/${ddbr_image}.tmp"
+    rm -f ${tmp_image} 2>/dev/null
+    if dd if=/dev/${emmc} bs=1M | pv -s ${dev_intsize}"K" | gzip >${tmp_image} && gzip -t ${tmp_image}; then
+        mv -f ${tmp_image} ${out_path}/${ddbr_image} && sync
+        echo -e "${SUCCESS} eMMC backup completed successfully."
+    else
+        rm -f ${tmp_image} 2>/dev/null
+        error_msg "eMMC backup failed. The previous backup (if any) was kept."
+    fi
     sync && sleep 3
     exit 0
 }
@@ -100,13 +107,24 @@ do_restore() {
     echo -e "${STEPS} Starting eMMC system restore..."
     [[ ! -f "${out_path}/${ddbr_image}" ]] && error_msg "Backup file [ ${out_path}/${ddbr_image} ] not found."
     echo -e "${INFO} Restoring [ ${out_path}/${ddbr_image} ] to [ /dev/${emmc} ], please wait..."
-    gunzip -c ${out_path}/${ddbr_image} | pv -s ${dev_intsize}"K" | dd of=/dev/${emmc}
-    [[ "$?" -eq "0" ]] && sync && echo -e "${SUCCESS} eMMC restore completed successfully."
+    # Verify the archive before touching the eMMC
+    echo -e "${INFO} Verifying backup file integrity..."
+    gzip -t ${out_path}/${ddbr_image} || error_msg "Backup file is corrupted or truncated. Restore aborted, eMMC untouched."
+    echo -ne "${OPTIONS} This will OVERWRITE the whole eMMC [ /dev/${emmc} ]. Type YES to continue: "
+    read confirm
+    [[ "${confirm}" == "YES" ]] || error_msg "Restore cancelled by user."
+    if gunzip -c ${out_path}/${ddbr_image} | pv -s ${dev_intsize}"K" | dd of=/dev/${emmc} bs=1M conv=fsync; then
+        sync && echo -e "${SUCCESS} eMMC restore completed successfully."
+    else
+        error_msg "eMMC restore FAILED. The eMMC content is now incomplete; do not reboot from it."
+    fi
     sync && sleep 3
     exit 0
 }
 
 echo -e "${STEPS} Welcome to the eMMC system backup/restore tool."
+# Fail a pipeline if any command in it fails (dd | pv | gzip)
+set -o pipefail
 # Check script permission
 [[ "$(id -u)" == "0" ]] || error_msg "Please run this script as root: [ sudo $0 ]"
 
