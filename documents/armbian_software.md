@@ -88,6 +88,8 @@ ID    NAME                STATE           MANAGE
 - `Uninstalled software`: Status shows `not-installed`. Enter the software `ID` to install.
 - `Installed software`: Status shows `installed`. Enter the software `ID` and follow the prompts to `update` or `remove`.
 
+> Note for `101` Docker: `update` upgrades only the Docker packages, leaving the rest of the system untouched, and `remove` uninstalls Docker but **keeps** the data in `/var/lib/docker` (images, containers, volumes). To delete that data as well, run `armbian-docker remove --purge-data` and type `YES` to confirm. Run `armbian-docker -h` for details.
+
 ## Software Center Development Guide
 
 The software center scripts and commands are stored in the [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) directory. Use `armbian-software -u` to sync and download this directory to the local system, updating the software center list. Files prefixed with numbers are `one-click installation scripts` for the corresponding software. [software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) is the `unified command file` for installing/updating/removing software. [software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) is the software list configuration file, described as follows:
@@ -203,6 +205,8 @@ ID    NAME                STATE           MANAGE
 - `未安装的软件`：状态显示为 `not-installed`，输入软件对应的 `ID` 即可安装。
 - `已安装的软件`：状态显示为 `installed`，输入软件对应的 `ID`，根据提示选择更新或删除。
 
+> 关于 `101` Docker 的说明：`update` 仅升级 Docker 相关的软件包，不会改动系统的其他部分；`remove` 会卸载 Docker，但**保留** `/var/lib/docker` 中的数据（镜像、容器、数据卷）。如需同时删除这些数据，请执行 `armbian-docker remove --purge-data`，并输入 `YES` 确认。详细信息可运行 `armbian-docker -h` 查看。
+
 ## 软件中心开发说明
 
 软件中心的脚本和命令集中存放在 [/usr/share/ophub/armbian-software](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software) 目录下。使用 `armbian-software -u` 命令可同步下载此目录至本地，更新本地软件中心列表。其中以数字开头的文件是对应软件的`一键安装脚本`。[software-command.sh](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-command.sh) 是用于安装/更新/删除操作的`统一指令文件`。[software-list.conf](../build-armbian/armbian-files/common-files/usr/share/ophub/armbian-software/software-list.conf) 是软件列表配置文件，说明如下：
@@ -317,6 +321,8 @@ ID    NAME                STATE           MANAGE
 
 - `未インストールのソフトウェア`：ステータスが `not-installed` と表示されます。ソフトウェアの `ID` を入力するとインストールされます。
 - `インストール済みのソフトウェア`：ステータスが `installed` と表示されます。ソフトウェアの `ID` を入力し、プロンプトに従って更新または削除を選択します。
+
+> `101` Docker に関する注意：`update` は Docker 関連のパッケージのみを更新し、システムの他の部分には触れません。`remove` は Docker をアンインストールしますが、`/var/lib/docker` 内のデータ（イメージ、コンテナ、ボリューム）は**保持**されます。これらのデータも削除するには、`armbian-docker remove --purge-data` を実行し、`YES` を入力して確認してください。詳細は `armbian-docker -h` で確認できます。
 
 ## ソフトウェアセンター開発ガイド
 
