@@ -21,8 +21,8 @@
 out_path="/ddbr"
 # File name for backup/restore
 ddbr_image="BACKUP-arm-64-emmc.img.gz"
-# Need remaining space, unit: GB
-need_space="2"
+# Need remaining space, unit: GiB
+need_space="5"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
