@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# Bluetooth initialization script for Torder Tablet (UWE5621DS/UWE5622)
+# This script initializes the Unisoc SDIO-based Bluetooth chip
+
+BT_MAC_FILE="/data/misc/bluetooth/btmac.txt"
+BT_MAC_FILE_ALT="/lib/firmware/bt_mac.txt"
+BT_TTY_DEVICE=""
+
+# Check if sprd-mtty device tree node exists
+if [[ ! -d /proc/device-tree/sprd-mtty ]]; then
+	echo "No sprd-mtty device found, disabling bluetooth service"
+	systemctl disable torder-tablet-bluetooth.service
+	exit 0
+fi
+
+# Generate a persistent Bluetooth MAC address if not exists
+generate_bt_mac() {
+	local mac_file="$1"
+	local mac_dir=$(dirname "$mac_file")
+	
+	mkdir -p "$mac_dir"
+	
+	if [[ -f /etc/machine-id ]]; then
+		local machine_id=$(cat /etc/machine-id)
+		local hash=$(echo -n "$machine_id-bt" | md5sum | cut -c1-12)
+		local first_octet=$(printf "%02X" $(( (0x${hash:0:2} | 0x02) & 0xFE )))
+		local mac="${first_octet}:${hash:2:2}:${hash:4:2}:${hash:6:2}:${hash:8:2}:${hash:10:2}"
+		echo "$mac" > "$mac_file"
+		echo "Generated Bluetooth MAC: $mac"
+	else
+		local mac=$(printf "%02X:%02X:%02X:%02X:%02X:%02X" \
+			$(( (RANDOM % 256 | 0x02) & 0xFE )) \
+			$((RANDOM % 256)) $((RANDOM % 256)) \
+			$((RANDOM % 256)) $((RANDOM % 256)) $((RANDOM % 256)))
+		echo "$mac" > "$mac_file"
+		echo "Generated random Bluetooth MAC: $mac"
+	fi
+}
+
+# Ensure BT MAC address file exists
+if [[ ! -f "$BT_MAC_FILE" ]] && [[ ! -f "$BT_MAC_FILE_ALT" ]]; then
+	generate_bt_mac "$BT_MAC_FILE"
+fi
+
+# Load required kernel modules
+modprobe sprdbt_tty 2>/dev/null || true
+
+# Unblock bluetooth
+rfkill unblock bluetooth 2>/dev/null || rfkill unblock all
+
+# Attach HCI device using hciattach_opi with sprd protocol
+if [[ -f "$BT_MAC_FILE_ALT" ]]; then
+	bt_mac=$(tr -d '[:space:]' < "$BT_MAC_FILE_ALT")
+else
+	bt_mac=$(tr -d '[:space:]' < "$BT_MAC_FILE")
+fi
+if [[ ! "$bt_mac" =~ ^([[:xdigit:]]{2}:){5}[[:xdigit:]]{2}$ ]]; then
+	echo "Invalid persistent Bluetooth address" >&2
+	exit 1
+fi
+exec /usr/bin/hciattach_opi -n -s 1500000 /dev/ttyBT0 sprd 1500000 flow "$bt_mac"

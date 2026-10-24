@@ -1,0 +1,9 @@
+verbosity=1
+bootlogo=false
+console=both
+fdtfile=rockchip/rk3566-torder-r10d.dtb
+rootdev=UUID=BUILD_REPLACES_THIS
+rootfstype=ext4
+initrd_high=0xffffffffffffffff
+fdt_high=0xffffffffffffffff
+extraargs=cma=256M
