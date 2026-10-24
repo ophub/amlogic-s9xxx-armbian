@@ -1,0 +1,15 @@
+[Unit]
+Description=Provision the Torder UWE5621DS WiFi MAC
+DefaultDependencies=no
+Wants=systemd-remount-fs.service
+After=systemd-remount-fs.service
+Before=sysinit.target systemd-modules-load.service systemd-udev-trigger.service
+ConditionPathIsReadWrite=/lib/firmware
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/sbin/torder-wifi-mac
+
+[Install]
+WantedBy=sysinit.target
