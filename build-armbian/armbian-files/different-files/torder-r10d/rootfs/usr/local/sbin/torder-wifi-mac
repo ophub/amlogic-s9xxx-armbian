@@ -1,0 +1,41 @@
+#!/bin/bash
+set -euo pipefail
+
+mac_file=/lib/firmware/unisoc_wifi_mac.txt
+
+valid_mac_file() {
+    [ -s "$mac_file" ] || return 1
+    mac=$(tr '[:upper:]' '[:lower:]' < "$mac_file" | tr -d '[:space:]')
+    [[ "$mac" =~ ^([0-9a-f]{2}:){5}[0-9a-f]{2}$ ]] || return 1
+    first=${mac%%:*}
+    [ $((16#$first & 1)) -eq 0 ] || return 1
+    [ "$mac" != "00:00:00:00:00:00" ]
+}
+
+if valid_mac_file; then
+    exit 0
+fi
+
+seed=""
+if [ -r /proc/device-tree/serial-number ]; then
+    seed=$(tr -d '\000\n\r' < /proc/device-tree/serial-number)
+fi
+if [ -z "$seed" ] && [ -r /sys/devices/soc0/serial_number ]; then
+    seed=$(tr -d '\n\r' < /sys/devices/soc0/serial_number)
+fi
+if [ -z "$seed" ] && [ -s /etc/machine-id ]; then
+    seed=$(tr -d '\n\r' < /etc/machine-id)
+fi
+[ -n "$seed" ] || seed=$(cat /proc/sys/kernel/random/uuid)
+
+hash=$(printf '%s' "torder-uwe5621ds:$seed" | sha256sum | awk '{print $1}')
+mac="42:45:da:${hash:0:2}:${hash:2:2}:${hash:4:2}"
+
+tmp=$(mktemp /lib/firmware/.unisoc_wifi_mac.XXXXXX)
+trap 'rm -f "$tmp"' EXIT
+printf '%s\n' "$mac" > "$tmp"
+chmod 0644 "$tmp"
+mv -f "$tmp" "$mac_file"
+trap - EXIT
+
+printf 'Provisioned UWE5621DS WiFi MAC %s\n' "$mac"
