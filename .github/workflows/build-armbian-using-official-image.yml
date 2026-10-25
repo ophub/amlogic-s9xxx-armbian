@@ -247,6 +247,7 @@ on:
           - tn3399
           - torder-r10d
           - tpm312
+          - tps781
           - tqc-a01
           - tvi3315a
           - vontar-h618
