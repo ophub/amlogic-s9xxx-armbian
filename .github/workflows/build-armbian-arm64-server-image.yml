@@ -141,6 +141,7 @@ on:
           - rk3318-box
           - roceos-k40pro
           - rock-5-itx
+          - rock-3a
           - rock-3b
           - rock-3c
           - rock5b
