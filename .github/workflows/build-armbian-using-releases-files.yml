@@ -214,6 +214,7 @@ on:
           - s905x3-ugoosx3
           - s905x3-whale
           - s905x3-x88-pro-x3
+          - s905x3-yzd-s18
           - s905x3-x96air
           - s905x3-x96air-gb
           - s905x3-x96max
