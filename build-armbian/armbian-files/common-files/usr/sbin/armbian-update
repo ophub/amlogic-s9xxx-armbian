@@ -103,7 +103,7 @@ check_depends() {
 # Verify network connectivity to GitHub
 check_network() {
     # Check the connection status to github.com
-    curl --connect-timeout 10 -s "github.com" >/dev/null 2>&1 && github_net="yes" || github_net="no"
+    curl --connect-timeout 10 -s "https://github.com" >/dev/null 2>&1 && github_net="yes" || github_net="no"
     if [[ "${github_net}" == "yes" ]]; then
         echo -e "${INFO} Network connection to [ github.com ] is available."
     else
