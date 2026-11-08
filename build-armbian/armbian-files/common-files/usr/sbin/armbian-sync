@@ -34,6 +34,8 @@ sbin_path="/usr/sbin"
 share_path="/usr/share/ophub"
 # Openvfd service storage path
 openvfd_path="/usr/share/openvfd"
+# Model database configuration file path
+model_database_conf="/etc/model_database.conf"
 #
 # Set font color
 STEPS="[\033[95m STEPS \033[0m]"
@@ -154,6 +156,10 @@ sync_config() {
         cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/platform-files/amlogic/rootfs${openvfd_path}/* ${openvfd_path}
         [[ "${?}" -ne "0" ]] && error_msg "Failed to sync Amlogic [ ${openvfd_path} ] scripts."
         chmod +x ${openvfd_path}/vfdservice
+
+        echo -e "${STEPS} Syncing Amlogic model_database.conf..."
+        cp -af --no-preserve=ownership ${git_tmp_path}/${script_dir}/common-files${model_database_conf} ${model_database_conf}
+        [[ "${?}" -ne "0" ]] && error_msg "Failed to sync Amlogic [ ${model_database_conf} ] script."
     }
 
     # Clean up temporary files
