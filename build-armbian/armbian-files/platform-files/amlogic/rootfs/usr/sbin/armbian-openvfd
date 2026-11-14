@@ -147,6 +147,7 @@ do_select_box() {
     22 | x92) do_start x92.conf ;;
     23 | whale) do_start whale.conf ;;
     24 | x88pro-x3) do_start x88pro-x3.conf ;;
+    25 | x96-max-plus-ultra) do_start x96-max-plus-ultra.conf ;;
     99 | diy) do_start diy.conf ;;
     0 | stop) do_stop ;;
     1 | quit) echo "quit!" && exit 0 ;;
@@ -182,6 +183,8 @@ case "${1}" in
         │    22. x92 (s912)             │
         │    23. whale (s905x3)         │
         |    24. x88pro-x3 (s905x3)     |
+        |    25. x96-max-plus-ultra     |
+        |       (s905x4/sc2)            |
         │    99. diy                    │
         │                               │
         ├──────[ Other Operations ]─────┤
