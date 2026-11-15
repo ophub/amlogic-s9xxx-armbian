@@ -1,0 +1,35 @@
+#
+#	Copyright (c) 2020-2023 Devmfc
+#	After editing this file you MUST remove the old u-boot header and 
+#	generate a new u-boot header via:
+#	mkimage -C none -A arm -T script -d boxguess.src boxguess.scr
+
+# try to guess the box type if none given, order is important
+test "${hostname}" = "arm_gxbb"					&& box='s905_generic'
+test "${ethact}" = "dwmac.c9410000"				&& box='s912_generic_gigabit'
+test "${board_defined_bootup}" = "bootup_X2"	&& box='s905x2_generic'
+test "${board_defined_bootup}" = "bootup_X3"	&& box='s905x3_generic_gigabit'
+test "${board_defined_bootup}" = "bootup_X4" 	&& box='s905x4_generic'
+test "${aml_dt}" = "gxl_p212_2g"				&& box='s905x_generic'
+test "${aml_dt}" = "gxl_p281_2g"				&& box='s905x_generic'
+test "${aml_dt}" = "gxm_q201_3g"				&& box='s912_generic_gigabit'
+test "${aml_dt}" = "g12a_u211_4g"				&& box='s905x2_generic'
+test "${aml_dt}" = "g12a_u211_2g"				&& box='s905x2_generic'
+test "${aml_dt}" = "g12a_u212_2g"				&& box='s905x2_generic'
+test "${aml_dt}" = "g12a_u212_4g"				&& box='s905x2_generic'
+test "${aml_dt}" = "sm1_ac213_4g"				&& box='s905x3_generic_gigabit'
+test "${aml_dt}" = "sm1_ac213_2g"				&& box='s905x3_generic'
+test "${aml_dt}" = "sm1_X2CUBE_4g"				&& box='ugoosx3pro'
+test "${aml_dt}" = "g12b_w400_a"				&& box='s922x_generic_gigabit'
+test "${soc}" = "s4"							&& box='s905w2_generic_slow'
+test "${board}" = "ap201"						&& box='s905w2_generic_slow'
+test "${board_name}" = "s4_ap201" 				&& box='s905w2_generic_slow'
+test "${aml_dt}" = "s4_s905w2_2g"				&& box='s905w2_generic_slow'
+test "${aml_dt}" = "s4_s905y4_2g"				&& box='s905y4_generic'
+test "${soc}" = "sc2"							&& box='s905x4_generic'
+test "${board_name}" = "sc2_ah212_ddr3"			&& box='s905x4_generic'
+test "${board_name}" = "sc2_ah212"				&& box='s905x4_generic'
+test "${board_name}" = "sc2_ah218"				&& box='s905x4_generic'
+test "${aml_dt}" = "sc2_s905x4_ah212-4g"		&& box='s905x4_generic_gigabit'
+test "${aml_dt}" = "sc2_s905x4_ah218-4g"		&& box='s905x4_generic_gigabit'
+
