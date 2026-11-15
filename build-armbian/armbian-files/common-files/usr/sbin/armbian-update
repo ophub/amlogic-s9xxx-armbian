@@ -175,6 +175,20 @@ init_var() {
     KERNEL_SIGNATURE="${KERNEL_SIGNATURE}"
     DOWNLOAD_TYPE="${DOWNLOAD_TYPE}"
     KERNEL_BACKUP="${KERNEL_BACKUP}"
+    BOOT_CONF="${BOOT_CONF}"
+
+    # Set specific kernel repository for model ID 601: X96-Max-Plus-Ultra(s905x4)
+    # Pull requests: https://github.com/ophub/amlogic-s9xxx-armbian/pull/3776
+    if [[ "${MODEL_ID}" == "601" ]]; then
+        KERNEL_S905X4_REPO="AmakerGame/amlogic-s9xxx-armbian"
+        test_repo="https://github.com/${KERNEL_S905X4_REPO}/releases/tag/kernel_s905x4"
+
+        # Check whether the kernel release page is accessible
+        if curl -fsSL --connect-timeout 5 --max-time 15 -o /dev/null "${test_repo}" 2>/dev/null; then
+            KERNEL_REPO="${KERNEL_S905X4_REPO}"
+            echo -e "${INFO} Using kernel repository: [ ${KERNEL_REPO} ]"
+        fi
+    fi
 
     # Check the platform variable
     [[ -z "${PLATFORM}" ]] && error_msg "[ PLATFORM ] variable is missing. Update aborted."
@@ -277,7 +291,7 @@ init_var() {
         sed -i "s|^KERNEL_TAGS=.*|KERNEL_TAGS='${KERNEL_TAGS}'|g" ${ophub_release_file}
     }
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx)")" ]] && {
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|s905x4)")" ]] && {
         echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ]. Resetting to default [ stable ]."
         KERNEL_TAGS="stable"
     }
@@ -741,6 +755,11 @@ update_deb_kernel() {
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
 
+    # Update config for model ID 601: X96-Max-Plus-Ultra(s905x4)
+    if [[ "${MODEL_ID}" == "601" && -f "/boot/${BOOT_CONF}" ]]; then
+        sed -i "s|^release=.*|release=${kernel_name}|g" /boot/${BOOT_CONF}
+    fi
+
     # Restore the DTB files if necessary
     restore_fdtfile
 
@@ -838,6 +857,11 @@ update_tar_kernel() {
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
     sed -i "s|^KERNEL_SIGNATURE=.*|KERNEL_SIGNATURE='${kernel_signature}'|g" ${ophub_release_file}
+
+    # Update config for model ID 601: X96-Max-Plus-Ultra(s905x4)
+    if [[ "${MODEL_ID}" == "601" && -f "/boot/${BOOT_CONF}" ]]; then
+        sed -i "s|^release=.*|release=${kernel_name}|g" /boot/${BOOT_CONF}
+    fi
 
     # Restore the DTB files if necessary
     restore_fdtfile
