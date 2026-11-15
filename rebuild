@@ -769,6 +769,11 @@ make_image() {
     parted -s "${build_image_file}" mkpart primary ${bootfs_type} $((skip_mb))MiB $((skip_mb + boot_mb - 1))MiB 2>/dev/null
     parted -s "${build_image_file}" mkpart primary ${rootfs_type} $((skip_mb + boot_mb))MiB 100% 2>/dev/null
 
+    # The vendor U-Boot on some boards selects the boot partition with
+    # part list mmc 0 -bootable, which only lists ESP-typed partitions; with
+    # nothing listed, distro_bootcmd scans no partition at all.
+    [[ "${board}" == "hd9901" ]] && parted -s "${build_image_file}" set 1 esp on 2>/dev/null
+
     loop_new="$(losetup -P -f --show "${build_image_file}")"
     [[ -n "${loop_new}" ]] || error_msg "losetup ${build_image_file} failed."
 
