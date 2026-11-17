@@ -1,0 +1,11 @@
+[Unit]
+Description=Amlogic W1 (CDW.47W3155) WiFi + Bluetooth via SDIO
+After=local-fs.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/sh /usr/local/sbin/w1-wireless.sh
+
+[Install]
+WantedBy=multi-user.target
