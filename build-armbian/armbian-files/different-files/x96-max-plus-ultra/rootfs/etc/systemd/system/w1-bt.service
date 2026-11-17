@@ -1,10 +1,11 @@
 [Unit]
 Description=Amlogic W1 Bluetooth HCI attach
-After=w1-wireless.service
-Requires=w1-wireless.service
+After=w1-wireless.service dev-ttyS2.device
+Wants=dev-ttyS2.device
 
 [Service]
 Type=forking
+ExecStartPre=/usr/local/sbin/w1-bt-prep.sh
 ExecStart=/usr/sbin/aml_hciattach -d 1 /dev/ttyS2 aml
 Restart=on-failure
 RestartSec=3
