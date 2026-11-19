@@ -105,11 +105,11 @@ config_download="false"
 
 # Compile toolchain download mirror, run on Armbian
 dev_repo="https://github.com/ophub/kernel/releases/download/toolchain"
-# Arm GNU Toolchain source: https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
-gun_file="arm-gnu-toolchain-15.3.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
+# Arm GNU Toolchain source: https://gitlab.arm.com/tooling/gnu-toolchains-for-arm
+gun_file="arm-gnu-toolchain-15.3.rel2-aarch64-aarch64-none-linux-gnu.tar.xz"
 # Set the toolchain path
 toolchain_path="/usr/local/toolchain"
-# Set the default cross-compilation toolchain: [ clang / gcc / gcc-14.2, etc. ]
+# Set the default cross-compilation toolchain: [ clang / gcc / gcc-15.3, gcc-15.3.rel1, etc. ]
 toolchain_name="gcc"
 
 # CCACHE Configuration
@@ -301,11 +301,18 @@ init_var() {
     [[ -n "${code_owner}" ]] || error_msg "The [ -r ] parameter is invalid."
     [[ -n "${code_branch}" ]] || code_branch="${repo_branch}"
 
-    # Set the gcc version code
-    [[ "${toolchain_name}" =~ ^gcc-[0-9]+.[0-9]+ ]] && {
-        gcc_version_code="${toolchain_name#*-}"
-        gun_file="arm-gnu-toolchain-${gcc_version_code}.rel1-aarch64-aarch64-none-linux-gnu.tar.xz"
-    }
+    # Set the gcc version code. supported option formats: gcc-15.3, gcc-15.3.rel1
+    if [[ "${toolchain_name}" =~ ^gcc-[0-9]+\.[0-9]+(\.rel[0-9]+)?$ ]]; then
+        gcc_version_code="${toolchain_name#gcc-}"
+
+        if [[ "${gcc_version_code}" =~ rel ]]; then
+            gcc_rel_suffix=""
+        else
+            gcc_rel_suffix=".rel1"
+        fi
+
+        gun_file="arm-gnu-toolchain-${gcc_version_code}${gcc_rel_suffix}-aarch64-aarch64-none-linux-gnu.tar.xz"
+    fi
 
     # Set compilation parameters
     export SRC_ARCH="arm64"
