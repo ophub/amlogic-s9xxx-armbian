@@ -1,12 +1,14 @@
 #!/bin/dash
-# Ensure /dev/ttyS2 is a usable char device for aml_hciattach
+# W1 BT: aml_hciattach UART_DEV_PORT_BT is hardcoded to /dev/ttyS1,
+# but the BT UART is ttyS2 (serial@80000). Provide the alias and wait
+# for the SDIO BT channel created by sdio_bt.ko.
 i=0
-while [ ! -e /dev/ttyS2 ] && [ $i -lt 15 ]; do sleep 1; i=$((i+1)); done
-ls -la /dev/ttyS* /dev/serial* > /dev/kmsg 2>&1
-if [ ! -c /dev/ttyS2 ]; then
-  rm -f /dev/ttyS2
-  mknod /dev/ttyS2 c 4 66
-  chmod 666 /dev/ttyS2
+while [ ! -e /dev/stpbt ] && [ $i -lt 30 ]; do sleep 1; i=$((i+1)); done
+if [ ! -e /dev/ttyS2 ]; then
+  i=0
+  while [ ! -e /dev/ttyS2 ] && [ $i -lt 15 ]; do sleep 1; i=$((i+1)); done
 fi
-echo "w1-bt: ttyS2 is $(ls -la /dev/ttyS2 2>&1)" > /dev/kmsg
+ls -la /dev/ttyS* /dev/stpbt > /dev/kmsg 2>&1
+ln -sf /dev/ttyS2 /dev/ttyS1
+echo "w1-bt: ttyS1 -> $(ls -la /dev/ttyS1 2>&1)" > /dev/kmsg
 exit 0

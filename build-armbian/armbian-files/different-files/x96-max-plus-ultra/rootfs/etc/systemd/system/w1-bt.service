@@ -1,7 +1,7 @@
 [Unit]
 Description=Amlogic W1 Bluetooth HCI attach
-After=w1-wireless.service dev-ttyS2.device
-Wants=dev-ttyS2.device
+After=w1-wireless.service
+Wants=w1-wireless.service
 
 [Service]
 Type=forking
