@@ -1,1 +1,1 @@
-/etc/systemd/system/w1-bt.service
+../w1-bt.service

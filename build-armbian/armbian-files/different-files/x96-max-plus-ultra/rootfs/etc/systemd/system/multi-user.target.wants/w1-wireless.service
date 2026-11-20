@@ -1,1 +1,1 @@
-/etc/systemd/system/w1-wireless.service
+../w1-wireless.service
