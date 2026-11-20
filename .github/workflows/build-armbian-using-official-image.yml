@@ -81,6 +81,7 @@ on:
           - h88k
           - h88k-v3
           - h96-max-m2
+          - hd9901
           - hk1-rbox-k8s
           - houzzkit-f1
           - hs530r
@@ -260,10 +261,12 @@ on:
           - wxy-oect-mod
           - x88pro13
           - x88pro20
+          - x96-max-plus-ultra
           - x98h
           - x98h-100mb
           - xiaobao
           - xingyicloud
+          - ydzy-box
           - youyeetoo-r1-v3
           - youyeetoo-yy3568
           - youyeetoo-yy3588

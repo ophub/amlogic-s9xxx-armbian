@@ -57,6 +57,7 @@ on:
         options:
           - clang
           - gcc
+          - gcc-15.3.rel2
           - gcc-15.3
           - gcc-15.2
           - gcc-14.3
