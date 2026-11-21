@@ -1,2 +1,4 @@
-ACTION=="add|change", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", KERNEL=="sd[a-z]*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="152d", ATTRS{idProduct}=="0562", ATTR{size}=="0", ATTR{device/delete}="1"
-
+# JMicron JMS578/JMS567 (152d:0562) USB-SATA bridge: remove the 0-size ghost disk.
+# device/delete is a write-only sysfs attribute: it can only be assigned with "=",
+# and must never be used in a "!=" match. A negated GOTO chain silently never fires.
+ACTION=="add|change", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", KERNEL=="sd[a-z]", SUBSYSTEMS=="usb", ATTRS{idVendor}=="152d", ATTRS{idProduct}=="0562", ATTR{size}=="0", ATTR{device/delete}="1"
