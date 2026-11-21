@@ -1,0 +1,11 @@
+[Unit]
+Description=Enable NEC protocol on meson-ir rc0
+After=systemd-udev-settle.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c "for i in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30; do [ -d /sys/class/rc/rc0 ] && break; sleep 1; done; echo nec > /sys/class/rc/rc0/protocols"
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
