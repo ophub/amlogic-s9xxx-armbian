@@ -1,0 +1,2 @@
+ACTION=="add|change", SUBSYSTEM=="block", ENV{DEVTYPE}=="disk", KERNEL=="sd[a-z]*", SUBSYSTEMS=="usb", ATTRS{idVendor}=="152d", ATTRS{idProduct}=="0562", ATTR{size}=="0", ATTR{device/delete}="1"
+
