@@ -17,7 +17,7 @@ The Armbian W152D image is for USB boot. The device keeps its vendor bootloader 
 
 ## SC2355 Wi-Fi
 
-The W152D root filesystem overlay installs `wcnmodem.bin` and `wifi_56630001_3ant.ini` under `/usr/lib/firmware/`. These are the files used on the tested W152D. They come from the stock Android vendor paths `/vendor/firmware/wcnmodem.bin` and `/vendor/etc/wifi_board_config.ini`, respectively.
+The standard rebuild takes `wcnmodem.bin` and `wifi_56630001_3ant.ini` from [ophub/firmware](https://github.com/ophub/firmware/pull/9). They are stored under `/usr/lib/firmware/w152d/`. The board overlay adds links to the names requested by the driver. These are the files used on the tested W152D. They come from the stock Android vendor paths `/vendor/firmware/wcnmodem.bin` and `/vendor/etc/wifi_board_config.ini`, respectively.
 
 The kernel build provides `sprdwl_ng.ko`, which loads automatically after the USB root filesystem is mounted. After boot, select a Wi-Fi network and enter its credentials using the system's network settings.
 
@@ -41,3 +41,22 @@ Cross-version kernel upgrades and physical regression tests on other boards
 using the shared kernel are pending. The box's direct connection to GitHub
 stalled during the update check, so the verified packages were transferred over
 the LAN for the reinstall test.
+
+## Image build and updates
+
+The vendor U-Boot reads the prebuilt FAT `aml_autoscript`. Regenerate it
+after changing the script source:
+
+~~~sh
+SOURCE_DATE_EPOCH=0 mkimage -A arm -O linux -T script -C none \
+    -n 'Armbian USB boot' -d aml_autoscript.cmd aml_autoscript
+~~~
+
+Use the standard `rebuild` and the stable 6.12 kernel package containing
+`meson-gxlx4-w152d.dtb`. Select `w152d` explicitly. The stock Bookworm image
+runs `armbian-tf` on first boot. The image supports USB boot only.
+
+The board overlay was rebuilt offline using the [ophub 6.12.118 package](https://github.com/ophub/kernel/actions/runs/45017563483).
+Its kernel and initramfs match the published package byte for byte.
+The RC3 results above describe the prior hardware run. Fresh hardware
+boot and updates using the narrowed image are pending.

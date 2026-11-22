@@ -1,2 +1,0 @@
-# The vendor bootloader has a 24 MiB initramfs load window.
-MODULES=list

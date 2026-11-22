@@ -73,8 +73,6 @@ error_msg() {
 check_release_file() {
     [[ -s "${ophub_release_file}" ]] || error_msg "[ ${ophub_release_file} ] file is missing!"
     source "${ophub_release_file}"
-    [[ "${VENDOR_USB_BOOT:-no}" != "yes" ]] ||
-        error_msg "This board uses the vendor bootloader and supports USB boot only."
     [[ " ${without_ampart[*]} " =~ " ${SOC} " ]] && default_ampart="no"
 }
 

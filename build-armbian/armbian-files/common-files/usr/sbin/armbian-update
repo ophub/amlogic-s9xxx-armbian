@@ -291,12 +291,10 @@ init_var() {
         sed -i "s|^KERNEL_TAGS=.*|KERNEL_TAGS='${KERNEL_TAGS}'|g" ${ophub_release_file}
     }
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    # W152D fork builds are published under kernel_w152d.
-    if [[ ! ( "${BOARD:-}" == "w152d" && "${KERNEL_TAGS}" == "w152d" ) ]] &&
-       [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|s905x4)")" ]]; then
+    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|s905x4)")" ]] && {
         echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ]. Resetting to default [ stable ]."
         KERNEL_TAGS="stable"
-    fi
+    }
 
     # Check if the mainline u-boot exists
     [[ "${auto_mainline_uboot}" =~ ^(yes|no)$ ]] || auto_mainline_uboot="no"
@@ -312,14 +310,6 @@ init_var() {
 
     # Check the current system running disk
     check_disk
-    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
-        local boot_partition
-        boot_partition="$(findmnt -nro SOURCE --mountpoint /boot)" ||
-            error_msg "The USB boot partition is not mounted."
-        [[ "$(lsblk -dnro TRAN "/dev/${DISK_NAME}")" == usb &&
-           "$(lsblk -dnro PKNAME "${boot_partition}")" == "${DISK_NAME}" ]] ||
-            error_msg "The boot and root filesystems must be on the same USB disk."
-    fi
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
@@ -580,21 +570,6 @@ check_kernel() {
         done
     fi
 
-    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
-        (
-            set -o pipefail
-            if [[ "${download_type}" == "deb" ]]; then
-                dpkg-deb --fsys-tarfile "${kernel_deb_list[1]}_${kernel_name}.deb" |
-                    tar -tf - | awk -v path="boot/dtb/${PLATFORM}/${FDTFILE}" \
-                        '$0 == path || $0 == "./" path { found=1 } END { exit !found }'
-            else
-                tar -tzf "dtb-${PLATFORM}-${kernel_name}.tar.gz" |
-                    awk -v path="${FDTFILE}" \
-                        '$0 == path || $0 == "./" path { found=1 } END { exit !found }'
-            fi
-        ) || error_msg "The kernel package does not include the required [ ${FDTFILE} ]."
-    fi
-
     sync && echo ""
 }
 
@@ -775,15 +750,6 @@ update_deb_kernel() {
         error_msg "No kernel .deb packages found for installation."
     fi
 
-    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
-        local image_package release
-        image_package="$(dpkg-deb -f "linux-image_${kernel_name}.deb" Package)" ||
-            error_msg "Cannot identify the installed kernel package."
-        release="$(dpkg-query -L "${image_package}" | sed -n 's|^/boot/vmlinuz-||p')"
-        /usr/libexec/armbian-build-usb-initramfs "${release}" ||
-            error_msg "Cannot prepare the USB initramfs for [ ${release} ]."
-    fi
-
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
@@ -887,11 +853,6 @@ update_tar_kernel() {
     [[ -n "${header_path}" ]] && (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build)
     echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
 
-    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
-        /usr/libexec/armbian-build-usb-initramfs "${kernel_name}" ||
-            error_msg "Cannot prepare the USB initramfs for [ ${kernel_name} ]."
-    fi
-
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
@@ -913,7 +874,6 @@ update_tar_kernel() {
 
 # Update the U-Boot bootloader
 update_uboot() {
-    [[ "${VENDOR_USB_BOOT:-no}" != "yes" ]] || return 0
     echo -e "${STEPS} Updating U-Boot bootloader..."
 
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
@@ -1070,9 +1030,6 @@ update_os_version() {
 
 # Rescue and restore the kernel to a target disk
 sos_kernel() {
-    [[ ! -r "${ophub_release_file}" ]] || source "${ophub_release_file}"
-    [[ "${VENDOR_USB_BOOT:-no}" != "yes" ]] ||
-        error_msg "Kernel rescue to another disk is unavailable for this vendor USB boot board."
     echo -e "${STEPS} Starting kernel rescue..."
 
     # Check the current system running disk
@@ -1250,7 +1207,7 @@ else
     check_kernel
     [[ "${KERNEL_BACKUP}" != "no" ]] && backup_kernel
     [[ "${download_type}" == "deb" ]] && update_deb_kernel || update_tar_kernel
-    [[ "${PLATFORM}" == "amlogic" && "${VENDOR_USB_BOOT:-no}" != "yes" ]] && {
+    [[ "${PLATFORM}" == "amlogic" ]] && {
         update_uboot
         update_initrd_addr
     }

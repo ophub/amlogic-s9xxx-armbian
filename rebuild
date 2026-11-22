@@ -751,8 +751,6 @@ make_image() {
     # Reset default parameters
     write_board_file="no"
     adjust_kernel_files="no"
-    amlogic_vendor_usb_boot="no"
-    unset -f finalize_board_image_cmd
     # Check the personalization settings of this board
     board_release="${different_files}/${board}/rootfs/${board_release_file}"
     [[ -f "${board_release}" ]] && source ${board_release}
@@ -974,7 +972,7 @@ refactor_bootfs() {
     cd "${tag_bootfs}"
 
     # Process Amlogic series boot partition files
-    [[ "${PLATFORM}" == "amlogic" && "${amlogic_vendor_usb_boot}" != "yes" && "${need_overload}" == "yes" ]] && {
+    [[ "${PLATFORM}" == "amlogic" && "${need_overload}" == "yes" ]] && {
         if [[ -n "${UBOOT_OVERLOAD}" && -f "${UBOOT_OVERLOAD}" ]]; then
             cp -f ${UBOOT_OVERLOAD} u-boot.ext
             chmod +x u-boot.ext
@@ -1335,7 +1333,6 @@ refactor_rootfs() {
         "DISK_TYPE='usb'"
         "AMPART_STATUS='no'"
         "MLUBOOT_STATUS='no'"
-        "VENDOR_USB_BOOT='${amlogic_vendor_usb_boot}'"
         "MAINLINE_UBOOT='${RECORD_MAINLINE_UBOOT}'"
         "BOOTLOADER_IMG='${RECORD_BOOTLOADER_IMG}'"
         "BUILD_REPOSITORY='github.com/armbian/build'"
@@ -1413,9 +1410,6 @@ loop_rebuild() {
                     replace_kernel
                     refactor_bootfs
                     refactor_rootfs
-                    if declare -F finalize_board_image_cmd >/dev/null; then
-                        finalize_board_image_cmd
-                    fi
                     clean_tmp
 
                     echo -e "(${j}.${i}) Armbian built successfully. \n"
