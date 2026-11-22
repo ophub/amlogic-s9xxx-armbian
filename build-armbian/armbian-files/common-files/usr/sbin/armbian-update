@@ -291,10 +291,12 @@ init_var() {
         sed -i "s|^KERNEL_TAGS=.*|KERNEL_TAGS='${KERNEL_TAGS}'|g" ${ophub_release_file}
     }
     KERNEL_TAGS="${KERNEL_TAGS//kernel_/}"
-    [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|s905x4)")" ]] && {
+    # W152D fork builds are published under kernel_w152d.
+    if [[ ! ( "${BOARD:-}" == "w152d" && "${KERNEL_TAGS}" == "w152d" ) ]] &&
+       [[ -z "$(echo ${KERNEL_TAGS} | grep -oE "(stable|flippy|beta|rk3588|rk35xx|s905x4)")" ]]; then
         echo -e "${PROMPT} Invalid KERNEL_TAGS value [ ${KERNEL_TAGS} ]. Resetting to default [ stable ]."
         KERNEL_TAGS="stable"
-    }
+    fi
 
     # Check if the mainline u-boot exists
     [[ "${auto_mainline_uboot}" =~ ^(yes|no)$ ]] || auto_mainline_uboot="no"
@@ -310,6 +312,14 @@ init_var() {
 
     # Check the current system running disk
     check_disk
+    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
+        local boot_partition
+        boot_partition="$(findmnt -nro SOURCE --mountpoint /boot)" ||
+            error_msg "The USB boot partition is not mounted."
+        [[ "$(lsblk -dnro TRAN "/dev/${DISK_NAME}")" == usb &&
+           "$(lsblk -dnro PKNAME "${boot_partition}")" == "${DISK_NAME}" ]] ||
+            error_msg "The boot and root filesystems must be on the same USB disk."
+    fi
 
     # Display settings results
     echo -e "${INFO} Armbian platform: [ ${PLATFORM} ]"
@@ -568,6 +578,21 @@ check_kernel() {
             echo -e "${INFO} (${i}/4) [ ${tmp_file} ] checksum verified successfully."
             ((i++))
         done
+    fi
+
+    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
+        (
+            set -o pipefail
+            if [[ "${download_type}" == "deb" ]]; then
+                dpkg-deb --fsys-tarfile "${kernel_deb_list[1]}_${kernel_name}.deb" |
+                    tar -tf - | awk -v path="boot/dtb/${PLATFORM}/${FDTFILE}" \
+                        '$0 == path || $0 == "./" path { found=1 } END { exit !found }'
+            else
+                tar -tzf "dtb-${PLATFORM}-${kernel_name}.tar.gz" |
+                    awk -v path="${FDTFILE}" \
+                        '$0 == path || $0 == "./" path { found=1 } END { exit !found }'
+            fi
+        ) || error_msg "The kernel package does not include the required [ ${FDTFILE} ]."
     fi
 
     sync && echo ""
@@ -1045,6 +1070,9 @@ update_os_version() {
 
 # Rescue and restore the kernel to a target disk
 sos_kernel() {
+    [[ ! -r "${ophub_release_file}" ]] || source "${ophub_release_file}"
+    [[ "${VENDOR_USB_BOOT:-no}" != "yes" ]] ||
+        error_msg "Kernel rescue to another disk is unavailable for this vendor USB boot board."
     echo -e "${STEPS} Starting kernel rescue..."
 
     # Check the current system running disk
