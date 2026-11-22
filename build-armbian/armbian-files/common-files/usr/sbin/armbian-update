@@ -750,6 +750,15 @@ update_deb_kernel() {
         error_msg "No kernel .deb packages found for installation."
     fi
 
+    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
+        local image_package release
+        image_package="$(dpkg-deb -f "linux-image_${kernel_name}.deb" Package)" ||
+            error_msg "Cannot identify the installed kernel package."
+        release="$(dpkg-query -L "${image_package}" | sed -n 's|^/boot/vmlinuz-||p')"
+        /usr/libexec/armbian-build-usb-initramfs "${release}" ||
+            error_msg "Cannot prepare the USB initramfs for [ ${release} ]."
+    fi
+
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
@@ -853,6 +862,11 @@ update_tar_kernel() {
     [[ -n "${header_path}" ]] && (cd /usr/lib/modules/${kernel_name}/ && rm -f build source && ln -sf /usr/src/${header_path} build)
     echo -e "${INFO} (4/4) Unpacking [ modules-${kernel_name}.tar.gz ] succeeded."
 
+    if [[ "${VENDOR_USB_BOOT:-no}" == "yes" ]]; then
+        /usr/libexec/armbian-build-usb-initramfs "${kernel_name}" ||
+            error_msg "Cannot prepare the USB initramfs for [ ${kernel_name} ]."
+    fi
+
     # Update release file
     sed -i "s|^KERNEL_VERSION=.*|KERNEL_VERSION='${kernel_base}'|g" ${ophub_release_file}
     sed -i "s|^DOWNLOAD_TYPE=.*|DOWNLOAD_TYPE='${download_type}'|g" ${ophub_release_file}
@@ -874,6 +888,7 @@ update_tar_kernel() {
 
 # Update the U-Boot bootloader
 update_uboot() {
+    [[ "${VENDOR_USB_BOOT:-no}" != "yes" ]] || return 0
     echo -e "${STEPS} Updating U-Boot bootloader..."
 
     # With TEXT_OFFSET patch is [ 0108 ], without TEXT_OFFSET patch is [ 0000 ] and need to ues [ UBOOT_OVERLOAD ] file.
@@ -1207,7 +1222,7 @@ else
     check_kernel
     [[ "${KERNEL_BACKUP}" != "no" ]] && backup_kernel
     [[ "${download_type}" == "deb" ]] && update_deb_kernel || update_tar_kernel
-    [[ "${PLATFORM}" == "amlogic" ]] && {
+    [[ "${PLATFORM}" == "amlogic" && "${VENDOR_USB_BOOT:-no}" != "yes" ]] && {
         update_uboot
         update_initrd_addr
     }

@@ -1,0 +1,13 @@
+[Unit]
+Description=Armbian front-panel power and Ethernet LEDs
+After=network.target ssh.service ssh.socket
+
+[Service]
+Type=exec
+EnvironmentFile=/etc/default/armbian-front-panel
+ExecStart=/usr/libexec/armbian-front-panel
+Restart=on-failure
+RestartSec=3s
+
+[Install]
+WantedBy=multi-user.target

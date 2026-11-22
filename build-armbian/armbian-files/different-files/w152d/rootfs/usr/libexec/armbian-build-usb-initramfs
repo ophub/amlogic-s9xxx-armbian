@@ -1,0 +1,21 @@
+#!/bin/sh
+set -eu
+
+release=${1:?kernel release required}
+test -s "/boot/vmlinuz-$release"
+test -d "/lib/modules/$release"
+
+stage=$(mktemp -d /boot/.armbian-initramfs.XXXXXX)
+trap 'rm -rf -- "$stage"' EXIT
+mkinitramfs -o "$stage/initrd.img" "$release"
+mkimage -A arm64 -O linux -T ramdisk -C none -n 'Armbian initramfs' \
+    -d "$stage/initrd.img" "$stage/uInitrd"
+if [ "$(stat -c %s "$stage/uInitrd")" -gt $((0x01800000)) ]; then
+    echo 'The initramfs exceeds the vendor USB load window.' >&2
+    exit 1
+fi
+
+mv -f "$stage/initrd.img" "/boot/initrd.img-$release"
+cp "$stage/uInitrd" "$stage/uInitrd-versioned"
+mv -f "$stage/uInitrd-versioned" "/boot/uInitrd-$release"
+mv -f "$stage/uInitrd" /boot/uInitrd

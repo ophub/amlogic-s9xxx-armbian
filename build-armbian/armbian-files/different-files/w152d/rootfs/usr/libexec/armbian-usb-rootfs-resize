@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo pipefail
+
+# armbian-tf expands partition 2 on the disk reported by df for /.
+root_device=$(df --output=source / | tail -n 1)
+parent=$(lsblk -dnro PKNAME "$root_device")
+if [[ ! -b "$root_device" || -z "$parent" ||
+      "$(findmnt -nro FSTYPE --mountpoint /)" != ext4 ||
+      "$(lsblk -dnro TRAN "/dev/$parent")" != usb ||
+      "$(cat "/sys/class/block/${root_device##*/}/partition")" != 2 ]]; then
+    echo "Expected the root filesystem on ext4 partition 2 of a USB disk." >&2
+    exit 1
+fi
+
+exec /usr/sbin/armbian-tf
