@@ -76,6 +76,7 @@ grep -qx yes "$root/root/.no_rootfs_resize"
 test ! -s "$root/root/.ssh/authorized_keys"
 test -z "$(chroot "$root" dpkg --audit)"
 grep -Fx 'ConditionPathExists=/dev/watchdog' "$root/etc/systemd/system/watchdog.service.d/require-device.conf"
+grep -Fx 'ConditionPathExists=/dev/fb0' "$root/etc/systemd/system/console-setup.service.d/require-framebuffer.conf"
 (
     cd "$root/usr/lib/firmware"
     sha256sum -c <<'SUMS'
