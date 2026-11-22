@@ -74,6 +74,8 @@ if ! test -L "$root/etc/systemd/system/multi-user.target.wants/armbian-usb-rootf
 fi
 grep -qx yes "$root/root/.no_rootfs_resize"
 test ! -s "$root/root/.ssh/authorized_keys"
+test -z "$(chroot "$root" dpkg --audit)"
+grep -Fx 'ConditionPathExists=/dev/watchdog' "$root/etc/systemd/system/watchdog.service.d/require-device.conf"
 (
     cd "$root/usr/lib/firmware"
     sha256sum -c <<'SUMS'
