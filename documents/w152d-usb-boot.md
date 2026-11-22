@@ -20,3 +20,24 @@ The Armbian W152D image is for USB boot. The device keeps its vendor bootloader 
 The W152D root filesystem overlay installs `wcnmodem.bin` and `wifi_56630001_3ant.ini` under `/usr/lib/firmware/`. These are the files used on the tested W152D. They come from the stock Android vendor paths `/vendor/firmware/wcnmodem.bin` and `/vendor/etc/wifi_board_config.ini`, respectively.
 
 The kernel build provides `sprdwl_ng.ko`, which loads automatically after the USB root filesystem is mounted. After boot, select a Wi-Fi network and enter its credentials using the system's network settings.
+
+## Hardware and support status
+
+| Function | Status on the tested GXLX4 BT203 W152D |
+| --- | --- |
+| USB boot and mass storage | Three USB2 ports and one USB3 port tested with the vendor U-Boot USB-first configuration. The SanDisk drive enumerated at 5 Gbps on USB3. |
+| Wired Ethernet | 100 Mbps full duplex, DHCP and LAN traffic verified. |
+| SC2355 Wi-Fi | SDIO driver, firmware and board configuration included. Association, DHCP and SSH verified. Users supply their own network credentials. |
+| Serial and front panel | UART console at 921600 baud, 8N1. Power and Ethernet link LEDs verified. |
+| Internal flash | USB-only Armbian. With the drive removed, the tested box returns to its existing Android 11 installation. |
+| Unsupported in this port | HDMI output, Bluetooth, hardware video decoding, temperature readout, CPU frequency scaling and the hardware watchdog. |
+
+The [RC3 image](https://github.com/Zlion-Y/amlogic-s9xxx-armbian/releases/tag/W152D-Bookworm-6.12.118-rc3) passed clean USB3 first boot, ext4 expansion,
+wired and wireless checks, and a same-version kernel package reinstall followed
+by a reboot. The three USB2 ports and no-drive Android fallback were checked
+earlier on the same box with the same boot configuration.
+
+Cross-version kernel upgrades and physical regression tests on other boards
+using the shared kernel are pending. The box's direct connection to GitHub
+stalled during the update check, so the verified packages were transferred over
+the LAN for the reinstall test.
