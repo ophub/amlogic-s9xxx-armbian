@@ -14,3 +14,9 @@ run bootcmd
 After testing both Armbian and the no-drive Android fallback, set the same `bootcmd` again and verify it with `printenv bootcmd`. Run `saveenv` to make it persistent. Keep the power connected until U-Boot reports success. For USB boot, connect the Armbian drive before power-on and use one USB storage device. To restore the previous boot order, set the saved original `bootcmd` and run `saveenv` again.
 
 The Armbian W152D image is for USB boot. The device keeps its vendor bootloader and Android installation.
+
+## SC2355 Wi-Fi
+
+The W152D root filesystem overlay installs `wcnmodem.bin` and `wifi_56630001_3ant.ini` under `/usr/lib/firmware/`. These are the files used on the tested W152D. They come from the stock Android vendor paths `/vendor/firmware/wcnmodem.bin` and `/vendor/etc/wifi_board_config.ini`, respectively.
+
+The kernel build provides `sprdwl_ng.ko`, which loads automatically after the USB root filesystem is mounted. After boot, select a Wi-Fi network and enter its credentials using the system's network settings.
