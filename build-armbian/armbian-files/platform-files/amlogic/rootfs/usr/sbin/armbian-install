@@ -271,10 +271,17 @@ show_aml_model() {
     echo -e "${INFO} UBOOT_OVERLOAD: [ ${UBOOT_OVERLOAD} ]"
     echo -e "${INFO} NEED_OVERLOAD: [ ${NEED_OVERLOAD} ]"
 
-    # Check DTB file
+    if [[ "${BOARD:-}" == "w152d" || "${boxid}" == 602 ]]; then
+        [[ "${BOARD:-}" == "w152d" && "${boxid}" == 602 ]] ||
+            error_msg "Use the W152D USB image to install to the W152D."
+        default_ampart="no"
+        auto_mainline_uboot="no"
+    else
+        [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] ||
+            error_msg "U-Boot overload file [ ${UBOOT_OVERLOAD} ] not found. Installation aborted!"
+    fi
+
     [[ -n "${FDTFILE}" && -f "/boot/dtb/amlogic/${FDTFILE}" ]] || error_msg "DTB file [ ${FDTFILE} ] not found. Installation aborted!"
-    # Check UBOOT_OVERLOAD file
-    [[ -n "${UBOOT_OVERLOAD}" && -f "/boot/${UBOOT_OVERLOAD}" ]] || error_msg "U-Boot overload file [ ${UBOOT_OVERLOAD} ] not found. Installation aborted!"
 }
 
 # Select the root filesystem type
@@ -408,6 +415,10 @@ create_partition() {
         BLANK1="108" # CM311-1a-YST: Must skip [ 108 MiB ]
         BOOT="512"   # A total of [ 1024 MiB ] can be used in this block, gave up [ 1024-512=512 MiB ]
         BLANK2="778" # Rootfs partition could be set after [ 1398 MiB ] of the total disk, Multi-backward offset 100 MiB, [ 1398-108-512=778 MiB ]
+    elif [[ "${boxid}" -eq "602" ]]; then
+        BLANK1="108" # ZTE W152D: Use the vendor cache window for FAT32.
+        BOOT="301"   # The partition ends at 408 MiB (BLANK1 + BOOT - 1).
+        BLANK2="871" # The root filesystem starts at 1280 MiB.
     elif [[ "${AMLOGIC_SOC}" == "s905l3b" ]]; then
         BLANK1="128" # https://github.com/janko888/MBH-M30xA
         BOOT="512"   # M302A/M304A, Compatible with Android 4 and Android 9 firmware
@@ -504,6 +515,16 @@ copy_bootfs() {
         sed -i "s|root=.*console=ttyAML0|root=${uenv_mount_string} console=ttyAML0|g" ${boot_extlinux_file}
         sed -i "s|meson.*.dtb|${FDTFILE}|g" ${boot_extlinux_file}
     }
+
+    if [[ "${BOARD:-}" == "w152d" ]]; then
+        BOOT_CONF="uEnv.txt"
+        cat >"${DIR_INSTALL}/uEnv.txt" <<EOF
+LINUX=/zImage
+INITRD=/uInitrd
+FDT=/dtb/amlogic/${FDTFILE}
+APPEND=root=${uenv_mount_string} rootwait console=ttyAML0,921600n8 net.ifnames=0
+EOF
+    fi
 
     # Copy u-boot.ext and u-boot.emmc
     if { [[ "${NEED_OVERLOAD}" == "yes" || "${auto_mainline_uboot}" == "yes" ]]; } &&
@@ -626,5 +647,8 @@ copy_bootfs
 # Copy rootfs partition files
 copy_rootfs
 
+if [[ "${BOARD:-}" == "w152d" ]]; then
+    echo -e "${INFO} Configure the vendor U-Boot to load /boot.scr from FAT32 on [ mmc 1:2 ] after the USB boot attempt."
+fi
 echo -e "${SUCCESS} Installation completed successfully. Run [ poweroff ], remove the installation media, then re-insert the power supply to boot the new system."
 exit 0
