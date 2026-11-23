@@ -4,7 +4,11 @@ After=network.target ssh.service ssh.socket
 
 [Service]
 Type=exec
-EnvironmentFile=/etc/default/armbian-front-panel
+Environment=POWER_READY=green:power
+Environment=POWER_BOOT=red:power
+Environment=LINK_UP=green:lan
+Environment=LINK_DOWN=red:lan
+Environment=INTERFACE=eth0
 ExecStart=/usr/libexec/armbian-front-panel
 Restart=on-failure
 RestartSec=3s

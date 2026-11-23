@@ -1,5 +1,0 @@
-POWER_READY=green:power
-POWER_BOOT=red:power
-LINK_UP=green:lan
-LINK_DOWN=red:lan
-INTERFACE=eth0

@@ -899,6 +899,14 @@ copy_files() {
     [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/. ${tag_bootfs}
     [[ -d "${different_rootfs}" ]] && cp -af --no-preserve=ownership ${different_rootfs}/. ${tag_rootfs}
 
+    if [[ "${board}" == "w152d" ]]; then
+        local fw_dir="${tag_rootfs}/usr/lib/firmware" fw_file
+        for fw_file in wcnmodem.bin wifi_56630001_3ant.ini; do
+            [[ -s "${fw_dir}/uwe5622_sc3255/${fw_file}" ]] || error_msg "Missing W152D firmware: ${fw_file}"
+            ln -sfn "uwe5622_sc3255/${fw_file}" "${fw_dir}/${fw_file}" || error_msg "Cannot link W152D firmware: ${fw_file}"
+        done
+    fi
+
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p "${tag_rootfs}/usr/lib/u-boot"
     [[ -n "${tag_rootfs}" && -d "${tag_rootfs}/usr/lib/u-boot" ]] && rm -rf "${tag_rootfs}/usr/lib/u-boot"/*
