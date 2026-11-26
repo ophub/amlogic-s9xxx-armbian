@@ -81,6 +81,7 @@ on:
           - h88k
           - h88k-v3
           - h96-max-m2
+          - h96-tvbox
           - hd9901
           - hk1-rbox-k8s
           - houzzkit-f1
