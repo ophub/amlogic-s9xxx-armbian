@@ -1,0 +1,117 @@
+# AIC POWERLIMIT 2025/0623/1700
+# Max tx power reference: Linux wireless regulatory database for CRDA
+# https://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git/tree/db.txt
+# If loss_value in aic_userconfig.txt is enabled, the power value in this document will be subtracted from loss_value in actual judgment
+
+# Table 1:
+##    2.4G, 20M,#6#
+##	START
+##        SRRC  FCC  ETSI  JP  KCC   UNSET
+CH01      16    14   14    16  16    15
+CH02      16    14   14    16  16    16
+CH03      16    14   14    16  16    16
+CH04      16    14   14    16  16    16
+CH05      16    14   14    16  16    16
+CH06      16    14   14    16  16    16
+CH07      16    14   14    16  16    16
+CH08      16    14   14    16  16    16
+CH09      16    14   14    16  16    16
+CH10      16    14   14    16  16    16
+CH11      16    14   14    16  16    16
+CH12      15    14   14    16  16    12
+CH13      13    14   14    16  16    12
+CH14      NA    NA   NA    16  NA    12
+##	END
+
+# Table 2:
+##	2.4G, 40M,#6#
+##	START
+##        SRRC  FCC  ETSI  JP  KCC  UNSET
+CH01      NA    NA   NA    NA  NA   NA
+CH02      NA    NA   NA    NA  NA   NA
+CH03      16    13   14    16  16   16
+CH04      16    13   14    16  16   16
+CH05      16    13   14    16  16   16
+CH06      16    13   14    16  16   16
+CH07      16    13   14    16  16   16
+CH08      16    13   14    16  16   16
+CH09      16    11   14    16  16   16
+CH10      16    11   14    16  16   16
+CH11      16    11   14    16  16   16
+CH12      NA    NA   NA    NA  NA   NA
+CH13      NA    NA   NA    NA  NA   NA
+CH14      NA    NA   NA    NA  NA   NA
+##	END
+
+# Table 3:
+##	5G, 20M,#6#
+##	START
+##        SRRC  FCC  ETSI  JP  KCC  UNSET
+# 5G Band 1
+CH36      15    16    16   16  16   15
+CH40      15    16    16   16  16   15
+CH44      15    16    16   16  16   15
+CH48      15    16    16   16  16   15
+# 5G Band 2
+CH52      15    16    16   16  16   15
+CH56      15    16    16   16  16   15
+CH60      15    16    16   16  16   15
+CH64      15    16    16   16  16   15
+# 5G Band 3
+CH100     NA    16    16   16  16   15
+CH104     NA    16    16   16  16   15
+CH108     NA    16    16   16  16   15
+CH112     NA    16    16   16  16   15
+CH116     NA    16    16   16  16   15
+CH120     NA    16    16   16  16   15
+CH124     NA    16    16   16  16   15
+CH128     NA    16    16   16  16   15
+CH132     NA    16    16   16  16   15
+CH136     NA    16    16   16  16   15
+CH140     NA    16    16   16  16   15
+CH144     NA    NA    16   16  16   15
+# 5G Band 4
+CH149     20    16    8    NA  20   11
+CH153     20    16    8    NA  20   11
+CH157     20    16    8    NA  20   11
+CH161     20    16    8    NA  20   11
+CH165     20    16    8    NA  20   11
+##	END
+
+# Table 4:
+##	5G, 40M,#6#
+##	START
+##        SRRC  FCC  ETSI  JP  KCC  UNSET
+# 5G Band 1
+CH38      15    16    16   16  20   15
+CH46      15    16    16   16  20   15
+# 5G Band 2
+CH54      15    16    16   16  20   15
+CH62      15    16    16   16  20   15
+# 5G Band 3
+CH102     NA    16    16   16  20   15
+CH110     NA    16    16   16  20   15
+CH118     NA    16    16   16  20   15
+CH126     NA    16    16   16  20   15
+CH134     NA    16    16   16  20   15
+CH142     NA    16    NA   16  20   15
+# 5G Band 4
+CH151     16    15    8    NA  18   11
+CH159     17    16    8    NA  17   11
+##	END
+
+# Table 5:
+##	5G, 80M,#6#
+##	START
+##        SRRC  FCC  ETSI  JP  KCC  UNSET
+# 5G Band 1
+CH42      15    16    16   16  20   15
+# 5G Band 2
+CH58      15    16    16   16  20   15
+# 5G Band 3
+CH106     NA    16    16   16  20   15
+CH122     NA    16    16   16  20   15
+CH138     NA    16    NA   NA  20   15
+# 5G Band 4
+CH155     15    14    8    NA  16   11
+##	END
