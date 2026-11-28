@@ -51,6 +51,7 @@ on:
           - chainedbox
           - cm3588-nas
           - crrc
+          - cx3566-z
           - dc-a588
           - dg3399
           - dg-nas-lite
