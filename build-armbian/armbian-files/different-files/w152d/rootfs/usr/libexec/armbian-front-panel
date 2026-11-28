@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+set_led() {
+    led="/sys/class/leds/$1/brightness"
+    [ -w "$led" ] || return 0
+    printf '%s\n' "$2" >"$led"
+}
+
+set_led "$POWER_BOOT" 0
+set_led "$POWER_READY" 1
+
+previous=
+while :; do
+    carrier=$(cat "/sys/class/net/$INTERFACE/carrier" 2>/dev/null) || carrier=0
+    if [ "$carrier" != "$previous" ]; then
+        if [ "$carrier" = 1 ]; then
+            set_led "$LINK_DOWN" 0
+            set_led "$LINK_UP" 1
+        else
+            set_led "$LINK_UP" 0
+            set_led "$LINK_DOWN" 1
+        fi
+        previous=$carrier
+    fi
+    sleep 1
+done

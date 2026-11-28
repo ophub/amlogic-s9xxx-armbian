@@ -1,0 +1,4 @@
+LINUX=/zImage
+INITRD=/uInitrd
+FDT=/dtb/amlogic/meson-gxlx4-w152d.dtb
+APPEND=root=LABEL=ROOTFS console=ttyAML0,921600n8 net.ifnames=0
