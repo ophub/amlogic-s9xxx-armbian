@@ -109,7 +109,7 @@ uboot_meson_g12b=("gtking.bin" "gtkingpro.bin" "gtkingpro-rev-a.bin" "s905x2-s92
 uboot_meson_sm1=("x96maxplus.bin" "ugoos-x3.bin" "tx3-qz.bin" "tx3-bz.bin" "skyworth-lb2004.bin" "s905x3.bin" "sei610.bin")
 uboot_meson_sc2=("s905x4.bin")
 uboot_meson_gxbb=("p201.bin" "s905.bin")
-
+uboot_meson_gxlx4=("s905x-s912.bin")
 # Initialize the build device
 build_board="all"
 # Set Armbian size (Unit: MiB, boot_mb >= 256, root_mb >= 2048)
@@ -899,14 +899,6 @@ copy_files() {
     [[ -d "${different_bootfs}" ]] && cp -rf ${different_bootfs}/. ${tag_bootfs}
     [[ -d "${different_rootfs}" ]] && cp -af --no-preserve=ownership ${different_rootfs}/. ${tag_rootfs}
 
-    if [[ "${board}" == "w152d" ]]; then
-        local fw_dir="${tag_rootfs}/usr/lib/firmware" fw_file
-        for fw_file in wcnmodem.bin wifi_56630001_3ant.ini; do
-            [[ -s "${fw_dir}/uwe5622_sc3255/${fw_file}" ]] || error_msg "Missing W152D firmware: ${fw_file}"
-            ln -sfn "uwe5622_sc3255/${fw_file}" "${fw_dir}/${fw_file}" || error_msg "Cannot link W152D firmware: ${fw_file}"
-        done
-    fi
-
     # Copy the bootloader files
     [[ -d "${tag_rootfs}/usr/lib/u-boot" ]] || mkdir -p "${tag_rootfs}/usr/lib/u-boot"
     [[ -n "${tag_rootfs}" && -d "${tag_rootfs}/usr/lib/u-boot" ]] && rm -rf "${tag_rootfs}/usr/lib/u-boot"/*
@@ -1282,6 +1274,14 @@ refactor_rootfs() {
     osc_file="usr/lib/systemd/profile.d/80-systemd-osc-context.sh"
     [[ -f "${osc_file}" ]] && {
         grep -q "SSH_CLIENT" "${osc_file}" || sed -i '/\[ "${TERM:-dumb}" = "dumb" \]/a [[ -n "${SSH_CLIENT}" || -n "${SSH_TTY}" ]] && return 0' "${osc_file}"
+    }
+
+    # Add w152d firmware
+    [[ "${board}" == "w152d" ]] && {
+        local fw_dir="${tag_rootfs}/usr/lib/firmware" fw_file
+        for fw_file in wcnmodem.bin wifi_56630001_3ant.ini; do
+            [[ -s "${fw_dir}/uwe5622_sc3255/${fw_file}" ]] && ln -sfn "uwe5622_sc3255/${fw_file}" "${fw_dir}/${fw_file}"
+        done
     }
 
     # Get random macaddr
